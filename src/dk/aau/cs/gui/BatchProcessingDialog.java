@@ -76,6 +76,7 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
@@ -99,7 +100,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "VerifyPN: Untimed engine";
-	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with over-approximation";
+	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with linear over-approximation";
 	private static final String name_verifyTAPNWithLegend = "A: "
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
@@ -134,6 +135,9 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
+	private static final String name_NONE_APPROXIMATION = "None";
+	private static final String name_OVER_APPROXIMATION = "Over-approximation";
+	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
 
 	//Tool tip strings
 	//Tool tips for model panel
@@ -159,6 +163,14 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_OOMLabel = null;
 	private final static String TOOL_TIP_OOMValue = "<html>Enter the maximum amount of available memory to the verification.<br>Verification is skipped as soon as it is detected that this amount of memory is exceeded.</html>";
 	private final static String TOOL_TIP_NoOOMCheckBox = "Choose whether to use memory restrictions";
+	private final static String TOOL_TIP_Approximation_method = null;
+	private final static String TOOL_TIP_Approximation_Method_Option_Keep = "Do not override the default approximation method.";
+	private final static String TOOL_TIP_Approximation_Method_Option_None = "No approximation method is used.";
+	private final static String TOOL_TIP_Approximation_Method_Option_Over = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
+	private final static String TOOL_TIP_Approximation_Method_Option_Under = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
+	private final static String TOOL_TIP_ApproximationDenominatorLabel = null;
+	private final static String TOOL_TIP_ApproximationDenominator = "Choose the approximation constant.";
+	private final static String TOOL_TIP_ApproximationDenominatorCheckbox = "Check to override the default approximation constant.";
 	
 	//Tool tips for monitor panel
 	private final static String TOOL_TIP_FileLabel = "Currently verified net";
@@ -211,6 +223,10 @@ public class BatchProcessingDialog extends JDialog {
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
+	private JComboBox approximationMethodOption;
+	private CustomJSpinner approximationDenominator;
+	private JCheckBox approximationDenominatorCheckbox;
+	
 	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			timeoutCurrentVerificationTask();
@@ -381,7 +397,6 @@ public class BatchProcessingDialog extends JDialog {
 		addFilesButton = new JButton("Add models");
 		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
 		addFilesButton.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent arg0) {
 				addFiles();
 			}
@@ -486,6 +501,7 @@ public class BatchProcessingDialog extends JDialog {
 		initCapacityComponents();
 		initTimeoutComponents();
 		initOOMComponents();
+		initApproximationMethodOptionsComponents();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -522,6 +538,92 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(queryPropertyOption, gbc);
+	}
+	
+	private void initApproximationMethodOptionsComponents() {
+		JLabel approximationLabel = new JLabel("Approximation method:");
+		approximationLabel.setToolTipText(TOOL_TIP_Approximation_method);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.VERTICAL;
+		gbc.gridx = 0;
+		gbc.gridy = 8;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
+		verificationOptionsPanel.add(approximationLabel, gbc);
+
+		String[] options = new String[] { 
+				name_KeepQueryOption,
+				name_NONE_APPROXIMATION,
+				name_OVER_APPROXIMATION,
+				name_UNDER_APPROXIMATION
+				};
+		approximationMethodOption = new JComboBox(options);
+		approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
+		approximationMethodOption.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (approximationMethodOption.getSelectedItem() == name_NONE_APPROXIMATION) {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_None);
+				} else if (approximationMethodOption.getSelectedItem() == name_OVER_APPROXIMATION) {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Over);
+				} else if (approximationMethodOption.getSelectedItem() == name_UNDER_APPROXIMATION) {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Under);
+				} else {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 1;
+		gbc.gridy = 8;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(approximationMethodOption, gbc);
+		
+		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");
+		approximationDenominatorLabel.setToolTipText(TOOL_TIP_ApproximationDenominatorLabel);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 9;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(approximationDenominatorLabel, gbc);
+
+		approximationDenominator = new CustomJSpinner(2, 1,Integer.MAX_VALUE);
+		approximationDenominator.setToolTipText(TOOL_TIP_ApproximationDenominator);
+		approximationDenominator.setMaximumSize(new Dimension(70, 30));
+		approximationDenominator.setMinimumSize(new Dimension(70, 30));
+		approximationDenominator.setPreferredSize(new Dimension(70, 30));
+		approximationDenominator.setEnabled(false);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 9;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 10);
+		verificationOptionsPanel.add(approximationDenominator, gbc);
+		
+		approximationDenominatorCheckbox = new JCheckBox("Do not override");
+		approximationDenominatorCheckbox.setToolTipText(TOOL_TIP_ApproximationDenominatorCheckbox);
+		approximationDenominatorCheckbox.setSelected(true);
+		approximationDenominatorCheckbox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (approximationDenominatorCheckbox.isSelected())
+					approximationDenominator.setEnabled(false);
+				else
+					approximationDenominator.setEnabled(true);
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 9;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(approximationDenominatorCheckbox, gbc);
 	}
 
 	private void initCapacityComponents() {
@@ -731,6 +833,7 @@ public class BatchProcessingDialog extends JDialog {
 			c.setEnabled(true);
 
 		numberOfExtraTokensInNet.setEnabled(!keepQueryCapacity.isSelected());
+		approximationDenominator.setEnabled(!approximationDenominatorCheckbox.isSelected());
 		timeoutValue.setEnabled(useTimeout());
 	}
 	
@@ -741,7 +844,7 @@ public class BatchProcessingDialog extends JDialog {
 				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
 				getSearchOption(), getSymmetryOption(), reductionOption,
 				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.useTimeDartsPTrie(), reductionOptionChooser.useTimeDarts(), 
-				reductionOptionChooser.usePTrie(), reductionOptionChooser.getChoosenOptions());
+				reductionOptionChooser.usePTrie(), getApproximationMethodOption(), getApproximationDenominator(), reductionOptionChooser.getChoosenOptions());
 	}
 
 	private int getNumberOfExtraTokens() {
@@ -759,12 +862,28 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private QueryPropertyOption getQueryPropertyOption() {
-		String propertyOptionString = (String) queryPropertyOption
-				.getSelectedItem();
+		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
 		if (propertyOptionString.equals(name_SEARCHWHOLESTATESPACE))
 			return QueryPropertyOption.SearchWholeStateSpace;
 		else
 			return QueryPropertyOption.KeepQueryOption;
+	}
+	
+	private ApproximationMethodOption getApproximationMethodOption() {
+		String ApproximationMethodOptionString = (String) approximationMethodOption.getSelectedItem();
+		if(ApproximationMethodOptionString.equals(name_OVER_APPROXIMATION)) {
+			return ApproximationMethodOption.OverApproximation;
+		} else if (ApproximationMethodOptionString.equals(name_UNDER_APPROXIMATION)) {
+			return ApproximationMethodOption.UnderApproximation;
+		} else if (ApproximationMethodOptionString.equals(name_NONE_APPROXIMATION)) {
+			return ApproximationMethodOption.None;
+		} else {
+			return ApproximationMethodOption.KeepQueryOption;
+		}
+	}
+	
+	private int getApproximationDenominator() {
+		return (approximationDenominatorCheckbox.isSelected()) ? 0 : (Integer) approximationDenominator.getValue();
 	}
 
 	private void initSearchOptionsComponents() {
@@ -1103,8 +1222,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void process() {
 		tableModel.clear();
-		currentWorker = new BatchProcessingWorker(files, tableModel,
-				getVerificationOptions());
+		currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
 		currentWorker.addPropertyChangeListener(new PropertyChangeListener() {
 
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -1444,6 +1562,19 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(name_SEARCHWHOLESTATESPACE);
 			else
 				s.append(query.getProperty().toString());
+			
+			s.append("\n\n");
+			s.append("Approximation method: ");
+			if (query.isOverApproximationEnabled()) {
+				s.append(name_OVER_APPROXIMATION);
+			} else if (query.isUnderApproximationEnabled()) {
+				s.append(name_UNDER_APPROXIMATION);
+			} else {
+				s.append(name_NONE_APPROXIMATION);
+			}
+			s.append("\n");
+			s.append("Approximation Constant: ");
+			s.append(query.approximationDenominator());
 
 			return s.toString();
 		}

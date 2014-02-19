@@ -6,9 +6,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.TimedPlace.PlaceType;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 public class LocalTimedPlace  extends TimedPlace {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -19,6 +21,8 @@ public class LocalTimedPlace  extends TimedPlace {
 	private TimedArcPetriNet model;
 	private TimedMarking currentMarking;
 	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
+	
+	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
 
 	public LocalTimedPlace(String name) {
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
@@ -183,5 +187,68 @@ public class LocalTimedPlace  extends TimedPlace {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	public Tuple<PlaceType, Integer> extrapolate(){
+		if(extrapolation.value2() > -2)	return extrapolation;
+		
+		PlaceType type = PlaceType.Dead;
+		int cmax = -1;
+		
+		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
+		
+		if(invariant != TimeInvariant.LESS_THAN_INFINITY){
+			cmax = Math.max(cmax, invariant.upperBound().value());
+		}
+		
+		// Invariant place
+		if(cmax > -1){
+			extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
+			return new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Invariant, cmax);
+		}
+		
+		
+		for(TimedInputArc arc : model.inputArcs()){
+			if(!arc.source().equals(this))	continue;
+			if(!arc.interval().upperBound().equals(Bound.Infinity)){
+				cmax = Math.max(cmax, arc.interval().upperBound().value());
+			}else if(arc.interval().lowerBound().value() > 0){
+				cmax = Math.max(cmax, arc.interval().lowerBound().value());
+			}
+			
+			if(type == PlaceType.Dead && arc.interval().upperBound().equals(Bound.Infinity)){
+				type = PlaceType.Standard;
+			}
+			
+			extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
+		}
+		
+		for(TransportArc arc : model.transportArcs()){
+			if(!arc.source().equals(this))	continue;
+			if(!arc.interval().upperBound().equals(Bound.Infinity)){
+				cmax = Math.max(cmax, arc.interval().upperBound().value());
+			}else if(arc.interval().lowerBound().value() > 0){
+				cmax = Math.max(cmax, arc.interval().lowerBound().value());
+			}
+			
+			if(type == PlaceType.Dead && arc.interval().upperBound().equals(Bound.Infinity)){
+				type = PlaceType.Standard;
+			}
+			
+			Tuple<PlaceType, Integer> other = arc.source().extrapolate();
+			if(other.value2() > cmax){
+				cmax = other.value2();
+			}
+			
+			if(type == PlaceType.Dead && arc.interval().upperBound().equals(Bound.Infinity)){
+				type = PlaceType.Standard;
+			}
+			
+			extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
+		}
+		
+		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
+		
+		return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 	}
 }

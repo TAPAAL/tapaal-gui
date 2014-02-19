@@ -1,10 +1,12 @@
 package dk.aau.cs.TCTL.visitors;
 
+import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
@@ -12,7 +14,10 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 
@@ -122,6 +127,26 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	
 	public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) {
 		uppaalQuery.append(tctlDeadLockNode.toString());
+	}
+	
+	public void visit(AritmeticOperator aritmeticOperator, Object context){
+		throw new RuntimeException("The UPPAAL translations does not yet support advanced querires");
+	}
+
+	public void visit(TCTLPlusListNode tctlPlusListNode, Object context){
+		throw new RuntimeException("The UPPAAL translations does not yet support advanced querires");
+	}
+
+	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
+		throw new RuntimeException("The UPPAAL translations does not yet support advanced querires");
+	}
+
+	public void visit(TCTLConstNode tctlConstNode, Object context){
+		throw new RuntimeException("The UPPAAL translations does not yet support advanced querires");
+	}
+
+	public void visit(TCTLTermListNode tctlTermListNode, Object context){
+		throw new RuntimeException("The UPPAAL translations does not yet support advanced querires");
 	}
 
 	protected String operatorConversion(String op) {

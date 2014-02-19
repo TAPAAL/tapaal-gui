@@ -23,9 +23,12 @@ public class SimplifyPropositionsVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
+		//TODO Evaluate the preposition to determine if its always satisfied / not satisfied  
+		/*
 		if(atomicPropositionNode.getOp().equals(">=") && atomicPropositionNode.getN() == 0)
 			truePropositions.add(atomicPropositionNode);
 		else if(atomicPropositionNode.getOp().equals("<") && atomicPropositionNode.getN() == 0)
 			falsePropositions.add(atomicPropositionNode);
+		*/
 	}
 }

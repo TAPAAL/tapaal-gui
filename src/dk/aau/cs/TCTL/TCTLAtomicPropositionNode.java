@@ -2,27 +2,26 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-// atomic propositions are of the form: <place_name> <operator> n,
-// where <operator> = {<, <=, =, >=, >}
 public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
-	// TODO: make this more object oriented, i.e. use something like TAPNPlace
-	// instead of String for places.
-	private String template;
-	private String place;
+	private TCTLAbstractStateProperty left;
+	private TCTLAbstractStateProperty right;
 	private String op;
-	private int n;
 
-	public String getPlace() {
-		return place;
+	public TCTLAbstractStateProperty getLeft() {
+		return left;
 	}
 
-	public String getTemplate() {
-		return template;
+	public void setLeft(TCTLAbstractStateProperty left) {
+		this.left = left;
+	}
+	
+	public TCTLAbstractStateProperty getRight() {
+		return right;
 	}
 
-	public void setPlace(String place) {
-		this.place = place;
+	public void setRight(TCTLAbstractStateProperty right) {
+		this.right = right;
 	}
 
 	public String getOp() {
@@ -33,30 +32,15 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		this.op = op;
 	}
 
-	public int getN() {
-		return n;
-	}
-
-	public void setN(int n) {
-		this.n = n;
-	}
-
-	public TCTLAtomicPropositionNode(String place, String op, int n) {
-		this("", place, op, n);
-	}
-
-	public TCTLAtomicPropositionNode(String template, String place, String op,
-			int n) {
-		this.template = template;
-		this.place = place;
+	public TCTLAtomicPropositionNode(TCTLAbstractStateProperty left, String op, TCTLAbstractStateProperty right) {
+		this.left = left;
 		this.op = op;
-		this.n = n;
-
+		this.right = right;
 	}
-
+	
 	@Override
 	public TCTLAbstractStateProperty copy() {
-		return new TCTLAtomicPropositionNode(template, place, op, n);
+		return new TCTLAtomicPropositionNode(left, op, right);
 	}
 
 	@Override
@@ -65,9 +49,8 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) o;
 			// TODO: Not sure if this is intentional but this is reference
 			// equals and not equality
-			return template.equals(node.template)
-					&& place.equals(node.getPlace()) && op.equals(node.getOp())
-					&& n == node.getN();
+			return left.equals(node.left)
+					&& right.equals(node.right) && op.equals(node.getOp());
 		}
 		return false;
 	}
@@ -86,9 +69,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public String toString() {
-		String value = place + "" + op + "" + n;
-		return (template == null || template.isEmpty()) ? value : template + "."
-				+ value;
+		return left + " " + op + " " + right;
 	}
 
 	@Override
@@ -99,25 +80,25 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public boolean containsPlaceHolder() {
-		return false;
+		return left.containsPlaceHolder() || right.containsPlaceHolder();
 	}
 
 	@Override
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		return place.equals(placeName);
+		return left.containsAtomicPropWithSpecificPlace(placeName) || 
+				right.containsAtomicPropWithSpecificPlace(placeName);
 	}
 
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
-		return null;
+		TCTLAbstractProperty rightP = right.findFirstPlaceHolder(); 
+		
+		return rightP == null ? left.findFirstPlaceHolder() : rightP;
 	}
 
-	public void setTemplate(String string) {
-		template = string;
-	}
-	
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
-		return template.equals(templateName) && place.equals(placeName);
+		return right.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName) ||
+				left.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
 
 }

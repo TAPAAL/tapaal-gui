@@ -65,6 +65,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 
@@ -138,7 +139,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
 					
 					if (batchProcessingVerificationOptions.isReductionOptionUserdefined()){
-						processQueryForUserdefinedReductions(file,composedModel, queryToVerify);
+						processQueryForUserdefinedReductions(file, composedModel, queryToVerify);
 					} else {
 						processQuery(file, composedModel, queryToVerify);
 					}
@@ -247,8 +248,24 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
+			boolean overApproximation = query.isOverApproximationEnabled();
+			boolean underApproximation = query.isUnderApproximationEnabled();
+			int approximationDenominator = query.approximationDenominator();
+			if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.None) {
+				overApproximation = false;
+				underApproximation = false;
+			} else if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.OverApproximation) {
+				overApproximation = true;
+				underApproximation = false;
+			} else if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.UnderApproximation) {
+				overApproximation = false;
+				underApproximation = true;
+			}
+			if (batchProcessingVerificationOptions.approximationDenominator() != 0) {
+				approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
+			}
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, true, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, true, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
 			
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());

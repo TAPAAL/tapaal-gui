@@ -1,42 +1,26 @@
 package dk.aau.cs.approximation;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.swing.JOptionPane;
-
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
-import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.UnsupportedModelException;
-import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerificationResult;
-import dk.aau.cs.verification.UPPAAL.UppaalExporter;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
-import pipe.gui.MessengerImpl;
-import pipe.gui.widgets.QueryDialog;
 
 public class OverApproximation implements ITAPNApproximation {
 	@Override
@@ -203,7 +187,7 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		TCTLAbstractProperty topNode = query.getProperty();
-		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(blockPlace.name(), "=", 1);
+		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(new TCTLPlaceNode("", blockPlace.name()), "=", new TCTLConstNode(1));
 		
 		if(topNode instanceof TCTLEFNode)
 		{
@@ -254,18 +238,7 @@ public class OverApproximation implements ITAPNApproximation {
 		
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
-		}
-				
-		
-		PrintStream modelStream;
-		try {
-			modelStream = new PrintStream(new File("C:\\Users\\Sine\\Documents\\Universitet\\test.xml"));
-			outputModel(net, modelStream);  
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-            
+		}           
 	}
 	
 	public static HashMap<String,String> reverseNameMapping(HashMap<String,Tuple<String,String>> map) {
@@ -274,106 +247,5 @@ public class OverApproximation implements ITAPNApproximation {
 		    newMap.put(entry.getValue().value2(), entry.getKey());
 		}
 		return newMap;
-	}
-	
-	
-	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
-		modelStream.append("<pnml>\n");
-		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
-		
-		for(TimedPlace p : model.places())
-			outputPlace(p, modelStream);
-		
-		for(TimedTransition t : model.transitions())
-			outputTransition(t,modelStream);
-		
-		for(TimedInputArc inputArc : model.inputArcs())
-			outputInputArc(inputArc, modelStream);
-		
-		for(TimedOutputArc outputArc : model.outputArcs())
-			outputOutputArc(outputArc, modelStream);
-		
-		for(TransportArc transArc : model.transportArcs())
-			outputTransportArc(transArc, modelStream);
-		
-		for(TimedInhibitorArc inhibArc : model.inhibitorArcs())
-			outputInhibitorArc(inhibArc, modelStream);
-		
-		modelStream.append("</net>\n");
-		modelStream.append("</pnml>");
-	}
-	
-	private void outputPlace(TimedPlace p, PrintStream modelStream) {
-		modelStream.append("<place ");
-		
-		modelStream.append("id=\"" + p.name() + "\" ");
-		modelStream.append("name=\"" + p.name() + "\" ");
-		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
-		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
-		
-		modelStream.append("/>\n");
-	}
-
-	private void outputTransition(TimedTransition t, PrintStream modelStream) {
-		modelStream.append("<transition ");
-		
-		modelStream.append("id=\"" + t.name() + "\" ");
-		modelStream.append("name=\"" + t.name() + "\" ");
-		modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
-		
-		modelStream.append("/>");
-	}
-
-	protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
-		modelStream.append("<inputArc ");
-		
-		modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
-		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
-		modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
-		if(inputArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
-		}
-		
-		modelStream.append("/>\n");
-	}
-
-	protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
-		modelStream.append("<outputArc ");
-		
-		modelStream.append("inscription=\"1\" " );
-		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
-		modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
-		if(outputArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
-		}
-		
-		modelStream.append("/>\n");
-	}
-
-	protected void outputTransportArc(TransportArc transArc, PrintStream modelStream) {
-		modelStream.append("<transportArc ");
-		
-		modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
-		modelStream.append("source=\"" + transArc.source().name() + "\" ");
-		modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
-		modelStream.append("target=\"" + transArc.destination().name() + "\" ");
-		if(transArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
-		}
-		
-		modelStream.append("/>\n");
-	}
-
-	protected void outputInhibitorArc(TimedInhibitorArc inhibArc,	PrintStream modelStream) {
-		modelStream.append("<inhibitorArc ");
-		
-		modelStream.append("inscription=\"" + inhibArc.interval().toString(false).replace("<", "&lt;") + "\" ");
-		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
-		modelStream.append("target=\"" + inhibArc.destination().name() + "\" ");
-		if(inhibArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + inhibArc.getWeight().nameForSaving(false) + "\"");
-		}
-		
-		modelStream.append("/>\n");
 	}
 }

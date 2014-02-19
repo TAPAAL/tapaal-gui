@@ -3,6 +3,8 @@ package dk.aau.cs.TCTL.visitors;
 import java.util.Hashtable;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 
@@ -26,10 +28,15 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
 			Object context) {
+		assert(atomicPropositionNode.getRight() instanceof TCTLPlaceNode && atomicPropositionNode.getLeft() instanceof TCTLConstNode):
+			"The " + getClass().getCanonicalName() + " cannot translate this query, as the prepositions are too complex";
+		TCTLPlaceNode placeNode = (TCTLPlaceNode) atomicPropositionNode.getLeft();
+		TCTLConstNode constNode = (TCTLConstNode) atomicPropositionNode.getRight();
+		
 		boolean timed = true;
 		for (TimedPlace p : model.places()){
 			if (!placeNameToTimed.get(p.name())){
-				if (atomicPropositionNode.getPlace().equals(p.name())){
+				if (placeNode.getPlace().equals(p.name())){
 					timed=false;
 				}
 			}
@@ -41,20 +48,20 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 				append(")");
 				append(TOKEN_TEMPLATE_NAME);
 				append("(i).");
-				append(atomicPropositionNode.getPlace());
+				append(placeNode.getPlace());
 				append(") ");
 				append(operatorConversion(atomicPropositionNode.getOp()));
 				append(" ");
-				append(atomicPropositionNode.getN());
+				append(constNode.getConstant());
 			} else if (totalTokens == 0) {
 				append("(");
 				append(TOKEN_TEMPLATE_NAME);
 				append(".");
-				append(atomicPropositionNode.getPlace());
+				append(placeNode.getPlace());
 				append(") ");
 				append(operatorConversion(atomicPropositionNode.getOp()));
 				append(" ");
-				append(atomicPropositionNode.getN());
+				append(constNode.getConstant());
 			} else {
 				append("(");
 				for (int i = 0; i < totalTokens; i++) {
@@ -65,19 +72,19 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 					append(TOKEN_TEMPLATE_NAME);
 					append(i);
 					append(".");
-					append(atomicPropositionNode.getPlace());
+					append(placeNode.getPlace());
 				}
 				append(") ");
 				append(operatorConversion(atomicPropositionNode.getOp()));
 				append(" ");
-				append(atomicPropositionNode.getN());
+				append(constNode.getConstant());
 			}
 		} else {
 			append("X_");
-			append(atomicPropositionNode.getPlace());
+			append(placeNode.getPlace());
 			append(operatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
-			append(atomicPropositionNode.getN());		
+			append(constNode.getConstant());		
 		}
 	}
 

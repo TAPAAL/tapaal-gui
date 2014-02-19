@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.TCTL.visitors.ContainsAtomicPropWithSharedPlaceVisitor;
+import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.gui.undo.Command;
@@ -189,7 +189,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private Collection<TAPNQuery> findAffectedQueries(SharedPlace sharedPlace) {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
-		ContainsAtomicPropWithSharedPlaceVisitor visitor = new ContainsAtomicPropWithSharedPlaceVisitor(sharedPlace.name());
+		ContainsSharedPlaceVisitor visitor = new ContainsSharedPlaceVisitor(sharedPlace.name());
 
 		for(TAPNQuery query : tab.queries()){
 			BooleanResult result = new BooleanResult();

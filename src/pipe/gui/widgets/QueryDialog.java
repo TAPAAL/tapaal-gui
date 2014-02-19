@@ -85,6 +85,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
@@ -92,6 +93,7 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -339,6 +341,12 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
+	
+	//Tool tips for approximation panel
+	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
+	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
+	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
+	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
@@ -632,18 +640,23 @@ public class QueryDialog extends JPanel {
 	private void updateQueryButtonsAccordingToSelection() {
 		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
-
+			if(!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode)){
+				return;
+			}
+			TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+			TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+			
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
 			// because a different atomic proposition was selected
 			userChangedAtomicPropSelection = false;
-			if(node.getTemplate().equals(""))
+			if(placeNode.getTemplate().equals(""))
 				templateBox.setSelectedItem(SHARED);
 			else
-				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
-			placesBox.setSelectedItem(node.getPlace());
+				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
+			placesBox.setSelectedItem(placeNode.getPlace());
 			relationalOperatorBox.setSelectedItem(node.getOp());
-			placeMarking.setValue(node.getN());
+			placeMarking.setValue(placeMarkingNode.getConstant());
 			userChangedAtomicPropSelection = true;
 		} else if (currentSelection.getObject() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
@@ -944,10 +957,9 @@ public class QueryDialog extends JPanel {
 			Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
 			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-					template,
-					(String) placesBox.getSelectedItem(),
+					new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
 					(String) relationalOperatorBox.getSelectedItem(),
-					(Integer) placeMarking.getValue());
+					new TCTLConstNode((Integer) placeMarking.getValue()));
 			if (!property.equals(currentSelection.getObject())) {
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
@@ -1759,10 +1771,9 @@ public class QueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 				TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-						template,
-						(String) placesBox.getSelectedItem(),
+						new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
 						(String) relationalOperatorBox.getSelectedItem(),
-						(Integer) placeMarking.getValue());
+						new TCTLConstNode((Integer) placeMarking.getValue()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
@@ -2125,17 +2136,17 @@ public class QueryDialog extends JPanel {
 		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Approximation Options"));
 		approximationRadioButtonGroup = new ButtonGroup();
 		
-		noApproximationEnable = new JRadioButton("No approximation method");
+		noApproximationEnable = new JRadioButton("Exact analysis");
 		noApproximationEnable.setVisible(true);
-		noApproximationEnable.setToolTipText("Enable over-approximation");
+		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
 		
-		overApproximationEnable = new JRadioButton("Enable over-approximation");
+		overApproximationEnable = new JRadioButton("Over-approximation");
 		overApproximationEnable.setVisible(true);
-		overApproximationEnable.setToolTipText("Enable over-approximation");
+		overApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
 		
-		underApproximationEnable = new JRadioButton("Enable under-approximation");
+		underApproximationEnable = new JRadioButton("Under-approximation");
 		underApproximationEnable.setVisible(true);
-		underApproximationEnable.setToolTipText("Enable under-approximation");
+		underApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_UNDER);
 
 		approximationRadioButtonGroup.add(noApproximationEnable);
 		approximationRadioButtonGroup.add(overApproximationEnable);
@@ -2146,15 +2157,18 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		
+		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
+		
 		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
-		overApproximationDenominator.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
+		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
 		
 		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(approximationDenominatorLabel, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
 	
 		gridBagConstraints = new GridBagConstraints();

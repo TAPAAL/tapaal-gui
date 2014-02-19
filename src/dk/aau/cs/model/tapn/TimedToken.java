@@ -60,7 +60,7 @@ public class TimedToken {
 		result = prime * result + ((place == null) ? 0 : place.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -73,8 +73,9 @@ public class TimedToken {
 		if (age == null) {
 			if (other.age != null)
 				return false;
-		} else if (age.compareTo(other.age) != 0)
+		} else if (age.compareTo(other.age) != 0){
 			return false;
+		}
 		if (place == null) {
 			if (other.place != null)
 				return false;
