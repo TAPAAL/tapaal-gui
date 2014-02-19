@@ -12,6 +12,10 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 		this.place = place;
 	}
 
+	public TCTLPlaceNode(String place) {
+		this("", place);
+	}
+
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
 			TCTLAbstractProperty object2) {
