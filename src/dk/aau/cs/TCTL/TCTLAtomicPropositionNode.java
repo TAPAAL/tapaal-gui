@@ -40,7 +40,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	
 	@Override
 	public TCTLAbstractStateProperty copy() {
-		return new TCTLAtomicPropositionNode(left, op, right);
+		return new TCTLAtomicPropositionNode(left.copy(), op, right.copy());
 	}
 
 	@Override
