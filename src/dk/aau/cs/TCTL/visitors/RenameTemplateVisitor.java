@@ -8,7 +8,7 @@ public class RenameTemplateVisitor extends VisitorBase {
 	private final String newName;
 
 	public RenameTemplateVisitor(String oldName, String newName){
-		Require.that(oldName != null && !oldName.isEmpty(), "oldName cannot be null or empty");
+		//Require.that(oldName != null && !oldName.isEmpty(), "oldName cannot be null or empty");
 		Require.that(newName != null && !newName.isEmpty(), "newName cannot be null or empty");
 		this.oldName = oldName;
 		this.newName = newName;

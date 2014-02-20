@@ -66,13 +66,13 @@ TOKEN :
 
 TOKEN :
 {
-	<EF: "E *F">
+	<EF: "E"(" ")*"F">
 	|
-	<EG: "E *G">
+	<EG: "E"(" ")*"G">
 	|
-	<AF: "A *F">
+	<AF: "A"(" ")*"F">
 	|
-	<AG: "A *G">
+	<AG: "A"(" ")*"G">
 }
 
 TOKEN :
