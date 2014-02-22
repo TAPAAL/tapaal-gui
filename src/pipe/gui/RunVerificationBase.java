@@ -67,7 +67,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			if(!verifypn.setup()){
 				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 			}else{
-				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true), transformedModel, clonedQuery);
+				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true, false), transformedModel, clonedQuery);
 				if(!overapprox_result.error() && (
 						(query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
 						(query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
