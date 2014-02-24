@@ -27,7 +27,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append(" -m 0 ");	// Disable memory limit to ensure similar behaviour to other engines
 		result.append(searchMap.get(searchOption));
 		result.append(useOverApproximation()? "":" -d ");	// Disable over-approximation if disabled
-		result.append(useReduction()? " -r ":"");
+		result.append(useReduction()? " -r 1 ":"");
 		return result.toString();
 	}
 
