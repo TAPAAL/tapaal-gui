@@ -10,11 +10,11 @@ import pipe.gui.widgets.InclusionPlaces;
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
-	private boolean useReduction;
+	private ModelReduction modelReduction;
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useReduction) {
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces());
-		this.useReduction = useReduction;
+		this.modelReduction = modelReduction;
 	}
 
 	@Override
@@ -27,7 +27,19 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append(" -m 0 ");	// Disable memory limit to ensure similar behaviour to other engines
 		result.append(searchMap.get(searchOption));
 		result.append(useOverApproximation()? "":" -d ");	// Disable over-approximation if disabled
-		result.append(useReduction()? " -r ":"");
+		switch(getModelReduction()){
+		case AGGRESSIVE:
+			result.append(" -r 1 ");
+			break;
+		case NO_REDUCTION:
+			break;
+		case BOUNDPRESERVING:
+			result.append(" -r 2 ");
+			break;
+		default:
+			break;
+			
+		}
 		return result.toString();
 	}
 
@@ -50,7 +62,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		return map;
 	}
 	
-	public boolean useReduction(){
-		return useReduction;
+	public ModelReduction getModelReduction(){
+		return modelReduction;
 	}
 }
