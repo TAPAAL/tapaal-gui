@@ -141,6 +141,14 @@ public class VerificationResult<TTrace> {
 		return queryResult.toString();
 	}
 	
+	public String getReductionResultAsString(){
+		ReductionStats reductionStats = stats.getReductionStats();
+		if(reductionStats == null){
+			return "";
+		}
+		return reductionStats.toString();
+	}
+	
 	public NetworkMarking getCoveredMarking(TimedArcPetriNetNetwork model){
 		
 		if(stats.getCoveredMarking() == null)	return null;

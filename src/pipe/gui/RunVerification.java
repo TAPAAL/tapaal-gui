@@ -262,6 +262,21 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
 			}
+			
+			if(!result.getReductionResultAsString().isEmpty()){
+				JButton reductionStatsButton = new JButton("Reduction Statistics");
+				reductionStatsButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						JOptionPane.showMessageDialog(panel,result.getReductionResultAsString() , "Reduction Statistics", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+				gbc = new GridBagConstraints();
+				gbc.gridx = 0;
+				gbc.gridy = 5;
+				gbc.insets = new Insets(10,0,10,0);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(reductionStatsButton, gbc);
+			}
 		}
 		
 		if(result.isOverApproximationResult()){
@@ -296,7 +311,7 @@ public class RunVerification extends RunVerificationBase {
 				&& modelChecker.useDiscreteSemantics()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = modelChecker.supportsStats() ? 5 : 4;
+			gbc.gridy = 10;
 			gbc.gridwidth = 2;
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);
