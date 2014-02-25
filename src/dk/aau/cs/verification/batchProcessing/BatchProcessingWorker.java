@@ -184,7 +184,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		query = query.copy();
 		query.setDiscreteInclusion(false);
 		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN) { continue; }
+			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN || r == ReductionOption.VerifyPNReduce) { continue; }
 			if(exiting()) return;
 			query = query.copy();
 			query.setReductionOption(r);
@@ -196,6 +196,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			query = query.copy();
 			query.setReductionOption(ReductionOption.VerifyPN);
 			query.setUseOverApproximation(false);
+			query.setUseReduction(false);
 			processQuery(file, composedModel, query);
 		}
 		
@@ -203,6 +204,15 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			query = query.copy();
 			query.setReductionOption(ReductionOption.VerifyPNApprox);
 			query.setUseOverApproximation(true);
+			query.setUseReduction(false);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyPNReduce)){
+			query = query.copy();
+			query.setReductionOption(ReductionOption.VerifyPNReduce);
+			query.setUseOverApproximation(false);
+			query.setUseReduction(true);
 			processQuery(file, composedModel, query);
 		}
 	}
@@ -337,7 +347,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return getVerifyTAPN();
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
 			return getVerifyTAPNDiscreteVerification();
-		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
+		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
 			return getVerifyPN();
 		else
 			return getVerifyta();
@@ -348,8 +358,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
 			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
-		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
-			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), false);
+		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
+			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction());
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false);
 	}

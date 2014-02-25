@@ -100,6 +100,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "VerifyPN: Untimed engine";
 	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with over-approximation";
+	private static final String name_UNTIMED_REDUCE = "VerifyPN: Untimed engine, with net reduction";
 	private static final String name_verifyTAPNWithLegend = "A: "
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
@@ -126,6 +127,8 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_UNTIMED;
 	private static final String name_UNTIMED_APPROXWithLegend = "M: "
 			+ name_UNTIMED_APPROX;
+	private static final String name_UNTIMED_REDUCEWithLegend = "N: "
+			+ name_UNTIMED_REDUCE;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
@@ -1480,8 +1483,10 @@ public class BatchProcessingDialog extends JDialog {
 					} else {
 						s.append(name_verifyTAPNDiscreteVerificationNone);
 					}
-				} else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox){
-					if(query.useOverApproximation())
+				} else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce){
+					if(query.useReduction())
+						s.append(name_UNTIMED_REDUCE);
+					else if(query.useOverApproximation())
 						s.append(name_UNTIMED_APPROX);
 					else
 						s.append(name_UNTIMED);
@@ -1595,6 +1600,7 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox BROADCASTDEG2;
 		private JCheckBox UNTIMED;
 		private JCheckBox UNTIMEDAPPROX;
+		private JCheckBox UNTIMEDREDUCE;
 		
 		JButton selectAll;
 		JButton deselectAll;
@@ -1712,6 +1718,9 @@ public class BatchProcessingDialog extends JDialog {
 			UNTIMEDAPPROX = new JCheckBox(name_UNTIMED_APPROXWithLegend);
 			UNTIMEDAPPROX.setEnabled(false);
 			
+			UNTIMEDREDUCE = new JCheckBox(name_UNTIMED_REDUCEWithLegend);
+			UNTIMEDREDUCE.setEnabled(false);
+			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 0;
@@ -1799,9 +1808,16 @@ public class BatchProcessingDialog extends JDialog {
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 12;
-			gbc.insets = new Insets(0, 5, 5	, 5);
+			gbc.insets = new Insets(0, 5, 0	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(UNTIMEDAPPROX, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 13;
+			gbc.insets = new Insets(0, 5, 5	, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(UNTIMEDREDUCE, gbc);
 		}
 
 		private void initLeftPanel() {
@@ -1864,6 +1880,7 @@ public class BatchProcessingDialog extends JDialog {
 			BROADCASTDEG2.setEnabled(override);
 			UNTIMED.setEnabled(override);
 			UNTIMEDAPPROX.setEnabled(override);
+			UNTIMEDREDUCE.setEnabled(override);
 			verifyTAPNDiscreteVerificationTimeDartPTrie.setEnabled(override);
 			verifyTAPNDiscreteVerificationTimeDart.setEnabled(override);
 			verifyTAPNDiscreteVerificationPTrie.setEnabled(override);
@@ -1882,6 +1899,7 @@ public class BatchProcessingDialog extends JDialog {
 			BROADCASTDEG2.setSelected(selected);
 			UNTIMED.setSelected(selected);
 			UNTIMEDAPPROX.setSelected(selected);
+			UNTIMEDREDUCE.setSelected(selected);
 			verifyTAPNDiscreteVerificationTimeDartPTrie.setSelected(selected);
 			verifyTAPNDiscreteVerificationTimeDart.setSelected(selected);
 			verifyTAPNDiscreteVerificationPTrie.setSelected(selected);
@@ -1916,6 +1934,9 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			if(UNTIMEDAPPROX.isSelected()){
 				result.add(ReductionOption.VerifyPNApprox);
+			}
+			if(UNTIMEDREDUCE.isSelected()){
+				result.add(ReductionOption.VerifyPNReduce);
 			}
 			return result;
 		}

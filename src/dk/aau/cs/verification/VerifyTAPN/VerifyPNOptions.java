@@ -16,6 +16,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces());
 		this.modelReduction = modelReduction;
 	}
+	
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction) {
+		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION);
+	}
 
 	@Override
 	public String toString() {
