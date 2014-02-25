@@ -296,8 +296,6 @@ Printable, DrawingSurface {
 			app.validate();
 			doSetViewPosition = false;
 		}
-		revalidate();
-		repaint();
 	}
 
 	public void updatePreferredSize() {
