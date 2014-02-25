@@ -257,7 +257,7 @@ public class RunVerification extends RunVerificationBase {
 				});
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 4;
+				gbc.gridy = 2;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
@@ -272,7 +272,7 @@ public class RunVerification extends RunVerificationBase {
 				});
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 5;
+				gbc.gridy = 3;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsButton, gbc);
@@ -282,7 +282,7 @@ public class RunVerification extends RunVerificationBase {
 		if(result.isOverApproximationResult()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 1;
+			gbc.gridy = 4;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel(toHTML("The query was resolved using the over-approximation.")), gbc);
@@ -290,14 +290,14 @@ public class RunVerification extends RunVerificationBase {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 5;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 6;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
