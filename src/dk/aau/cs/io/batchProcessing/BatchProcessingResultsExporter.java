@@ -15,7 +15,7 @@ public class BatchProcessingResultsExporter {
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "D: TAPAAL Engine - Discrete Verification, Time darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "E: TAPAAL Engine - Discrete Verification, PTries";
 	private static final String name_verifyTAPNDiscreteVerificationNone = "F: TAPAAL Engine - Discrete Verification, No optimizations";
-	private static final String name_COMBI = "G: UPPAAL: Combi Reduction";
+	private static final String name_COMBI = "G: UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_STANDARD = "H: UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "I: UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "J: UPPAAL: Broadcast Reduction";

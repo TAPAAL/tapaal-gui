@@ -93,7 +93,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Engine - Discrete Verification, Time darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Engine - Discrete Verification, PTries";
 	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Engine - Discrete Verification, No optimizations";
-	private static final String name_COMBI = "UPPAAL: Combi Reduction";
+	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
