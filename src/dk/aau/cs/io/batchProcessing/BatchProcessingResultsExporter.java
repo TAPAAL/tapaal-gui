@@ -9,19 +9,19 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 public class BatchProcessingResultsExporter {
-	private static final String name_verifyTAPN = "A: TAPAAL Engine";
-	private static final String name_verifyTAPN_discreteInclusion = "B: TAPAAL Engine w. Discrete Inclusion";
-	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "C: TAPAAL Engine - Discrete Verification, Time darts and PTrie";
-	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "D: TAPAAL Engine - Discrete Verification, Time darts";
-	private static final String name_verifyTAPNDiscreteVerificationPTrie = "E: TAPAAL Engine - Discrete Verification, PTries";
-	private static final String name_verifyTAPNDiscreteVerificationNone = "F: TAPAAL Engine - Discrete Verification, No optimizations";
-	private static final String name_COMBI = "G: UPPAAL: Combi Reduction";
+	private static final String name_verifyTAPN = "A: TAPAAL Continuous Engine";
+	private static final String name_verifyTAPN_discreteInclusion = "B: TAPAAL Continuous Engine w. Discrete Inclusion";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "C: TAPAAL Discrete Engine w. Time Darts and PTrie";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "D: TAPAAL Discrete Engine w. Time Darts";
+	private static final String name_verifyTAPNDiscreteVerificationPTrie = "E: TAPAAL Discrete Engine Engine w. PTries";
+	private static final String name_verifyTAPNDiscreteVerificationNone = "F: TAPAAL Discrete Engine w. no Optimizations";
+	private static final String name_COMBI = "G: UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_STANDARD = "H: UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "I: UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "J: UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "K: UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_UNTIMED = "L: VerifyPN: Untimed engine";
-	private static final String name_UNTIMEDAPPROX = "M: VerifyPN: Untimed engine, with over-approximation";	
+	private static final String name_UNTIMED = "L: VerifyPN: TAPAAL Untimed Engine";
+	private static final String name_UNTIMEDAPPROX = "M: VerifyPN: TAPAAL Untimed Engine w. over-approximation";	
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";

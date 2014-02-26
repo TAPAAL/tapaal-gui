@@ -219,7 +219,7 @@ public class QueryDialog extends JPanel {
 	private InclusionPlaces inclusionPlaces;
 
 	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
-	private String name_COMBI = "UPPAAL: Combi reduction";
+	private String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
