@@ -102,7 +102,7 @@ public class TimedArcPetriNet {
 		Require.that(arc != null, "Argument must be a non-null output arc.");
 		Require.that(places.containsKey(arc.source().name()), "The source place \"" + arc.source() + "\" must be part of the petri net.");
 		Require.that(transitions.containsKey(arc.transition().name()), "The transition \"" + arc.transition() + "\" must be part of the petri net");
-		Require.that(places.containsKey(arc.destination()), "The destination place \"" + arc.destination() + "\" must be part of the petri net.");
+		Require.that(places.containsKey(arc.destination().name()), "The destination place \"" + arc.destination() + "\" must be part of the petri net.");
 		Require.that(!transportArcs.containsKey(arc.source().name() + arc.transition().name() + arc.destination().name()), "The specified arc is already a part of the petri net.");
 		Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.transition()), "Cannot have two arcs between the same place and transition");
 		Require.that(!hasArcFromTransitionToPlace(arc.transition(), arc.destination()),	"Cannot have two arcs between the same transition and place");
