@@ -1,5 +1,6 @@
 package dk.aau.cs.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -62,7 +64,8 @@ public class TabContent extends JSplitPane {
 	protected JScrollPane drawingSurfaceScroller;
 	protected DrawingSurfaceImpl drawingSurface;
 	protected File appFile;
-
+	private JPanel drawingSurfaceDummy;
+	
 	// Normal mode
 	BugHandledJXMultisplitPane editorSplitPane;
 	static Split editorModelroot = null;
@@ -124,16 +127,19 @@ public class TabContent extends JSplitPane {
 			}
 		});
 		
+		drawingSurfaceDummy = new JPanel(new GridBagLayout());
+		GridBagConstraints gc=new GridBagConstraints();
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.gridx=0;
+		gc.gridy=0;
+		drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
+		
 		createEditorLeftPane();
 		createAnimatorSplitPane(netType);
 
 		this.setOrientation(HORIZONTAL_SPLIT);
 		this.setLeftComponent(editorSplitPane);
-		if(tapnNetwork.getPaintNet()){
-			//this.setRightComponent(drawingSurfaceScroller);
-		} else {
-			this.setRightComponent(drawingSurfaceScroller);
-		}
+		this.setRightComponent(drawingSurfaceScroller);
 
 		this.setContinuousLayout(true);
 		this.setOneTouchExpandable(true);
@@ -598,6 +604,12 @@ public class TabContent extends JSplitPane {
 		templateExplorer.updateTemplateList();
 
 		constantsPanel.setNetwork(tapnNetwork);
+		
+		if(network.paintNet()){
+			this.setRightComponent(drawingSurfaceScroller);
+		} else {
+			this.setRightComponent(drawingSurfaceDummy);
+		}
 	}
 
 	public void swapTemplates(int currentIndex, int newIndex) {

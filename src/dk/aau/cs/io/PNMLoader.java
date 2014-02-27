@@ -71,7 +71,7 @@ public class PNMLoader {
 	
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
-	private int maxNetSize = 500;
+	private int maxNetSize = 2000;
 	
 	public PNMLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -124,6 +124,8 @@ public class PNMLoader {
 	
 		parseTimedArcPetriNet(netNode, tapn, template);
 		
+		network.setPaintNet(isNetDrawable());
+		
 		return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>());
 	}
 
@@ -157,7 +159,7 @@ public class PNMLoader {
 			node = node.getNextSibling();
 		}
 		
-		template.guiModel().setDrawable(netIsDrawable());
+		template.guiModel().setDrawable(isNetDrawable());
 		
 		node = first;
 		//We parse the places and transitions first
@@ -195,7 +197,7 @@ public class PNMLoader {
 		TimedPlace place = new LocalTimedPlace(name.name);
 		tapn.add(place);		
 		
-		if(netIsDrawable()){
+		if(isNetDrawable()){
 			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(),
 				marking.marking, marking.point.x, marking.point.y, 0);
 			placeComponent.setUnderlyingPlace(place);
@@ -235,7 +237,7 @@ public class PNMLoader {
 		TimedTransition transition = new TimedTransition(name.name);
 		tapn.add(transition);
 		
-		if(netIsDrawable()){
+		if(isNetDrawable()){
 			TimedTransitionComponent transitionComponent = 
 				new TimedTransitionComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(), 
 						true, false, 0, 0);
@@ -271,7 +273,7 @@ public class PNMLoader {
 		
 		int _startx = 0, _starty = 0, _endx = 0, _endy = 0;
 		
-		if(netIsDrawable()){
+		if(isNetDrawable()){
 			// add the insets and offset
 			_startx = source.getX() + source.centreOffsetLeft();
 			_starty = source.getY() + source.centreOffsetTop();
@@ -382,7 +384,7 @@ public class PNMLoader {
 		
 		TimedInputArcComponent arc = null;
 		
-		if(netIsDrawable()){
+		if(isNetDrawable()){
 			arc = new TimedInputArcComponent(new TimedOutputArcComponent(
 				_startx, _starty, _endx, _endy, source, target, 1, arcId,
 				false));
@@ -414,7 +416,7 @@ public class PNMLoader {
 		
 		TimedOutputArcComponent arc = null;
 		
-		if(netIsDrawable()){
+		if(isNetDrawable()){
 			arc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
 				source, target, 1,	arcId, false); //TODO weight
 			arc.setUnderlyingArc(outputArc);
@@ -430,7 +432,7 @@ public class PNMLoader {
 		return arc;
 	}
 	
-	private boolean netIsDrawable(){
+	private boolean isNetDrawable(){
 		return netSize <= maxNetSize;
 	}
 	

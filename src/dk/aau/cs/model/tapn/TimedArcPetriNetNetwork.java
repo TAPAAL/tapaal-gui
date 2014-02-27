@@ -558,7 +558,7 @@ public class TimedArcPetriNetNetwork {
 		this.defaultBound = defaultBound;
 	}
 
-	public boolean getPaintNet() {
+	public boolean paintNet() {
 		return paintNet;
 	}
 	
