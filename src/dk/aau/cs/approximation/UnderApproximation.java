@@ -164,6 +164,14 @@ public class UnderApproximation implements ITAPNApproximation {
 		{
 			return null;
 		}
+		
+		// if the interval becomes too small
+		if ( (newUpperBound.value() == newLowerBound.value()) && 
+				((oldInterval.IsLowerBoundNonStrict() && !oldInterval.IsUpperBoundNonStrict()) ||
+						(!oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict())))
+		{
+			return null;
+		}
 
 		return new TimeInterval(
 			 oldInterval.IsLowerBoundNonStrict(),
