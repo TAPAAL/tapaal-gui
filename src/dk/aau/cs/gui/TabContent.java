@@ -98,13 +98,16 @@ public class TabContent extends JSplitPane {
 	private Boolean selectedTemplateWasActive = false;
 	
 	private WorkflowDialog workflowDialog = null;
+	
+	//Some nets are so big we can't draw them 
+	private boolean showDrawingSurface;
 
 	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
 		}
-
+		
 		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
@@ -124,7 +127,11 @@ public class TabContent extends JSplitPane {
 
 		this.setOrientation(HORIZONTAL_SPLIT);
 		this.setLeftComponent(editorSplitPane);
-		this.setRightComponent(drawingSurfaceScroller);
+		if(tapnNetwork.getPaintNet()){
+			//this.setRightComponent(drawingSurfaceScroller);
+		} else {
+			this.setRightComponent(drawingSurfaceScroller);
+		}
 
 		this.setContinuousLayout(true);
 		this.setOneTouchExpandable(true);

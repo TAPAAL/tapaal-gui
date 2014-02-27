@@ -52,7 +52,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 	}
 
 	private boolean isNotTestingEdge(Edge e) {
-		Pattern pattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*_test\\?$");
+		Pattern pattern = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*_test\\?$");
 		Matcher matcher = pattern.matcher(e.getSync());
 		return !matcher.find();
 	}

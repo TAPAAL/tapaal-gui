@@ -36,6 +36,7 @@ import dk.aau.cs.util.FormatException;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -67,6 +68,10 @@ public class PNMLoader {
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private IdResolver idResolver = new IdResolver();
+	
+	//If the net is too big, do not make the graphics
+	private int netSize = 0;
+	private int maxNetSize = 500;
 	
 	public PNMLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -124,15 +129,21 @@ public class PNMLoader {
 
 	private String getTAPNName(Node netNode) {
 		if(netNode == null || !(netNode instanceof Element)){
-			return "";
+			return "Default";
 		}
-		String result = "";
+		String result = "Default";
 
 		Node name =  getFirstDirectChild(netNode, "name");
-		result = getFirstDirectChild(name, "text").getTextContent(); 
+		if(name != null){
+			result = getFirstDirectChild(name, "text").getTextContent();
+		}
+		
+		result = result.trim();
+		result = result.replace(".", "_");
+		result = result.replace(" ", "_");
 		
 		//TODO Fix the name if not allowed
-		return result == null ? "" : result;
+		return result == null ? "Default" : result;
 	}
 
 	private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template) throws FormatException {
@@ -140,6 +151,15 @@ public class PNMLoader {
 		Node node = getFirstDirectChild(netNode, "page").getFirstChild();
 		Node first = node;
 		
+		//Calculate netsize
+		while(node != null){
+			netSize += 1;
+			node = node.getNextSibling();
+		}
+		
+		template.guiModel().setDrawable(netIsDrawable());
+		
+		node = first;
 		//We parse the places and transitions first
 		while(node != null){
 			String tag = node.getNodeName();
@@ -175,11 +195,13 @@ public class PNMLoader {
 		TimedPlace place = new LocalTimedPlace(name.name);
 		tapn.add(place);		
 		
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(),
+		if(netIsDrawable()){
+			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(),
 				marking.marking, marking.point.x, marking.point.y, 0);
-		placeComponent.setUnderlyingPlace(place);
-		template.guiModel().addPetriNetObject(placeComponent);
-		addListeners(placeComponent, template);
+			placeComponent.setUnderlyingPlace(place);
+			template.guiModel().addPetriNetObject(placeComponent);
+			addListeners(placeComponent, template);
+		}
 		
 		idResolver.add(tapn.name(), id, name.name);
 		
@@ -213,12 +235,14 @@ public class PNMLoader {
 		TimedTransition transition = new TimedTransition(name.name);
 		tapn.add(transition);
 		
-		TimedTransitionComponent transitionComponent = 
+		if(netIsDrawable()){
+			TimedTransitionComponent transitionComponent = 
 				new TimedTransitionComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(), 
 						true, false, 0, 0);
-		transitionComponent.setUnderlyingTransition(transition);
-		template.guiModel().addPetriNetObject(transitionComponent);
-		addListeners(transitionComponent, template);
+			transitionComponent.setUnderlyingTransition(transition);
+			template.guiModel().addPetriNetObject(transitionComponent);
+			addListeners(transitionComponent, template);
+		}
 		idResolver.add(tapn.name(), id, name.name);
 	}
 	
@@ -236,27 +260,35 @@ public class PNMLoader {
 		String sourceName = idResolver.get(template.model().name(), sourceId);
 		String targetName = idResolver.get(template.model().name(), targetId);
 		
+		TimedPlace sourcePlace = template.model().getPlaceByName(sourceName);
+		TimedPlace targetPlace = template.model().getPlaceByName(targetName);
+		
+		TimedTransition sourceTransition = template.model().getTransitionByName(sourceName);
+		TimedTransition targetTransition = template.model().getTransitionByName(targetName);
+		
 		PlaceTransitionObject source = template.guiModel().getPlaceTransitionObject(sourceName);
 		PlaceTransitionObject target = template.guiModel().getPlaceTransitionObject(targetName);
 		
-		// add the insets and offset
-		int _startx = source.getX() + source.centreOffsetLeft();
-		int _starty = source.getY() + source.centreOffsetTop();
+		int _startx = 0, _starty = 0, _endx = 0, _endy = 0;
+		
+		if(netIsDrawable()){
+			// add the insets and offset
+			_startx = source.getX() + source.centreOffsetLeft();
+			_starty = source.getY() + source.centreOffsetTop();
 
-		int _endx = target.getX() + target.centreOffsetLeft();
-		int _endy = target.getY() + target.centreOffsetTop();
-		
-		
+			_endx = target.getX() + target.centreOffsetLeft();
+			_endy = target.getY() + target.centreOffsetTop();
+		}
 		
 		//TODO weights!!
 		//TODO arcpath!! 
 		
 		Arc arc;
 		
-		if(source instanceof TimedPlaceComponent && target instanceof TimedTransitionComponent) {
-			arc = parseInputArc(id, source, target, _startx, _starty, _endx, _endy, tapn, template);
-		} else if(source instanceof TimedTransitionComponent && target instanceof TimedPlaceComponent) {
-			arc = parseOutputArc(id, source, target, _startx, _starty, _endx, _endy, tapn, template);
+		if(sourcePlace != null && targetTransition != null) {
+			arc = parseInputArc(id, sourcePlace, targetTransition, source, target, _startx, _starty, _endx, _endy, tapn, template);
+		} else if(sourceTransition != null && targetPlace != null) {
+			arc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, _startx, _starty, _endx, _endy, tapn, template);
 		} else {
 			throw new FormatException("Arcs much be between places and transitions");
 		}
@@ -273,12 +305,19 @@ public class PNMLoader {
 		
 		String name = getFirstDirectChild(node, "text").getTextContent();
 		
+		name = name.trim();
+		name = name.replace(".", "_");
+		name = name.replace(" ", "_");
+		
 		return new Name(name, offset);
 	}
 	
 	private Point parseGraphics(Node node, GraphicsType type){
 		if(node == null || !(node instanceof Element)){
-			return new Point(0, -10);
+			if(type == GraphicsType.Offset)
+				return new Point(0, -10);
+			else 
+				return new Point(100, 100);
 		}
 		
 		Element offset = (Element)getFirstDirectChild(node, type == GraphicsType.Offset ? "offset" : "position");
@@ -331,62 +370,73 @@ public class PNMLoader {
 		}
 	}
 	
-	private TimedInputArcComponent parseInputArc(String arcId, PlaceTransitionObject source,
+	private TimedInputArcComponent parseInputArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
 			PlaceTransitionObject target, int _startx, int _starty, int _endx,
 			int _endy, TimedArcPetriNet tapn, Template template) throws FormatException {
-		TimedInputArcComponent arc = new TimedInputArcComponent(new TimedOutputArcComponent(
-				_startx, _starty, _endx, _endy, source, target, 1, arcId,
-				false));
-		
-		TimedPlace place = template.model().getPlaceByName(source.getName());
-		TimedTransition transition = template.model().getTransitionByName(target.getName());
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF); //TODO Weight
-		arc.setUnderlyingArc(inputArc);
-
+		
 		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
+		
+		TimedInputArcComponent arc = null;
+		
+		if(netIsDrawable()){
+			arc = new TimedInputArcComponent(new TimedOutputArcComponent(
+				_startx, _starty, _endx, _endy, source, target, 1, arcId,
+				false));
+			arc.setUnderlyingArc(inputArc);
 
-		template.guiModel().addPetriNetObject(arc);
-		addListeners(arc, template);
+			template.guiModel().addPetriNetObject(arc);
+			addListeners(arc, template);
+
+			source.addConnectFrom(arc);
+			target.addConnectTo(arc);
+		}
+		
 		template.model().add(inputArc);
-
-		source.addConnectFrom(arc);
-		target.addConnectTo(arc);
 		
 		return arc;
 
 		
 	}
 	
-	private Arc parseOutputArc(String arcId, PlaceTransitionObject source,
+	private Arc parseOutputArc(String arcId, TimedTransition transition, TimedPlace place, PlaceTransitionObject source,
 			PlaceTransitionObject target, int _startx, int _starty, int _endx,
 			int _endy, TimedArcPetriNet tapn, Template template) throws FormatException {
 		
-		TimedOutputArcComponent arc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				source, target, 1,	arcId, false); //TODO weight
-
-		TimedPlace place = template.model().getPlaceByName(target.getName());
-		TimedTransition transition = template.model().getTransitionByName(source.getName());
-
-		TimedOutputArc outputArc = new TimedOutputArc(transition, place); //Weight
-		arc.setUnderlyingArc(outputArc);
-
+		TimedOutputArc outputArc = new TimedOutputArc(transition, place); //Weight	
+		
 		if(template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
+		
+		TimedOutputArcComponent arc = null;
+		
+		if(netIsDrawable()){
+			arc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
+				source, target, 1,	arcId, false); //TODO weight
+			arc.setUnderlyingArc(outputArc);
 
-		template.guiModel().addPetriNetObject(arc);
-		addListeners(arc, template);
+			template.guiModel().addPetriNetObject(arc);
+			addListeners(arc, template);
+
+			source.addConnectFrom(arc);
+			target.addConnectTo(arc);
+		}
+		
 		template.model().add(outputArc);
-
-		source.addConnectFrom(arc);
-		target.addConnectTo(arc);
 		return arc;
 	}
 	
+	private boolean netIsDrawable(){
+		return netSize <= maxNetSize;
+	}
+	
 	Node getFirstDirectChild(Node parent, String tagName){
+		if(parent == null)
+			System.err.println("NNNOOOO!!!");
 		NodeList children = parent.getChildNodes();
 		for(int i = 0; i < children.getLength(); i++){
 			if(children.item(i).getNodeName().equals(tagName)){
