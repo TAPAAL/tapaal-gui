@@ -22,8 +22,11 @@ import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -194,8 +197,8 @@ public class PNMLoader {
 		String id = ((Element) node).getAttribute("id");
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
-		TimedPlace place = new LocalTimedPlace(name.name);
-		tapn.add(place);		
+		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(true, new IntBound(0)));
+		tapn.add(place);
 		
 		if(isNetDrawable()){
 			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(),
@@ -271,6 +274,20 @@ public class PNMLoader {
 		PlaceTransitionObject source = template.guiModel().getPlaceTransitionObject(sourceName);
 		PlaceTransitionObject target = template.guiModel().getPlaceTransitionObject(targetName);
 		
+		//Inscription
+		int weight = 1;
+		Node inscription  = getFirstDirectChild(node, "inscription");
+		if(inscription != null){
+			Node text = getFirstDirectChild(inscription, "text");
+			if(text != null){
+				String weightString = text.getTextContent().trim();
+				try{
+					if(weightString != null)
+						weight = Integer.parseInt(weightString);
+					} catch(NumberFormatException e) {}
+			}
+		}
+		
 		int _startx = 0, _starty = 0, _endx = 0, _endy = 0;
 		
 		if(isNetDrawable()){
@@ -288,9 +305,9 @@ public class PNMLoader {
 		Arc arc;
 		
 		if(sourcePlace != null && targetTransition != null) {
-			arc = parseInputArc(id, sourcePlace, targetTransition, source, target, _startx, _starty, _endx, _endy, tapn, template);
+			arc = parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
 		} else if(sourceTransition != null && targetPlace != null) {
-			arc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, _startx, _starty, _endx, _endy, tapn, template);
+			arc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
 		} else {
 			throw new FormatException("Arcs much be between places and transitions");
 		}
@@ -373,10 +390,10 @@ public class PNMLoader {
 	}
 	
 	private TimedInputArcComponent parseInputArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
-			PlaceTransitionObject target, int _startx, int _starty, int _endx,
+			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
 			int _endy, TimedArcPetriNet tapn, Template template) throws FormatException {
 
-		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF); //TODO Weight
+		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
 		
 		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
@@ -405,10 +422,10 @@ public class PNMLoader {
 	}
 	
 	private Arc parseOutputArc(String arcId, TimedTransition transition, TimedPlace place, PlaceTransitionObject source,
-			PlaceTransitionObject target, int _startx, int _starty, int _endx,
+			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
 			int _endy, TimedArcPetriNet tapn, Template template) throws FormatException {
 		
-		TimedOutputArc outputArc = new TimedOutputArc(transition, place); //Weight	
+		TimedOutputArc outputArc = new TimedOutputArc(transition, place, new IntWeight(weight));
 		
 		if(template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
@@ -437,8 +454,6 @@ public class PNMLoader {
 	}
 	
 	Node getFirstDirectChild(Node parent, String tagName){
-		if(parent == null)
-			System.err.println("NNNOOOO!!!");
 		NodeList children = parent.getChildNodes();
 		for(int i = 0; i < children.getLength(); i++){
 			if(children.item(i).getNodeName().equals(tagName)){
