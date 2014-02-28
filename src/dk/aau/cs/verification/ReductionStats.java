@@ -43,29 +43,24 @@ public class ReductionStats {
 	
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("Removed transitions: ");
-		buffer.append(removedTrantitions);
-		buffer.append(System.getProperty("line.separator"));
-		
+		StringBuffer buffer = new StringBuffer();		
 		buffer.append("Removed places: ");
 		buffer.append(removedPlaces);
 		buffer.append(System.getProperty("line.separator"));
 		
-		buffer.append("Rule A: ");
+		buffer.append("Removed transitions: ");
+		buffer.append(removedTrantitions);
+		buffer.append(System.getProperty("line.separator"));
+		
+		buffer.append("Applications of rules A, B, C, D: (");
 		buffer.append(ruleA);
-		buffer.append(System.getProperty("line.separator"));
-		
-		buffer.append("Rule B: ");
+		buffer.append(", ");
 		buffer.append(ruleB);
-		buffer.append(System.getProperty("line.separator"));
-		
-		buffer.append("Rule C: ");
+		buffer.append(", ");
 		buffer.append(ruleC);
-		buffer.append(System.getProperty("line.separator"));
-		
-		buffer.append("Rule D: ");
+		buffer.append(", ");
 		buffer.append(ruleD);
+		buffer.append(")");
 		
 		return buffer.toString();
 	}
