@@ -73,6 +73,10 @@ TOKEN :
 	<AF: "A"(" ")*"F">
 	|
 	<AG: "A"(" ")*"G">
+	|
+	<I: "I">
+	| 
+	<N: "N">
 }
 
 TOKEN :
@@ -124,6 +128,8 @@ TCTLAbstractProperty AbstractProperty() :
 		| <EG> child = OrExpr() {return new TCTLEGNode(child); } 
 		| <AF> child = OrExpr() {return new TCTLAFNode(child); } 
 		| <AG> child = OrExpr() {return new TCTLAGNode(child); } 
+		| <I> child = OrExpr() {return new TCTLAGNode(child); }
+		| <N> child = OrExpr() {return new TCTLAGNode(new TCTLNotNode(child)); }
 	) 
 }
 

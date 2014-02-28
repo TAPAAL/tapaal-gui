@@ -57,6 +57,16 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
       child = OrExpr();
                                          {if (true) return new TCTLAGNode(child);}
       break;
+    case I:
+      jj_consume_token(I);
+      child = OrExpr();
+                                        {if (true) return new TCTLAGNode(child);}
+      break;
+    case N:
+      jj_consume_token(N);
+      child = OrExpr();
+                                        {if (true) return new TCTLAGNode(new TCTLNotNode(child));}
+      break;
     default:
       jj_la1[0] = jj_gen;
       jj_consume_token(-1);
@@ -116,17 +126,17 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NOT:
       jj_consume_token(NOT);
-      jj_consume_token(21);
+      jj_consume_token(23);
       child = OrExpr();
-      jj_consume_token(22);
+      jj_consume_token(24);
                                          {if (true) return new TCTLNotNode(child);}
       break;
     case TRUE:
     case FALSE:
     case DEADLOCK:
     case NUM:
-    case 21:
     case 23:
+    case 25:
       child = Factor();
                              {if (true) return child;}
       break;
@@ -159,10 +169,10 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
         thisProp = AtomicProposition();
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 21:
-          jj_consume_token(21);
+        case 23:
+          jj_consume_token(23);
           thisProp = OrExpr();
-          jj_consume_token(22);
+          jj_consume_token(24);
           break;
         default:
           jj_la1[5] = jj_gen;
@@ -255,20 +265,20 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
         Token op;
         Token num;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 23:
-      jj_consume_token(23);
+    case 25:
+      jj_consume_token(25);
       place = jj_consume_token(IDENT);
-      jj_consume_token(24);
+      jj_consume_token(26);
                                                        thisProp = new TCTLPlaceNode(place.image);
       break;
     case NUM:
       num = jj_consume_token(NUM);
                                 thisProp = new TCTLConstNode(Integer.parseInt(num.image));
       break;
-    case 21:
-      jj_consume_token(21);
+    case 23:
+      jj_consume_token(23);
       thisProp = AritmeticExpr();
-      jj_consume_token(22);
+      jj_consume_token(24);
       break;
     default:
       jj_la1[9] = jj_gen;
@@ -286,45 +296,15 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_3R_10() {
-    if (jj_scan_token(PLUS)) return true;
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12() {
-    if (jj_scan_token(MULT)) return true;
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_15() {
-    if (jj_scan_token(21)) return true;
-    if (jj_3R_6()) return true;
-    if (jj_scan_token(22)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_5() {
-    if (jj_3R_6()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_8()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3R_14() {
     if (jj_scan_token(NUM)) return true;
     return false;
   }
 
   private boolean jj_3R_13() {
-    if (jj_scan_token(23)) return true;
+    if (jj_scan_token(25)) return true;
     if (jj_scan_token(IDENT)) return true;
-    if (jj_scan_token(24)) return true;
+    if (jj_scan_token(26)) return true;
     return false;
   }
 
@@ -378,6 +358,36 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
     return false;
   }
 
+  private boolean jj_3R_10() {
+    if (jj_scan_token(PLUS)) return true;
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    if (jj_scan_token(MULT)) return true;
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_scan_token(23)) return true;
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(24)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_5() {
+    if (jj_3R_6()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_8()) return true;
+    }
+    return false;
+  }
+
   /** Generated Token Manager. */
   public SUMOQueryParserTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -395,7 +405,7 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xf0,0x100,0x200,0xa0240e,0xe,0x200000,0x18000,0x800,0x1000,0xa02000,};
+      jj_la1_0 = new int[] {0x3f0,0x400,0x800,0x280900e,0xe,0x800000,0x60000,0x2000,0x4000,0x2808000,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[1];
   private boolean jj_rescan = false;
@@ -581,7 +591,7 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[25];
+    boolean[] la1tokens = new boolean[27];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -595,7 +605,7 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
         }
       }
     }
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 27; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

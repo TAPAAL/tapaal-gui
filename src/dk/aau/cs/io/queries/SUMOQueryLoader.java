@@ -37,7 +37,7 @@ public class SUMOQueryLoader extends QueryLoader{
 	@Override
 	protected ArrayList<TAPNQuery> getQueries() {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
-		Pattern p = Pattern.compile("ctl\\s*([^:]*):(.*)");
+		Pattern p = Pattern.compile("(?:ctl|reach)\\s*([^:]*):(.*)");
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(file));
