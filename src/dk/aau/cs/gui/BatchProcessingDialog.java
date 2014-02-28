@@ -87,20 +87,20 @@ import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
 public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;
 
-	private static final String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
-	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Engine w. Discrete Inclusion";
-	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "TAPAAL Engine - Discrete Verification, Time darts and PTrie";
-	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Engine - Discrete Verification, Time darts";
-	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Engine - Discrete Verification, PTries";
-	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Engine - Discrete Verification, No optimizations";
-	private static final String name_COMBI = "UPPAAL: Combi Reduction";
+	private static final String name_verifyTAPN = "TAPAAL Continuous Engine (verifytapn)";
+	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Continuous Engine w. Discrete Inclusion";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "TAPAAL Discrete Engine w. Time Darts and PTrie";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Discrete Engine w. Time Darts";
+	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Discrete Engine w. PTries";
+	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Discrete Engine (verifydtapn) w. no Optimizations";
+	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_UNTIMED = "VerifyPN: Untimed engine";
-	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with over-approximation";
-	private static final String name_UNTIMED_REDUCE = "VerifyPN: Untimed engine, with net reduction";
+	private static final String name_UNTIMED = "TAPAAL Untimed Engine (verifypn)";
+	private static final String name_UNTIMED_APPROX = "TAPAAL Untimed Engine Over-Approximation Only";
+	private static final String name_UNTIMED_REDUCE = "TAPAAL Untimed Engine w. Net Reductions";
 	private static final String name_verifyTAPNWithLegend = "A: "
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "

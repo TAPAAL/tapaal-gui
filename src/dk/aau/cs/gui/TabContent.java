@@ -110,6 +110,8 @@ public class TabContent extends JSplitPane {
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		drawingSurfaceScroller.setWheelScrollingEnabled(true);
+		drawingSurfaceScroller.getVerticalScrollBar().setUnitIncrement(10);
+		drawingSurfaceScroller.getHorizontalScrollBar().setUnitIncrement(10);
 
 		// Make clicking the drawing area move focus to GuiFrame
 		drawingSurface.addMouseListener(new MouseAdapter() {	

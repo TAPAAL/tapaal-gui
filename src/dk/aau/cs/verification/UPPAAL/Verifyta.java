@@ -236,7 +236,7 @@ public class Verifyta implements ModelChecker {
 			.displayErrorMessage(
 					"The specified version of the file verifyta is too old.\n\n"
 							+ "Get the latest development version of UPPAAL from \n"
-							+ "www.uppaal.com.", "Verifyta Error");
+							+ "www.uppaal.org.", "Verifyta Error");
 			verifytapath = oldPath;
 			Preferences.getInstance().setVerifytaLocation(oldPath);
 		}
