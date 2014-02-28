@@ -308,6 +308,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						||
 						(query.queryType().equals(QueryType.AG) && verificationResult.getQueryResult().isQuerySatisfied())))
 				{queryResult = "Inconclusive answer";}
+				if(query.getReductionOption().equals(ReductionOption.VerifyPNApprox) && 
+						((query.queryType().equals(QueryType.EF) && verificationResult.getQueryResult().isQuerySatisfied()) ||
+						(query.queryType().equals(QueryType.AG) && !verificationResult.getQueryResult().isQuerySatisfied()))){
+					queryResult = "Inconclusive answer";
+				}
 			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime(), verificationResult.stats());
 		} else {
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), new NullStats());
