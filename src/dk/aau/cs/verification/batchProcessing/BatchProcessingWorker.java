@@ -427,7 +427,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	            // If r > 1
 				if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG ) && verificationResult.getQueryResult().isQuerySatisfied())
 						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && !verificationResult.getQueryResult().isQuerySatisfied())) {
-	                //Create the verification satisfied result for the approximation
+					// If ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
+					//Create the verification satisfied result for the approximation
 	                VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
 	                valueNetwork = new VerificationResult<TAPNNetworkTrace>(
 	                            approxResult.getQueryResult(),
@@ -460,11 +461,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                renameTraceTransitions(verificationResult.getSecondaryTrace());
 	                QueryResult queryResult= verificationResult.getQueryResult();
 	                
-	                // If (EG AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
-	                if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) 
-	                    || verificationResult.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied()){
-	                    queryResult.setApproximationInconclusive(true);
-	                }
+	                // If ((EG OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
+					if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied()) 
+							|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())){
+						queryResult.setApproximationInconclusive(true);
+					}
 	                // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
 	                // This is satisfied for EF and not satisfied for AG
 	                value = new VerificationResult<TimedArcPetriNetTrace>(

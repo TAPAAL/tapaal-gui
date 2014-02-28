@@ -153,9 +153,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				value.setNameMapping(transformedModel.value2());
 			} else {
 				// If r > 1
-				if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG ) && result.getQueryResult().isQuerySatisfied())
+				if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied())
 					|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && !result.getQueryResult().isQuerySatisfied())) {
+						// If ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
 						// The results are inconclusive, but we get a trace and can use trace TAPN for verification.
+					
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
 						value = new VerificationResult<TAPNNetworkTrace>(
 								approxResult.getQueryResult(),
@@ -189,8 +191,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						renameTraceTransitions(result.getSecondaryTrace());
 						QueryResult queryResult = result.getQueryResult();
 						
-						// If (EG AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
-						if ((result.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied()){
+						// If ((EG OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
+						if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied()) 
+								|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())){
 							queryResult.setApproximationInconclusive(true);
 						}
 						
@@ -207,7 +210,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					} 
 					else if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !result.getQueryResult().isQuerySatisfied())
 							|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && result.getQueryResult().isQuerySatisfied())) {
-						// If (EF AND not satisfied) OR (AG AND satisfied)
+						// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) AND satisfied)
 						
 						QueryResult queryResult = result.getQueryResult();
 						if (clonedQuery.hasDeadlock()) {
