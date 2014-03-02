@@ -513,9 +513,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	        }
 	        else {
 	            // If r > 1
-	            if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !verificationResult.getQueryResult().isQuerySatisfied()) 
-	             || (verificationResult.getQueryResult().queryType() == QueryType.AG && verificationResult.getQueryResult().isQuerySatisfied())) {
-                    // If (EF AND not satisfied) OR (AG and satisfied) -> Inconclusive
+				if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && ! verificationResult.getQueryResult().isQuerySatisfied()
+				|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
+					// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) and satisfied) -> Inconclusive
                     
                     QueryResult queryResult= verificationResult.getQueryResult();
                     queryResult.setApproximationInconclusive(true);
@@ -528,9 +528,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         					verificationResult.isOverApproximationResult());
                     value.setNameMapping(composedModel.value2());
 	                    
-	            } else if (verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied()
-	                     || (verificationResult.getQueryResult().queryType() == QueryType.AG && ! verificationResult.getQueryResult().isQuerySatisfied())) {
-	                    // (EF AND satisfied) OR (AG and not satisfied) -> Check for deadlock
+				} else if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && verificationResult.getQueryResult().isQuerySatisfied()
+						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
+					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 	                    
 	                    if (!clonedQuery.hasDeadlock()) {
 	                    	QueryResult queryResult= verificationResult.getQueryResult();

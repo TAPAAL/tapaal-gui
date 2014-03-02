@@ -258,9 +258,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			}
 			else {
 				// If r > 1
-				if (result.getQueryResult().queryType() == QueryType.EF && ! result.getQueryResult().isQuerySatisfied()
-				|| (result.getQueryResult().queryType() == QueryType.AG && result.getQueryResult().isQuerySatisfied())) {
-					// If (EF AND not satisfied) OR (AG and satisfied) -> Inconclusive
+				if ((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && ! result.getQueryResult().isQuerySatisfied()
+				|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && result.getQueryResult().isQuerySatisfied())) {
+					// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) and satisfied) -> Inconclusive
 					QueryResult queryResult= result.getQueryResult();
 					queryResult.setApproximationInconclusive(true);
 					value =  new VerificationResult<TAPNNetworkTrace>(
@@ -271,9 +271,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							result.stats(),
 							result.isOverApproximationResult());
 					value.setNameMapping(transformedModel.value2());
-				} else if (result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()
-						|| (result.getQueryResult().queryType() == QueryType.AG && ! result.getQueryResult().isQuerySatisfied())) {
-					// (EF AND satisfied) OR (AG and not satisfied) -> Check for deadlock
+				} else if ((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied()
+						|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && ! result.getQueryResult().isQuerySatisfied())) {
+					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 					
 					if ( ! query.hasDeadlock()) {
 						// If query does not have deadlock -> return answer from result
