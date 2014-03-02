@@ -213,11 +213,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) AND satisfied)
 						
 						QueryResult queryResult = result.getQueryResult();
-						if (clonedQuery.hasDeadlock()) {
-							// If query has deadlock -> return inconclusive
-							// Otherwise -> return answer
-							queryResult.setApproximationInconclusive(true);
-						}
+						queryResult.setApproximationInconclusive(true);
 						
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
 						value = new VerificationResult<TAPNNetworkTrace>(

@@ -482,11 +482,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                // If (EF AND not satisfied) OR (AG AND satisfied)
 	               
 	                QueryResult queryResult = verificationResult.getQueryResult();
-	                if (clonedQuery.hasDeadlock()) {
-	                    // If query has deadlock -> return inconclusive
-	                    // Otherwise -> return answer
-	                    queryResult.setApproximationInconclusive(true);
-	                }
+                    queryResult.setApproximationInconclusive(true);
 	                
 	                value =  new VerificationResult<TimedArcPetriNetTrace>(
 						queryResult,
