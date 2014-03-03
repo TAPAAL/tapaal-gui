@@ -246,7 +246,6 @@ public class GuiFrame extends JFrame implements Observer {
 		addWindowListener(new WindowHandler());
 
 		this.setForeground(java.awt.Color.BLACK);
-		this.setBackground(java.awt.Color.WHITE);
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);

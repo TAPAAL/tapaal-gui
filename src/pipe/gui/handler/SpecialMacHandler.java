@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import javax.imageio.ImageIO;
-
 import net.tapaal.TAPAAL;
-
 import pipe.gui.CreateGui;
+
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
+import com.apple.eawt.FullScreenUtilities;
 
 import dk.aau.cs.debug.Logger;
 
@@ -52,8 +52,6 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
         
         // Grow size of boxes to add room for the resizer
         System.setProperty("apple.awt.showGrowBox", "true");
-
-	    
 	}
 	
 	public void handleAbout(AboutEvent arg0) {
@@ -64,6 +62,9 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 		CreateGui.appGui.exit();
 	}
 
- 
+	public static void postprocess(){
+		// Enable fullscreen on Mac
+        FullScreenUtilities.setWindowCanFullScreen(CreateGui.appGui, true);
+	}
 
 }
