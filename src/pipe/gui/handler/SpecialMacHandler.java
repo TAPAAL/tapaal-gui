@@ -1,10 +1,13 @@
 package pipe.gui.handler;
 
 import java.awt.Image;
+import java.awt.Window;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 
 import javax.imageio.ImageIO;
+
 import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 
@@ -14,7 +17,6 @@ import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
-import com.apple.eawt.FullScreenUtilities;
 
 import dk.aau.cs.debug.Logger;
 
@@ -64,7 +66,15 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 
 	public static void postprocess(){
 		// Enable fullscreen on Mac
-        FullScreenUtilities.setWindowCanFullScreen(CreateGui.appGui, true);
+		// Use reflection to prevent compile errors
+		try {
+	        Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+	        Class params[] = new Class[]{Window.class, Boolean.TYPE};
+	        Method method = util.getMethod("setWindowCanFullScreen", params);
+	        method.invoke(util, CreateGui.appGui, true);
+	    } catch (Exception e) {
+	    	// Fullscreen not supported
+	    }
 	}
 
 }
