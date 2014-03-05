@@ -15,6 +15,7 @@ public enum ReductionOption {
 	VerifyTAPNdiscreteVerification,
 	VerifyPN,
 	VerifyPNApprox,
+	VerifyPNReduce,
 	BatchProcessingKeepQueryOption,
 	BatchProcessingUserDefinedReductions
 }

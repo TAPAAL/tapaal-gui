@@ -43,6 +43,7 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
+	private boolean useReduction;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -175,6 +176,14 @@ public class TAPNQuery {
 		overApproximation = useOverApproximation;
 	}
 	
+	public void setUseReduction(boolean useReduction){
+		this.useReduction = useReduction;
+	}
+	
+	public boolean useReduction(){
+		return useReduction;
+	}
+	
 	public boolean useOverApproximation(){
 		return overApproximation;
 	}
@@ -213,7 +222,7 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry,boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, WorkflowMode workflow) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, new InclusionPlaces());
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, false, hashTabelSize, extrapolationOption, new InclusionPlaces());
 		this.setWorkflowMode(workflow);
 	}
 	
@@ -221,12 +230,12 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, false, hashTabelSize, extrapolationOption, new InclusionPlaces());
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, false, false, hashTabelSize, extrapolationOption, new InclusionPlaces());
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
 		this.setName(name);
 		this.setCapacity(capacity);
@@ -242,6 +251,7 @@ public class TAPNQuery {
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
+		this.useReduction = reduction;
 	}
 	
 	@Override
@@ -276,7 +286,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		

@@ -23,8 +23,14 @@ public class Stats {
 	private int maxExecutionTime;
 	private ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking;
 	private List<Tuple<String,Integer>> transitionStats;
+	private ReductionStats reductionStats;
 	
 	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking)
+	{
+		this(discovered, explored,stored,transitionStats,minExecutionTime, maxExecutionTime,coveredMarking, null);
+	}
+	
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking, ReductionStats reductionStats)
 	{
 		this.discovered = discovered;
 		this.explored = explored;
@@ -33,11 +39,17 @@ public class Stats {
 		this.minExecutionTime = minExecutionTime;
 		this.maxExecutionTime = maxExecutionTime;
 		this.coveredMarking = coveredMarking;
+		this.reductionStats = reductionStats;
 	}
 	
 	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats)
 	{
 		this(discovered, explored, stored, transitionStats, -1, -1, null);
+	}
+	
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, ReductionStats reductionStats)
+	{
+		this(discovered, explored, stored, transitionStats, -1, -1, null, reductionStats);
 	}
 	
 	public Stats(long discovered, long explored, long stored)
@@ -71,6 +83,10 @@ public class Stats {
 	
 	public int maximumExecutionTime(){
 		return maxExecutionTime;
+	}
+	
+	public ReductionStats getReductionStats(){
+		return reductionStats;
 	}
 	
 	public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){
