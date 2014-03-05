@@ -1,36 +1,25 @@
 package pipe.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.gui.widgets.RequestFocusListener;
-import dk.aau.cs.debug.Logger;
+import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
@@ -130,7 +119,11 @@ public class CreateGui {
 		userPath = null;
 
 		appGui = new GuiFrame(TAPAAL.getProgramName());
-
+		
+		if (appGui.isMac()){ 
+			SpecialMacHandler.postprocess();
+		}
+		
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
