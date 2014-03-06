@@ -53,7 +53,6 @@ import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -382,14 +381,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<TimedArcPetriNet, NameMapping>(composedModel.value1().copy(), composedModel.value2());
 		
 		TraceOption oldTraceOption = options.traceOption();
-		if (query != null && query.isOverApproximationEnabled())
-		{
+		if (query != null && query.isOverApproximationEnabled()) {
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(composedModel.value1(), query);
 			options.setTraceOption(TraceOption.SOME);
-		}
-		else if (query != null && query.isUnderApproximationEnabled())
-		{
+		} else if (query != null && query.isUnderApproximationEnabled()) {
 			UnderApproximation underaprx = new UnderApproximation();
 			underaprx.modifyTAPN(composedModel.value1(), query);
 		}
@@ -405,6 +401,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
 		if (verificationResult.error()) {
+			options.setTraceOption(oldTraceOption);
+			MemoryMonitor.setCumulativePeakMemory(false);
 			return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 		}
 		else if (query != null && query.isOverApproximationEnabled()) {		
@@ -454,6 +452,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                    firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 	                }
 	                if (verificationResult.error()) {
+	                	options.setTraceOption(oldTraceOption);
+	            		MemoryMonitor.setCumulativePeakMemory(false);
 	                    return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 	                }
 	                //Create the result from trace TAPN
@@ -569,6 +569,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                        firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 	                    }
 	                    if (verificationResult.error()) {
+	                    	options.setTraceOption(oldTraceOption);
+	                		MemoryMonitor.setCumulativePeakMemory(false);
 	        				return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 	        			}
 	                    

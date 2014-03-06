@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
+import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.FileFinderImpl;
@@ -285,6 +286,10 @@ public class Verifyta implements ModelChecker {
 				}
 		}
 		
+		if (((VerifytaOptions) options).traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry() == true) {
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -363,7 +368,7 @@ public class Verifyta implements ModelChecker {
 		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)), (VerifytaOptions) options);
 
 		if (trace == null) {
-			if (((VerifytaOptions) options).trace() != TraceOption.NONE) {
+			if (((VerifytaOptions) options).traceOption() != TraceOption.NONE) {
 				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
 				   (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied()))
 					return null;

@@ -33,7 +33,6 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -135,6 +134,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 		}
 		if (result.error()) {
+			options.setTraceOption(oldTraceOption);
+			MemoryMonitor.setCumulativePeakMemory(false);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
 		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled()) {
@@ -184,6 +185,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 						}
 						if (result.error()) {
+							options.setTraceOption(oldTraceOption);
+							MemoryMonitor.setCumulativePeakMemory(false);
 							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 						}
 						//Create the result from trace TAPN
@@ -316,6 +319,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 						}
 						if (result.error()) {
+							options.setTraceOption(oldTraceOption);
+							MemoryMonitor.setCumulativePeakMemory(false);
 							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 						}
 						//Create the result from trace TAPN

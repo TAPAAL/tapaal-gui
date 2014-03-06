@@ -29,12 +29,12 @@ public class VerifytaOptions implements VerificationOptions {
 		this.useOverApproximation = useOverApproximation;
 	}
 
-	public TraceOption trace() {
-		return traceOption;
-	}
-	
 	public boolean symmetry() {
 		return symmetry;
+	}
+	
+	public void setSymmetry(boolean newOption) {
+		this.symmetry = newOption;
 	}
 
 	@Override
