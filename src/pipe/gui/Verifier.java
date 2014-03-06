@@ -17,6 +17,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -153,7 +154,7 @@ public class Verifier {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation());
+			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION);
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces());
 		}

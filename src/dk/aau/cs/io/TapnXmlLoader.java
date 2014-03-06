@@ -798,12 +798,13 @@ public class TapnXmlLoader {
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
+		boolean reduction = getReductionOption(queryElement, "reduction", true);
 
 		TCTLAbstractProperty query;
 		query = parseQueryProperty(queryElement.getAttribute("query"));
 
 		if (query != null) {
-			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;

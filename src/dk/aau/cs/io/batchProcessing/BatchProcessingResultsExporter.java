@@ -20,8 +20,9 @@ public class BatchProcessingResultsExporter {
 	private static final String name_OPTIMIZEDSTANDARD = "I: UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "J: UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "K: UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_UNTIMED = "L: VerifyPN: TAPAAL Untimed Engine";
-	private static final String name_UNTIMEDAPPROX = "M: VerifyPN: TAPAAL Untimed Engine w. over-approximation";	
+	private static final String name_UNTIMED = "L: TAPAAL Untimed Engine";
+	private static final String name_UNTIMEDAPPROX = "M: TAPAAL Untimed Engine, Over-Approximation Only";	
+	private static final String name_UNTIMEDREDUCE = "N: TAPAAL Untimed engine w. Net Reductions";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -141,6 +142,8 @@ public class BatchProcessingResultsExporter {
 			return name_UNTIMED;
 		}else if(reduction == ReductionOption.VerifyPNApprox){
 			return name_UNTIMEDAPPROX;
+		}else if(reduction == ReductionOption.VerifyPNReduce){
+			return name_UNTIMEDREDUCE;
 		}
 			return name_BROADCAST;
 	}
