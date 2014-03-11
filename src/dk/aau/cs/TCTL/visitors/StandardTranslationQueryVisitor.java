@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 public class StandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "pid_t";
@@ -21,12 +23,17 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
 			Object context) {
+		
+		assert(atomicPropositionNode.getRight() instanceof TCTLPlaceNode && atomicPropositionNode.getLeft() instanceof TCTLConstNode):
+			"The " + getClass().getCanonicalName() + " cannot translate this query, as the prepositions are too complex";
+		TCTLPlaceNode placeNode = (TCTLPlaceNode) atomicPropositionNode.getLeft();
+		TCTLConstNode constNode = (TCTLConstNode) atomicPropositionNode.getRight();
 
 		append("(");
-		append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));
+		append(createAtomicPropositionSum(placeNode.getPlace()));
 		append(operatorConversion(atomicPropositionNode.getOp()));
 		append(" ");
-		append(atomicPropositionNode.getN());
+		append(constNode.getConstant());
 		append(")");
 	}
 
