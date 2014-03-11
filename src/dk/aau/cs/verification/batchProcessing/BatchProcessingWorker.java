@@ -397,10 +397,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		TraceOption oldTraceOption = options.traceOption();
 		if (query != null && query.isOverApproximationEnabled()) {
+			// Create a fresh model
+			composedModel = composeModel(model);
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(composedModel.value1(), query);
 			options.setTraceOption(TraceOption.SOME);
 		} else if (query != null && query.isUnderApproximationEnabled()) {
+			// Create a fresh model
+			composedModel = composeModel(model);
 			UnderApproximation underaprx = new UnderApproximation();
 			underaprx.modifyTAPN(composedModel.value1(), query);
 		}
