@@ -141,7 +141,7 @@ public class RunVerification extends RunVerificationBase {
 		gbc.weightx = 2;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
+		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search. If the count is -1 then the data for the given transition is not available as the transition was removed during the net reduction.\n"), JLabel.LEFT), gbc);
 		
 		//Setup table
 		String[] columnNames = {"Count",
@@ -197,7 +197,7 @@ public class RunVerification extends RunVerificationBase {
 			    //set resizable to true
 			    dialog.setResizable(true);
 				dialog.setMinimumSize(new Dimension(350, 300));
-				dialog.setPreferredSize(new Dimension(450, 400));
+				dialog.setPreferredSize(new Dimension(550, 400));
 			   }
 			  }
 			 }
