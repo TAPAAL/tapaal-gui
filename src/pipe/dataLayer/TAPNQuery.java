@@ -9,6 +9,7 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 
 public class TAPNQuery {
+    
 	public enum TraceOption {
 		SOME, NONE
 	};
@@ -43,7 +44,9 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
-	private boolean useReduction;
+        private int strongSoundnessBound;
+        private boolean useReduction;
+
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -225,6 +228,14 @@ public class TAPNQuery {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, false, hashTabelSize, extrapolationOption, new InclusionPlaces());
 		this.setWorkflowMode(workflow);
 	}
+        
+        public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry,boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption, WorkflowMode workflow, int strongSoundnessBound) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, workflow);
+		this.setStrongSoundnessBound(strongSoundnessBound);
+	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
@@ -307,5 +318,15 @@ public class TAPNQuery {
 	public void setWorkflowMode(WorkflowMode workflow) {
 		this.workflow = workflow;
 	}
+        
+        public int getStrongSoundnessBound(){
+            return strongSoundnessBound;
+        }
+        
+        public void setStrongSoundnessBound(int newval) {
+            strongSoundnessBound = newval;
+        }
+            
+            
 	
 }

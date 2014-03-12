@@ -1023,98 +1023,6 @@ public class WorkflowDialog extends JDialog {
 		}
 	}
 
-	private TimedArcPetriNetNetwork composeStrongSoundnessModel() {
-		TimedArcPetriNetNetwork network = model.copy();
-		TimedArcPetriNet out_template = network.getTAPNByName(this.out_template.name());
-		TimedPlace out_hook = null;
-
-		for(TimedPlace p : out_template.places()){
-			if(p.name().equals(out.name())){
-				out_hook = p;
-				break;
-			}
-		}
-
-		// Add new components
-		String name = "C";
-		while(network.getConstant(name) != null){
-			name += "x";
-		}
-		c = new Constant(name, (int) m*B+1); 
-		network.constants().add(c);
-
-		/* Create transitions */
-
-		name = "nok";
-		while(out_template.getTransitionByName(name) != null){
-			name += "x";
-		}
-		TimedTransition nok_t = new TimedTransition(name, true);
-		nok_t.setUrgent(true);
-		out_template.add(nok_t);
-
-		name = "tick";
-		while(out_template.getTransitionByName(name) != null){
-			name += "x";
-		}
-		TimedTransition tick_t = new TimedTransition(name, false);
-		out_template.add(tick_t);
-
-		name = "ok";
-		while(out_template.getTransitionByName(name) != null){
-			name += "x";
-		}
-		TimedTransition ok_t = new TimedTransition(name, true);
-		ok_t.setUrgent(true);
-		out_template.add(ok_t);
-
-		/* Create places */
-
-		name = "timer";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-		TimedPlace timer_p = new LocalTimedPlace(name, new TimeInvariant(true, new ConstantBound(c)));
-		out_template.add(timer_p);
-
-		name = "ready";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-		TimedPlace ready_p = new LocalTimedPlace(name);
-		out_template.add(ready_p);
-
-		name = "finished";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-		TimedPlace finished_p = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
-		out_template.add(finished_p);
-
-		name = "done";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-
-		done = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
-		out_template.add(done);
-
-		/* Create arcs */
-
-		out_template.add(new TimedInputArc(out_hook, nok_t, TimeInterval.ZERO_INF));
-		out_template.add(new TimedInputArc(out_hook, ok_t, TimeInterval.ZERO_INF));
-		out_template.add(new TimedInputArc(timer_p, tick_t, new TimeInterval(true, new ConstantBound(c), new ConstantBound(c), true)));
-		out_template.add(new TimedOutputArc(tick_t, ready_p));
-		out_template.add(new TimedInputArc(ready_p, ok_t, TimeInterval.ZERO_INF));
-		out_template.add(new TimedOutputArc(ok_t, done));
-		out_template.add(new TimedOutputArc(nok_t, finished_p));
-		out_template.add(new TimedInhibitorArc(ready_p, nok_t, TimeInterval.ZERO_INF));
-
-		out_template.addToken(new TimedToken(timer_p));
-
-		return network;
-	}
-
 	private Runnable getStrongSoundnessRunnable() {
 		return new Runnable() {
 
@@ -1139,19 +1047,19 @@ public class WorkflowDialog extends JDialog {
 					}
 				}
 
-				final TimedArcPetriNetNetwork model = composeStrongSoundnessModel();		
+
 
 				/* Call engine */
 
-				String template = done.isShared()? ((SharedPlace) done).getComponentsUsingThisPlace().get(0):((LocalTimedPlace) done).model().name();
-				final TAPNQuery q = new TAPNQuery(
-						"Workflow strong soundness checking",
-						numberOfExtraTokensInNet == null ? 0
-								: (Integer) numberOfExtraTokensInNet.getValue(),
-								new TCTLEFNode(new TCTLAtomicPropositionNode(template, done.name(), "=", 1)), TraceOption.SOME,
-								SearchOption.HEURISTIC,
-								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
-								false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+				final TAPNQuery q;
+                            q = new TAPNQuery(
+                                    "Workflow strong soundness checking",
+                                    numberOfExtraTokensInNet == null ? 0
+                                            : (Integer) numberOfExtraTokensInNet.getValue(),
+                                    new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
+                                    SearchOption.HEURISTIC,
+                                    ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+                                    false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, B);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
