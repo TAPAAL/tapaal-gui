@@ -19,6 +19,8 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final Pattern discoveredPattern = Pattern.compile("\\s*discovered states:\\s*(\\d+)\\s*");
 	private static final Pattern exploredPattern = Pattern.compile("\\s*explored states:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(\\d+)\\s*");
+        private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
+        private static final Pattern transitionStatsPatternUnknown = Pattern.compile("<([^:\\s]+):\\?>");
 	
 	/* Reductions */
 	private static final Pattern reductionsUsedPattern = Pattern.compile("\\s*Net reduction is enabled.\\s*");
@@ -48,8 +50,17 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 		boolean result = false;
 		boolean foundResult = false;
 		String[] lines = output.split(System.getProperty("line.separator"));
-		try {			
-			Matcher matcher;
+            try {
+                Matcher matcher = transitionStatsPattern.matcher(output);
+                while (matcher.find()) {
+                    transitionStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                }
+
+                matcher = transitionStatsPatternUnknown.matcher(output);
+                while (matcher.find()) {
+                    transitionStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
+                }
+
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
 				if (line.contains(Query_IS_SATISFIED_STRING)) {
