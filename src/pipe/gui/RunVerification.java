@@ -244,7 +244,7 @@ public class RunVerification extends RunVerificationBase {
 			gbc = new GridBagConstraints();
 			gbc.gridx = 1;
 			gbc.gridy = 1;
-			gbc.insets = new Insets(0,10,15,0);
+			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.EAST;
 			panel.add(infoButton, gbc);
 			
@@ -262,13 +262,27 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
 			}
+                        if(!result.getPlaceBoundStatistics().isEmpty()){
+				JButton placeStatsButton = new JButton("Place-Bound Statistics");
+				placeStatsButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						JOptionPane.showMessageDialog(panel,createTransitionStatisticsPanel(result) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+				gbc = new GridBagConstraints();
+				gbc.gridx = 1;
+				gbc.gridy = 2;
+				gbc.insets = new Insets(10,0,10,0);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(placeStatsButton, gbc);
+			}
 			
 			if(!result.getReductionResultAsString().isEmpty()){
 				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
 				gbc.gridy = 3;
-				gbc.insets = new Insets(0,0,20,0);
+				gbc.insets = new Insets(0,0,20,-90);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
 			}

@@ -83,6 +83,21 @@ public class VerificationResult<TTrace> {
 		Collections.sort(returnList,new transitionTupleComparator());
 		return returnList;
 	}
+        
+        public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
+		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
+		for (int i = 0; i < stats.placeBoundCount();i++) {
+			Tuple<String,Integer> element = stats.getPlaceBoundStats(i);
+			String placeName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
+			if(placeName.charAt(0) == '.'){
+                            placeName = "Shared"+placeName;
+			}
+			Integer placeBound = element.value2();
+			returnList.add(new Tuple<String, Integer>(placeName, placeBound));
+		}
+		Collections.sort(returnList,new transitionTupleComparator());
+		return returnList;
+	}
 	
 	public class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
 		
