@@ -35,7 +35,8 @@ public class VerifyDTAPNOutputParser {
 	private final TAPNQuery query;
 	private final int extraTokens;
 	private List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
-	
+	private List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
+        
 	public VerifyDTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
@@ -120,7 +121,7 @@ public class VerifyDTAPNOutputParser {
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored,transitionStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking));
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();

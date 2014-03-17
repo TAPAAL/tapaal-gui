@@ -21,7 +21,9 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(\\d+)\\s*");
         private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
         private static final Pattern transitionStatsPatternUnknown = Pattern.compile("<([^:\\s]+):\\?>");
-	
+	private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
+        private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
+        
 	/* Reductions */
 	private static final Pattern reductionsUsedPattern = Pattern.compile("\\s*Net reduction is enabled.\\s*");
 	private static final Pattern removedTransitionsPattern = Pattern.compile("\\s*Removed transitions:\\s*(\\d+)\\s*");
@@ -59,6 +61,14 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
                 matcher = transitionStatsPatternUnknown.matcher(output);
                 while (matcher.find()) {
                     transitionStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
+                }
+                matcher = placeBoundPattern.matcher(output);
+                while (matcher.find()) {
+                    placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                }
+                matcher = placeBoundPatternUnknown.matcher(output);
+                while (matcher.find()) {
+                    placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
                 }
 
 			for (int i = 0; i < lines.length; i++) {
@@ -127,7 +137,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 			if(!foundResult) return null;
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
 			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD) : null;
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats, reductionStats));
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();
