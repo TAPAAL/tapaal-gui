@@ -1890,7 +1890,7 @@ public class QueryDialog extends JPanel {
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();
-							s.append("The following places was used in the query, but are not present in your model:\n\n");
+							s.append("The following places were used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
