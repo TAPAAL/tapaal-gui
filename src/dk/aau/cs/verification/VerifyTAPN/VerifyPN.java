@@ -266,7 +266,7 @@ public class VerifyPN implements ModelChecker{
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
 			if(!supportsQuery(model.value1(), query, options))
-				throw new UnsupportedQueryException("verifypn does not support the given query.");
+				throw new UnsupportedQueryException("Verifypn does not support the given query.");
 			
 //			if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
@@ -341,7 +341,7 @@ public class VerifyPN implements ModelChecker{
 							(query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())){
 						return null;
 					} else{
-						messenger.displayErrorMessage("verifypn cannot generate the requested trace for the model. Try another trace option.");
+						messenger.displayErrorMessage("Verifypn cannot generate the requested trace for the model. Try another trace option.");
 					}
 				}
 			} 
