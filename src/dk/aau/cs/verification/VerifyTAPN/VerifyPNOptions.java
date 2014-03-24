@@ -12,13 +12,13 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 	private ModelReduction modelReduction;
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction) {
-		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces());
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.modelReduction = modelReduction;
 	}
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction) {
-		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION);
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 
 	@Override

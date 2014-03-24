@@ -400,15 +400,15 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			// Create a fresh model
 			composedModel = composeModel(model);
 			OverApproximation overaprx = new OverApproximation();
-			overaprx.modifyTAPN(composedModel.value1(), query);
+			overaprx.modifyTAPN(composedModel.value1(), query.approximationDenominator());
 			options.setTraceOption(TraceOption.SOME);
 		} else if (query != null && query.isUnderApproximationEnabled()) {
 			// Create a fresh model
 			composedModel = composeModel(model);
 			UnderApproximation underaprx = new UnderApproximation();
-			underaprx.modifyTAPN(composedModel.value1(), query);
+			underaprx.modifyTAPN(composedModel.value1(), query.approximationDenominator());
 		}
-		
+		 
 		modelChecker = getModelChecker(query);
 		fireVerificationTaskStarted();
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);		
@@ -442,8 +442,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				value.setNameMapping(composedModel.value2());
 	        } else {
 	            // If r > 1
-				if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG ) && verificationResult.getQueryResult().isQuerySatisfied())
-						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && !verificationResult.getQueryResult().isQuerySatisfied())) {
+				if (verificationResult.getTrace() != null && (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG ) && verificationResult.getQueryResult().isQuerySatisfied())
+						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && !verificationResult.getQueryResult().isQuerySatisfied()))) {
 					// If ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
 					//Create the verification satisfied result for the approximation
 	                VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
@@ -498,10 +498,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	            }
 				else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
 						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
-	                // If (EF AND not satisfied) OR (AG AND satisfied)
+	                // If (EF AND EG not satisfied) OR (AG AND AF satisfied)
 	               
 	                QueryResult queryResult = verificationResult.getQueryResult();
-                    queryResult.setApproximationInconclusive(true);
+	              
+	                if(queryResult.hasDeadlock() || queryResult.queryType() == QueryType.EG || queryResult.queryType() == QueryType.AF){
+						queryResult.setApproximationInconclusive(true);
+					}
 	                
 	                value =  new VerificationResult<TimedArcPetriNetTrace>(
 						queryResult,
@@ -512,6 +515,23 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						verificationResult.isOverApproximationResult());
 				    value.setNameMapping(composedModel.value2());
 	            }
+				else {
+					// We cannot use the result directly, and did not get a trace.
+					
+					QueryResult queryResult = verificationResult.getQueryResult();
+					
+					queryResult.setApproximationInconclusive(true);
+	                
+	                value =  new VerificationResult<TimedArcPetriNetTrace>(
+						queryResult,
+						verificationResult.getTrace(),
+						verificationResult.getSecondaryTrace(),
+						verificationResult.verificationTime(),
+						verificationResult.stats(),
+						verificationResult.isOverApproximationResult());
+				    value.setNameMapping(composedModel.value2());
+					
+				}
 	        }
 	    } 
 	    else if (query != null && query.isUnderApproximationEnabled()) {
@@ -551,7 +571,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
 					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 	                    
-	                    if (!clonedQuery.hasDeadlock()) {
+	                    if (!clonedQuery.hasDeadlock() && verificationResult.getQueryResult().queryType() != QueryType.EG && verificationResult.getQueryResult().queryType() != QueryType.AF) {
 	                    	QueryResult queryResult= verificationResult.getQueryResult();
 	                        value =  new VerificationResult<TimedArcPetriNetTrace>(
 	                            queryResult,
@@ -561,7 +581,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                            verificationResult.stats(),
 	        					verificationResult.isOverApproximationResult());
 	                        value.setNameMapping(composedModel.value2());
-	                } else {
+	                } else if(verificationResult.getTrace() != null) {
 	                    // If query does have deadlock -> create trace TAPN
 	                    //Create the verification satisfied result for the approximation
 	                    valueNetwork = new VerificationResult<TAPNNetworkTrace>(
@@ -616,6 +636,20 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	        					verificationResult.isOverApproximationResult());
 	                    value.setNameMapping(composedModel.value2());
 	                }
+	                else {
+	                	QueryResult queryResult = verificationResult.getQueryResult();
+						
+						queryResult.setApproximationInconclusive(true);
+		                
+		                value =  new VerificationResult<TimedArcPetriNetTrace>(
+							queryResult,
+							verificationResult.getTrace(),
+							verificationResult.getSecondaryTrace(),
+							verificationResult.verificationTime(),
+							verificationResult.stats(),
+							verificationResult.isOverApproximationResult());
+					    value.setNameMapping(composedModel.value2());
+	                }
 	            }
 	        }
 	    } else {
@@ -659,13 +693,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces());	// XXX DISABLES OverApprox
+			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
-			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction());
+			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		else
-			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false);
+			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 	}
 	
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {

@@ -2594,12 +2594,12 @@ public class QueryDialog extends JPanel {
 					if (overApproximationEnable.isSelected())
 					{
 						OverApproximation overaprx = new OverApproximation();
-						overaprx.modifyTAPN(transformedModel.value1(), getQuery());
+						overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
 					}
 					else if (underApproximationEnable.isSelected())
 					{
 						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery(), ((TAPNComposerExtended) composer).getGuiModel());
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposerExtended) composer).getGuiModel());
 					}
 					templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
 					

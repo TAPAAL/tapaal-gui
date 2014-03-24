@@ -42,11 +42,11 @@ public class VerifyTAPNExporter {
 			
 			VerifyTAPNOptions options = null;
 			if(dataLayerQuery == null){
-				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
+				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true, false, false, 1);
 			}else if(dataLayerQuery.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useGCD(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie(), dataLayerQuery.useOverApproximation());
+				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useGCD(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie(), dataLayerQuery.useOverApproximation(), dataLayerQuery.isOverApproximationEnabled(), dataLayerQuery.isUnderApproximationEnabled(), dataLayerQuery.approximationDenominator());
 			} else {
-				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useOverApproximation());
+				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useOverApproximation(), dataLayerQuery.isOverApproximationEnabled(), dataLayerQuery.isUnderApproximationEnabled(), dataLayerQuery.approximationDenominator());
 			}
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");

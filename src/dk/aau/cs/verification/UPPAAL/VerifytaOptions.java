@@ -15,18 +15,24 @@ public class VerifytaOptions implements VerificationOptions {
 	private ReductionOption reduction;
 	private boolean symmetry;
 	private boolean useOverApproximation;
+	private boolean enableOverApproximation;
+	private boolean enableUnderApproximation;
+	private int approximationDenominator;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifytaOptions(TraceOption trace, SearchOption search,
-			boolean untimedTrace, ReductionOption reduction, boolean symmetry, boolean useOverApproximation) {
+			boolean untimedTrace, ReductionOption reduction, boolean symmetry, boolean useOverApproximation, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		traceOption = trace;
 		searchOption = search;
 		this.untimedTrace = untimedTrace;
 		this.reduction = reduction;
 		this.symmetry = symmetry;
 		this.useOverApproximation = useOverApproximation;
+		this.enableOverApproximation = enableOverApproximation;
+		this.enableUnderApproximation = enableUnderApproximation;
+		this.approximationDenominator = approximationDenominator;
 	}
 
 	public boolean symmetry() {
@@ -96,5 +102,20 @@ public class VerifytaOptions implements VerificationOptions {
 	@Override
 	public SearchOption searchOption() {
 		return searchOption;
+	}
+	
+	@Override
+	public boolean enableOverApproximation() {
+		return enableOverApproximation;
+	}
+
+	@Override
+	public boolean enableUnderApproximation() {
+		return enableUnderApproximation;
+	}
+
+	@Override
+	public int approximationDenominator() {
+		return approximationDenominator;
 	}
 }

@@ -13,6 +13,7 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.verification.VerificationOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.graphicElements.Arc;
@@ -23,18 +24,18 @@ import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class UnderApproximation implements ITAPNApproximation {
 	@Override
-	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query) {
-		modifyTAPN(net, query, null);
+	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator) {
+		modifyTAPN(net, approximationDenominator, null);
 	}
 	
-	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query, DataLayer guiModel) {	
+	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator, DataLayer guiModel) {	
 		// Fix input arcs
 		ArrayList<TAPNElement> arcsToDelete = new ArrayList<TAPNElement>();
 		for (TimedInputArc arc : net.inputArcs()) {
 			 //Fix input arcs
 			TimeInterval oldInterval = arc.interval();
 			
-			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
 			if (newInterval != null)
@@ -47,7 +48,7 @@ public class UnderApproximation implements ITAPNApproximation {
 			//fix transport arcs
 			TimeInterval oldInterval = arc.interval();
 			
-			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
 			if (newInterval != null)
@@ -137,7 +138,7 @@ public class UnderApproximation implements ITAPNApproximation {
 		for (TimedPlace place1 : net.places()) {
 			if ( ! (place1.invariant().upperBound() instanceof Bound.InfBound) && place1.invariant().upperBound().value() > 0) {					
 				TimeInvariant oldInvariant = place1.invariant();
-				place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.floor(oldInvariant.upperBound().value() / (double)query.approximationDenominator()))));
+				place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator))));
 			}
 		}
 	}

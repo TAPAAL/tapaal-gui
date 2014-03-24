@@ -17,16 +17,17 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.TAPNQuery;
 
 public class OverApproximation implements ITAPNApproximation {
 	@Override
-	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query) {
+	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator) {
 		// Fix input arcs
 		for (TimedInputArc arc : net.inputArcs()) {
 			TimeInterval oldInterval = arc.interval();
-			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			arc.setTimeInterval(newInterval);
 		}
@@ -34,7 +35,7 @@ public class OverApproximation implements ITAPNApproximation {
 		// Fix transport arcs
 		for (TransportArc arc : net.transportArcs()) {
 			TimeInterval oldInterval = arc.interval();
-			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			arc.setTimeInterval(newInterval);
 		}
@@ -43,7 +44,7 @@ public class OverApproximation implements ITAPNApproximation {
 		for (TimedPlace place : net.places()) {
 			if ( ! (place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {					
 				TimeInvariant oldInvariant = place.invariant();
-				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.ceil(oldInvariant.upperBound().value() / (double)query.approximationDenominator()))));
+				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.ceil(oldInvariant.upperBound().value() / (double)approximationDenominator))));
 			}
 		}
 	}
