@@ -8,6 +8,7 @@ import dk.aau.cs.model.tapn.TAPNElement;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -19,6 +20,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
@@ -125,11 +127,33 @@ public class UnderApproximation implements ITAPNApproximation {
 					}
 				}
 				if (guiModel != null) {
-					guiTransition.delete(); //NOT AT ALL SURE THIS ALSO DELETES MODELS TRANSITION (Like what happens with arcs)
+					guiTransition.delete(); //Asserting that this also deletes the underlying model transition
 				} else {
 					transition.delete(); 
 				}
-				
+				//Now that the transition has been deleted, we also need to delete any inhibitor arcs that were inhibiting it
+				ArrayList<TAPNElement> inhibArcsToDelete = new ArrayList<TAPNElement>();
+				for (TimedInhibitorArc inhibArc : net.inhibitorArcs()) {
+					if (inhibArc.destination() == transition){
+						inhibArcsToDelete.add(inhibArc);
+					}
+				}
+				for(TAPNElement inhibArc : inhibArcsToDelete){
+					if (guiModel != null) {	// If we are in the process of saving XML and want to update guiModel
+						//We need to find the arc in the guiModel and delete it
+						for (Arc arc1 : guiModel.getArcs()){	
+							if(arc1 instanceof TimedInhibitorArcComponent)
+							{ 
+								if(((TimedInhibitorArcComponent) arc1).underlyingTimedInhibitorArc() == inhibArc){
+									arc1.delete();
+								}
+							}
+						}
+					}
+					else {
+						inhibArc.delete();
+					}
+				}
 			}
 		}	
 		
