@@ -566,7 +566,11 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				newOutArc.setGuiModel(guiModel);
 				newOutArc.updateArcPosition();
 				guiModel.addArc(newOutArc);
-
+				
+				// Add connection references to the two transport arcs
+				newInArc.setConnectedTo(newOutArc);
+				newOutArc.setConnectedTo(newInArc);
+				
 				guiSourceOut.addConnectTo(newOutArc);
 				guiTargetOut.addConnectFrom(newOutArc);
 				
