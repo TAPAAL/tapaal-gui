@@ -162,7 +162,14 @@ public class UnderApproximation implements ITAPNApproximation {
 		for (TimedPlace place1 : net.places()) {
 			if ( ! (place1.invariant().upperBound() instanceof Bound.InfBound) && place1.invariant().upperBound().value() > 0) {					
 				TimeInvariant oldInvariant = place1.invariant();
-				place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator))));
+				
+				int newInvariantBound = (int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				if(newInvariantBound != 0){
+					place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
+				}
+				else{
+					place1.setInvariant(new TimeInvariant(true, new IntBound(0)));
+				}
 			}
 		}
 	}
@@ -191,9 +198,7 @@ public class UnderApproximation implements ITAPNApproximation {
 		}
 		
 		// if the interval becomes too small
-		if ( (newUpperBound.value() == newLowerBound.value()) && 
-				((oldInterval.IsLowerBoundNonStrict() && !oldInterval.IsUpperBoundNonStrict()) ||
-						(!oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict())))
+		if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
 		{
 			return null;
 		}
