@@ -69,6 +69,7 @@ import com.sun.jna.Platform;
 
 
 
+
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -133,6 +134,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GridAction toggleGrid;
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
+	private SpacingAction incSpacing, decSpacing;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
@@ -539,6 +541,16 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.add(zoomMenu);
 
 		viewMenu.addSeparator();
+		
+		addMenuItem(viewMenu, incSpacing = new SpacingAction("Increase spacing",
+				"Increase spacing by 20% ", "ctrl +"));
+		
+		addMenuItem(viewMenu, decSpacing = new SpacingAction("Decrease spacing",
+				"Decrease spacing by 20% ", "ctrl +"));
+
+		
+		viewMenu.addSeparator();
+		
 		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				"Change the grid size", "G"));
 		
@@ -2185,6 +2197,41 @@ public class GuiFrame extends JFrame implements Observer {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
+		}
+
+	}
+	
+	class SpacingAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 549331166742882564L;
+
+		SpacingAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			String actionName = (String) getValue(NAME);
+			Zoomer zoomer = appView.getZoomController();
+			TabContent tabContent = (TabContent) appTab.getSelectedComponent();
+			JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
+			
+			/*if (actionName.equals("Increase spacing")) {
+				zoomer.incSpacing();
+			} else if (actionName.equals("Decrease spacing")) {
+				zoomer.decSpacing();
+			} 
+			
+			double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
+					+ (thisView.getWidth() * 0.5), zoomer.getPercent());
+			double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
+					+ (thisView.getHeight() * 0.5), zoomer.getPercent());
+
+			java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
+
+			appView.zoomTo(midpoint);*/
 		}
 
 	}
