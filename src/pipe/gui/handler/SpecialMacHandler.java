@@ -1,14 +1,16 @@
 package pipe.gui.handler;
 
 import java.awt.Image;
+import java.awt.Window;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 
 import javax.imageio.ImageIO;
 
 import net.tapaal.TAPAAL;
-
 import pipe.gui.CreateGui;
+
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
@@ -52,8 +54,6 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
         
         // Grow size of boxes to add room for the resizer
         System.setProperty("apple.awt.showGrowBox", "true");
-
-	    
 	}
 	
 	public void handleAbout(AboutEvent arg0) {
@@ -64,6 +64,17 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 		CreateGui.appGui.exit();
 	}
 
- 
+	public static void postprocess(){
+		// Enable fullscreen on Mac
+		// Use reflection to prevent compile errors
+		try {
+	        Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+	        Class params[] = new Class[]{Window.class, Boolean.TYPE};
+	        Method method = util.getMethod("setWindowCanFullScreen", params);
+	        method.invoke(util, CreateGui.appGui, true);
+	    } catch (Exception e) {
+	    	// Fullscreen not supported
+	    }
+	}
 
 }
