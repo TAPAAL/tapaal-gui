@@ -393,6 +393,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		VerificationOptions options = getVerificationOptionsFromQuery(query);
 		
+		InclusionPlaces oldInclusionPlaces = null;
+		if (options instanceof VerifyTAPNOptions)
+			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
+		
 		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<TimedArcPetriNet, NameMapping>(composedModel.value1().copy(), composedModel.value2());
 		
 		TraceOption oldTraceOption = options.traceOption();
@@ -412,10 +416,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		modelChecker = getModelChecker(query);
 		fireVerificationTaskStarted();
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);		
-		
-		InclusionPlaces oldInclusionPlaces = null;
-		if (options instanceof VerifyTAPNOptions)
-			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
@@ -462,8 +462,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
 	                
 	                // Reset the inclusion places in order to avoid NullPointerExceptions
-	                if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
+	                if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null){
 	                    ((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
+	                }
 
 	                //run model checker again for trace TAPN
 	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
