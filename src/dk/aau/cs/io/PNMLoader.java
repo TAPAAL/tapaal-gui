@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,6 +38,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.util.FormatException;
+import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -71,6 +74,9 @@ public class PNMLoader {
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private IdResolver idResolver = new IdResolver();
+	private HashSet<String> arcs = new HashSet<String>();
+	private HashMap<String, TimedPlace> places = new HashMap<String, TimedPlace>();
+	private HashMap<String, TimedTransition> transitions = new HashMap<String, TimedTransition>();
 	
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
@@ -119,6 +125,7 @@ public class PNMLoader {
 		String name = getTAPNName(netNode);
 		
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
+		tapn.setCheckNames(false);
 		network.add(tapn);
 		nameGenerator.add(tapn);
 
@@ -128,27 +135,32 @@ public class PNMLoader {
 		parseTimedArcPetriNet(netNode, tapn, template);
 		
 		network.setPaintNet(isNetDrawable());
-		
+		tapn.setCheckNames(true);
 		return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>());
 	}
 
 	private String getTAPNName(Node netNode) {
 		if(netNode == null || !(netNode instanceof Element)){
-			return "Default";
+			return nameGenerator.getNewTemplateName();
 		}
-		String result = "Default";
+		String result = null;
 
 		Node name =  getFirstDirectChild(netNode, "name");
 		if(name != null){
 			result = getFirstDirectChild(name, "text").getTextContent();
 		}
 		
+		if(name == null || name.equals("")){
+			return nameGenerator.getNewTemplateName();
+		}
+		
 		result = result.trim();
-		result = result.replace(".", "_");
-		result = result.replace(" ", "_");
+		result = result.replace(".", "<dot>");
+		result = result.replace(" ", "<space>");
+		result = result.replace("-", "<dash>");
 		
 		//TODO Fix the name if not allowed
-		return result == null ? "Default" : result;
+		return result;
 	}
 
 	private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template) throws FormatException {
@@ -193,11 +205,16 @@ public class PNMLoader {
 		}
 		
 		Name name = parseName(getFirstDirectChild(node, "name"));
+		if(name == null){
+			name = new Name(nameGenerator.getNewPlaceName(template.model()));
+		}
 		Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
 		String id = ((Element) node).getAttribute("id");
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
 		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(true, new IntBound(0)));
+		Require.that(places.put(name.name, place) == null && !transitions.containsKey(name.name), 
+				"The name: " + name.name + ", was already used");
 		tapn.add(place);
 		
 		if(isNetDrawable()){
@@ -220,7 +237,6 @@ public class PNMLoader {
 			return new InitialMarking();
 		}
 		
-		Element element = (Element) node;
 		Point offset = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Offset);
 		
 		int marking = Integer.parseInt(getFirstDirectChild(node, "text").getTextContent());
@@ -235,9 +251,14 @@ public class PNMLoader {
 		
 		Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
 		Name name = parseName(getFirstDirectChild(node, "name"));
+		if(name == null){
+			name = new Name(nameGenerator.getNewTransitionName(template.model()));
+		}
 		String id = ((Element) node).getAttribute("id");
 		
 		TimedTransition transition = new TimedTransition(name.name);
+		Require.that(transitions.put(name.name, transition) == null && !places.containsKey(name.name), 
+				"The name: " + name.name + ", was already used");
 		tapn.add(transition);
 		
 		if(isNetDrawable()){
@@ -265,11 +286,11 @@ public class PNMLoader {
 		String sourceName = idResolver.get(template.model().name(), sourceId);
 		String targetName = idResolver.get(template.model().name(), targetId);
 		
-		TimedPlace sourcePlace = template.model().getPlaceByName(sourceName);
-		TimedPlace targetPlace = template.model().getPlaceByName(targetName);
+		TimedPlace sourcePlace = places.get(sourceName);
+		TimedPlace targetPlace = places.get(targetName);
 		
-		TimedTransition sourceTransition = template.model().getTransitionByName(sourceName);
-		TimedTransition targetTransition = template.model().getTransitionByName(targetName);
+		TimedTransition sourceTransition = transitions.get(sourceName);
+		TimedTransition targetTransition = transitions.get(targetName);
 		
 		PlaceTransitionObject source = template.guiModel().getPlaceTransitionObject(sourceName);
 		PlaceTransitionObject target = template.guiModel().getPlaceTransitionObject(targetName);
@@ -317,16 +338,18 @@ public class PNMLoader {
 
 	private Name parseName(Node node){
 		if(node == null || !(node instanceof Element)){
-			return new Name();
+			return null;
 		}
-		
 		Point offset = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Offset);
 		
 		String name = getFirstDirectChild(node, "text").getTextContent();
-		
+		if(name == null || name.equals("")){
+			return null;
+		}
 		name = name.trim();
-		name = name.replace(".", "_");
-		name = name.replace(" ", "_");
+		name = name.replace(".", "<dot>");
+		name = name.replace(" ", "<space>");
+		name = name.replace("-", "<dash>");
 		
 		return new Name(name, offset);
 	}
@@ -358,11 +381,15 @@ public class PNMLoader {
 			this("", new Point());
 		}
 		
+		public Name(String newPlaceName) {
+			this(newPlaceName, new Point());
+		}
+		
 		public Name(String name, Point p) {
 			this.name = name;
 			this.point = p;
 		}
-		
+
 		@Override
 		public String toString() {
 			return name + ";" + point;
@@ -395,7 +422,9 @@ public class PNMLoader {
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
 		
-		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
+		Require.that(places.containsKey(inputArc.source().name()),	"The source place must be part of the petri net.");
+		Require.that(transitions.containsKey(inputArc.destination().name()), "The destination transition must be part of the petri net");
+		if(!arcs.add(inputArc.source().name() + "-in-" + inputArc.destination().name())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 		
@@ -427,7 +456,9 @@ public class PNMLoader {
 		
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place, new IntWeight(weight));
 		
-		if(template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
+		Require.that(places.containsKey(outputArc.destination().name()), "The destination place must be part of the petri net.");
+		Require.that(transitions.containsKey(outputArc.source().name()), "The source transition must be part of the petri net");
+		if(!arcs.add(outputArc.source().name() + "-out-" + outputArc.destination().name())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 		

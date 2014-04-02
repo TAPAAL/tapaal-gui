@@ -86,6 +86,12 @@ TOKEN :
 	<AND: "&">
 	|
 	<NOT: "!">
+	|
+	<XOR: "xor">
+	|
+	<IMPL: "=>">
+	| 
+	<BIIMPL: "<=>">
 }
 
 TOKEN :
@@ -154,14 +160,36 @@ TCTLAbstractStateProperty AndExpr() :
 	ArrayList<TCTLAbstractStateProperty> conjunctions = new ArrayList<TCTLAbstractStateProperty>();
 }
 {
-	currentChild = NotExpr()
+	currentChild = Xor()
 	{ conjunctions.add(currentChild); }
 	(
-		<AND> currentChild = NotExpr() 
+		<AND> currentChild = Xor() 
 		{ conjunctions.add(currentChild); }
 	)*
 	{ return conjunctions.size() == 1 ? currentChild : new TCTLAndListNode(conjunctions); }
 }
+
+TCTLAbstractStateProperty Xor() :
+{
+	TCTLAbstractStateProperty currentChild; 
+	TCTLAbstractStateProperty next; 
+}
+{
+	currentChild = NotExpr()
+	(
+		<XOR> next = NotExpr() 
+		{ 
+			//Convert to & and | 
+			TCTLAbstractStateProperty first = new TCTLOrListNode(currentChild, next);
+			TCTLAbstractStateProperty second = new TCTLAndListNode(currentChild, next);
+			second = new TCTLNotNode(second);
+			currentChild = new TCTLAndListNode(first, second); 
+		}
+	)*
+	{ return currentChild; }
+}
+
+
 
 TCTLAbstractStateProperty NotExpr() :
 {

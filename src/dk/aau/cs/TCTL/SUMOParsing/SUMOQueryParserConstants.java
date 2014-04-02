@@ -35,17 +35,23 @@ public interface SUMOQueryParserConstants {
   /** RegularExpression Id. */
   int NOT = 12;
   /** RegularExpression Id. */
-  int PLUS = 13;
+  int XOR = 13;
   /** RegularExpression Id. */
-  int MULT = 14;
+  int IMPL = 14;
   /** RegularExpression Id. */
-  int NUM = 15;
+  int BIIMPL = 15;
   /** RegularExpression Id. */
-  int IDENT = 16;
+  int PLUS = 16;
   /** RegularExpression Id. */
-  int OP = 17;
+  int MULT = 17;
   /** RegularExpression Id. */
-  int NOP = 18;
+  int NUM = 18;
+  /** RegularExpression Id. */
+  int IDENT = 19;
+  /** RegularExpression Id. */
+  int OP = 20;
+  /** RegularExpression Id. */
+  int NOP = 21;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -65,6 +71,9 @@ public interface SUMOQueryParserConstants {
     "\"|\"",
     "\"&\"",
     "\"!\"",
+    "\"xor\"",
+    "\"=>\"",
+    "\"<=>\"",
     "<PLUS>",
     "\"*\"",
     "<NUM>",
