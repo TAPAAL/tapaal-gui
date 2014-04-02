@@ -485,7 +485,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 
 	private void createTransportArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
-		int nextGroupNr = 1;
+		int nextGroupNr = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			DataLayer currentGuiModel = this.guiModels.get(tapn);
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
@@ -536,6 +536,19 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				guiSourceIn.addConnectTo(newInArc);
 				guiTargetIn.addConnectFrom(newInArc);
 				
+				// Calculate the next group number for this transport arc
+				// By looking at the target of the newInArc -> a transition
+				// Then finding the largest existing group number of outgoing transport arcs from this transition
+				for (Object pt : newInArc.getTarget().getPostset()) {
+					if (pt instanceof TimedTransportArcComponent) {
+						if (((TimedTransportArcComponent) pt).getGroupNr() > nextGroupNr) {
+							nextGroupNr = ((TimedTransportArcComponent) pt).getGroupNr();
+						}
+					}
+				}
+
+				((TimedTransportArcComponent) newInArc).setGroupNr(nextGroupNr + 1);
+				
 				//Create output transport arc
 				Transition guiSourceOut = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
 				Place guiTargetOut = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
@@ -552,7 +565,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 							mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
 							false
 							)), 
-						nextGroupNr, 
+						nextGroupNr + 1, 
 						false
 						);
 				
@@ -573,8 +586,6 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				
 				guiSourceOut.addConnectTo(newOutArc);
 				guiTargetOut.addConnectFrom(newOutArc);
-				
-				++nextGroupNr;
 			}
 			i++;
 		}
