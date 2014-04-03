@@ -80,7 +80,7 @@ public class PNMLoader {
 	
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
-	private int maxNetSize = 2000;
+	private int maxNetSize = 4000;
 	
 	public PNMLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -155,9 +155,10 @@ public class PNMLoader {
 		}
 		
 		result = result.trim();
-		result = result.replace(".", "<dot>");
-		result = result.replace(" ", "<space>");
-		result = result.replace("-", "<dash>");
+		result = result.replace(".", "_dot_");
+		result = result.replace(" ", "_space_");
+		result = result.replace("-", "_dash_");
+		result = result.replace("/", "_slash_");
 		
 		//TODO Fix the name if not allowed
 		return result;
@@ -347,9 +348,10 @@ public class PNMLoader {
 			return null;
 		}
 		name = name.trim();
-		name = name.replace(".", "<dot>");
-		name = name.replace(" ", "<space>");
-		name = name.replace("-", "<dash>");
+		name = name.replace(".", "_dot_");
+                name = name.replace(" ", "_space_");
+                name = name.replace("-", "_dash_");
+                name = name.replace("/", "_slash_");
 		
 		return new Name(name, offset);
 	}

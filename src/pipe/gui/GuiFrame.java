@@ -356,12 +356,12 @@ public class GuiFrame extends JFrame implements Observer {
 		importMenu.setIcon(new ImageIcon(Thread.currentThread()
 				.getContextClassLoader().getResource(
 						CreateGui.imgPath + "Export.png")));
-		addMenuItem(importMenu, importPNMLAction = new FileAction("PNML",
-				"Import a net in the PNML format", ""));
+		addMenuItem(importMenu, importPNMLAction = new FileAction("PNML untimed net",
+				"Import an untimed net in the PNML format", ""));
 		//importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('G', shortcutkey));
 
-		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO", 
-				"Import queries in the SUMO format", ""));
+		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
+				"Import SUMO queries in a plain text format", ""));
 
 		fileMenu.add(importMenu);
 
