@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -23,7 +22,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -36,13 +34,11 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -154,14 +150,8 @@ public class PNMLoader {
 			return nameGenerator.getNewTemplateName();
 		}
 		
-		result = result.trim();
-		result = result.replace(".", "_dot_");
-		result = result.replace(" ", "_space_");
-		result = result.replace("-", "_dash_");
-		result = result.replace("/", "_slash_");
-		
 		//TODO Fix the name if not allowed
-		return result;
+		return NamePurifier.purify(result);
 	}
 
 	private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template) throws FormatException {
@@ -347,12 +337,8 @@ public class PNMLoader {
 		if(name == null || name.equals("")){
 			return null;
 		}
-		name = name.trim();
-		name = name.replace(".", "_dot_");
-                name = name.replace(" ", "_space_");
-                name = name.replace("-", "_dash_");
-                name = name.replace("/", "_slash_");
 		
+		name = NamePurifier.purify(name);
 		return new Name(name, offset);
 	}
 	
