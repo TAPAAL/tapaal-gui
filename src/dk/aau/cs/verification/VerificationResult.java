@@ -110,6 +110,14 @@ public class VerificationResult<TTrace> {
 		return queryResult;
 	}
 
+	public void setTrace(TTrace newTrace){
+		trace = newTrace;
+	}
+	
+	public void setSecondaryTrace(TTrace newTrace){
+		secondaryTrace = newTrace;
+	}
+	
 	public TTrace getTrace() {
 		return trace;
 	}
