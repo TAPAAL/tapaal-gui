@@ -77,6 +77,8 @@ TOKEN :
 	<I: "I">
 	| 
 	<N: "N">
+	|
+	<P: "P">
 }
 
 TOKEN :
@@ -136,6 +138,7 @@ TCTLAbstractProperty AbstractProperty() :
 		| <AG> child = OrExpr() {return new TCTLAGNode(child); } 
 		| <I> child = OrExpr() {return new TCTLAGNode(child); }
 		| <N> child = OrExpr() {return new TCTLAGNode(new TCTLNotNode(child)); }
+		| <P> child = OrExpr() {return new TCTLEGNode(child); }
 	) 
 }
 
@@ -160,19 +163,23 @@ TCTLAbstractStateProperty AndExpr() :
 	ArrayList<TCTLAbstractStateProperty> conjunctions = new ArrayList<TCTLAbstractStateProperty>();
 }
 {
-	currentChild = Xor()
+	currentChild = XorOrImpl()
 	{ conjunctions.add(currentChild); }
 	(
-		<AND> currentChild = Xor() 
+		<AND> currentChild = XorOrImpl() 
 		{ conjunctions.add(currentChild); }
 	)*
 	{ return conjunctions.size() == 1 ? currentChild : new TCTLAndListNode(conjunctions); }
 }
 
-TCTLAbstractStateProperty Xor() :
+TCTLAbstractStateProperty XorOrImpl() :
 {
 	TCTLAbstractStateProperty currentChild; 
 	TCTLAbstractStateProperty next; 
+	TCTLAbstractStateProperty first;
+	TCTLAbstractStateProperty second;
+	TCTLAbstractStateProperty firstOfSecond;
+	TCTLAbstractStateProperty secondOfSecond;
 }
 {
 	currentChild = NotExpr()
@@ -180,10 +187,27 @@ TCTLAbstractStateProperty Xor() :
 		<XOR> next = NotExpr() 
 		{ 
 			//Convert to & and | 
-			TCTLAbstractStateProperty first = new TCTLOrListNode(currentChild, next);
-			TCTLAbstractStateProperty second = new TCTLAndListNode(currentChild, next);
+			first = new TCTLOrListNode(currentChild, next);
+			second = new TCTLAndListNode(currentChild, next);
 			second = new TCTLNotNode(second);
 			currentChild = new TCTLAndListNode(first, second); 
+		}
+		|
+		<IMPL> next = NotExpr()
+		{
+			//Convert to & and |
+			first = new TCTLNotNode(currentChild);
+			currentChild = new TCTLOrListNode(first, next);
+		}
+		|
+		<BIIMPL> next = NotExpr()
+		{
+			//Convert to & and |
+			first = new TCTLAndListNode(currentChild, next);
+			firstOfSecond = new TCTLNotNode(currentChild);
+			secondOfSecond = new TCTLNotNode(next);
+			second = new TCTLAndListNode(firstOfSecond, secondOfSecond);
+			currentChild = new TCTLOrListNode(first, second);
 		}
 	)*
 	{ return currentChild; }
@@ -223,67 +247,49 @@ TCTLAbstractStateProperty AtomicProposition() :
 	Token op;
 }
 {
-	left = AritmeticExpr() 
+	left = AtomicFactor() 
 	
 	(
-		op = <OP> right = AritmeticExpr() 	{ return new TCTLAtomicPropositionNode(left, op.image, right); }
+		op = <OP> right = AtomicFactor() 	{ return new TCTLAtomicPropositionNode(left, op.image, right); }
 		|
-		<NOP> right = AritmeticExpr() { return new TCTLNotNode(new TCTLAtomicPropositionNode(left, "=", right)); }
+		<NOP> right = AtomicFactor() { return new TCTLNotNode(new TCTLAtomicPropositionNode(left, "=", right)); }
 	) 
 		
 }
 
-TCTLAbstractStateProperty AritmeticExpr() : 
+TCTLAbstractStateProperty AtomicFactor() :
 {
-	TCTLAbstractStateProperty currentChild; 
-	ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
-	Token op;
-}
-{
-	currentChild = AritmeticTerm()
-	{ terms.add(currentChild); }
-	( 
-		op = <PLUS> currentChild = AritmeticTerm()
-		{ 
-			terms.add(new AritmeticOperator(op.image));
-			terms.add(currentChild); 
-		}
-	)*
-	{ return terms.size() == 1 ? currentChild : new TCTLPlusListNode(terms); }
-}
-
-TCTLAbstractStateProperty AritmeticTerm() : 
-{
-	TCTLAbstractStateProperty currentChild; 
-	ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<TCTLAbstractStateProperty>();
-	Token op;
-}
-{
-	currentChild = AritmeticFactor()
-	{ factors.add(currentChild); }
-	( 
-		op = <MULT> currentChild = AritmeticFactor()
-		{ 
-			factors.add(new AritmeticOperator(op.image));
-			factors.add(currentChild); 
-		}
-	)*
-	{ return factors.size() == 1 ? currentChild : new TCTLTermListNode(factors); }
-}
-
-TCTLAbstractStateProperty AritmeticFactor() : 
-{
-	TCTLAbstractStateProperty thisProp; 
-	Token place;
-	Token op;
+	TCTLAbstractStateProperty thisProp;
 	Token num;
 }
 {
 	(
-		"|marking(\"" place = <IDENT> "\")|" { thisProp = new TCTLPlaceNode(place.image); }
-		| num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); } 
-		| "(" thisProp = AritmeticExpr() ")"
+		thisProp = PlaceList()
+		|
+		num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); }
+		|
+		"(" thisProp = AtomicFactor() ")" { return thisProp; }
 	)
+	{return thisProp;}
+}
+
+TCTLAbstractStateProperty PlaceList() :
+{
+	TCTLAbstractStateProperty currentChild;
+	ArrayList<TCTLAbstractStateProperty> places = new ArrayList<TCTLAbstractStateProperty>();
+	Token place;
+}
+{
+	"#tokens(" "\"" place = <IDENT> "\"" { currentChild = new TCTLPlaceNode(place.image); places.add(currentChild); }
 	
-	{ return thisProp; }
+	(
+		"," "\"" place = <IDENT> "\"" 
+		{
+			places.add(new AritmeticOperator("+"));
+			currentChild = new TCTLPlaceNode(place.image); 
+			places.add(currentChild); 
+		}
+	)*
+	")"
+	{ return places.size() == 1 ? currentChild : new TCTLPlusListNode(places); }
 }

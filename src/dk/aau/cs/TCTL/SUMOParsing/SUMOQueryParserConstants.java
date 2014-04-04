@@ -29,29 +29,31 @@ public interface SUMOQueryParserConstants {
   /** RegularExpression Id. */
   int N = 9;
   /** RegularExpression Id. */
-  int OR = 10;
+  int P = 10;
   /** RegularExpression Id. */
-  int AND = 11;
+  int OR = 11;
   /** RegularExpression Id. */
-  int NOT = 12;
+  int AND = 12;
   /** RegularExpression Id. */
-  int XOR = 13;
+  int NOT = 13;
   /** RegularExpression Id. */
-  int IMPL = 14;
+  int XOR = 14;
   /** RegularExpression Id. */
-  int BIIMPL = 15;
+  int IMPL = 15;
   /** RegularExpression Id. */
-  int PLUS = 16;
+  int BIIMPL = 16;
   /** RegularExpression Id. */
-  int MULT = 17;
+  int PLUS = 17;
   /** RegularExpression Id. */
-  int NUM = 18;
+  int MULT = 18;
   /** RegularExpression Id. */
-  int IDENT = 19;
+  int NUM = 19;
   /** RegularExpression Id. */
-  int OP = 20;
+  int IDENT = 20;
   /** RegularExpression Id. */
-  int NOP = 21;
+  int OP = 21;
+  /** RegularExpression Id. */
+  int NOP = 22;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -68,6 +70,7 @@ public interface SUMOQueryParserConstants {
     "<AG>",
     "\"I\"",
     "\"N\"",
+    "\"P\"",
     "\"|\"",
     "\"&\"",
     "\"!\"",
@@ -86,8 +89,9 @@ public interface SUMOQueryParserConstants {
     "\"\\r\"",
     "\"(\"",
     "\")\"",
-    "\"|marking(\\\"\"",
-    "\"\\\")|\"",
+    "\"#tokens(\"",
+    "\"\\\"\"",
+    "\",\"",
   };
 
 }
