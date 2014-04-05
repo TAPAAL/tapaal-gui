@@ -70,7 +70,7 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
     case P:
       jj_consume_token(P);
       child = OrExpr();
-                                        {if (true) return new TCTLEGNode(child);}
+                                        {if (true) return new TCTLEFNode(child);}
       break;
     default:
       jj_la1[0] = jj_gen;

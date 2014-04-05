@@ -138,7 +138,7 @@ TCTLAbstractProperty AbstractProperty() :
 		| <AG> child = OrExpr() {return new TCTLAGNode(child); } 
 		| <I> child = OrExpr() {return new TCTLAGNode(child); }
 		| <N> child = OrExpr() {return new TCTLAGNode(new TCTLNotNode(child)); }
-		| <P> child = OrExpr() {return new TCTLEGNode(child); }
+		| <P> child = OrExpr() {return new TCTLEFNode(child); }
 	) 
 }
 
