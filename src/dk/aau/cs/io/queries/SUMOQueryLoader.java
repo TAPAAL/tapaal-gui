@@ -67,8 +67,8 @@ public class SUMOQueryLoader extends QueryLoader{
 			} catch (ParseException e){ Logger.log(e); queries.add(null); continue; }
 			catch (TokenMgrError e){ Logger.log(e); queries.add(null); continue; }
 					
-			TAPNQuery query = new TAPNQuery(name, 9999, property, 
-					TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.COMBI, 
+			TAPNQuery query = new TAPNQuery(name, 99999, property, 
+					TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
 					true, false, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC);
 					
 			RenameTemplateVisitor rt = new RenameTemplateVisitor("", network.activeTemplates().get(0).name());
