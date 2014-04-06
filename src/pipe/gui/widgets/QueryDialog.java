@@ -2548,6 +2548,17 @@ public class QueryDialog extends JPanel {
 					if (xmlFile != null && queryFile != null) {
 						ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
+						
+						if (overApproximationEnable.isSelected())
+						{
+							OverApproximation overaprx = new OverApproximation();
+							overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
+						}
+						else if (underApproximationEnable.isSelected())
+						{
+							UnderApproximation underaprx = new UnderApproximation();
+							underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
+						}						
 
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
