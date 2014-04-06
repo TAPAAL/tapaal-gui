@@ -1,5 +1,6 @@
 package dk.aau.cs.approximation;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import dk.aau.cs.model.tapn.Bound;
@@ -32,7 +33,8 @@ public class UnderApproximation implements ITAPNApproximation {
 	
 	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator, DataLayer guiModel) {	
 		// Fix input arcs
-		ArrayList<TAPNElement> arcsToDelete = new ArrayList<TAPNElement>();
+		ArrayList<TimedTransition> transitionsToDelete = new ArrayList<TimedTransition>();
+		
 		for (TimedInputArc arc : net.inputArcs()) {
 			 //Fix input arcs
 			TimeInterval oldInterval = arc.interval();
@@ -40,10 +42,16 @@ public class UnderApproximation implements ITAPNApproximation {
 			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
-			if (newInterval != null)
+			if (newInterval != null){
 				arc.setTimeInterval(newInterval);
-			else
-				arcsToDelete.add(arc);
+			}
+			else{
+				//If an arcs interval became invalid we need to delete it, as well as the destination transition and any other arcs that transition has
+				//otherwise we could enable behavior which is not allowed for under approximation
+				if(!transitionsToDelete.contains(arc.destination())){
+					transitionsToDelete.add(arc.destination());
+				}
+			}
 		}
 
 		for (TransportArc arc : net.transportArcs()) {
@@ -55,108 +63,56 @@ public class UnderApproximation implements ITAPNApproximation {
 			//New interval can be null if lower bound surpassed upper bound in rounding
 			if (newInterval != null)
 				arc.setTimeInterval(newInterval);
-			else
-				arcsToDelete.add(arc);
+			else{
+				if(!transitionsToDelete.contains(arc.transition())){
+					transitionsToDelete.add(arc.transition());
+				}
+			}
 		}
-		
-		TimedTransition transition = null;
-		TimedPlace place = null;
-		Transition guiTransition = null;
-		
-		for(TAPNElement arc : arcsToDelete){
-			if(arc instanceof TimedInputArc){
-				transition = ((TimedInputArc)arc).destination();
-				place = ((TimedInputArc)arc).source();
-			}
-			else if(arc instanceof TransportArc){
-				transition = ((TransportArc)arc).transition();
-				place = ((TransportArc)arc).source();
-			}
-			
-			if (guiModel != null) {	// If we are in the process of saving XML and want to update guiModel
-				guiTransition = guiModel.getTransitionByName(transition.name());
-	
-				//We need to find the arc in the guiModel and delete it
-				for (Arc arc1 : guiModel.getArcs()){	
-					if(arc1 instanceof TimedInputArcComponent) //If input arc or transport arc
-					{ 
-						if(arc1 instanceof TimedTransportArcComponent){
-							if (net.getTransitionByName(((TimedTransportArcComponent)arc1).getTransition().getName()) == transition){
-								arc1.delete();
-							}
-						}
-						else { //Else we must have an input arc
-						// TEST TO ENSURE THAT WE ARE ACTUALLY WORKING WITH THE CORRECT GUIMODEL (it verifies)
-						//	((TimedInputArcComponent) arc1).setGuardAndWeight(new TimeInterval(true, new IntBound(11), Bound.Infinity, false), arc1.getWeight()); 
-							if(net.getTransitionByName(((Transition)arc1.getTarget()).getName()) == transition &&
-							   net.getPlaceByName(((Place)arc1.getSource()).getName()) == place){	//If we have the matching arc
-						       arc1.delete();
-							}
-						}
-					}
-				}
-			}
-			else {
-				arc.delete();
-			}
+
+		for(TimedTransition transitionToDelete : transitionsToDelete){
+			if(guiModel != null){
+				// We assert here that deletions in the guimodel will also delete underlying model elements
+				Transition guiTransition = guiModel.getTransitionByName(transitionToDelete.name());
 				
-			// checks if the transition are now orphan and the output and inhibitorarcs should be deleted
-			if(transition.getInputArcs().isEmpty() && transition.getTransportArcsGoingThrough().isEmpty()){
-				ArrayList<TAPNElement> toDelete = new ArrayList<TAPNElement>();
-				toDelete.addAll(transition.getOutputArcs());
-				toDelete.addAll(transition.getInhibitorArcs());
-				for(TAPNElement orphanTransitionArc : toDelete){	//Delete the arcs that were connected to 
-				//	orphanTransitionArc.delete();
-					if (orphanTransitionArc instanceof TimedOutputArc){	//We have only been deleting input arcs and know there are now no input ares or transport arcs
-						
-						if (guiModel != null){
-							//We need to find the arc in the gui and delete it
-							for (Arc arc1 : guiModel.getArcs()){
-								if (arc1.getTarget() instanceof Place) //If arc1 is an output arc
-								{ 
-									if(net.getTransitionByName(((Transition)arc1.getSource()).getName()) == ((TimedOutputArc)orphanTransitionArc).source() &&
-									   net.getPlaceByName(((Place)arc1.getTarget()).getName()) == ((TimedOutputArc)orphanTransitionArc).destination()){
-										arc1.delete();
-									}
-								}
-							}
-						}
-						else {
-							orphanTransitionArc.delete();
-						}
+				for (Arc arc1 : guiModel.getArcs()){
+					if (arc1.getTarget() instanceof Place && arc1.getSource() == guiTransition) //If arc1 is an output arc
+					{ 
+						arc1.delete();
+					}
+					else if (arc1.getTarget() instanceof Transition && arc1.getTarget() == guiTransition){ //Else if arc1 is an input arc
+						arc1.delete();
 					}
 				}
-				if (guiModel != null) {
-					guiTransition.delete(); //Asserting that this also deletes the underlying model transition
-				} else {
-					transition.delete(); 
+				guiTransition.delete();
+			}
+			else{
+				ArrayList<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
+				inputArcs.addAll(transitionToDelete.getInputArcs());
+				for(TimedInputArc arc : transitionToDelete.getInputArcs()){
+					arc.delete();
 				}
-				//Now that the transition has been deleted, we also need to delete any inhibitor arcs that were inhibiting it
-				ArrayList<TAPNElement> inhibArcsToDelete = new ArrayList<TAPNElement>();
-				for (TimedInhibitorArc inhibArc : net.inhibitorArcs()) {
-					if (inhibArc.destination() == transition){
-						inhibArcsToDelete.add(inhibArc);
-					}
+				
+				ArrayList<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+				outputArcs.addAll(transitionToDelete.getOutputArcs());
+				for(TimedOutputArc arc : outputArcs){
+					arc.delete();
 				}
-				for(TAPNElement inhibArc : inhibArcsToDelete){
-					if (guiModel != null) {	// If we are in the process of saving XML and want to update guiModel
-						//We need to find the arc in the guiModel and delete it
-						for (Arc arc1 : guiModel.getArcs()){	
-							if(arc1 instanceof TimedInhibitorArcComponent)
-							{ 
-								if(((TimedInhibitorArcComponent) arc1).underlyingTimedInhibitorArc() == inhibArc){
-									arc1.delete();
-								}
-							}
-						}
-					}
-					else {
-						inhibArc.delete();
-					}
+				
+				ArrayList<TransportArc> transportArcs = new ArrayList<TransportArc>();
+				transportArcs.addAll(transitionToDelete.getTransportArcsGoingThrough());
+				for(TransportArc arc : transportArcs){
+					arc.delete();
+				}
+				
+				ArrayList<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+				inhibitorArcs.addAll(transitionToDelete.getInhibitorArcs());
+				for(TimedInhibitorArc arc : inhibitorArcs){
+					arc.delete();
 				}
 			}
+			transitionToDelete.delete();
 		}	
-		
 		
 		// Fix invariants in places
 		for (TimedPlace place1 : net.places()) {
