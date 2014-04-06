@@ -65,9 +65,10 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	
 	public void reduceTraceForOriginalNet(String matchForTransition, String matchTokenRemoval) {
 		for (TimedArcPetriNetStep step : steps){
-			if (step instanceof TimedTransitionStep && ((TimedTransitionStep) step).transition().name().contains(matchForTransition)) {
-				((TimedTransitionStep) step).transition().setName(((TimedTransitionStep) step).transition().name().substring(0, ((TimedTransitionStep) step).transition().name().indexOf(matchForTransition)));
-				
+			if (step instanceof TimedTransitionStep) {
+				if (((TimedTransitionStep) step).transition().name().contains(matchForTransition)) {
+					((TimedTransitionStep) step).transition().setName(((TimedTransitionStep) step).transition().name().substring(0, ((TimedTransitionStep) step).transition().name().indexOf(matchForTransition)));
+				}
 				if(((TimedTransitionStep) step).consumedTokens() != null){
 					for (TimedToken token : ((TimedTransitionStep) step).consumedTokens()){
 						if(token.place().name().contains(matchTokenRemoval)){
