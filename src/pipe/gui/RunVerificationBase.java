@@ -137,11 +137,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		}
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);
-			// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-			if (oldTraceOption == TraceOption.NONE){
-				value.setTrace(null);
-				value.setSecondaryTrace(null);
-			}
 			MemoryMonitor.setCumulativePeakMemory(false);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
@@ -194,7 +189,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
 							// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-							if (oldTraceOption == TraceOption.NONE){
+							if (oldTraceOption == TraceOption.NONE && value != null){
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
 							}
@@ -352,7 +347,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
 							// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-							if (oldTraceOption == TraceOption.NONE){
+							if (oldTraceOption == TraceOption.NONE && value != null){
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
 							}
