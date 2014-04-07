@@ -88,25 +88,35 @@ public class UnderApproximation implements ITAPNApproximation {
 			}
 			else{
 				ArrayList<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
-				inputArcs.addAll(transitionToDelete.getInputArcs());
+				
+				//Add all did not work properly, so we do it manually.
 				for(TimedInputArc arc : transitionToDelete.getInputArcs()){
+					inputArcs.add(arc);
+				}
+				for(TimedInputArc arc : inputArcs){
 					arc.delete();
 				}
 				
 				ArrayList<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
-				outputArcs.addAll(transitionToDelete.getOutputArcs());
+				for(TimedOutputArc arc : transitionToDelete.getOutputArcs()){
+					outputArcs.add(arc);
+				}
 				for(TimedOutputArc arc : outputArcs){
 					arc.delete();
 				}
 				
 				ArrayList<TransportArc> transportArcs = new ArrayList<TransportArc>();
-				transportArcs.addAll(transitionToDelete.getTransportArcsGoingThrough());
+				for(TransportArc arc : transitionToDelete.getTransportArcsGoingThrough()){
+					transportArcs.add(arc);
+				}
 				for(TransportArc arc : transportArcs){
 					arc.delete();
 				}
 				
 				ArrayList<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-				inhibitorArcs.addAll(transitionToDelete.getInhibitorArcs());
+				for(TimedInhibitorArc arc : transitionToDelete.getInhibitorArcs()){
+					inhibitorArcs.add(arc);
+				}
 				for(TimedInhibitorArc arc : inhibitorArcs){
 					arc.delete();
 				}
