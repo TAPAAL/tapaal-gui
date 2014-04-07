@@ -362,7 +362,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						
 						// If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
 						if ((result.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
-							|| result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied()) {
+							|| (result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied())
+							|| (result.getQueryResult().queryType() == QueryType.EG && !queryResult.isQuerySatisfied())
+							|| (result.getQueryResult().queryType() == QueryType.AF && queryResult.isQuerySatisfied())) {
 							queryResult.setApproximationInconclusive(true);
 						}
 						
