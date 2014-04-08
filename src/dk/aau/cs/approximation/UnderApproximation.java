@@ -158,25 +158,27 @@ public class UnderApproximation implements ITAPNApproximation {
 		IntBound newLowerBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
 		 
 		// if the lower bound has become greater than the upper bound by rounding
-		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
-		{
-			newLowerBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() /  denominator));
-			newUpperBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
-		}
-		
-		// if the interval becomes too small
-		if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
-		{
-			newLowerBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() /  denominator));
-			newUpperBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
-		}
+				if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
+				{
+					newLowerBound = new IntBound(newUpperBound.value());
+				}
+				
+				boolean isLowerBoundNonStrict = oldInterval.IsLowerBoundNonStrict();
+				boolean isUpperBoundNonStrict = oldInterval.IsUpperBoundNonStrict();
+				
+				// if the interval becomes too small
+				if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
+				{
+					isUpperBoundNonStrict = true;
+					isLowerBoundNonStrict = true;
+				}
 
-		return new TimeInterval(
-			 oldInterval.IsLowerBoundNonStrict(),
-			 newLowerBound,
-			 newUpperBound,
-			 oldInterval.IsUpperBoundNonStrict()
-			 );
+				return new TimeInterval(
+					 isLowerBoundNonStrict,
+					 newLowerBound,
+					 newUpperBound,
+					 isUpperBoundNonStrict
+					 );
 	}
 
 }
