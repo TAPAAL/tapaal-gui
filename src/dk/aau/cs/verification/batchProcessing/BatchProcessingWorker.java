@@ -411,6 +411,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			composedModel = composeModel(model);
 			UnderApproximation underaprx = new UnderApproximation();
 			underaprx.modifyTAPN(composedModel.value1(), query.approximationDenominator());
+			options.setTraceOption(TraceOption.SOME);
 		}
 		 
 		modelChecker = getModelChecker(query);
@@ -621,7 +622,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                    
 	                    // If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
 	                    if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
-	                        || verificationResult.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied()) {
+	                        || (verificationResult.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied())
+	                        || (verificationResult.getQueryResult().queryType() == QueryType.EG && !queryResult.isQuerySatisfied())
+							|| (verificationResult.getQueryResult().queryType() == QueryType.AF && queryResult.isQuerySatisfied())) {
 	                        queryResult.setApproximationInconclusive(true);
 	                    }
 	                    
