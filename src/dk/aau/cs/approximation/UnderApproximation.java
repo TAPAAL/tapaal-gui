@@ -160,13 +160,15 @@ public class UnderApproximation implements ITAPNApproximation {
 		// if the lower bound has become greater than the upper bound by rounding
 		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
 		{
-			return null;
+			newLowerBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() /  denominator));
+			newUpperBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
 		}
 		
 		// if the interval becomes too small
 		if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
 		{
-			return null;
+			newLowerBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() /  denominator));
+			newUpperBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
 		}
 
 		return new TimeInterval(
