@@ -475,7 +475,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
 	            		MemoryMonitor.setCumulativePeakMemory(false);
-	                    return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
+	                    return new VerificationResult<TimedArcPetriNetTrace>(
+	                    		verificationResult.errorMessage(),
+	                    		verificationResult.verificationTime() + approxResult.verificationTime());
 	                }
 	                //Create the result from trace TAPN
 	                renameTraceTransitions(verificationResult.getTrace());
@@ -576,13 +578,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					if(verificationResult.getTrace() != null) {
 	                    // If query does have deadlock -> create trace TAPN
 	                    //Create the verification satisfied result for the approximation
+						VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
 	                    valueNetwork = new VerificationResult<TAPNNetworkTrace>(
-	                        verificationResult.getQueryResult(),
-	                        decomposeTrace(verificationResult.getTrace(), composedModel.value2()),
-	                        decomposeTrace(verificationResult.getSecondaryTrace(), composedModel.value2()),
-	                        verificationResult.verificationTime(),
-	                        verificationResult.stats(),
-	    					verificationResult.isOverApproximationResult());
+	                    		approxResult.getQueryResult(),
+	                        decomposeTrace(approxResult.getTrace(), composedModel.value2()),
+	                        decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2()),
+	                        approxResult.verificationTime(),
+	                        approxResult.stats(),
+	                        approxResult.isOverApproximationResult());
 	                    valueNetwork.setNameMapping(composedModel.value2());
 	                    
 	                    OverApproximation overaprx = new OverApproximation();
@@ -602,7 +605,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);
 	                		MemoryMonitor.setCumulativePeakMemory(false);
-	        				return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
+	        				return new VerificationResult<TimedArcPetriNetTrace>(
+	        						verificationResult.errorMessage(),
+	        						verificationResult.verificationTime() + approxResult.verificationTime());
 	        			}
 	                    
 	                    //Create the result from trace TAPN
@@ -618,14 +623,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                        queryResult.setApproximationInconclusive(true);
 	                    }
 	                    
-	                    
 	                    // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
 	                    // This is satisfied for EF and not satisfied for AG
 	                   value =  new VerificationResult<TimedArcPetriNetTrace>(
 	                		    queryResult,
 	                            verificationResult.getTrace(),
 	                            verificationResult.getSecondaryTrace(),
-	                            verificationResult.verificationTime(),
+	                            verificationResult.verificationTime() + approxResult.verificationTime(),
 	                            verificationResult.stats(),
 	        					verificationResult.isOverApproximationResult());
 	                    value.setNameMapping(composedModel.value2());
