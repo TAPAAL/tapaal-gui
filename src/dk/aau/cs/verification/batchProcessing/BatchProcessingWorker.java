@@ -573,17 +573,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
 					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 	                    
-	                    if (!clonedQuery.hasDeadlock() && verificationResult.getQueryResult().queryType() != QueryType.EG && verificationResult.getQueryResult().queryType() != QueryType.AF) {
-	                    	QueryResult queryResult= verificationResult.getQueryResult();
-	                        value =  new VerificationResult<TimedArcPetriNetTrace>(
-	                            queryResult,
-	                            verificationResult.getTrace(),
-	                            verificationResult.getSecondaryTrace(),
-	                            verificationResult.verificationTime(),
-	                            verificationResult.stats(),
-	        					verificationResult.isOverApproximationResult());
-	                        value.setNameMapping(composedModel.value2());
-	                } else if(verificationResult.getTrace() != null) {
+					if(verificationResult.getTrace() != null) {
 	                    // If query does have deadlock -> create trace TAPN
 	                    //Create the verification satisfied result for the approximation
 	                    valueNetwork = new VerificationResult<TAPNNetworkTrace>(
