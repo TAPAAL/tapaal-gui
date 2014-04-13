@@ -160,8 +160,21 @@ public class UnderApproximation implements ITAPNApproximation {
 		// if the lower bound has become greater than the upper bound by rounding
 				if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
 				{
-					newLowerBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() /  denominator));
-					newUpperBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
+					double upperFraction = (double)oldInterval.upperBound().value() / denominator;
+					double lowerFraction = (double)oldInterval.lowerBound().value() / denominator;
+					
+
+					// if the fractional part of a/r is larger than (1-fractional part of b/r)
+					// round up
+					if (lowerFraction > (1 - upperFraction)) {
+						newLowerBound = new IntBound((int) Math.ceil(lowerFraction));
+						newUpperBound = new IntBound((int) Math.ceil(upperFraction));
+					}
+					// Otherwise, round down
+					else {
+						newLowerBound = new IntBound((int) Math.floor(lowerFraction));
+						newUpperBound = new IntBound((int) Math.floor(upperFraction));
+					}
 				}
 				
 				boolean isLowerBoundNonStrict = oldInterval.IsLowerBoundNonStrict();
