@@ -129,7 +129,7 @@ public class UnderApproximation implements ITAPNApproximation {
 			if ( ! (place1.invariant().upperBound() instanceof Bound.InfBound) && place1.invariant().upperBound().value() > 0) {					
 				TimeInvariant oldInvariant = place1.invariant();
 				
-				int newInvariantBound = (int) Math.round(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				int newInvariantBound = (int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
 				if(newInvariantBound != 0){
 					place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
 				}
@@ -160,20 +160,8 @@ public class UnderApproximation implements ITAPNApproximation {
 		// if the lower bound has become greater than the upper bound by rounding
 				if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
 				{
-					double upperFraction = ((double)oldInterval.upperBound().value() / denominator) % 1;
-					double lowerFraction = ((double)oldInterval.lowerBound().value() / denominator) % 1;
-
-					// if the fractional part of a/r is larger than (1-fractional part of b/r)
-					// round up
-					if (lowerFraction > (1 - upperFraction)) {
-						newLowerBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
-						newUpperBound = new IntBound((int) Math.ceil((double)oldInterval.upperBound().value() / denominator));
-					}
-					// Otherwise, round down
-					else {
-						newLowerBound = new IntBound((int) Math.floor((double)oldInterval.lowerBound().value() / denominator));
-						newUpperBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() / denominator));
-					}
+					newLowerBound = new IntBound((int) Math.floor((double)oldInterval.lowerBound().value() / denominator));
+					newUpperBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() / denominator));
 				}
 				
 				boolean isLowerBoundNonStrict = oldInterval.IsLowerBoundNonStrict();
