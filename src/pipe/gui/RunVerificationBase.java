@@ -302,20 +302,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					value.setNameMapping(transformedModel.value2());
 				} else if ((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied()
 						|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && ! result.getQueryResult().isQuerySatisfied())) {
-					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
-					
-					if ( ! query.hasDeadlock() && result.getQueryResult().queryType() != QueryType.EG && result.getQueryResult().queryType() != QueryType.AF) {
-						// If query does not have deadlock and are of the type EF or AG -> return answer from result
-						QueryResult queryResult= result.getQueryResult();
-						value =  new VerificationResult<TAPNNetworkTrace>(
-								queryResult,
-								decomposeTrace(result.getTrace(), transformedModel.value2()),
-								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
-								result.verificationTime(),
-								result.stats(),
-								result.isOverApproximationResult());
-						value.setNameMapping(transformedModel.value2());
-					} else if (result.getTrace() != null){
+										
+					if (result.getTrace() != null){
 						// If query does have deadlock or EG or AF a trace -> create trace TAPN
 						//Create the verification satisfied result for the approximation
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
