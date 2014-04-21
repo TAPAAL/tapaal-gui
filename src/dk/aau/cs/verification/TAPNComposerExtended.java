@@ -231,7 +231,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 	
 	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for(SharedPlace place : model.sharedPlaces()){
-			String uniquePlaceName = "Shared_" + place.name();
+			String uniquePlaceName = (model.activeTemplates().size() > 1) ? "Shared_" + place.name() : place.name();
 			
 			LocalTimedPlace constructedPlace = null;
 			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
@@ -276,7 +276,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if(!timedPlace.isShared()){
-					String uniquePlaceName = (timedPlace instanceof LocalTimedPlace) ? ((LocalTimedPlace)timedPlace).model().name() + "_" + timedPlace.name() : "Shared_" + timedPlace.name();
+					String uniquePlaceName = (model.activeTemplates().size() > 1) ? ((LocalTimedPlace)timedPlace).model().name() + "_" + timedPlace.name() : timedPlace.name();
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
@@ -333,7 +333,12 @@ public class TAPNComposerExtended implements ITAPNComposer {
 					//   support for such queries are added later.
 					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
 					if(!timedTransition.isOrphan()){
-						String uniqueTransitionName = ( ! timedTransition.isShared()) ? timedTransition.model().name() + "_" + timedTransition.name() : "Shared_" + timedTransition.name();
+						String uniqueTransitionName = "";
+						if (model.activeTemplates().size() > 1) {
+							uniqueTransitionName = ( ! timedTransition.isShared()) ? timedTransition.model().name() + "_" + timedTransition.name() : "Shared_" + timedTransition.name();
+						} else {
+							uniqueTransitionName = timedTransition.name();
+						}
 						
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent());
 						constructedModel.add(transition);
