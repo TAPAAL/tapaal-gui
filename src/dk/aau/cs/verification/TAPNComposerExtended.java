@@ -231,7 +231,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 	
 	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for(SharedPlace place : model.sharedPlaces()){
-			String uniquePlaceName = getUniquePlaceName();
+			String uniquePlaceName = "Shared_" + place.name();
 			
 			LocalTimedPlace constructedPlace = null;
 			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
