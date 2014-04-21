@@ -18,8 +18,12 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -229,7 +233,12 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		for(SharedPlace place : model.sharedPlaces()){
 			String uniquePlaceName = getUniquePlaceName();
 			
-			LocalTimedPlace constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant());
+			LocalTimedPlace constructedPlace = null;
+			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
+				constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant());
+			} else {
+				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())));
+			}
 			constructedModel.add(constructedPlace);
 			mapping.addMappingForShared(place.name(), uniquePlaceName);
 
@@ -267,9 +276,14 @@ public class TAPNComposerExtended implements ITAPNComposer {
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if(!timedPlace.isShared()){
-					String uniquePlaceName = getUniquePlaceName();
+					String uniquePlaceName = (timedPlace instanceof LocalTimedPlace) ? ((LocalTimedPlace)timedPlace).model().name() + "_" + timedPlace.name() : "Shared_" + timedPlace.name();
 
-					LocalTimedPlace place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
+					LocalTimedPlace place = null;
+					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
+						place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
+					} else {
+						place = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(timedPlace.invariant().isUpperNonstrict(), new IntBound(timedPlace.invariant().upperBound().value())));
+					}
 					constructedModel.add(place);
 					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
 
@@ -281,7 +295,6 @@ public class TAPNComposerExtended implements ITAPNComposer {
 					TimedPlaceComponent newPlace = new TimedPlaceComponent(
 							oldPlace.getPositionX() + offset.value1() * greatestWidth,
 							oldPlace.getPositionY() + offset.value2() * greatestHeight,
-							
 							oldPlace.getId(),
 							uniquePlaceName,
 							oldPlace.getNameOffsetX(),
@@ -320,7 +333,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 					//   support for such queries are added later.
 					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
 					if(!timedTransition.isOrphan()){
-						String uniqueTransitionName = getUniqueTransitionName();
+						String uniqueTransitionName = ( ! timedTransition.isShared()) ? timedTransition.model().name() + "_" + timedTransition.name() : "Shared_" + timedTransition.name();
 						
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent());
 						constructedModel.add(transition);
@@ -398,7 +411,14 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				String targetTemplate = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 
-				TimedInputArc addedArc = new TimedInputArc(source, target, arc.interval(), arc.getWeight());
+				TimeInterval newInterval = new TimeInterval(arc.interval());
+				newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
+				if (newInterval.upperBound() instanceof Bound.InfBound) {
+					newInterval.setUpperBound(newInterval.upperBound());
+				} else {
+					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
+				}
+				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeight());
 				constructedModel.add(addedArc);
 				
 				Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
@@ -499,7 +519,14 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
 				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 				
-				TransportArc addedArc = new TransportArc(source, transition, destination, arc.interval(), arc.getWeight());
+				TimeInterval newInterval = new TimeInterval(arc.interval());
+				newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
+				if (newInterval.upperBound() instanceof Bound.InfBound) {
+					newInterval.setUpperBound(newInterval.upperBound());
+				} else {
+					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
+				}
+				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeight());
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
@@ -606,7 +633,14 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
 
-				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, arc.interval(), arc.getWeight());
+				TimeInterval newInterval = new TimeInterval(arc.interval());
+				newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
+				if (newInterval.upperBound() instanceof Bound.InfBound) {
+					newInterval.setUpperBound(newInterval.upperBound());
+				} else {
+					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
+				}
+				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeight());
 				constructedModel.add(addedArc);
 				
 				Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));

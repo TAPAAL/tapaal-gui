@@ -2616,15 +2616,13 @@ public class QueryDialog extends JPanel {
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();
-					for (Constant constant : tapnNetwork.constants()) {
-						newConstantStore.add(constant);
-					}
+
 					
 					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(newConstantStore);
 					
 					network.add(transformedModel.value1());
 					
-					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), tapnNetwork.constants());
+					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
 			
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
