@@ -21,7 +21,7 @@ public class BatchProcessingResultsExporter {
 	private static final String name_BROADCAST = "J: UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "K: UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "L: TAPAAL Untimed Engine";
-	private static final String name_UNTIMEDAPPROX = "M: TAPAAL Untimed Engine, Over-Approximation Only";	
+	private static final String name_UNTIMEDAPPROX = "M: TAPAAL Untimed Engine, w. State-Equations Check Only";	
 	private static final String name_UNTIMEDREDUCE = "N: TAPAAL Untimed engine w. Net Reductions";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";

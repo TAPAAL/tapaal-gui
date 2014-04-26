@@ -1266,10 +1266,10 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
 
-		numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet = new CustomJSpinner(4, 0, Integer.MAX_VALUE);	
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
 		numberOfExtraTokensInNet.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
 		boundednessCheckPanel.add(numberOfExtraTokensInNet);
 
@@ -2171,9 +2171,9 @@ public class QueryDialog extends JPanel {
 		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
 		
 		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
-		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
-		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
-		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
+		overApproximationDenominator.setMaximumSize(new Dimension(65, 30));
+		overApproximationDenominator.setMinimumSize(new Dimension(65, 30));
+		overApproximationDenominator.setPreferredSize(new Dimension(65, 30));
 		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
 		
 		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
@@ -2319,7 +2319,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
 
-		useOverApproximation = new JCheckBox("Use over-approximation check");
+		useOverApproximation = new JCheckBox("Use untimed state-equations check");
 		useOverApproximation.setSelected(true);
 		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
 

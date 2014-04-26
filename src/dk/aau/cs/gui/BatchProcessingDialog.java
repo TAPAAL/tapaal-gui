@@ -100,7 +100,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "TAPAAL Untimed Engine (verifypn)";
-	private static final String name_UNTIMED_APPROX = "TAPAAL Untimed Engine Over-Approximation Only";
+	private static final String name_UNTIMED_APPROX = "TAPAAL Untimed Engine w. State-Equations Check Only";
 	private static final String name_UNTIMED_REDUCE = "TAPAAL Untimed Engine w. Net Reductions";
 	private static final String name_verifyTAPNWithLegend = "A: "
 			+ name_verifyTAPN;
