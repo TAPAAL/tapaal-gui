@@ -144,7 +144,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			// Over-approximation
 			if (options.approximationDenominator() == 1) {
 				// If r = 1
-				// No matter what EF and AG answered -> return that answer
+				// No matter what it answered -> return that answer
 				QueryResult queryResult = result.getQueryResult();
 				value =  new VerificationResult<TAPNNetworkTrace>(
 						queryResult,
@@ -188,7 +188,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						}
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
-							// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
+							// if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
 							if (oldTraceOption == TraceOption.NONE && value != null){
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
@@ -207,8 +207,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							queryResult.setApproximationInconclusive(true);
 						}
 						
-						// If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
-						// This is satisfied for EF and not satisfied for AG
+						// If satisfied trace -> Return result
+						// This is satisfied for EF and EG and not satisfied for AG and AF
 						value = new VerificationResult<TAPNNetworkTrace>(
 								queryResult,
 								decomposeTrace(result.getTrace(), transformedModel.value2()),
@@ -274,7 +274,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			
 			if (options.approximationDenominator() == 1) { 
 				// If r = 1
-				// No matter what EF and AG answered -> return that answer
+				// No matter it answered -> return that answer
 				QueryResult queryResult= result.getQueryResult();
 				value =  new VerificationResult<TAPNNetworkTrace>(
 						queryResult,
@@ -334,7 +334,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						}
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
-							// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
+							// if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
 							if (oldTraceOption == TraceOption.NONE && value != null){
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
@@ -348,7 +348,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						QueryResult queryResult = result.getQueryResult();
 						
 						
-						// If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
+						// If (EF or EG AND not satisfied trace) OR (AG or AF AND satisfied trace) -> inconclusive
 						if ((result.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
 							|| (result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied())
 							|| (result.getQueryResult().queryType() == QueryType.EG && !queryResult.isQuerySatisfied())
@@ -356,8 +356,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							queryResult.setApproximationInconclusive(true);
 						}
 						
-						// If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
-						// This is satisfied for EF and not satisfied for AG
+						// If satisfied trace) -> Return result
+						// This is satisfied for EF and EG and not satisfied for AG and AF
 						value = new VerificationResult<TAPNNetworkTrace>(
 								queryResult,
 								decomposeTrace(result.getTrace(), transformedModel.value2()),

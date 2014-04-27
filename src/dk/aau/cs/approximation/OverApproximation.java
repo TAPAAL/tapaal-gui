@@ -54,7 +54,7 @@ public class OverApproximation implements ITAPNApproximation {
 		Bound newUpperBound;
 		// Do not calculate upper bound for infinite
 		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound)) {
-			 // Calculate the new upper bound value. If the value is fx. 22 the new value needs to be 3  
+			 // Calculate the new upper bound value. E.g. if the value is 22, the new value needs to be 3 given that r = 10
 			int oldUpperBoundValue = oldInterval.upperBound().value();
 			newUpperBound = new IntBound((int) Math.ceil((double)oldUpperBoundValue /  denominator));
 		} else {
@@ -86,26 +86,31 @@ public class OverApproximation implements ITAPNApproximation {
 		net.add(blockPlace);
 		blockPlace.addToken(blockToken);
 		
+		// Copy the original transitions
 		ArrayList<TimedTransition> originalTransitions = new ArrayList<TimedTransition>();
 		for (TimedTransition transition : net.transitions()) {
 			originalTransitions.add(transition);
 		}
 		
+		// Copy the original input arcs
 		ArrayList<TimedInputArc> originalInput = new ArrayList<TimedInputArc>();
 		for (TimedInputArc inputarc : net.inputArcs()) {
 			originalInput.add(inputarc);
 		}
 		
+		// Copy the original output arcs
 		ArrayList<TimedOutputArc> originalOutput = new ArrayList<TimedOutputArc>();
 		for (TimedOutputArc outputarc : net.outputArcs()) {
 			originalOutput.add(outputarc);
 		}
 		
+		// Copy the original inhibitor arcs
 		ArrayList<TimedInhibitorArc> originalInhibitor = new ArrayList<TimedInhibitorArc>();
 		for (TimedInhibitorArc inhibitor : net.inhibitorArcs()) {
 			originalInhibitor.add(inhibitor);
 		}
 		
+		// Copy the original transport arcs
 		ArrayList<TransportArc> originalTransport = new ArrayList<TransportArc>();
 		for (TransportArc transport : net.transportArcs()) {
 			originalTransport.add(transport);
@@ -122,7 +127,8 @@ public class OverApproximation implements ITAPNApproximation {
 		boolean delayIsLoopStep = false;
 		
 		for(TAPNNetworkTraceStep step : trace) {
-			if (step instanceof TAPNNetworkTimeDelayStep) {
+			if (step instanceof TAPNNetworkTimeDelayStep){
+				// Skip if delay step, but check if this step is a delayStep
 				if(step.isLoopStep())
 				{
 					delayIsLoopStep = true;
@@ -182,6 +188,7 @@ public class OverApproximation implements ITAPNApproximation {
 			}
 		}
 		
+		// If the trace is a EG trace with a loop, we need to incorporate the loop in traceTAPN
 		if(loopStep != null){
 			net.add(new TimedOutputArc(next.source(), loopStep));
 		}
@@ -194,6 +201,7 @@ public class OverApproximation implements ITAPNApproximation {
 		TCTLAbstractProperty topNode = query.getProperty();
 		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(blockPlace.name(), "=", 1);
 		
+		// We need to modify the query to also have pBlock = 1. 
 		if(topNode instanceof TCTLEFNode)
 		{
 			if(((TCTLEFNode) topNode).getProperty() instanceof TCTLAndListNode){
@@ -241,6 +249,7 @@ public class OverApproximation implements ITAPNApproximation {
 			}
 		}
 		
+		// An input arc from pBlock to all original transitions makes sure, that we can do deadlock checks.
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
 		}           

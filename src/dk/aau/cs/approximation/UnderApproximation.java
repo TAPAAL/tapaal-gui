@@ -167,7 +167,7 @@ public class UnderApproximation implements ITAPNApproximation {
 				boolean isLowerBoundNonStrict = oldInterval.IsLowerBoundNonStrict();
 				boolean isUpperBoundNonStrict = oldInterval.IsUpperBoundNonStrict();
 				
-				// if the interval becomes too small
+				// if the interval becomes too small we make it a bit bigger to secure, that we do not have to delete the arc
 				if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
 				{
 					isUpperBoundNonStrict = true;

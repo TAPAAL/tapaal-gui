@@ -484,13 +484,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                renameTraceTransitions(verificationResult.getSecondaryTrace());
 	                QueryResult queryResult= verificationResult.getQueryResult();
 	                
-	                // If ((EG OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
+	                // If ((EF OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
 					if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied()) 
 							|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())){
 						queryResult.setApproximationInconclusive(true);
 					}
-	                // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
-	                // This is satisfied for EF and not satisfied for AG
+	                // If satisfied trace -> Return result
+	                // This is satisfied for EF and EG and not satisfied for AG and AF
 	                value = new VerificationResult<TimedArcPetriNetTrace>(
 	                        queryResult,
 	                        approxResult.getTrace(),
@@ -615,7 +615,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                    renameTraceTransitions(verificationResult.getSecondaryTrace());
 	                    QueryResult queryResult = verificationResult.getQueryResult();
 	                    
-	                    // If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
+	                    // If (EF or EG AND not satisfied trace) OR (AG or AF AND satisfied trace) -> inconclusive
 	                    if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
 	                        || (verificationResult.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied())
 	                        || (verificationResult.getQueryResult().queryType() == QueryType.EG && !queryResult.isQuerySatisfied())
@@ -623,8 +623,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                        queryResult.setApproximationInconclusive(true);
 	                    }
 	                    
-	                    // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
-	                    // This is satisfied for EF and not satisfied for AG
+	                    // If satisfied trace -> Return result
+	                    // This is satisfied for EF and EG and not satisfied for AG and AF
 	                   value =  new VerificationResult<TimedArcPetriNetTrace>(
 	                		    queryResult,
 	                            verificationResult.getTrace(),
