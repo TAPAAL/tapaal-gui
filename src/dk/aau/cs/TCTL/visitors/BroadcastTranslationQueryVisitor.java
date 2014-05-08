@@ -18,12 +18,8 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	}
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+	public void visit(TCTLPlaceNode placeNode,
 			Object context) {
-		assert(atomicPropositionNode.getRight() instanceof TCTLPlaceNode && atomicPropositionNode.getLeft() instanceof TCTLConstNode):
-			"The " + getClass().getCanonicalName() + " cannot translate this query, as the prepositions are too complex";
-		TCTLPlaceNode placeNode = (TCTLPlaceNode) atomicPropositionNode.getLeft();
-		TCTLConstNode constNode = (TCTLConstNode) atomicPropositionNode.getRight();
 		
 		if (useSymmetry) {
 			append("(sum(i:");
@@ -32,19 +28,13 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append(TOKEN_TEMPLATE_NAME);
 			append("(i).");
 			append(placeNode.getPlace());
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(constNode.getConstant());
+			append(")");
 		} else if (totalTokens == 0) {
 			append("(");
 			append(TOKEN_TEMPLATE_NAME);
 			append(".");
 			append(placeNode.getPlace());
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(constNode.getConstant());
+			append(")");
 		} else {
 			append("(");
 			for (int i = 0; i < totalTokens; i++) {
@@ -57,10 +47,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 				append(".");
 				append(placeNode.getPlace());
 			}
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(constNode.getConstant());
+			append(")");
 		}
 	}
 

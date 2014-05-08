@@ -22,11 +22,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	}
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
-		assert(atomicPropositionNode.getRight() instanceof TCTLPlaceNode && atomicPropositionNode.getLeft() instanceof TCTLConstNode):
-			"The " + getClass().getCanonicalName() + " cannot translate this query, as the prepositions are too complex";
-		TCTLPlaceNode placeNode = (TCTLPlaceNode) atomicPropositionNode.getLeft();
-		TCTLConstNode constNode = (TCTLConstNode) atomicPropositionNode.getRight();
+	public void visit(TCTLPlaceNode placeNode, Object context) {
 		
 		if(useSymmetry) {
 			append("(sum(i:");
@@ -35,17 +31,9 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 			append(TOKEN_TEMPLATE_NAME);
 			append("(i).");
 			append(placeNode.getPlace());
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(constNode.getConstant());
-		} else {
-			append("(");
-			append(createAtomicPropositionSum(placeNode.getPlace()));
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(constNode.getConstant());
 			append(")");
+		} else {
+			append(createAtomicPropositionSum(placeNode.getPlace()));
 		}
 	}
 

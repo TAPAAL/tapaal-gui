@@ -14,23 +14,15 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 	private static final String TOKEN_TEMPLATE_NAME = "Token";
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+	public void visit(TCTLPlaceNode placeNode,
 			Object context) {
-		assert(atomicPropositionNode.getRight() instanceof TCTLPlaceNode && atomicPropositionNode.getLeft() instanceof TCTLConstNode):
-			"The " + getClass().getCanonicalName() + " cannot translate this query, as the prepositions are too complex";
-		TCTLPlaceNode placeNode = (TCTLPlaceNode) atomicPropositionNode.getLeft();
-		TCTLConstNode constNode = (TCTLConstNode) atomicPropositionNode.getRight();
-		
 		append("(sum(i:");
 		append(ID_TYPE);
 		append(")");
 		append(TOKEN_TEMPLATE_NAME);
 		append("(i).");
 		append(placeNode.getPlace());
-		append(") ");
-		append(operatorConversion(atomicPropositionNode.getOp()));
-		append(" ");
-		append(constNode.getConstant());
+		append(")");
 	}
 
 	@Override
