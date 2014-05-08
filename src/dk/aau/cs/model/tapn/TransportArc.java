@@ -90,7 +90,8 @@ public class TransportArc extends TAPNElement {
 
 	@Override
 	public void delete() {
-		model().remove(this);
+		if (model() != null)
+			model().remove(this);
 	}
 
 	public TransportArc copy(TimedArcPetriNet tapn) {

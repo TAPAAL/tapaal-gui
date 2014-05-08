@@ -267,6 +267,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		queryElement.setAttribute("active", "" + query.isActive());
 		queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
 		queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
+		queryElement.setAttribute("reduction", "" + query.useReduction());
 		queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
 		queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
 		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());

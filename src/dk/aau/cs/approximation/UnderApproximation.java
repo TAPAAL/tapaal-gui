@@ -1,5 +1,6 @@
 package dk.aau.cs.approximation;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import dk.aau.cs.model.tapn.Bound;
@@ -8,136 +9,133 @@ import dk.aau.cs.model.tapn.TAPNElement;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.verification.VerificationOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class UnderApproximation implements ITAPNApproximation {
 	@Override
-	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query) {
-		modifyTAPN(net, query, null);
+	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator) {
+		modifyTAPN(net, approximationDenominator, null);
 	}
 	
-	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query, DataLayer guiModel) {	
+	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator, DataLayer guiModel) {	
 		// Fix input arcs
-		ArrayList<TAPNElement> arcsToDelete = new ArrayList<TAPNElement>();
+		ArrayList<TimedTransition> transitionsToDelete = new ArrayList<TimedTransition>();
+		
 		for (TimedInputArc arc : net.inputArcs()) {
 			 //Fix input arcs
 			TimeInterval oldInterval = arc.interval();
 			
-			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
-			if (newInterval != null)
+			if (newInterval != null){
 				arc.setTimeInterval(newInterval);
-			else
-				arcsToDelete.add(arc);
+			}
+			else{
+				//If an arcs interval became invalid we need to delete it, as well as the destination transition and any other arcs that transition has
+				//otherwise we could enable behavior which is not allowed for under approximation
+				if(!transitionsToDelete.contains(arc.destination())){
+					transitionsToDelete.add(arc.destination());
+				}
+			}
 		}
 
 		for (TransportArc arc : net.transportArcs()) {
 			//fix transport arcs
 			TimeInterval oldInterval = arc.interval();
 			
-			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
 			if (newInterval != null)
 				arc.setTimeInterval(newInterval);
-			else
-				arcsToDelete.add(arc);
+			else{
+				if(!transitionsToDelete.contains(arc.transition())){
+					transitionsToDelete.add(arc.transition());
+				}
+			}
 		}
-		
-		TimedTransition transition = null;
-		TimedPlace place = null;
-		Transition guiTransition = null;
-		
-		for(TAPNElement arc : arcsToDelete){
-			if(arc instanceof TimedInputArc){
-				transition = ((TimedInputArc)arc).destination();
-				place = ((TimedInputArc)arc).source();
-			}
-			else if(arc instanceof TransportArc){
-				transition = ((TransportArc)arc).transition();
-				place = ((TransportArc)arc).source();
-			}
-			
-			if (guiModel != null) {	// If we are in the process of saving XML and want to update guiModel
-				guiTransition = guiModel.getTransitionByName(transition.name());
-	
-				//We need to find the arc in the guiModel and delete it
-				for (Arc arc1 : guiModel.getArcs()){	
-					if(arc1 instanceof TimedInputArcComponent) //If input arc or transport arc
+
+		for(TimedTransition transitionToDelete : transitionsToDelete){
+			if(guiModel != null){
+				// We assert here that deletions in the guimodel will also delete underlying model elements
+				Transition guiTransition = guiModel.getTransitionByName(transitionToDelete.name());
+				
+				for (Arc arc1 : guiModel.getArcs()){
+					if (arc1.getTarget() instanceof Place && arc1.getSource() == guiTransition) //If arc1 is an output arc
 					{ 
-						if(arc1 instanceof TimedTransportArcComponent){
-							if (net.getTransitionByName(((TimedTransportArcComponent)arc1).getTransition().getName()) == transition){
-								arc1.delete();
-							}
-						}
-						else { //Else we must have an input arc
-						// TEST TO ENSURE THAT WE ARE ACTUALLY WORKING WITH THE CORRECT GUIMODEL (it verifies)
-						//	((TimedInputArcComponent) arc1).setGuardAndWeight(new TimeInterval(true, new IntBound(11), Bound.Infinity, false), arc1.getWeight()); 
-							if(net.getTransitionByName(((Transition)arc1.getTarget()).getName()) == transition &&
-							   net.getPlaceByName(((Place)arc1.getSource()).getName()) == place){	//If we have the matching arc
-						       arc1.delete();
-							}
-						}
+						arc1.delete();
+					}
+					else if (arc1.getTarget() instanceof Transition && arc1.getTarget() == guiTransition){ //Else if arc1 is an input arc
+						arc1.delete();
 					}
 				}
+				guiTransition.delete();
 			}
-			else {
-				arc.delete();
-			}
+			else{
+				ArrayList<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
 				
-			// checks if the transition are now orphan and the output and inhibitorarcs should be deleted
-			if(transition.getInputArcs().isEmpty() && transition.getTransportArcsGoingThrough().isEmpty()){
-				ArrayList<TAPNElement> toDelete = new ArrayList<TAPNElement>();
-				toDelete.addAll(transition.getOutputArcs());
-				toDelete.addAll(transition.getInhibitorArcs());
-				for(TAPNElement orphanTransitionArc : toDelete){	//Delete the arcs that were connected to 
-				//	orphanTransitionArc.delete();
-					if (orphanTransitionArc instanceof TimedOutputArc){	//We have only been deleting input arcs and know there are now no input ares or transport arcs
-						
-						if (guiModel != null){
-							//We need to find the arc in the gui and delete it
-							for (Arc arc1 : guiModel.getArcs()){
-								if (arc1.getTarget() instanceof Place) //If arc1 is an output arc
-								{ 
-									if(net.getTransitionByName(((Transition)arc1.getSource()).getName()) == ((TimedOutputArc)orphanTransitionArc).source() &&
-									   net.getPlaceByName(((Place)arc1.getTarget()).getName()) == ((TimedOutputArc)orphanTransitionArc).destination()){
-										arc1.delete();
-									}
-								}
-							}
-						}
-						else {
-							orphanTransitionArc.delete();
-						}
-					}
+				//Add all did not work properly, so we do it manually.
+				for(TimedInputArc arc : transitionToDelete.getInputArcs()){
+					inputArcs.add(arc);
 				}
-				if (guiModel != null) {
-					guiTransition.delete(); //NOT AT ALL SURE THIS ALSO DELETES MODELS TRANSITION (Like what happens with arcs)
-				} else {
-					transition.delete(); 
+				for(TimedInputArc arc : inputArcs){
+					arc.delete();
 				}
 				
+				ArrayList<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+				for(TimedOutputArc arc : transitionToDelete.getOutputArcs()){
+					outputArcs.add(arc);
+				}
+				for(TimedOutputArc arc : outputArcs){
+					arc.delete();
+				}
+				
+				ArrayList<TransportArc> transportArcs = new ArrayList<TransportArc>();
+				for(TransportArc arc : transitionToDelete.getTransportArcsGoingThrough()){
+					transportArcs.add(arc);
+				}
+				for(TransportArc arc : transportArcs){
+					arc.delete();
+				}
+				
+				ArrayList<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+				for(TimedInhibitorArc arc : transitionToDelete.getInhibitorArcs()){
+					inhibitorArcs.add(arc);
+				}
+				for(TimedInhibitorArc arc : inhibitorArcs){
+					arc.delete();
+				}
 			}
+			transitionToDelete.delete();
 		}	
-		
 		
 		// Fix invariants in places
 		for (TimedPlace place1 : net.places()) {
 			if ( ! (place1.invariant().upperBound() instanceof Bound.InfBound) && place1.invariant().upperBound().value() > 0) {					
 				TimeInvariant oldInvariant = place1.invariant();
-				place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.floor(oldInvariant.upperBound().value() / (double)query.approximationDenominator()))));
+				
+				int newInvariantBound = (int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				if(newInvariantBound != 0){
+					place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
+				}
+				else{
+					place1.setInvariant(new TimeInvariant(true, new IntBound(0)));
+				}
 			}
 		}
 	}
@@ -160,25 +158,28 @@ public class UnderApproximation implements ITAPNApproximation {
 		IntBound newLowerBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
 		 
 		// if the lower bound has become greater than the upper bound by rounding
-		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
-		{
-			return null;
-		}
-		
-		// if the interval becomes too small
-		if ( (newUpperBound.value() == newLowerBound.value()) && 
-				((oldInterval.IsLowerBoundNonStrict() && !oldInterval.IsUpperBoundNonStrict()) ||
-						(!oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict())))
-		{
-			return null;
-		}
+				if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
+				{
+					newLowerBound = new IntBound((int) Math.floor((double)oldInterval.lowerBound().value() / denominator));
+					newUpperBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() / denominator));
+				}
+				
+				boolean isLowerBoundNonStrict = oldInterval.IsLowerBoundNonStrict();
+				boolean isUpperBoundNonStrict = oldInterval.IsUpperBoundNonStrict();
+				
+				// if the interval becomes too small we make it a bit bigger to secure, that we do not have to delete the arc
+				if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
+				{
+					isUpperBoundNonStrict = true;
+					isLowerBoundNonStrict = true;
+				}
 
-		return new TimeInterval(
-			 oldInterval.IsLowerBoundNonStrict(),
-			 newLowerBound,
-			 newUpperBound,
-			 oldInterval.IsUpperBoundNonStrict()
-			 );
+				return new TimeInterval(
+					 isLowerBoundNonStrict,
+					 newLowerBound,
+					 newUpperBound,
+					 isUpperBoundNonStrict
+					 );
 	}
 
 }

@@ -134,7 +134,8 @@ public class RunVerification extends RunVerificationBase {
 		return buffer.toString();
 	}
 	
-	private JPanel createTransitionStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result) {
+	
+        private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
 		final JPanel fullPanel = new JPanel(new GridBagLayout());
 		
@@ -144,20 +145,45 @@ public class RunVerification extends RunVerificationBase {
 		gbc.weightx = 2;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
-		
+                if (transitionPanel) {
+                    headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
+                } else {
+                    headLinePanel.add(new JLabel(toHTML("Maximum number of tokens per place achieved during the search.\n"), JLabel.LEFT), gbc);
+                }
+                    
 		//Setup table
-		String[] columnNames = {"Count",
-                "Transition"};
-		Object[][] data = extractArrayFromTransitionStatistics(result);
-		JTable table = new JTable(data, columnNames);
+                JTable table;
+                if (transitionPanel) {
+                    String[] columnNames = {"Count", "Transition"};
+                    Object[][] data = extractArrayFromTransitionStatistics(result);
+                    table = new JTable(data, columnNames);
+                } else {
+                    String[] columnNames = {"Max Tokens", "Place"};
+                    Object[][] data = extractArrayFromPlaceBoundStatistics(result);
+                    table = new JTable(data, columnNames);
+                }
 
-		Comparator<Integer> comparator = new Comparator<Integer>() {
-		
-			public int compare(Integer arg0, Integer arg1) {
-				return arg0-arg1;
-			}
-		};
+                Comparator<Object> comparator = new Comparator<Object>() {
+                @Override
+                public int compare(Object oo1, Object oo2) {
+                    boolean isFirstNumeric, isSecondNumeric;
+                    String o1 = oo1.toString(), o2 = oo2.toString();
+                    isFirstNumeric = o1.matches("\\d+");
+                    isSecondNumeric = o2.matches("\\d+");
+                    if (isFirstNumeric) {
+                        if (isSecondNumeric) {
+                            return Integer.valueOf(o2).compareTo(Integer.valueOf(o1));
+                        } else {
+                            return -1; // numbers always smaller than letters
+                        }
+                    } else {
+                        if (isSecondNumeric) {
+                            return 1; // numbers always smaller than letters
+                        }
+                    }
+                    return 0; // we do not compare strings (it is the same all the time) 
+                }
+                };
 		
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
 		sorter.setComparator(0, comparator);
@@ -200,7 +226,7 @@ public class RunVerification extends RunVerificationBase {
 			    //set resizable to true
 			    dialog.setResizable(true);
 				dialog.setMinimumSize(new Dimension(350, 300));
-				dialog.setPreferredSize(new Dimension(450, 400));
+				dialog.setPreferredSize(new Dimension(600, 400));
 			   }
 			  }
 			 }
@@ -209,16 +235,26 @@ public class RunVerification extends RunVerificationBase {
 		return fullPanel;
 	}
 	
-	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+        private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
 		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
 		Object[][] out = new Object[transistionStats.size()][2];
 		for (int i=0;i<transistionStats.size();i++) {
-			Object[] line = {transistionStats.get(i).value2(),transistionStats.get(i).value1()};
+			Object[] line = {(transistionStats.get(i).value2()==-1 ? "unknown - transition was removed" : transistionStats.get(i).value2()) ,transistionStats.get(i).value1()};
 			out[i] = line;
 		}
 		return out;
 	}
-	
+        
+	private Object[][] extractArrayFromPlaceBoundStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+		List<Tuple<String,Integer>> placeBoundStats = result.getPlaceBoundStatistics();
+		Object[][] out = new Object[placeBoundStats.size()][2];
+		for (int i=0;i<placeBoundStats.size();i++) {
+			Object[] line = {(placeBoundStats.get(i).value2()==-1 ? "unknown - place was removed" : placeBoundStats.get(i).value2()),placeBoundStats.get(i).value1()};
+			out[i] = line;
+		}
+		return out;
+        }
+        
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		
@@ -247,7 +283,7 @@ public class RunVerification extends RunVerificationBase {
 			gbc = new GridBagConstraints();
 			gbc.gridx = 1;
 			gbc.gridy = 1;
-			gbc.insets = new Insets(0,10,15,0);
+			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.EAST;
 			panel.add(infoButton, gbc);
 			
@@ -255,22 +291,46 @@ public class RunVerification extends RunVerificationBase {
 				JButton transitionStatsButton = new JButton("Transition Statistics");
 				transitionStatsButton.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent arg0) {
-						JOptionPane.showMessageDialog(panel,createTransitionStatisticsPanel(result) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 4;
+				gbc.gridy = 2;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
+			}
+                        if(!result.getPlaceBoundStatistics().isEmpty()){
+				JButton placeStatsButton = new JButton("Place-Bound Statistics");
+				placeStatsButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+				gbc = new GridBagConstraints();
+				gbc.gridx = 1;
+				gbc.gridy = 2;
+				gbc.insets = new Insets(10,0,10,0);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(placeStatsButton, gbc);
+			}
+			
+			if(!result.getReductionResultAsString().isEmpty()){
+				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
+				gbc = new GridBagConstraints();
+				gbc.gridx = 0;
+				gbc.gridy = 3;
+				gbc.insets = new Insets(0,0,20,-90);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(reductionStatsLabet, gbc);
 			}
 		}
 		
 		if(result.isOverApproximationResult()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 1;
+			gbc.gridy = 4;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel(toHTML("The query was resolved using the over-approximation.")), gbc);
@@ -278,14 +338,14 @@ public class RunVerification extends RunVerificationBase {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 5;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 6;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
@@ -299,7 +359,7 @@ public class RunVerification extends RunVerificationBase {
 				&& modelChecker.useDiscreteSemantics()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = modelChecker.supportsStats() ? 5 : 4;
+			gbc.gridy = 10;
 			gbc.gridwidth = 2;
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);

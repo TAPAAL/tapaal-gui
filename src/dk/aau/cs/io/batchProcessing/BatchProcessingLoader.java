@@ -499,6 +499,7 @@ public class BatchProcessingLoader {
 		int approximationDenominator = getApproximationValue(queryElement, "approximationDenominator", 2);
 		boolean active = getActiveStatus(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
+		boolean reduction = getReductionOption(queryElement, "reduction", true);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		
 		TCTLAbstractProperty query;
@@ -506,7 +507,7 @@ public class BatchProcessingLoader {
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, hashTableSize, 
+					searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, 
 					extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);

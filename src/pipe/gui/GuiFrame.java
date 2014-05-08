@@ -253,7 +253,6 @@ public class GuiFrame extends JFrame implements Observer {
 		addWindowListener(new WindowHandler());
 
 		this.setForeground(java.awt.Color.BLACK);
-		this.setBackground(java.awt.Color.WHITE);
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
@@ -2282,9 +2281,9 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
-		buffer.append("Lasse Jacobsen, Morten Jacobsen, Peter G. Jensen, ");
-		buffer.append("Kenneth Y. Joergensen,\nMikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
+		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
+		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
+		buffer.append("\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2014\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");

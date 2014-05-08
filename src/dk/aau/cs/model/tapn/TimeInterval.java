@@ -95,9 +95,17 @@ public class TimeInterval {
 	public Bound lowerBound() {
 		return lower;
 	}
+	
+	public void setLowerBound(Bound lower) {
+		this.lower = lower;
+	}
 
 	public Bound upperBound() {
 		return upper;
+	}
+	
+	public void setUpperBound(Bound upper) {
+		this.upper = upper;
 	}
 
 	public boolean IsLowerBoundNonStrict() {

@@ -7,6 +7,9 @@
 package pipe.gui;
 
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,19 +17,11 @@ import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
-import javax.print.Doc;
 import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
 import javax.print.PrintException;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.ServiceUI;
 import javax.print.SimpleDoc;
 import javax.print.StreamPrintServiceFactory;
-import javax.print.attribute.DocAttributeSet;
-import javax.print.attribute.HashDocAttributeSet;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
@@ -81,35 +76,17 @@ public class Export {
 		ImageIO.write(img, "png", f);
 	}
 
-	private static void toPrinter(Object g) throws PrintException {
-		// /* The Swing way
-		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-		DocFlavor flavour = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
-		PrintService[] printService = PrintServiceLookup.lookupPrintServices(
-				flavour, pras);
-
-		if (printService.length == 0) {
-			throw new PrintException(
-					"\nUnable to locate a compatible printer service."
-							+ "\nTry exporting to PostScript.");
+	private static void toPrinter(DrawingSurfaceImpl g) throws PrintException {
+		PrinterJob pjob = PrinterJob.getPrinterJob(); 
+		PageFormat pf = pjob.defaultPage(); 
+		pjob.setPrintable(g, pf);
+		if(pjob.printDialog()){
+			try {
+				pjob.print();
+			} catch (PrinterException e) {
+				throw new PrintException(e);
+			} 
 		}
-		PrintService defaultService = PrintServiceLookup
-				.lookupDefaultPrintService();
-		PrintService service = ServiceUI.printDialog(null, 200, 200,
-				printService, defaultService, flavour, pras);
-		if (service != null) {
-			DocPrintJob job = service.createPrintJob();
-			DocAttributeSet das = new HashDocAttributeSet();
-			Doc doc = new SimpleDoc(g, flavour, das);
-			job.print(doc, pras);
-		}
-		// */
-		/*
-		 * The AWT way: PrinterJob pjob = PrinterJob.getPrinterJob(); PageFormat
-		 * pf = pjob.defaultPage(); pjob.setPrintable(g, pf); try { if
-		 * (pjob.printDialog()) pjob.print(); } catch (PrinterException e) {
-		 * error=e.toString(); } //
-		 */
 	}
 
 	public static void exportGuiView(DrawingSurfaceImpl g, int format,

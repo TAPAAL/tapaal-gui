@@ -12,6 +12,9 @@ public interface VerificationOptions {
 
 	String toString();
 	boolean useOverApproximation();
+	boolean enableOverApproximation();
+	boolean enableUnderApproximation();
+	int approximationDenominator();
 	int extraTokens();
 	TraceOption traceOption();
 	void setTraceOption(TraceOption option);

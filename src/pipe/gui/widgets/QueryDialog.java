@@ -119,6 +119,7 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
+import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
@@ -220,6 +221,7 @@ public class QueryDialog extends JPanel {
 	private JCheckBox usePTrie;
 	private JCheckBox useGCD;
 	private JCheckBox useOverApproximation;
+	private JCheckBox useReduction;
 	
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
@@ -398,8 +400,10 @@ public class QueryDialog extends JPanel {
 		boolean pTrie = usePTrie.isSelected();
 		boolean gcd = useGCD.isSelected();
 		boolean overApproximation = useOverApproximation.isSelected();
+		boolean reduction = useReduction.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -1071,6 +1075,7 @@ public class QueryDialog extends JPanel {
 		usePTrie.setSelected(queryToCreateFrom.usePTrie());
 		useGCD.setSelected(queryToCreateFrom.useGCD());
 		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
+		useReduction.setSelected(queryToCreateFrom.useReduction());
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
@@ -1267,10 +1272,10 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
 
-		numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet = new CustomJSpinner(4, 0, Integer.MAX_VALUE);	
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
 		numberOfExtraTokensInNet.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
 		boundednessCheckPanel.add(numberOfExtraTokensInNet);
 
@@ -2171,9 +2176,9 @@ public class QueryDialog extends JPanel {
 		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
 		
 		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
-		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
-		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
-		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
+		overApproximationDenominator.setMaximumSize(new Dimension(65, 30));
+		overApproximationDenominator.setMinimumSize(new Dimension(65, 30));
+		overApproximationDenominator.setPreferredSize(new Dimension(65, 30));
 		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
 		
 		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
@@ -2293,6 +2298,24 @@ public class QueryDialog extends JPanel {
 		usePTrie = new JCheckBox("Use PTrie");
 		usePTrie.setSelected(true);
 		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);	
+		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
+
+		useReduction = new JCheckBox("Apply net reductions");
+		useReduction.setSelected(true);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);	
+		reductionOptionsPanel.add(useReduction, gbc);
+		
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
@@ -2301,7 +2324,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
 
-		useOverApproximation = new JCheckBox("Use over-approximation check");
+		useOverApproximation = new JCheckBox("Use untimed state-equations check");
 		useOverApproximation.setSelected(true);
 		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
 
@@ -2414,6 +2437,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshDiscreteOptions(){
+		useReduction.setVisible(false);
 		if(reductionOption.getSelectedItem() == null){
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
@@ -2436,6 +2460,10 @@ public class QueryDialog extends JPanel {
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
+			
+			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
+				useReduction.setVisible(true);
+			}
 		}
 	}
 
@@ -2525,6 +2553,17 @@ public class QueryDialog extends JPanel {
 					if (xmlFile != null && queryFile != null) {
 						ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
+						
+						if (overApproximationEnable.isSelected())
+						{
+							OverApproximation overaprx = new OverApproximation();
+							overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
+						}
+						else if (underApproximationEnable.isSelected())
+						{
+							UnderApproximation underaprx = new UnderApproximation();
+							underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
+						}						
 
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
@@ -2571,26 +2610,24 @@ public class QueryDialog extends JPanel {
 					if (overApproximationEnable.isSelected())
 					{
 						OverApproximation overaprx = new OverApproximation();
-						overaprx.modifyTAPN(transformedModel.value1(), getQuery());
+						overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
 					}
 					else if (underApproximationEnable.isSelected())
 					{
 						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery(), ((TAPNComposerExtended) composer).getGuiModel());
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposerExtended) composer).getGuiModel());
 					}
 					templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();
-					for (Constant constant : tapnNetwork.constants()) {
-						newConstantStore.add(constant);
-					}
+
 					
 					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(newConstantStore);
 					
 					network.add(transformedModel.value1());
 					
-					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), tapnNetwork.constants());
+					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
 			
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
