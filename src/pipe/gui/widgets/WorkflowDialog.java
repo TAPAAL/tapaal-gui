@@ -1,43 +1,8 @@
 package pipe.gui.widgets;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import pipe.gui.*;
-import pipe.gui.GuiFrame.GUIMode;
-import pipe.dataLayer.*;
-import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
@@ -70,6 +35,40 @@ import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import pipe.dataLayer.*;
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.gui.*;
+import pipe.gui.GuiFrame.GUIMode;
 
 public class WorkflowDialog extends JDialog {
 
@@ -1046,6 +1045,7 @@ public class WorkflowDialog extends JDialog {
 						B = Math.max(B, p.invariant().upperBound().value());
 					}
 				}
+                                int c  = (int)m*B+1;
 
 
 
@@ -1056,10 +1056,10 @@ public class WorkflowDialog extends JDialog {
                                     "Workflow strong soundness checking",
                                     numberOfExtraTokensInNet == null ? 0
                                             : (Integer) numberOfExtraTokensInNet.getValue(),
-                                    new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
+                                    new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
                                     SearchOption.HEURISTIC,
                                     ReductionOption.VerifyTAPNdiscreteVerification, true, true,
-                                    false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, B);
+                                    false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, c);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
