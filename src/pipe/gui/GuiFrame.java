@@ -70,6 +70,9 @@ import com.sun.jna.Platform;
 
 
 
+
+
+
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -79,6 +82,8 @@ import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -134,7 +139,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GridAction toggleGrid;
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
-	private SpacingAction incSpacing, decSpacing;
+	private SpacingAction incSpacingAction, decSpacingAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
@@ -541,11 +546,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 		
-		addMenuItem(viewMenu, incSpacing = new SpacingAction("Increase spacing",
-				"Increase spacing by 20% ", "ctrl +"));
+		addMenuItem(viewMenu, incSpacingAction = new SpacingAction("Increase node spacing",
+				"Increase spacing by 20% ", null));
+		incSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey));
 		
-		addMenuItem(viewMenu, decSpacing = new SpacingAction("Decrease spacing",
-				"Decrease spacing by 20% ", "ctrl +"));
+		addMenuItem(viewMenu, decSpacingAction = new SpacingAction("Decrease node spacing",
+				"Decrease spacing by 20% ", null));
+		decSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift U"));
 
 		
 		viewMenu.addSeparator();
@@ -2212,25 +2219,21 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			String actionName = (String) getValue(NAME);
-			Zoomer zoomer = appView.getZoomController();
-			TabContent tabContent = (TabContent) appTab.getSelectedComponent();
-			JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
+			double factor = equals(incSpacingAction)? 1.25 : 0.8;
 			
-			/*if (actionName.equals("Increase spacing")) {
-				zoomer.incSpacing();
-			} else if (actionName.equals("Decrease spacing")) {
-				zoomer.decSpacing();
-			} 
+			TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
+			for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
+				if(obj instanceof PlaceTransitionObject){
+					((PlaceTransitionObject) obj).setPositionX(Math.max(obj.getLocation().x*factor, obj.getWidth()));
+					((PlaceTransitionObject) obj).setPositionY(Math.max(obj.getLocation().y*factor, obj.getHeight()));
+					((PlaceTransitionObject) obj).update(true);
+				}else{
+					obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+				}
+			}
 			
-			double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
-					+ (thisView.getWidth() * 0.5), zoomer.getPercent());
-			double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
-					+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-
-			java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
-
-			appView.zoomTo(midpoint);*/
+			tabContent.currentTemplate().guiModel().repaintAll(true);
+			appGui.appView.updatePreferredSize();
 		}
 
 	}
