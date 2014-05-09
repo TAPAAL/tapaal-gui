@@ -77,7 +77,7 @@ import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
@@ -132,7 +132,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction, exportPNGAction,
-	exportPSAction, exportToTikZAction, exportTraceAction, importTraceAction;
+	exportPSAction, exportToTikZAction, exportToPNMLAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -379,7 +379,9 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(exportMenu, exportToTikZAction = new FileAction("TikZ",
 				"Export the net to PNG format", "ctrl L"));
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
-
+		addMenuItem(exportMenu, exportToPNMLAction = new FileAction("PNML",
+				"Export the net to PNML format", ""));
+		
 		fileMenu.add(exportMenu);
 
 		fileMenu.addSeparator();
@@ -1117,6 +1119,7 @@ public class GuiFrame extends JFrame implements Observer {
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
+		exportToPNMLAction.setEnabled(enable);
 
 		exportTraceAction.setEnabled(enable);
 		importTraceAction.setEnabled(enable);
@@ -1311,7 +1314,7 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
 			}
 
-			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 					currentTab.network(),
 					currentTab.allTemplates(), 
 					currentTab.queries(), 
@@ -2422,6 +2425,8 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == exportToTikZAction) {
 				Export.exportGuiView(appView, Export.TIKZ, appView
 						.getGuiModel());
+			} else if (this == exportToPNMLAction){
+				Export.exportGuiView(appView, Export.PNML, null);
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
 			} else if (this == printAction) {
