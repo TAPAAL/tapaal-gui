@@ -85,5 +85,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public boolean pTrie() {
 		return pTrie;
 	}
+        
+        public WorkflowMode getWorkflowMode(){
+            return workflow;
+        }
 	
 }

@@ -1,25 +1,5 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import net.tapaal.Preferences;
-import net.tapaal.TAPAAL;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
-import pipe.gui.MessengerImpl;
-import pipe.gui.Pipe;
-import pipe.gui.widgets.InclusionPlaces;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -41,6 +21,26 @@ import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import net.tapaal.Preferences;
+import net.tapaal.TAPAAL;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.gui.FileFinder;
+import pipe.gui.FileFinderImpl;
+import pipe.gui.MessengerImpl;
+import pipe.gui.Pipe;
+import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 
 public class VerifyTAPNDiscreteVerification implements ModelChecker{
 	
@@ -360,8 +360,11 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			StringBuffer buffer = new StringBuffer(options.toString());
 			buffer.append(' ');
 			buffer.append(modelFile);
-			buffer.append(' ');
-			buffer.append(queryFile);
+                        VerifyDTAPNOptions opts = (VerifyDTAPNOptions)options;
+                        if(opts.getWorkflowMode() == WorkflowMode.NOT_WORKFLOW) {
+                            buffer.append(' ');
+                            buffer.append(queryFile);
+                        }
 
 			return buffer.toString();
 		}
