@@ -73,6 +73,9 @@ import com.sun.jna.Platform;
 
 
 
+
+
+
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -81,9 +84,12 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -2227,6 +2233,19 @@ public class GuiFrame extends JFrame implements Observer {
 					((PlaceTransitionObject) obj).setPositionX(Math.max(obj.getLocation().x*factor, obj.getWidth()));
 					((PlaceTransitionObject) obj).setPositionY(Math.max(obj.getLocation().y*factor, obj.getHeight()));
 					((PlaceTransitionObject) obj).update(true);
+					
+					if(obj instanceof Transition){
+						for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
+							for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+								point.setPointLocation((float) Math.max(point.getLocation().x*factor, point.getWidth()), (float) Math.max(point.getLocation().y*factor, point.getHeight()));
+							}
+						}
+						for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
+							for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+								point.setPointLocation((float) Math.max(point.getLocation().x*factor, point.getWidth()), (float) Math.max(point.getLocation().y*factor, point.getHeight()));
+							}
+						}
+					}
 				}else{
 					obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
 				}

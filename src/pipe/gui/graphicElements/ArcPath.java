@@ -51,6 +51,10 @@ public class ArcPath implements Shape, Cloneable {
 		transitionAngle = 0;
 	}
 
+	public List<ArcPathPoint> getArcPathPoints(){
+		return pathPoints;
+	}
+	
 	public ArcPathPoint getArcPathPoint(int i) {
 		return (pathPoints.get(i));
 	}
