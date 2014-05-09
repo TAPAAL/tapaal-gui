@@ -2230,9 +2230,8 @@ public class GuiFrame extends JFrame implements Observer {
 			TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
 			for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
 				if(obj instanceof PlaceTransitionObject){
-					((PlaceTransitionObject) obj).setPositionX(Math.max(obj.getLocation().x*factor, obj.getWidth()));
-					((PlaceTransitionObject) obj).setPositionY(Math.max(obj.getLocation().y*factor, obj.getHeight()));
-					((PlaceTransitionObject) obj).update(true);
+					((PlaceTransitionObject) obj).setPositionX(Math.max(((PlaceTransitionObject) obj).getPositionXObject()*factor, obj.getWidth()));
+					((PlaceTransitionObject) obj).setPositionY(Math.max(((PlaceTransitionObject) obj).getPositionYObject()*factor, obj.getHeight()));
 					
 					if(obj instanceof Transition){
 						for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
@@ -2246,6 +2245,8 @@ public class GuiFrame extends JFrame implements Observer {
 							}
 						}
 					}
+					
+					((PlaceTransitionObject) obj).update(true);
 				}else{
 					obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
 				}
