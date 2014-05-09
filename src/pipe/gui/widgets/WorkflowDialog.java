@@ -1045,7 +1045,8 @@ public class WorkflowDialog extends JDialog {
 						B = Math.max(B, p.invariant().upperBound().value());
 					}
 				}
-                                int c  = (int)m*B+1;
+                
+				int c  = (int)m*B+1;
 
 
 
@@ -1069,8 +1070,19 @@ public class WorkflowDialog extends JDialog {
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
 						if(result.isQuerySatisfied()){
+							
+							switch(((TimedTAPNNetworkTrace) result.getTrace()).getTraceType()){
+							case EG_LOOP:
+								setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
+								break;
+							case EG_DELAY_FOREVER:
+								setStrongSoundnessResult(false, RESULT_ERROR_TIME);
+							default:
+								assert(false);
+								break;
+							}
 
-							strongSoundnessResultTrace = determineError(mapTraceToRealModel(result.getTrace()));
+							strongSoundnessResultTrace = mapTraceToRealModel(result.getTrace());
 							strongSoundnessResultTraceButton.setVisible(true);
 
 							if(max.isSelected()){
@@ -1095,58 +1107,6 @@ public class WorkflowDialog extends JDialog {
 						strongSoundnessVerificationStats.setVisible(true);
 
 						pack();
-					}
-
-					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
-						NetworkMarking marking = CreateGui.getCurrentTab().network().marking();
-						TimedTAPNNetworkTrace tmpTrace = new TimedTAPNNetworkTrace(trace.length());
-						TraceType type = null;
-						ArrayList<Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer, Integer>>> detectLoops = new ArrayList<Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>,Tuple<Integer,Integer>>>();
-						int loopIndex = -1;
-						int delay = 0;
-						int maxDelay = 0;
-						int divergentIndex = -1;
-						
-						// Get trace until bound violated						
-						outer: for(TAPNNetworkTraceStep step : trace){
-							if(step instanceof TAPNNetworkTimeDelayStep){
-								delay += ((TAPNNetworkTimeDelayStep) step).getDelay().intValue();
-								if(((TAPNNetworkTimeDelayStep) step).getDelay().intValue() > maxDelay){
-									maxDelay = ((TAPNNetworkTimeDelayStep) step).getDelay().intValue();
-									divergentIndex = tmpTrace.length();
-								}
-							}else{
-								for(Tuple<Tuple<TAPNNetworkTraceStep, NetworkMarking>, Tuple<Integer, Integer>> checkStep : detectLoops){
-									if(checkStep.value1().value1().equals(step) && checkStep.value1().value2().equals(marking.cut()) && checkStep.value2().value1() < delay){
-										loopIndex = checkStep.value2().value2();
-										setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
-										type = TraceType.EG_LOOP;
-										break outer;
-									}
-								}
-								detectLoops.add(new Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer,Integer>>(new Tuple<TAPNNetworkTraceStep,NetworkMarking>(step, marking.cut()), new Tuple<Integer, Integer>(delay, tmpTrace.length())));
-							}
-							tmpTrace.add(step);
-							marking = step.performStepFrom(marking);
-						}
-
-						if(type == null){
-							type = TraceType.EG_DELAY_FOREVER;
-							setStrongSoundnessResult(false, RESULT_ERROR_TIME);
-							loopIndex = divergentIndex;
-						}
-
-						TimedTAPNNetworkTrace realTrace = new TimedTAPNNetworkTrace(loopIndex);
-						for(TAPNNetworkTraceStep step : tmpTrace){
-							if(type == TraceType.EG_DELAY_FOREVER && realTrace.length() == loopIndex){
-								break;
-							}
-							realTrace.add(step);
-						}
-
-						realTrace.setTraceType(type);
-
-						return realTrace;
 					}
 				});
 			}
