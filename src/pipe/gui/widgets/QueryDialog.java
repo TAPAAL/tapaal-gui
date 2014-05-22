@@ -86,6 +86,8 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -600,18 +602,23 @@ public class QueryDialog extends JPanel {
 	private void updateQueryButtonsAccordingToSelection() {
 		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
-
+			if(!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode)){
+				return;
+			}
+			TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+			TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+			
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
 			// because a different atomic proposition was selected
 			userChangedAtomicPropSelection = false;
-			if(node.getTemplate().equals(""))
+			if(placeNode.getTemplate().equals(""))
 				templateBox.setSelectedItem(SHARED);
 			else
-				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
-			placesBox.setSelectedItem(node.getPlace());
+				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
+			placesBox.setSelectedItem(placeNode.getPlace());
 			relationalOperatorBox.setSelectedItem(node.getOp());
-			placeMarking.setValue(node.getN());
+			placeMarking.setValue(placeMarkingNode.getConstant());
 			userChangedAtomicPropSelection = true;
 		} else if (currentSelection.getObject() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
@@ -916,10 +923,9 @@ public class QueryDialog extends JPanel {
 			Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
 			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-					template,
-					(String) placesBox.getSelectedItem(),
+					new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
 					(String) relationalOperatorBox.getSelectedItem(),
-					(Integer) placeMarking.getValue());
+					new TCTLConstNode((Integer) placeMarking.getValue()));
 			if (!property.equals(currentSelection.getObject())) {
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
@@ -1713,10 +1719,9 @@ public class QueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 				TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-						template,
-						(String) placesBox.getSelectedItem(),
+						new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
 						(String) relationalOperatorBox.getSelectedItem(),
-						(Integer) placeMarking.getValue());
+						new TCTLConstNode((Integer) placeMarking.getValue()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
@@ -1885,7 +1890,7 @@ public class QueryDialog extends JPanel {
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();
-							s.append("The following places was used in the query, but are not present in your model:\n\n");
+							s.append("The following places were used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
