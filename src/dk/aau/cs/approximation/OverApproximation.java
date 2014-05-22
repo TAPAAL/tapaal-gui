@@ -9,10 +9,12 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
 import dk.aau.cs.util.Tuple;
@@ -199,7 +201,7 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		TCTLAbstractProperty topNode = query.getProperty();
-		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(blockPlace.name(), "=", 1);
+		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(new TCTLPlaceNode(blockPlace.name()), "=", new TCTLConstNode(1));
 		
 		// We need to modify the query to also have pBlock = 1. 
 		if(topNode instanceof TCTLEFNode)

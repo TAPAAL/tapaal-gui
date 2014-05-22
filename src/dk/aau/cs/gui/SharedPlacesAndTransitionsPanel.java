@@ -53,7 +53,6 @@ import pipe.gui.undo.DeleteTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.TCTL.visitors.ContainsAtomicPropWithSharedPlaceVisitor;
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;

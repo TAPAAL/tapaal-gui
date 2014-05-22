@@ -4,6 +4,11 @@ package dk.aau.cs.TCTL.Parsing;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import dk.aau.cs.TCTL.AritmeticOperator;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -30,23 +35,29 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
 /** Root production. */
   final public TCTLAbstractProperty AbstractProperty() throws ParseException {
         TCTLAbstractStateProperty child = null;
-    if (jj_2_1(2)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case EF:
       jj_consume_token(EF);
       child = OrExpr();
                                        {if (true) return new TCTLEFNode(child);}
-    } else if (jj_2_2(2)) {
+      break;
+    case EG:
       jj_consume_token(EG);
       child = OrExpr();
                                          {if (true) return new TCTLEGNode(child);}
-    } else if (jj_2_3(2)) {
+      break;
+    case AF:
       jj_consume_token(AF);
       child = OrExpr();
                                          {if (true) return new TCTLAFNode(child);}
-    } else if (jj_2_4(2)) {
+      break;
+    case AG:
       jj_consume_token(AG);
       child = OrExpr();
                                          {if (true) return new TCTLAGNode(child);}
-    } else {
+      break;
+    default:
+      jj_la1[0] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -60,9 +71,12 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
           disjunctions.add(currentChild);
     label_1:
     while (true) {
-      if (jj_2_5(2)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case OR:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[1] = jj_gen;
         break label_1;
       }
       jj_consume_token(OR);
@@ -80,9 +94,12 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
           conjunctions.add(currentChild);
     label_2:
     while (true) {
-      if (jj_2_6(2)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AND:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[2] = jj_gen;
         break label_2;
       }
       jj_consume_token(AND);
@@ -95,16 +112,25 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
 
   final public TCTLAbstractStateProperty NotExpr() throws ParseException {
         TCTLAbstractStateProperty child;
-    if (jj_2_7(2)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
       jj_consume_token(NOT);
-      jj_consume_token(18);
+      jj_consume_token(20);
       child = OrExpr();
-      jj_consume_token(19);
+      jj_consume_token(21);
                                          {if (true) return new TCTLNotNode(child);}
-    } else if (jj_2_8(2)) {
+      break;
+    case TRUE:
+    case FALSE:
+    case DEADLOCK:
+    case NUM:
+    case IDENT:
+    case 20:
       child = Factor();
                              {if (true) return child;}
-    } else {
+      break;
+    default:
+      jj_la1[3] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -113,49 +139,134 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
 
   final public TCTLAbstractStateProperty Factor() throws ParseException {
         TCTLAbstractStateProperty thisProp;
-    if (jj_2_9(2)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
       jj_consume_token(TRUE);
                         thisProp = new TCTLTrueNode();
-    } else if (jj_2_10(2)) {
+      break;
+    case FALSE:
       jj_consume_token(FALSE);
                            thisProp = new TCTLFalseNode();
-    } else if (jj_2_11(2)) {
+      break;
+    case DEADLOCK:
       jj_consume_token(DEADLOCK);
                               thisProp = new TCTLDeadlockNode();
-    } else if (jj_2_12(2)) {
-      thisProp = AtomicProposition();
-    } else if (jj_2_13(2)) {
-      jj_consume_token(18);
-      thisProp = OrExpr();
-      jj_consume_token(19);
-    } else {
-      jj_consume_token(-1);
-      throw new ParseException();
+      break;
+    default:
+      jj_la1[4] = jj_gen;
+      if (jj_2_1(2147483647)) {
+        thisProp = AtomicProposition();
+      } else {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case 20:
+          jj_consume_token(20);
+          thisProp = OrExpr();
+          jj_consume_token(21);
+          break;
+        default:
+          jj_la1[5] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+      }
     }
           {if (true) return thisProp;}
     throw new Error("Missing return statement in function");
   }
 
   final public TCTLAbstractStateProperty AtomicProposition() throws ParseException {
+        TCTLAbstractStateProperty left;
+        TCTLAbstractStateProperty right;
+        Token op;
+    left = AritmeticExpr();
+    op = jj_consume_token(OP);
+    right = AritmeticExpr();
+                {if (true) return new TCTLAtomicPropositionNode(left, op.image, right);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public TCTLAbstractStateProperty AritmeticExpr() throws ParseException {
+        TCTLAbstractStateProperty currentChild;
+        ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
+        Token op;
+    currentChild = AritmeticTerm();
+          terms.add(currentChild);
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case PLUS:
+        ;
+        break;
+      default:
+        jj_la1[6] = jj_gen;
+        break label_3;
+      }
+      op = jj_consume_token(PLUS);
+      currentChild = AritmeticTerm();
+                        terms.add(new AritmeticOperator(op.image));
+                        terms.add(currentChild);
+    }
+          {if (true) return terms.size() == 1 ? currentChild : new TCTLPlusListNode(terms);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public TCTLAbstractStateProperty AritmeticTerm() throws ParseException {
+        TCTLAbstractStateProperty currentChild;
+        ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<TCTLAbstractStateProperty>();
+        Token op;
+    currentChild = AritmeticFactor();
+          factors.add(currentChild);
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case MULT:
+        ;
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        break label_4;
+      }
+      op = jj_consume_token(MULT);
+      currentChild = AritmeticFactor();
+                        factors.add(new AritmeticOperator(op.image));
+                        factors.add(currentChild);
+    }
+          {if (true) return factors.size() == 1 ? currentChild : new TCTLTermListNode(factors);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public TCTLAbstractStateProperty AritmeticFactor() throws ParseException {
+        TCTLAbstractStateProperty thisProp;
         Token template = null;
         Token place;
         Token op;
         Token num;
-    if (jj_2_14(2)) {
-      template = jj_consume_token(IDENT);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IDENT:
+      if (jj_2_2(2)) {
+        template = jj_consume_token(IDENT);
+        jj_consume_token(22);
+      } else {
+        ;
+      }
+      place = jj_consume_token(IDENT);
+                                                                          thisProp = new TCTLPlaceNode(template == null ? "" : template.image, place.image);
+      break;
+    case NUM:
+      num = jj_consume_token(NUM);
+                                thisProp = new TCTLConstNode(Integer.parseInt(num.image));
+      break;
+    case 20:
       jj_consume_token(20);
-    } else {
-      ;
+      thisProp = AritmeticExpr();
+      jj_consume_token(21);
+      break;
+    default:
+      jj_la1[8] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
-    place = jj_consume_token(IDENT);
-    op = jj_consume_token(OP);
-    num = jj_consume_token(NUM);
-                String templateString = template == null ? "" : template.image;
-                String placeString = place.image;
-                String opString = op.image.equals("==") ? "=" : op.image;
-                int n = Integer.parseInt(num.image);
-
-                {if (true) return new TCTLAtomicPropositionNode(templateString, placeString, opString, n);}
+          {if (true) return thisProp;}
     throw new Error("Missing return statement in function");
   }
 
@@ -173,214 +284,86 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_2_3(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_3(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(2, xla); }
-  }
-
-  private boolean jj_2_4(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_4(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(3, xla); }
-  }
-
-  private boolean jj_2_5(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_5(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(4, xla); }
-  }
-
-  private boolean jj_2_6(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_6(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(5, xla); }
-  }
-
-  private boolean jj_2_7(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_7(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(6, xla); }
-  }
-
-  private boolean jj_2_8(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_8(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(7, xla); }
-  }
-
-  private boolean jj_2_9(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_9(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(8, xla); }
-  }
-
-  private boolean jj_2_10(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_10(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(9, xla); }
-  }
-
-  private boolean jj_2_11(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_11(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(10, xla); }
-  }
-
-  private boolean jj_2_12(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_12(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(11, xla); }
-  }
-
-  private boolean jj_2_13(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_13(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(12, xla); }
-  }
-
-  private boolean jj_2_14(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_14(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(13, xla); }
-  }
-
-  private boolean jj_3R_7() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_14()) jj_scanpos = xsp;
-    if (jj_scan_token(IDENT)) return true;
-    if (jj_scan_token(OP)) return true;
+  private boolean jj_3_1() {
+    if (jj_3R_5()) return true;
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_scan_token(18)) return true;
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
-  private boolean jj_3_12() {
+  private boolean jj_3R_8() {
+    if (jj_scan_token(PLUS)) return true;
     if (jj_3R_7()) return true;
     return false;
   }
 
-  private boolean jj_3_11() {
-    if (jj_scan_token(DEADLOCK)) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
-    if (jj_scan_token(AG)) return true;
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_3() {
-    if (jj_3R_4()) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(TRUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_scan_token(AF)) return true;
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_scan_token(EG)) return true;
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_scan_token(EF)) return true;
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_6() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_9()) {
-    jj_scanpos = xsp;
-    if (jj_3_10()) {
-    jj_scanpos = xsp;
-    if (jj_3_11()) {
-    jj_scanpos = xsp;
-    if (jj_3_12()) {
-    jj_scanpos = xsp;
-    if (jj_3_13()) return true;
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_8() {
+  private boolean jj_3R_5() {
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(OP)) return true;
     if (jj_3R_6()) return true;
     return false;
   }
 
-  private boolean jj_3_7() {
-    if (jj_scan_token(NOT)) return true;
-    if (jj_scan_token(18)) return true;
+  private boolean jj_3R_13() {
+    if (jj_scan_token(20)) return true;
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(21)) return true;
     return false;
   }
 
-  private boolean jj_3R_5() {
+  private boolean jj_3R_10() {
+    if (jj_scan_token(MULT)) return true;
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    if (jj_scan_token(NUM)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_scan_token(IDENT)) return true;
+    if (jj_scan_token(22)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3_8()) return true;
+    if (jj_3_2()) jj_scanpos = xsp;
+    if (jj_scan_token(IDENT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_6() {
+    if (jj_3R_7()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_8()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3_6() {
-    if (jj_scan_token(AND)) return true;
-    if (jj_3R_5()) return true;
+  private boolean jj_3R_7() {
+    if (jj_3R_9()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_10()) { jj_scanpos = xsp; break; }
+    }
     return false;
   }
 
-  private boolean jj_3_14() {
-    if (jj_scan_token(IDENT)) return true;
-    if (jj_scan_token(20)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_4() {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3_5() {
-    if (jj_scan_token(OR)) return true;
-    if (jj_3R_4()) return true;
+  private boolean jj_3R_9() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_11()) {
+    jj_scanpos = xsp;
+    if (jj_3R_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_13()) return true;
+    }
+    }
     return false;
   }
 
@@ -395,15 +378,15 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[0];
+  final private int[] jj_la1 = new int[9];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {};
+      jj_la1_0 = new int[] {0xf0,0x100,0x200,0x10640e,0xe,0x100000,0x800,0x1000,0x106000,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[14];
+  final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -418,7 +401,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -433,7 +416,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -444,7 +427,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -455,7 +438,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -465,7 +448,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -475,7 +458,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -587,12 +570,12 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[21];
+    boolean[] la1tokens = new boolean[23];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 0; i++) {
+    for (int i = 0; i < 9; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -601,7 +584,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
         }
       }
     }
-    for (int i = 0; i < 21; i++) {
+    for (int i = 0; i < 23; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -628,7 +611,7 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 2; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -637,18 +620,6 @@ public class TAPAALQueryParser implements TAPAALQueryParserConstants {
           switch (i) {
             case 0: jj_3_1(); break;
             case 1: jj_3_2(); break;
-            case 2: jj_3_3(); break;
-            case 3: jj_3_4(); break;
-            case 4: jj_3_5(); break;
-            case 5: jj_3_6(); break;
-            case 6: jj_3_7(); break;
-            case 7: jj_3_8(); break;
-            case 8: jj_3_9(); break;
-            case 9: jj_3_10(); break;
-            case 10: jj_3_11(); break;
-            case 11: jj_3_12(); break;
-            case 12: jj_3_13(); break;
-            case 13: jj_3_14(); break;
           }
         }
         p = p.next;

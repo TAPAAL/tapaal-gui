@@ -1,7 +1,8 @@
 package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "id_t";
@@ -17,29 +18,23 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	}
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+	public void visit(TCTLPlaceNode placeNode,
 			Object context) {
-
+		
 		if (useSymmetry) {
 			append("(sum(i:");
 			append(ID_TYPE);
 			append(")");
 			append(TOKEN_TEMPLATE_NAME);
 			append("(i).");
-			append(atomicPropositionNode.getPlace());
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(atomicPropositionNode.getN());
+			append(placeNode.getPlace());
+			append(")");
 		} else if (totalTokens == 0) {
 			append("(");
 			append(TOKEN_TEMPLATE_NAME);
 			append(".");
-			append(atomicPropositionNode.getPlace());
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(atomicPropositionNode.getN());
+			append(placeNode.getPlace());
+			append(")");
 		} else {
 			append("(");
 			for (int i = 0; i < totalTokens; i++) {
@@ -50,12 +45,9 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 				append(TOKEN_TEMPLATE_NAME);
 				append(i);
 				append(".");
-				append(atomicPropositionNode.getPlace());
+				append(placeNode.getPlace());
 			}
-			append(") ");
-			append(operatorConversion(atomicPropositionNode.getOp()));
-			append(" ");
-			append(atomicPropositionNode.getN());
+			append(")");
 		}
 	}
 

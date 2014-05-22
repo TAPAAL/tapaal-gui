@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 public class StandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "pid_t";
@@ -17,17 +19,9 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 	public StandardTranslationQueryVisitor(int totalTokens) {
 		this.totalTokens = totalTokens;
 	}
-
-	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
-			Object context) {
-
-		append("(");
-		append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));
-		append(operatorConversion(atomicPropositionNode.getOp()));
-		append(" ");
-		append(atomicPropositionNode.getN());
-		append(")");
+	
+	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
+		append(createAtomicPropositionSum(tctlPlaceNode.getPlace()));
 	}
 
 	@Override
