@@ -15,7 +15,6 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.TCTL.visitors.SimplifyPropositionsVisitor;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
@@ -243,16 +242,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
-			simplifyQuery(changedQuery);
 			return changedQuery;
 		}
 		
 		return query;
-	}
-	
-	private void simplifyQuery(pipe.dataLayer.TAPNQuery query) {
-		SimplifyPropositionsVisitor visitor = new SimplifyPropositionsVisitor();
-		visitor.findAndReplaceTrueAndFalsePropositions(query.getProperty());
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
