@@ -1,10 +1,15 @@
 package dk.aau.cs.TCTL.visitors;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
@@ -12,11 +17,14 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 
-public abstract class QueryVisitor implements ITCTLVisitor {
+public abstract class QueryVisitor extends VisitorBase {
 	protected enum QueryType {
 		EF, EG, AF, AG
 	}
@@ -65,29 +73,21 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	}
 
 	public void visit(TCTLAndListNode andListNode, Object context) {
-		uppaalQuery.append('(');
-		boolean firstTime = true;
-
-		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
-			if (!firstTime) {
-				uppaalQuery.append(" && ");
-			}
-
-			p.accept(this, context);
-			firstTime = false;
-		}
-
-		uppaalQuery.append(')');
-
+		createList(andListNode.getProperties(), context, "&&");
 	}
-
+	
 	public void visit(TCTLOrListNode orListNode, Object context) {
+		createList(orListNode.getProperties(), context, "||");
+	}
+	
+
+	private void createList(ArrayList<TCTLAbstractStateProperty> properties, Object context, String seperator) {
 		uppaalQuery.append('(');
 		boolean firstTime = true;
 
-		for (TCTLAbstractStateProperty p : orListNode.getProperties()) {
+		for (TCTLAbstractStateProperty p : properties) {
 			if (!firstTime) {
-				uppaalQuery.append(" || ");
+				uppaalQuery.append(" " + seperator + " ");
 			}
 
 			p.accept(this, context);
@@ -95,7 +95,6 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		}
 
 		uppaalQuery.append(')');
-
 	}
 
 	public void visit(TCTLNotNode notNode, Object context) {
@@ -103,13 +102,6 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		uppaalQuery.append('(');
 		notNode.getProperty().accept(this, context);
 		uppaalQuery.append(')');
-	}
-
-	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) {
-	}
-
-	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) {
-
 	}
 	
 	public void visit(TCTLTrueNode tctlTrueNode, Object context) {
@@ -123,6 +115,48 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) {
 		uppaalQuery.append(tctlDeadLockNode.toString());
 	}
+	
+	public void visit(AritmeticOperator aritmeticOperator, Object context){
+		uppaalQuery.append(aritmeticOperator.toString());
+	}
+
+	public void visit(TCTLPlusListNode tctlPlusListNode, Object context){
+		createArithmeticList(tctlPlusListNode.getProperties(), context);
+	}
+	
+	public void visit(TCTLTermListNode tctlTermListNode, Object context){
+		createArithmeticList(tctlTermListNode.getProperties(), context);
+	}
+
+	private void createArithmeticList(List<TCTLAbstractStateProperty> properties,
+			Object context) {
+		for(TCTLAbstractStateProperty prop : properties){
+			if(prop.isSimpleProperty()){
+				prop.accept(this, context);
+			} else {
+				uppaalQuery.append("(");
+				prop.accept(this, context);
+				uppaalQuery.append(")");
+			}
+			
+			uppaalQuery.append(" ");
+		}
+	}
+
+	public void visit(TCTLConstNode tctlConstNode, Object context){
+		append(tctlConstNode.getConstant());
+	}
+	
+	@Override
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+			Object context) {
+		append("(");
+		atomicPropositionNode.getLeft().accept(this, context);
+		append(operatorConversion(atomicPropositionNode.getOp()));
+		append(" ");
+		atomicPropositionNode.getRight().accept(this, context);
+		append(")");
+	}
 
 	protected String operatorConversion(String op) {
 		if (op.equals("="))
@@ -130,9 +164,6 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 
 		return op;
 	}
-
-	public abstract void visit(TCTLAtomicPropositionNode atomicPropositionNode,
-			Object context);
 
 	protected abstract void addEnding(QueryType queryType);
 }

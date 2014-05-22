@@ -31,11 +31,15 @@ public interface TAPAALQueryParserConstants {
   /** RegularExpression Id. */
   int NOT = 10;
   /** RegularExpression Id. */
-  int NUM = 11;
+  int PLUS = 11;
   /** RegularExpression Id. */
-  int IDENT = 12;
+  int MULT = 12;
   /** RegularExpression Id. */
-  int OP = 13;
+  int NUM = 13;
+  /** RegularExpression Id. */
+  int IDENT = 14;
+  /** RegularExpression Id. */
+  int OP = 15;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -53,6 +57,8 @@ public interface TAPAALQueryParserConstants {
     "<OR>",
     "<AND>",
     "<NOT>",
+    "<PLUS>",
+    "\"*\"",
     "<NUM>",
     "<IDENT>",
     "<OP>",

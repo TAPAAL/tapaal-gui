@@ -56,7 +56,7 @@ import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
+import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortTemplatesCommand;
@@ -939,7 +939,7 @@ public class TemplateExplorer extends JPanel {
 		
 		private void toggleAffectedQueries() {
 			for(TAPNQuery query : parent.queries()) {
-				ContainsAtomicPropositionsWithDisabledTemplateVisitor visitor = new ContainsAtomicPropositionsWithDisabledTemplateVisitor(parent.network());
+				ContainsPlaceWithDisabledTemplateVisitor visitor = new ContainsPlaceWithDisabledTemplateVisitor(parent.network());
 				BooleanResult result = new BooleanResult(true);
 				query.getProperty().accept(visitor, result);
 				
