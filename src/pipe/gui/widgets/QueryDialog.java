@@ -97,6 +97,8 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -1957,7 +1959,7 @@ public class QueryDialog extends JPanel {
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();
-							s.append("The following places was used in the query, but are not present in your model:\n\n");
+							s.append("The following places were used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);

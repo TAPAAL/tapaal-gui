@@ -201,7 +201,8 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		TCTLAbstractProperty topNode = query.getProperty();
-		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(new TCTLPlaceNode("", blockPlace.name()), "=", new TCTLConstNode(1));
+
+		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(new TCTLPlaceNode(blockPlace.name()), "=", new TCTLConstNode(1));
 		
 		// We need to modify the query to also have pBlock = 1. 
 		if(topNode instanceof TCTLEFNode)

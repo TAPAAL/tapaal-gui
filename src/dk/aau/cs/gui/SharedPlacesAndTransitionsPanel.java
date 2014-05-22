@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionListener;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
+
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortSharedPlacesCommand;

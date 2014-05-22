@@ -9,8 +9,8 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 
-//TODO This visitor is never called in the current code, it is NOT updated to handle arithmetics in the queries 
-//TODO It might only support propositions on the form <PLACE_NAME> <OPPERATOR> <CONSTANT>
+//XXX:TODO This visitor is never called in the current code, it is NOT updated to handle arithmetics in the queries 
+//XXX:TODO It might only support propositions on the form <PLACE_NAME> <OPPERATOR> <CONSTANT>
 public class UpwardsClosedVisitor extends VisitorBase {
 	public boolean isUpwardClosed(TCTLAbstractProperty query){
 		if(query instanceof TCTLPathPlaceHolder)

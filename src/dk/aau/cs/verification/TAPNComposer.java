@@ -32,9 +32,6 @@ public class TAPNComposer implements ITAPNComposer {
 		this.messenger = messenger;
 	}
 	
-	/* (non-Javadoc)
-	 * @see dk.aau.cs.verification.ITAPNComposer#transformModel(dk.aau.cs.model.tapn.TimedArcPetriNetNetwork)
-	 */
 	@Override
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
@@ -51,8 +48,6 @@ public class TAPNComposer implements ITAPNComposer {
 		createOutputArcs(model, tapn, mapping);
 		createTransportArcs(model, tapn, mapping);
 		createInhibitorArcs(model, tapn, mapping);
-
-		//dumpToConsole(tapn, mapping);
 
 		return new Tuple<TimedArcPetriNet, NameMapping>(tapn, mapping);
 	}

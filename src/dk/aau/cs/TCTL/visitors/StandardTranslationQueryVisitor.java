@@ -19,22 +19,9 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 	public StandardTranslationQueryVisitor(int totalTokens) {
 		this.totalTokens = totalTokens;
 	}
-
-	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
-			Object context) {
-		
-		assert(atomicPropositionNode.getRight() instanceof TCTLPlaceNode && atomicPropositionNode.getLeft() instanceof TCTLConstNode):
-			"The " + getClass().getCanonicalName() + " cannot translate this query, as the prepositions are too complex";
-		TCTLPlaceNode placeNode = (TCTLPlaceNode) atomicPropositionNode.getLeft();
-		TCTLConstNode constNode = (TCTLConstNode) atomicPropositionNode.getRight();
-
-		append("(");
-		append(createAtomicPropositionSum(placeNode.getPlace()));
-		append(operatorConversion(atomicPropositionNode.getOp()));
-		append(" ");
-		append(constNode.getConstant());
-		append(")");
+	
+	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
+		append(createAtomicPropositionSum(tctlPlaceNode.getPlace()));
 	}
 
 	@Override
