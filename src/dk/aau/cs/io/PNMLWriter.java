@@ -186,7 +186,8 @@ public class PNMLWriter implements NetWriter {
 		Element initialMarkingText = document.createElement("text");
 		initialMarking.appendChild(initialMarkingText);
 		initialMarkingText.setTextContent(((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
-
+		placeElement.appendChild(initialMarking);
+                
 		return placeElement;
 	}
 
