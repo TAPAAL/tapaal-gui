@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -205,7 +206,7 @@ public class PNMLoader {
 		String id = ((Element) node).getAttribute("id");
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
-		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(true, new IntBound(0)));
+		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(true, new Bound.InfBound()));
 		Require.that(places.put(name.name, place) == null && !transitions.containsKey(name.name), 
 				"The name: " + name.name + ", was already used");
 		tapn.add(place);
