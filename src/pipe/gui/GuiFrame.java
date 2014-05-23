@@ -37,6 +37,7 @@ import java.util.jar.JarFile;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -64,6 +65,7 @@ import net.tapaal.Preferences;
 
 import com.sun.j3d.loaders.Loader;
 import com.sun.jna.Platform;
+
 
 
 
@@ -2427,10 +2429,16 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == exportToTikZAction) {
 				Export.exportGuiView(appView, Export.TIKZ, appView
 						.getGuiModel());
-			} else if (this == exportToPNMLAction){
-				JOptionPane.showMessageDialog(null, "In the saved PNML all timing information will be lost,\n" +
-						"and the components in the net will be merged into one big net.", 
+			} else if (this == exportToPNMLAction) {
+				if(Preferences.getInstance().getShowPNMLWarning()) {
+					JCheckBox showAgain = new JCheckBox("Do not show again.");
+					String message = "In the saved PNML all timing information will be lost,\n" +
+							"and the components in the net will be merged into one big net.";
+					Object[] dialogContent = {message, showAgain};
+					JOptionPane.showMessageDialog(null, dialogContent, 
 						"PNML loss of information", JOptionPane.WARNING_MESSAGE);
+					Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
+				}
 				Export.exportGuiView(appView, Export.PNML, null);
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
