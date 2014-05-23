@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,7 +22,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -37,13 +35,11 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -318,17 +314,12 @@ public class PNMLoader {
 			_endy = target.getY() + target.centreOffsetTop();
 		}
 		
-		//TODO weights!!
-		//TODO arcpath!! 
-		
-		Arc arc;
-		
 		if(type != null && type.equals("inhibitor")) {
-			arc = parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
+			parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else if(sourcePlace != null && targetTransition != null) {
-			arc = parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
+			parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else if(sourceTransition != null && targetPlace != null) {
-			arc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
+			parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else {
 			throw new FormatException("Arcs much be between places and transitions");
 		}
@@ -374,10 +365,6 @@ public class PNMLoader {
 		String name;
 		Point point;
 		
-		public Name() {
-			this("", new Point());
-		}
-		
 		public Name(String newPlaceName) {
 			this(newPlaceName, new Point());
 		}
@@ -415,7 +402,7 @@ public class PNMLoader {
 	
 	private TimedInputArcComponent parseInputArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
 			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
-			int _endy, TimedArcPetriNet tapn, Template template) throws FormatException {
+			int _endy, Template template) throws FormatException {
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
 		
@@ -449,7 +436,7 @@ public class PNMLoader {
 	
 	private Arc parseOutputArc(String arcId, TimedTransition transition, TimedPlace place, PlaceTransitionObject source,
 			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
-			int _endy, TimedArcPetriNet tapn, Template template) throws FormatException {
+			int _endy, Template template) throws FormatException {
 		
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place, new IntWeight(weight));
 		
@@ -479,7 +466,7 @@ public class PNMLoader {
 	
 	private Arc parseAndAddTimedInhibitorArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
 			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
-			int _endy, TimedArcPetriNet tapn, Template template) {
+			int _endy, Template template) {
 		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
 				new TimedInputArcComponent(
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	source, target, weight, arcId, false)

@@ -17,38 +17,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.Template;
 import pipe.gui.MessengerImpl;
-import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposerExtended;
 
 public class PNMLWriter implements NetWriter {
@@ -260,15 +245,5 @@ public class PNMLWriter implements NetWriter {
 		}
 		
 		return arcElement;
-	}
-
-	private String getInputArcTypeAsString(TimedInputArcComponent inputArc) {
-		if (inputArc instanceof TimedTransportArcComponent) {
-			return "transport";
-		} else if (inputArc instanceof TimedInhibitorArcComponent) {
-			return "tapnInhibitor";
-		} else {
-			return "timed";
-		}
 	}
 }
