@@ -2428,6 +2428,8 @@ public class GuiFrame extends JFrame implements Observer {
 				Export.exportGuiView(appView, Export.TIKZ, appView
 						.getGuiModel());
 			} else if (this == exportToPNMLAction){
+				JOptionPane.showMessageDialog(null, "In the saved PNML all timeing information will be lost!", 
+						"PNML loss of information", JOptionPane.WARNING_MESSAGE);
 				Export.exportGuiView(appView, Export.PNML, null);
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
