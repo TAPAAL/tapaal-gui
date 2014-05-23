@@ -1491,7 +1491,9 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.getApp().restoreMode();
 				}
 
-				CreateGui.setFile(file, freeSpace);
+				if(!loadPNML){
+					CreateGui.setFile(file, freeSpace);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				undoAddTab(currentlySelected);
