@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,6 +23,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -29,16 +31,19 @@ import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -48,6 +53,7 @@ import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -273,6 +279,7 @@ public class PNMLoader {
 		String id = element.getAttribute("id");
 		String sourceId = element.getAttribute("source");
 		String targetId = element.getAttribute("target");
+		String type = element.getAttribute("type");
 		
 		String sourceName = idResolver.get(template.model().name(), sourceId);
 		String targetName = idResolver.get(template.model().name(), targetId);
@@ -316,7 +323,9 @@ public class PNMLoader {
 		
 		Arc arc;
 		
-		if(sourcePlace != null && targetTransition != null) {
+		if(type != null && type.equals("inhibitor")) {
+			arc = parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
+		} else if(sourcePlace != null && targetTransition != null) {
 			arc = parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
 		} else if(sourceTransition != null && targetPlace != null) {
 			arc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, tapn, template);
@@ -420,7 +429,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			arc = new TimedInputArcComponent(new TimedOutputArcComponent(
-				_startx, _starty, _endx, _endy, source, target, 1, arcId,
+				_startx, _starty, _endx, _endy, source, target, weight, arcId,
 				false));
 			arc.setUnderlyingArc(inputArc);
 
@@ -454,7 +463,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			arc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				source, target, 1,	arcId, false); //TODO weight
+				source, target, weight,	arcId, false); //TODO weight
 			arc.setUnderlyingArc(outputArc);
 
 			template.guiModel().addPetriNetObject(arc);
@@ -466,6 +475,27 @@ public class PNMLoader {
 		
 		template.model().add(outputArc);
 		return arc;
+	}
+	
+	private Arc parseAndAddTimedInhibitorArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
+			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
+			int _endy, TimedArcPetriNet tapn, Template template) {
+		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
+				new TimedInputArcComponent(
+						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	source, target, weight, arcId, false)
+				),
+				(""));
+		
+		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
+
+		tempArc.setUnderlyingArc(inhibArc);
+		template.guiModel().addPetriNetObject(tempArc);
+		addListeners(tempArc, template);
+		template.model().add(inhibArc);
+
+		source.addConnectFrom(tempArc);
+		target.addConnectTo(tempArc);
+		return tempArc;
 	}
 	
 	private boolean isNetDrawable(){

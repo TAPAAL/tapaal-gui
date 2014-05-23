@@ -234,29 +234,31 @@ public class PNMLWriter implements NetWriter {
 		return transitionElement;
 	}
 
-	private Element createArcElement(Arc inputArc, DataLayer guiModel, Document document) {
-		Require.that(inputArc != null, "Error: inputArc was null");
+	private Element createArcElement(Arc arc, DataLayer guiModel, Document document) {
+		Require.that(arc != null, "Error: inputArc was null");
 		Require.that(guiModel != null, "Error: guiModel was null");
 		Require.that(document != null, "Error: document was null");
 		
-		if(inputArc instanceof TimedInhibitorArcComponent){
-			System.err.println("INHIBITOR ARCS NOT SUPPORTED!");
-			return null;
-		}
-		
 		Element arcElement = document.createElement("arc");
 		
-		arcElement.setAttribute("id", (inputArc.getId() != null ? inputArc.getId() : "error"));
-		arcElement.setAttribute("source", (inputArc.getSource().getId() != null ? inputArc.getSource().getId() : ""));
-		arcElement.setAttribute("target", (inputArc.getTarget().getId() != null ? inputArc.getTarget().getId() : ""));
+		arcElement.setAttribute("id", (arc.getId() != null ? arc.getId() : "error"));
+		arcElement.setAttribute("source", (arc.getSource().getId() != null ? arc.getSource().getId() : ""));
+		arcElement.setAttribute("target", (arc.getTarget().getId() != null ? arc.getTarget().getId() : ""));
 		
-		if (inputArc instanceof TimedOutputArcComponent) {
+		if (arc instanceof TimedOutputArcComponent) {
 			Element inscription = document.createElement("inscription");
 			arcElement.appendChild(inscription);
 			Element text = document.createElement("text");
 			inscription.appendChild(text);
-			text.setTextContent(((TimedOutputArcComponent)inputArc).getWeight().nameForSaving(true)+"");
+			text.setTextContent(((TimedOutputArcComponent)arc).getWeight().nameForSaving(true)+"");
 		} 
+		
+		if(arc instanceof TimedInhibitorArcComponent){
+			arcElement.setAttribute("type", "inhibitor");
+		} else {
+			arcElement.setAttribute("type", "normal");
+		}
+		
 		return arcElement;
 	}
 
