@@ -358,11 +358,12 @@ public class GuiFrame extends JFrame implements Observer {
 				.getContextClassLoader().getResource(
 						CreateGui.imgPath + "Export.png")));
 		addMenuItem(importMenu, importPNMLAction = new FileAction("PNML untimed net",
-				"Import an untimed net in the PNML format", ""));
-		//importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('G', shortcutkey));
+				"Import an untimed net in the PNML format", "ctrl U"));
+		importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('U', shortcutkey));
 
 		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
-				"Import SUMO queries in a plain text format", ""));
+				"Import SUMO queries in a plain text format", "ctrl R"));
+		importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
 
 		fileMenu.add(importMenu);
 
@@ -382,7 +383,8 @@ public class GuiFrame extends JFrame implements Observer {
 				"Export the net to PNG format", "ctrl L"));
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
 		addMenuItem(exportMenu, exportToPNMLAction = new FileAction("PNML",
-				"Export the net to PNML format", ""));
+				"Export the net to PNML format", "ctrl V"));
+		exportToPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', shortcutkey));
 		
 		fileMenu.add(exportMenu);
 
