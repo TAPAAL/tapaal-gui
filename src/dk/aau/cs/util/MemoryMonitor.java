@@ -43,13 +43,14 @@ public class MemoryMonitor {
 		return formatter;
 	}
 
-
 	public static void attach(Process p){
 		PID = getPid(p);
 		
 		if( ! cumulativePeakMemory) {
 			peakMemory = -1;
 		}
+		
+		cumulativePeakMemory = false;
 	}
 	
 	public static void detach(){
@@ -61,11 +62,8 @@ public class MemoryMonitor {
 		return PID != -1;
 	}
 	
-	public static void setCumulativePeakMemory(Boolean input) {
-		if (input)
-			peakMemory = -1;
-		 
-		cumulativePeakMemory = input;
+	public static void cumulateMemory() {
+		cumulativePeakMemory = true;
 	}
 
 	public static String getUsage(){
@@ -103,7 +101,6 @@ public class MemoryMonitor {
 			}
 
 			busy.release();
-
 			if(memory < 0){
 				return null;
 			}else{
