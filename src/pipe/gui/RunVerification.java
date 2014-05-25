@@ -333,7 +333,7 @@ public class RunVerification extends RunVerificationBase {
 			gbc.gridy = 4;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel(toHTML("The query was resolved using the over-approximation.")), gbc);
+			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
 		}
 		
 		gbc = new GridBagConstraints();
