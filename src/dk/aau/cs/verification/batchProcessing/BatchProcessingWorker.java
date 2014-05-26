@@ -376,9 +376,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return decomposer.decompose();
 	}
 	
-	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
-		MemoryMonitor.setCumulativePeakMemory(true);
-		
+	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {		
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
 		
@@ -387,6 +385,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		VerificationOptions options = getVerificationOptionsFromQuery(query);
 		modelChecker = getModelChecker(query);
+		fireVerificationTaskStarted();
 		
 		ApproximationWorker worker = new ApproximationWorker();
 		return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery, this);

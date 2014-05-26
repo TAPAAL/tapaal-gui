@@ -57,7 +57,6 @@ public class ApproximationWorker {
 		TraceOption oldTraceOption = options.traceOption();
 		if ((options.enableOverApproximation() || options.enableUnderApproximation()) && !(options instanceof VerifytaOptions)) {
 			options.setTraceOption(TraceOption.SOME);
-			MemoryMonitor.setCumulativePeakMemory(true);
 		}
 		
 		VerificationResult<TAPNNetworkTrace> value = null;
@@ -67,7 +66,6 @@ public class ApproximationWorker {
 		}
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);
-			MemoryMonitor.setCumulativePeakMemory(false);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
 		else if (options.enableOverApproximation()) {
@@ -112,6 +110,7 @@ public class ApproximationWorker {
 							((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 			
 						// run model checker again for trace TAPN
+						MemoryMonitor.cumulateMemory();
 						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 						if (verificationBase.isCancelled()) {
 							verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
@@ -123,7 +122,6 @@ public class ApproximationWorker {
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
 							}
-							MemoryMonitor.setCumulativePeakMemory(false);
 							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 						}
 						//Create the result from trace TAPN
@@ -258,6 +256,7 @@ public class ApproximationWorker {
 							((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 			
 						//run model checker again for trace TAPN
+						MemoryMonitor.cumulateMemory();
 						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 						if (verificationBase.isCancelled()) {
 							verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
@@ -269,7 +268,6 @@ public class ApproximationWorker {
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
 							}
-							MemoryMonitor.setCumulativePeakMemory(false);
 							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 						}
 						//Create the result from trace TAPN
@@ -332,7 +330,6 @@ public class ApproximationWorker {
 			value.setTrace(null);
 			value.setSecondaryTrace(null);
 		}
-		MemoryMonitor.setCumulativePeakMemory(false);
 		
 		return value;
 	}
@@ -360,14 +357,13 @@ public class ApproximationWorker {
 			underaprx.modifyTAPN(composedModel.value1(), query.approximationDenominator());
 			options.setTraceOption(TraceOption.SOME);
 		}
-		 
+		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);		
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
 		if (verificationResult.error()) {
 			options.setTraceOption(oldTraceOption);
-			MemoryMonitor.setCumulativePeakMemory(false);
 			return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 		}
 		else if (query != null && query.isOverApproximationEnabled()) {		
@@ -413,13 +409,13 @@ public class ApproximationWorker {
 	                }
 
 	                //run model checker again for trace TAPN
+	                MemoryMonitor.cumulateMemory();
 	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 	                if (verificationBase.isCancelled()) {
 	                	verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 	                }
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
-	            		MemoryMonitor.setCumulativePeakMemory(false);
 	                    return new VerificationResult<TimedArcPetriNetTrace>(
 	                    		verificationResult.errorMessage(),
 	                    		verificationResult.verificationTime() + approxResult.verificationTime());
@@ -427,7 +423,7 @@ public class ApproximationWorker {
 	                //Create the result from trace TAPN
 	                renameTraceTransitions(verificationResult.getTrace());
 	                renameTraceTransitions(verificationResult.getSecondaryTrace());
-	                QueryResult queryResult= verificationResult.getQueryResult();
+	                QueryResult queryResult = verificationResult.getQueryResult();
 	                
 	                // If ((EF OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
 					if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied()) 
@@ -505,7 +501,7 @@ public class ApproximationWorker {
 				|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
 					// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) and satisfied) -> Inconclusive
                     
-                    QueryResult queryResult= verificationResult.getQueryResult();
+                    QueryResult queryResult = verificationResult.getQueryResult();
                     queryResult.setApproximationInconclusive(true);
                     value =  new VerificationResult<TimedArcPetriNetTrace>(
                             queryResult,
@@ -543,13 +539,13 @@ public class ApproximationWorker {
 	                        ((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 	        
 	                    //run model checker again for trace TAPN
+	                    MemoryMonitor.cumulateMemory();
 	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 	                    if (verificationBase.isCancelled()) {
 	                    	verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 	                    }
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);
-	                		MemoryMonitor.setCumulativePeakMemory(false);
 	        				return new VerificationResult<TimedArcPetriNetTrace>(
 	        						verificationResult.errorMessage(),
 	        						verificationResult.verificationTime() + approxResult.verificationTime());
@@ -607,7 +603,6 @@ public class ApproximationWorker {
 	    }
 		
 		options.setTraceOption(oldTraceOption);
-		MemoryMonitor.setCumulativePeakMemory(false);
 		return value;
 	}
 	
