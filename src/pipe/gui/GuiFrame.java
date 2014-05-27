@@ -33,7 +33,6 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -59,23 +58,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import net.tapaal.Preferences;
-
 import com.sun.jna.Platform;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -2230,18 +2214,17 @@ public class GuiFrame extends JFrame implements Observer {
 			TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
 			for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
 				if(obj instanceof PlaceTransitionObject){
-					((PlaceTransitionObject) obj).setPositionX(Math.max(((PlaceTransitionObject) obj).getPositionXObject()*factor, obj.getWidth()));
-					((PlaceTransitionObject) obj).setPositionY(Math.max(((PlaceTransitionObject) obj).getPositionYObject()*factor, obj.getHeight()));
+					obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
 					
 					if(obj instanceof Transition){
 						for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
 							for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-								point.setPointLocation((float) Math.max(point.getLocation().x*factor, point.getWidth()), (float) Math.max(point.getLocation().y*factor, point.getHeight()));
+								point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
 							}
 						}
 						for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
 							for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-								point.setPointLocation((float) Math.max(point.getLocation().x*factor, point.getWidth()), (float) Math.max(point.getLocation().y*factor, point.getHeight()));
+								point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
 							}
 						}
 					}
