@@ -361,7 +361,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			buffer.append(' ');
 			buffer.append(modelFile);
                         VerifyDTAPNOptions opts = (VerifyDTAPNOptions)options;
-                        if(opts.getWorkflowMode() == WorkflowMode.NOT_WORKFLOW) {
+                        if(opts.getWorkflowMode() == WorkflowMode.NOT_WORKFLOW || opts.getWorkflowMode() == null) {
                             buffer.append(' ');
                             buffer.append(queryFile);
                         }

@@ -1077,6 +1077,7 @@ public class WorkflowDialog extends JDialog {
 								break;
 							case EG_DELAY_FOREVER:
 								setStrongSoundnessResult(false, RESULT_ERROR_TIME);
+								break;
 							default:
 								assert(false);
 								break;
