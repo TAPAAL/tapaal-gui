@@ -200,6 +200,16 @@ public class OverApproximation implements ITAPNApproximation {
 			net.remove(currentPlace);
 		}
 		
+		modifyQuery(query, blockPlace);
+		
+		// An input arc from pBlock to all original transitions makes sure, that we can do deadlock checks.
+		for (TimedTransition transition : originalTransitions) {
+			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
+		}           
+	}
+
+
+	private void modifyQuery(dk.aau.cs.model.tapn.TAPNQuery query, LocalTimedPlace blockPlace) {
 		TCTLAbstractProperty topNode = query.getProperty();
 
 		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(new TCTLPlaceNode(blockPlace.name()), "=", new TCTLConstNode(1));
@@ -227,7 +237,7 @@ public class OverApproximation implements ITAPNApproximation {
 				TCTLOrListNode orList = new TCTLOrListNode((((TCTLAGNode) topNode).getProperty()), notNode);
 				((TCTLAGNode) topNode).setProperty(orList);
 			}
-
+	
 		}
 		else if(topNode instanceof TCTLEGNode)
 		{
@@ -251,10 +261,5 @@ public class OverApproximation implements ITAPNApproximation {
 				((TCTLAFNode) topNode).setProperty(orList);
 			}
 		}
-		
-		// An input arc from pBlock to all original transitions makes sure, that we can do deadlock checks.
-		for (TimedTransition transition : originalTransitions) {
-			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
-		}           
 	}
 }

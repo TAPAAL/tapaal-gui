@@ -72,54 +72,10 @@ public class UnderApproximation implements ITAPNApproximation {
 
 		for(TimedTransition transitionToDelete : transitionsToDelete){
 			if(guiModel != null){
-				// We assert here that deletions in the guimodel will also delete underlying model elements
-				Transition guiTransition = guiModel.getTransitionByName(transitionToDelete.name());
-				
-				for (Arc arc1 : guiModel.getArcs()){
-					if (arc1.getTarget() instanceof Place && arc1.getSource() == guiTransition) //If arc1 is an output arc
-					{ 
-						arc1.delete();
-					}
-					else if (arc1.getTarget() instanceof Transition && arc1.getTarget() == guiTransition){ //Else if arc1 is an input arc
-						arc1.delete();
-					}
-				}
-				guiTransition.delete();
+				deleteTransitionFromGuiModel(transitionToDelete, guiModel);
 			}
 			else{
-				ArrayList<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
-				
-				//Add all did not work properly, so we do it manually.
-				for(TimedInputArc arc : transitionToDelete.getInputArcs()){
-					inputArcs.add(arc);
-				}
-				for(TimedInputArc arc : inputArcs){
-					arc.delete();
-				}
-				
-				ArrayList<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
-				for(TimedOutputArc arc : transitionToDelete.getOutputArcs()){
-					outputArcs.add(arc);
-				}
-				for(TimedOutputArc arc : outputArcs){
-					arc.delete();
-				}
-				
-				ArrayList<TransportArc> transportArcs = new ArrayList<TransportArc>();
-				for(TransportArc arc : transitionToDelete.getTransportArcsGoingThrough()){
-					transportArcs.add(arc);
-				}
-				for(TransportArc arc : transportArcs){
-					arc.delete();
-				}
-				
-				ArrayList<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-				for(TimedInhibitorArc arc : transitionToDelete.getInhibitorArcs()){
-					inhibitorArcs.add(arc);
-				}
-				for(TimedInhibitorArc arc : inhibitorArcs){
-					arc.delete();
-				}
+				deleteArcsFromTransition(transitionToDelete);
 			}
 			transitionToDelete.delete();
 		}	
@@ -140,6 +96,56 @@ public class UnderApproximation implements ITAPNApproximation {
 		}
 	}
 	
+	private void deleteTransitionFromGuiModel(TimedTransition transitionToDelete, DataLayer guiModel) {
+		// We assert here that deletions in the guimodel will also delete underlying model elements
+		Transition guiTransition = guiModel.getTransitionByName(transitionToDelete.name());
+		
+		for (Arc arc1 : guiModel.getArcs()){
+			if (arc1.getTarget() instanceof Place && arc1.getSource() == guiTransition) //If arc1 is an output arc
+			{ 
+				arc1.delete();
+			}
+			else if (arc1.getTarget() instanceof Transition && arc1.getTarget() == guiTransition){ //Else if arc1 is an input arc
+				arc1.delete();
+			}
+		}
+		guiTransition.delete();
+	}
+	
+	private void deleteArcsFromTransition(TimedTransition transitionToDelete) {
+		ArrayList<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
+		//Add all did not work properly, so we do it manually.
+		for(TimedInputArc arc : transitionToDelete.getInputArcs()){
+			inputArcs.add(arc);
+		}
+		for(TimedInputArc arc : inputArcs){
+			arc.delete();
+		}
+		
+		ArrayList<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+		for(TimedOutputArc arc : transitionToDelete.getOutputArcs()){
+			outputArcs.add(arc);
+		}
+		for(TimedOutputArc arc : outputArcs){
+			arc.delete();
+		}
+		
+		ArrayList<TransportArc> transportArcs = new ArrayList<TransportArc>();
+		for(TransportArc arc : transitionToDelete.getTransportArcsGoingThrough()){
+			transportArcs.add(arc);
+		}
+		for(TransportArc arc : transportArcs){
+			arc.delete();
+		}
+		
+		ArrayList<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+		for(TimedInhibitorArc arc : transitionToDelete.getInhibitorArcs()){
+			inhibitorArcs.add(arc);
+		}
+		for(TimedInhibitorArc arc : inhibitorArcs){
+			arc.delete();
+		}
+	}
 	
 	//Returns a copy of an approximated interval
 	private TimeInterval modifyIntervals(TimeInterval oldInterval, int denominator){
