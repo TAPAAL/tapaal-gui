@@ -35,7 +35,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
-public class TAPNComposerExtended implements ITAPNComposer {
+public class TAPNComposerWithGUI implements ITAPNComposer {
 	private static final String PLACE_FORMAT = "P%1$d";
 	private static final String TRANSITION_FORMAT = "T%1$d";
 
@@ -49,7 +49,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
 
-	public TAPNComposerExtended(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels){
+	public TAPNComposerWithGUI(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels){
 		this.messenger = messenger;
 		
 		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
