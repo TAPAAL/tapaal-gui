@@ -74,7 +74,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		result.append(' ');
 		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');
-		result.append(gcd ? "-c" : "");
+                if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
+                    result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
+                }
 		return result.toString();
 	}
 
