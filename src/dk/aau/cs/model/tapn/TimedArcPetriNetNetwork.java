@@ -15,6 +15,7 @@ import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 
@@ -467,7 +468,7 @@ public class TimedArcPetriNetNetwork {
 	}
 	
 	public boolean isDegree2(){
-		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
+		ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
 		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
 
 		return composedModel.value1().isDegree2();

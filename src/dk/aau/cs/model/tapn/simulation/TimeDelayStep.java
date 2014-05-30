@@ -21,6 +21,10 @@ public class TimeDelayStep implements TimedArcPetriNetStep {
 	public BigDecimal delay() {
 		return delay;
 	}
+	
+	public void setDelay(BigDecimal delay) {
+		this.delay = delay;
+	}
 
 	@Override
 	public String toString() {

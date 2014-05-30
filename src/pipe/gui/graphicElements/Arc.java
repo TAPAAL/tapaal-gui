@@ -202,6 +202,10 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public ArcPath getArcPath() {
 		return myPath;
 	}
+	
+	public void setArcPath(ArcPath newPath) {
+		myPath = newPath;
+	}
 
 	@Override
 	public boolean contains(int x, int y) {

@@ -16,7 +16,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
-public class TAPNComposer {
+public class TAPNComposer implements ITAPNComposer {
 	private static final String PLACE_FORMAT = "P%1$d";
 	private static final String TRANSITION_FORMAT = "T%1$d";
 
@@ -32,6 +32,7 @@ public class TAPNComposer {
 		this.messenger = messenger;
 	}
 	
+	@Override
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
 		nextTransitionIndex = -1;
@@ -47,8 +48,6 @@ public class TAPNComposer {
 		createOutputArcs(model, tapn, mapping);
 		createTransportArcs(model, tapn, mapping);
 		createInhibitorArcs(model, tapn, mapping);
-
-		//dumpToConsole(tapn, mapping);
 
 		return new Tuple<TimedArcPetriNet, NameMapping>(tapn, mapping);
 	}

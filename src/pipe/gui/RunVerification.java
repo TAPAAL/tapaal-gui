@@ -19,6 +19,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -38,9 +39,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
@@ -54,14 +57,14 @@ import dk.aau.cs.verification.VerificationResult;
 public class RunVerification extends RunVerificationBase {
 	private IconSelector iconSelector;
 	private VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-		super(modelChecker, messenger);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+		super(modelChecker, messenger, guiModels);
 		iconSelector = selector;
 		this.callback = callback;
 	}
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null);
+		this(modelChecker, selector, messenger, null, null);
 	}
 
 	@Override
@@ -330,7 +333,7 @@ public class RunVerification extends RunVerificationBase {
 			gbc.gridy = 4;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel(toHTML("The query was resolved using the over-approximation.")), gbc);
+			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
 		}
 		
 		gbc = new GridBagConstraints();

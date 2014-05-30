@@ -45,17 +45,17 @@ public class KBoundAnalyzer {
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 		dialog.setupListeners(analyzer);
 
-		analyzer.execute(options, tapnNetwork, query);
+		analyzer.execute(options, tapnNetwork, query, null);
 		dialog.setVisible(true);
 	}
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPN){
-			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true);
+			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, tapnNetwork.hasUrgentTransitions()?false:true, true);
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, tapnNetwork.hasUrgentTransitions()?false:true, true, false, false, 1);
 		}
 		return null;
 	}
