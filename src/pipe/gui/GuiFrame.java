@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -71,11 +69,11 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
+import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -1772,6 +1770,35 @@ public class GuiFrame extends JFrame implements Observer {
 	public StatusBar getStatusBar() {
 		return statusBar;
 	}
+	
+	public void changeSpacing(double factor){
+		TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
+		for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
+			if(obj instanceof PlaceTransitionObject){
+				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
+				
+				if(obj instanceof Transition){
+					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+				}
+				
+				((PlaceTransitionObject) obj).update(true);
+			}else{
+				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+			}
+		}
+		
+		tabContent.currentTemplate().guiModel().repaintAll(true);
+		appGui.appView.updatePreferredSize();
+	}
 
 	class AnimateAction extends GuiAction {
 
@@ -2210,33 +2237,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			double factor = equals(incSpacingAction)? 1.25 : 0.8;
-			
-			TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
-			for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
-				if(obj instanceof PlaceTransitionObject){
-					obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
-					
-					if(obj instanceof Transition){
-						for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
-							for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-								point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
-							}
-						}
-						for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
-							for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-								point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
-							}
-						}
-					}
-					
-					((PlaceTransitionObject) obj).update(true);
-				}else{
-					obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
-				}
-			}
-			
-			tabContent.currentTemplate().guiModel().repaintAll(true);
-			appGui.appView.updatePreferredSize();
+			changeSpacing(factor);
+			appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 		}
 
 	}
