@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,7 +31,6 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -59,16 +56,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import net.tapaal.Preferences;
-
 import com.sun.jna.Platform;
-
-
-
-
-
-
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -77,9 +66,14 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
+import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -133,6 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GridAction toggleGrid;
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
+	private SpacingAction incSpacingAction, decSpacingAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
@@ -538,6 +533,18 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.add(zoomMenu);
 
 		viewMenu.addSeparator();
+		
+		addMenuItem(viewMenu, incSpacingAction = new SpacingAction("Increase node spacing",
+				"Increase spacing by 20% ", null));
+		incSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey));
+		
+		addMenuItem(viewMenu, decSpacingAction = new SpacingAction("Decrease node spacing",
+				"Decrease spacing by 20% ", null));
+		decSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift U"));
+
+		
+		viewMenu.addSeparator();
+		
 		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				"Change the grid size", "G"));
 		
@@ -1763,6 +1770,35 @@ public class GuiFrame extends JFrame implements Observer {
 	public StatusBar getStatusBar() {
 		return statusBar;
 	}
+	
+	public void changeSpacing(double factor){
+		TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
+		for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
+			if(obj instanceof PlaceTransitionObject){
+				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
+				
+				if(obj instanceof Transition){
+					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+				}
+				
+				((PlaceTransitionObject) obj).update(true);
+			}else{
+				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+			}
+		}
+		
+		tabContent.currentTemplate().guiModel().repaintAll(true);
+		appGui.appView.updatePreferredSize();
+	}
 
 	class AnimateAction extends GuiAction {
 
@@ -2184,6 +2220,25 @@ public class GuiFrame extends JFrame implements Observer {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
+		}
+
+	}
+	
+	class SpacingAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 549331166742882564L;
+
+		SpacingAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			double factor = equals(incSpacingAction)? 1.25 : 0.8;
+			changeSpacing(factor);
+			appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 		}
 
 	}
