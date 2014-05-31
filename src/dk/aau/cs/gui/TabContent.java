@@ -239,6 +239,10 @@ public class TabContent extends JSplitPane {
 	public DataLayer getModel() {
 		return drawingSurface.getGuiModel();
 	}
+	
+	public HashMap<TimedArcPetriNet, DataLayer> getGuiModels() {
+		return this.guiModels;
+	}
 
 	public void setDrawingSurface(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;

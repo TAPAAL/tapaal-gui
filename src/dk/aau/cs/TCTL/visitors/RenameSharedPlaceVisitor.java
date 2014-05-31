@@ -1,6 +1,6 @@
 package dk.aau.cs.TCTL.visitors;
 
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 
 public class RenameSharedPlaceVisitor extends VisitorBase  {
@@ -14,7 +14,7 @@ public class RenameSharedPlaceVisitor extends VisitorBase  {
 	}
 	
 	@Override
-	public void visit(TCTLAtomicPropositionNode node, Object context) {
+	public void visit(TCTLPlaceNode node, Object context) {
 		if(node.getTemplate().equals("") && node.getPlace().equals(oldName)){
 			node.setPlace(newName);
 		}

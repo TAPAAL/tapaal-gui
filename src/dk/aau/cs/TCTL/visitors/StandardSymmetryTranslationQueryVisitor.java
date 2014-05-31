@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 	private static final String ID_TYPE = "pid_t";
@@ -12,18 +14,15 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 	private static final String TOKEN_TEMPLATE_NAME = "Token";
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+	public void visit(TCTLPlaceNode placeNode,
 			Object context) {
 		append("(sum(i:");
 		append(ID_TYPE);
 		append(")");
 		append(TOKEN_TEMPLATE_NAME);
 		append("(i).");
-		append(atomicPropositionNode.getPlace());
-		append(") ");
-		append(operatorConversion(atomicPropositionNode.getOp()));
-		append(" ");
-		append(atomicPropositionNode.getN());
+		append(placeNode.getPlace());
+		append(")");
 	}
 
 	@Override

@@ -665,7 +665,15 @@ public class DataLayer extends Observable implements Cloneable {
 		return returnArray;
 	}
 
-
+	public Arc getArcByEndpoints(PlaceTransitionObject source, PlaceTransitionObject target) {
+		Arc returnArc = null;
+		for (Arc arc : arcsArray) {
+			if (arc.getSource() == source && arc.getTarget() == target) {
+				returnArc = arc;
+			}
+		}
+		return returnArc;
+	}
 
 	/**
 	 * Return the Transition called transitionName from the Petri-Net

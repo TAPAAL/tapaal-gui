@@ -1,5 +1,5 @@
 options {
-  LOOKAHEAD = 2;
+  LOOKAHEAD = 1;
   CHOICE_AMBIGUITY_CHECK = 2;
   OTHER_AMBIGUITY_CHECK = 1;
   STATIC = false;
@@ -24,6 +24,11 @@ package dk.aau.cs.TCTL.Parsing;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import dk.aau.cs.TCTL.AritmeticOperator;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -77,6 +82,13 @@ TOKEN :
 	<AND: "and" | "&&">
 	|
 	<NOT: "not" | "!">
+}
+
+TOKEN :
+{
+	<PLUS: "+" | "-">
+	|
+	<MULT: "*">
 }
 
 TOKEN :
@@ -161,7 +173,8 @@ TCTLAbstractStateProperty Factor() :
 		<TRUE> {thisProp = new TCTLTrueNode(); }
 		| <FALSE> {thisProp = new TCTLFalseNode(); }
 		| <DEADLOCK> {thisProp = new TCTLDeadlockNode(); }
-		| thisProp = AtomicProposition() 
+		| LOOKAHEAD(AtomicProposition())
+		thisProp = AtomicProposition() 
 		| "(" thisProp = OrExpr() ")"
 	)
 	{ return thisProp; }
@@ -169,20 +182,71 @@ TCTLAbstractStateProperty Factor() :
 
 TCTLAbstractStateProperty AtomicProposition() :
 {
+	TCTLAbstractStateProperty left; 
+	TCTLAbstractStateProperty right; 
+	Token op;
+}
+{
+	( 
+		left = AritmeticExpr() op = <OP> right = AritmeticExpr()
+	)
+	{ 	
+		return new TCTLAtomicPropositionNode(left, op.image, right);
+	}
+}
+
+TCTLAbstractStateProperty AritmeticExpr() : 
+{
+	TCTLAbstractStateProperty currentChild; 
+	ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
+	Token op;
+}
+{
+	currentChild = AritmeticTerm()
+	{ terms.add(currentChild); }
+	( 
+		op = <PLUS> currentChild = AritmeticTerm()
+		{ 
+			terms.add(new AritmeticOperator(op.image));
+			terms.add(currentChild); 
+		}
+	)*
+	{ return terms.size() == 1 ? currentChild : new TCTLPlusListNode(terms); }
+}
+
+TCTLAbstractStateProperty AritmeticTerm() : 
+{
+	TCTLAbstractStateProperty currentChild; 
+	ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<TCTLAbstractStateProperty>();
+	Token op;
+}
+{
+	currentChild = AritmeticFactor()
+	{ factors.add(currentChild); }
+	( 
+		op = <MULT> currentChild = AritmeticFactor()
+		{ 
+			factors.add(new AritmeticOperator(op.image));
+			factors.add(currentChild); 
+		}
+	)*
+	{ return factors.size() == 1 ? currentChild : new TCTLTermListNode(factors); }
+}
+
+TCTLAbstractStateProperty AritmeticFactor() : 
+{
+	TCTLAbstractStateProperty thisProp; 
 	Token template = null;
 	Token place;
 	Token op;
 	Token num;
 }
 {
-	( 
-		[ template = <IDENT>  "." ]  place = <IDENT> op = <OP> num = <NUM> 
+	(
+		[ LOOKAHEAD(2) template = <IDENT> "." ] place = <IDENT> { thisProp = new TCTLPlaceNode(template == null ? "" : template.image, place.image); }
+		| num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); } 
+		| "(" thisProp = AritmeticExpr() ")"
 	)
-	{ 	String templateString = template == null ? "" : template.image;
-		String placeString = place.image;
-		String opString = op.image.equals("==") ? "=" : op.image; 
-		int n = Integer.parseInt(num.image);
-		
-		return new TCTLAtomicPropositionNode(templateString, placeString, opString, n);
-	}
+	
+	{ return thisProp; }
 }

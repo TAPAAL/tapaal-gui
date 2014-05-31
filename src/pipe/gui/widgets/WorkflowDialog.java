@@ -1,8 +1,10 @@
 package pipe.gui.widgets;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
@@ -1281,7 +1283,7 @@ public class WorkflowDialog extends JDialog {
 								"Workflow computing trace",
 								numberOfExtraTokensInNet == null ? 0
 										: (Integer) numberOfExtraTokensInNet.getValue(),
-										new TCTLEFNode(new TCTLAtomicPropositionNode(out.isShared()?"":out_template.name(), out.name(), ">=",1)), TraceOption.SOME,
+										new TCTLEFNode(new TCTLAtomicPropositionNode(new TCTLPlaceNode(out.isShared()?"":out_template.name(), out.name()), ">=",new TCTLConstNode(1))), TraceOption.SOME,
 										SearchOption.DEFAULT,
 										ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 										true, true, null, ExtrapolationOption.AUTOMATIC);

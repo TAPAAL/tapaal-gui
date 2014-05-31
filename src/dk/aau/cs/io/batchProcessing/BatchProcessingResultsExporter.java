@@ -21,12 +21,15 @@ public class BatchProcessingResultsExporter {
 	private static final String name_BROADCAST = "J: UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "K: UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "L: TAPAAL Untimed Engine";
-	private static final String name_UNTIMEDAPPROX = "M: TAPAAL Untimed Engine, Over-Approximation Only";	
+	private static final String name_UNTIMEDAPPROX = "M: TAPAAL Untimed Engine, State-Equations Check Only";	
 	private static final String name_UNTIMEDREDUCE = "N: TAPAAL Untimed engine w. Net Reductions";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
-	private static final String DELIMITER = ";";
+	private static final String name_NONE_APPROXIMATION = "None";
+	private static final String name_OVER_APPROXIMATION = "Over-approximation";
+	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
+	private static final String DELIMITER = ";";	
 	
 	public void exportToCSV(Iterable<BatchProcessingVerificationResult> results, File outputFile) throws Exception {
 		PrintStream writer = new PrintStream(outputFile);
@@ -43,7 +46,9 @@ public class BatchProcessingResultsExporter {
 				       "Extra Tokens" + DELIMITER + 
 				       "Verification Method" + DELIMITER + 
 				       "Symmetry" + DELIMITER + 
-				       "Search Order");
+				       "Search Order" + DELIMITER + 
+				       "Approximation Method" + DELIMITER +
+				       "Approximation Constant");
 		
 		for(BatchProcessingVerificationResult result : results) {
 			TAPNQuery query = result.query();
@@ -77,6 +82,10 @@ public class BatchProcessingResultsExporter {
 			s.append((query != null) ? (query.useSymmetry() ? "Yes" : "No") : "");
 			s.append(DELIMITER);
 			s.append((query != null) ? getVerificationMethod(query) : "");
+			s.append(DELIMITER);
+			s.append((query != null) ? getApproximationMethod(query) : "");
+			s.append(DELIMITER);
+			s.append((query != null) ? query.approximationDenominator() : "");
 			
 			writer.println(s.toString());
 		}
@@ -92,6 +101,15 @@ public class BatchProcessingResultsExporter {
 		else 
 			return name_BFS;
 		
+	}
+	
+	private String getApproximationMethod(TAPNQuery query) {
+		if (query.isOverApproximationEnabled()) {
+			return name_OVER_APPROXIMATION;
+		} else if (query.isUnderApproximationEnabled()) {
+			return name_UNDER_APPROXIMATION;
+		}
+		return name_NONE_APPROXIMATION;
 	}
 
 	private Object getSearchOrder(TAPNQuery query) {

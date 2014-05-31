@@ -20,6 +20,9 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private boolean useOverApproximation;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
+	private boolean enableOverApproximation;
+	private boolean enableUnderApproximation;
+	private int approximationDenominator;
 	
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
@@ -27,21 +30,21 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation) {
-		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 	
 	//Only used for boundedness analysis
-	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation) {
-		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces());
+	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.dontUseDeadPlaces = dontUseDeadPLaces;
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion) {
-		this(extraTokens,traceOption, search, symmetry, useOverApproximation, discreteInclusion, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens,traceOption, search, symmetry, useOverApproximation, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		searchOption = search;
@@ -49,6 +52,9 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		this.discreteInclusion = discreteInclusion;
 		this.useOverApproximation = useOverApproximation;
 		this.inclusionPlaces = inclusionPlaces;
+		this.enableOverApproximation = enableOverApproximation;
+		this.enableUnderApproximation = enableUnderApproximation;
+		this.approximationDenominator = approximationDenominator;
 	}
 
 	public TraceOption trace() {
@@ -145,9 +151,28 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public TraceOption traceOption() {
 		return traceOption;
 	}
+	
+	public void setTraceOption(TraceOption option) {
+		traceOption = option;
+	}
 
 	@Override
 	public SearchOption searchOption() {
 		return searchOption;
+	}
+
+	@Override
+	public boolean enableOverApproximation() {
+		return enableOverApproximation;
+	}
+
+	@Override
+	public boolean enableUnderApproximation() {
+		return enableUnderApproximation;
+	}
+
+	@Override
+	public int approximationDenominator() {
+		return approximationDenominator;
 	}
 }

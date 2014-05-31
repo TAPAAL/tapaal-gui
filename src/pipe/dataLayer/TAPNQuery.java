@@ -48,6 +48,10 @@ public class TAPNQuery {
         private boolean useReduction;
 
 	
+	private boolean enableOverApproximation = false;
+	private boolean enableUnderApproximation = false;
+	private int denominator = 2;
+	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
 	private TCTLAbstractProperty property = null;
@@ -66,6 +70,19 @@ public class TAPNQuery {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	public boolean isOverApproximationEnabled() {
+		return this.enableOverApproximation;
+	}
+	
+	public boolean isUnderApproximationEnabled() {
+		return this.enableUnderApproximation;
+	}
+
+	
+	public int approximationDenominator() {
+		return this.denominator;
 	}
 
 	public void setDiscreteInclusion(boolean value){
@@ -248,6 +265,14 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, false, reduction, hashTabelSize, extrapolationOption, new InclusionPlaces(), false, false, 0);
+	}
+	
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, 
+			int approximationDenominator) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -263,8 +288,12 @@ public class TAPNQuery {
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
 		this.useReduction = reduction;
+		this.enableOverApproximation = enableOverApproximation;
+		this.enableUnderApproximation = enableUnderApproximation;
+		this.denominator = approximationDenominator;
 	}
-	
+
+
 	@Override
 	public String toString() {
 		return getName();
@@ -297,7 +326,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, denominator);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		

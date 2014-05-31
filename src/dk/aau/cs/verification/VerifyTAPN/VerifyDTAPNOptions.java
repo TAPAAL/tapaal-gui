@@ -17,36 +17,41 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
-			boolean pTrie, WorkflowMode workflowMode) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false);
+			boolean pTrie, WorkflowMode workflowMode,
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.workflow = workflowMode;
 	}
 	
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
-			boolean pTrie, boolean useOverApproximation) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0);
+			boolean pTrie, boolean useOverApproximation,
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 	
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
-			boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0);
+			boolean pTrie,
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean discreteInclusion, boolean gcd,
-			boolean timeDarts, boolean pTrie, boolean useOverApproximation) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, discreteInclusion, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0);
+			boolean timeDarts, boolean pTrie, boolean useOverApproximation,
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, discreteInclusion, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
 			boolean pTrie, boolean useOverApproximation, boolean discreteInclusion,
-			InclusionPlaces inclusionPlaces, WorkflowMode workflow, int workflowbound) {
-		super(extraTokens, traceOption, search, symmetry, useOverApproximation, discreteInclusion, inclusionPlaces);
+			InclusionPlaces inclusionPlaces, WorkflowMode workflow, int workflowbound,
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		super(extraTokens, traceOption, search, symmetry, useOverApproximation, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;
 		this.workflow = workflow;

@@ -1,11 +1,15 @@
 package pipe.gui;
 
+import java.util.HashMap;
+
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.VerificationCallback;
@@ -103,7 +107,7 @@ public class Verifier {
 
 		TCTLAbstractProperty inputQuery = input.getProperty();
 
-		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption(), input.useSymmetry(), input.useOverApproximation());
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption(), input.useSymmetry(), input.useOverApproximation(), input.isOverApproximationEnabled(), input.isUnderApproximationEnabled(), input.approximationDenominator());
 
 		if (inputQuery == null) {
 			return;
@@ -113,7 +117,7 @@ public class Verifier {
 			RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()));
+			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()), null);
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -127,8 +131,12 @@ public class Verifier {
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
 		runVerifyTAPNVerification(tapnNetwork, query, null);		
 	}
-
+	
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
+		runVerifyTAPNVerification(tapnNetwork, query, callback, null);
+	}
+
+	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		ModelChecker verifytapn = getModelChecker(query);
 
 		if (!verifytapn.isCorrectVersion()) {
@@ -144,11 +152,11 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound());
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION);
+			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		} else {
-			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces());
+			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		}
 		
 		if (inputQuery == null) {
@@ -156,10 +164,10 @@ public class Verifier {
 		}
 		
 		if (tapnNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound));
+			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),

@@ -26,6 +26,10 @@ public class TimedToken {
 		return age;
 	}
 	
+	public void setAge(BigDecimal age) {
+		this.age = age;		
+	}
+	
 	public TimedToken clone() {
 		return new TimedToken(place, age); // age is immutable so ok to pass it
 											// to constructor
