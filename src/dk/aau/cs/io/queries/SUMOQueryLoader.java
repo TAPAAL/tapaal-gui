@@ -14,6 +14,7 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.SUMOParsing.TokenMgrError;
 import dk.aau.cs.TCTL.SUMOParsing.ParseException;
@@ -60,7 +61,7 @@ public class SUMOQueryLoader extends QueryLoader{
 					
 			TAPNQuery query = new TAPNQuery(name, 99999, property, 
 					TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
-					true, false, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC);
+					true, false, true, true, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
 					
 			RenameTemplateVisitor rt = new RenameTemplateVisitor("", network.activeTemplates().get(0).name());
 			query.getProperty().accept(rt, null);
