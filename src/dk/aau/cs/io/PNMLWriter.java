@@ -245,6 +245,26 @@ public class PNMLWriter implements NetWriter {
 			arcElement.setAttribute("type", "normal");
 		}
 		
+		Element graphics = document.createElement("graphics");
+		arcElement.appendChild(graphics);
+		
+		//ArcPath
+		int arcPoints = arc.getArcPath().getArcPathDetails().length;
+		String[][] point = arc.getArcPath().getArcPathDetails();
+		for (int j = 0; j < arcPoints; j++) {
+			graphics.appendChild(createArcPoint(point[j][0],
+					point[j][1], point[j][2], document, j));
+		}
+		
 		return arcElement;
+	}
+	
+	private Element createArcPoint(String x, String y, String type, Document document, int id) {
+		Require.that(document != null, "Error: document was null");
+		Element position = document.createElement("position");
+		position.setAttribute("x", x);
+		position.setAttribute("y", y);
+
+		return position;
 	}
 }

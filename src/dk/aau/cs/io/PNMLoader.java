@@ -42,6 +42,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
@@ -187,7 +188,7 @@ public class PNMLoader {
 		while(node != null){
 			String tag = node.getNodeName();
 			if(tag.equals("arc")){
-				parseArc(node, tapn, template);
+				parseArc(node, template);
 			} 
 			node = node.getNextSibling();
 		}
@@ -266,7 +267,7 @@ public class PNMLoader {
 		idResolver.add(tapn.name(), id, name.name);
 	}
 	
-	private void parseArc(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
+	private void parseArc(Node node, Template template) throws FormatException {
 		if(node == null || !(node instanceof Element)){
 			return;
 		}
@@ -315,17 +316,43 @@ public class PNMLoader {
 			_endy = target.getY() + target.centreOffsetTop();
 		}
 		
+		Arc tempArc;
+		
 		if(type != null && type.equals("inhibitor")) {
-			parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
+			tempArc = parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else if(sourcePlace != null && targetTransition != null) {
-			parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
+			tempArc = parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else if(sourceTransition != null && targetPlace != null) {
-			parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, template);
+			tempArc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else {
 			throw new FormatException("Arcs much be between places and transitions");
 		}
 		
-		//TODO Parse ArcPath
+		if(isNetDrawable()) parseArcPath(element, tempArc);
+	}
+	
+	private void parseArcPath(Element arc, Arc tempArc) {
+		Element element = (Element) getFirstDirectChild(arc, "graphics");
+		NodeList nodelist = element.getElementsByTagName("position");
+		if (nodelist.getLength() > 0) {
+			tempArc.getArcPath().purgePathPoints();
+			for (int i = 0; i < nodelist.getLength(); i++) {
+				Node node = nodelist.item(i);
+				if (node instanceof Element) {
+					Element position = (Element) node;
+					if ("position".equals(position.getNodeName())) {
+						String arcTempX = position.getAttribute("x");
+						String arcTempY = position.getAttribute("y");
+
+						float arcPointX = Float.valueOf(arcTempX).floatValue();
+						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	true);
+					}
+				}
+			}
+		}
 	}
 
 	private Name parseName(Node node){
