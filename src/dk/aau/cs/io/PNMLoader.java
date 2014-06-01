@@ -348,7 +348,7 @@ public class PNMLoader {
 						float arcPointY = Float.valueOf(arcTempY).floatValue();
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	true);
+						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	false);
 					}
 				}
 			}
