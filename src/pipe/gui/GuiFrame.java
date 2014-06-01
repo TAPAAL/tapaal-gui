@@ -2460,7 +2460,7 @@ public class GuiFrame extends JFrame implements Observer {
 				appTab.remove(index);
 				CreateGui.removeTab(index);
 			} else if (this == importPNMLAction){
-				File[] files = new FileBrowser(CreateGui.userPath, "pnml").openFiles();
+				File[] files = new FileBrowser("Import PNML", "pnml", CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
@@ -2468,7 +2468,7 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 				}
 			} else if(this == importSUMOAction){
-				File[] files = new FileBrowser(CreateGui.userPath, "txt").openFiles();
+				File[] files = new FileBrowser("Import SUMO", "txt", CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
