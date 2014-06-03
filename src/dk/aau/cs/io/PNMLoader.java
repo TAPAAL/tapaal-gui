@@ -207,7 +207,7 @@ public class PNMLoader {
 		String id = ((Element) node).getAttribute("id");
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
-		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(true, new Bound.InfBound()));
+		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(false, new Bound.InfBound()));
 		Require.that(places.put(name.name, place) == null && !transitions.containsKey(name.name), 
 				"The name: " + name.name + ", was already used");
 		tapn.add(place);
