@@ -1514,6 +1514,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
+		name = name.replace(".pnml",".xml"); // rename .pnml input file to .xml	
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
