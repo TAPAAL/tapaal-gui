@@ -333,6 +333,7 @@ public class PNMLoader {
 	
 	private void parseArcPath(Element arc, Arc tempArc) {
 		Element element = (Element) getFirstDirectChild(arc, "graphics");
+		if(element == null) return;
 		NodeList nodelist = element.getElementsByTagName("position");
 		if (nodelist.getLength() > 0) {
 			tempArc.getArcPath().purgePathPoints();
