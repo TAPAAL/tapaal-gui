@@ -231,7 +231,7 @@ public class PNMLWriter implements NetWriter {
 		arcElement.setAttribute("source", (arc.getSource().getId() != null ? arc.getSource().getId() : ""));
 		arcElement.setAttribute("target", (arc.getTarget().getId() != null ? arc.getTarget().getId() : ""));
 		
-		if (arc instanceof TimedOutputArcComponent) {
+		if (arc instanceof TimedOutputArcComponent && ((TimedOutputArcComponent)arc).getWeight().value() > 1 ) {
 			Element inscription = document.createElement("inscription");
 			arcElement.appendChild(inscription);
 			Element text = document.createElement("text");
@@ -251,7 +251,7 @@ public class PNMLWriter implements NetWriter {
 		//ArcPath
 		int arcPoints = arc.getArcPath().getArcPathDetails().length;
 		String[][] point = arc.getArcPath().getArcPathDetails();
-		for (int j = 0; j < arcPoints; j++) {
+		for (int j = 1; j < arcPoints-1; j++) {
 			graphics.appendChild(createArcPoint(point[j][0],
 					point[j][1], point[j][2], document, j));
 		}

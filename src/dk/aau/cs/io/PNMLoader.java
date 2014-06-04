@@ -44,6 +44,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Note;
@@ -334,9 +335,9 @@ public class PNMLoader {
 	private void parseArcPath(Element arc, Arc tempArc) {
 		Element element = (Element) getFirstDirectChild(arc, "graphics");
 		if(element == null) return;
+		// tempArc.getArcPath().purgePathPoints();
 		NodeList nodelist = element.getElementsByTagName("position");
 		if (nodelist.getLength() > 0) {
-			tempArc.getArcPath().purgePathPoints();
 			for (int i = 0; i < nodelist.getLength(); i++) {
 				Node node = nodelist.item(i);
 				if (node instanceof Element) {
@@ -349,7 +350,8 @@ public class PNMLoader {
 						float arcPointY = Float.valueOf(arcTempY).floatValue();
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	false);
+						//tempArc.getArcPath().addPoint(arcPointX, arcPointY,	false);
+						tempArc.getArcPath().pathPoints.add(i+1,new ArcPathPoint(arcPointX, arcPointY, false, tempArc.getArcPath()));
 					}
 				}
 			}

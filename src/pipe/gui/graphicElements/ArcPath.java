@@ -32,7 +32,7 @@ import dk.aau.cs.gui.undo.Command;
 public class ArcPath implements Shape, Cloneable {
 
 	private GeneralPath path = new GeneralPath();
-	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
+	public List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
 	private Arc myArc;
 	protected ArcPathPoint currentPoint;
 	private boolean pointLock = false;
