@@ -208,20 +208,21 @@ public class PNMLoader {
 		String id = ((Element) node).getAttribute("id");
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
-		TimedPlace place = new LocalTimedPlace(name.name, new TimeInvariant(false, new Bound.InfBound()));
-		Require.that(places.put(name.name, place) == null && !transitions.containsKey(name.name), 
-				"The name: " + name.name + ", was already used");
+		TimedPlace place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()));
+		Require.that(places.put(id, place) == null && !transitions.containsKey(id), 
+				"The name: " + id + ", was already used");
 		tapn.add(place);
 		
 		if(isNetDrawable()){
-			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(),
+			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
+			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, id, name.point.getX(), name.point.getY(),
 				marking.marking, marking.point.x, marking.point.y, 0);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
 			addListeners(placeComponent, template);
 		}
 		
-		idResolver.add(tapn.name(), id, name.name);
+		idResolver.add(tapn.name(), id, id);
 		
 		for (int i = 0; i < marking.marking; i++) {
 			tapn.parentNetwork().marking().add(new TimedToken(place));
@@ -252,14 +253,15 @@ public class PNMLoader {
 		}
 		String id = ((Element) node).getAttribute("id");
 		
-		TimedTransition transition = new TimedTransition(name.name);
-		Require.that(transitions.put(name.name, transition) == null && !places.containsKey(name.name), 
-				"The name: " + name.name + ", was already used");
+		TimedTransition transition = new TimedTransition(id);
+		Require.that(transitions.put(id, transition) == null && !places.containsKey(id), 
+				"The id: " + id + ", was already used");
 		tapn.add(transition);
 		
 		if(isNetDrawable()){
 			TimedTransitionComponent transitionComponent = 
-				new TimedTransitionComponent(position.getX(), position.getY(), id, name.name, name.point.getX(), name.point.getY(), 
+				//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
+				new TimedTransitionComponent(position.getX(), position.getY(), id, id, name.point.getX(), name.point.getY(), 
 						true, false, 0, 0);
 			transitionComponent.setUnderlyingTransition(transition);
 			template.guiModel().addPetriNetObject(transitionComponent);
