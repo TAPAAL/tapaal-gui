@@ -267,7 +267,7 @@ public class PNMLoader {
 			template.guiModel().addPetriNetObject(transitionComponent);
 			addListeners(transitionComponent, template);
 		}
-		idResolver.add(tapn.name(), id, name.name);
+		idResolver.add(tapn.name(), id, id);
 	}
 	
 	private void parseArc(Node node, Template template) throws FormatException {
