@@ -335,7 +335,6 @@ public class PNMLoader {
 	private void parseArcPath(Element arc, Arc tempArc) {
 		Element element = (Element) getFirstDirectChild(arc, "graphics");
 		if(element == null) return;
-		// tempArc.getArcPath().purgePathPoints();
 		NodeList nodelist = element.getElementsByTagName("position");
 		if (nodelist.getLength() > 0) {
 			for (int i = 0; i < nodelist.getLength(); i++) {
@@ -350,6 +349,9 @@ public class PNMLoader {
 						float arcPointY = Float.valueOf(arcTempY).floatValue();
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						
+						//We add the point at i+1 as the starting and end points of 
+						//the arc is already in the path as point number 0 and 1
 						tempArc.getArcPath().addPoint(i+1,arcPointX, arcPointY, false);
 					}
 				}
