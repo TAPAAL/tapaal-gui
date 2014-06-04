@@ -205,7 +205,7 @@ public class PNMLoader {
 			name = new Name(nameGenerator.getNewPlaceName(template.model()));
 		}
 		Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
-		String id = ((Element) node).getAttribute("id");
+		String id = NamePurifier.purify(((Element) node).getAttribute("id"));
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
 		TimedPlace place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()));
@@ -251,7 +251,7 @@ public class PNMLoader {
 		if(name == null){
 			name = new Name(nameGenerator.getNewTransitionName(template.model()));
 		}
-		String id = ((Element) node).getAttribute("id");
+		String id = NamePurifier.purify(((Element) node).getAttribute("id"));
 		
 		TimedTransition transition = new TimedTransition(id);
 		Require.that(transitions.put(id, transition) == null && !places.containsKey(id), 
@@ -278,8 +278,8 @@ public class PNMLoader {
 		Element element = (Element) node;
 		
 		String id = element.getAttribute("id");
-		String sourceId = element.getAttribute("source");
-		String targetId = element.getAttribute("target");
+		String sourceId = NamePurifier.purify(element.getAttribute("source"));
+		String targetId = NamePurifier.purify(element.getAttribute("target"));
 		String type = element.getAttribute("type");
 		
 		String sourceName = idResolver.get(template.model().name(), sourceId);
