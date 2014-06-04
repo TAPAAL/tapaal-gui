@@ -325,7 +325,7 @@ public class PNMLoader {
 		} else if(sourceTransition != null && targetPlace != null) {
 			tempArc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, template);
 		} else {
-			throw new FormatException("Arcs much be between places and transitions");
+			throw new FormatException("Arcs must be only between places and transitions");
 		}
 		
 		if(isNetDrawable()) parseArcPath(element, tempArc);
