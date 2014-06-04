@@ -188,17 +188,17 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NOT:
       jj_consume_token(NOT);
-      jj_consume_token(27);
+      jj_consume_token(29);
       child = OrExpr();
-      jj_consume_token(28);
+      jj_consume_token(30);
                                          {if (true) return new TCTLNotNode(child);}
       break;
     case TRUE:
     case FALSE:
     case DEADLOCK:
     case NUM:
-    case 27:
     case 29:
+    case 31:
       child = Factor();
                              {if (true) return child;}
       break;
@@ -231,10 +231,10 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
         thisProp = AtomicProposition();
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 27:
-          jj_consume_token(27);
+        case 29:
+          jj_consume_token(29);
           thisProp = OrExpr();
-          jj_consume_token(28);
+          jj_consume_token(30);
           break;
         default:
           jj_la1[7] = jj_gen;
@@ -275,17 +275,17 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
         TCTLAbstractStateProperty thisProp;
         Token num;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 29:
+    case 31:
       thisProp = PlaceList();
       break;
     case NUM:
       num = jj_consume_token(NUM);
                               thisProp = new TCTLConstNode(Integer.parseInt(num.image));
       break;
-    case 27:
-      jj_consume_token(27);
+    case 29:
+      jj_consume_token(29);
       thisProp = AtomicFactor();
-      jj_consume_token(28);
+      jj_consume_token(30);
                                                     {if (true) return thisProp;}
       break;
     default:
@@ -301,30 +301,30 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
         TCTLAbstractStateProperty currentChild;
         ArrayList<TCTLAbstractStateProperty> places = new ArrayList<TCTLAbstractStateProperty>();
         Token place;
-    jj_consume_token(29);
-    jj_consume_token(30);
+    jj_consume_token(31);
+    jj_consume_token(QUOTE);
     place = jj_consume_token(IDENT);
-    jj_consume_token(30);
-                                               currentChild = new TCTLPlaceNode(place.image); places.add(currentChild);
+    jj_consume_token(ENDQUOTE);
+                                                        currentChild = new TCTLPlaceNode(place.image); places.add(currentChild);
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 31:
+      case 32:
         ;
         break;
       default:
         jj_la1[10] = jj_gen;
         break label_4;
       }
-      jj_consume_token(31);
-      jj_consume_token(30);
+      jj_consume_token(32);
+      jj_consume_token(QUOTE);
       place = jj_consume_token(IDENT);
-      jj_consume_token(30);
+      jj_consume_token(ENDQUOTE);
                         places.add(new AritmeticOperator("+"));
                         currentChild = new TCTLPlaceNode(place.image);
                         places.add(currentChild);
     }
-    jj_consume_token(28);
+    jj_consume_token(30);
           {if (true) return places.size() == 1 ? currentChild : new TCTLPlusListNode(places);}
     throw new Error("Missing return statement in function");
   }
@@ -334,6 +334,47 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
     try { return !jj_3_1(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(0, xla); }
+  }
+
+  private boolean jj_3R_11() {
+    if (jj_scan_token(29)) return true;
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(30)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10() {
+    if (jj_scan_token(NUM)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_9() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_5() {
+    if (jj_3R_6()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_8()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_scan_token(32)) return true;
+    if (jj_scan_token(QUOTE)) return true;
+    if (jj_scan_token(IDENT)) return true;
+    if (jj_scan_token(ENDQUOTE)) return true;
+    return false;
   }
 
   private boolean jj_3R_6() {
@@ -362,56 +403,15 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
   }
 
   private boolean jj_3R_12() {
-    if (jj_scan_token(29)) return true;
-    if (jj_scan_token(30)) return true;
+    if (jj_scan_token(31)) return true;
+    if (jj_scan_token(QUOTE)) return true;
     if (jj_scan_token(IDENT)) return true;
-    if (jj_scan_token(30)) return true;
+    if (jj_scan_token(ENDQUOTE)) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
       if (jj_3R_13()) { jj_scanpos = xsp; break; }
     }
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11() {
-    if (jj_scan_token(27)) return true;
-    if (jj_3R_6()) return true;
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_10() {
-    if (jj_scan_token(NUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_5() {
-    if (jj_3R_6()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_8()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    if (jj_scan_token(31)) return true;
-    if (jj_scan_token(30)) return true;
-    if (jj_scan_token(IDENT)) return true;
     if (jj_scan_token(30)) return true;
     return false;
   }
@@ -429,11 +429,16 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
   private int jj_gen;
   final private int[] jj_la1 = new int[11];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
+      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x7f0,0x800,0x1000,0x1c000,0x1c000,0x2808200e,0xe,0x8000000,0x600000,0x28080000,0x80000000,};
+      jj_la1_0 = new int[] {0x7f0,0x800,0x1000,0x1c000,0x1c000,0xa040200e,0xe,0x20000000,0x1800000,0xa0400000,0x0,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[1];
   private boolean jj_rescan = false;
@@ -619,7 +624,7 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[32];
+    boolean[] la1tokens = new boolean[33];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -630,10 +635,13 @@ public class SUMOQueryParser implements SUMOQueryParserConstants {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 33; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

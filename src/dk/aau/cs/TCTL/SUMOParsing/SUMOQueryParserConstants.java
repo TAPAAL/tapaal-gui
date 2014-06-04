@@ -47,16 +47,22 @@ public interface SUMOQueryParserConstants {
   /** RegularExpression Id. */
   int MULT = 18;
   /** RegularExpression Id. */
-  int NUM = 19;
+  int QUOTE = 19;
   /** RegularExpression Id. */
-  int IDENT = 20;
+  int ENDQUOTE = 20;
   /** RegularExpression Id. */
-  int OP = 21;
+  int IDENT = 21;
   /** RegularExpression Id. */
-  int NOP = 22;
+  int NUM = 22;
+  /** RegularExpression Id. */
+  int OP = 23;
+  /** RegularExpression Id. */
+  int NOP = 24;
 
   /** Lexical state. */
   int DEFAULT = 0;
+  /** Lexical state. */
+  int STRING_STATE = 1;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -79,8 +85,10 @@ public interface SUMOQueryParserConstants {
     "\"<=>\"",
     "<PLUS>",
     "\"*\"",
-    "<NUM>",
+    "\"\\\"\"",
+    "<ENDQUOTE>",
     "<IDENT>",
+    "<NUM>",
     "<OP>",
     "\"!=\"",
     "\" \"",
@@ -90,7 +98,6 @@ public interface SUMOQueryParserConstants {
     "\"(\"",
     "\")\"",
     "\"#tokens(\"",
-    "\"\\\"\"",
     "\",\"",
   };
 

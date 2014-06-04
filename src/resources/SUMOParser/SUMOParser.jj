@@ -103,11 +103,20 @@ TOKEN :
 	<MULT: "*">
 }
 
+TOKEN:
+{
+  <QUOTE:"\""> : STRING_STATE
+}
+
+<STRING_STATE> TOKEN:
+{
+  <ENDQUOTE:<QUOTE>> : DEFAULT
+| <IDENT: ["a"-"z","A"-"Z","_","."," ","-","/","="] ( ["a"-"z","A"-"Z","_","."," ","-","/","=","0"-"9"] )* > 
+}
+
 TOKEN :
 {
 	< NUM: ( ["0"-"9"] )+ >
-	|
-	<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* > 
 }
 
 TOKEN : 
@@ -280,10 +289,10 @@ TCTLAbstractStateProperty PlaceList() :
 	Token place;
 }
 {
-	"#tokens(" "\"" place = <IDENT> "\"" { currentChild = new TCTLPlaceNode(place.image); places.add(currentChild); }
+	"#tokens(" <QUOTE> place = <IDENT> <ENDQUOTE> { currentChild = new TCTLPlaceNode(place.image); places.add(currentChild); }
 	
 	(
-		"," "\"" place = <IDENT> "\"" 
+		"," <QUOTE> place = <IDENT> <ENDQUOTE> 
 		{
 			places.add(new AritmeticOperator("+"));
 			currentChild = new TCTLPlaceNode(place.image); 

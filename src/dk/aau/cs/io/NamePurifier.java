@@ -6,6 +6,7 @@ public class NamePurifier {
 				replace(".", "_dot_").
 				replace(" ", "_space_").
 				replace("-", "_dash_").
-				replace("/", "_slash_");
+				replace("/", "_slash_").
+				replace("=", "_equals_");
 	}
 }
