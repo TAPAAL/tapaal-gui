@@ -116,7 +116,6 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNComposerWithGUI;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;

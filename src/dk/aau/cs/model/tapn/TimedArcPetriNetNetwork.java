@@ -17,7 +17,6 @@ import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNComposerWithGUI;
 
 public class TimedArcPetriNetNetwork {

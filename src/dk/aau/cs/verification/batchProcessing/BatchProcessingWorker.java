@@ -52,7 +52,6 @@ import dk.aau.cs.verification.NullStats;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
-import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNComposerWithGUI;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
