@@ -2,8 +2,6 @@ package dk.aau.cs.approximation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
-
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -19,9 +17,7 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
-import pipe.dataLayer.TAPNQuery;
 
 public class OverApproximation implements ITAPNApproximation {
 	@Override

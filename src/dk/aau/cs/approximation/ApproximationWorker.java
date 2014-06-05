@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 
 import javax.swing.SwingWorker.StateValue;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.FileFinderImpl;
-import pipe.gui.MessengerImpl;
 import pipe.gui.RunVerificationBase;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
@@ -21,7 +18,6 @@ import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
-import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ITAPNComposer;
@@ -30,16 +26,11 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNComposerWithGUI;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
-import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
-import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 
@@ -122,7 +113,7 @@ public class ApproximationWorker {
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
 							}
-							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
+							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), approxResult.verificationTime() + result.verificationTime());
 						}
 						//Create the result from trace TAPN
 						renameTraceTransitions(result.getTrace());
@@ -268,7 +259,7 @@ public class ApproximationWorker {
 								value.setTrace(null);
 								value.setSecondaryTrace(null);
 							}
-							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
+							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime() + approxResult.verificationTime());
 						}
 						//Create the result from trace TAPN
 						renameTraceTransitions(result.getTrace());
@@ -622,7 +613,7 @@ public class ApproximationWorker {
 	}
 	
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		ITAPNComposer composer = new TAPNComposer(new Messenger(){
+		ITAPNComposer composer = new TAPNComposerWithGUI(new Messenger(){
 			public void displayInfoMessage(String message) { }
 			public void displayInfoMessage(String message, String title) {}
 			public void displayErrorMessage(String message) {}
@@ -632,40 +623,5 @@ public class ApproximationWorker {
 		});
 		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 		return composedModel;
-	}
-	
-	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-			return getVerifyTAPN();
-		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return getVerifyTAPNDiscreteVerification();
-		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
-			return getVerifyPN();
-		else
-			return getVerifyta();
-	}
-	
-	private Verifyta getVerifyta() {
-		Verifyta verifyta = new Verifyta(new FileFinderImpl(), new MessengerImpl());
-		verifyta.setup();
-		return verifyta;
-	}
-
-	private static VerifyTAPN getVerifyTAPN() {
-		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
-		verifytapn.setup();
-		return verifytapn;
-	}
-	
-	private static VerifyPN getVerifyPN() {
-		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
-		verifypn.setup();
-		return verifypn;
-	}
-	
-	private static VerifyTAPNDiscreteVerification getVerifyTAPNDiscreteVerification() {
-		VerifyTAPNDiscreteVerification verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
-		verifytapnDiscreteVerification.setup();
-		return verifytapnDiscreteVerification;
 	}
 }

@@ -2551,7 +2551,7 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
+						ITAPNComposer composer = new TAPNComposerWithGUI(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 						
 						if (overApproximationEnable.isSelected())

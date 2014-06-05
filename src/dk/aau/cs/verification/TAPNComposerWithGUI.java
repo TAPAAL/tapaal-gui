@@ -36,14 +36,8 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
 public class TAPNComposerWithGUI implements ITAPNComposer {
-	private static final String PLACE_FORMAT = "P%1$d";
-	private static final String TRANSITION_FORMAT = "T%1$d";
-
 	private Messenger messenger;
 	private boolean hasShownMessage = false;
-	
-	private int nextPlaceIndex;
-	private int nextTransitionIndex;
 
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
@@ -60,9 +54,11 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 		this.guiModels = newGuiModels;
 	}
 	
+	public TAPNComposerWithGUI(Messenger messenger) {
+		this.messenger = messenger;
+	}
+	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
-		nextPlaceIndex = -1;
-		nextTransitionIndex = -1;
 		processedSharedObjects = new HashSet<String>();
 		TimedArcPetriNet tapn = new TimedArcPetriNet("ComposedModel");
 		DataLayer guiModel = new DataLayer();
@@ -72,9 +68,11 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 		
 		double greatestWidth = 0,
 			   greatestHeight = 0;
-		for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
-			greatestWidth = greatestWidth >= getRightmostObject(guiModels.get(tapn1)).getPositionX() ? greatestWidth : getRightmostObject(guiModels.get(tapn1)).getPositionX();
-			greatestHeight = greatestHeight >= getLowestObject(guiModels.get(tapn1)).getPositionY() ? greatestHeight : getLowestObject(guiModels.get(tapn1)).getPositionY();
+		if (this.guiModels != null) {
+			for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
+				greatestWidth = greatestWidth >= getRightmostObject(guiModels.get(tapn1)).getPositionX() ? greatestWidth : getRightmostObject(guiModels.get(tapn1)).getPositionX();
+				greatestHeight = greatestHeight >= getLowestObject(guiModels.get(tapn1)).getPositionY() ? greatestHeight : getLowestObject(guiModels.get(tapn1)).getPositionY();
+			}
 		}
 		
 		createSharedPlaces(model, tapn, mapping, guiModel);
@@ -166,31 +164,37 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 				}
 			}
 			
-			Place oldPlace = getSharedPlace(place.name());
-			TimedPlaceComponent newPlace = new TimedPlaceComponent(
-					oldPlace.getPositionX(),
-					oldPlace.getPositionY(),
-					oldPlace.getId(),
-					uniquePlaceName,
-					oldPlace.getNameOffsetX(),
-					oldPlace.getNameOffsetY(),
-					0,
-					oldPlace.getMarkingOffsetXObject().doubleValue(),
-					oldPlace.getMarkingOffsetYObject().doubleValue(),
-					0
-					);
-			newPlace.setGuiModel(guiModel);
-			newPlace.setUnderlyingPlace(constructedPlace);
-			newPlace.setName(uniquePlaceName);
-			guiModel.addPlace(newPlace);
+			// Gui work
+			if (this.guiModels != null) {
+				Place oldPlace = getSharedPlace(place.name());
+				TimedPlaceComponent newPlace = new TimedPlaceComponent(
+						oldPlace.getPositionX(),
+						oldPlace.getPositionY(),
+						oldPlace.getId(),
+						uniquePlaceName,
+						oldPlace.getNameOffsetX(),
+						oldPlace.getNameOffsetY(),
+						0,
+						oldPlace.getMarkingOffsetXObject().doubleValue(),
+						oldPlace.getMarkingOffsetYObject().doubleValue(),
+						0
+						);
+				newPlace.setGuiModel(guiModel);
+				newPlace.setUnderlyingPlace(constructedPlace);
+				newPlace.setName(uniquePlaceName);
+				guiModel.addPlace(newPlace);
+			}
 		}
 	}
 
 	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+			DataLayer currentGuiModel = null;
+			if (this.guiModels != null) {
+				currentGuiModel = this.guiModels.get(tapn);
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
-			DataLayer currentGuiModel = this.guiModels.get(tapn);
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if(!timedPlace.isShared()){
@@ -209,39 +213,40 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 						place.addToken(new TimedToken(place, token.age()));
 					}
 					
-					Place oldPlace = currentGuiModel.getPlaceByName(timedPlace.name());
-					TimedPlaceComponent newPlace = new TimedPlaceComponent(
-							oldPlace.getPositionX() + offset.value1() * greatestWidth,
-							oldPlace.getPositionY() + offset.value2() * greatestHeight,
-							oldPlace.getId(),
-							uniquePlaceName,
-							oldPlace.getNameOffsetX(),
-							oldPlace.getNameOffsetY(),
-							0,
-							oldPlace.getMarkingOffsetXObject().doubleValue(),
-							oldPlace.getMarkingOffsetYObject().doubleValue(),
-							0
-							);
-					newPlace.setGuiModel(guiModel);
-					newPlace.setUnderlyingPlace(place);
-					newPlace.setName(uniquePlaceName);
-					guiModel.addPlace(newPlace);
+					// Gui work
+					if (this.guiModels != null) {
+						Place oldPlace = currentGuiModel.getPlaceByName(timedPlace.name());
+						TimedPlaceComponent newPlace = new TimedPlaceComponent(
+								oldPlace.getPositionX() + offset.value1() * greatestWidth,
+								oldPlace.getPositionY() + offset.value2() * greatestHeight,
+								oldPlace.getId(),
+								uniquePlaceName,
+								oldPlace.getNameOffsetX(),
+								oldPlace.getNameOffsetY(),
+								0,
+								oldPlace.getMarkingOffsetXObject().doubleValue(),
+								oldPlace.getMarkingOffsetYObject().doubleValue(),
+								0
+								);
+						newPlace.setGuiModel(guiModel);
+						newPlace.setUnderlyingPlace(place);
+						newPlace.setName(uniquePlaceName);
+						guiModel.addPlace(newPlace);
+					}
 				}
 			}
 			i++;
 		}
 	}
 
-	private String getUniquePlaceName() {
-		nextPlaceIndex++;
-		return String.format(PLACE_FORMAT, nextPlaceIndex);
-	}
-
 	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+			DataLayer currentGuiModel = null;
+			if (this.guiModels != null) {
+				currentGuiModel = this.guiModels.get(tapn);
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
-			DataLayer currentGuiModel = this.guiModels.get(tapn);
 			
 			for (TimedTransition timedTransition : tapn.transitions()) {
 				if(!processedSharedObjects.contains(timedTransition.name())){
@@ -260,22 +265,26 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 						
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent());
 						constructedModel.add(transition);
-						Transition oldTransition = currentGuiModel.getTransitionByName(timedTransition.name());
-						TimedTransitionComponent newTransition = new TimedTransitionComponent(
-								oldTransition.getPositionX() + offset.value1() * greatestWidth,
-								oldTransition.getPositionY() + offset.value2() * greatestHeight,
-								oldTransition.getId(),
-								uniqueTransitionName,
-								oldTransition.getNameOffsetX(),
-								oldTransition.getNameOffsetY(),
-								true,
-								false,
-								oldTransition.getAngle(),
-								0);
-						newTransition.setGuiModel(guiModel);
-						newTransition.setUnderlyingTransition(transition);
-						newTransition.setName(uniqueTransitionName);
-						guiModel.addTransition(newTransition);
+						
+						// Gui work
+						if (this.guiModels != null) {
+							Transition oldTransition = currentGuiModel.getTransitionByName(timedTransition.name());
+							TimedTransitionComponent newTransition = new TimedTransitionComponent(
+									oldTransition.getPositionX() + offset.value1() * greatestWidth,
+									oldTransition.getPositionY() + offset.value2() * greatestHeight,
+									oldTransition.getId(),
+									uniqueTransitionName,
+									oldTransition.getNameOffsetX(),
+									oldTransition.getNameOffsetY(),
+									true,
+									false,
+									oldTransition.getAngle(),
+									0);
+							newTransition.setGuiModel(guiModel);
+							newTransition.setUnderlyingTransition(transition);
+							newTransition.setName(uniqueTransitionName);
+							guiModel.addTransition(newTransition);
+						}
 						
 						if(timedTransition.isShared()){
 							String name = timedTransition.sharedTransition().name();
@@ -295,11 +304,6 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 			}
 			i++;
 		}
-	}
-
-	private String getUniqueTransitionName() {
-		nextTransitionIndex++;
-		return String.format(TRANSITION_FORMAT, nextTransitionIndex);
 	}
 	
 	private ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc, double offsetX, double offsetY) {
@@ -324,7 +328,10 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 	private void createInputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			DataLayer currentGuiModel = null;
+			if (this.guiModels != null) {
+				currentGuiModel = this.guiModels.get(tapn);
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedInputArc arc : tapn.inputArcs()) {
@@ -344,34 +351,37 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeight());
 				constructedModel.add(addedArc);
 				
-				Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
-				Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
-				
-				Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-						0d,
-						0d,
-						0d,
-						0d,
-						guiSource,
-						guiTarget,
-						arc.getWeight().value(),
-						mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
-						false
-						));
-				
-				// Build ArcPath
-				Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());
-				Transition oldGuiTarget = currentGuiModel.getTransitionByName(arc.destination().name());
-				ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
-				
-				// Set arcPath, guiModel and connectors
-				((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
-				newArc.setArcPath(newArcPath);
-				newArc.setGuiModel(guiModel);
-				newArc.updateArcPosition();
-				guiModel.addPetriNetObject(newArc);
-				guiSource.addConnectFrom(newArc);
-				guiTarget.addConnectTo(newArc);
+				// Gui work
+				if (this.guiModels != null) {
+					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
+					Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
+					
+					Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
+							0d,
+							0d,
+							0d,
+							0d,
+							guiSource,
+							guiTarget,
+							arc.getWeight().value(),
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
+							false
+							));
+					
+					// Build ArcPath
+					Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());
+					Transition oldGuiTarget = currentGuiModel.getTransitionByName(arc.destination().name());
+					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
+					
+					// Set arcPath, guiModel and connectors
+					((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setArcPath(newArcPath);
+					newArc.setGuiModel(guiModel);
+					newArc.updateArcPosition();
+					guiModel.addPetriNetObject(newArc);
+					guiSource.addConnectFrom(newArc);
+					guiTarget.addConnectTo(newArc);
+				}
 			}
 			i++;
 		}
@@ -380,7 +390,10 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 	private void createOutputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			DataLayer currentGuiModel = null;
+			if (this.guiModels != null) {
+				currentGuiModel = this.guiModels.get(tapn);
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedOutputArc arc : tapn.outputArcs()) {
@@ -393,34 +406,37 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeight());
 				constructedModel.add(addedArc);
 				
-				Transition guiSource = guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name()));
-				Place guiTarget = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
-				
-				TimedOutputArcComponent newArc = new TimedOutputArcComponent(
-						0d,
-						0d,
-						0d,
-						0d,
-						guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
-						guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name())),
-						arc.getWeight().value(),
-						mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-						false
-						);
-				
-				// Build ArcPath
-				Transition oldGuiSource = currentGuiModel.getTransitionByName(arc.source().name());
-				Place oldGuiTarget = currentGuiModel.getPlaceByName(arc.destination().name());
-				ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
-				
-				// Set arcPath, guiModel and connectors
-				newArc.setUnderlyingArc(addedArc);
-				newArc.setArcPath(newArcPath);
-				newArc.setGuiModel(guiModel);
-				newArc.updateArcPosition();
-				guiModel.addArc(newArc);
-				guiSource.addConnectTo(newArc);
-				guiTarget.addConnectFrom(newArc);
+				// Gui work
+				if (this.guiModels != null) {
+					Transition guiSource = guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name()));
+					Place guiTarget = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
+					
+					TimedOutputArcComponent newArc = new TimedOutputArcComponent(
+							0d,
+							0d,
+							0d,
+							0d,
+							guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
+							guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name())),
+							arc.getWeight().value(),
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
+							false
+							);
+					
+					// Build ArcPath
+					Transition oldGuiSource = currentGuiModel.getTransitionByName(arc.source().name());
+					Place oldGuiTarget = currentGuiModel.getPlaceByName(arc.destination().name());
+					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
+					
+					// Set arcPath, guiModel and connectors
+					newArc.setUnderlyingArc(addedArc);
+					newArc.setArcPath(newArcPath);
+					newArc.setGuiModel(guiModel);
+					newArc.updateArcPosition();
+					guiModel.addArc(newArc);
+					guiSource.addConnectTo(newArc);
+					guiTarget.addConnectFrom(newArc);
+				}
 			}
 			i++;
 		}
@@ -430,7 +446,10 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 		int i = 0;
 		int nextGroupNr = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			DataLayer currentGuiModel = null;
+			if (this.guiModels != null) {
+				currentGuiModel = this.guiModels.get(tapn);
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TransportArc arc : tapn.transportArcs()) {
@@ -453,89 +472,92 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
-				Place guiSourceIn = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
-				Transition guiTargetIn = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
+				// Gui work
+				if (this.guiModels != null) {
+					Place guiSourceIn = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
+					Transition guiTargetIn = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
+									
+					TimedTransportArcComponent newInArc = new TimedTransportArcComponent(
+							new TimedInputArcComponent(new TimedOutputArcComponent(
+								0d,
+								0d,
+								0d,
+								0d,
+								guiSourceIn,
+								guiTargetIn,
+								arc.getWeight().value(),
+								mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name()),
+								false
+								)), 
+							nextGroupNr, 
+							true
+							);
+					
+					// Build ArcPath
+					Place oldGuiSourceIn = currentGuiModel.getPlaceByName(arc.source().name());
+					Transition oldGuiTargetIn = currentGuiModel.getTransitionByName(arc.transition().name());
+					ArcPath newArcPathIn = createArcPath(currentGuiModel, oldGuiSourceIn, oldGuiTargetIn, newInArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
 								
-				TimedTransportArcComponent newInArc = new TimedTransportArcComponent(
-						new TimedInputArcComponent(new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiSourceIn,
-							guiTargetIn,
-							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name()),
-							false
-							)), 
-						nextGroupNr, 
-						true
-						);
-				
-				// Build ArcPath
-				Place oldGuiSourceIn = currentGuiModel.getPlaceByName(arc.source().name());
-				Transition oldGuiTargetIn = currentGuiModel.getTransitionByName(arc.transition().name());
-				ArcPath newArcPathIn = createArcPath(currentGuiModel, oldGuiSourceIn, oldGuiTargetIn, newInArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
-							
-				newInArc.setUnderlyingArc(addedArc);
-				newInArc.setArcPath(newArcPathIn);
-				newInArc.setGuiModel(guiModel);
-				newInArc.updateArcPosition();
-				guiModel.addArc(newInArc);
-				
-				guiSourceIn.addConnectTo(newInArc);
-				guiTargetIn.addConnectFrom(newInArc);
-				
-				// Calculate the next group number for this transport arc
-				// By looking at the target of the newInArc -> a transition
-				// Then finding the largest existing group number of outgoing transport arcs from this transition
-				for (Object pt : newInArc.getTarget().getPostset()) {
-					if (pt instanceof TimedTransportArcComponent) {
-						if (((TimedTransportArcComponent) pt).getGroupNr() > nextGroupNr) {
-							nextGroupNr = ((TimedTransportArcComponent) pt).getGroupNr();
+					newInArc.setUnderlyingArc(addedArc);
+					newInArc.setArcPath(newArcPathIn);
+					newInArc.setGuiModel(guiModel);
+					newInArc.updateArcPosition();
+					guiModel.addArc(newInArc);
+					
+					guiSourceIn.addConnectTo(newInArc);
+					guiTargetIn.addConnectFrom(newInArc);
+					
+					// Calculate the next group number for this transport arc
+					// By looking at the target of the newInArc -> a transition
+					// Then finding the largest existing group number of outgoing transport arcs from this transition
+					for (Object pt : newInArc.getTarget().getPostset()) {
+						if (pt instanceof TimedTransportArcComponent) {
+							if (((TimedTransportArcComponent) pt).getGroupNr() > nextGroupNr) {
+								nextGroupNr = ((TimedTransportArcComponent) pt).getGroupNr();
+							}
 						}
 					}
-				}
-
-				((TimedTransportArcComponent) newInArc).setGroupNr(nextGroupNr + 1);
-				
-				//Create output transport arc
-				Transition guiSourceOut = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
-				Place guiTargetOut = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
-				
-				TimedTransportArcComponent newOutArc = new TimedTransportArcComponent(
-						new TimedInputArcComponent(new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiSourceOut,
-							guiTargetOut,
-							1,
-							mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
+	
+					((TimedTransportArcComponent) newInArc).setGroupNr(nextGroupNr + 1);
+					
+					//Create output transport arc
+					Transition guiSourceOut = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
+					Place guiTargetOut = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
+					
+					TimedTransportArcComponent newOutArc = new TimedTransportArcComponent(
+							new TimedInputArcComponent(new TimedOutputArcComponent(
+								0d,
+								0d,
+								0d,
+								0d,
+								guiSourceOut,
+								guiTargetOut,
+								1,
+								mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
+								false
+								)), 
+							nextGroupNr + 1, 
 							false
-							)), 
-						nextGroupNr + 1, 
-						false
-						);
+							);
+					
+					// Build ArcPath
+					Transition oldGuiSourceOut = currentGuiModel.getTransitionByName(arc.transition().name());
+					Place oldGuiTargetOut = currentGuiModel.getPlaceByName(arc.destination().name());
+					ArcPath newArcPathOut = createArcPath(currentGuiModel, oldGuiSourceOut, oldGuiTargetOut, newOutArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
 				
-				// Build ArcPath
-				Transition oldGuiSourceOut = currentGuiModel.getTransitionByName(arc.transition().name());
-				Place oldGuiTargetOut = currentGuiModel.getPlaceByName(arc.destination().name());
-				ArcPath newArcPathOut = createArcPath(currentGuiModel, oldGuiSourceOut, oldGuiTargetOut, newOutArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
-			
-				newOutArc.setUnderlyingArc(addedArc);
-				newOutArc.setArcPath(newArcPathOut);
-				newOutArc.setGuiModel(guiModel);
-				newOutArc.updateArcPosition();
-				guiModel.addArc(newOutArc);
-				
-				// Add connection references to the two transport arcs
-				newInArc.setConnectedTo(newOutArc);
-				newOutArc.setConnectedTo(newInArc);
-				
-				guiSourceOut.addConnectTo(newOutArc);
-				guiTargetOut.addConnectFrom(newOutArc);
+					newOutArc.setUnderlyingArc(addedArc);
+					newOutArc.setArcPath(newArcPathOut);
+					newOutArc.setGuiModel(guiModel);
+					newOutArc.updateArcPosition();
+					guiModel.addArc(newOutArc);
+					
+					// Add connection references to the two transport arcs
+					newInArc.setConnectedTo(newOutArc);
+					newOutArc.setConnectedTo(newInArc);
+					
+					guiSourceOut.addConnectTo(newOutArc);
+					guiTargetOut.addConnectFrom(newOutArc);
+				}
 			}
 			i++;
 		}
@@ -546,7 +568,10 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 	private void createInhibitorArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			DataLayer currentGuiModel = null;
+			if (this.guiModels != null) {
+				currentGuiModel = this.guiModels.get(tapn);
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
@@ -566,32 +591,35 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeight());
 				constructedModel.add(addedArc);
 				
-				Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
-				Transition guiTarget = guiModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
-				Arc newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
-						0d,
-						0d,
-						0d,
-						0d,
-						guiSource,
-						guiTarget,
-						arc.getWeight().value(),
-						mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-						false
-						), "");
-				
-				// Build ArcPath
-				Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());
-				Transition oldGuiTarget = currentGuiModel.getTransitionByName(arc.destination().name());
-				ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
-				
-				((TimedInhibitorArcComponent) newArc).setUnderlyingArc(addedArc);
-				newArc.setArcPath(newArcPath);
-				newArc.setGuiModel(guiModel);
-				newArc.updateArcPosition();
-				guiModel.addPetriNetObject(newArc);
-				guiSource.addConnectTo(newArc);
-				guiTarget.addConnectFrom(newArc);
+				// Gui work
+				if (this.guiModels != null) {
+					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
+					Transition guiTarget = guiModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
+					Arc newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
+							0d,
+							0d,
+							0d,
+							0d,
+							guiSource,
+							guiTarget,
+							arc.getWeight().value(),
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
+							false
+							), "");
+					
+					// Build ArcPath
+					Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());
+					Transition oldGuiTarget = currentGuiModel.getTransitionByName(arc.destination().name());
+					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
+					
+					((TimedInhibitorArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setArcPath(newArcPath);
+					newArc.setGuiModel(guiModel);
+					newArc.updateArcPosition();
+					guiModel.addPetriNetObject(newArc);
+					guiSource.addConnectTo(newArc);
+					guiTarget.addConnectFrom(newArc);
+				}
 			}
 			i++;
 		}

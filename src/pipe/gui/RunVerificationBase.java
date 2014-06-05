@@ -34,6 +34,7 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNComposerWithGUI;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -74,7 +75,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-		ITAPNComposer composer = new TAPNComposer(messenger);
+		ITAPNComposer composer = new TAPNComposerWithGUI(messenger);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
 		if (options.enableOverApproximation())
