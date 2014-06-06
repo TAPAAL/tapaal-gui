@@ -1835,6 +1835,17 @@ public class GuiFrame extends JFrame implements Observer {
 		tabContent.currentTemplate().guiModel().repaintAll(true);
 		appGui.appView.updatePreferredSize();
 	}
+        
+        private boolean canNetBeSaved() {
+                if (CreateGui.getCurrentTab().network().paintNet()) {
+                        return true;
+                } else {
+                        String message = "The net is too big and cannot be saved or exported.";
+                        Object[] dialogContent = {message};
+                        JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
+                }
+                return false;
+        }
 
 	class AnimateAction extends GuiAction {
 
@@ -2437,9 +2448,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			if (this == saveAction) {
-				saveOperation(false); // code for Save operation
+                                if (canNetBeSaved()) {
+                                        saveOperation(false); // code for Save operation
+                                }
 			} else if (this == saveAsAction) {
-				saveOperation(true); // code for Save As operations
+                                if (canNetBeSaved()) {
+                                        saveOperation(true); // code for Save As operations
+                                }
 			} else if (this == openAction) { // code for Open operation
 				File[] files = new FileBrowser(CreateGui.userPath).openFiles();
 				for(File f : files){
@@ -2479,23 +2494,30 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			else if (this == exportPNGAction) {
-				Export.exportGuiView(appView, Export.PNG, null);
+                                if (canNetBeSaved()) {
+                                        Export.exportGuiView(appView, Export.PNG, null);
+                                }
 			} else if (this == exportToTikZAction) {
-				Export.exportGuiView(appView, Export.TIKZ, appView
-						.getGuiModel());
+                                if (canNetBeSaved()) {
+                                        Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
+                                }
 			} else if (this == exportToPNMLAction) {
-				if(Preferences.getInstance().getShowPNMLWarning()) {
-					JCheckBox showAgain = new JCheckBox("Do not show this warning.");
-					String message = "In the saved PNML all timing information will be lost\n" +
-							"and the components in the net will be merged into one big net.";
-					Object[] dialogContent = {message, showAgain};
-					JOptionPane.showMessageDialog(null, dialogContent, 
-						"PNML loss of information", JOptionPane.WARNING_MESSAGE);
-					Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
-				}
-				Export.exportGuiView(appView, Export.PNML, null);
+                                if (canNetBeSaved()) {
+                                        if(Preferences.getInstance().getShowPNMLWarning()) {
+                                                JCheckBox showAgain = new JCheckBox("Do not show this warning.");
+                                                String message = "In the saved PNML all timing information will be lost\n" +
+                                                        	"and the components in the net will be merged into one big net.";
+                                                Object[] dialogContent = {message, showAgain};
+                                                JOptionPane.showMessageDialog(null, dialogContent, 
+                                                        "PNML loss of information", JOptionPane.WARNING_MESSAGE);
+                                                Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
+                                        }
+                                        Export.exportGuiView(appView, Export.PNML, null);
+                                }
 			} else if (this == exportPSAction) {
-				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+                                if (canNetBeSaved()) {
+                                        Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+                                }
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			} else if(this == exportTraceAction){
