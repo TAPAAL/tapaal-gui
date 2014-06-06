@@ -58,7 +58,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import net.tapaal.Preferences;
-import com.sun.j3d.loaders.Loader;
 import com.sun.jna.Platform;
 
 import net.tapaal.TAPAAL;
