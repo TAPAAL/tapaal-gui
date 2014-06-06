@@ -65,6 +65,9 @@ public class DataLayer extends Observable implements Cloneable {
 
 	private NetType type = NetType.TAPN;
 
+	//Is the net too big to be drawn
+	private boolean isDrawable= true;
+	
 	/**
 	 * Create empty Petri-Net object
 	 */
@@ -949,5 +952,12 @@ public class DataLayer extends Observable implements Cloneable {
 		return guiModel;
 	}
 
+	public void setDrawable(boolean isDrawable) {
+		this.isDrawable = isDrawable;
+	}
+	
+	public boolean getDrawable(){
+		return isDrawable;
+	}
 	
 }

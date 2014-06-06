@@ -39,7 +39,7 @@ public class FileBrowser extends FileBrowserImplementation {
 	}
 	
 	public String saveFile(){
-		return saveFile(CreateGui.appGui.getCurrentTabName());
+		return saveFile(CreateGui.appGui.getCurrentTabName().replaceAll(".xml", ""));
 	}
 
 	public String saveFile(String suggestedName) {

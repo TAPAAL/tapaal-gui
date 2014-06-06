@@ -13,7 +13,7 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class LocalTimedPlace  extends TimedPlace {
-	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
 
 	private String name;
 	private TimeInvariant invariant;
@@ -66,7 +66,7 @@ public class LocalTimedPlace  extends TimedPlace {
 	}
 
 	public void setName(String newName) {
-		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
+		Require.that(newName != null && !newName.isEmpty(), "A timed place must have a name");
 		Require.that(isValid(newName) && !newName.toLowerCase().equals("true") && !newName.toLowerCase().equals("false"), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
 		fireNameChanged();

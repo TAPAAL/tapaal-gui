@@ -9,7 +9,7 @@ import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.DOMException;
 
-public interface PNMLWriter {
+public interface NetWriter {
 	void savePNML(File file) throws NullPointerException, IOException,
 			ParserConfigurationException, DOMException,
 			TransformerConfigurationException, TransformerException;

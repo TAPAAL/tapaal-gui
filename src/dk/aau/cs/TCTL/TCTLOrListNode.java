@@ -1,14 +1,15 @@
 package dk.aau.cs.TCTL;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
 public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
-	private ArrayList<TCTLAbstractStateProperty> properties;
+	private List<TCTLAbstractStateProperty> properties;
 
-	public void setProperties(ArrayList<TCTLAbstractStateProperty> properties) {
+	public void setProperties(List<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
 
 		for (TCTLAbstractStateProperty p : properties) {
@@ -16,11 +17,11 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	public ArrayList<TCTLAbstractStateProperty> getProperties() {
+	public List<TCTLAbstractStateProperty> getProperties() {
 		return properties;
 	}
 
-	public TCTLOrListNode(ArrayList<TCTLAbstractStateProperty> properties) {
+	public TCTLOrListNode(List<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
 
 		for (TCTLAbstractStateProperty p : properties) {

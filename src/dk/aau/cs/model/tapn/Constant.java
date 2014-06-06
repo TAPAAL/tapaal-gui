@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.util.Require;
 
 public class Constant {
-	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
 	
 	private String name;
 	private int value;

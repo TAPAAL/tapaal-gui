@@ -1,6 +1,7 @@
 package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+import dk.aau.cs.io.NamePurifier;
 
 public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 
@@ -8,8 +9,8 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 	String place;
 	
 	public TCTLPlaceNode(String template, String place) {
-		this.template = template;
-		this.place = place;
+		this.template = NamePurifier.purify(template);
+		this.place = NamePurifier.purify(place);
 	}
 
 	public TCTLPlaceNode(String place) {
