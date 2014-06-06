@@ -1836,7 +1836,7 @@ public class GuiFrame extends JFrame implements Observer {
 		appGui.appView.updatePreferredSize();
 	}
         
-        private boolean canNetBeSaved() {
+        private boolean canNetBeSavedAndShowMessage() {
                 if (CreateGui.getCurrentTab().network().paintNet()) {
                         return true;
                 } else {
@@ -2448,11 +2448,11 @@ public class GuiFrame extends JFrame implements Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			if (this == saveAction) {
-                                if (canNetBeSaved()) {
+                                if (canNetBeSavedAndShowMessage()) {
                                         saveOperation(false); // code for Save operation
                                 }
 			} else if (this == saveAsAction) {
-                                if (canNetBeSaved()) {
+                                if (canNetBeSavedAndShowMessage()) {
                                         saveOperation(true); // code for Save As operations
                                 }
 			} else if (this == openAction) { // code for Open operation
@@ -2494,15 +2494,15 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			else if (this == exportPNGAction) {
-                                if (canNetBeSaved()) {
+                                if (canNetBeSavedAndShowMessage()) {
                                         Export.exportGuiView(appView, Export.PNG, null);
                                 }
 			} else if (this == exportToTikZAction) {
-                                if (canNetBeSaved()) {
+                                if (canNetBeSavedAndShowMessage()) {
                                         Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
                                 }
 			} else if (this == exportToPNMLAction) {
-                                if (canNetBeSaved()) {
+                                if (canNetBeSavedAndShowMessage()) {
                                         if(Preferences.getInstance().getShowPNMLWarning()) {
                                                 JCheckBox showAgain = new JCheckBox("Do not show this warning.");
                                                 String message = "In the saved PNML all timing information will be lost\n" +
@@ -2515,7 +2515,7 @@ public class GuiFrame extends JFrame implements Observer {
                                         Export.exportGuiView(appView, Export.PNML, null);
                                 }
 			} else if (this == exportPSAction) {
-                                if (canNetBeSaved()) {
+                                if (canNetBeSavedAndShowMessage()) {
                                         Export.exportGuiView(appView, Export.POSTSCRIPT, null);
                                 }
 			} else if (this == printAction) {
