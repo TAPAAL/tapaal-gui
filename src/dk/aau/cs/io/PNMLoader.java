@@ -155,7 +155,6 @@ public class PNMLoader {
 			return nameGenerator.getNewTemplateName();
 		}
 		
-		//TODO Fix the name if not allowed
 		return NamePurifier.purify(result);
 	}
 
@@ -484,7 +483,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			arc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				source, target, weight,	arcId, false); //TODO weight
+				source, target, weight,	arcId, false);
 			arc.setUnderlyingArc(outputArc);
 
 			template.guiModel().addPetriNetObject(arc);
