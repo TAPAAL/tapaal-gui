@@ -59,8 +59,8 @@ public class SUMOQueryLoader extends QueryLoader{
 			} catch (ParseException e){ Logger.log(e); queries.add(null); continue; }
 			catch (TokenMgrError e){ Logger.log(e); queries.add(null); continue; }
 					
-			//The number 99999 is the number of extra tokens allowed, this is set high s.t. we don't have to change it manually
-			TAPNQuery query = new TAPNQuery(name, 99999, property, 
+			//The number 9999 is the number of extra tokens allowed, this is set high s.t. we don't have to change it manually
+			TAPNQuery query = new TAPNQuery(name, 9999, property, 
 					TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
 					true, false, true, true, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
 					
