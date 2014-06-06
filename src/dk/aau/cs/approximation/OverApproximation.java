@@ -207,6 +207,7 @@ public class OverApproximation implements ITAPNApproximation {
 
 	private void modifyQuery(dk.aau.cs.model.tapn.TAPNQuery query, LocalTimedPlace blockPlace) {
 		TCTLAbstractProperty topNode = query.getProperty();
+
 		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(new TCTLPlaceNode(blockPlace.name()), "=", new TCTLConstNode(1));
 		
 		// We need to modify the query to also have pBlock = 1. 

@@ -22,8 +22,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	}
 
 	@Override
-	public void visit(TCTLPlaceNode placeNode, Object context) {
-		
+	public void visit(TCTLPlaceNode placeNode, Object context) {		
 		if(useSymmetry) {
 			append("(sum(i:");
 			append(ID_TYPE);

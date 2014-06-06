@@ -15,6 +15,10 @@ public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
 	private boolean isActive;
+	
+	//Should the names be checked to see if the name is already used 
+	//This is used when loading big nets as the checking  of names is slow.
+	private boolean checkNames = true; 
 
 	private List<TimedPlace> places = new ArrayList<TimedPlace>();
 	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
@@ -62,9 +66,9 @@ public class TimedArcPetriNet {
 
 	public void add(TimedInputArc arc) {
 		Require.that(arc != null, "Argument must be a non-null input arc.");
-		Require.that(places.contains(arc.source()),	"The source place must be part of the petri net.");
-		Require.that(transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
-		Require.that(!inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
+		Require.that(!checkNames || places.contains(arc.source()),	"The source place must be part of the petri net.");
+		Require.that(!checkNames || transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
+		Require.that(!checkNames || !inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
 		
 		arc.setModel(this);
 		inputArcs.add(arc);
@@ -73,9 +77,9 @@ public class TimedArcPetriNet {
 
 	public void add(TimedOutputArc arc) {
 		Require.that(arc != null, "Argument must be a non-null output arc.");
-		Require.that(places.contains(arc.destination()), "The destination place must be part of the petri net.");
-		Require.that(transitions.contains(arc.source()), "The source transition must be part of the petri net");
-		Require.that(!outputArcs.contains(arc),	"The specified arc is already a part of the petri net.");
+		Require.that(!checkNames || places.contains(arc.destination()), "The destination place must be part of the petri net.");
+		Require.that(!checkNames || transitions.contains(arc.source()), "The source transition must be part of the petri net");
+		Require.that(!checkNames || !outputArcs.contains(arc),	"The specified arc is already a part of the petri net.");
 	
 		arc.setModel(this);
 		outputArcs.add(arc);
@@ -84,10 +88,10 @@ public class TimedArcPetriNet {
 
 	public void add(TimedInhibitorArc arc) {
 		Require.that(arc != null, "Argument must be a non-null output arc.");
-		Require.that(places.contains(arc.source()),	"The source place must be part of the petri net.");
-		Require.that(transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
-		Require.that(!inhibitorArcs.contains(arc), "The specified arc is already a part of the petri net.");
-		Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
+		Require.that(!checkNames || places.contains(arc.source()),	"The source place must be part of the petri net.");
+		Require.that(!checkNames || transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
+		Require.that(!checkNames || !inhibitorArcs.contains(arc), "The specified arc is already a part of the petri net.");
+		Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
 
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
@@ -96,12 +100,12 @@ public class TimedArcPetriNet {
 
 	public void add(TransportArc arc) {
 		Require.that(arc != null, "Argument must be a non-null output arc.");
-		Require.that(places.contains(arc.source()), "The source place must be part of the petri net.");
-		Require.that(transitions.contains(arc.transition()), "The transition must be part of the petri net");
-		Require.that(places.contains(arc.destination()), "The destination place must be part of the petri net.");
-		Require.that(!inhibitorArcs.contains(arc), "The specified arc is already a part of the petri net.");
-		Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.transition()), "Cannot have two arcs between the same place and transition");
-		Require.that(!hasArcFromTransitionToPlace(arc.transition(), arc.destination()),	"Cannot have two arcs between the same transition and place");
+		Require.that(!checkNames || places.contains(arc.source()), "The source place must be part of the petri net.");
+		Require.that(!checkNames || transitions.contains(arc.transition()), "The transition must be part of the petri net");
+		Require.that(!checkNames || places.contains(arc.destination()), "The destination place must be part of the petri net.");
+		Require.that(!checkNames || !inhibitorArcs.contains(arc), "The specified arc is already a part of the petri net.");
+		Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.transition()), "Cannot have two arcs between the same place and transition");
+		Require.that(!checkNames || !hasArcFromTransitionToPlace(arc.transition(), arc.destination()),	"Cannot have two arcs between the same transition and place");
 
 		arc.setModel(this);
 		transportArcs.add(arc);
@@ -191,6 +195,7 @@ public class TimedArcPetriNet {
 	}
 
 	public boolean isNameUsed(String name) {
+		if(!isCheckNames()) return false;
 		if(parentNetwork != null && parentNetwork.isNameUsedForShared(name)) return true;
 
 		for (TimedPlace place : places){
@@ -635,5 +640,13 @@ public class TimedArcPetriNet {
 			}
 		}
 		return biggestConstant;
+	}
+
+	public boolean isCheckNames() {
+		return checkNames;
+	}
+
+	public void setCheckNames(boolean checkNames) {
+		this.checkNames = checkNames;
 	}
 }

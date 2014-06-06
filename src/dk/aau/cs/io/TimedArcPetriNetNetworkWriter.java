@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -43,7 +43,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 
-public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
+public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 	private Iterable<Template> templates;
 	private Iterable<TAPNQuery> queries;

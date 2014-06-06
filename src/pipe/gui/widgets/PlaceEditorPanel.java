@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -162,7 +163,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void setupInitialState() {
 		sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
 
-		List<TimedPlace> usedPlaces = context.activeModel().places();
+		Collection<TimedPlace> usedPlaces = context.activeModel().places();
 
 		sharedPlaces.removeAll(usedPlaces);
 		if (place.underlyingPlace().isShared()){

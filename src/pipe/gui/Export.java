@@ -24,8 +24,19 @@ import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
+import org.w3c.dom.DOMException;
+
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.PNMLWriter;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetWriter;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.widgets.FileBrowser;
 
@@ -40,6 +51,29 @@ public class Export {
 	public static final int POSTSCRIPT = 2;
 	public static final int PRINTER = 3;
 	public static final int TIKZ = 5;
+	public static final int PNML = 6;
+
+	private static void toPnml(DrawingSurfaceImpl g, String filename) 
+			throws NullPointerException, DOMException, TransformerConfigurationException, 
+			IOException, ParserConfigurationException, TransformerException {
+		TabContent currentTab = CreateGui.getCurrentTab();
+		NetworkMarking currentMarking = null;
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+			currentMarking = currentTab.network().marking();
+			currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
+		}
+
+		NetWriter tapnWriter = new PNMLWriter(
+				currentTab.network(),
+				currentTab.getGuiModels()
+				);
+
+		tapnWriter.savePNML(new File(filename));
+
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+			currentTab.network().setMarking(currentMarking);
+		}
+	}
 
 	public static void toPostScript(Object g, String filename)
 			throws PrintException, IOException {
@@ -112,6 +146,8 @@ public class Export {
 					break;
 				case TIKZ:
 					filename += "tex";
+				case PNML:
+					filename += "pnml";
 				}
 			}
 		}
@@ -129,7 +165,7 @@ public class Export {
 				break;
 			case POSTSCRIPT:
 				filename = new FileBrowser("PostScript file", "ps", filename)
-						.saveFile();
+				.saveFile();
 				if (filename != null) {
 					toPostScript(g, filename);
 				}
@@ -139,12 +175,12 @@ public class Export {
 				break;
 			case TIKZ:
 				Object[] possibilities = { "Only the TikZ figure",
-						"Full compilable LaTex including your figure" };
+				"Full compilable LaTex including your figure" };
 				String figureOptions = (String) JOptionPane.showInputDialog(
-								CreateGui.getApp(),
-								"Choose how you would like your TikZ figure outputted: \n",
-								"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
-								null, possibilities, "Only the TikZ figure");
+						CreateGui.getApp(),
+						"Choose how you would like your TikZ figure outputted: \n",
+						"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
+						null, possibilities, "Only the TikZ figure");
 				TikZExporter.TikZOutputOption tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if (figureOptions == null)
 					return;
@@ -158,6 +194,13 @@ public class Export {
 				if (filename != null) {
 					TikZExporter output = new TikZExporter(model, filename, tikZOption);
 					output.ExportToTikZ();
+				}
+				break;
+			case PNML:
+				filename = new FileBrowser("PNML file", "pnml", filename)
+				.saveFile();
+				if (filename != null) {
+					toPnml(g, filename);
 				}
 			}
 		} catch (Exception e) {

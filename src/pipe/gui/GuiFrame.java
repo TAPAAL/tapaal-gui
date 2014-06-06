@@ -34,6 +34,7 @@ import java.util.jar.JarFile;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -58,10 +59,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
+
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
@@ -89,8 +91,10 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
+import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -118,8 +122,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private JComboBox zoomComboBox;
 
 	private FileAction createAction, openAction, closeAction, saveAction,
-	saveAsAction, exitAction, printAction, exportPNGAction,
-	exportPSAction, exportToTikZAction, exportTraceAction, importTraceAction;
+	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction, exportPNGAction,
+	exportPSAction, exportToTikZAction, exportToPNMLAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -152,7 +156,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public enum GUIMode {
 		draw, animation, noNet
 	}
-	
+
 	private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
 	private JCheckBoxMenuItem showComponentsCheckBox;
 	private JCheckBoxMenuItem showQueriesCheckBox;
@@ -170,13 +174,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	private GUIMode guiMode = GUIMode.noNet;
-	private JMenu exportMenu, zoomMenu;
+	private JMenu importMenu, exportMenu, zoomMenu;
 
 
 	public boolean isMac(){
 		return Platform.isMac();
 	}
-	
+
 	public int getJRE(){
 		return Character.getNumericValue(System.getProperty("java.version").charAt(2));
 	}	
@@ -266,7 +270,7 @@ public class GuiFrame extends JFrame implements Observer {
 		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
 			CreateGui.toggleShowZeroToInfinityIntervals();
 		}
-		
+
 		Dimension dimension = prefs.getWindowSize();
 		if(dimension != null){
 			this.setSize(dimension);
@@ -284,14 +288,14 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 			}
 		}
-		
+
 		// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
 		UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
 				{
-				  "SPACE", "pressed",
-				  "released SPACE", "released",
-				  "ENTER", "pressed",
-				  "released ENTER", "released"
+				"SPACE", "pressed",
+				"released SPACE", "released",
+				"ENTER", "pressed",
+				"released ENTER", "released"
 				}));
 	}
 
@@ -336,6 +340,23 @@ public class GuiFrame extends JFrame implements Observer {
 				"Save as...", null));
 		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK)));
 
+
+		// Import menu
+		importMenu = new JMenu("Import");
+
+		importMenu.setIcon(new ImageIcon(Thread.currentThread()
+				.getContextClassLoader().getResource(
+						CreateGui.imgPath + "Export.png")));
+		addMenuItem(importMenu, importPNMLAction = new FileAction("PNML untimed net",
+				"Import an untimed net in the PNML format", "ctrl X"));
+		importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('X', shortcutkey));
+
+		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
+				"Import SUMO queries in a plain text format", "ctrl R"));
+		importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
+
+		fileMenu.add(importMenu);
+
 		// Export menu
 		exportMenu = new JMenu("Export");
 
@@ -351,9 +372,12 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(exportMenu, exportToTikZAction = new FileAction("TikZ",
 				"Export the net to PNG format", "ctrl L"));
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
-
-		fileMenu.add(exportMenu);
+		addMenuItem(exportMenu, exportToPNMLAction = new FileAction("PNML",
+				"Export the net to PNML format", "ctrl D"));
+		exportToPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('D', shortcutkey));
 		
+		fileMenu.add(exportMenu);
+
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
 				"ctrl P"));
@@ -547,7 +571,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				"Change the grid size", "G"));
-		
+
 		viewMenu.addSeparator();
 
 		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
@@ -569,7 +593,7 @@ public class GuiFrame extends JFrame implements Observer {
 				453247, "Show/hide the list of enabled transitions","ctrl 4",true),
 				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
-		
+
 		addCheckboxMenuItem(viewMenu, showBlueTransitions, showBlueTransitionsAction = new ViewAction("Display future-enabled transitions",
 				453247, "Highlight transitions which can be enabled after a delay","ctrl 5",true),
 				showBlueTransitionsCheckBox = new JCheckBoxMenuItem());
@@ -592,47 +616,47 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
 
 		/* Simulator */
-		 JMenu animateMenu = new JMenu("Simulator");
-		 animateMenu.setMnemonic('A');
-		 addMenuItem(animateMenu, startAction = new AnimateAction(
-				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
-				 "M", true));
-		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
-		 addMenuItem(animateMenu,
-				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
+		JMenu animateMenu = new JMenu("Simulator");
+		animateMenu.setMnemonic('A');
+		addMenuItem(animateMenu, startAction = new AnimateAction(
+				"Simulation mode", ElementType.START, "Toggle simulation mode (M)",
+				"M", true));
+		addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
+				ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
+		addMenuItem(animateMenu,
+				stepforwardAction = new AnimateAction("Step forward",
+						ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
 
-		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
-				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
-		 
-		 addMenuItem(animateMenu, delayFireAction = new AnimateAction("Delay and fire",
-				 ElementType.DELAYFIRE, "Delay and fire selected transition", "F"));
-		 
-		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-				 ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
- 
-		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-				 ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
-		 
-		 animateMenu.addSeparator();
-		 
-		 addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
-					"Export the current trace",""));
-		 addMenuItem(animateMenu, importTraceAction = new FileAction("Import trace",
-					"Import trace to simulator",""));
+		addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
+				ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 
-		 /*
-		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
-		  * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
-		  * addMenuItem(animateMenu, randomAnimateAction = new
-		  * AnimateAction("Simulate", Pipe.ANIMATE,
-		  * "Randomly fire a number of transitions", "typed 7",true));
-		  */
-		 randomAction = new AnimateAction("Random", ElementType.RANDOM,
-				 "Randomly fire a transition", "typed 5");
-		 randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
-				 "Randomly fire a number of transitions", "typed 7", true);
+		addMenuItem(animateMenu, delayFireAction = new AnimateAction("Delay and fire",
+				ElementType.DELAYFIRE, "Delay and fire selected transition", "F"));
+
+		addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
+				ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
+
+		addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
+				ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
+
+		animateMenu.addSeparator();
+
+		addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
+				"Export the current trace",""));
+		addMenuItem(animateMenu, importTraceAction = new FileAction("Import trace",
+				"Import trace to simulator",""));
+
+		/*
+		 * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
+		 * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
+		 * addMenuItem(animateMenu, randomAnimateAction = new
+		 * AnimateAction("Simulate", Pipe.ANIMATE,
+		 * "Randomly fire a number of transitions", "typed 7",true));
+		 */
+		randomAction = new AnimateAction("Random", ElementType.RANDOM,
+				"Randomly fire a transition", "typed 5");
+		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
+				"Randomly fire a number of transitions", "typed 7", true);
 
 
 		/* The help part */
@@ -706,7 +730,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(batchProcessing);
-		
+
 		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)));				
 		workflowDialog.setMnemonic('f');
 		workflowDialog.addActionListener(new ActionListener() {
@@ -728,10 +752,10 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
-		
+
 		JMenuItem clearPreferences = new JMenuItem("Clear all preferences");
 		clearPreferences.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// Clear persistent storage
@@ -930,7 +954,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
 		return addCheckboxMenuItem(menu, selected, action, new JCheckBoxMenuItem());
 	}
-	
+
 	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action, JCheckBoxMenuItem checkBoxItem) {
 		checkBoxItem.setAction(action);
 		checkBoxItem.setSelected(selected);
@@ -956,7 +980,7 @@ public class GuiFrame extends JFrame implements Observer {
 			enableAllActions(true);
 			exportTraceAction.setEnabled(false);
 			importTraceAction.setEnabled(false);
-			
+
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
@@ -983,11 +1007,11 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
 			showBlueTransitionsAction.setEnabled(false);
-			
+
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
-			
+
 			workflowDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
@@ -996,7 +1020,7 @@ public class GuiFrame extends JFrame implements Observer {
 			if(CreateGui.getCurrentTab().restoreWorkflowDialog()){
 				WorkflowDialog.showDialog();
 			}
-			
+
 			break;
 
 		case animation:
@@ -1031,14 +1055,14 @@ public class GuiFrame extends JFrame implements Observer {
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
-			
+
 			workflowDialogAction.setEnabled(false);
 
 			// Remove constant highlight
 			CreateGui.getCurrentTab().removeConstantHighlights();
-			
+
 			CreateGui.getAnimationController().requestFocusInWindow();
-			
+
 			// Event repeater
 			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
 			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_right_hold", stepforwardAction);
@@ -1074,7 +1098,7 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
-			
+
 			workflowDialogAction.setEnabled(false);
 
 			enableAllActions(false);
@@ -1101,7 +1125,8 @@ public class GuiFrame extends JFrame implements Observer {
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
-		
+		exportToPNMLAction.setEnabled(enable);
+
 		exportTraceAction.setEnabled(enable);
 		importTraceAction.setEnabled(enable);
 
@@ -1208,18 +1233,18 @@ public class GuiFrame extends JFrame implements Observer {
 		Preferences.getInstance().setShowToolTips(showToolTips);
 		showToolTipsCheckBox.setSelected(enable);
 		ToolTipManager.sharedInstance().setEnabled(enable);
-   		ToolTipManager.sharedInstance().setInitialDelay(400);
-	        ToolTipManager.sharedInstance().setReshowDelay(800);
-	        ToolTipManager.sharedInstance().setDismissDelay(60000);
+		ToolTipManager.sharedInstance().setInitialDelay(400);
+		ToolTipManager.sharedInstance().setReshowDelay(800);
+		ToolTipManager.sharedInstance().setDismissDelay(60000);
 	}
 	public void toggleToolTips(){
 		showToolTips(!showToolTips);
 	}
 
-  	public boolean isShowingToolTips(){
- 		return showToolTips;
-        }	
-	
+	public boolean isShowingToolTips(){
+		return showToolTips;
+	}	
+
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
 		Preferences.getInstance().setShowZeroInfIntervals(CreateGui.showZeroToInfinityIntervals());
@@ -1243,7 +1268,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void toggleEnabledTransitionsList(){
 		showEnabledTransitionsList(!showEnabledTransitions);
 	}
-	
+
 	public void showBlueTransitions(boolean enable){
 		showBlueTransitions = enable;
 		CreateGui.getCurrentTab().showBlueTransitions(enable);
@@ -1295,7 +1320,7 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
 			}
 
-			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 					currentTab.network(),
 					currentTab.allTemplates(), 
 					currentTab.queries(), 
@@ -1346,7 +1371,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
-		
+
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
@@ -1426,7 +1451,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            Filename of net to load, or <b>null</b> to create a new, empty
 	 *            tab
 	 */
-	public void createNewTabFromFile(File file) {
+	public void createNewTabFromFile(File file, boolean loadPNML) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name = "";
 
@@ -1452,8 +1477,14 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
-				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
-				LoadedModel loadedModel = loader.load(file);
+				LoadedModel loadedModel;
+				if(loadPNML){
+					PNMLoader loader = new PNMLoader(currentTab.drawingSurface());
+					loadedModel = loader.load(file);
+				} else {
+					ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
+					loadedModel = loader.load(file);
+				}
 
 				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
 				currentTab.setQueries(loadedModel.queries());
@@ -1466,8 +1497,11 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.getApp().restoreMode();
 				}
 
-				CreateGui.setFile(file, freeSpace);
+				if(!loadPNML){
+					CreateGui.setFile(file, freeSpace);
+				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(), 
@@ -1479,6 +1513,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
+		name = name.replace(".pnml",".xml"); // rename .pnml input file to .xml	
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
@@ -1680,7 +1715,7 @@ public class GuiFrame extends JFrame implements Observer {
 		// xxx - This must be refactored when someone findes out excatly what is
 		// gowing on
 		mode = prev_mode;
-		
+
 		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
@@ -1720,8 +1755,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (annotationAction != null)
 			annotationAction.setSelected(mode == ElementType.ANNOTATION);
-		
-		
+
+
 
 
 
@@ -1799,6 +1834,17 @@ public class GuiFrame extends JFrame implements Observer {
 		tabContent.currentTemplate().guiModel().repaintAll(true);
 		appGui.appView.updatePreferredSize();
 	}
+        
+        private boolean canNetBeSavedAndShowMessage() {
+                if (CreateGui.getCurrentTab().network().paintNet()) {
+                        return true;
+                } else {
+                        String message = "The net is too big and cannot be saved or exported.";
+                        Object[] dialogContent = {message};
+                        JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
+                }
+                return false;
+        }
 
 	class AnimateAction extends GuiAction {
 
@@ -1833,7 +1879,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			animBox = CreateGui.getAnimationHistory();
-			
+
 			// Hack to ensure the toolbar is not in focus
 			if(CreateGui.getAnimationController() != null){
 				CreateGui.getAnimationController().requestFocusInWindow();
@@ -1866,7 +1912,7 @@ public class GuiFrame extends JFrame implements Observer {
 									"You need at least one active template to enter simulation mode",
 									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
-						
+
 						stepforwardAction.setEnabled(false);
 						stepbackwardAction.setEnabled(false);
 					} else {
@@ -1886,10 +1932,10 @@ public class GuiFrame extends JFrame implements Observer {
 					appView.changeAnimationMode(false);
 					throw new RuntimeException(e);
 				}
-					
+
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
-					
+
 					// XXX
 					// This is a fix for bug #812694 where on mac some menues are gray after
 					// changing from simulation mode, when displaying a trace. Showing and 
@@ -1906,7 +1952,7 @@ public class GuiFrame extends JFrame implements Observer {
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
-			
+
 			case DELAYFIRE:
 				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -2012,22 +2058,22 @@ public class GuiFrame extends JFrame implements Observer {
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 					: JOptionPane.YES_OPTION;
 
-			if (choice == JOptionPane.YES_OPTION) {
-				appView.getUndoManager().newEdit(); // new "transaction""
-				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-					for (TAPNQuery q : queriesToDelete) {
-						Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
-						cmd.redo();
-						appView.getUndoManager().addEdit(cmd);
+					if (choice == JOptionPane.YES_OPTION) {
+						appView.getUndoManager().newEdit(); // new "transaction""
+						if (queriesAffected) {
+							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+							for (TAPNQuery q : queriesToDelete) {
+								Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+								cmd.redo();
+								appView.getUndoManager().addEdit(cmd);
+							}
+						}
+
+						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+						appView.getSelectionObject().deleteSelection();
+						appView.repaint();
+						CreateGui.getCurrentTab().network().buildConstraints();
 					}
-				}
-				
-				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-				appView.getSelectionObject().deleteSelection();
-				appView.repaint();
-				CreateGui.getCurrentTab().network().buildConstraints();
-			}
 		}
 
 	}
@@ -2307,7 +2353,7 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
 		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
-                buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
+		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
 		buffer.append("\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2014\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
@@ -2401,15 +2447,19 @@ public class GuiFrame extends JFrame implements Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			if (this == saveAction) {
-				saveOperation(false); // code for Save operation
+                                if (canNetBeSavedAndShowMessage()) {
+                                        saveOperation(false); // code for Save operation
+                                }
 			} else if (this == saveAsAction) {
-				saveOperation(true); // code for Save As operations
+                                if (canNetBeSavedAndShowMessage()) {
+                                        saveOperation(true); // code for Save As operations
+                                }
 			} else if (this == openAction) { // code for Open operation
 				File[] files = new FileBrowser(CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()) {
 						CreateGui.userPath = f.getParent();
-						createNewTabFromFile(f);
+						createNewTabFromFile(f, false);
 					}
 				}
 			} else if (this == createAction) {
@@ -2424,15 +2474,49 @@ public class GuiFrame extends JFrame implements Observer {
 				int index = appTab.getSelectedIndex();
 				appTab.remove(index);
 				CreateGui.removeTab(index);
+			} else if (this == importPNMLAction){
+				File[] files = new FileBrowser("Import PNML", "pnml", CreateGui.userPath).openFiles();
+				for(File f : files){
+					if(f.exists() && f.isFile() && f.canRead()){
+						CreateGui.userPath = f.getParent();
+						createNewTabFromFile(f, true);
+					}
+				}
+			} else if(this == importSUMOAction){
+				File[] files = new FileBrowser("Import SUMO", "txt", CreateGui.userPath).openFiles();
+				for(File f : files){
+					if(f.exists() && f.isFile() && f.canRead()){
+						CreateGui.userPath = f.getParent();
+						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
+					}
+				}
+			}
 
-				// Disable all action not available when no net is opend
-			} else if (this == exportPNGAction) {
-				Export.exportGuiView(appView, Export.PNG, null);
+			else if (this == exportPNGAction) {
+                                if (canNetBeSavedAndShowMessage()) {
+                                        Export.exportGuiView(appView, Export.PNG, null);
+                                }
 			} else if (this == exportToTikZAction) {
-				Export.exportGuiView(appView, Export.TIKZ, appView
-						.getGuiModel());
+                                if (canNetBeSavedAndShowMessage()) {
+                                        Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
+                                }
+			} else if (this == exportToPNMLAction) {
+                                if (canNetBeSavedAndShowMessage()) {
+                                        if(Preferences.getInstance().getShowPNMLWarning()) {
+                                                JCheckBox showAgain = new JCheckBox("Do not show this warning.");
+                                                String message = "In the saved PNML all timing information will be lost\n" +
+                                                        	"and the components in the net will be merged into one big net.";
+                                                Object[] dialogContent = {message, showAgain};
+                                                JOptionPane.showMessageDialog(null, dialogContent, 
+                                                        "PNML loss of information", JOptionPane.WARNING_MESSAGE);
+                                                Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
+                                        }
+                                        Export.exportGuiView(appView, Export.PNML, null);
+                                }
 			} else if (this == exportPSAction) {
-				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+                                if (canNetBeSavedAndShowMessage()) {
+                                        Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+                                }
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			} else if(this == exportTraceAction){
@@ -2559,7 +2643,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
 	}
-	
+
 
 	public void setStepShotcutEnabled(boolean enabled){
 		if(enabled){
@@ -2578,7 +2662,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void incrementNameCounter() {
 		newNameCounter++;
 	}
-	
+
 	public String getCurrentTabName(){
 		return appTab.getTitleAt(appTab.getSelectedIndex());
 	}
@@ -2586,5 +2670,5 @@ public class GuiFrame extends JFrame implements Observer {
 	public boolean isShowingBlueTransitions() {
 		return showBlueTransitions;
 	}
-	
+
 }
