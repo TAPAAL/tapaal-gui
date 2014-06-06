@@ -15,7 +15,10 @@ public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
 	private boolean isActive;
-	private boolean checkNames = true;
+	
+	//Should the names be checked to see if the name is already used 
+	//This is used when loading big nets as the checking  of names is slow.
+	private boolean checkNames = true; 
 
 	private List<TimedPlace> places = new ArrayList<TimedPlace>();
 	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
