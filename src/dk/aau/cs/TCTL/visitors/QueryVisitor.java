@@ -79,9 +79,8 @@ public abstract class QueryVisitor extends VisitorBase {
 	public void visit(TCTLOrListNode orListNode, Object context) {
 		createList(orListNode.getProperties(), context, "||");
 	}
-	
 
-	private void createList(ArrayList<TCTLAbstractStateProperty> properties, Object context, String seperator) {
+	private void createList(List<TCTLAbstractStateProperty> properties, Object context, String seperator) {
 		uppaalQuery.append('(');
 		boolean firstTime = true;
 

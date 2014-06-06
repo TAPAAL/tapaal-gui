@@ -1,5 +1,6 @@
 package dk.aau.cs.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -62,7 +64,8 @@ public class TabContent extends JSplitPane {
 	protected JScrollPane drawingSurfaceScroller;
 	protected DrawingSurfaceImpl drawingSurface;
 	protected File appFile;
-
+	private JPanel drawingSurfaceDummy;
+	
 	// Normal mode
 	BugHandledJXMultisplitPane editorSplitPane;
 	static Split editorModelroot = null;
@@ -98,13 +101,16 @@ public class TabContent extends JSplitPane {
 	private Boolean selectedTemplateWasActive = false;
 	
 	private WorkflowDialog workflowDialog = null;
+	
+	//Some nets are so big we can't draw them 
+	private boolean showDrawingSurface;
 
 	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
 		}
-
+		
 		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
@@ -120,6 +126,13 @@ public class TabContent extends JSplitPane {
 				CreateGui.getApp().requestFocus();
 			}
 		});
+		
+		drawingSurfaceDummy = new JPanel(new GridBagLayout());
+		GridBagConstraints gc=new GridBagConstraints();
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.gridx=0;
+		gc.gridy=0;
+		drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
 		
 		createEditorLeftPane();
 		createAnimatorSplitPane(netType);
@@ -591,6 +604,12 @@ public class TabContent extends JSplitPane {
 		templateExplorer.updateTemplateList();
 
 		constantsPanel.setNetwork(tapnNetwork);
+		
+		if(network.paintNet()){
+			this.setRightComponent(drawingSurfaceScroller);
+		} else {
+			this.setRightComponent(drawingSurfaceDummy);
+		}
 	}
 
 	public void swapTemplates(int currentIndex, int newIndex) {

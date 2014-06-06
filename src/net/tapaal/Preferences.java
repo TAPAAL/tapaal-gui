@@ -279,6 +279,15 @@ public class Preferences {
 	public boolean getShowZeroInfIntervals(){
 		return pref.getBoolean("showZeroInfIntervals", true);
 	}
+	
+	//Show dialogs
+	public void setShowPNMLWarning(boolean show){
+		pref.putBoolean("showPNMLWarning", show);
+	}
+	
+	public boolean getShowPNMLWarning() {
+		return pref.getBoolean("showPNMLWarning", true);
+	}
 
 
 	//Helper functions

@@ -64,7 +64,7 @@ public class TAPAAL {
 
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
-					CreateGui.appGui.createNewTabFromFile(file);
+					CreateGui.appGui.createNewTabFromFile(file, false);
 				} else if (file.exists()) {
 					System.err.println("Can not read file " + file.toString());
 				}

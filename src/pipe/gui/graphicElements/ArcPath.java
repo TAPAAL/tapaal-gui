@@ -312,6 +312,10 @@ public class ArcPath implements Shape, Cloneable {
 					myPoint.getControl2()));
 		}
 	}
+	
+	public void addPoint(int index, double x, double y, boolean type) {
+		pathPoints.add(index, new ArcPathPoint((float) x, (float) y, type, this));
+	}
 
 	public void addPoint(double x, double y, boolean type) {
 		pathPoints.add(new ArcPathPoint((float) x, (float) y, type, this));

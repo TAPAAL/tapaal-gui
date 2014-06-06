@@ -59,6 +59,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.ConstantWeight;
@@ -86,14 +87,12 @@ import dk.aau.cs.util.Tuple;
 
 public class TapnXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
-	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();;
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
-	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 	private IdResolver idResolver = new IdResolver();
@@ -156,7 +155,7 @@ public class TapnXmlLoader {
 		parseSharedTransitions(doc, network);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
-		Collection<TAPNQuery> queries = parseQueries(doc, network);
+		Collection<TAPNQuery> queries = new TAPNQueryLoader(doc, network).parseQueries();
 
 		network.buildConstraints();
 		
@@ -226,60 +225,6 @@ public class TapnXmlLoader {
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		return st;
-	}
-
-	private Collection<TAPNQuery> parseQueries(Document doc, TimedArcPetriNetNetwork network) {
-		Collection<TAPNQuery> queries = new ArrayList<TAPNQuery>();
-		NodeList queryNodes = doc.getElementsByTagName("query");
-		
-		ArrayList<Tuple<String, String>> templatePlaceNames = getPlaceNames(network);
-		boolean queryUsingNonexistentPlaceFound = false;
-		for (int i = 0; i < queryNodes.getLength(); i++) {
-			Node q = queryNodes.item(i);
-
-			if (q instanceof Element) {
-				TAPNQuery query = parseTAPNQuery((Element) q, network);
-				
-				if (query != null) {
-					if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
-						queryUsingNonexistentPlaceFound = true;
-						continue;
-					}
-
-					queries.add(query);
-				}
-			}
-		}
-		
-		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-			firstQueryParsingWarning = false;
-		}
-		
-		return queries;
-	}
-
-	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
-		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
-
-		VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(query.getProperty());
-		
-		return c.getResult();
-		
-	}
-
-	private ArrayList<Tuple<String, String>> getPlaceNames(TimedArcPetriNetNetwork network) {
-		ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
-		for(TimedArcPetriNet tapn : network.allTemplates()) {
-			for(TimedPlace p : tapn.places()) {
-				templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
-			}
-		}
-		
-		for(TimedPlace p : network.sharedPlaces()) {
-			templatePlaceNames.add(new Tuple<String, String>("", p.name()));
-		}
-		return templatePlaceNames;
 	}
 
 	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
@@ -777,207 +722,6 @@ public class TapnXmlLoader {
 				}
 			}
 		}
-	}
-
-	private TAPNQuery parseTAPNQuery(Element queryElement, TimedArcPetriNetNetwork network) {
-		String comment = getQueryComment(queryElement);
-		TraceOption traceOption = getQueryTraceOption(queryElement);
-		SearchOption searchOption = getQuerySearchOption(queryElement);
-		HashTableSize hashTableSize = getQueryHashTableSize(queryElement);
-		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
-		ReductionOption reductionOption = getQueryReductionOption(queryElement);
-		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
-		boolean symmetry = getReductionOption(queryElement, "symmetry", true);
-		boolean gcd = getReductionOption(queryElement, "gcd", true);
-		boolean timeDarts = getReductionOption(queryElement, "timeDarts", true);
-		boolean pTrie = getReductionOption(queryElement, "pTrie", true);
-		boolean overApproximation = getReductionOption(queryElement, "overApproximation", true);
-		boolean isOverApproximationEnabled = getApproximationOption(queryElement, "enableOverApproximation", false);
-		boolean isUnderApproximationEnabled = getApproximationOption(queryElement, "enableUnderApproximation", false);
-		int approximationDenominator = getApproximationValue(queryElement, "approximationDenominator", 2);
-		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
-		boolean active = getActiveStatus(queryElement);
-		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
-		boolean reduction = getReductionOption(queryElement, "reduction", true);
-
-		TCTLAbstractProperty query;
-		query = parseQueryProperty(queryElement.getAttribute("query"));
-
-		if (query != null) {
-			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
-			parsedQuery.setActive(active);
-			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			return parsedQuery;
-		} else
-			return null;
-	}
-
-	private InclusionPlaces getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
-		List<TimedPlace> places = new ArrayList<TimedPlace>();
-		
-		String inclusionPlaces;
-		try{
-			inclusionPlaces = queryElement.getAttribute("inclusionPlaces");
-		} catch(Exception e) {
-			inclusionPlaces = "*ALL*";
-		}
-		
-		if(!queryElement.hasAttribute("inclusionPlaces") || inclusionPlaces.equals("*ALL*")) 
-			return new InclusionPlaces();
-		
-		if(inclusionPlaces.isEmpty() || inclusionPlaces.equals("*NONE*")) 
-			return new InclusionPlaces(InclusionPlacesOption.UserSpecified, new ArrayList<TimedPlace>());
-		
-		String[] placeNames = inclusionPlaces.split(",");
-		
-		for(String name : placeNames) {
-			if(name.contains(".")) {
-				String templateName = name.split("\\.")[0];
-				String placeName = name.split("\\.")[1];
-				
-				// "true" and "false" are reserved keywords and places using these names are renamed to "_true" and "_false" respectively
-				if(placeName.equalsIgnoreCase("false") || placeName.equalsIgnoreCase("true"))
-					placeName = "_" + placeName;
-				
-				TimedPlace p = network.getTAPNByName(templateName).getPlaceByName(placeName);
-				places.add(p);
-			} else { // shared Place
-				if(name.equalsIgnoreCase("false") || name.equalsIgnoreCase("true"))
-					name = "_" + name;
-				
-				TimedPlace p = network.getSharedPlaceByName(name);
-				places.add(p);
-			}
-		}
-		
-		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
-	}
-
-	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {
-		if(!queryElement.hasAttribute(attributeName)){
-			return defaultValue;
-		}
-		boolean result;
-		try {
-			result = queryElement.getAttribute(attributeName).equals("true");
-		} catch(Exception e) {
-			result = defaultValue;
-		}
-		return result;	
-	}
-	
-	private int getApproximationValue(Element queryElement, String attributeName, int defaultValue)
-	{
-		if(!queryElement.hasAttribute(attributeName)){
-			return defaultValue;
-		}
-		int result;
-		try {
-			result = Integer.parseInt(queryElement.getAttribute(attributeName));
-		} catch(Exception e) {
-			result = defaultValue;
-		}
-		return result;
-	}
-	
-	private boolean getApproximationOption(Element queryElement, String attributeName, boolean defaultValue)
-	{
-		if(!queryElement.hasAttribute(attributeName)){
-			return defaultValue;
-		}
-		boolean result;
-		try {
-			result = queryElement.getAttribute(attributeName).equals("true");
-		} catch(Exception e) {
-			result = defaultValue;
-		}
-		return result;	
-	}
-	
-	private boolean getDiscreteInclusionOption(Element queryElement) {
-		boolean discreteInclusion;
-		try {
-			discreteInclusion = queryElement.getAttribute("discreteInclusion").equals("true");
-		} catch(Exception e) {
-			discreteInclusion = false;
-		}
-		return discreteInclusion;	
-	}
-
-	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
-		TCTLAbstractProperty query = null;
-
-		try {
-			query = TAPAALQueryParser.parse(queryToParse);
-		} catch (Exception e) {
-			if(firstQueryParsingWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-				firstQueryParsingWarning = false;
-			}
-			System.err.println("No query was specified: ");
-			e.printStackTrace();
-		}
-		return query;
-	}
-
-	private ReductionOption getQueryReductionOption(Element queryElement) {
-		ReductionOption reductionOption;
-		try {
-			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
-		} catch (Exception e) {
-			reductionOption = ReductionOption.STANDARD;
-		}
-		return reductionOption;
-	}
-
-	private ExtrapolationOption getQueryExtrapolationOption(Element queryElement) {
-		ExtrapolationOption extrapolationOption;
-		try {
-			extrapolationOption = ExtrapolationOption.valueOf(queryElement.getAttribute("extrapolationOption"));
-		} catch (Exception e) {
-			extrapolationOption = ExtrapolationOption.AUTOMATIC;
-		}
-		return extrapolationOption;
-	}
-
-	private HashTableSize getQueryHashTableSize(Element queryElement) {
-		HashTableSize hashTableSize;
-		try {
-			hashTableSize = HashTableSize.valueOf(queryElement.getAttribute("hashTableSize"));
-		} catch (Exception e) {
-			hashTableSize = HashTableSize.MB_16;
-		}
-		return hashTableSize;
-	}
-
-	private SearchOption getQuerySearchOption(Element queryElement) {
-		SearchOption searchOption;
-		try {
-			searchOption = SearchOption.valueOf(queryElement.getAttribute("searchOption"));
-		} catch (Exception e) {
-			searchOption = SearchOption.BFS;
-		}
-		return searchOption;
-	}
-
-	private TraceOption getQueryTraceOption(Element queryElement) {
-		TraceOption traceOption;
-		try {
-			traceOption = TraceOption.valueOf(queryElement.getAttribute("traceOption"));
-		} catch (Exception e) {
-			traceOption = TraceOption.NONE;
-		}
-		return traceOption;
-	}
-
-	private String getQueryComment(Element queryElement) {
-		String comment;
-		try {
-			comment = queryElement.getAttribute("name");
-		} catch (Exception e) {
-			comment = "No comment specified";
-		}
-		return comment;
 	}
 
 	private Constant parseConstant(Element constantElement) {

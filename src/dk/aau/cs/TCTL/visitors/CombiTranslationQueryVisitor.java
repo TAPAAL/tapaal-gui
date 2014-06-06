@@ -68,7 +68,7 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 			}
 		} else {
 			append("X_");
-			append(placeNode.getPlace());		
+			append(placeNode.getPlace());
 		}
 	}
 
