@@ -118,7 +118,7 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposerWithGUI;
+import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
@@ -2552,7 +2552,7 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						ITAPNComposer composer = new TAPNComposerWithGUI(new MessengerImpl());
+						ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 						
 						if (overApproximationEnable.isSelected())
@@ -2603,7 +2603,7 @@ public class QueryDialog extends JPanel {
 			
 			openComposedNetButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					TAPNComposerWithGUI composer = new TAPNComposerWithGUI(new MessengerImpl(), guiModels);
+					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels);
 					Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);
@@ -2616,9 +2616,9 @@ public class QueryDialog extends JPanel {
 					else if (underApproximationEnable.isSelected())
 					{
 						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposerWithGUI) composer).getGuiModel());
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposer) composer).getGuiModel());
 					}
-					templates.add(new Template(transformedModel.value1(), ((TAPNComposerWithGUI) composer).getGuiModel(), new Zoomer()));
+					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();

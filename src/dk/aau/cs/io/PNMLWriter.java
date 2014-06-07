@@ -34,7 +34,7 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.verification.TAPNComposerWithGUI;
+import dk.aau.cs.verification.TAPNComposer;
 
 public class PNMLWriter implements NetWriter {
 
@@ -53,7 +53,7 @@ public class PNMLWriter implements NetWriter {
 		Document document = null;
 		Transformer transformer = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		TAPNComposerWithGUI composer = new TAPNComposerWithGUI(new MessengerImpl(), guiModels);
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels);
 		composedNetwork = composer.transformModel(network).value1();
 		
 		// Build a Petri Net XML Document

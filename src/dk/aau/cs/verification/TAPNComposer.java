@@ -35,7 +35,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
-public class TAPNComposerWithGUI implements ITAPNComposer {
+public class TAPNComposer implements ITAPNComposer {
 	private Messenger messenger;
 	private boolean hasShownMessage = false;
 
@@ -43,7 +43,7 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
 
-	public TAPNComposerWithGUI(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels){
+	public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels){
 		this.messenger = messenger;
 		
 		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -54,7 +54,7 @@ public class TAPNComposerWithGUI implements ITAPNComposer {
 		this.guiModels = newGuiModels;
 	}
 	
-	public TAPNComposerWithGUI(Messenger messenger) {
+	public TAPNComposer(Messenger messenger) {
 		this.messenger = messenger;
 	}
 	
