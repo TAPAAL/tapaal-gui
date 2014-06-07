@@ -1,11 +1,9 @@
 package dk.aau.cs.approximation;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TAPNElement;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -15,15 +13,10 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.verification.VerificationOptions;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class UnderApproximation implements ITAPNApproximation {
 	@Override
