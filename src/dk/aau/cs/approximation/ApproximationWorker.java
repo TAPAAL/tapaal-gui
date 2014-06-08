@@ -619,7 +619,7 @@ public class ApproximationWorker {
 			public void displayErrorMessage(String message, String title) {}
 			public void displayWrappedErrorMessage(String message, String title) {}
 			
-		});
+		}, false);
 		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 		return composedModel;
 	}
