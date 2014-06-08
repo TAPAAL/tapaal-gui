@@ -3,7 +3,7 @@
 <constant name="deadline" value="6"/>
 <constant name="delay" value="5"/>
 <net active="true" id="Protocol" type="P/T net">
-<labels border="true" height="575" positionX="781" positionY="68" width="166">Classical Alternating Bit Protocol with timeouts for resending messages.
+<labels border="true" height="426" positionX="782" positionY="69" width="167">Classical Alternating Bit Protocol with timeouts for resending messages.
 
 In this version of the protocol we use transport arcs to track the timestamp of each message from the point it was sent until it returns as an acknowledgement back to the sender.
 
@@ -48,10 +48,10 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="Receiver_0_A to Receive_0" inscription="[0,inf)" source="Receiver_0_A" target="Receive_0" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="626" yCoord="794"/>
-<arcpath arcPointType="false" id="1" xCoord="680" yCoord="805"/>
-<arcpath arcPointType="false" id="2" xCoord="729" yCoord="804"/>
-<arcpath arcPointType="false" id="3" xCoord="729" yCoord="144"/>
-<arcpath arcPointType="false" id="4" xCoord="655" yCoord="143"/>
+<arcpath arcPointType="false" id="1" xCoord="681" yCoord="806"/>
+<arcpath arcPointType="false" id="2" xCoord="730" yCoord="805"/>
+<arcpath arcPointType="false" id="3" xCoord="730" yCoord="145"/>
+<arcpath arcPointType="false" id="4" xCoord="656" yCoord="144"/>
 <arcpath arcPointType="false" id="5" xCoord="627" yCoord="161"/>
 </arc>
 <arc id="Sender_0_A to Send_0" inscription="[0,inf)" source="Sender_0_A" target="Send_0" type="timed" weight="1">
@@ -64,8 +64,8 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="Sender_0_B to ReSend_0" inscription="[delay,deadline]" source="Sender_0_B" target="ReSend_0" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="176" yCoord="247"/>
-<arcpath arcPointType="false" id="1" xCoord="219" yCoord="234"/>
-<arcpath arcPointType="false" id="2" xCoord="247" yCoord="247"/>
+<arcpath arcPointType="false" id="1" xCoord="220" yCoord="235"/>
+<arcpath arcPointType="false" id="2" xCoord="246" yCoord="252"/>
 </arc>
 <arc id="Sender_1_A to Send_1" inscription="[0,inf)" source="Sender_1_A" target="Send_1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="162" yCoord="476"/>
@@ -73,8 +73,8 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="Sender_1_B to ReSend_1" inscription="[delay,deadline]" source="Sender_1_B" target="ReSend_1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="176" yCoord="637"/>
-<arcpath arcPointType="false" id="1" xCoord="219" yCoord="624"/>
-<arcpath arcPointType="false" id="2" xCoord="247" yCoord="637"/>
+<arcpath arcPointType="false" id="1" xCoord="220" yCoord="625"/>
+<arcpath arcPointType="false" id="2" xCoord="246" yCoord="642"/>
 </arc>
 <arc id="Sender_1_B to Ack_rec_1" inscription="[0,inf)" source="Sender_1_B" target="Ack_rec_1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="162" yCoord="656"/>
@@ -125,8 +125,8 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="612" yCoord="447"/>
 </arc>
 <arc id="ReSend_1 to Sender_1_B" inscription="1" source="ReSend_1" target="Sender_1_B" type="normal" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="246" yCoord="647"/>
-<arcpath arcPointType="false" id="1" xCoord="219" yCoord="699"/>
+<arcpath arcPointType="false" id="0" xCoord="252" yCoord="657"/>
+<arcpath arcPointType="false" id="1" xCoord="220" yCoord="700"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="652"/>
 </arc>
 <arc id="ReSend_1 to Medium_C" inscription="1" source="ReSend_1" target="Medium_C" type="normal" weight="1">
@@ -163,11 +163,11 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="Ack_rec_1 to Sender_0_A" inscription="1" source="Ack_rec_1" target="Sender_0_A" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="162" yCoord="737"/>
-<arcpath arcPointType="false" id="1" xCoord="143" yCoord="803"/>
-<arcpath arcPointType="false" id="2" xCoord="68" yCoord="803"/>
-<arcpath arcPointType="false" id="3" xCoord="68" yCoord="38"/>
-<arcpath arcPointType="false" id="4" xCoord="173" yCoord="38"/>
-<arcpath arcPointType="false" id="5" xCoord="166" yCoord="57"/>
+<arcpath arcPointType="false" id="1" xCoord="144" yCoord="804"/>
+<arcpath arcPointType="false" id="2" xCoord="69" yCoord="804"/>
+<arcpath arcPointType="false" id="3" xCoord="69" yCoord="39"/>
+<arcpath arcPointType="false" id="4" xCoord="174" yCoord="39"/>
+<arcpath arcPointType="false" id="5" xCoord="167" yCoord="57"/>
 </arc>
 <arc id="Send_0 to Medium_A" inscription="1" source="Send_0" target="Medium_A" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="177" yCoord="161"/>
@@ -190,8 +190,8 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="389" yCoord="169"/>
 </arc>
 <arc id="ReSend_0 to Sender_0_B" inscription="1" source="ReSend_0" target="Sender_0_B" type="normal" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="246" yCoord="257"/>
-<arcpath arcPointType="false" id="1" xCoord="219" yCoord="309"/>
+<arcpath arcPointType="false" id="0" xCoord="252" yCoord="267"/>
+<arcpath arcPointType="false" id="1" xCoord="220" yCoord="310"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="262"/>
 </arc>
 <arc id="Medium_A to Receive_old_0" inscription="[0,1]:1" source="Medium_A" target="Receive_old_0" type="transport" weight="1">
@@ -211,5 +211,6 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="612" yCoord="612"/>
 </arc>
 </net>
-<query active="true" capacity="7" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Synchronization Violation" pTrie="true" query="EF ((Protocol.Sender_0_A&gt;=1 and (Protocol.Receiver_0_B&gt;=1 or Protocol.Receiver_1_A&gt;=1)) or (Protocol.Sender_1_A&gt;=1 and (Protocol.Receiver_0_A&gt;=1 or Protocol.Receiver_1_B&gt;=1)))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<query active="true" approximationDenominator="2" capacity="7" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Synchronization Violation" overApproximation="true" pTrie="true" query="EF ((Protocol.Sender_0_A &gt;= 1 and (Protocol.Receiver_0_B &gt;= 1 or Protocol.Receiver_1_A &gt;= 1)) or (Protocol.Sender_1_A &gt;= 1 and (Protocol.Receiver_0_A &gt;= 1 or Protocol.Receiver_1_B &gt;= 1)))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<k-bound bound="3"/>
 </pnml>

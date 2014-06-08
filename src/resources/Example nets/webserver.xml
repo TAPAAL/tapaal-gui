@@ -5,7 +5,7 @@
 <constant name="periodA" value="7"/>
 <constant name="periodB" value="5"/>
 <net active="true" id="WebServer" type="P/T net">
-<labels border="true" height="276" positionX="540" positionY="374" width="368">This example represents a simple webserver which can process only one request at a time.
+<labels border="true" height="202" positionX="541" positionY="375" width="369">This example represents a simple webserver which can process only one request at a time.
 
 There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
 
@@ -49,8 +49,8 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="Process to Processing" inscription="[0,deadline):1" source="Process" target="Processing" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="511" yCoord="287"/>
-<arcpath arcPointType="false" id="1" xCoord="671" yCoord="292"/>
-<arcpath arcPointType="false" id="2" xCoord="737" yCoord="203"/>
+<arcpath arcPointType="false" id="1" xCoord="672" yCoord="293"/>
+<arcpath arcPointType="false" id="2" xCoord="738" yCoord="204"/>
 </arc>
 <arc id="Process to Working" inscription="1" source="Process" target="Working" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="512" yCoord="277"/>
@@ -58,7 +58,7 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="Processing to SendReply" inscription="[0,deadline]:1" source="Processing" target="SendReply" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="736" yCoord="181"/>
-<arcpath arcPointType="false" id="1" xCoord="667" yCoord="117"/>
+<arcpath arcPointType="false" id="1" xCoord="668" yCoord="118"/>
 <arcpath arcPointType="false" id="2" xCoord="512" yCoord="112"/>
 </arc>
 <arc id="SendReply to Responses" inscription="[0,deadline]:1" source="SendReply" target="Responses" type="transport" weight="1">
@@ -75,7 +75,7 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="SendRequestA to UserA" inscription="1" source="SendRequestA" target="UserA" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="152" yCoord="407"/>
-<arcpath arcPointType="false" id="1" xCoord="229" yCoord="469"/>
+<arcpath arcPointType="false" id="1" xCoord="230" yCoord="470"/>
 <arcpath arcPointType="false" id="2" xCoord="158" yCoord="527"/>
 </arc>
 <arc id="SendRequestB to Requests" inscription="1" source="SendRequestB" target="Requests" type="normal" weight="1">
@@ -84,13 +84,14 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="SendRequestB to UserB" inscription="1" source="SendRequestB" target="UserB" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="406" yCoord="407"/>
-<arcpath arcPointType="false" id="1" xCoord="484" yCoord="469"/>
-<arcpath arcPointType="false" id="2" xCoord="414" yCoord="513"/>
+<arcpath arcPointType="false" id="1" xCoord="485" yCoord="470"/>
+<arcpath arcPointType="false" id="2" xCoord="414" yCoord="514"/>
 </arc>
 <arc id="Drop to Dropped" inscription="1" source="Drop" target="Dropped" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="146" yCoord="186"/>
 <arcpath arcPointType="false" id="1" xCoord="146" yCoord="131"/>
 </arc>
 </net>
-<query active="true" capacity="6" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="5 responses, no drops" pTrie="true" query="EF (WebServer.Responses=5 and WebServer.Dropped=0)" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<query active="true" approximationDenominator="2" capacity="6" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="5 responses, no drops" overApproximation="true" pTrie="true" query="EF (WebServer.Responses = 5 and WebServer.Dropped = 0)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<k-bound bound="3"/>
 </pnml>

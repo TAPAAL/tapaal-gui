@@ -8,7 +8,7 @@
 <constant name="minInDangerZone" value="3"/>
 <constant name="maxInDangerZone" value="6"/>
 <net active="true" id="Train" type="P/T net">
-<labels border="true" height="109" positionX="145" positionY="329" width="405">This is a simple train level crossing model consisting of two components, the train model and traffic light controller. Trains may arrive at arbitrary moments and activate a sensor (via the shared transition SensorActivation) that gives signal to the traffic light controller. The model contains different constants and for some of them the crossing is save (train in danger zone implies that the light is red) and some other, for example by decreasing the RedDuration constant by one, may cause collisions.</labels>
+<labels border="true" height="95" positionX="146" positionY="315" width="406">This is a simple train level crossing model consisting of two components, the train model and traffic light controller. Trains may arrive at arbitrary moments and activate a sensor (via the shared transition SensorActivation) that gives signal to the traffic light controller. The model contains different constants and for some of them the crossing is save (train in danger zone implies that the light is red) and some other, for example by decreasing the RedDuration constant by one, may cause collisions.</labels>
 <place id="Trains" initialMarking="5" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Trains" nameOffsetX="29.444444444444443" nameOffsetY="5.000000000000007" positionX="285.0" positionY="45.0"/>
 <place id="Approaching" initialMarking="0" invariant="&lt;= maxTimeToLeveler" markingOffsetX="0.0" markingOffsetY="0.0" name="Approaching" nameOffsetX="116.00000000000003" nameOffsetY="49.44444444444443" positionX="120.0" positionY="210.0"/>
 <place id="DangerZone" initialMarking="0" invariant="&lt;= maxInDangerZone" markingOffsetX="0.0" markingOffsetY="0.0" name="DangerZone" nameOffsetX="131.6666666666667" nameOffsetY="52.77777777777779" positionX="555.0" positionY="210.0"/>
@@ -77,12 +77,12 @@
 </arc>
 <arc id="RedTimerReset to Red" inscription="1" source="RedTimerReset" target="Red" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="406" yCoord="167"/>
-<arcpath arcPointType="true" id="1" xCoord="577" yCoord="188"/>
+<arcpath arcPointType="true" id="1" xCoord="578" yCoord="189"/>
 <arcpath arcPointType="false" id="2" xCoord="717" yCoord="164"/>
 </arc>
 <arc id="Red to RedTimerReset" inscription="[0,inf)" source="Red" target="RedTimerReset" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="717" yCoord="158"/>
-<arcpath arcPointType="true" id="1" xCoord="516" yCoord="141"/>
+<arcpath arcPointType="true" id="1" xCoord="517" yCoord="142"/>
 <arcpath arcPointType="false" id="2" xCoord="407" yCoord="157"/>
 </arc>
 <arc id="RedRequested to GreenToYellow" inscription="[0,inf)" source="RedRequested" target="GreenToYellow" type="timed" weight="1">
@@ -99,12 +99,12 @@
 </arc>
 <arc id="Yellow to YellowStaysYellow" inscription="[0,inf):1" source="Yellow" target="YellowStaysYellow" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="417" yCoord="399"/>
-<arcpath arcPointType="true" id="1" xCoord="321" yCoord="357"/>
+<arcpath arcPointType="true" id="1" xCoord="322" yCoord="358"/>
 <arcpath arcPointType="false" id="2" xCoord="251" yCoord="271"/>
 </arc>
 <arc id="YellowStaysYellow to Yellow" inscription="[0,inf):1" source="YellowStaysYellow" target="Yellow" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="266" yCoord="267"/>
-<arcpath arcPointType="true" id="1" xCoord="383" yCoord="338"/>
+<arcpath arcPointType="true" id="1" xCoord="384" yCoord="339"/>
 <arcpath arcPointType="false" id="2" xCoord="422" yCoord="390"/>
 </arc>
 <arc id="SensorActivation to RedRequested" inscription="1" source="SensorActivation" target="RedRequested" type="normal" weight="1">
@@ -112,5 +112,6 @@
 <arcpath arcPointType="false" id="1" xCoord="117" yCoord="147"/>
 </arc>
 </net>
-<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Crossing is Save" pTrie="true" query="AG (!(Train.DangerZone&gt;0) or TraficLight.Red=1)" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Crossing is Save" overApproximation="true" pTrie="true" query="AG (!(Train.DangerZone &gt; 0) or TraficLight.Red = 1)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<k-bound bound="3"/>
 </pnml>
