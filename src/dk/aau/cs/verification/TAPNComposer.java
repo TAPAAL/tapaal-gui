@@ -38,13 +38,13 @@ import dk.aau.cs.util.Tuple;
 public class TAPNComposer implements ITAPNComposer {
 	private Messenger messenger;
 	private boolean hasShownMessage = false;
-	private boolean singleComponentSimplify = true; // if set to true then nets with single components will have not net prefix
+	private boolean singleComponentPrefix = false; // if set to true then nets with only a single component have no prefix before places/transitions 
 
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
 
-	public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentSimplify){
+	public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentPrefix){
 		this.messenger = messenger;
 		
 		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -53,12 +53,12 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 		
 		this.guiModels = newGuiModels;
-		this.singleComponentSimplify = singleComponentSimplify;
+		this.singleComponentPrefix = singleComponentPrefix;
 	}
 	
-	public TAPNComposer(Messenger messenger, boolean singleComponentSimplify) {
+	public TAPNComposer(Messenger messenger, boolean singleComponentPrefix) {
 		this.messenger = messenger;
-		this.singleComponentSimplify = singleComponentSimplify;
+		this.singleComponentPrefix = singleComponentPrefix;
 	}
 	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
@@ -150,7 +150,7 @@ public class TAPNComposer implements ITAPNComposer {
 	
 	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for(SharedPlace place : model.sharedPlaces()){
-			String uniquePlaceName = (!singleComponentSimplify || model.activeTemplates().size() > 1) ? "Shared_" + place.name() : place.name();
+			String uniquePlaceName = (!singleComponentPrefix || model.activeTemplates().size() > 1) ? "Shared_" + place.name() : place.name();
 			
 			LocalTimedPlace constructedPlace = null;
 			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
@@ -201,7 +201,7 @@ public class TAPNComposer implements ITAPNComposer {
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if(!timedPlace.isShared()){
-					String uniquePlaceName = (!singleComponentSimplify || model.activeTemplates().size() > 1) ? ((LocalTimedPlace)timedPlace).model().name() + "_" + timedPlace.name() : timedPlace.name();
+					String uniquePlaceName = (!singleComponentPrefix || model.activeTemplates().size() > 1) ? ((LocalTimedPlace)timedPlace).model().name() + "_" + timedPlace.name() : timedPlace.name();
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
@@ -260,7 +260,7 @@ public class TAPNComposer implements ITAPNComposer {
 					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
 					if(!timedTransition.isOrphan()){
 						String uniqueTransitionName = "";
-						if (!singleComponentSimplify || model.activeTemplates().size() > 1) {
+						if (!singleComponentPrefix || model.activeTemplates().size() > 1) {
 							uniqueTransitionName = ( ! timedTransition.isShared()) ? timedTransition.model().name() + "_" + timedTransition.name() : "Shared_" + timedTransition.name();
 						} else {
 							uniqueTransitionName = timedTransition.name();
