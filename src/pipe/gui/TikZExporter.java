@@ -126,10 +126,18 @@ public class TikZExporter {
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel = "";
-		if (arc instanceof TimedInputArcComponent
-				&& !net.netType().equals(NetType.UNTIMED)) {
+		if (arc instanceof TimedInputArcComponent) {
+                        if (net.netType().equals(NetType.UNTIMED)) {
+                                if (arc.getWeight().value() > 1) {
+                                        arcLabel += "node[midway,auto] {$" + arc.getWeight().value() + "\\times\\ $}";
+                                }
+                                return arcLabel;
+                        }    
 			if (!(arc.getSource() instanceof TimedTransitionComponent)) {
 				arcLabel = "node[midway,auto] {";
+                                if (arc.getWeight().value() > 1) {
+                                        arcLabel += "$" + arc.getWeight().value() + "\\times\\ $";
+                                }
 				arcLabel += replaceWithMathLatex(((TimedInputArcComponent) arc)
 						.getGuardAsString());
 
@@ -140,10 +148,17 @@ public class TikZExporter {
 				arcLabel += "}";
 			} else {
 				if (arc instanceof TimedTransportArcComponent)
-					arcLabel = "node[midway,auto] {"
-							+ ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "}";
+					arcLabel = "node[midway,auto] {";
+                                        if (arc.getWeight().value() > 1) {
+                                                arcLabel += "$" + arc.getWeight().value() + "\\times\\ $";
+                                        }
+					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "}";
 			}
-		}
+		} else {
+                        if (arc.getWeight().value() > 1) {
+                                arcLabel += "node[midway,auto] { $" + arc.getWeight().value() + "\\times\\ $}";
+                        }
+                }
 		return arcLabel;
 	}
 
