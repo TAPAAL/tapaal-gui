@@ -42,7 +42,6 @@ import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
-import pipe.gui.CreateGui;
 
 public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
