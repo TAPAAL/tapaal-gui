@@ -2552,7 +2552,7 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
+						ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 						
 						if (overApproximationEnable.isSelected())
@@ -2603,7 +2603,7 @@ public class QueryDialog extends JPanel {
 			
 			openComposedNetButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels);
+					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true);
 					Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);
