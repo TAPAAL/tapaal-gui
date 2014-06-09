@@ -42,6 +42,7 @@ import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
+import pipe.gui.CreateGui;
 
 public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
@@ -396,7 +397,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			return inputArc.getGuardAsString();
 		}
 	}
-
+                
 	private Element createArcPoint(String x, String y, String type, Document document, int id) {
 		Require.that(document != null, "Error: document was null");
 		Element arcPoint = document.createElement("arcpath");

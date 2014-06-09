@@ -138,7 +138,7 @@ public class TikZExporter {
                                 if (arc.getWeight().value() > 1) {
                                         arcLabel += "$" + arc.getWeight().value() + "\\times\\ $";
                                 }
-				arcLabel += replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsStringNoShowZeroToInfinityIntervals());
+				arcLabel += "$" + replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsStringNoShowZeroToInfinityIntervals()) + "$";
 				if (arc instanceof TimedTransportArcComponent)
 					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
 				arcLabel += "}";
@@ -245,7 +245,7 @@ public class TikZExporter {
 		String invariant = "";
 
 		if (!((TimedPlaceComponent) place).getInvariantAsString().contains("inf"))
-			invariant = "label=315:inv: " + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + ",";
+			invariant = "label=315:inv: $\\mathit{" + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + "}$,";
 		return invariant;
 	}
 
@@ -288,7 +288,7 @@ public class TikZExporter {
 	}
 
 	protected String replaceWithMathLatex(String text) {
-		return "$" + text.replace("inf", "\\infty").replace("<=", "\\leq ").replace("*", "\\cdot ") + "$";
+		return text.replace("inf", "\\infty").replace("<=", "\\leq ").replace("*", "\\cdot ");
 	}
 
 	private String exportMathName(String name) {
