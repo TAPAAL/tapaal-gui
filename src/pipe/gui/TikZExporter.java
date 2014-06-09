@@ -167,7 +167,7 @@ public class TikZExporter {
 
 			out.append("\\node[transition");
 			out.append(angle);
-			out.append(",label=above:");
+			out.append(",label=135:");
 			out.append(exportMathName(trans.getName()));
 			out.append("] at (");
 			out.append(RoundCoordinate(trans.getPositionX()));
@@ -202,7 +202,7 @@ public class TikZExporter {
 			String invariant = getPlaceInvariantString(place);
 			String tokensInPlace = getTokenListStringFor(place);
 
-			out.append("\\node[place,label=above:");
+			out.append("\\node[place,label=135:");
 			out.append(exportMathName(place.getName()));
 			out.append(',');
 			out.append(invariant);
@@ -245,7 +245,7 @@ public class TikZExporter {
 		String invariant = "";
 
 		if (!((TimedPlaceComponent) place).getInvariantAsString().contains("inf"))
-			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + ",";
+			invariant = "label=315:inv: " + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + ",";
 		return invariant;
 	}
 
@@ -271,6 +271,8 @@ public class TikZExporter {
 		StringBuffer out = new StringBuffer();
 
 		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=1, yscale=1]\n");
+                out.append("%% the figure can be scaled by changing xscale and y scale and positions of labels\n");
+                out.append("%% that are currently fixed to label=135 degrees can be adjusted so that they do not cover arcs\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 
 		if (!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
