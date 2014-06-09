@@ -29,6 +29,10 @@ public class TikZExporter {
 	private String fullpath;
 	private TikZOutputOption option;
 	private double scale = 1.0 / 55.0;
+        
+        private double RoundCoordinate(double position) {
+            return Math.round(position * scale * 10)/10.0d;
+        }
 
 	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option) {
 		this.net = net;
@@ -89,8 +93,7 @@ public class TikZExporter {
 			String arcPoints = "";
 			for (int i = 1; i < arc.getArcPath().getEndIndex(); i++) {
 				ArcPathPoint point = arc.getArcPath().getArcPathPoint(i);
-				arcPoints += "-- (" + point.getX() * scale + "," + point.getY()
-						* scale * (-1) + ") ";
+				arcPoints += "-- (" + RoundCoordinate(point.getX()) + "," + RoundCoordinate(point.getY() * (-1)) + ") ";
 			}
 
 			String arrowType = "";
@@ -156,9 +159,9 @@ public class TikZExporter {
 			out.append(",label=above:");
 			out.append(exportMathName(trans.getName()));
 			out.append("] at (");
-			out.append(trans.getPositionX() * scale);
+			out.append(RoundCoordinate(trans.getPositionX()));
 			out.append(',');
-			out.append(trans.getPositionY() * scale * (-1));
+			out.append(RoundCoordinate(trans.getPositionY() * (-1)));
 			out.append(") (");
 			out.append(trans.getId());
 			out.append(") {};\n");
@@ -194,9 +197,9 @@ public class TikZExporter {
 			out.append(invariant);
 			out.append(tokensInPlace);
 			out.append("] at (");
-			out.append(place.getPositionX() * scale);
+			out.append(RoundCoordinate(place.getPositionX()));
 			out.append(',');
-			out.append(place.getPositionY() * scale * (-1));
+			out.append(RoundCoordinate(place.getPositionY() * (-1)));
 			out.append(") (");
 			out.append(place.getId());
 			out.append(") {};\n");
@@ -256,7 +259,7 @@ public class TikZExporter {
 	private StringBuffer exportTikZstyle() {
 		StringBuffer out = new StringBuffer();
 
-		out.append("\\begin{tikzpicture}[font=\\scriptsize]\n");
+		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=1, yscale=1]\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 
 		if (!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
