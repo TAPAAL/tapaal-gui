@@ -170,6 +170,14 @@ public class TikZExporter {
 				out.append(trans.getId());
 				out.append(".center) { };\n");
 			}
+                        
+                        if(((TimedTransitionComponent)trans).underlyingTransition().isUrgent()){
+				out.append("\\node[urgenttransition");
+				out.append(angle);
+				out.append("] at (");
+				out.append(trans.getId());
+				out.append(".center) { };\n");
+			}
 		}
 		return out;
 	}
@@ -259,6 +267,7 @@ public class TikZExporter {
 		out.append("\\tikzstyle{every token}=[fill=white,text=black]\n");
 		out.append("\\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]\n");
 		out.append("\\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]\n");
+                out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]");
 		return out;
 	}
 
