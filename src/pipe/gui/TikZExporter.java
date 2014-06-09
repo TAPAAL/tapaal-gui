@@ -267,7 +267,7 @@ public class TikZExporter {
 	}
 
 	private String exportMathName(String name) {
-		StringBuffer out = new StringBuffer("$");
+		StringBuffer out = new StringBuffer("$\\mathit{");
 		int subscripts = 0;
 		for (int i = 0; i < name.length() - 1; i++) {
 			char c = name.charAt(i);
@@ -288,7 +288,7 @@ public class TikZExporter {
 		for (int i = 0; i < subscripts; i++) {
 			out.append('}');
 		}
-		out.append('$');
+		out.append("}$");
 		return out.toString();
 	}
 
