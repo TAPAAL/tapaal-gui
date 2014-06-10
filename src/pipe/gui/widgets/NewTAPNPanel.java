@@ -15,8 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import org.jdesktop.swingx.MultiSplitLayout;
-
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;

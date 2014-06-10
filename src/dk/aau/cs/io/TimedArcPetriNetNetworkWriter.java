@@ -396,7 +396,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			return inputArc.getGuardAsString();
 		}
 	}
-
+                
 	private Element createArcPoint(String x, String y, String type, Document document, int id) {
 		Require.that(document != null, "Error: document was null");
 		Element arcPoint = document.createElement("arcpath");
