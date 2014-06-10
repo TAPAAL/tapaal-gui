@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="Protocol" type="P/T net">
-<labels border="true" height="381" positionX="36" positionY="509" width="124">There are four places A, B, C, and CS 
+<labels border="true" height="277" positionX="22" positionY="510" width="125">There are four places A, B, C, and CS 
 and their dual places A_, B_, C_, and CS_
 There is always at most one token in
 either of the dual places representing
@@ -39,8 +39,8 @@ of processes.
 <transition angle="0" id="GenerateProcesses" infiniteServer="false" name="GenerateProcesses" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="0.0" priority="0" urgent="false"/>
 <arc id="A_ to Choose2A" inscription="[0,inf)" source="A_" target="Choose2A" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="172" yCoord="121"/>
-<arcpath arcPointType="false" id="1" xCoord="222" yCoord="72"/>
-<arcpath arcPointType="false" id="2" xCoord="672" yCoord="72"/>
+<arcpath arcPointType="false" id="1" xCoord="223" yCoord="73"/>
+<arcpath arcPointType="false" id="2" xCoord="673" yCoord="73"/>
 <arcpath arcPointType="false" id="3" xCoord="672" yCoord="87"/>
 </arc>
 <arc id="A to Initiate" inscription="[0,inf)" source="A" target="Initiate" type="timed" weight="1">
@@ -72,10 +72,10 @@ of processes.
 <arcpath arcPointType="false" id="1" xCoord="676" yCoord="192"/>
 </arc>
 <arc id="B_ to Exit2B" inscription="[0,inf)" source="B_" target="Exit2B" type="timed" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="837" yCoord="132"/>
-<arcpath arcPointType="false" id="1" xCoord="972" yCoord="132"/>
-<arcpath arcPointType="false" id="2" xCoord="972" yCoord="762"/>
-<arcpath arcPointType="false" id="3" xCoord="432" yCoord="762"/>
+<arcpath arcPointType="false" id="0" xCoord="836" yCoord="132"/>
+<arcpath arcPointType="false" id="1" xCoord="973" yCoord="133"/>
+<arcpath arcPointType="false" id="2" xCoord="973" yCoord="763"/>
+<arcpath arcPointType="false" id="3" xCoord="433" yCoord="763"/>
 <arcpath arcPointType="false" id="4" xCoord="402" yCoord="687"/>
 </arc>
 <arc id="B_ to Choose3" inscription="[0,2]" source="B_" target="Choose3" type="timed" weight="1">
@@ -84,12 +84,12 @@ of processes.
 </arc>
 <arc id="udf to Initiate" inscription="[0,inf)" source="udf" target="Initiate" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="395" yCoord="268"/>
-<arcpath arcPointType="false" id="1" xCoord="372" yCoord="222"/>
+<arcpath arcPointType="false" id="1" xCoord="373" yCoord="223"/>
 <arcpath arcPointType="false" id="2" xCoord="402" yCoord="147"/>
 </arc>
 <arc id="udf to Fail1" inscription="[0,inf)" source="udf" target="Fail1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="416" yCoord="285"/>
-<arcpath arcPointType="false" id="1" xCoord="865" yCoord="406"/>
+<arcpath arcPointType="false" id="1" xCoord="866" yCoord="407"/>
 <arcpath arcPointType="false" id="2" xCoord="1041" yCoord="377"/>
 </arc>
 <arc id="udf to Fail2" inscription="[0,inf)" source="udf" target="Fail2" type="timed" weight="1">
@@ -98,7 +98,7 @@ of processes.
 </arc>
 <arc id="udf to Choose1" inscription="[0,inf)" source="udf" target="Choose1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="416" yCoord="286"/>
-<arcpath arcPointType="false" id="1" xCoord="492" yCoord="312"/>
+<arcpath arcPointType="false" id="1" xCoord="493" yCoord="313"/>
 <arcpath arcPointType="false" id="2" xCoord="552" yCoord="417"/>
 </arc>
 <arc id="udf to Exit3" inscription="[0,inf)" source="udf" target="Exit3" type="timed" weight="1">
@@ -107,7 +107,7 @@ of processes.
 </arc>
 <arc id="C to Fail2" inscription="[0,inf)" source="C" target="Fail2" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="149" yCoord="424"/>
-<arcpath arcPointType="false" id="1" xCoord="82" yCoord="382"/>
+<arcpath arcPointType="false" id="1" xCoord="83" yCoord="383"/>
 <arcpath arcPointType="false" id="2" xCoord="42" yCoord="282"/>
 </arc>
 <arc id="CS to Exit2B" inscription="[0,inf)" source="CS" target="Exit2B" type="timed" weight="1">
@@ -139,19 +139,19 @@ of processes.
 <arcpath arcPointType="false" id="1" xCoord="402" yCoord="447"/>
 </arc>
 <arc id="C_ to Exit2C" inscription="[0,inf)" source="C_" target="Exit2C" type="timed" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="822" yCoord="597"/>
-<arcpath arcPointType="false" id="1" xCoord="822" yCoord="732"/>
-<arcpath arcPointType="false" id="2" xCoord="492" yCoord="732"/>
+<arcpath arcPointType="false" id="0" xCoord="822" yCoord="596"/>
+<arcpath arcPointType="false" id="1" xCoord="823" yCoord="733"/>
+<arcpath arcPointType="false" id="2" xCoord="493" yCoord="733"/>
 <arcpath arcPointType="false" id="3" xCoord="462" yCoord="687"/>
 </arc>
 <arc id="C_ to Fail1" inscription="[0,inf)" source="C_" target="Fail1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="836" yCoord="578"/>
-<arcpath arcPointType="false" id="1" xCoord="1042" yCoord="532"/>
+<arcpath arcPointType="false" id="1" xCoord="1043" yCoord="533"/>
 <arcpath arcPointType="false" id="2" xCoord="1047" yCoord="387"/>
 </arc>
 <arc id="C_ to Choose2C" inscription="[0,inf)" source="C_" target="Choose2C" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="828" yCoord="568"/>
-<arcpath arcPointType="false" id="1" xCoord="927" yCoord="357"/>
+<arcpath arcPointType="false" id="1" xCoord="928" yCoord="358"/>
 <arcpath arcPointType="false" id="2" xCoord="676" yCoord="312"/>
 </arc>
 <arc id="C_ to Enter" inscription="(2,inf)" source="C_" target="Enter" type="timed" weight="1">
@@ -164,12 +164,12 @@ of processes.
 </arc>
 <arc id="Initiate to udf" inscription="1" source="Initiate" target="udf" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="406" yCoord="137"/>
-<arcpath arcPointType="false" id="1" xCoord="462" yCoord="222"/>
+<arcpath arcPointType="false" id="1" xCoord="463" yCoord="223"/>
 <arcpath arcPointType="false" id="2" xCoord="412" yCoord="271"/>
 </arc>
 <arc id="Choose2B to B" inscription="1" source="Choose2B" target="B" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="672" yCoord="177"/>
-<arcpath arcPointType="false" id="1" xCoord="672" yCoord="162"/>
+<arcpath arcPointType="false" id="1" xCoord="673" yCoord="163"/>
 <arcpath arcPointType="false" id="2" xCoord="566" yCoord="135"/>
 </arc>
 <arc id="Choose2B to C_" inscription="1" source="Choose2B" target="C_" type="normal" weight="1">
@@ -178,8 +178,8 @@ of processes.
 </arc>
 <arc id="Choose2CS to CS" inscription="1" source="Choose2CS" target="CS" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="672" yCoord="447"/>
-<arcpath arcPointType="false" id="1" xCoord="672" yCoord="552"/>
-<arcpath arcPointType="false" id="2" xCoord="312" yCoord="552"/>
+<arcpath arcPointType="false" id="1" xCoord="673" yCoord="553"/>
+<arcpath arcPointType="false" id="2" xCoord="313" yCoord="553"/>
 <arcpath arcPointType="false" id="3" xCoord="292" yCoord="571"/>
 </arc>
 <arc id="Choose2CS to C_" inscription="1" source="Choose2CS" target="C_" type="normal" weight="1">
@@ -192,13 +192,13 @@ of processes.
 </arc>
 <arc id="Exit2B to B" inscription="1" source="Exit2B" target="B" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="396" yCoord="677"/>
-<arcpath arcPointType="false" id="1" xCoord="177" yCoord="627"/>
-<arcpath arcPointType="false" id="2" xCoord="102" yCoord="252"/>
+<arcpath arcPointType="false" id="1" xCoord="178" yCoord="628"/>
+<arcpath arcPointType="false" id="2" xCoord="103" yCoord="253"/>
 <arcpath arcPointType="false" id="3" xCoord="537" yCoord="135"/>
 </arc>
 <arc id="Exit2B to udf" inscription="1" source="Exit2B" target="udf" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="402" yCoord="657"/>
-<arcpath arcPointType="false" id="1" xCoord="492" yCoord="492"/>
+<arcpath arcPointType="false" id="1" xCoord="493" yCoord="493"/>
 <arcpath arcPointType="false" id="2" xCoord="407" yCoord="295"/>
 </arc>
 <arc id="Exit2C to A" inscription="1" source="Exit2C" target="A" type="normal" weight="1">
@@ -207,13 +207,13 @@ of processes.
 </arc>
 <arc id="Exit2C to udf" inscription="1" source="Exit2C" target="udf" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="462" yCoord="657"/>
-<arcpath arcPointType="false" id="1" xCoord="522" yCoord="492"/>
+<arcpath arcPointType="false" id="1" xCoord="523" yCoord="493"/>
 <arcpath arcPointType="false" id="2" xCoord="409" yCoord="295"/>
 </arc>
 <arc id="Exit2C to C" inscription="1" source="Exit2C" target="C" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="456" yCoord="677"/>
-<arcpath arcPointType="false" id="1" xCoord="207" yCoord="597"/>
-<arcpath arcPointType="false" id="2" xCoord="165" yCoord="446"/>
+<arcpath arcPointType="false" id="1" xCoord="208" yCoord="598"/>
+<arcpath arcPointType="false" id="2" xCoord="166" yCoord="446"/>
 </arc>
 <arc id="Exit2CS to A" inscription="1" source="Exit2CS" target="A" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="522" yCoord="657"/>
@@ -221,7 +221,7 @@ of processes.
 </arc>
 <arc id="Exit2CS to udf" inscription="1" source="Exit2CS" target="udf" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="522" yCoord="657"/>
-<arcpath arcPointType="false" id="1" xCoord="552" yCoord="492"/>
+<arcpath arcPointType="false" id="1" xCoord="553" yCoord="493"/>
 <arcpath arcPointType="false" id="2" xCoord="410" yCoord="294"/>
 </arc>
 <arc id="Exit2CS to CS" inscription="1" source="Exit2CS" target="CS" type="normal" weight="1">
@@ -230,19 +230,19 @@ of processes.
 </arc>
 <arc id="Fail1 to B_" inscription="1" source="Fail1" target="B_" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="1047" yCoord="357"/>
-<arcpath arcPointType="false" id="1" xCoord="1056" yCoord="66"/>
-<arcpath arcPointType="false" id="2" xCoord="831" yCoord="81"/>
+<arcpath arcPointType="false" id="1" xCoord="1057" yCoord="67"/>
+<arcpath arcPointType="false" id="2" xCoord="832" yCoord="82"/>
 <arcpath arcPointType="false" id="3" xCoord="824" yCoord="117"/>
 </arc>
 <arc id="Fail1 to udf" inscription="1" source="Fail1" target="udf" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="1042" yCoord="367"/>
-<arcpath arcPointType="false" id="1" xCoord="907" yCoord="307"/>
+<arcpath arcPointType="false" id="1" xCoord="908" yCoord="308"/>
 <arcpath arcPointType="false" id="2" xCoord="416" yCoord="282"/>
 </arc>
 <arc id="Fail2 to B" inscription="1" source="Fail2" target="B" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="42" yCoord="252"/>
-<arcpath arcPointType="false" id="1" xCoord="82" yCoord="67"/>
-<arcpath arcPointType="false" id="2" xCoord="577" yCoord="37"/>
+<arcpath arcPointType="false" id="1" xCoord="83" yCoord="68"/>
+<arcpath arcPointType="false" id="2" xCoord="578" yCoord="38"/>
 <arcpath arcPointType="false" id="3" xCoord="555" yCoord="117"/>
 </arc>
 <arc id="Fail2 to udf" inscription="1" source="Fail2" target="udf" type="normal" weight="1">
@@ -255,7 +255,7 @@ of processes.
 </arc>
 <arc id="Choose2C to C" inscription="1" source="Choose2C" target="C" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="666" yCoord="317"/>
-<arcpath arcPointType="false" id="1" xCoord="222" yCoord="372"/>
+<arcpath arcPointType="false" id="1" xCoord="223" yCoord="373"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="421"/>
 </arc>
 <arc id="Choose2C to C_" inscription="1" source="Choose2C" target="C_" type="normal" weight="1">
@@ -272,7 +272,7 @@ of processes.
 </arc>
 <arc id="Exit3 to udf" inscription="1" source="Exit3" target="udf" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="282" yCoord="417"/>
-<arcpath arcPointType="false" id="1" xCoord="342" yCoord="282"/>
+<arcpath arcPointType="false" id="1" xCoord="343" yCoord="283"/>
 <arcpath arcPointType="false" id="2" xCoord="387" yCoord="282"/>
 </arc>
 <arc id="Exit1 to A" inscription="1" source="Exit1" target="A" type="normal" weight="1">
@@ -289,7 +289,7 @@ of processes.
 </arc>
 <arc id="Choose2A to A" inscription="1" source="Choose2A" target="A" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="667" yCoord="97"/>
-<arcpath arcPointType="false" id="1" xCoord="312" yCoord="102"/>
+<arcpath arcPointType="false" id="1" xCoord="313" yCoord="103"/>
 <arcpath arcPointType="false" id="2" xCoord="292" yCoord="121"/>
 </arc>
 <arc id="Choose2A to C_" inscription="1" source="Choose2A" target="C_" type="normal" weight="1">
@@ -301,7 +301,8 @@ of processes.
 <arcpath arcPointType="false" id="1" xCoord="274" yCoord="118"/>
 </arc>
 </net>
-<query active="true" capacity="10" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion 10 Processes" pTrie="true" query="AG (Protocol.CS&lt;=1 and Protocol.CS_&lt;=1 and (Protocol.CS&lt;=0 or Protocol.CS_&lt;=0))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
-<query active="true" capacity="15" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion 15 Processes" pTrie="true" query="AG (Protocol.CS&lt;=1 and Protocol.CS_&lt;=1 and (Protocol.CS&lt;=0 or Protocol.CS_&lt;=0))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
-<query active="true" capacity="20" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion 20 Processes" pTrie="true" query="AG (Protocol.CS&lt;=1 and Protocol.CS_&lt;=1 and (Protocol.CS&lt;=0 or Protocol.CS_&lt;=0))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<query active="true" approximationDenominator="2" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion 10 Processes" overApproximation="true" pTrie="true" query="AG (Protocol.CS &lt;= 1 and Protocol.CS_ &lt;= 1 and (Protocol.CS &lt;= 0 or Protocol.CS_ &lt;= 0))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<query active="true" approximationDenominator="2" capacity="15" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion 15 Processes" overApproximation="true" pTrie="true" query="AG (Protocol.CS &lt;= 1 and Protocol.CS_ &lt;= 1 and (Protocol.CS &lt;= 0 or Protocol.CS_ &lt;= 0))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<query active="true" approximationDenominator="2" capacity="20" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion 20 Processes" overApproximation="true" pTrie="true" query="AG (Protocol.CS &lt;= 1 and Protocol.CS_ &lt;= 1 and (Protocol.CS &lt;= 0 or Protocol.CS_ &lt;= 0))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<k-bound bound="3"/>
 </pnml>

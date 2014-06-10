@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="ProducerConsumer" type="P/T net">
-<labels border="true" height="109" positionX="516" positionY="163" width="183">By firing the transition Transport the produced items are moved to the place Ready. Transport arcs are used for this purpose so that the age of each item is preserved.</labels>
-<labels border="true" height="79" positionX="843" positionY="82" width="168">Consumer is consuming (with certain time restrictions) items that have not yet reached the age of 3.</labels>
-<labels border="true" height="58" positionX="459" positionY="463" width="168">Items that reach the age of 3 have to be Collected into the Garbage place.</labels>
-<labels border="true" height="79" positionX="155" positionY="73" width="183">Producer is producing items with certain time restrictions
+<labels border="true" height="110" positionX="517" positionY="164" width="184">By firing the transition Transport the produced items are moved to the place Ready. Transport arcs are used for this purpose so that the age of each item is preserved.</labels>
+<labels border="true" height="80" positionX="844" positionY="83" width="169">Consumer is consuming (with certain time restrictions) items that have not yet reached the age of 3.</labels>
+<labels border="true" height="59" positionX="460" positionY="464" width="169">Items that reach the age of 3 have to be Collected into the Garbage place.</labels>
+<labels border="true" height="80" positionX="156" positionY="74" width="184">Producer is producing items with certain time restrictions
 and these items wait in place In_transit for Transport.</labels>
 <place id="Ready_to_produce" initialMarking="1" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="Ready_to_produce" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="195.0"/>
 <place id="Recover" initialMarking="0" invariant="&lt;= 5" markingOffsetX="0.0" markingOffsetY="0.0" name="Recover" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="435.0"/>
@@ -76,6 +76,7 @@ and these items wait in place In_transit for Transport.</labels>
 <arcpath arcPointType="false" id="1" xCoord="702" yCoord="552"/>
 </arc>
 </net>
-<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Three in Garbage" pTrie="true" query="EF ProducerConsumer.Garbage=3" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
-<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Avoid Garbage" pTrie="true" query="EG ProducerConsumer.Garbage=0" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Three in Garbage" overApproximation="true" pTrie="true" query="EF ProducerConsumer.Garbage = 3" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Avoid Garbage" overApproximation="false" pTrie="true" query="EG ProducerConsumer.Garbage = 0" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<k-bound bound="3"/>
 </pnml>

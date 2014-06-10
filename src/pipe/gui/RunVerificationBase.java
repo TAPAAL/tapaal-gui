@@ -74,7 +74,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-		ITAPNComposer composer = new TAPNComposer(messenger);
+		ITAPNComposer composer = new TAPNComposer(messenger, false);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
 		if (options.enableOverApproximation())

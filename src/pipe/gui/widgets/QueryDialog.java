@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -2169,6 +2171,18 @@ public class QueryDialog extends JPanel {
 		approximationRadioButtonGroup.add(overApproximationEnable);
 		approximationRadioButtonGroup.add(underApproximationEnable);
 		
+		Enumeration<AbstractButton> buttons = approximationRadioButtonGroup.getElements(); 
+		
+		while(buttons.hasMoreElements()){
+			AbstractButton button = buttons.nextElement(); 
+			button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					setEnabledOptionsAccordingToCurrentReduction();
+				}
+			});
+		}
+		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
@@ -2402,7 +2416,17 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(false);
 		}
-		else{
+		else if((((String)reductionOption.getSelectedItem()).equals(name_COMBI) ||
+				((String)reductionOption.getSelectedItem()).equals(name_OPTIMIZEDSTANDARD) ||
+				((String)reductionOption.getSelectedItem()).equals(name_STANDARD) ||
+				((String)reductionOption.getSelectedItem()).equals(name_BROADCAST) ||
+				((String)reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)) &&
+				(!noApproximationEnable.isSelected()) 
+				){
+			symmetryReduction.setVisible(true);
+			symmetryReduction.setSelected(false);
+			symmetryReduction.setEnabled(false);
+		} else {
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(symmetryReduction.isSelected());
 			symmetryReduction.setEnabled(true);
@@ -2429,7 +2453,7 @@ public class QueryDialog extends JPanel {
 				useOverApproximation.setSelected(true);
 			}
 			useOverApproximation.setEnabled(true);
-					
+
 			noApproximationEnable.setEnabled(true);
 			overApproximationEnable.setEnabled(true);
 			underApproximationEnable.setEnabled(true);
@@ -2552,7 +2576,7 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
+						ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 						
 						if (overApproximationEnable.isSelected())
@@ -2603,7 +2627,7 @@ public class QueryDialog extends JPanel {
 			
 			openComposedNetButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels);
+					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true);
 					Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);

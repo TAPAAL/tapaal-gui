@@ -2,7 +2,7 @@
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <constant name="MaxDistance" value="17"/>
 <net active="true" id="InputGraph" type="P/T net">
-<labels border="true" height="133" positionX="24" positionY="534" width="329">The model implements the shortest path algorithm based on flooding. Simply pour water into the StartNode and measure if the water will arrive to the FinalNode within the given bound in the constant ShortestDistance. The weights of the edges are simly encoded as the intervals in the transport arcs that restrict the delay before tokens can be placed into the output places of the transitions.
+<labels border="true" height="134" positionX="25" positionY="535" width="330">The model implements the shortest path algorithm based on flooding. Simply pour water into the StartNode and measure if the water will arrive to the FinalNode within the given bound in the constant ShortestDistance. The weights of the edges are simly encoded as the intervals in the transport arcs that restrict the delay before tokens can be placed into the output places of the transitions.
 
 If the FinalNode can be reached within the given limit, the simulation shows one such path leading to the final node.</labels>
 <place id="StartNode" initialMarking="1" invariant="&lt;= MaxDistance" markingOffsetX="0.0" markingOffsetY="0.0" name="StartNode" nameOffsetX="32.0" nameOffsetY="-32.0" positionX="135.0" positionY="300.0"/>
@@ -26,7 +26,7 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T0 to StartNode" inscription="[5,5]:1" source="T0" target="StartNode" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="266" yCoord="199"/>
-<arcpath arcPointType="true" id="1" xCoord="228" yCoord="273"/>
+<arcpath arcPointType="true" id="1" xCoord="229" yCoord="274"/>
 <arcpath arcPointType="false" id="2" xCoord="160" yCoord="305"/>
 </arc>
 <arc id="StartNode to T1" inscription="[8,8]:1" source="StartNode" target="T1" type="transport" weight="1">
@@ -35,8 +35,8 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T1 to StartNode" inscription="[8,8]:1" source="T1" target="StartNode" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="259" yCoord="416"/>
-<arcpath arcPointType="true" id="1" xCoord="198" yCoord="393"/>
-<arcpath arcPointType="false" id="2" xCoord="154" yCoord="324"/>
+<arcpath arcPointType="true" id="1" xCoord="199" yCoord="394"/>
+<arcpath arcPointType="false" id="2" xCoord="155" yCoord="324"/>
 </arc>
 <arc id="P1 to T2" inscription="[2,2]:1" source="P1" target="T2" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="372" yCoord="71"/>
@@ -44,7 +44,7 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T2 to P1" inscription="[2,2]:1" source="T2" target="P1" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="391" yCoord="277"/>
-<arcpath arcPointType="true" id="1" xCoord="423" yCoord="183"/>
+<arcpath arcPointType="true" id="1" xCoord="424" yCoord="184"/>
 <arcpath arcPointType="false" id="2" xCoord="377" yCoord="70"/>
 </arc>
 <arc id="P2 to T5" inscription="[11,11]:1" source="P2" target="T5" type="transport" weight="1">
@@ -53,7 +53,7 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T5 to P2" inscription="[11,11]:1" source="T5" target="P2" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="576" yCoord="497"/>
-<arcpath arcPointType="true" id="1" xCoord="513" yCoord="513"/>
+<arcpath arcPointType="true" id="1" xCoord="514" yCoord="514"/>
 <arcpath arcPointType="false" id="2" xCoord="401" yCoord="494"/>
 </arc>
 <arc id="P1 to T3" inscription="[6,6]:1" source="P1" target="T3" type="transport" weight="1">
@@ -62,7 +62,7 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T3 to P1" inscription="[6,6]:1" source="T3" target="P1" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="576" yCoord="62"/>
-<arcpath arcPointType="true" id="1" xCoord="483" yCoord="78"/>
+<arcpath arcPointType="true" id="1" xCoord="484" yCoord="79"/>
 <arcpath arcPointType="false" id="2" xCoord="386" yCoord="59"/>
 </arc>
 <arc id="P3 to T4" inscription="[7,7]:1" source="P3" target="T4" type="transport" weight="1">
@@ -71,32 +71,32 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T4 to P3" inscription="[7,7]:1" source="T4" target="P3" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="782" yCoord="262"/>
-<arcpath arcPointType="true" id="1" xCoord="798" yCoord="168"/>
+<arcpath arcPointType="true" id="1" xCoord="799" yCoord="169"/>
 <arcpath arcPointType="false" id="2" xCoord="766" yCoord="71"/>
 </arc>
 <arc id="P1 to T0" inscription="[0,inf)" source="P1" target="T0" type="tapnInhibitor" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="359" yCoord="65"/>
-<arcpath arcPointType="true" id="1" xCoord="303" yCoord="123"/>
+<arcpath arcPointType="false" id="0" xCoord="360" yCoord="66"/>
+<arcpath arcPointType="true" id="1" xCoord="304" yCoord="124"/>
 <arcpath arcPointType="false" id="2" xCoord="266" yCoord="184"/>
 </arc>
 <arc id="P2 to T1" inscription="[0,inf)" source="P2" target="T1" type="tapnInhibitor" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="378" yCoord="479"/>
-<arcpath arcPointType="true" id="1" xCoord="333" yCoord="438"/>
+<arcpath arcPointType="true" id="1" xCoord="334" yCoord="439"/>
 <arcpath arcPointType="false" id="2" xCoord="274" yCoord="416"/>
 </arc>
 <arc id="P3 to T3" inscription="[0,inf)" source="P3" target="T3" type="tapnInhibitor" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="748" yCoord="62"/>
-<arcpath arcPointType="true" id="1" xCoord="648" yCoord="78"/>
+<arcpath arcPointType="true" id="1" xCoord="649" yCoord="79"/>
 <arcpath arcPointType="false" id="2" xCoord="586" yCoord="62"/>
 </arc>
 <arc id="FinalNode to T5" inscription="[0,inf)" source="FinalNode" target="T5" type="tapnInhibitor" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="747" yCoord="489"/>
-<arcpath arcPointType="true" id="1" xCoord="663" yCoord="483"/>
+<arcpath arcPointType="true" id="1" xCoord="664" yCoord="484"/>
 <arcpath arcPointType="false" id="2" xCoord="587" yCoord="487"/>
 </arc>
 <arc id="FinalNode to T4" inscription="[0,inf)" source="FinalNode" target="T4" type="tapnInhibitor" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="768" yCoord="478"/>
-<arcpath arcPointType="true" id="1" xCoord="798" yCoord="363"/>
+<arcpath arcPointType="false" id="0" xCoord="769" yCoord="478"/>
+<arcpath arcPointType="true" id="1" xCoord="799" yCoord="364"/>
 <arcpath arcPointType="false" id="2" xCoord="782" yCoord="272"/>
 </arc>
 <arc id="T1 to P2" inscription="1" source="T1" target="P2" type="normal" weight="1">
@@ -124,8 +124,8 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 <arcpath arcPointType="false" id="1" xCoord="386" yCoord="477"/>
 </arc>
 <arc id="P2 to T2" inscription="[0,inf)" source="P2" target="T2" type="tapnInhibitor" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="391" yCoord="477"/>
-<arcpath arcPointType="true" id="1" xCoord="408" yCoord="348"/>
+<arcpath arcPointType="false" id="0" xCoord="392" yCoord="477"/>
+<arcpath arcPointType="true" id="1" xCoord="409" yCoord="349"/>
 <arcpath arcPointType="false" id="2" xCoord="391" yCoord="287"/>
 </arc>
 <arc id="P2 to T6" inscription="[6,6]:1" source="P2" target="T6" type="transport" weight="1">
@@ -134,8 +134,8 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T6 to P2" inscription="[6,6]:1" source="T6" target="P2" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="506" yCoord="364"/>
-<arcpath arcPointType="true" id="1" xCoord="498" yCoord="408"/>
-<arcpath arcPointType="false" id="2" xCoord="398" yCoord="482"/>
+<arcpath arcPointType="true" id="1" xCoord="499" yCoord="409"/>
+<arcpath arcPointType="false" id="2" xCoord="399" yCoord="483"/>
 </arc>
 <arc id="P5 to T7" inscription="[4,4]:1" source="P5" target="T7" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="591" yCoord="278"/>
@@ -143,17 +143,17 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T7 to P5" inscription="[4,4]:1" source="T7" target="P5" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="671" yCoord="365"/>
-<arcpath arcPointType="true" id="1" xCoord="648" yCoord="303"/>
+<arcpath arcPointType="true" id="1" xCoord="649" yCoord="304"/>
 <arcpath arcPointType="false" id="2" xCoord="595" yCoord="274"/>
 </arc>
 <arc id="P5 to T6" inscription="[0,inf)" source="P5" target="T6" type="tapnInhibitor" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="567" yCoord="272"/>
-<arcpath arcPointType="true" id="1" xCoord="528" yCoord="303"/>
+<arcpath arcPointType="false" id="0" xCoord="568" yCoord="272"/>
+<arcpath arcPointType="true" id="1" xCoord="529" yCoord="304"/>
 <arcpath arcPointType="false" id="2" xCoord="506" yCoord="349"/>
 </arc>
 <arc id="FinalNode to T7" inscription="[0,inf)" source="FinalNode" target="T7" type="tapnInhibitor" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="760" yCoord="477"/>
-<arcpath arcPointType="true" id="1" xCoord="738" yCoord="423"/>
+<arcpath arcPointType="true" id="1" xCoord="739" yCoord="424"/>
 <arcpath arcPointType="false" id="2" xCoord="679" yCoord="372"/>
 </arc>
 <arc id="T6 to P5" inscription="1" source="T6" target="P5" type="normal" weight="1">
@@ -170,12 +170,12 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 </arc>
 <arc id="T8 to P3" inscription="[3,3]:1" source="T8" target="P3" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="663" yCoord="161"/>
-<arcpath arcPointType="true" id="1" xCoord="723" yCoord="138"/>
+<arcpath arcPointType="true" id="1" xCoord="724" yCoord="139"/>
 <arcpath arcPointType="false" id="2" xCoord="755" yCoord="70"/>
 </arc>
 <arc id="P5 to T8" inscription="[0,inf)" source="P5" target="T8" type="tapnInhibitor" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="587" yCoord="252"/>
-<arcpath arcPointType="true" id="1" xCoord="618" yCoord="198"/>
+<arcpath arcPointType="false" id="0" xCoord="587" yCoord="253"/>
+<arcpath arcPointType="true" id="1" xCoord="619" yCoord="199"/>
 <arcpath arcPointType="false" id="2" xCoord="649" yCoord="161"/>
 </arc>
 <arc id="T8 to P5" inscription="1" source="T8" target="P5" type="normal" weight="1">
@@ -183,5 +183,6 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 <arcpath arcPointType="false" id="1" xCoord="591" yCoord="255"/>
 </arc>
 </net>
-<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Distance to FinalNode less than MaxDistance" pTrie="true" query="EF InputGraph.FinalNode&gt;=1" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Distance to FinalNode less than MaxDistance" overApproximation="true" pTrie="true" query="EF InputGraph.FinalNode &gt;= 1" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<k-bound bound="3"/>
 </pnml>
