@@ -112,6 +112,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public static Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
 		map.put(TraceOption.SOME, "-t 1 -x");
+		map.put(TraceOption.FASTEST, "-t 2 -x");
 		map.put(TraceOption.NONE, "");
 
 		return map;

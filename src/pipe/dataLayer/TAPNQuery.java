@@ -10,7 +10,7 @@ import dk.aau.cs.verification.QueryType;
 
 public class TAPNQuery {
 	public enum TraceOption {
-		SOME, NONE
+		FASTEST, SOME, NONE
 	};
 
 	public enum SearchOption {
