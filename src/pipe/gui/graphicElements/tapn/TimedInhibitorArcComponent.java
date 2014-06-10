@@ -78,14 +78,17 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public String getGuardAsString() {
-		return inhibitorArc.interval().toString();
+        public String getGuardAsString() {
+		return getGuardAsString(true);
 	}
-        
-        @Override
-        public String getGuardAsStringNoShowZeroToInfinityIntervals() {
-                return ""; // inhibitor arcs do not carry any intervals - [0,inf) by default
+
+        public String getGuardAsString(boolean showZeroToInfinityIntervals) {
+                if (!showZeroToInfinityIntervals) {
+                        return "";  // inhibitor arcs do not carry any intervals - [0,inf) by default
+                } 
+                return inhibitorArc.interval().toString();
         }
+        
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {

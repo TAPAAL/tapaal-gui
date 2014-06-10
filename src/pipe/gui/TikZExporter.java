@@ -138,7 +138,7 @@ public class TikZExporter {
                                 if (arc.getWeight().value() > 1) {
                                         arcLabel += "$" + arc.getWeight().value() + "\\times\\ $";
                                 }
-				arcLabel += "$\\mathrm{" + replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsStringNoShowZeroToInfinityIntervals()) + "}$";
+				arcLabel += "$\\mathrm{" + replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsString(false)) + "}$";
 				if (arc instanceof TimedTransportArcComponent)
 					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
 				arcLabel += "}";
