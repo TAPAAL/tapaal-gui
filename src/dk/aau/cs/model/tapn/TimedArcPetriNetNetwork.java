@@ -470,7 +470,7 @@ public class TimedArcPetriNetNetwork {
 	}
 	
 	public boolean isDegree2(){
-		ITAPNComposer composer = new TAPNComposer(new MessengerImpl());
+		ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
 		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
 
 		return composedModel.value1().isDegree2();

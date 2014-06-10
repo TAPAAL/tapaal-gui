@@ -45,7 +45,7 @@ public class ApproximationWorker {
 		
 		// Enable SOME_TRACE if not already
 		TraceOption oldTraceOption = options.traceOption();
-		if ((options.enableOverApproximation() || options.enableUnderApproximation()) && !(options instanceof VerifytaOptions)) {
+		if ((options.enableOverApproximation() || options.enableUnderApproximation())) {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		
@@ -619,7 +619,7 @@ public class ApproximationWorker {
 			public void displayErrorMessage(String message, String title) {}
 			public void displayWrappedErrorMessage(String message, String title) {}
 			
-		});
+		}, false);
 		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 		return composedModel;
 	}
