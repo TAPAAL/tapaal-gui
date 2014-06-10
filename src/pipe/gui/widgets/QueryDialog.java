@@ -437,14 +437,20 @@ public class QueryDialog extends JPanel {
 	}
 
 	private SearchOption getSearchOption() {
+		if(fastestTraceRadioButton.isSelected()){
+			return SearchOption.DEFAULT;
+		}
+			
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
 		else if(randomSearch.isSelected())
 			return SearchOption.RANDOM;
 		else if(heuristicSearch.isSelected())
 			return SearchOption.HEURISTIC;
-		else
+		else if(breadthFirstSearch.isSelected())
 			return SearchOption.BFS;
+		else
+			return SearchOption.DEFAULT;
 	}
 
 	private ReductionOption getReductionOption() {

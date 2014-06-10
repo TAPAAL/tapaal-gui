@@ -124,6 +124,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		map.put(SearchOption.DFS, "-o 1");
 		map.put(SearchOption.RANDOM, "-o 2");
 		map.put(SearchOption.HEURISTIC, "-o 3");
+		map.put(SearchOption.DEFAULT, "");
 
 		return map;
 	}
