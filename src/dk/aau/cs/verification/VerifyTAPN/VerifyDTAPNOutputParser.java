@@ -28,8 +28,8 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
-	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (\\d*)");
-	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (\\d*)");
+	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
+	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
 	private static final Pattern wfCoveredMarkingPattern = Pattern.compile("Covered marking: (.*)");
 	private final int totalTokens;
 	private final TAPNQuery query;
