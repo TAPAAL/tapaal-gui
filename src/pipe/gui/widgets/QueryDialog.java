@@ -707,7 +707,7 @@ public class QueryDialog extends JPanel {
 
 		ArrayList<String> options = new ArrayList<String>();
 
-		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
+		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
 		}
 		
@@ -727,7 +727,9 @@ public class QueryDialog extends JPanel {
             useGCD.setEnabled(true);     
         }
 		
-        if (queryHasDeadlock()) {
+        if (fastestTraceRadioButton.isSelected()) {
+        	options.add(name_DISCRETE);
+        } else if (queryHasDeadlock()) {
             if (tapnNetwork.isNonStrict()) {
                 options.add(name_DISCRETE);
                 // disable timedarts if liveness and deadlock prop
@@ -2118,16 +2120,11 @@ public class QueryDialog extends JPanel {
 		
 		Enumeration<AbstractButton> buttons = traceRadioButtonGroup.getElements(); 
 		
-		fastestTraceRadioButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				reductionOption.setSelectedItem(name_DISCRETE);
-			}
-		});
-		
 		while(buttons.hasMoreElements()){
 			AbstractButton button = buttons.nextElement(); 
 			button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					setEnabledReductionOptions();
 					setEnabledOptionsAccordingToCurrentReduction();
 				}
 			});
