@@ -993,7 +993,8 @@ public class QueryDialog extends JPanel {
 
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
-
+		
+		refreshTraceOptions();
 		setEnabledReductionOptions();
 		
 		rootPane.setDefaultButton(saveAndVerifyButton);
