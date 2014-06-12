@@ -73,6 +73,9 @@ public class TAPNComposer implements ITAPNComposer {
 			   greatestHeight = 0;
 		if (this.guiModels != null) {
 			for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
+                                if (isComponentEmpty(this.guiModels.get(tapn1))) { 
+                                        continue;
+                                }
 				greatestWidth = greatestWidth >= getRightmostObject(guiModels.get(tapn1)).getPositionX() ? greatestWidth : getRightmostObject(guiModels.get(tapn1)).getPositionX();
 				greatestHeight = greatestHeight >= getLowestObject(guiModels.get(tapn1)).getPositionY() ? greatestHeight : getLowestObject(guiModels.get(tapn1)).getPositionY();
 			}
@@ -103,6 +106,10 @@ public class TAPNComposer implements ITAPNComposer {
 		return new Tuple<Integer, Integer>(x, y);		
 	}
 	
+        private boolean isComponentEmpty(DataLayer guiModel) {
+                return guiModel.getPlaces().length==0 && guiModel.getTransitions().length==0;
+        }
+        
 	private PlaceTransitionObject getRightmostObject(DataLayer guiModel) {
 		PlaceTransitionObject returnObject = null;
 		
@@ -196,7 +203,10 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-			}
+                                if (isComponentEmpty(currentGuiModel)) { 
+                                        continue;
+                                }
+                        }
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
@@ -245,9 +255,13 @@ public class TAPNComposer implements ITAPNComposer {
 	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+                        
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
+                                if (isComponentEmpty(currentGuiModel)) { 
+                                        continue;
+                                }
 			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
@@ -331,10 +345,14 @@ public class TAPNComposer implements ITAPNComposer {
 	private void createInputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+                        
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-			}
+                                if (isComponentEmpty(currentGuiModel)) { 
+                                        continue;
+                                }
+                        }
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedInputArc arc : tapn.inputArcs()) {
@@ -396,6 +414,9 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
+                                if (isComponentEmpty(currentGuiModel)) { 
+                                        continue;
+                                }
 			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
@@ -449,9 +470,13 @@ public class TAPNComposer implements ITAPNComposer {
 		int i = 0;
 		int nextGroupNr = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+                        
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
+                                if (isComponentEmpty(currentGuiModel)) { 
+                                        continue;
+                                }
 			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
@@ -571,10 +596,14 @@ public class TAPNComposer implements ITAPNComposer {
 	private void createInhibitorArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+                        
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-			}
+                                if (isComponentEmpty(currentGuiModel)) { 
+                                        continue;
+                                }
+                        }
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
