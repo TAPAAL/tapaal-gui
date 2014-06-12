@@ -7,6 +7,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 
 public class CombiTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "id_t";
@@ -17,12 +18,18 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 	private int totalTokens;
 	private TimedArcPetriNet model;
 	private Hashtable<String, Boolean> placeNameToTimed;
+	private int maxDegDif;
+	private int initTransitions;
+	private int maxTimeIn;
 
-	public CombiTranslationQueryVisitor(boolean useSymmetry, int totalTokens, TimedArcPetriNet model, Hashtable<String, Boolean> placeNameToTimed) {
+	public CombiTranslationQueryVisitor(boolean useSymmetry, int totalTokens, TimedArcPetriNet model, Hashtable<String, Boolean> placeNameToTimed, int maxDegDif, int initTransitions, int maxTimeIn) {
 		this.useSymmetry = useSymmetry;
 		this.totalTokens = totalTokens;
 		this.model = model;
 		this.placeNameToTimed = placeNameToTimed;
+		this.maxDegDif = maxDegDif; 
+		this.initTransitions = initTransitions;
+		this.maxTimeIn = maxTimeIn;
 	}
 
 	@Override
@@ -38,7 +45,9 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 			}
 		}
 		if (timed){
-			if (useSymmetry) {
+			if (maxDegDif==0 && initTransitions==0 && maxTimeIn==0) {
+				append("0");
+			} else if (useSymmetry) {
 				append("(sum(i:");
 				append(ID_TYPE);
 				append(")");
