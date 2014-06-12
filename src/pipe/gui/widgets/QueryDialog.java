@@ -138,7 +138,7 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Open composed net";
 	
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
-	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
+	private static final String SOME_TRACE_STRING = "Some trace       ";
 	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
 	private static final String SHARED = "Shared";
 
@@ -483,60 +483,18 @@ public class QueryDialog extends JPanel {
 		if(reductionOption.getSelectedItem() == null){
 			return;
 		}
-
-		TraceOption traceOption = getTraceOption();
-		if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)){
-			fastestTraceRadioButton.setEnabled(true);
-		}else{
-			fastestTraceRadioButton.setEnabled(false);
-		}
 		
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN) || ((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
-			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
-			someTraceRadioButton.setEnabled(true);
-			someTraceRadioButton.setSelected(someTraceRadioButton.isSelected());
-			noTraceRadioButton.setSelected(noTraceRadioButton.isSelected());
-		}
-		else if (symmetryReduction.isSelected()) {
-			someTraceRadioButton.setText(UPPAAL_SOME_TRACE_STRING);
-			someTraceRadioButton.setEnabled(false);
-			noTraceRadioButton.setSelected(true);
-		} else {
-			someTraceRadioButton.setText(UPPAAL_SOME_TRACE_STRING);
-			someTraceRadioButton.setEnabled(true);
-		}
+		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict());
+		someTraceRadioButton.setEnabled(true);
+		noTraceRadioButton.setEnabled(true);
 
-		if(traceOption == TraceOption.SOME && someTraceRadioButton.isEnabled())
-			someTraceRadioButton.setSelected(true);
-		else if(traceOption == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled())
-			fastestTraceRadioButton.setSelected(true);
-		else
-			noTraceRadioButton.setSelected(true);
-	}
-
-	private void refreshSearchOptions() {
-		//		SearchOption searchOption = getSearchOption();
-		//		
-		//		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
-		//		{
-		//			depthFirstSearch.setEnabled(true);
-		//			breadthFirstSearch.setEnabled(true);
-		//			breadthFirstSearch.setSelected(true);
-		//			randomSearch.setEnabled(false);
-		//		}
-		//		else {
-		//			depthFirstSearch.setEnabled(true);
-		//			breadthFirstSearch.setEnabled(true);
-		//			randomSearch.setEnabled(true);
-		//		}
-		//		
-		//		
-		//		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
-		//			depthFirstSearch.setSelected(true);
-		//		else if(searchOption == SearchOption.RDFS && randomSearch.isEnabled())
-		//			randomSearch.setSelected(true);
-		//		else
-		//			breadthFirstSearch.setSelected(true);
+		if(getTraceOption() == TraceOption.FASTEST) {
+			if(fastestTraceRadioButton.isEnabled()){
+				fastestTraceRadioButton.setSelected(true);
+			} else {
+				someTraceRadioButton.setSelected(true);
+			}
+		}
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -2158,13 +2116,22 @@ public class QueryDialog extends JPanel {
 		someTraceRadioButton.setEnabled(false);
 		noTraceRadioButton.setSelected(true);
 		
-		fastestTraceRadioButton.addChangeListener(new ChangeListener() {
-			
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				updateSearchStrategies();
+		Enumeration<AbstractButton> buttons = traceRadioButtonGroup.getElements(); 
+		
+		fastestTraceRadioButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				reductionOption.setSelectedItem(name_DISCRETE);
 			}
 		});
+		
+		while(buttons.hasMoreElements()){
+			AbstractButton button = buttons.nextElement(); 
+			button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					setEnabledOptionsAccordingToCurrentReduction();
+				}
+			});
+		}
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
@@ -2291,11 +2258,6 @@ public class QueryDialog extends JPanel {
 		symmetryReduction = new JCheckBox("Use symmetry reduction");
 		symmetryReduction.setSelected(true);
 		symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
-		symmetryReduction.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				refreshTraceOptions();
-			}
-		});
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -2408,13 +2370,12 @@ public class QueryDialog extends JPanel {
 
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
+		refreshTraceOptions();
 		refreshSymmetryReduction();
 		refreshDiscreteOptions();
 		refreshDiscreteInclusion();
 		refreshOverApproximationOption();
 		updateSearchStrategies();
-		refreshTraceOptions();
-		refreshSearchOptions();
 		refreshExportButtonText();
 	}
 
@@ -2469,14 +2430,15 @@ public class QueryDialog extends JPanel {
 				((String)reductionOption.getSelectedItem()).equals(name_STANDARD) ||
 				((String)reductionOption.getSelectedItem()).equals(name_BROADCAST) ||
 				((String)reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)) &&
-				(!noApproximationEnable.isSelected()) 
+				(!noApproximationEnable.isSelected() ||
+				someTraceRadioButton.isSelected()) 
 				){
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(false);
 			symmetryReduction.setEnabled(false);
 		} else {
 			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(symmetryReduction.isSelected());
+			symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(true);
 		}
 	}
