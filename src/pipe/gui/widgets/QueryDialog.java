@@ -1392,10 +1392,12 @@ public class QueryDialog extends JPanel {
 						deleteSelection();
 					}else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
 						e.consume();
-						changeToEditMode();
+						int position = queryField.getSelectionEnd();
 						if(e.getKeyCode() == KeyEvent.VK_LEFT){
-							queryField.setCaretPosition(0);
+							position = queryField.getSelectionStart();
 						}
+						changeToEditMode();
+						queryField.setCaretPosition(position);
 					}
 				} else {
 					if (e.getKeyChar() == KeyEvent.VK_ENTER) {
