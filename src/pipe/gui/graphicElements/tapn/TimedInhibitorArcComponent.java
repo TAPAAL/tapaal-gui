@@ -21,6 +21,7 @@ import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.Weight;
+import pipe.gui.CreateGui;
 
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
@@ -77,9 +78,17 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public String getGuardAsString() {
-		return inhibitorArc.interval().toString();
+        public String getGuardAsString() {
+		return getGuardAsString(true);
 	}
+
+        public String getGuardAsString(boolean showZeroToInfinityIntervals) {
+                if (!showZeroToInfinityIntervals) {
+                        return "";  // inhibitor arcs do not carry any intervals - [0,inf) by default
+                } 
+                return inhibitorArc.interval().toString();
+        }
+        
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {

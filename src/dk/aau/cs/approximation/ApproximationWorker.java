@@ -45,7 +45,7 @@ public class ApproximationWorker {
 		
 		// Enable SOME_TRACE if not already
 		TraceOption oldTraceOption = options.traceOption();
-		if ((options.enableOverApproximation() || options.enableUnderApproximation()) && !(options instanceof VerifytaOptions)) {
+		if ((options.enableOverApproximation() || options.enableUnderApproximation())) {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		

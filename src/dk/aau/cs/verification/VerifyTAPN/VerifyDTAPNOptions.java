@@ -11,6 +11,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean timeDarts;
 	private boolean pTrie;
 	private WorkflowMode workflow;
+        private int workflowbound;
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 
@@ -26,7 +27,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
 			boolean pTrie, boolean useOverApproximation,
 			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, enableOverApproximation, enableUnderApproximation, approximationDenominator);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 	
 	//Only used for boundedness analysis
@@ -34,7 +35,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie,
 			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, enableOverApproximation, enableUnderApproximation, approximationDenominator);
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -42,19 +43,20 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			SearchOption search, boolean symmetry, boolean discreteInclusion, boolean gcd,
 			boolean timeDarts, boolean pTrie, boolean useOverApproximation,
 			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, discreteInclusion, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, enableOverApproximation, enableUnderApproximation, approximationDenominator);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, discreteInclusion, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
 			boolean pTrie, boolean useOverApproximation, boolean discreteInclusion,
-			InclusionPlaces inclusionPlaces, WorkflowMode workflow,
+			InclusionPlaces inclusionPlaces, WorkflowMode workflow, int workflowbound,
 			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		super(extraTokens, traceOption, search, symmetry, useOverApproximation, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;
 		this.workflow = workflow;
 		this.gcd = gcd;
+                this.workflowbound = workflowbound;
 	}
 	
 	@Override
@@ -71,11 +73,15 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(" -w 1");
 		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
 			result.append(" -w 2");
-		}
+                        result.append(" -b ");
+                        result.append(workflowbound);
+                }
 		result.append(' ');
 		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');
-		result.append(gcd ? "-c" : "");
+                if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
+                    result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
+                }
 		return result.toString();
 	}
 
@@ -86,5 +92,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public boolean pTrie() {
 		return pTrie;
 	}
+        
+        public WorkflowMode getWorkflowMode(){
+            return workflow;
+        }
 	
 }

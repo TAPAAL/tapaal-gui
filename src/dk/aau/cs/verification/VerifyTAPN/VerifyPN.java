@@ -328,7 +328,7 @@ public class VerifyPN implements ModelChecker{
 		}
 
 		private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
-			if (((VerifyTAPNOptions) options).trace() != TraceOption.SOME) return null;
+			if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 			
 			VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 			TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
