@@ -383,6 +383,10 @@ public class QueryDialog extends JPanel {
 	private void setQueryFieldEditable(boolean isEditable) {
 		queryField.setEditable(isEditable);
 		queryField.setToolTipText(isEditable ? null : TOOL_TIP_QUERY_FIELD);
+		//XXX Workaround to fix SWING bug where caret is sometimes not shown in edit mode -- Mathias
+		queryField.setFocusable(false);
+		queryField.setFocusable(true);
+		queryField.requestFocus(true);
 	}
 
 	public TAPNQuery getQuery() {
@@ -966,6 +970,9 @@ public class QueryDialog extends JPanel {
 		disableAllQueryButtons();
 		disableEditingButtons();
 		setSaveButtonsEnabled();
+		
+		// Set default caret location to end of query
+		queryField.setCaretPosition(queryField.getText().length());
 	}
 
 	private void updateQueryOnAtomicPropositionChange() {
@@ -1383,6 +1390,14 @@ public class QueryDialog extends JPanel {
 					if (e.getKeyChar() == KeyEvent.VK_DELETE
 							|| e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
 						deleteSelection();
+					}else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
+						e.consume();
+						int position = queryField.getSelectionEnd();
+						if(e.getKeyCode() == KeyEvent.VK_LEFT){
+							position = queryField.getSelectionStart();
+						}
+						changeToEditMode();
+						queryField.setCaretPosition(position);
 					}
 				} else {
 					if (e.getKeyChar() == KeyEvent.VK_ENTER) {
