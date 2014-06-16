@@ -139,6 +139,7 @@ public class QueryDialog extends JPanel {
 	
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
+	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
 	private static final String SHARED = "Shared";
 
 	private static final long serialVersionUID = 7852107237344005546L;
@@ -213,7 +214,8 @@ public class QueryDialog extends JPanel {
 	private ButtonGroup traceRadioButtonGroup;
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
-
+	private JRadioButton fastestTraceRadioButton;
+	
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
@@ -432,19 +434,27 @@ public class QueryDialog extends JPanel {
 	private TraceOption getTraceOption() {
 		if(someTraceRadioButton.isSelected())
 			return TraceOption.SOME;
+		if(fastestTraceRadioButton.isSelected())
+			return TraceOption.FASTEST;
 		else
 			return TraceOption.NONE;
 	}
 
 	private SearchOption getSearchOption() {
+		if(fastestTraceRadioButton.isSelected()){
+			return SearchOption.DEFAULT;
+		}
+			
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
 		else if(randomSearch.isSelected())
 			return SearchOption.RANDOM;
 		else if(heuristicSearch.isSelected())
 			return SearchOption.HEURISTIC;
-		else
+		else if(breadthFirstSearch.isSelected())
 			return SearchOption.BFS;
+		else
+			return SearchOption.DEFAULT;
 	}
 
 	private ReductionOption getReductionOption() {
@@ -479,6 +489,13 @@ public class QueryDialog extends JPanel {
 		}
 
 		TraceOption traceOption = getTraceOption();
+		if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) && !(getQuantificationSelection().equals("E[]") || 
+                getQuantificationSelection().equals("A<>"))){
+			fastestTraceRadioButton.setEnabled(true);
+		}else{
+			fastestTraceRadioButton.setEnabled(false);
+		}
+		
 		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN) || ((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
 			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
@@ -496,6 +513,8 @@ public class QueryDialog extends JPanel {
 
 		if(traceOption == TraceOption.SOME && someTraceRadioButton.isEnabled())
 			someTraceRadioButton.setSelected(true);
+		else if(traceOption == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled())
+			fastestTraceRadioButton.setSelected(true);
 		else
 			noTraceRadioButton.setSelected(true);
 	}
@@ -829,6 +848,8 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setSelected(symmetry);
 			if(trace == TraceOption.SOME && someTraceRadioButton.isEnabled()){
 				someTraceRadioButton.setSelected(true);
+			}else if(trace == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled()){
+				fastestTraceRadioButton.setSelected(true);
 			}
 		}
 	}
@@ -848,10 +869,20 @@ public class QueryDialog extends JPanel {
 		}else{
 			currentselected = randomSearch;
 		}
+		
+		if(fastestTraceRadioButton.isSelected()){
+			breadthFirstSearch.setEnabled(false);
+			depthFirstSearch.setEnabled(false);
+			heuristicSearch.setEnabled(false);
+			randomSearch.setEnabled(false);
+			return;
+		}else{
+			breadthFirstSearch.setEnabled(true);
+			depthFirstSearch.setEnabled(true);
+			heuristicSearch.setEnabled(true);
+			randomSearch.setEnabled(true);
+		}
 
-
-		heuristicSearch.setEnabled(true);
-		breadthFirstSearch.setEnabled(true);
 		String reductionOptionString = getReductionOptionAsString();
 		if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			breadthFirstSearch.setEnabled(false);
@@ -1093,6 +1124,8 @@ public class QueryDialog extends JPanel {
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
 			someTraceRadioButton.setSelected(true);
+		} else if (queryToCreateFrom.getTraceOption() == TraceOption.FASTEST) {
+			fastestTraceRadioButton.setSelected(true);
 		} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE) {
 			noTraceRadioButton.setSelected(true);
 		}
@@ -2130,13 +2163,25 @@ public class QueryDialog extends JPanel {
 		traceRadioButtonGroup = new ButtonGroup();
 		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
 		noTraceRadioButton = new JRadioButton("No trace");
+		fastestTraceRadioButton = new JRadioButton("Fastest trace");
 		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
 		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
+		traceRadioButtonGroup.add(fastestTraceRadioButton);
 		traceRadioButtonGroup.add(someTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
 
+		fastestTraceRadioButton.setEnabled(false);
 		someTraceRadioButton.setEnabled(false);
 		noTraceRadioButton.setSelected(true);
+		
+		fastestTraceRadioButton.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				updateSearchStrategies();
+				refreshDiscreteOptions();
+			}
+		});
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
@@ -2148,6 +2193,11 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
+		
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -2477,7 +2527,14 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshDiscreteOptions(){
+		useTimeDarts.setEnabled(true);
+		if(hasForcedDisabledTimeDarts){
+			hasForcedDisabledTimeDarts = false;
+			useTimeDarts.setSelected(true);
+		}
+		
 		useReduction.setVisible(false);
+		
 		if(reductionOption.getSelectedItem() == null){
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
@@ -2487,7 +2544,8 @@ public class QueryDialog extends JPanel {
 			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
 			useTimeDarts.setVisible(true);
-			if(tapnNetwork.hasUrgentTransitions()){
+			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected()){
+				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
 			}
