@@ -484,7 +484,7 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 		
-		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict());
+		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && noApproximationEnable.isSelected());
 		someTraceRadioButton.setEnabled(true);
 		noTraceRadioButton.setEnabled(true);
 
