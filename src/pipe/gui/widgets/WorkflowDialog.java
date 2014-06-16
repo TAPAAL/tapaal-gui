@@ -1,44 +1,9 @@
 package pipe.gui.widgets;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import pipe.gui.*;
-import pipe.gui.GuiFrame.GUIMode;
-import pipe.dataLayer.*;
-import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.Bound;
@@ -72,6 +37,40 @@ import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import pipe.dataLayer.*;
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.gui.*;
+import pipe.gui.GuiFrame.GUIMode;
 
 public class WorkflowDialog extends JDialog {
 
@@ -1025,98 +1024,6 @@ public class WorkflowDialog extends JDialog {
 		}
 	}
 
-	private TimedArcPetriNetNetwork composeStrongSoundnessModel() {
-		TimedArcPetriNetNetwork network = model.copy();
-		TimedArcPetriNet out_template = network.getTAPNByName(this.out_template.name());
-		TimedPlace out_hook = null;
-
-		for(TimedPlace p : out_template.places()){
-			if(p.name().equals(out.name())){
-				out_hook = p;
-				break;
-			}
-		}
-
-		// Add new components
-		String name = "C";
-		while(network.getConstant(name) != null){
-			name += "x";
-		}
-		c = new Constant(name, (int) m*B+1); 
-		network.constants().add(c);
-
-		/* Create transitions */
-
-		name = "nok";
-		while(out_template.getTransitionByName(name) != null){
-			name += "x";
-		}
-		TimedTransition nok_t = new TimedTransition(name, true);
-		nok_t.setUrgent(true);
-		out_template.add(nok_t);
-
-		name = "tick";
-		while(out_template.getTransitionByName(name) != null){
-			name += "x";
-		}
-		TimedTransition tick_t = new TimedTransition(name, false);
-		out_template.add(tick_t);
-
-		name = "ok";
-		while(out_template.getTransitionByName(name) != null){
-			name += "x";
-		}
-		TimedTransition ok_t = new TimedTransition(name, true);
-		ok_t.setUrgent(true);
-		out_template.add(ok_t);
-
-		/* Create places */
-
-		name = "timer";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-		TimedPlace timer_p = new LocalTimedPlace(name, new TimeInvariant(true, new ConstantBound(c)));
-		out_template.add(timer_p);
-
-		name = "ready";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-		TimedPlace ready_p = new LocalTimedPlace(name);
-		out_template.add(ready_p);
-
-		name = "finished";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-		TimedPlace finished_p = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
-		out_template.add(finished_p);
-
-		name = "done";
-		while(out_template.getPlaceByName(name) != null){
-			name += "x";
-		}
-
-		done = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
-		out_template.add(done);
-
-		/* Create arcs */
-
-		out_template.add(new TimedInputArc(out_hook, nok_t, TimeInterval.ZERO_INF));
-		out_template.add(new TimedInputArc(out_hook, ok_t, TimeInterval.ZERO_INF));
-		out_template.add(new TimedInputArc(timer_p, tick_t, new TimeInterval(true, new ConstantBound(c), new ConstantBound(c), true)));
-		out_template.add(new TimedOutputArc(tick_t, ready_p));
-		out_template.add(new TimedInputArc(ready_p, ok_t, TimeInterval.ZERO_INF));
-		out_template.add(new TimedOutputArc(ok_t, done));
-		out_template.add(new TimedOutputArc(nok_t, finished_p));
-		out_template.add(new TimedInhibitorArc(ready_p, nok_t, TimeInterval.ZERO_INF));
-
-		out_template.addToken(new TimedToken(timer_p));
-
-		return network;
-	}
-
 	private Runnable getStrongSoundnessRunnable() {
 		return new Runnable() {
 
@@ -1140,20 +1047,22 @@ public class WorkflowDialog extends JDialog {
 						B = Math.max(B, p.invariant().upperBound().value());
 					}
 				}
+                
+				int c  = (int)m*B+1;
 
-				final TimedArcPetriNetNetwork model = composeStrongSoundnessModel();		
+
 
 				/* Call engine */
 
-				String template = done.isShared()? ((SharedPlace) done).getComponentsUsingThisPlace().get(0):((LocalTimedPlace) done).model().name();
-				final TAPNQuery q = new TAPNQuery(
-						"Workflow strong soundness checking",
-						numberOfExtraTokensInNet == null ? 0
-								: (Integer) numberOfExtraTokensInNet.getValue(),
-								new TCTLEFNode(new TCTLAtomicPropositionNode(new TCTLPlaceNode(template, done.name()), "=", new TCTLConstNode(1))), TraceOption.SOME,
-								SearchOption.HEURISTIC,
-								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
-								false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+				final TAPNQuery q;
+                            q = new TAPNQuery(
+                                    "Workflow strong soundness checking",
+                                    numberOfExtraTokensInNet == null ? 0
+                                            : (Integer) numberOfExtraTokensInNet.getValue(),
+                                    new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
+                                    SearchOption.DEFAULT,
+                                    ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+                                    false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, c);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
@@ -1163,8 +1072,20 @@ public class WorkflowDialog extends JDialog {
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
 						if(result.isQuerySatisfied()){
+							
+							switch(((TimedTAPNNetworkTrace) result.getTrace()).getTraceType()){
+							case EG_LOOP:
+								setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
+								break;
+							case EG_DELAY_FOREVER:
+								setStrongSoundnessResult(false, RESULT_ERROR_TIME);
+								break;
+							default:
+								assert(false);
+								break;
+							}
 
-							strongSoundnessResultTrace = determineError(mapTraceToRealModel(result.getTrace()));
+							strongSoundnessResultTrace = mapTraceToRealModel(result.getTrace());
 							strongSoundnessResultTraceButton.setVisible(true);
 
 							if(max.isSelected()){
@@ -1189,58 +1110,6 @@ public class WorkflowDialog extends JDialog {
 						strongSoundnessVerificationStats.setVisible(true);
 
 						pack();
-					}
-
-					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
-						NetworkMarking marking = CreateGui.getCurrentTab().network().marking();
-						TimedTAPNNetworkTrace tmpTrace = new TimedTAPNNetworkTrace(trace.length());
-						TraceType type = null;
-						ArrayList<Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer, Integer>>> detectLoops = new ArrayList<Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>,Tuple<Integer,Integer>>>();
-						int loopIndex = -1;
-						int delay = 0;
-						int maxDelay = 0;
-						int divergentIndex = -1;
-						
-						// Get trace until bound violated						
-						outer: for(TAPNNetworkTraceStep step : trace){
-							if(step instanceof TAPNNetworkTimeDelayStep){
-								delay += ((TAPNNetworkTimeDelayStep) step).getDelay().intValue();
-								if(((TAPNNetworkTimeDelayStep) step).getDelay().intValue() > maxDelay){
-									maxDelay = ((TAPNNetworkTimeDelayStep) step).getDelay().intValue();
-									divergentIndex = tmpTrace.length();
-								}
-							}else{
-								for(Tuple<Tuple<TAPNNetworkTraceStep, NetworkMarking>, Tuple<Integer, Integer>> checkStep : detectLoops){
-									if(checkStep.value1().value1().equals(step) && checkStep.value1().value2().equals(marking.cut()) && checkStep.value2().value1() < delay){
-										loopIndex = checkStep.value2().value2();
-										setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
-										type = TraceType.EG_LOOP;
-										break outer;
-									}
-								}
-								detectLoops.add(new Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer,Integer>>(new Tuple<TAPNNetworkTraceStep,NetworkMarking>(step, marking.cut()), new Tuple<Integer, Integer>(delay, tmpTrace.length())));
-							}
-							tmpTrace.add(step);
-							marking = step.performStepFrom(marking);
-						}
-
-						if(type == null){
-							type = TraceType.EG_DELAY_FOREVER;
-							setStrongSoundnessResult(false, RESULT_ERROR_TIME);
-							loopIndex = divergentIndex;
-						}
-
-						TimedTAPNNetworkTrace realTrace = new TimedTAPNNetworkTrace(loopIndex);
-						for(TAPNNetworkTraceStep step : tmpTrace){
-							if(type == TraceType.EG_DELAY_FOREVER && realTrace.length() == loopIndex){
-								break;
-							}
-							realTrace.add(step);
-						}
-
-						realTrace.setTraceType(type);
-
-						return realTrace;
 					}
 				});
 			}
@@ -1299,7 +1168,7 @@ public class WorkflowDialog extends JDialog {
 						numberOfExtraTokensInNet == null ? 0
 								: (Integer) numberOfExtraTokensInNet.getValue(),
 								new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
-								SearchOption.HEURISTIC,
+								SearchOption.DEFAULT,
 								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 								false, false, false, null, ExtrapolationOption.AUTOMATIC,
 								WorkflowMode.WORKFLOW_SOUNDNESS);
@@ -1414,9 +1283,8 @@ public class WorkflowDialog extends JDialog {
 								"Workflow computing trace",
 								numberOfExtraTokensInNet == null ? 0
 										: (Integer) numberOfExtraTokensInNet.getValue(),
-										new TCTLEFNode(new TCTLAtomicPropositionNode( new TCTLPlaceNode(out.isShared()?"":out_template.name(), out.name()), ">=", new TCTLConstNode(1))), 
-										TraceOption.SOME,
-										SearchOption.HEURISTIC,
+										new TCTLEFNode(new TCTLAtomicPropositionNode(new TCTLPlaceNode(out.isShared()?"":out_template.name(), out.name()), ">=",new TCTLConstNode(1))), TraceOption.SOME,
+										SearchOption.DEFAULT,
 										ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 										true, true, null, ExtrapolationOption.AUTOMATIC);
 						Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {

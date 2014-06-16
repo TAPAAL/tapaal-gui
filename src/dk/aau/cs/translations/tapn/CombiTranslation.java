@@ -123,7 +123,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		
 		maxDegDif=largestTimedDegreeDifference(conservativeModel);
 		maxTimeIn=largestTimedDegreeIn(conservativeModel);
-		
+
 		if(!(maxDegDif==0 && initTransitions==0 && maxTimeIn==0)){
 			if (useSymmetry || conservativeModel.marking().size() + extraTokens == 0) {
 				capInTokens=model.getNumberOfTokensInNet()+extraTokens;
@@ -134,7 +134,6 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 					tokenTemplate.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
 				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
-
 			} else {
 				capInTokens=model.getNumberOfTokensInNet()+extraTokens;
 				int j = 0;
@@ -1217,7 +1216,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 	}
 
 	private UPPAALQuery transformQuery(TAPNQuery tapnQuery, TimedArcPetriNet model) {
-		CombiTranslationQueryVisitor visitor = new CombiTranslationQueryVisitor(useSymmetry, model.marking().size() + tapnQuery.getExtraTokens(), model,  placeNameToTimed);
+		CombiTranslationQueryVisitor visitor = new CombiTranslationQueryVisitor(useSymmetry, model.marking().size() + tapnQuery.getExtraTokens(), model,  placeNameToTimed, maxDegDif, initTransitions, maxTimeIn);
 
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}

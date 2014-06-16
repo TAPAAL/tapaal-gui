@@ -58,9 +58,16 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	public String getGuardAsString() {
-		return inputArc.interval().toString();
+		return getGuardAsString(true);
 	}
 
+        public String getGuardAsString(boolean showZeroToInfinityIntervals) {
+                if (!showZeroToInfinityIntervals && !CreateGui.showZeroToInfinityIntervals() && inputArc.interval().toString().equals("[0,inf)")) {
+                        return "";
+                } 
+                return inputArc.interval().toString();
+        }
+        
 	public TimeInterval getGuard() {
 		return inputArc.interval();
 	}
