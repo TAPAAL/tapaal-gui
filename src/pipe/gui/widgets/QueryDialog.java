@@ -484,7 +484,7 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 		
-		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && noApproximationEnable.isSelected());
+		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict());
 		someTraceRadioButton.setEnabled(true);
 		noTraceRadioButton.setEnabled(true);
 
@@ -2454,6 +2454,13 @@ public class QueryDialog extends JPanel {
 			overApproximationEnable.setEnabled(false);
 			underApproximationEnable.setEnabled(false);
 			overApproximationDenominator.setEnabled(false);*/
+		}
+		else if(fastestTraceRadioButton.isSelected()){
+			noApproximationEnable.setEnabled(true);
+			noApproximationEnable.setSelected(true);
+			overApproximationEnable.setEnabled(false);
+			underApproximationEnable.setEnabled(false);
+			overApproximationDenominator.setEnabled(false);
 		}
 		else{
 			useOverApproximation.setVisible(true);
