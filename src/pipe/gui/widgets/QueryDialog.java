@@ -338,6 +338,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
 
 	//Tool tips for trace options panel
+	private final static String TOOL_TIP_FASTEST_TRACE = "Show a fastest concrete trace if applicable (verification can be slower with this trace option).";
 	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable.";
 	private final static String TOOL_TIP_NO_TRACE = "Do not display any trace information.";
 
@@ -2126,6 +2127,7 @@ public class QueryDialog extends JPanel {
 		fastestTraceRadioButton = new JRadioButton("Fastest trace");
 		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
 		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
+		fastestTraceRadioButton.setToolTipText(TOOL_TIP_FASTEST_TRACE);
 		traceRadioButtonGroup.add(fastestTraceRadioButton);
 		traceRadioButtonGroup.add(someTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
@@ -2457,18 +2459,9 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshOverApproximationOption() {
-		if(reductionOption.getSelectedItem() == null){
-			useOverApproximation.setVisible(false);
-		}
-		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
-			useOverApproximation.setVisible(true);
+		if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);
-			
-			/*noApproximationEnable.setEnabled(false);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
-			overApproximationDenominator.setEnabled(false);*/
 		}
 		else if(fastestTraceRadioButton.isSelected()){
 			noApproximationEnable.setEnabled(true);
@@ -2478,7 +2471,6 @@ public class QueryDialog extends JPanel {
 			overApproximationDenominator.setEnabled(false);
 		}
 		else{
-			useOverApproximation.setVisible(true);
 			if(!useOverApproximation.isEnabled()){
 				useOverApproximation.setSelected(true);
 			}
