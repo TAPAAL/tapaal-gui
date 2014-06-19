@@ -489,7 +489,8 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 
-		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && !queryHasDeadlock());
+		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && !queryHasDeadlock() && !(newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode));
+		
 		someTraceRadioButton.setEnabled(true);
 		noTraceRadioButton.setEnabled(true);
 
@@ -651,12 +652,10 @@ public class QueryDialog extends JPanel {
 			existsDiamond.setSelected(true);
 		} else if (currentSelection.getObject() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
-			noApproximationEnable.setSelected(true);
 		} else if (currentSelection.getObject() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
 		} else if (currentSelection.getObject() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
-			noApproximationEnable.setSelected(true);
 		}
 	}
 
