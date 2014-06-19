@@ -2461,8 +2461,14 @@ public class QueryDialog extends JPanel {
 		if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);
+		}else{
+			if(!useOverApproximation.isEnabled()){
+				useOverApproximation.setSelected(true);
+			}
+			useOverApproximation.setEnabled(true);
 		}
-		else if(fastestTraceRadioButton.isSelected()){
+		
+		if(fastestTraceRadioButton.isSelected()){
 			noApproximationEnable.setEnabled(true);
 			noApproximationEnable.setSelected(true);
 			overApproximationEnable.setEnabled(false);
@@ -2470,11 +2476,6 @@ public class QueryDialog extends JPanel {
 			overApproximationDenominator.setEnabled(false);
 		}
 		else{
-			if(!useOverApproximation.isEnabled()){
-				useOverApproximation.setSelected(true);
-			}
-			useOverApproximation.setEnabled(true);
-
 			noApproximationEnable.setEnabled(true);
 			overApproximationEnable.setEnabled(true);
 			underApproximationEnable.setEnabled(true);
