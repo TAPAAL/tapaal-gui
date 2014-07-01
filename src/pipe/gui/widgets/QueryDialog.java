@@ -272,6 +272,7 @@ public class QueryDialog extends JPanel {
 	
 	private static boolean hasForcedDisabledTimeDarts = false;
 	private static boolean hasForcedDisabledGCD = false;
+	private static boolean disableSymmetryUpdate = false;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -710,6 +711,8 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 
 		ArrayList<String> options = new ArrayList<String>();
+		
+		disableSymmetryUpdate = true;
 
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
@@ -793,7 +796,6 @@ public class QueryDialog extends JPanel {
 		reductionOption.removeAllItems();
 
 		boolean selectedOptionStillAvailable = false;	
-		boolean symmetry = symmetryReduction == null ? false : symmetryReduction.isSelected();
 		TraceOption trace = getTraceOption();
 		for (String s : options) {
 			reductionOption.addItem(s);
@@ -804,13 +806,14 @@ public class QueryDialog extends JPanel {
 
 		if (selectedOptionStillAvailable) {
 			reductionOption.setSelectedItem(reductionOptionString);
-			symmetryReduction.setSelected(symmetry);
 			if(trace == TraceOption.SOME && someTraceRadioButton.isEnabled()){
 				someTraceRadioButton.setSelected(true);
 			}else if(trace == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled()){
 				fastestTraceRadioButton.setSelected(true);
 			}
 		}
+		
+		disableSymmetryUpdate = false;
 	}
 
 	private void updateSearchStrategies(){
@@ -2431,7 +2434,10 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshSymmetryReduction() {
-		if(reductionOption.getSelectedItem() == null){
+		if(disableSymmetryUpdate){
+			return;
+		}
+		else if(reductionOption.getSelectedItem() == null){
 			symmetryReduction.setVisible(false);
 		} 
 		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
@@ -2452,7 +2458,7 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setEnabled(false);
 		} else {
 			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(true);
+			if(!symmetryReduction.isEnabled())	symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(true);
 		}
 	}
