@@ -62,7 +62,8 @@ public class QueryResult {
 		|| (queryType().equals(QueryType.AG) && isQuerySatisfied())
 		|| (hasDeadlock() && 
 				(!isQuerySatisfied() && queryType().equals(QueryType.EF)) || 
-				(isQuerySatisfied() && queryType().equals(QueryType.AG)));
+				(isQuerySatisfied() && queryType().equals(QueryType.AG))
+                || (hasDeadlock() && boundednessAnalysis.isUPPAAL()) );
 	}
 	
 	protected String getExplanationString(){
