@@ -4,11 +4,18 @@ public class BoundednessAnalysisResult {
 	private int maxUsedTokens;
 	private int totalTokens;
 	private int extraTokens;
+        private boolean isUPPAAL;
 	
 	public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens, int extraTokens){
 		this.maxUsedTokens = maxUsedTokens;
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
+                this.isUPPAAL = false;
+	}
+        
+        public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens, int extraTokens, boolean isUPPAAL){
+                this(totalTokens, maxUsedTokens, extraTokens);
+                this.isUPPAAL = isUPPAAL;
 	}
 	
 	@Override
@@ -42,5 +49,9 @@ public class BoundednessAnalysisResult {
 	public int tokensInNet(){
 		return totalTokens - extraTokens;
 	}
+        
+        public boolean isUPPAAL() {
+            return isUPPAAL;
+        }
 	
 }
