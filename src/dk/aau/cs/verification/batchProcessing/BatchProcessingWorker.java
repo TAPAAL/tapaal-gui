@@ -14,8 +14,10 @@ import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.approximation.ApproximationWorker;
 import dk.aau.cs.approximation.OverApproximation;
@@ -253,10 +255,20 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(batchProcessingVerificationOptions != null) {
 			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
 			ReductionOption option = query.getReductionOption();
-			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
+                        TCTLAbstractProperty property;
+                        String name;
+                        if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.ExistDeadlock) {
+                            property = generateExistDeadlock(model);
+                            name = "Existence of a deadlock";
+                        } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace) {
+                            property = generateSearchWholeStateSpaceProperty(model);
+                            name = "Search whole state space";
+                        } else {
+                            property = query.getProperty();
+                            name = query.getName();
+                        }
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
-			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
 			boolean overApproximation = query.isOverApproximationEnabled();
 			boolean underApproximation = query.isUnderApproximationEnabled();
 			int approximationDenominator = query.approximationDenominator();
@@ -401,6 +413,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			throw new Exception("Model contains no places. This may not happen.");
 		
 		return new TCTLAGNode(new TCTLTrueNode());
+	}
+        
+        private TCTLAbstractProperty generateExistDeadlock(TimedArcPetriNet model) throws Exception {
+		return new TCTLEFNode(new TCTLDeadlockNode()); 
 	}
 
 	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {

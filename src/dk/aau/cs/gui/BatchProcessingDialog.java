@@ -136,6 +136,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_Random = "Random search";
 	private static final String name_KeepQueryOption = "Do not override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
+        private static final String name_EXISTDEADLOCK = "Existence of a deadlock";
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
 	private static final String name_NONE_APPROXIMATION = "None";
@@ -529,7 +530,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(queryLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption,
-				name_SEARCHWHOLESTATESPACE };
+				name_SEARCHWHOLESTATESPACE, name_EXISTDEADLOCK};
 		queryPropertyOption = new JComboBox(options);
 		queryPropertyOption.setToolTipText(TOOL_TIP_Query_Property_Option);
 		
@@ -868,7 +869,9 @@ public class BatchProcessingDialog extends JDialog {
 		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
 		if (propertyOptionString.equals(name_SEARCHWHOLESTATESPACE))
 			return QueryPropertyOption.SearchWholeStateSpace;
-		else
+                else if (propertyOptionString.equals(name_EXISTDEADLOCK))
+                        return QueryPropertyOption.ExistDeadlock;
+                else
 			return QueryPropertyOption.KeepQueryOption;
 	}
 	
@@ -1561,10 +1564,7 @@ public class BatchProcessingDialog extends JDialog {
 			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
 
 			s.append("Query Property:\n");
-			if (query.getProperty().toString().equals("AG P0>=0"))
-				s.append(name_SEARCHWHOLESTATESPACE);
-			else
-				s.append(query.getProperty().toString());
+                        s.append(query.getProperty().toString());
 			
 			s.append("\n\n");
 			s.append("Approximation method: ");
