@@ -388,9 +388,9 @@ public class PNMLoader {
 		String x = offset.getAttribute("x");
 		String y = offset.getAttribute("y");
 		
-		int xd = Integer.parseInt(x);
-		int yd = Integer.parseInt(y);
-		
+                int xd = Math.round(Float.valueOf(x).floatValue());
+                int yd = Math.round(Float.valueOf(y).floatValue());
+               
 		return new Point(xd, yd);
 	}
 
