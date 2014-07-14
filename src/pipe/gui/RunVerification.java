@@ -239,7 +239,7 @@ public class RunVerification extends RunVerificationBase {
 		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
 		Object[][] out = new Object[transistionStats.size()][2];
 		for (int i=0;i<transistionStats.size();i++) {
-			Object[] line = {(transistionStats.get(i).value2()==-1 ? "unknown - transition was removed" : transistionStats.get(i).value2()) ,transistionStats.get(i).value1()};
+			Object[] line = {(transistionStats.get(i).value2()==-1 ? "unknown" : transistionStats.get(i).value2()) ,transistionStats.get(i).value1()};
 			out[i] = line;
 		}
 		return out;
@@ -249,7 +249,7 @@ public class RunVerification extends RunVerificationBase {
 		List<Tuple<String,Integer>> placeBoundStats = result.getPlaceBoundStatistics();
 		Object[][] out = new Object[placeBoundStats.size()][2];
 		for (int i=0;i<placeBoundStats.size();i++) {
-			Object[] line = {(placeBoundStats.get(i).value2()==-1 ? "unknown - place was removed" : placeBoundStats.get(i).value2()),placeBoundStats.get(i).value1()};
+			Object[] line = {(placeBoundStats.get(i).value2()==-1 ? "unknown" : placeBoundStats.get(i).value2()),placeBoundStats.get(i).value1()};
 			out[i] = line;
 		}
 		return out;

@@ -28,6 +28,9 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
+        private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
+        private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
+        
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
 	private static final Pattern wfCoveredMarkingPattern = Pattern.compile("Covered marking: (.*)");
@@ -60,6 +63,14 @@ public class VerifyDTAPNOutputParser {
 			while (matcher.find()) {
 				transitionStats.add(new Tuple<String,Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
 			}
+                        matcher = placeBoundPattern.matcher(output);
+                        while (matcher.find()) {
+                            placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                        }
+                        matcher = placeBoundPatternUnknown.matcher(output);
+                        while (matcher.find()) {
+                            placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
+                        }
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
 				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true; }
