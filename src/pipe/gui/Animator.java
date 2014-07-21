@@ -30,6 +30,7 @@ import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -50,6 +51,7 @@ import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import pipe.gui.AnimationHistoryComponent;
 
 public class Animator {
 	private ArrayList<TAPNNetworkTraceStep> actionHistory;
@@ -669,38 +671,46 @@ public class Animator {
 		return isDisplayingUntimedTrace || trace != null;
 	}
 	
-	public void exportTrace(){
-		DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
-		StringBuilder output = new StringBuilder();
-		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
-		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+\\.?\\d*)");
-		Matcher m = null;
-		try{
-			Enumeration<String> steps = trace.elements();
-			while(steps.hasMoreElements()){
-				String line = steps.nextElement().replaceAll("\\<.*?>","");
-				m = trans_p.matcher(line);
-				if(m.matches()){
-            		output.append(m.group(1) + "." + m.group(2) + "\n");
-            		continue;
-            	}
-            	m = delay_p.matcher(line);
-            	if(m.matches()){
-            		output.append(m.group(1) + "\n");
-            		continue;
-            	}
-			}
-			FileBrowser fb = new FileBrowser("Export Trace","txt");
-			String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-			FileWriter fw = new FileWriter(path);
-			fw.write(output.substring(0,  output.length()-1));
-			fw.close();
-		} catch (NullPointerException e) {
-			// Aborted by user
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
+	   public void exportTrace() {
+        DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
+        StringBuilder output = new StringBuilder();
+        Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
+        Pattern trans_shared = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
+        Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+\\.?\\d*)");
+        
+        Matcher m = null;
+        try {
+            Enumeration<String> steps = trace.elements();
+            while (steps.hasMoreElements()) {
+                String line = steps.nextElement();  //replaceAll("\\<.*?>", "");
+                if (line.startsWith("<html>")) continue;
+                m = trans_shared.matcher(line);
+                if (m.matches()) {
+                    output.append(line + "\n");
+                    continue;
+                }
+                m = trans_p.matcher(line);
+                if (m.matches()) {
+                    output.append(m.group(1) + "." + m.group(2) + "\n");
+                    continue;
+                }
+                m = delay_p.matcher(line);
+                if (m.matches()) {
+                    output.append(m.group(1) + "\n");
+                    continue;
+                }
+            }
+            FileBrowser fb = new FileBrowser("Export Trace", "txt");
+            String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
+            FileWriter fw = new FileWriter(path);
+            fw.write(output.substring(0, output.length() - 1));
+            fw.close();
+        } catch (NullPointerException e) {
+            // Aborted by user
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 	
 	public void importTrace(){
 		if(CreateGui.getAnimationHistory().getListModel().size() > 1){
@@ -720,6 +730,7 @@ public class Animator {
 		reset(true);
 						
 		Pattern trans_p = Pattern.compile("([^\\d][^\\.\\s]+)\\.([^\\.\\s]+)");
+                Pattern trans_shared = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
 		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
 		Matcher m = null;
 		
@@ -727,6 +738,26 @@ public class Animator {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 			String line = br.readLine();
             while(line != null){
+                m = trans_shared.matcher(line);
+                if(m.matches()){
+            		// Fire shared transition
+                        TimedArcPetriNet template = null;
+                        TimedTransition t = null;
+            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
+                            t = pn.getTransitionByName(m.group());
+                            if (t != null) {
+                                template = pn;
+                                break;
+                            }
+            		}
+            		if( template == null )	throw new IOException();
+            		if(t == null || !t.isEnabled() || !t.isShared()){
+            			throw new IOException();
+            		}
+            		fireTransition(t);
+            		line = br.readLine();
+            		continue;
+            	}
             	m = trans_p.matcher(line);
             	if(m.matches()){
             		// Fire transition
