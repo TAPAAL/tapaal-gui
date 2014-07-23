@@ -46,11 +46,18 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNTraceDecomposer;
+import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNTraceParser;
 import pipe.gui.AnimationHistoryComponent;
 
 public class Animator {
@@ -545,6 +552,10 @@ public class Animator {
 		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
+    private TAPNNetworkTrace mapTraceToRealModel(TimedArcPetriNetTrace trace1) {
+       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 	enum FillListStatus{
 		lessThanWeight,
 		weight,
@@ -720,7 +731,7 @@ public class Animator {
 			if(answer != JOptionPane.OK_OPTION) return;
 		}
 		
-		FileBrowser fb = new FileBrowser("Import Trace","txt");
+		FileBrowser fb = new FileBrowser("Import Trace","xml");
 		File f = fb.openFile();
 		
 		if(f == null){
@@ -729,65 +740,20 @@ public class Animator {
 		
 		reset(true);
 						
-		Pattern trans_p = Pattern.compile("([^\\d][^\\.\\s]+)\\.([^\\.\\s]+)");
-                Pattern trans_shared = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
-		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
-		Matcher m = null;
+	
 		
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-			String line = br.readLine();
-            while(line != null){
-                m = trans_shared.matcher(line);
-                if(m.matches()){
-            		// Fire shared transition
-                        TimedArcPetriNet template = null;
-                        TimedTransition t = null;
-            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
-                            t = pn.getTransitionByName(m.group());
-                            if (t != null) {
-                                template = pn;
-                                break;
-                            }
-            		}
-            		if( template == null )	throw new IOException();
-            		if(t == null || !t.isEnabled() || !t.isShared()){
-            			throw new IOException();
-            		}
-            		fireTransition(t);
-            		line = br.readLine();
-            		continue;
-            	}
-            	m = trans_p.matcher(line);
-            	if(m.matches()){
-            		// Fire transition
-            		TimedArcPetriNet template = null;
-            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
-            			if(pn.name().equals(m.group(1))){
-            				template = pn;
-            				break;
-            			}
-            		}
-            		if( template == null )	throw new IOException();
-            		TimedTransition t = template.getTransitionByName(m.group(2));
-            		if(t == null || !t.isEnabled()){
-            			throw new IOException();
-            		}
-            		fireTransition(t);
-            		line = br.readLine();
-            		continue;
-            	}
-            	m = delay_p.matcher(line);
-            	if(m.matches()){
-            		// Delay
-            		if(!letTimePass(new BigDecimal(m.group(1)))){
-            			throw new IOException();
-            		}
-            		line = br.readLine();
-            		continue;
-            	}
-            	throw new IOException();
-            }
+                        
+                        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
+                        Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
+                        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+                        TimedArcPetriNetTrace trace1 = traceParser.parseTrace(br);
+                        TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace1, CreateGui.getCurrentTab().network(), model.value2());
+
+                        CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+			CreateGui.getAnimator().SetTrace(decomposer.decompose());
+                                        
 		} catch (FileNotFoundException e) {
 			// Will never happen
 		} catch (IOException e) {
