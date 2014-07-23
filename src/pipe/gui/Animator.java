@@ -552,10 +552,6 @@ public class Animator {
 		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
-    private TAPNNetworkTrace mapTraceToRealModel(TimedArcPetriNetTrace trace1) {
-       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 	enum FillListStatus{
 		lessThanWeight,
 		weight,
