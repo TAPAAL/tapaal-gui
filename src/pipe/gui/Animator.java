@@ -29,6 +29,8 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
+import dk.aau.cs.model.NTA.trace.TraceToken;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -48,6 +50,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
@@ -552,6 +555,10 @@ public class Animator {
 		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
+    private TAPNNetworkTrace mapTraceToRealModel(TimedArcPetriNetTrace trace1) {
+       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 	enum FillListStatus{
 		lessThanWeight,
 		weight,
@@ -678,36 +685,49 @@ public class Animator {
 		return isDisplayingUntimedTrace || trace != null;
 	}
 	
-	   public void exportTrace() {
-        DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
-        StringBuilder output = new StringBuilder();
-        Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
-        Pattern trans_shared = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
-        Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+\\.?\\d*)");
+	public void exportTrace() {
+        // DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
         
-        Matcher m = null;
+        TimedTAPNNetworkTrace currentTrace = CreateGui.getAnimator().getTrace();
+        
+        StringBuilder output = new StringBuilder();
+        
         try {
-            Enumeration<String> steps = trace.elements();
-            while (steps.hasMoreElements()) {
-                String line = steps.nextElement();  //replaceAll("\\<.*?>", "");
-                if (line.startsWith("<html>")) continue;
-                m = trans_shared.matcher(line);
-                if (m.matches()) {
-                    output.append(line + "\n");
-                    continue;
+            List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
+            for (TAPNNetworkTraceStep step: steps) {
+                output.append(step.toString());
+                if (step.isLoopStep()) {
+                    output.append("    --- loop step");
                 }
-                m = trans_p.matcher(line);
-                if (m.matches()) {
-                    output.append(m.group(1) + "." + m.group(2) + "\n");
-                    continue;
+                if (step instanceof TAPNNetworkTimedTransitionStep) {
+                    TimedTransition transition = ((TAPNNetworkTimedTransitionStep)step).getTransition();
+                    if ( transition.isShared() ) {
+                        output.append("Shared_"+transition.name()+"\n");
+                    } else { // not shared
+                        output.append("   ---- timedTransitionStep = " + transition.model().name() + "_" + transition.name() + "\n");
+                    }
+                    
+                    List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep)step).getConsumedTokens();
+                    for (TimedToken token: consumedTokens) {
+                        if (token.place().isShared()) {
+                            output.append("   ---- consumedToken in place " + "Shared_" + token.place().name() + " of age " + token.age());
+                        } else { // not shared
+                        output.append("   ---- consumedToken in place " + ((LocalTimedPlace)token.place()).model().name() + "_" + token.place().name() + " of age " + token.age());
+                        }
+                        if ( ((TraceToken)token).isGreaterThanOrEqual() ) { 
+                            output.append("isGreatedThanOrEqual = true\n");
+                        } else {
+                            output.append("isGreatedThanOrEqual = false\n");
+                        }
+                    }
                 }
-                m = delay_p.matcher(line);
-                if (m.matches()) {
-                    output.append(m.group(1) + "\n");
-                    continue;
+                if (step instanceof TAPNNetworkTimeDelayStep) {
+                    output.append("   ---- delay step = " + ((TAPNNetworkTimeDelayStep)step).getDelay());
                 }
+                output.append("\n");
             }
-            FileBrowser fb = new FileBrowser("Export Trace", "txt");
+            
+            FileBrowser fb = new FileBrowser("Export Trace", "xml");
             String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
             FileWriter fw = new FileWriter(path);
             fw.write(output.substring(0, output.length() - 1));
@@ -736,16 +756,14 @@ public class Animator {
 		
 		reset(true);
 						
-	
-		
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
                         
                         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
                         Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
                         VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-                        TimedArcPetriNetTrace trace1 = traceParser.parseTrace(br);
-                        TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace1, CreateGui.getCurrentTab().network(), model.value2());
+                        TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
+                        TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
 
                         CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
 			CreateGui.getAnimator().SetTrace(decomposer.decompose());
