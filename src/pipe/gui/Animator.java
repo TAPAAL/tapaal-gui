@@ -719,12 +719,10 @@ public class Animator {
         Element traceRootNode = document.createElement("trace"); // TraceL Top Level
         document.appendChild(traceRootNode);
 
-        //Attr pnmlAttr = document.createAttribute("xmlns"); // PNML "xmlns"
-        //pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
-        //traceRootNode.setAttributeNode(pnmlAttr);
         // Output the trace to XML document
         TimedTAPNNetworkTrace currentTrace = CreateGui.getAnimator().getTrace();
         List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
 
         for (TAPNNetworkTraceStep step : steps) {
 
@@ -736,31 +734,15 @@ public class Animator {
             if (step instanceof TAPNNetworkTimedTransitionStep) {
                 TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
                 Element transitionElement = document.createElement("transition"); // Create transition
-                String transitionName = null;
-                if (transition.isShared()) {
-                    transitionName = "Shared_" + transition.name();
-                } else { // not shared
-                    transitionName = transition.model().name() + "_" + transition.name();
-                }
-                transitionElement.setAttribute("id", transitionName);
+                transitionElement.setAttribute("id", composer.composedTransitionName(transition));
                 traceRootNode.appendChild(transitionElement);
 
                 List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
                 for (TimedToken token : consumedTokens) {
-                    String placeName = null;
-                    if (token.place().isShared()) {
-                        placeName = "Shared_" + token.place().name();
-                    } else { // not shared
-                        placeName = ((LocalTimedPlace) token.place()).model().name() + "_" + token.place().name();
-                    }
                     Element tokenElement = document.createElement("token");
-                    tokenElement.setAttribute("place", placeName);
+                    tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
                     tokenElement.setAttribute("age", token.age().toString());
-                    if (((TraceToken) token).isGreaterThanOrEqual()) {
-                        tokenElement.setAttribute("greaterThanOrEqual", "true");
-                    } else {
-                        tokenElement.setAttribute("greaterThanOrEqual", "false");
-                    }
+                    tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
                     transitionElement.appendChild(tokenElement);
                 }
             }
