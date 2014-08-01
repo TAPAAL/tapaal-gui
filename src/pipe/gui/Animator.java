@@ -716,7 +716,7 @@ public class Animator {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         document = builder.newDocument();
 
-        Element traceRootNode = document.createElement("trace"); // TraceL Top Level
+        Element traceRootNode = document.createElement("trace"); // Trace Top Level
         document.appendChild(traceRootNode);
 
         // Output the trace to XML document
@@ -807,7 +807,7 @@ public class Animator {
                     .println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
                             + path
                             + "\"" + e);
-        } catch (NullPointerException e) {
+        //} catch (NullPointerException e) {
             // Aborted by user
         } catch (IOException e) {
             JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
