@@ -727,58 +727,53 @@ public class Animator {
         List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
 
         for (TAPNNetworkTraceStep step : steps) {
-            
+
             if (step.isLoopStep()) {
-                //    output.append("    --- loop step");
                 Element loopElement = document.createElement("loop");
                 traceRootNode.appendChild(loopElement);
             }
-            
+
             if (step instanceof TAPNNetworkTimedTransitionStep) {
                 TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
                 Element transitionElement = document.createElement("transition"); // Create transition
                 String transitionName = null;
                 if (transition.isShared()) {
-                    //  output.append("Shared_" + transition.name() + "\n");
                     transitionName = "Shared_" + transition.name();
                 } else { // not shared
-                    //  output.append("   ---- timedTransitionStep = " + transition.model().name() + "_" + transition.name() + "\n");
                     transitionName = transition.model().name() + "_" + transition.name();
                 }
                 transitionElement.setAttribute("id", transitionName);
                 traceRootNode.appendChild(transitionElement);
-                
+
                 List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
                 for (TimedToken token : consumedTokens) {
                     String placeName = null;
                     if (token.place().isShared()) {
-                        //    output.append("   ---- consumedToken in place " + "Shared_" + token.place().name() + " of age " + token.age());
                         placeName = "Shared_" + token.place().name();
                     } else { // not shared
-                        //    output.append("   ---- consumedToken in place " + ((LocalTimedPlace) token.place()).model().name() + "_" + token.place().name() + " of age " + token.age());
                         placeName = ((LocalTimedPlace) token.place()).model().name() + "_" + token.place().name();
                     }
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", placeName);
-                    tokenElement.setAttribute("age",token.age().toString());
+                    tokenElement.setAttribute("age", token.age().toString());
                     if (((TraceToken) token).isGreaterThanOrEqual()) {
-                        //    output.append("isGreatedThanOrEqual = true\n");
-                        tokenElement.setAttribute("greaterThanOrEqual","true");
+                        tokenElement.setAttribute("greaterThanOrEqual", "true");
                     } else {
-                        //    output.append("isGreatedThanOrEqual = false\n");
-                        tokenElement.setAttribute("greaterThanOrEqual","false");
+                        tokenElement.setAttribute("greaterThanOrEqual", "false");
                     }
                     transitionElement.appendChild(tokenElement);
                 }
             }
-            
+
             if (step instanceof TAPNNetworkTimeDelayStep) {
                 BigDecimal delay = ((TAPNNetworkTimeDelayStep) step).getDelay();
                 Element delayElement = document.createElement("delay"); // Create delay
                 traceRootNode.appendChild(delayElement);
                 delayElement.setTextContent(delay.toString());
             }
+
         }
+
         if (currentTrace.getTraceType() == EG_DELAY_FOREVER) {
             Element delayForeverElement = document.createElement("delay");
             traceRootNode.appendChild(delayForeverElement);
@@ -790,7 +785,7 @@ public class Animator {
         transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        
+
         DOMSource source = new DOMSource(document);
 
         StreamResult result = new StreamResult(os);
@@ -798,80 +793,83 @@ public class Animator {
 
         return os;
     }
-        
-	public void exportTrace() {
-                String path = null;
-		try {
-			ByteArrayOutputStream os = prepareTraceStream();
-                        
-                        FileBrowser fb = new FileBrowser("Export Trace", "xml");
-                        path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-			FileOutputStream fs = new FileOutputStream(path);
-			fs.write(os.toByteArray());
-			fs.close();
-		} catch (ParserConfigurationException e) {
-			System.out
-					.println("ParserConfigurationException thrown in savePNML() "
-							+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
-		} catch (DOMException e) {
-			System.out
-					.println("DOMException thrown in savePNML() "
-							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
-							+ path + "\" transformer=\"");
-		} catch (TransformerConfigurationException e) {
-			System.out
-					.println("TransformerConfigurationException thrown in savePNML() "
-							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
-							+ path
-							+ "\" transformer=\"");
-		} catch (TransformerException e) {
-			System.out
-					.println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
-							+ path
-							+ "\"" + e);
-		}  catch (NullPointerException e) {
-            // Aborted by user
-                }  catch (IOException e) {
-                       JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-	}
-            
-	
-	public void importTrace(){
-		if(CreateGui.getAnimationHistory().getListModel().size() > 1){
-			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
-					"You are about to import a trace. This removes the current trace.", 
-					"Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(answer != JOptionPane.OK_OPTION) return;
-		}
-		
-		FileBrowser fb = new FileBrowser("Import Trace","xml");
-		File f = fb.openFile();
-		
-		if(f == null){
-			return;
-		}
-		
-		reset(true);
-						
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-                        
-                        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
-                        Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
-                        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-                        TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
-                        TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
 
-                        CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
-			CreateGui.getAnimator().SetTrace(decomposer.decompose());
-                                        
-		} catch (FileNotFoundException e) {
-			// Will never happen
-		} catch (IOException e) {
-			reset(true);
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
-		}
-		
-	}
+    
+    public void exportTrace() {
+        String path = null;
+        try {
+            ByteArrayOutputStream os = prepareTraceStream();
+
+            FileBrowser fb = new FileBrowser("Export Trace", "xml");
+            path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
+            FileOutputStream fs = new FileOutputStream(path);
+            fs.write(os.toByteArray());
+            fs.close();
+        } catch (ParserConfigurationException e) {
+            System.out
+                    .println("ParserConfigurationException thrown in savePNML() "
+                            + ": dataLayerWriter Class : dataLayer Package: filename=\"");
+        } catch (DOMException e) {
+            System.out
+                    .println("DOMException thrown in savePNML() "
+                            + ": dataLayerWriter Class : dataLayer Package: filename=\""
+                            + path + "\" transformer=\"");
+        } catch (TransformerConfigurationException e) {
+            System.out
+                    .println("TransformerConfigurationException thrown in savePNML() "
+                            + ": dataLayerWriter Class : dataLayer Package: filename=\""
+                            + path
+                            + "\" transformer=\"");
+        } catch (TransformerException e) {
+            System.out
+                    .println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
+                            + path
+                            + "\"" + e);
+        } catch (NullPointerException e) {
+            // Aborted by user
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    
+    public void importTrace() {
+        if (CreateGui.getAnimationHistory().getListModel().size() > 1) {
+            int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+                    "You are about to import a trace. This removes the current trace.",
+                    "Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (answer != JOptionPane.OK_OPTION) {
+                return;
+            }
+        }
+
+        FileBrowser fb = new FileBrowser("Import Trace", "xml");
+        File f = fb.openFile();
+
+        if (f == null) {
+            return;
+        }
+
+        reset(true);
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+
+            TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
+            Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
+            VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+            TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
+            TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
+
+            CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+            CreateGui.getAnimator().SetTrace(decomposer.decompose());
+
+        } catch (FileNotFoundException e) {
+            // Will never happen
+        } catch (IOException e) {
+            reset(true);
+            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
 }
