@@ -17,6 +17,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -53,6 +59,7 @@ import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
@@ -61,6 +68,18 @@ import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNTraceParser;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import pipe.gui.AnimationHistoryComponent;
 
 public class Animator {
@@ -685,59 +704,130 @@ public class Animator {
 		return isDisplayingUntimedTrace || trace != null;
 	}
 	
-	public void exportTrace() {
-        // DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
-        
+
+    private ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+        Document document = null;
+        Transformer transformer = null;
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        // Build a Trace XML Document
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        document = builder.newDocument();
+
+        Element traceRootNode = document.createElement("trace"); // TraceL Top Level
+        document.appendChild(traceRootNode);
+
+        //Attr pnmlAttr = document.createAttribute("xmlns"); // PNML "xmlns"
+        //pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
+        //traceRootNode.setAttributeNode(pnmlAttr);
+        // Output the trace to XML document
         TimedTAPNNetworkTrace currentTrace = CreateGui.getAnimator().getTrace();
-        
-        StringBuilder output = new StringBuilder();
-        
-        try {
-            List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
-            for (TAPNNetworkTraceStep step: steps) {
-                output.append(step.toString());
-                if (step.isLoopStep()) {
-                    output.append("    --- loop step");
-                }
-                if (step instanceof TAPNNetworkTimedTransitionStep) {
-                    TimedTransition transition = ((TAPNNetworkTimedTransitionStep)step).getTransition();
-                    if ( transition.isShared() ) {
-                        output.append("Shared_"+transition.name()+"\n");
-                    } else { // not shared
-                        output.append("   ---- timedTransitionStep = " + transition.model().name() + "_" + transition.name() + "\n");
-                    }
-                    
-                    List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep)step).getConsumedTokens();
-                    for (TimedToken token: consumedTokens) {
-                        if (token.place().isShared()) {
-                            output.append("   ---- consumedToken in place " + "Shared_" + token.place().name() + " of age " + token.age());
-                        } else { // not shared
-                        output.append("   ---- consumedToken in place " + ((LocalTimedPlace)token.place()).model().name() + "_" + token.place().name() + " of age " + token.age());
-                        }
-                        if ( ((TraceToken)token).isGreaterThanOrEqual() ) { 
-                            output.append("isGreatedThanOrEqual = true\n");
-                        } else {
-                            output.append("isGreatedThanOrEqual = false\n");
-                        }
-                    }
-                }
-                if (step instanceof TAPNNetworkTimeDelayStep) {
-                    output.append("   ---- delay step = " + ((TAPNNetworkTimeDelayStep)step).getDelay());
-                }
-                output.append("\n");
+        List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
+
+        for (TAPNNetworkTraceStep step : steps) {
+            
+            if (step.isLoopStep()) {
+                //    output.append("    --- loop step");
             }
             
-            FileBrowser fb = new FileBrowser("Export Trace", "xml");
-            String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-            FileWriter fw = new FileWriter(path);
-            fw.write(output.substring(0, output.length() - 1));
-            fw.close();
-        } catch (NullPointerException e) {
-            // Aborted by user
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+            if (step instanceof TAPNNetworkTimedTransitionStep) {
+                TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
+                Element transitionElement = document.createElement("transition"); // Create transition
+                String transitionName = null;
+                if (transition.isShared()) {
+                    //  output.append("Shared_" + transition.name() + "\n");
+                    transitionName = "Shared_" + transition.name();
+                } else { // not shared
+                    //  output.append("   ---- timedTransitionStep = " + transition.model().name() + "_" + transition.name() + "\n");
+                    transitionName = transition.model().name() + "_" + transition.name();
+                }
+                transitionElement.setAttribute("id", transitionName);
+                traceRootNode.appendChild(transitionElement);
+                
+                List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
+                for (TimedToken token : consumedTokens) {
+                    String placeName = null;
+                    if (token.place().isShared()) {
+                        //    output.append("   ---- consumedToken in place " + "Shared_" + token.place().name() + " of age " + token.age());
+                        placeName = "Shared_" + token.place().name();
+                    } else { // not shared
+                        //    output.append("   ---- consumedToken in place " + ((LocalTimedPlace) token.place()).model().name() + "_" + token.place().name() + " of age " + token.age());
+                        placeName = ((LocalTimedPlace) token.place()).model().name() + "_" + token.place().name();
+                    }
+                    Element tokenElement = document.createElement("token");
+                    tokenElement.setAttribute("place", placeName);
+                    tokenElement.setAttribute("age",token.age().toString());
+                    if (((TraceToken) token).isGreaterThanOrEqual()) {
+                        //    output.append("isGreatedThanOrEqual = true\n");
+                        tokenElement.setAttribute("greaterThanOrEqual","true");
+                    } else {
+                        //    output.append("isGreatedThanOrEqual = false\n");
+                        tokenElement.setAttribute("greaterThanOrEqual","false");
+                    }
+                    transitionElement.appendChild(tokenElement);
+                }
+            }
+            
+            if (step instanceof TAPNNetworkTimeDelayStep) {
+                BigDecimal delay = ((TAPNNetworkTimeDelayStep) step).getDelay();
+                Element delayElement = document.createElement("delay"); // Create delay
+                traceRootNode.appendChild(delayElement);
+                delayElement.setTextContent(delay.toString());
+            }
         }
+
+        document.normalize();
+        // Create Transformer with XSL Source File
+        transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        
+        DOMSource source = new DOMSource(document);
+
+        StreamResult result = new StreamResult(os);
+        transformer.transform(source, result);
+
+        return os;
     }
+        
+	public void exportTrace() {
+                String path = null;
+		try {
+			ByteArrayOutputStream os = prepareTraceStream();
+                        
+                        FileBrowser fb = new FileBrowser("Export Trace", "xml");
+                        path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
+			FileOutputStream fs = new FileOutputStream(path);
+			fs.write(os.toByteArray());
+			fs.close();
+		} catch (ParserConfigurationException e) {
+			System.out
+					.println("ParserConfigurationException thrown in savePNML() "
+							+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
+		} catch (DOMException e) {
+			System.out
+					.println("DOMException thrown in savePNML() "
+							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
+							+ path + "\" transformer=\"");
+		} catch (TransformerConfigurationException e) {
+			System.out
+					.println("TransformerConfigurationException thrown in savePNML() "
+							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
+							+ path
+							+ "\" transformer=\"");
+		} catch (TransformerException e) {
+			System.out
+					.println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
+							+ path
+							+ "\"" + e);
+		}  catch (NullPointerException e) {
+            // Aborted by user
+                }  catch (IOException e) {
+                       JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+	}
+            
 	
 	public void importTrace(){
 		if(CreateGui.getAnimationHistory().getListModel().size() > 1){
