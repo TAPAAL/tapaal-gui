@@ -720,25 +720,31 @@ public class Animator {
         document.appendChild(traceRootNode);
 
         // Output the trace to XML document
-        TimedTAPNNetworkTrace currentTrace = CreateGui.getAnimator().getTrace();
-        List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
+        //TimedTAPNNetworkTrace currentTrace = CreateGui.getAnimator().getTrace();
+        
+        //List<TAPNNetworkTraceStep> steps = null;
+        //for( TAPNNetworkTraceStep action : actionHistory ) {
+        //    steps.add(action);
+       // }
+                
+        //List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
 
-        for (TAPNNetworkTraceStep step : steps) {
-
+        for (TAPNNetworkTraceStep step : actionHistory) {
+            System.out.println(step.toString());
             if (step.isLoopStep()) {
                 Element loopElement = document.createElement("loop");
                 traceRootNode.appendChild(loopElement);
             }
 
             if (step instanceof TAPNNetworkTimedTransitionStep) {
-                TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
+                TimedTransition transition = ((TAPNNetworkTimedTransitionStep)step).getTransition();
                 Element transitionElement = document.createElement("transition"); // Create transition
                 transitionElement.setAttribute("id", composer.composedTransitionName(transition));
                 traceRootNode.appendChild(transitionElement);
 
-                List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
-                for (TimedToken token : consumedTokens) {
+                List<TimedToken> consumedTokens =  ((TAPNNetworkTimedTransitionStep)step).getConsumedTokens();
+                for (TimedToken token : ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens()) {
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
                     tokenElement.setAttribute("age", token.age().toString());
@@ -755,8 +761,8 @@ public class Animator {
             }
 
         }
-
-        if (currentTrace.getTraceType() == EG_DELAY_FOREVER) {
+        //TimedTAPNNetworkTrace currentTrace = getTrace(); // ((TimedTAPNNetworkTrace)trace);
+        if (getTrace()!= null && getTrace().getTraceType() == EG_DELAY_FOREVER) {
             Element delayForeverElement = document.createElement("delay");
             traceRootNode.appendChild(delayForeverElement);
             delayForeverElement.setTextContent("forever");
