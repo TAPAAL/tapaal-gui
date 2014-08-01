@@ -67,6 +67,7 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import static dk.aau.cs.verification.VerifyTAPN.TraceType.EG_DELAY_FOREVER;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNTraceParser;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -777,6 +778,11 @@ public class Animator {
                 traceRootNode.appendChild(delayElement);
                 delayElement.setTextContent(delay.toString());
             }
+        }
+        if (currentTrace.getTraceType() == EG_DELAY_FOREVER) {
+            Element delayForeverElement = document.createElement("delay");
+            traceRootNode.appendChild(delayForeverElement);
+            delayForeverElement.setTextContent("forever");
         }
 
         document.normalize();
