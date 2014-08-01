@@ -729,6 +729,8 @@ public class Animator {
             
             if (step.isLoopStep()) {
                 //    output.append("    --- loop step");
+                Element loopElement = document.createElement("loop");
+                traceRootNode.appendChild(loopElement);
             }
             
             if (step instanceof TAPNNetworkTimedTransitionStep) {
