@@ -782,8 +782,10 @@ public class Animator {
         try {
             ByteArrayOutputStream os = prepareTraceStream();
 
-            FileBrowser fb = new FileBrowser("Export Trace", "xml");
-            path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
+            FileBrowser fb = new FileBrowser("Export Trace", "trc");
+            // path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
+            path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')));
+            
             FileOutputStream fs = new FileOutputStream(path);
             fs.write(os.toByteArray());
             fs.close();
@@ -825,7 +827,7 @@ public class Animator {
             }
         }
 
-        FileBrowser fb = new FileBrowser("Import Trace", "xml");
+        FileBrowser fb = new FileBrowser("Import Trace", "trc");
         File f = fb.openFile();
 
         if (f == null) {
