@@ -127,7 +127,6 @@ public class NetworkMarking implements TimedMarking {
 		return newMarking;
 	}
 
-        @Override
 	public Tuple<NetworkMarking, List<TimedToken>> fireTransition(TimedTransition transition, FiringMode firingMode) {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(firingMode != null, "firingMode cannot be null");
