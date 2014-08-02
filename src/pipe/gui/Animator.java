@@ -848,10 +848,10 @@ public class Animator {
 
         } catch (FileNotFoundException e) {
             // Will never happen
-        } catch (IOException e) {
+        } catch (Exception e) { //IOException
             reset(true);
             JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        } 
 
     }
 }
