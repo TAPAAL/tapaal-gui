@@ -158,13 +158,13 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		return clone; //xxx
 	}
 
-	public LocalTimedMarking fireTransition(TimedTransition transition, FiringMode firingMode) {
+	public Tuple<LocalTimedMarking, List<TimedToken>> fireTransition(TimedTransition transition, FiringMode firingMode) {
 		Require.that(transition != null, "transition must not be null");
 		Require.that(transition.isEnabled(), "Transition must be enabled");
 
 		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(this, firingMode);
 
-		return fireTransition(transition, tokensToConsume);
+		return new Tuple<> (fireTransition(transition, tokensToConsume), tokensToConsume);
 	}
 
 	public int size() {

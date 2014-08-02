@@ -393,14 +393,15 @@ public class Animator {
 			return;
 		}
 
-		NetworkMarking next = null;
+		Tuple<NetworkMarking, List<TimedToken>> next = null;
+                List<TimedToken> tokensToConsume = null;
 		try{
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
 			} else {
-				List<TimedToken> tokensToConsume = getTokensToConsume(transition);
+				tokensToConsume = getTokensToConsume(transition);
 				if(tokensToConsume == null) return; // Cancelled
-				next = currentMarking().fireTransition(transition, tokensToConsume);
+				next = new Tuple<> (currentMarking().fireTransition(transition, tokensToConsume), tokensToConsume);
 			}
 		}catch(RequireException e){
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -432,12 +433,12 @@ public class Animator {
 			}
 		}
 
-		tab.network().setMarking(next);
+		tab.network().setMarking(next.value1());
 		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
-		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
+		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
 		
 		reportBlockingPlaces();
 
@@ -720,18 +721,9 @@ public class Animator {
         document.appendChild(traceRootNode);
 
         // Output the trace to XML document
-        //TimedTAPNNetworkTrace currentTrace = CreateGui.getAnimator().getTrace();
-        
-        //List<TAPNNetworkTraceStep> steps = null;
-        //for( TAPNNetworkTraceStep action : actionHistory ) {
-        //    steps.add(action);
-       // }
-                
-        //List<TAPNNetworkTraceStep> steps = currentTrace.getSteps();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
 
         for (TAPNNetworkTraceStep step : actionHistory) {
-            System.out.println(step.toString());
             if (step.isLoopStep()) {
                 Element loopElement = document.createElement("loop");
                 traceRootNode.appendChild(loopElement);
@@ -748,7 +740,9 @@ public class Animator {
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
                     tokenElement.setAttribute("age", token.age().toString());
-                    tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
+                    if (getTrace()!= null) {
+                        tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
+                    }
                     transitionElement.appendChild(tokenElement);
                 }
             }
@@ -761,7 +755,7 @@ public class Animator {
             }
 
         }
-        //TimedTAPNNetworkTrace currentTrace = getTrace(); // ((TimedTAPNNetworkTrace)trace);
+
         if (getTrace()!= null && getTrace().getTraceType() == EG_DELAY_FOREVER) {
             Element delayForeverElement = document.createElement("delay");
             traceRootNode.appendChild(delayForeverElement);
@@ -813,7 +807,7 @@ public class Animator {
                     .println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
                             + path
                             + "\"" + e);
-        //} catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             // Aborted by user
         } catch (IOException e) {
             JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
