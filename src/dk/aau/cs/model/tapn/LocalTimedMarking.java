@@ -155,7 +155,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		clone.remove(tokensToConsume);
 		clone.add(producedTokens);
 
-		return clone; //xxx
+		return clone;
 	}
 
 	public Tuple<LocalTimedMarking, List<TimedToken>> fireTransition(TimedTransition transition, FiringMode firingMode) {
