@@ -164,7 +164,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 
 		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(this, firingMode);
 
-		return new Tuple<> (fireTransition(transition, tokensToConsume), tokensToConsume);
+		return new Tuple<LocalTimedMarking, List<TimedToken>> (fireTransition(transition, tokensToConsume), tokensToConsume);
 	}
 
 	public int size() {

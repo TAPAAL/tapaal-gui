@@ -401,7 +401,7 @@ public class Animator {
 			} else {
 				tokensToConsume = getTokensToConsume(transition);
 				if(tokensToConsume == null) return; // Cancelled
-				next = new Tuple<> (currentMarking().fireTransition(transition, tokensToConsume), tokensToConsume);
+				next = new Tuple<NetworkMarking, List<TimedToken>> (currentMarking().fireTransition(transition, tokensToConsume), tokensToConsume);
 			}
 		}catch(RequireException e){
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

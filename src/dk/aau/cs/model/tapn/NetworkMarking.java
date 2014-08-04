@@ -139,7 +139,7 @@ public class NetworkMarking implements TimedMarking {
 		clone.removeMarkingFor(transition.model());
 		clone.addMarking(transition.model(), newMarking.value1());
 		
-		return new Tuple<> (clone, newMarking.value2());
+		return new Tuple<NetworkMarking, List<TimedToken>> (clone, newMarking.value2());
 	}
 
 	private Tuple<NetworkMarking, List<TimedToken>> fireSharedTransition(SharedTransition sharedTransition, FiringMode firingMode) {
@@ -156,7 +156,7 @@ public class NetworkMarking implements TimedMarking {
 			}
 		}
 		
-		return new Tuple<> (clone, consumedTokens);
+		return new Tuple<NetworkMarking, List<TimedToken>> (clone, consumedTokens);
 	}
 
 	private NetworkMarking fireSharedTransition(SharedTransition sharedTransition, List<TimedToken> tokensToConsume) {
