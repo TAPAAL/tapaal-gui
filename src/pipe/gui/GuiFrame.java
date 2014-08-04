@@ -94,6 +94,7 @@ import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
@@ -2520,9 +2521,9 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			} else if(this == exportTraceAction){
-				CreateGui.getAnimator().exportTrace();
+				(new TraceImportExport()).exportTrace();
 			} else if(this == importTraceAction){
-				CreateGui.getAnimator().importTrace();
+                                (new TraceImportExport()).importTrace();
 			}
 		}
 
