@@ -658,11 +658,11 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 
    public String composedTransitionName(TimedTransition transition) {
-        return  !transition.isShared() ? transition.model().name() + "_" + transition.name() : "Shared_" + transition.name();
+        return  transition.isShared() ? "Shared_" + transition.name() : transition.model().name() + "_" + transition.name();
    }
    
    public String composedPlaceName(TimedPlace place) {
-        return  !place.isShared() ? ((LocalTimedPlace)place).model().name() + "_" + place.name() : "Shared_" + place.name();
+        return  place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
    }
    
 

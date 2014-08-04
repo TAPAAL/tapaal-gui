@@ -576,10 +576,6 @@ public class Animator {
 		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
-    private TAPNNetworkTrace mapTraceToRealModel(TimedArcPetriNetTrace trace1) {
-       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 	enum FillListStatus{
 		lessThanWeight,
 		weight,
@@ -740,9 +736,9 @@ public class Animator {
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
                     tokenElement.setAttribute("age", token.age().toString());
-                    if (getTrace()!= null) {
-                        tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
-                    }
+                    //if (getTrace()!= null) {
+                    //    tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
+                    // }
                     transitionElement.appendChild(tokenElement);
                 }
             }
@@ -790,23 +786,23 @@ public class Animator {
             fs.write(os.toByteArray());
             fs.close();
         } catch (ParserConfigurationException e) {
-            System.out
-                    .println("ParserConfigurationException thrown in savePNML() "
-                            + ": dataLayerWriter Class : dataLayer Package: filename=\"");
+            System.err
+                    .println("ParserConfigurationException thrown in exportTrace() "
+                            + ": Animator Class : filename=\"");
         } catch (DOMException e) {
-            System.out
-                    .println("DOMException thrown in savePNML() "
-                            + ": dataLayerWriter Class : dataLayer Package: filename=\""
+            System.err
+                    .println("DOMException thrown in exportTrace() "
+                            + ": Animator Class : filename=\""
                             + path + "\" transformer=\"");
         } catch (TransformerConfigurationException e) {
-            System.out
-                    .println("TransformerConfigurationException thrown in savePNML() "
-                            + ": dataLayerWriter Class : dataLayer Package: filename=\""
+            System.err
+                    .println("TransformerConfigurationException thrown in exportTrace()) "
+                            + ": Animator Class :  filename=\""
                             + path
                             + "\" transformer=\"");
         } catch (TransformerException e) {
-            System.out
-                    .println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
+            System.err
+                    .println("TransformerException thrown in exportTrace() : Animator Class : filename=\""
                             + path
                             + "\"" + e);
         } catch (NullPointerException e) {
