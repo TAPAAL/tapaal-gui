@@ -2521,9 +2521,9 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			} else if(this == exportTraceAction){
-				(new TraceImportExport()).exportTrace();
+				TraceImportExport.exportTrace();
 			} else if(this == importTraceAction){
-                                (new TraceImportExport()).importTrace();
+                                TraceImportExport.importTrace();
 			}
 		}
 

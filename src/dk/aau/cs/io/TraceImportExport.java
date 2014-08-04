@@ -42,7 +42,7 @@ import javax.xml.transform.stream.StreamResult;
 
 public class TraceImportExport {
 
-    public void exportTrace() {
+    public static void exportTrace() {
         String path = null;
         try {
             ByteArrayOutputStream os = prepareTraceStream();
@@ -81,7 +81,7 @@ public class TraceImportExport {
         }
     }
 
-    private ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+    private static ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
         Document document;
         Transformer transformer;
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -147,7 +147,7 @@ public class TraceImportExport {
         return os;
     }
 
-    public void importTrace() {
+    public static void importTrace() {
         if (pipe.gui.CreateGui.getAnimationHistory().getListModel().size() > 1) {
             int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
                     "You are about to import a trace. This removes the current trace.",
