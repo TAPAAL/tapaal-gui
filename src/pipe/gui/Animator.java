@@ -708,8 +708,8 @@ public class Animator {
 	
 
     private ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
-        Document document = null;
-        Transformer transformer = null;
+        Document document;
+        Transformer transformer;
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         // Build a Trace XML Document
@@ -735,7 +735,7 @@ public class Animator {
                 transitionElement.setAttribute("id", composer.composedTransitionName(transition));
                 traceRootNode.appendChild(transitionElement);
 
-                List<TimedToken> consumedTokens =  ((TAPNNetworkTimedTransitionStep)step).getConsumedTokens();
+                List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep)step).getConsumedTokens();
                 for (TimedToken token : ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens()) {
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
