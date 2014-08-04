@@ -75,6 +75,7 @@ public class AnimationHistoryComponent extends JList {
 			int nextIndex = getSelectedIndex() + 1;
 			setSelectedIndex(nextIndex);
 		}
+                layoutAdjustment();
 	}
 
 	public void stepBackwards() {
@@ -85,6 +86,7 @@ public class AnimationHistoryComponent extends JList {
 	}
 
 	public boolean isStepForwardAllowed() {
+                layoutAdjustment();
 		if(lastShown != TraceType.EG_DEADLOCK){
 			return getSelectedIndex() < getListModel().size() - 1;
 		} else {
@@ -138,13 +140,21 @@ public class AnimationHistoryComponent extends JList {
 			break;
 		case EG_DELAY_FOREVER:
 			getListModel().addElement(delayForeverString);
-			break;
+                        break;
 		case EG_LOOP:
 			getListModel().addElement(gotoString);
 		case NOT_EG:
 			break;
 		}
+                layoutAdjustment();
 	}
+        
+        private void layoutAdjustment() { 
+            // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
+            int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
+            CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex+1);
+            CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+        }
 	
 	private void updateAccordingToDeadlock() {
 		
