@@ -736,9 +736,6 @@ public class Animator {
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
                     tokenElement.setAttribute("age", token.age().toString());
-                    //if (getTrace()!= null) {
-                    //    tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
-                    // }
                     transitionElement.appendChild(tokenElement);
                 }
             }
