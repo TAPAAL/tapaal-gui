@@ -1,39 +1,23 @@
 package pipe.gui;
 
 import java.awt.Container;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -50,6 +34,7 @@ import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import pipe.gui.AnimationHistoryComponent;
 
@@ -363,14 +348,15 @@ public class Animator {
 			return;
 		}
 
-		NetworkMarking next = null;
+		Tuple<NetworkMarking, List<TimedToken>> next = null;
+                List<TimedToken> tokensToConsume = null;
 		try{
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
 			} else {
-				List<TimedToken> tokensToConsume = getTokensToConsume(transition);
+				tokensToConsume = getTokensToConsume(transition);
 				if(tokensToConsume == null) return; // Cancelled
-				next = currentMarking().fireTransition(transition, tokensToConsume);
+				next = new Tuple<NetworkMarking, List<TimedToken>> (currentMarking().fireTransition(transition, tokensToConsume), tokensToConsume);
 			}
 		}catch(RequireException e){
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -402,12 +388,12 @@ public class Animator {
 			}
 		}
 
-		tab.network().setMarking(next);
+		tab.network().setMarking(next.value1());
 		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
-		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
+		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
 		
 		reportBlockingPlaces();
 
@@ -670,130 +656,9 @@ public class Animator {
 	public boolean isShowingTrace(){
 		return isDisplayingUntimedTrace || trace != null;
 	}
-	
-	   public void exportTrace() {
-        DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
-        StringBuilder output = new StringBuilder();
-        Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
-        Pattern trans_shared = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
-        Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+\\.?\\d*)");
         
-        Matcher m = null;
-        try {
-            Enumeration<String> steps = trace.elements();
-            while (steps.hasMoreElements()) {
-                String line = steps.nextElement();  //replaceAll("\\<.*?>", "");
-                if (line.startsWith("<html>")) continue;
-                m = trans_shared.matcher(line);
-                if (m.matches()) {
-                    output.append(line + "\n");
-                    continue;
-                }
-                m = trans_p.matcher(line);
-                if (m.matches()) {
-                    output.append(m.group(1) + "." + m.group(2) + "\n");
-                    continue;
-                }
-                m = delay_p.matcher(line);
-                if (m.matches()) {
-                    output.append(m.group(1) + "\n");
-                    continue;
-                }
-            }
-            FileBrowser fb = new FileBrowser("Export Trace", "txt");
-            String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-            FileWriter fw = new FileWriter(path);
-            fw.write(output.substring(0, output.length() - 1));
-            fw.close();
-        } catch (NullPointerException e) {
-            // Aborted by user
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+        public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
+            return actionHistory;
+        }   
 	
-	public void importTrace(){
-		if(CreateGui.getAnimationHistory().getListModel().size() > 1){
-			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
-					"You are about to import a trace. This removes the current trace.", 
-					"Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(answer != JOptionPane.OK_OPTION) return;
-		}
-		
-		FileBrowser fb = new FileBrowser("Import Trace","txt");
-		File f = fb.openFile();
-		
-		if(f == null){
-			return;
-		}
-		
-		reset(true);
-						
-		Pattern trans_p = Pattern.compile("([^\\d][^\\.\\s]+)\\.([^\\.\\s]+)");
-                Pattern trans_shared = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
-		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
-		Matcher m = null;
-		
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-			String line = br.readLine();
-            while(line != null){
-                m = trans_shared.matcher(line);
-                if(m.matches()){
-            		// Fire shared transition
-                        TimedArcPetriNet template = null;
-                        TimedTransition t = null;
-            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
-                            t = pn.getTransitionByName(m.group());
-                            if (t != null) {
-                                template = pn;
-                                break;
-                            }
-            		}
-            		if( template == null )	throw new IOException();
-            		if(t == null || !t.isEnabled() || !t.isShared()){
-            			throw new IOException();
-            		}
-            		fireTransition(t);
-            		line = br.readLine();
-            		continue;
-            	}
-            	m = trans_p.matcher(line);
-            	if(m.matches()){
-            		// Fire transition
-            		TimedArcPetriNet template = null;
-            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
-            			if(pn.name().equals(m.group(1))){
-            				template = pn;
-            				break;
-            			}
-            		}
-            		if( template == null )	throw new IOException();
-            		TimedTransition t = template.getTransitionByName(m.group(2));
-            		if(t == null || !t.isEnabled()){
-            			throw new IOException();
-            		}
-            		fireTransition(t);
-            		line = br.readLine();
-            		continue;
-            	}
-            	m = delay_p.matcher(line);
-            	if(m.matches()){
-            		// Delay
-            		if(!letTimePass(new BigDecimal(m.group(1)))){
-            			throw new IOException();
-            		}
-            		line = br.readLine();
-            		continue;
-            	}
-            	throw new IOException();
-            }
-		} catch (FileNotFoundException e) {
-			// Will never happen
-		} catch (IOException e) {
-			reset(true);
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
-		}
-		
-	}
 }

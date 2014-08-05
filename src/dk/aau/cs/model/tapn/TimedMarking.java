@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.util.Tuple;
 
 public interface TimedMarking {
 	void add(TimedToken token);
@@ -23,7 +24,9 @@ public interface TimedMarking {
 	TimedMarking delay(BigDecimal amount);
 
 	TimedMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume);
-	TimedMarking fireTransition(TimedTransition transition, FiringMode firingMode);
+	// the first element in the tuple returns the new marking after firing, the second element the list of consumed tokens
+        Tuple<? extends TimedMarking, List<TimedToken>> fireTransition(TimedTransition transition, FiringMode firingMode);
+        
 
 	int size();
 }

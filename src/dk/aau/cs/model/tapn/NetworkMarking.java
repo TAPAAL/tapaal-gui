@@ -127,34 +127,36 @@ public class NetworkMarking implements TimedMarking {
 		return newMarking;
 	}
 
-	public NetworkMarking fireTransition(TimedTransition transition, FiringMode firingMode) {
+	public Tuple<NetworkMarking, List<TimedToken>> fireTransition(TimedTransition transition, FiringMode firingMode) {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(firingMode != null, "firingMode cannot be null");
 		
 		if(transition.isShared()) return fireSharedTransition(transition.sharedTransition(), firingMode);
 
 		NetworkMarking clone = clone(); // TODO: try to conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
-		LocalTimedMarking newMarking = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
+		Tuple<LocalTimedMarking, List<TimedToken>> newMarking = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
 
 		clone.removeMarkingFor(transition.model());
-		clone.addMarking(transition.model(), newMarking);
+		clone.addMarking(transition.model(), newMarking.value1());
 		
-		return clone;
+		return new Tuple<NetworkMarking, List<TimedToken>> (clone, newMarking.value2());
 	}
 
-	private NetworkMarking fireSharedTransition(SharedTransition sharedTransition, FiringMode firingMode) {
+	private Tuple<NetworkMarking, List<TimedToken>> fireSharedTransition(SharedTransition sharedTransition, FiringMode firingMode) {
 		// validity of arguments already checked above
 		NetworkMarking clone = clone();
+                Tuple<LocalTimedMarking, List<TimedToken>> ltm;
+                List<TimedToken> consumedTokens = new ArrayList<TimedToken>();
 		for(TimedTransition transition : sharedTransition.transitions()){
 			if(transition.model().isActive()) {
-				LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
-				
+				ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
+				consumedTokens.addAll(ltm.value2());
 				clone.removeMarkingFor(transition.model());
-				clone.addMarking(transition.model(), ltm);
+				clone.addMarking(transition.model(), ltm.value1());
 			}
 		}
 		
-		return clone;
+		return new Tuple<NetworkMarking, List<TimedToken>> (clone, consumedTokens);
 	}
 
 	private NetworkMarking fireSharedTransition(SharedTransition sharedTransition, List<TimedToken> tokensToConsume) {
