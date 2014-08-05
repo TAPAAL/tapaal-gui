@@ -106,7 +106,7 @@ public class AnimationHistoryComponent extends JList {
 		return (String) getListModel().get(i);
 	}
 
-	DefaultListModel getListModel() {
+	public DefaultListModel getListModel() {
 		return (DefaultListModel) getModel();
 	}
 

@@ -1,47 +1,23 @@
 package pipe.gui;
 
 import java.awt.Container;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.model.NTA.trace.TraceToken;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -54,33 +30,12 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
-import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.TAPNTraceDecomposer;
-import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
-import static dk.aau.cs.verification.VerifyTAPN.TraceType.EG_DELAY_FOREVER;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNTraceParser;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import pipe.gui.AnimationHistoryComponent;
 
 public class Animator {
@@ -576,10 +531,6 @@ public class Animator {
 		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
-    private TAPNNetworkTrace mapTraceToRealModel(TimedArcPetriNetTrace trace1) {
-       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 	enum FillListStatus{
 		lessThanWeight,
 		weight,
@@ -705,155 +656,9 @@ public class Animator {
 	public boolean isShowingTrace(){
 		return isDisplayingUntimedTrace || trace != null;
 	}
+        
+        public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
+            return actionHistory;
+        }   
 	
-
-    private ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
-        Document document;
-        Transformer transformer;
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-        // Build a Trace XML Document
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        document = builder.newDocument();
-
-        Element traceRootNode = document.createElement("trace"); // Trace Top Level
-        document.appendChild(traceRootNode);
-
-        // Output the trace to XML document
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
-
-        for (TAPNNetworkTraceStep step : actionHistory) {
-            if (step.isLoopStep()) {
-                Element loopElement = document.createElement("loop");
-                traceRootNode.appendChild(loopElement);
-            }
-
-            if (step instanceof TAPNNetworkTimedTransitionStep) {
-                TimedTransition transition = ((TAPNNetworkTimedTransitionStep)step).getTransition();
-                Element transitionElement = document.createElement("transition"); // Create transition
-                transitionElement.setAttribute("id", composer.composedTransitionName(transition));
-                traceRootNode.appendChild(transitionElement);
-
-                List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep)step).getConsumedTokens();
-                for (TimedToken token : ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens()) {
-                    Element tokenElement = document.createElement("token");
-                    tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
-                    tokenElement.setAttribute("age", token.age().toString());
-                    if (getTrace()!= null) {
-                        tokenElement.setAttribute("greaterThanOrEqual", ((TraceToken) token).isGreaterThanOrEqual() ? "true" : "false");
-                    }
-                    transitionElement.appendChild(tokenElement);
-                }
-            }
-
-            if (step instanceof TAPNNetworkTimeDelayStep) {
-                BigDecimal delay = ((TAPNNetworkTimeDelayStep) step).getDelay();
-                Element delayElement = document.createElement("delay"); // Create delay
-                traceRootNode.appendChild(delayElement);
-                delayElement.setTextContent(delay.toString());
-            }
-
-        }
-
-        if (getTrace()!= null && getTrace().getTraceType() == EG_DELAY_FOREVER) {
-            Element delayForeverElement = document.createElement("delay");
-            traceRootNode.appendChild(delayForeverElement);
-            delayForeverElement.setTextContent("forever");
-        }
-
-        document.normalize();
-        // Create Transformer with XSL Source File
-        transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-        DOMSource source = new DOMSource(document);
-
-        StreamResult result = new StreamResult(os);
-        transformer.transform(source, result);
-
-        return os;
-    }
-
-    
-    public void exportTrace() {
-        String path = null;
-        try {
-            ByteArrayOutputStream os = prepareTraceStream();
-
-            FileBrowser fb = new FileBrowser("Export Trace", "trc");
-            // path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-            path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')));
-            
-            FileOutputStream fs = new FileOutputStream(path);
-            fs.write(os.toByteArray());
-            fs.close();
-        } catch (ParserConfigurationException e) {
-            System.out
-                    .println("ParserConfigurationException thrown in savePNML() "
-                            + ": dataLayerWriter Class : dataLayer Package: filename=\"");
-        } catch (DOMException e) {
-            System.out
-                    .println("DOMException thrown in savePNML() "
-                            + ": dataLayerWriter Class : dataLayer Package: filename=\""
-                            + path + "\" transformer=\"");
-        } catch (TransformerConfigurationException e) {
-            System.out
-                    .println("TransformerConfigurationException thrown in savePNML() "
-                            + ": dataLayerWriter Class : dataLayer Package: filename=\""
-                            + path
-                            + "\" transformer=\"");
-        } catch (TransformerException e) {
-            System.out
-                    .println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
-                            + path
-                            + "\"" + e);
-        } catch (NullPointerException e) {
-            // Aborted by user
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    
-    public void importTrace() {
-        if (CreateGui.getAnimationHistory().getListModel().size() > 1) {
-            int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
-                    "You are about to import a trace. This removes the current trace.",
-                    "Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (answer != JOptionPane.OK_OPTION) {
-                return;
-            }
-        }
-
-        FileBrowser fb = new FileBrowser("Import Trace", "trc");
-        File f = fb.openFile();
-
-        if (f == null) {
-            return;
-        }
-
-        reset(true);
-
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-
-            TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false);
-            Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
-            VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-            TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
-            TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
-
-            CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
-            CreateGui.getAnimator().SetTrace(decomposer.decompose());
-
-        } catch (FileNotFoundException e) {
-            // Will never happen
-        } catch (Exception e) { //IOException
-            reset(true);
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
-        } 
-
-    }
 }
