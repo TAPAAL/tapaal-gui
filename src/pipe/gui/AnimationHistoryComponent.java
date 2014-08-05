@@ -152,8 +152,10 @@ public class AnimationHistoryComponent extends JList {
         private void layoutAdjustment() { 
             // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
             int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
-            CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex+1);
-            CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+            if (selectedIndex >= CreateGui.getAnimationHistory().getListModel().getSize()-2) {
+                CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex+1);
+                CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+            }
         }
 	
 	private void updateAccordingToDeadlock() {
