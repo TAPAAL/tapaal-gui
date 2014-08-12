@@ -177,7 +177,8 @@ public class TAPNComposer implements ITAPNComposer {
 			// Gui work
 			if (this.guiModels != null) {
 				Place oldPlace = getSharedPlace(place.name());
-				TimedPlaceComponent newPlace = new TimedPlaceComponent(
+				if (oldPlace != null) {
+					TimedPlaceComponent newPlace = new TimedPlaceComponent(
 						oldPlace.getPositionX(),
 						oldPlace.getPositionY(),
 						oldPlace.getId(),
@@ -189,10 +190,11 @@ public class TAPNComposer implements ITAPNComposer {
 						oldPlace.getMarkingOffsetYObject().doubleValue(),
 						0
 						);
-				newPlace.setGuiModel(guiModel);
-				newPlace.setUnderlyingPlace(constructedPlace);
-				newPlace.setName(uniquePlaceName);
-				guiModel.addPlace(newPlace);
+					newPlace.setGuiModel(guiModel);
+					newPlace.setUnderlyingPlace(constructedPlace);
+					newPlace.setName(uniquePlaceName);
+					guiModel.addPlace(newPlace);
+				}
 			}
 		}
 	}
