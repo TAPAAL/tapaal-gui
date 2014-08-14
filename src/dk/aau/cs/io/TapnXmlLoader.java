@@ -537,7 +537,7 @@ public class TapnXmlLoader {
 			double _endx, double _endy, Template template, Weight weight) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput, taggedArc);
+				sourceIn, targetIn,	(inscriptionTempStorage!="" ? Integer.valueOf(inscriptionTempStorage) : 1), idInput, taggedArc);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());
