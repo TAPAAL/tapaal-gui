@@ -2517,6 +2517,13 @@ public class QueryDialog extends JPanel {
 				useGCD.setSelected(false);
 				useGCD.setEnabled(false);
 			}
+
+			// Disable time darts for EG/AF with deadlock
+			if(queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))){
+				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
+				useTimeDarts.setSelected(false);
+				useTimeDarts.setEnabled(false);
+			}
 		} else {
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
