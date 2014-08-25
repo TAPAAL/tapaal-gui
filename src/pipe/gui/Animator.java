@@ -189,7 +189,7 @@ public class Animator {
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions() && !isUrgentTransitionEnabled)) {
+				if (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions() && !isUrgentTransitionEnabled) {
 					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
