@@ -218,6 +218,11 @@ public class EnabledTransitionsList extends JPanel{
 		}
 
 		public int compareTo(TransitionListItem o) {
+			if(this.transition.getDInterval() == null){
+				return -1;
+			}else if(o.transition.getDInterval() == null){
+				return 1;
+			}
 			BigDecimal thisLower = IntervalOperations.getRatBound(this.transition.getDInterval().lowerBound()).getBound();
 			BigDecimal otherLower = IntervalOperations.getRatBound(o.transition.getDInterval().lowerBound()).getBound();
 			StringComparator s = new StringComparator();
