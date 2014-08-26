@@ -123,7 +123,7 @@ public class TimedInputArc extends TAPNElement {
 						newUpper = BigDecimal.ZERO;
 					}
 					
-					if (newUpper.compareTo(newLower) == 0 && interval.IsLowerBoundNonStrict() && interval.IsUpperBoundNonStrict()){
+					if (newUpper.compareTo(newLower) == 0 && (interval.IsLowerBoundNonStrict() || overrideLowerInclusion) && interval.IsUpperBoundNonStrict()){
 						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newLower.compareTo(newUpper) < 0){
 						temp = new  TimeInterval(interval.IsLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
