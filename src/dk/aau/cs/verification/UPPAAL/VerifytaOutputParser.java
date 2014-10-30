@@ -8,8 +8,8 @@ import dk.aau.cs.verification.QueryType;
 public class VerifytaOutputParser {
 	private static final String PROPERTY_IS_NOT_SATISFIED_STRING = "Property is NOT satisfied";
 	private static final String PROPERTY_IS_SATISFIED_STRING = "Property is satisfied";
-	private static final String PROPERTY_IS_NOT_SATISFIED_STRING_NEW = "-- Formula is NOT satisfied";
-	private static final String PROPERTY_IS_SATISFIED_STRING_NEW = "-- Formula is satisfied";
+	private static final String PROPERTY_IS_NOT_SATISFIED_STRING_NEW = "Formula is NOT satisfied";
+	private static final String PROPERTY_IS_SATISFIED_STRING_NEW = "Formula is satisfied";
 	private static final String DISCRETE_INCLUSION = "discrete inclusion";
 	private boolean error = false;
 	private boolean discreteInclusion = false;
