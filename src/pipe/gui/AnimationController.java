@@ -260,7 +260,7 @@ public class AnimationController extends JPanel {
                         
                         JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
                         JButton decrese = new JButton("-");
-                        decrese.setPreferredSize(new Dimension(30, 30));
+                        decrese.setPreferredSize(new Dimension(20, 30));
                         decrese.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 setDelayModeScale(delayScale/2);
@@ -286,7 +286,7 @@ public class AnimationController extends JPanel {
                         
                         sliderPanel.add(delaySlider);
                         JButton increse = new JButton("+");
-                        increse.setPreferredSize(new Dimension(30, 30));
+                        increse.setPreferredSize(new Dimension(20, 30));
                         increse.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 setDelayModeScale(delayScale*2);
@@ -305,8 +305,8 @@ public class AnimationController extends JPanel {
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Simulation Control"), BorderFactory
 				.createEmptyBorder(3, 3, 3, 3)));
-		this.setPreferredSize(new Dimension(275, 150));
-		this.setMinimumSize(new Dimension(275, 150));
+		this.setPreferredSize(new Dimension(275, 180));
+		this.setMinimumSize(new Dimension(275, 180));
 		
 		initializeDocumentFilterForDelayInput();
 	}
