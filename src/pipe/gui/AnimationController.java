@@ -269,20 +269,20 @@ public class AnimationController extends JPanel {
                         });
                         sliderPanel.add(decrese);
                         
-                        delaySlider = new JSlider(0, 100);
+                        delaySlider = new JSlider(0, 160);
                         delaySlider.setSnapToTicks(false);
                         delaySlider.setMajorTickSpacing(10);
-                        delaySlider.setMinorTickSpacing(1);
+                        delaySlider.setMinorTickSpacing(0);
                         delaySlider.setPaintLabels(true);
                         delaySlider.setPaintTicks(true);
                         delaySlider.addChangeListener(new ChangeListener() {
                             @Override
                             public void stateChanged(ChangeEvent e) {
-                                TimeDelayField.setText(Double.toString(delaySlider.getValue()*((double) delayScale)/100));
+                                TimeDelayField.setText(Double.toString(delaySlider.getValue()*((double) delayScale)/160));
                             }
                         });
                         
-                        setDelayModeScale(8);
+                        setDelayModeScale(16);
                         
                         sliderPanel.add(delaySlider);
                         JButton increse = new JButton("+");
@@ -316,7 +316,7 @@ public class AnimationController extends JPanel {
             delayScale = scale;
             Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
             labels.put(0, new JLabel("0"));
-            labels.put(100, new JLabel(Integer.toString(delayScale)));
+            labels.put(160, new JLabel(Integer.toString(delayScale)));
             delaySlider.setLabelTable(labels);
         }
 
