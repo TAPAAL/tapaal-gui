@@ -279,8 +279,26 @@ public class AnimationController extends JPanel {
                             @Override
                             public void stateChanged(ChangeEvent e) {
                                 TimeDelayField.setText(Double.toString(delaySlider.getValue()*((double) delayScale)/160));
+                                
                             }
                         });
+                        
+                        delaySlider.addKeyListener(new KeyListener() {
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+						addTimeDelayToHistory();
+					}
+				}
+
+				public void keyReleased(KeyEvent e) {
+					CreateGui.getAnimator().reportBlockingPlaces();
+				}
+
+				public void keyTyped(KeyEvent e) {
+
+				}
+
+			});
                         
                         setDelayModeScale(16);
                         
