@@ -252,6 +252,11 @@ public class AnimationController extends JPanel {
 			// add(timedelayPanel, c);
 			animationToolBar.add(timedelayPanel);
                         delaySlider = new JSlider(0, 10);
+                        delaySlider.setSnapToTicks(false);
+                        delaySlider.setMajorTickSpacing(1);
+                        delaySlider.setPaintTicks(true);
+                        delaySlider.setPaintLabels(true);
+                        
                         
                         c.fill = GridBagConstraints.HORIZONTAL;
                         c.weightx = 0.5;
