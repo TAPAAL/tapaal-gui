@@ -279,6 +279,7 @@ public class AnimationController extends JPanel {
                             @Override
                             public void stateChanged(ChangeEvent e) {
                                 TimeDelayField.setText(Double.toString(delaySlider.getValue()*((double) delayScale)/160));
+                                CreateGui.getAnimator().reportBlockingPlaces();
                                 
                             }
                         });
