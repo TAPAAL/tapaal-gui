@@ -44,6 +44,9 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import java.awt.BorderLayout;
+import javax.swing.JButton;
+import javax.swing.JSlider;
 
 /**
  * Implementes af class handling drawing of animation functions
@@ -61,6 +64,7 @@ public class AnimationController extends JPanel {
 	 */
 	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
+        private JSlider delaySlider;
 	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded"; 
 
@@ -147,7 +151,7 @@ public class AnimationController extends JPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 0;
-		c.gridy = 1;
+		c.gridy = 2;
 		add(animationToolBar, c);
 
 		if (!netType.equals(NetType.UNTIMED)) {
@@ -163,7 +167,7 @@ public class AnimationController extends JPanel {
 			c.gridy = 0;
 			add(firemode, c);
 
-			JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                        JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 			okButton = new javax.swing.JButton();
 
@@ -236,7 +240,7 @@ public class AnimationController extends JPanel {
 
 			TimeDelayField.setText(df.format(1f));
 			TimeDelayField.setColumns(6);
-
+                        
 			timedelayPanel.add(TimeDelayField);
 			timedelayPanel.add(okButton);
 			//CreateGui.getAnimator().reportBlockingPlaces();
@@ -247,13 +251,20 @@ public class AnimationController extends JPanel {
 			// c.gridy = 3;
 			// add(timedelayPanel, c);
 			animationToolBar.add(timedelayPanel);
+                        delaySlider = new JSlider(0, 10);
+                        
+                        c.fill = GridBagConstraints.HORIZONTAL;
+                        c.weightx = 0.5;
+                	c.gridx = 0;
+                        c.gridy = 1;
+                        add(delaySlider, c);
 		}
-
+                
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Simulation Control"), BorderFactory
 				.createEmptyBorder(3, 3, 3, 3)));
-		this.setPreferredSize(new Dimension(275, 100));
-		this.setMinimumSize(new Dimension(275, 100));
+		this.setPreferredSize(new Dimension(275, 150));
+		this.setMinimumSize(new Dimension(275, 150));
 		
 		initializeDocumentFilterForDelayInput();
 	}
