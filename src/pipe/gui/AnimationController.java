@@ -260,6 +260,7 @@ public class AnimationController extends JPanel {
                         
                         JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
                         JButton decrese = new JButton("-");
+                        decrese.setPreferredSize(new Dimension(30, 30));
                         decrese.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 setDelayModeScale(delayScale/2);
@@ -285,6 +286,7 @@ public class AnimationController extends JPanel {
                         
                         sliderPanel.add(delaySlider);
                         JButton increse = new JButton("+");
+                        increse.setPreferredSize(new Dimension(30, 30));
                         increse.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 setDelayModeScale(delayScale*2);
