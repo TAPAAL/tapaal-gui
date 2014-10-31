@@ -45,6 +45,7 @@ import pipe.gui.widgets.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import javax.swing.JButton;
@@ -69,6 +70,7 @@ public class AnimationController extends JPanel {
 	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
         private JSlider delaySlider;
+        private int delayScale = 10;
 	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded"; 
 
@@ -255,31 +257,47 @@ public class AnimationController extends JPanel {
 			// c.gridy = 3;
 			// add(timedelayPanel, c);
 			animationToolBar.add(timedelayPanel);
+                        
+                        JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                        JButton decrese = new JButton("-");
+                        decrese.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                setDelayModeScale(delayScale/2);
+                                delaySlider.setValue(delaySlider.getValue()*2);
+                            }
+                        });
+                        sliderPanel.add(decrese);
+                        
                         delaySlider = new JSlider(0, 100);
                         delaySlider.setSnapToTicks(false);
                         delaySlider.setMajorTickSpacing(10);
                         delaySlider.setMinorTickSpacing(1);
-                        Hashtable<Integer, JLabel> labels = new Hashtable<>();
-                        for(int i = 0; i <= 100; i+=10){
-                            labels.put(i, new JLabel(Integer.toString(i/10)));
-                        }
-                        delaySlider.setLabelTable(labels);
                         delaySlider.setPaintLabels(true);
+                        delaySlider.setPaintTicks(true);
                         delaySlider.addChangeListener(new ChangeListener() {
                             @Override
                             public void stateChanged(ChangeEvent e) {
-                                TimeDelayField.setText(Double.toString(delaySlider.getValue()/10.0));
-                                System.out.println("test");
-                                     
-                                
+                                TimeDelayField.setText(Double.toString(delaySlider.getValue()*((double) delayScale)/100));
                             }
                         });
+                        
+                        setDelayModeScale(8);
+                        
+                        sliderPanel.add(delaySlider);
+                        JButton increse = new JButton("+");
+                        increse.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                setDelayModeScale(delayScale*2);
+                                delaySlider.setValue(delaySlider.getValue()/2);
+                            }
+                        });
+                        sliderPanel.add(increse);
                         
                         c.fill = GridBagConstraints.HORIZONTAL;
                         c.weightx = 0.5;
                 	c.gridx = 0;
                         c.gridy = 1;
-                        add(delaySlider, c);
+                        add(sliderPanel, c);
 		}
                 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
@@ -290,6 +308,15 @@ public class AnimationController extends JPanel {
 		
 		initializeDocumentFilterForDelayInput();
 	}
+        
+        private void setDelayModeScale(int scale){
+            if (scale == 0) return;
+            delayScale = scale;
+            Hashtable<Integer, JLabel> labels = new Hashtable<>();
+            labels.put(0, new JLabel("0"));
+            labels.put(100, new JLabel(Integer.toString(delayScale)));
+            delaySlider.setLabelTable(labels);
+        }
 
 	public void updateFiringModeComboBox() {
 		FiringMode currentFiringMode = CreateGui.getAnimator().getFiringmode();
