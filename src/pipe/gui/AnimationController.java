@@ -45,8 +45,12 @@ import pipe.gui.widgets.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import java.awt.BorderLayout;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import javax.swing.JButton;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Implementes af class handling drawing of animation functions
@@ -251,12 +255,25 @@ public class AnimationController extends JPanel {
 			// c.gridy = 3;
 			// add(timedelayPanel, c);
 			animationToolBar.add(timedelayPanel);
-                        delaySlider = new JSlider(0, 10);
+                        delaySlider = new JSlider(0, 100);
                         delaySlider.setSnapToTicks(false);
-                        delaySlider.setMajorTickSpacing(1);
-                        delaySlider.setPaintTicks(true);
+                        delaySlider.setMajorTickSpacing(10);
+                        delaySlider.setMinorTickSpacing(1);
+                        Hashtable<Integer, JLabel> labels = new Hashtable<>();
+                        for(int i = 0; i <= 100; i+=10){
+                            labels.put(i, new JLabel(Integer.toString(i/10)));
+                        }
+                        delaySlider.setLabelTable(labels);
                         delaySlider.setPaintLabels(true);
-                        
+                        delaySlider.addChangeListener(new ChangeListener() {
+                            @Override
+                            public void stateChanged(ChangeEvent e) {
+                                TimeDelayField.setText(Double.toString(delaySlider.getValue()/10.0));
+                                System.out.println("test");
+                                     
+                                
+                            }
+                        });
                         
                         c.fill = GridBagConstraints.HORIZONTAL;
                         c.weightx = 0.5;
