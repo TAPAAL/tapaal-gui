@@ -312,7 +312,7 @@ public class AnimationController extends JPanel {
         private void setDelayModeScale(int scale){
             if (scale == 0) return;
             delayScale = scale;
-            Hashtable<Integer, JLabel> labels = new Hashtable<>();
+            Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
             labels.put(0, new JLabel("0"));
             labels.put(100, new JLabel(Integer.toString(delayScale)));
             delaySlider.setLabelTable(labels);
