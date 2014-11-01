@@ -26,8 +26,9 @@ public class FixAbbrivPlaceNames extends VisitorBase {
                 if (placeNode.getTemplate().equals("")
                         && !templatePlaceNames.contains(new Tuple<String, String>(placeNode.getTemplate(), placeNode.getPlace()))) {
                         for (Tuple<String, String> place : templatePlaceNames) {
-                                if (placeNode.getPlace().equals(place.value2()));
-                                placeNode.setTemplate(place.value1());
+                                if (placeNode.getPlace().equals(place.value2())){
+                                        placeNode.setTemplate(place.value1());
+                                }
                         }
                 }
         }
