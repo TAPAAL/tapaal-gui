@@ -1937,7 +1937,7 @@ public class QueryDialog extends JPanel {
 
 					try {
 						newQuery = TAPAALQueryParser.parse(queryField.getText());
-					} catch (Exception ex) {
+					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),
 								"TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
