@@ -441,7 +441,7 @@ public class Animator {
 		}
 		try{
 			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
-			if(delay.compareTo(new BigDecimal(0))<=0){
+			if(delay.compareTo(new BigDecimal(0))<0){
 				CreateGui.getAnimationController().getOkButton().setEnabled(false);
 				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for positive rational numbers");
 			} else {
