@@ -406,7 +406,7 @@ public class Animator {
 		}
 
 		boolean result = false;
-		if (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled) {
+		if (delay.compareTo(new BigDecimal(0))==0 || (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled)) {
 			NetworkMarking delayedMarking = currentMarking().delay(delay);
 			tab.network().setMarking(delayedMarking);
 			addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
