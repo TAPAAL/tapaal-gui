@@ -101,6 +101,7 @@ import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -1965,6 +1966,8 @@ public class QueryDialog extends JPanel {
 							templatePlaceNames.add(new Tuple<String, String>("", p.name()));
 						}
 
+                                                FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery);
+                                                
 						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
 						VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(newQuery);
