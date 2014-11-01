@@ -443,7 +443,7 @@ public class Animator {
 			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
 			if(delay.compareTo(new BigDecimal(0))<0){
 				CreateGui.getAnimationController().getOkButton().setEnabled(false);
-				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for positive rational numbers");
+				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
 			} else {
 				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
 				if(blockingPlaces.size() == 0){
