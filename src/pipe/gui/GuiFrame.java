@@ -196,6 +196,7 @@ public class GuiFrame extends JFrame implements Observer {
 			// Set the Look and Feel native for the system.
 			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
+                        UIManager.put("Slider.paintValue", false);
 
 			// 2010-05-07, Kenneth Yrke Joergensen:
 			// If the native look and feel is GTK replace the useless open
