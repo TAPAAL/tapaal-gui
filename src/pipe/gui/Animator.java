@@ -406,7 +406,7 @@ public class Animator {
 		}
 
 		boolean result = false;
-		if (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled) {
+		if (delay.compareTo(new BigDecimal(0))==0 || (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled)) {
 			NetworkMarking delayedMarking = currentMarking().delay(delay);
 			tab.network().setMarking(delayedMarking);
 			addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
@@ -422,7 +422,9 @@ public class Animator {
 
 	public void reportBlockingPlaces(){
 
-		if(isUrgentTransitionEnabled){
+		try{
+			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
+		if(isUrgentTransitionEnabled && delay.compareTo(new BigDecimal(0))>0){
 			CreateGui.getAnimationController().getOkButton().setEnabled(false);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
@@ -439,11 +441,9 @@ public class Animator {
 			CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
 			return;
 		}
-		try{
-			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
-			if(delay.compareTo(new BigDecimal(0))<=0){
+			if(delay.compareTo(new BigDecimal(0))<0){
 				CreateGui.getAnimationController().getOkButton().setEnabled(false);
-				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for positive rational numbers");
+				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
 			} else {
 				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
 				if(blockingPlaces.size() == 0){
