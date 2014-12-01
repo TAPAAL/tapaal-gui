@@ -750,6 +750,7 @@ public class WorkflowDialog extends JDialog {
 		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> sharedAcceptedPlaces = new ArrayList<TimedPlace>();
+		ArrayList<TimedPlace> sharedOrphanedPlaces = new ArrayList<TimedPlace>();
 		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 		in = null;
 		out = null;
@@ -807,18 +808,21 @@ public class WorkflowDialog extends JDialog {
 					if (!isin && !isout)
 						break;
 				}
-
+				
+				
 				if (p.isShared()) {
-					if (isin) {
-						sharedInPlaces.add(p);
-					}
-
-					if (isout) {
-						sharedOutPlaces.add(p);
-					}
-
-					if(!isin && !isout){
-						sharedAcceptedPlaces.add(p);
+					if(isin && isout){
+						sharedOrphanedPlaces.add(p);
+					}else{
+						if (isin) {
+							sharedInPlaces.add(p);
+						}else if (isout) {
+							sharedOutPlaces.add(p);
+						}else if(!isin && !isout){
+							sharedAcceptedPlaces.add(p);
+						}
+						
+						sharedOrphanedPlaces.remove(p);
 					}
 
 				} else if (isin && isout) {
@@ -880,7 +884,10 @@ public class WorkflowDialog extends JDialog {
 			}
 			while (sharedOutPlaces.remove(p)) {
 			}
+			while (sharedOrphanedPlaces.remove(p)) {
+			}
 		}
+
 
 		while (sharedInPlaces.size() != 0) {
 			TimedPlace p = sharedInPlaces.get(0);
@@ -891,12 +898,16 @@ public class WorkflowDialog extends JDialog {
 			}
 			while (sharedOutPlaces.remove(p)) {
 			}
+			while (sharedOrphanedPlaces.remove(p)) {
+			}
 		}
 
 		while (sharedOutPlaces.size() > 0) {
 			TimedPlace p = sharedOutPlaces.get(0);
 			outCandidates.add(p);
 			while (sharedOutPlaces.remove(p)) {
+			}
+			while (sharedOrphanedPlaces.remove(p)) {
 			}
 		}
 		
@@ -956,6 +967,10 @@ public class WorkflowDialog extends JDialog {
 			else
 				errorMsgs
 				.add("The current marking is not a valid initial marking.");
+		}
+		
+		for(TimedPlace p : sharedOrphanedPlaces){
+			errorMsgs.add("The shared place \"" + p.name() + "\" has no incoming or outgoing arcs.");
 		}
 
 		if (!errorMsgs.isEmpty()) {
