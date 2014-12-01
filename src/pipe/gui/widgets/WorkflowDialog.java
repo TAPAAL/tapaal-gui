@@ -884,6 +884,8 @@ public class WorkflowDialog extends JDialog {
 			}
 			while (sharedOutPlaces.remove(p)) {
 			}
+			while (sharedOrphanedPlaces.remove(p)) {
+			}
 		}
 
 
@@ -896,12 +898,16 @@ public class WorkflowDialog extends JDialog {
 			}
 			while (sharedOutPlaces.remove(p)) {
 			}
+			while (sharedOrphanedPlaces.remove(p)) {
+			}
 		}
 
 		while (sharedOutPlaces.size() > 0) {
 			TimedPlace p = sharedOutPlaces.get(0);
 			outCandidates.add(p);
 			while (sharedOutPlaces.remove(p)) {
+			}
+			while (sharedOrphanedPlaces.remove(p)) {
 			}
 		}
 		
@@ -964,7 +970,7 @@ public class WorkflowDialog extends JDialog {
 		}
 		
 		for(TimedPlace p : sharedOrphanedPlaces){
-			errorMsgs.add("Place " + p.name() + " has no incoming or outgoing arcs.");
+			errorMsgs.add("The shared place \"" + p.name() + "\" has no incoming or outgoing arcs.");
 		}
 
 		if (!errorMsgs.isEmpty()) {
