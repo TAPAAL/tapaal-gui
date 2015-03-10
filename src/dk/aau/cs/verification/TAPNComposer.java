@@ -157,6 +157,8 @@ public class TAPNComposer implements ITAPNComposer {
 	
 	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for(SharedPlace place : model.sharedPlaces()){
+			if(!model.isSharedPlaceUsedInTemplates(place))	continue;
+			
 			String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(place) : place.name(); 
 			
 			LocalTimedPlace constructedPlace = null;
@@ -165,13 +167,12 @@ public class TAPNComposer implements ITAPNComposer {
 			} else {
 				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())));
 			}
+			
 			constructedModel.add(constructedPlace);
 			mapping.addMappingForShared(place.name(), uniquePlaceName);
-
-			if(model.isSharedPlaceUsedInTemplates(place)){
-				for (TimedToken token : place.tokens()) {
-					constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
-				}
+			
+			for (TimedToken token : place.tokens()) {
+				constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
 			}
 			
 			// Gui work
