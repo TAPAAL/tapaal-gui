@@ -372,7 +372,7 @@ public class GuiFrame extends JFrame implements Observer {
 				"Export the net to PostScript format", "ctrl T"));
 		exportPSAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('T', shortcutkey));
 		addMenuItem(exportMenu, exportToTikZAction = new FileAction("TikZ",
-				"Export the net to PNG format", "ctrl L"));
+				"Export the net to LaTex (TikZ) format", "ctrl L"));
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
 		addMenuItem(exportMenu, exportToPNMLAction = new FileAction("PNML",
 				"Export the net to PNML format", "ctrl D"));
