@@ -393,7 +393,7 @@ public class TimedArcPetriNet {
 		
 		for(TimedArcPetriNet t : nets){
 			numberOfComponents += 1;
-                        int itemCount = 0;
+                        int sharedPlaceCount = 0;
                         int sharedTokensCount = 0;
                         // here we count only the non-shared places; shared places info is added after the for-loop
                         for (TimedPlace p: t.places()) {
@@ -401,23 +401,23 @@ public class TimedArcPetriNet {
                                 numberOfPlaces++;
                                 numberOfTokens += p.numberOfTokens();
                             } else {
-                                itemCount ++;
+                                sharedPlaceCount++;
                                 sharedTokensCount += p.numberOfTokens();
                             }
                         }
-                        numberOfSharedPlaces = java.lang.Math.max(numberOfSharedPlaces,itemCount); 
+                        numberOfSharedPlaces = java.lang.Math.max(numberOfSharedPlaces,sharedPlaceCount); 
                         numberOfSharedTokens = java.lang.Math.max(numberOfSharedTokens,sharedTokensCount); 
                        
                         // here we count only the non-shared tranistions; shared transitions are added after the for-loop
-                        itemCount = 0;
+                        int sharedTransitionCount = 0;
                         for (TimedTransition trans : t.transitions()) {
                             if (!trans.isShared()) {
                                 numberOfTransitions++;
                             } else {
-                                itemCount++;
+                                sharedTransitionCount++;
                             }
                         }
-                        numberOfSharedTransitions = java.lang.Math.max(numberOfSharedTransitions,itemCount); 
+                        numberOfSharedTransitions = java.lang.Math.max(numberOfSharedTransitions,sharedTransitionCount); 
 			numberOfInputArcs += t.inputArcs.size();
 			numberOfOutputArcs += t.outputArcs.size();
 			numberOfInhibitorArcs += t.inhibitorArcs.size();
