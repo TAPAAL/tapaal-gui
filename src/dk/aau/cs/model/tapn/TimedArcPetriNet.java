@@ -382,6 +382,10 @@ public class TimedArcPetriNet {
 		boolean networkWeighted = false; 
 		int numberOfUntimedInputArcs = 0;
 		int numberOfUntimedTransportArcs = 0;
+                
+                int numberOfSharedPlaces = 0;
+                int numberOfSharedTransitions = 0;
+                int numberOfSharedTokens = 0;
 		
 		//For comparing to 
 		TimeInterval infInterval = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
@@ -389,13 +393,35 @@ public class TimedArcPetriNet {
 		
 		for(TimedArcPetriNet t : nets){
 			numberOfComponents += 1;
-			numberOfPlaces += t.places().size();
-			numberOfTransitions += t.transitions.size();
+                        int itemCount = 0;
+                        int sharedTokensCount = 0;
+                        // here we count only the non-shared places; shared places info is added after the for-loop
+                        for (TimedPlace p: t.places()) {
+                            if (!p.isShared()) {
+                                numberOfPlaces++;
+                                numberOfTokens += p.numberOfTokens();
+                            } else {
+                                itemCount ++;
+                                sharedTokensCount += p.numberOfTokens();
+                            }
+                        }
+                        numberOfSharedPlaces = java.lang.Math.max(numberOfSharedPlaces,itemCount); 
+                        numberOfSharedTokens = java.lang.Math.max(numberOfSharedTokens,sharedTokensCount); 
+                       
+                        // here we count only the non-shared tranistions; shared transitions are added after the for-loop
+                        itemCount = 0;
+                        for (TimedTransition trans : t.transitions()) {
+                            if (!trans.isShared()) {
+                                numberOfTransitions++;
+                            } else {
+                                itemCount++;
+                            }
+                        }
+                        numberOfSharedTransitions = java.lang.Math.max(numberOfSharedTransitions,itemCount); 
 			numberOfInputArcs += t.inputArcs.size();
 			numberOfOutputArcs += t.outputArcs.size();
 			numberOfInhibitorArcs += t.inhibitorArcs.size();
 			numberOfTransportArcs += t.transportArcs.size();
-			numberOfTokens += t.getNumberOfTokensInNet();
 			numberOfOrphans += t.getOrphanTransitions().size();
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
@@ -441,7 +467,11 @@ public class TimedArcPetriNet {
 			}
 			
 		}
-		
+                
+                numberOfPlaces +=  numberOfSharedPlaces;
+                numberOfTransitions += numberOfSharedTransitions;
+                numberOfTokens += numberOfSharedTokens;
+                          
 		numberOfTotalNumberOfArcs = numberOfInputArcs + numberOfOutputArcs + numberOfInhibitorArcs + numberOfTransportArcs;
 		
 		int rowNumber = 0;
