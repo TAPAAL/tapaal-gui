@@ -44,7 +44,7 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
-        private int strongSoundnessBound;
+        private long strongSoundnessBound;
         private boolean useReduction;
 
 	
@@ -249,7 +249,7 @@ public class TAPNQuery {
         public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry,boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, WorkflowMode workflow, int strongSoundnessBound) {
+			ExtrapolationOption extrapolationOption, WorkflowMode workflow, long strongSoundnessBound) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, workflow);
 		this.setStrongSoundnessBound(strongSoundnessBound);
 	}
@@ -348,11 +348,11 @@ public class TAPNQuery {
 		this.workflow = workflow;
 	}
         
-        public int getStrongSoundnessBound(){
+        public long getStrongSoundnessBound(){
             return strongSoundnessBound;
         }
         
-        public void setStrongSoundnessBound(int newval) {
+        public void setStrongSoundnessBound(long newval) {
             strongSoundnessBound = newval;
         }
             
