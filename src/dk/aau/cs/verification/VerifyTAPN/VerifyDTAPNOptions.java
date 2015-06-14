@@ -11,7 +11,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean timeDarts;
 	private boolean pTrie;
 	private WorkflowMode workflow;
-        private int workflowbound;
+        private long workflowbound;
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 
@@ -49,7 +49,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
 			boolean pTrie, boolean useOverApproximation, boolean discreteInclusion,
-			InclusionPlaces inclusionPlaces, WorkflowMode workflow, int workflowbound,
+			InclusionPlaces inclusionPlaces, WorkflowMode workflow, long workflowbound,
 			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		super(extraTokens, traceOption, search, symmetry, useOverApproximation, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;

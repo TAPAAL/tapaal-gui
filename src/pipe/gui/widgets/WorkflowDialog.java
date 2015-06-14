@@ -1063,7 +1063,7 @@ public class WorkflowDialog extends JDialog {
 					}
 				}
                 
-				int c  = (int)m*B+1;
+				long c  = m*B+1;
 
 
 
