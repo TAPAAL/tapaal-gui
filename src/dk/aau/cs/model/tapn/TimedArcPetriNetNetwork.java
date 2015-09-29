@@ -519,8 +519,8 @@ public class TimedArcPetriNetNetwork {
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 		
 		for(SharedPlace p : sharedPlaces){
-			network.add(p);	// TODO This is okay for now
-			
+			network.add(new SharedPlace(p.name(), p.invariant().copy()));
+            
 			/* Copy markings for shared places */
 			for(TimedToken token : currentMarking.getTokensFor(p)){
 				network.currentMarking.add(token.clone());

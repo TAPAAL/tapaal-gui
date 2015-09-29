@@ -76,7 +76,7 @@ public class SharedPlace extends TimedPlace{
 	}
 
 	public TimedPlace copy() {
-		return this; // TODO: there should only be one of each shared place
+		return new SharedPlace(this.name(), this.invariant().copy());
 	}
 
 	public boolean isShared() {
