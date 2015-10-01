@@ -123,8 +123,9 @@ public class GuiFrame extends JFrame implements Observer {
 	private JComboBox zoomComboBox;
 
 	private FileAction createAction, openAction, closeAction, saveAction,
-	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction, exportPNGAction,
-	exportPSAction, exportToTikZAction, exportToPNMLAction, exportTraceAction, importTraceAction;
+	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction,
+        importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
+        exportToPNMLAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -356,6 +357,10 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
 				"Import SUMO queries in a plain text format", "ctrl R"));
 		importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
+
+		addMenuItem(importMenu, importXMLAction = new FileAction("XML queries (.xml)", 
+				"Import MCC queries in XML format", "ctrl C"));
+		importXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('C', shortcutkey));
 
 		fileMenu.add(importMenu);
 
@@ -2490,6 +2495,14 @@ public class GuiFrame extends JFrame implements Observer {
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
 						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
+					}
+				}
+			} else if(this == importXMLAction){
+				File[] files = new FileBrowser("Import XML queries", "xml", CreateGui.userPath).openFiles();
+				for(File f : files){
+					if(f.exists() && f.isFile() && f.canRead()){
+						CreateGui.userPath = f.getParent();
+                                                //TODO call XML parser when created.
 					}
 				}
 			}
