@@ -60,6 +60,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private JRootPane rootPane;
 
 	private JCheckBox sharedCheckBox;
+	private JCheckBox MakeNewSharedCheckBox;
 	private WidthAdjustingComboBox sharedPlacesComboBox;
 
 	private TimedPlaceComponent place;
@@ -238,6 +239,13 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
 		basicPropertiesPanel.add(sharedCheckBox, gridBagConstraints);
 
+		MakeNewSharedCheckBox = new JCheckBox("Make new shared");
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
+		basicPropertiesPanel.add(MakeNewSharedCheckBox, gridBagConstraints);
+		
 		nameLabel = new javax.swing.JLabel("Name:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
