@@ -2502,7 +2502,7 @@ public class GuiFrame extends JFrame implements Observer {
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
-                                                //TODO call XML parser when created.
+						XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
 					}
 				}
 			}
