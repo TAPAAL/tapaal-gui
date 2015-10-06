@@ -96,6 +96,7 @@ import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
+import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;

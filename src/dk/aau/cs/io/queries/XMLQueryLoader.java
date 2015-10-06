@@ -18,6 +18,7 @@ import dk.aau.cs.TCTL.SUMOParsing.TokenMgrError;
 import dk.aau.cs.TCTL.SUMOParsing.ParseException;
 import dk.aau.cs.TCTL.SUMOParsing.SUMOQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -25,6 +26,7 @@ import dk.aau.cs.translations.ReductionOption;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException; 
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -43,43 +45,89 @@ public class XMLQueryLoader extends QueryLoader{
     @Override
     protected ArrayList<TAPNQuery> getQueries(){
         ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
+        TCTLAbstractProperty property = null;
+        TAPNQuery query = null;
+        String propertyName = null;
 
         // Instantiate DOM builder components and build DOM Document object
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder(); 
-        Document doc;
+        DocumentBuilder db = null;
+        Document doc = null;
+        NodeList propList;
+        NodeList propChildren;
+
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch(ParserConfigurationException e){
+            // TODO do something meaningful with exception
+            Logger.log(e);
+            queries.add(null);
+            return queries;
+        }
 
         try {
             doc = db.parse(file);
         } catch (SAXException e){
-            Logger.log(e); queries.add(null); continue;
+            // TODO add dialog box: could not parse XML file
+            Logger.log(e);
+            queries.add(null);
+            return queries;
         } catch (IOException e){
-            Logger.log(e); queries.add(null); continue;
+            Logger.log(e);
+            queries.add(null);
+            return queries;
         }
 
-        TCTLAbstractProperty property;
+        // Get all properties from DOM Document
+        propList = doc.getElementsByTagName("property");
 
-        try{
-            property = XMLQueryParser.parse(doc);
-        } 
-        catch (ParseException e){ 
-            // TODO Implement custom exception in XMLQueryParser
-            Logger.log(e); queries.add(null); continue; 
+        for(int i = 0; i < propList.getLength(); i++){
+            Node prop = propList.item(i);
+            
+            try{
+                property = XMLQueryParser.parse(prop);
+            } catch (XMLQueryParseException e){
+                // TODO Add dialog box: syntax error while parsing properties
+                Logger.log(e);
+                queries.add(null); 
+                continue; 
+            }
+
+            // Find <id> tag and get property name
+            propChildren = prop.getChildNodes();
+
+            for(int j = 0; j < propChildren.getLength(); j++){
+                Node child = propChildren.item(j);
+                if(child.getNodeType() == Node.ELEMENT_NODE){
+                    if(child.getNodeName().equals("id")){
+                        // Traverse children and get TEXT
+                        NodeList subNodes = child.getChildNodes();
+                        for(int k = 0; k < subNodes.getLength(); k++){
+                            Node n = subNodes.item(k);
+                            if(n.getNodeType() == Node.TEXT_NODE){
+                                propertyName = n.getNodeValue();
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+                                
+            // The number 9999 is the number of extra tokens allowed, 
+            // this is set high s.t. we don't have to change it manually
+            query = new TAPNQuery(propertyName, 9999, property, 
+                TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
+                true, false, true, true, true, true, HashTableSize.MB_16, 
+                ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
+
+            RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
+                network.activeTemplates().get(0).name());
+
+            query.getProperty().accept(rt, null);
+                    
+            queries.add(query);
         }
-                            
-        // The number 9999 is the number of extra tokens allowed, 
-        // this is set high s.t. we don't have to change it manually
-        TAPNQuery query = new TAPNQuery(name, 9999, property, 
-            TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
-            true, false, true, true, true, true, HashTableSize.MB_16, 
-            ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
-                        
-        RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
-            network.activeTemplates().get(0).name());
-
-        query.getProperty().accept(rt, null);
-                
-        queries.add(query);
 
         return queries;
     }
