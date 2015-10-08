@@ -1,6 +1,7 @@
 package pipe.gui.widgets;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.AbstractListModel;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -35,6 +38,10 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.gui.SharedPlaceNamePanel;
+import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
+import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
+import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
@@ -58,9 +65,9 @@ import dk.aau.cs.util.RequireException;
 public class PlaceEditorPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = -4163767112591119036L;
 	private JRootPane rootPane;
-
+	
 	private JCheckBox sharedCheckBox;
-	private JCheckBox MakeNewSharedCheckBox;
+	private JCheckBox makeNewSharedCheckBox;
 	private WidthAdjustingComboBox sharedPlacesComboBox;
 
 	private TimedPlaceComponent place;
@@ -239,12 +246,27 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
 		basicPropertiesPanel.add(sharedCheckBox, gridBagConstraints);
 
-		MakeNewSharedCheckBox = new JCheckBox("Make new shared");
+		makeNewSharedCheckBox = new JCheckBox("Make new shared");
+		makeNewSharedCheckBox.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				JCheckBox box = (JCheckBox)arg0.getSource();
+				if(box.isSelected()){
+					sharedCheckBox.setSelected(false);
+					sharedCheckBox.setEnabled(false);
+					switchToNameTextField();
+					
+					//nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getDrawingSurface().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
+				}else{
+					sharedCheckBox.setEnabled(sharedPlaces.size() > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));;
+				}
+			}		
+		});		
+		
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
-		basicPropertiesPanel.add(MakeNewSharedCheckBox, gridBagConstraints);
+		basicPropertiesPanel.add(makeNewSharedCheckBox, gridBagConstraints);
 		
 		nameLabel = new javax.swing.JLabel("Name:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -661,17 +683,57 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			
+			/** Creating a new shared place **/
+			if(makeNewSharedCheckBox.isSelected()){
+				// Current solution does not refresh the list of shared places to the left when adding new shared place. Does not accept reusing the name of underlying place.				
 
-			Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
-			context.undoManager().addEdit(renameCommand);
-			try{ // set name
-				renameCommand.redo();
-			}catch(RequireException e){
-				context.undoManager().undo(); 
-				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+				// Create a new shared place and add it to the net
+				SharedPlace newSharedPlace = null;
+				try{
+					newSharedPlace = new SharedPlace(newName);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				SharedPlacesAndTransitionsPanel sharedPanel = new SharedPlacesAndTransitionsPanel(context.tabContent());
+				SharedPlacesListModel listModel = sharedPanel.new SharedPlacesListModel(context.network());
+				
+				try{
+					listModel.addElement(newSharedPlace);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				context.undoManager().addNewEdit(new AddSharedPlaceCommand(listModel, newSharedPlace));
+				context.nameGenerator().updateIndicesForAllModels(newName);
+				
+				// Make the underlying place shared
+				Command command = new MakePlaceSharedCommand(context.activeModel(), newSharedPlace, place.underlyingPlace(), place, context.tabContent());
+				context.undoManager().addEdit(command);
+				try{
+					command.redo(); // this method does not allow the use of a name already existing.
+				}catch(RequireException e){
+					context.undoManager().undo();
+					JOptionPane.showMessageDialog(this,"Another place in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}	
+			}   	
+			
+			else {
+				Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
+				context.undoManager().addEdit(renameCommand);
+				try{ // set name
+					renameCommand.redo();
+				}catch(RequireException e){
+					context.undoManager().undo(); 
+					JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				context.nameGenerator().updateIndices(context.activeModel(), newName);
 			}
-			context.nameGenerator().updateIndices(context.activeModel(), newName);
 		}
 
 
