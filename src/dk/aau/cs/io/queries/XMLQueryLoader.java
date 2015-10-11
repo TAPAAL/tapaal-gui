@@ -2,7 +2,6 @@ package dk.aau.cs.io.queries;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,9 +13,6 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.SUMOParsing.TokenMgrError;
-import dk.aau.cs.TCTL.SUMOParsing.ParseException;
-import dk.aau.cs.TCTL.SUMOParsing.SUMOQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
@@ -31,7 +27,6 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
-import org.w3c.dom.Element;
 
 public class XMLQueryLoader extends QueryLoader{
 
@@ -47,28 +42,23 @@ public class XMLQueryLoader extends QueryLoader{
         ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
         TCTLAbstractProperty property = null;
         TAPNQuery query = null;
+        NodeList propList = null;
+        Node idNode = null;
         String propertyName = null;
 
         // Instantiate DOM builder components and build DOM Document object
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = null;
         Document doc = null;
-        NodeList propList;
-        NodeList propChildren;
 
         try {
             db = dbf.newDocumentBuilder();
+            doc = db.parse(file);
         } catch(ParserConfigurationException e){
-            // TODO do something meaningful with exception
             Logger.log(e);
             queries.add(null);
             return queries;
-        }
-
-        try {
-            doc = db.parse(file);
         } catch (SAXException e){
-            // TODO add dialog box: could not parse XML file
             Logger.log(e);
             queries.add(null);
             return queries;
@@ -87,31 +77,16 @@ public class XMLQueryLoader extends QueryLoader{
             try{
                 property = XMLQueryParser.parse(prop);
             } catch (XMLQueryParseException e){
-                // TODO Add dialog box: syntax error while parsing properties
                 Logger.log(e);
                 queries.add(null); 
                 continue; 
             }
 
             // Find <id> tag and get property name
-            propChildren = prop.getChildNodes();
+            if(((idNode = XMLQueryParser.findSubNode("id", prop)) == null) ||
+                ((propertyName = XMLQueryParser.getText(idNode)) == null)){
 
-            for(int j = 0; j < propChildren.getLength(); j++){
-                Node child = propChildren.item(j);
-                if(child.getNodeType() == Node.ELEMENT_NODE){
-                    if(child.getNodeName().equals("id")){
-                        // Traverse children and get TEXT
-                        NodeList subNodes = child.getChildNodes();
-                        for(int k = 0; k < subNodes.getLength(); k++){
-                            Node n = subNodes.item(k);
-                            if(n.getNodeType() == Node.TEXT_NODE){
-                                propertyName = n.getNodeValue();
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
+                propertyName = "Query-" + i;
             }
                                 
             // The number 9999 is the number of extra tokens allowed, 
