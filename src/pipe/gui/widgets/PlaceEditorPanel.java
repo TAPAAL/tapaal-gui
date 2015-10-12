@@ -686,8 +686,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			
 			/** Creating a new shared place **/
 			if(makeNewSharedCheckBox.isSelected()){
-				// Current solution does not refresh the list of shared places to the left when adding new shared place. Does not accept reusing the name of underlying place.				
-
+				// Current solution does not accept reusing the name of underlying place.	
+				
 				// Create a new shared place and add it to the net
 				SharedPlace newSharedPlace = null;
 				try{
@@ -697,16 +697,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					return;
 				}
 
-				SharedPlacesAndTransitionsPanel sharedPanel = new SharedPlacesAndTransitionsPanel(context.tabContent());
-				SharedPlacesListModel listModel = sharedPanel.new SharedPlacesListModel(context.network());
-				
+				SharedPlacesAndTransitionsPanel sharedPanel = context.tabContent().getSharedPlacesAndTransitionsPanel();
+				SharedPlacesListModel listModel = sharedPanel.getSharedPlacesListModel();
+
 				try{
 					listModel.addElement(newSharedPlace);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-
+	
 				context.undoManager().addNewEdit(new AddSharedPlaceCommand(listModel, newSharedPlace));
 				context.nameGenerator().updateIndicesForAllModels(newName);
 				

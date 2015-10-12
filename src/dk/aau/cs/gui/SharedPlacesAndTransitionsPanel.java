@@ -419,6 +419,9 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		guiDialog.setVisible(true);
 	}
 
+	public SharedPlacesListModel getSharedPlacesListModel(){
+		return sharedPlacesListModel;
+	}
 
 	public class SharedPlacesListModel extends AbstractListModel {
 		private static final long serialVersionUID = 1L;
