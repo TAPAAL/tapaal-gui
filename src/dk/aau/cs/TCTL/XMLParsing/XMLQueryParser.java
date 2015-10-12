@@ -1,6 +1,7 @@
 package dk.aau.cs.TCTL.XMLParsing;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
@@ -16,6 +17,8 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.AritmeticOperator;
 
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -47,12 +50,19 @@ public class XMLQueryParser {
         String nodeNameOperator = operator.getNodeName();
         String nodeNameChild = child.getNodeName();
 
-        /* TODO Not implementet:
-         * MCC14 Reachability operators: 
-         * "invariant", "impossibility" and "possibility"
-         */
-
-        if(nodeNameOperator.equals("exists-path")){
+        if(nodeNameOperator.equals("invariant")){
+            // TODO remember to negate result!
+            //return new TCTLEFNode();
+            throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+        } else if(nodeNameOperator.equals("impossibility")){
+            // TODO remember to negate result!
+            //return new TCTLEFNode();
+            throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+        } else if(nodeNameOperator.equals("possibility")){
+            // TODO remember to negate result in: invariant, impossibility and possibility
+            //return new TCTLEFNode();
+            throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+        } else if(nodeNameOperator.equals("exists-path")){
             if (nodeNameChild.equals("finally")){
                 booleanFormula = parseBooleanFormula(getFirstChildNode(child));
                 return new TCTLEFNode(booleanFormula);
@@ -96,22 +106,79 @@ public class XMLQueryParser {
             }
 
             children = getAllChildren(booleanFormula);
-            ArrayList<TCTLAbstractStateProperty> properties = 
+            ArrayList<TCTLAbstractStateProperty> boolExpList = 
                 new ArrayList<TCTLAbstractStateProperty>();
 
             for (Node n : children){
-                properties.add(parseBooleanFormula(n));
+                boolExpList.add(parseBooleanFormula(n));
             }
 
             if(nodeName == "conjunction"){
-                return new TCTLAndListNode(properties);
+                return new TCTLAndListNode(boolExpList);
             } else{
-                return new TCTLOrListNode(properties);
+                return new TCTLOrListNode(boolExpList);
+            }
+        } else if(nodeName.equals("exclusive-disjunction")){
+            children = getAllChildren(booleanFormula);
+
+            if(children.size() != 2){
+                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
             }
 
-        /* TODO Not implementet:
-         * "exclusive-disjunction", "implication" and "equivalence"
-         */
+            ArrayList<TCTLAbstractStateProperty> boolExpList = 
+                new ArrayList<TCTLAbstractStateProperty>();
+
+            // Parse boolean expressions
+            boolExpList.add(parseBooleanFormula(children.get(0)));
+            boolExpList.add(parseBooleanFormula(children.get(1)));
+
+            // Build left sub tree
+            TCTLAndListNode leftSubFormula = 
+                new TCTLAndListNode(boolExpList.get(0), new TCTLNotNode(boolExpList.get(1)));
+
+            // Build right sub tree
+            TCTLAndListNode rightSubFormula = 
+                new TCTLAndListNode(new TCTLNotNode(boolExpList.get(0)), boolExpList.get(1));
+
+            return new TCTLOrListNode(leftSubFormula, rightSubFormula);
+        } else if(nodeName.equals("implication")){
+            children = getAllChildren(booleanFormula);
+
+            if(children.size() != 2){
+                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+            }
+
+            ArrayList<TCTLAbstractStateProperty> boolExpList = 
+                new ArrayList<TCTLAbstractStateProperty>();
+
+            // Parse boolean expressions
+            boolExpList.add(parseBooleanFormula(children.get(0)));
+            boolExpList.add(parseBooleanFormula(children.get(1)));
+
+            return new TCTLOrListNode(new TCTLNotNode(boolExpList.get(0)), boolExpList.get(1));
+        } else if(nodeName.equals("equivalence")){
+            children = getAllChildren(booleanFormula);
+
+            if(children.size() != 2){
+                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+            }
+
+            ArrayList<TCTLAbstractStateProperty> boolExpList = 
+                new ArrayList<TCTLAbstractStateProperty>();
+
+            // Parse boolean expressions
+            boolExpList.add(parseBooleanFormula(children.get(0)));
+            boolExpList.add(parseBooleanFormula(children.get(1)));
+
+            // Build left sub tree
+            TCTLAndListNode leftSubFormula = 
+                new TCTLAndListNode(boolExpList.get(0), boolExpList.get(1));
+
+            // Build right sub tree
+            TCTLAndListNode rightSubFormula = 
+                new TCTLAndListNode(new TCTLNotNode(boolExpList.get(0)), new TCTLNotNode(boolExpList.get(1)));
+
+            return new TCTLOrListNode(leftSubFormula, rightSubFormula);
         } else if(nodeName.equals("integer-eq") || nodeName.equals("integer-ne") ||
             nodeName.equals("integer-lt") || nodeName.equals("integer-le") ||
             nodeName.equals("integer-gt") || nodeName.equals("integer-ge")){
@@ -124,25 +191,22 @@ public class XMLQueryParser {
             TCTLAbstractStateProperty subformula1 = parseIntegerExpression(children.get(0));
             TCTLAbstractStateProperty subformula2 = parseIntegerExpression(children.get(1));
 
-            if(nodeName == "integer-eq"){
+            if(nodeName.equals("integer-eq")){
                 return new TCTLAtomicPropositionNode(subformula1, "==", subformula2);
-            } else if(nodeName == "integer-ne"){
+            } else if(nodeName.equals("integer-ne")){
                 return new TCTLAtomicPropositionNode(subformula1, "!=", subformula2);
-            } else if(nodeName == "integer-lt"){
+            } else if(nodeName.equals("integer-lt")){
                 return new TCTLAtomicPropositionNode(subformula1, "<", subformula2);
-            } else if(nodeName == "integer-le"){
+            } else if(nodeName.equals("integer-le")){
                 return new TCTLAtomicPropositionNode(subformula1, "<=", subformula2);
-            } else if(nodeName == "integer-gt"){
+            } else if(nodeName.equals("integer-gt")){
                 return new TCTLAtomicPropositionNode(subformula1, ">", subformula2);
-            } else if(nodeName == "integer-ge"){
+            } else if(nodeName.equals("integer-ge")){
                 return new TCTLAtomicPropositionNode(subformula1, ">=", subformula2);
             }
-
         }
 
-        /* TODO Not implementet:
-         * "is-fireable"
-         * */
+        // We do not support "is-fireable" queries
 
         throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
     }
@@ -174,11 +238,53 @@ public class XMLQueryParser {
             }
 
             return new TCTLPlusListNode(places);
-        }
+        } else if(nodeName.equals("integer-sum") || nodeName.equals("integer-product")){
+            children = getAllChildren(integerExpression);
+            Iterator<Node> itr = children.iterator();
 
-        /* TODO Not implementet:
-         * "integer-sum", "integer-product" and "integer-difference"
-         * */
+            if(children.size() < 2){
+                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+            }
+
+            ArrayList<TCTLAbstractStateProperty> intExpList = 
+                new ArrayList<TCTLAbstractStateProperty>();
+
+            while(itr.hasNext()){
+                Node n = itr.next();
+                intExpList.add(parseIntegerExpression(n));
+
+                if(itr.hasNext()){
+                    if(nodeName.equals("integer-sum")){
+                        intExpList.add(new AritmeticOperator("+"));
+                    } else{
+                        intExpList.add(new AritmeticOperator("*"));
+                    }
+                }
+            }
+            
+            return new TCTLTermListNode(intExpList);
+        } else if(nodeName.equals("integer-difference") || nodeName.equals("integer-division")){
+            children = getAllChildren(integerExpression);
+
+            if(children.size() != 2){
+                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+            }
+
+            ArrayList<TCTLAbstractStateProperty> intExpList = 
+                new ArrayList<TCTLAbstractStateProperty>();
+
+            intExpList.add(parseIntegerExpression(children.get(0)));
+
+            if(nodeName.equals("integer-difference")){
+                intExpList.add(new AritmeticOperator("-"));
+            } else{
+                intExpList.add(new AritmeticOperator("/"));
+            }
+
+            intExpList.add(parseIntegerExpression(children.get(1)));
+            
+            return new TCTLTermListNode(intExpList);
+        }
 
         throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
     }
