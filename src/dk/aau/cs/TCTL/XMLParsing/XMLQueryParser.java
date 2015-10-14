@@ -3,6 +3,7 @@ package dk.aau.cs.TCTL.XMLParsing;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
@@ -26,19 +27,50 @@ import org.w3c.dom.Node;
 public class XMLQueryParser {
 
     private Node property;
+    private QueryWrapper queryWrapper;
 
-    public static TCTLAbstractProperty parse(Node prop) throws XMLQueryParseException{
-        XMLQueryParser parser = new XMLQueryParser(prop);
-        return parser.AbstractProperty();
+    private static final String ERROR_MESSAGE = "Could not parse XML tag: ";
+    
+    public static boolean parse(Node prop, QueryWrapper queryWrapper){
+
+        XMLQueryParser parser = new XMLQueryParser(prop, queryWrapper);
+
+        queryWrapper.setName(parser.parsePropertyName());
+
+        try{
+            queryWrapper.setProp(parser.AbstractProperty());
+        } catch (XMLQueryParseException e){
+            queryWrapper.setException(e);
+            Logger.log(e);
+            return false;
+        }
+
+        return true;
     }
 
     final public TCTLAbstractProperty AbstractProperty() throws XMLQueryParseException{
         Node formula = null;
+
         if((formula = findSubNode("formula", property)) != null){
             return parseFormula(formula);
         } else{
-            throw new XMLQueryParseException("An error occurred while parsing: " + property.getNodeName());
+            throw new XMLQueryParseException(ERROR_MESSAGE + property.getNodeName());
         }
+    }
+
+    private String parsePropertyName(){
+        Node idNode;
+        String result;
+
+        // Find <id> tag and get property name
+        if(((idNode = XMLQueryParser.findSubNode("id", this.property)) == null) ||
+            ((result = XMLQueryParser.getText(idNode)) == null)){
+
+            // If no name was found, set generic name
+            result = "Query Comment/Name Here";
+        }
+
+        return result;
     }
 
     private TCTLAbstractProperty parseFormula(Node formula)
@@ -51,40 +83,39 @@ public class XMLQueryParser {
         String nodeNameChild = child.getNodeName();
 
         if(nodeNameOperator.equals("invariant")){
-            // TODO remember to negate result!
-            //return new TCTLEFNode();
-            throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+            booleanFormula = parseBooleanFormula(getFirstChildNode(operator));
+            this.queryWrapper.negateQuery();
+            return new TCTLEFNode(new TCTLNotNode(booleanFormula));
         } else if(nodeNameOperator.equals("impossibility")){
-            // TODO remember to negate result!
-            //return new TCTLEFNode();
-            throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+            booleanFormula = parseBooleanFormula(getFirstChildNode(operator));
+            this.queryWrapper.negateQuery();
+            return new TCTLEFNode(booleanFormula);
         } else if(nodeNameOperator.equals("possibility")){
-            // TODO remember to negate result in: invariant, impossibility and possibility
-            //return new TCTLEFNode();
-            throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+            booleanFormula = parseBooleanFormula(getFirstChildNode(operator));
+            return new TCTLEFNode(booleanFormula);
         } else if(nodeNameOperator.equals("exists-path")){
             if (nodeNameChild.equals("finally")){
                 booleanFormula = parseBooleanFormula(getFirstChildNode(child));
                 return new TCTLEFNode(booleanFormula);
             } else{
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeNameOperator);
             }
         } else if(nodeNameOperator.equals("all-paths")){
             if (nodeNameChild.equals("globally")){
                 booleanFormula = parseBooleanFormula(getFirstChildNode(child));
                 return new TCTLAGNode(booleanFormula);
             } else{
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeNameOperator);
             }
         }
-        throw new XMLQueryParseException("An error occurred while parsing: " + nodeNameOperator);
+        throw new XMLQueryParseException(ERROR_MESSAGE + nodeNameOperator);
     }
 
     private TCTLAbstractStateProperty parseBooleanFormula(Node booleanFormula)
         throws XMLQueryParseException{
 
         String nodeName = booleanFormula.getNodeName();
-        ArrayList<Node> children = null;
+        ArrayList<Node> children;
 
         if(nodeName.equals("deadlock")){
             return new TCTLDeadlockNode();
@@ -98,11 +129,11 @@ public class XMLQueryParser {
                     parseBooleanFormula(getFirstChildNode(booleanFormula));
                 return new TCTLNotNode(booleanFormulaChild);
             } else{
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
         } else if(nodeName.equals("conjunction") || nodeName.equals("disjunction")){
             if(getChildCount(booleanFormula) < 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             children = getAllChildren(booleanFormula);
@@ -122,7 +153,7 @@ public class XMLQueryParser {
             children = getAllChildren(booleanFormula);
 
             if(children.size() != 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             ArrayList<TCTLAbstractStateProperty> boolExpList = 
@@ -145,7 +176,7 @@ public class XMLQueryParser {
             children = getAllChildren(booleanFormula);
 
             if(children.size() != 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             ArrayList<TCTLAbstractStateProperty> boolExpList = 
@@ -160,7 +191,7 @@ public class XMLQueryParser {
             children = getAllChildren(booleanFormula);
 
             if(children.size() != 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             ArrayList<TCTLAbstractStateProperty> boolExpList = 
@@ -184,7 +215,7 @@ public class XMLQueryParser {
             nodeName.equals("integer-gt") || nodeName.equals("integer-ge")){
 
             if(getChildCount(booleanFormula) != 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             children = getAllChildren(booleanFormula);
@@ -206,9 +237,7 @@ public class XMLQueryParser {
             }
         }
 
-        // We do not support "is-fireable" queries
-
-        throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+        throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
     }
 
     private TCTLAbstractStateProperty parseIntegerExpression(Node integerExpression)
@@ -220,13 +249,13 @@ public class XMLQueryParser {
         if(nodeName.equals("integer-constant")){
             String value = null;
             if((value = getText(integerExpression)) == null){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
             return new TCTLConstNode(Integer.parseInt(value));
         } else if(nodeName.equals("tokens-count")){
             children = getAllChildren(integerExpression);
             if(children.size() < 1){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             ArrayList<TCTLAbstractStateProperty> places = 
@@ -243,7 +272,7 @@ public class XMLQueryParser {
             Iterator<Node> itr = children.iterator();
 
             if(children.size() < 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             ArrayList<TCTLAbstractStateProperty> intExpList = 
@@ -263,11 +292,11 @@ public class XMLQueryParser {
             }
             
             return new TCTLTermListNode(intExpList);
-        } else if(nodeName.equals("integer-difference") || nodeName.equals("integer-division")){
+        } else if(nodeName.equals("integer-difference")){
             children = getAllChildren(integerExpression);
 
             if(children.size() != 2){
-                throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
             ArrayList<TCTLAbstractStateProperty> intExpList = 
@@ -275,18 +304,14 @@ public class XMLQueryParser {
 
             intExpList.add(parseIntegerExpression(children.get(0)));
 
-            if(nodeName.equals("integer-difference")){
-                intExpList.add(new AritmeticOperator("-"));
-            } else{
-                intExpList.add(new AritmeticOperator("/"));
-            }
+            intExpList.add(new AritmeticOperator("-"));
 
             intExpList.add(parseIntegerExpression(children.get(1)));
             
             return new TCTLTermListNode(intExpList);
         }
 
-        throw new XMLQueryParseException("An error occurred while parsing: " + nodeName);
+        throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
     }
 
     public static Node findSubNode(String name, Node node){
@@ -373,7 +398,8 @@ public class XMLQueryParser {
         return child;
     }
 
-    public XMLQueryParser(Node prop){
+    public XMLQueryParser(Node prop, QueryWrapper qw){
         this.property = prop;
+        this.queryWrapper = qw;
     }
 }
