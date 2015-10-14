@@ -53,15 +53,15 @@ public class XMLQueryLoader extends QueryLoader{
             doc = db.parse(file);
         } catch(ParserConfigurationException e){
             Logger.log(e);
-            createDialogBox(e.getMessage(), "Parsing Exception");
+            createDialogBox(e.getMessage(), "Parse Exception");
             return queries;
         } catch (SAXException e){
             Logger.log(e);
-            createDialogBox(e.getMessage(), "Parsing Exception");
+            createDialogBox(e.getMessage(), "Parse Exception");
             return queries;
         } catch (IOException e){
             Logger.log(e);
-            createDialogBox(e.getMessage(), "Parsing Exception");
+            createDialogBox(e.getMessage(), "Parse Exception");
             return queries;
         }
 
@@ -73,7 +73,7 @@ public class XMLQueryLoader extends QueryLoader{
             QueryWrapper queryWrapper = new QueryWrapper();
 
             // Save query for later use in dialog window
-            addQueryToList(queryWrapper);
+            this.faultyQueries.add(queryWrapper);
 
             // Update queryWrapper name and property
             if(!XMLQueryParser.parse(prop, queryWrapper)){
@@ -152,11 +152,7 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     private void createDialogBox(String text, String header){
-	    JOptionPane.showMessageDialog(CreateGui.getApp(), text, 
-                header, JOptionPane.ERROR_MESSAGE);
-    }
-
-    private void addQueryToList(QueryWrapper queryWrapper){
-        this.faultyQueries.add(queryWrapper);
+        JOptionPane.showMessageDialog(CreateGui.getApp(), text, 
+            header, JOptionPane.ERROR_MESSAGE);
     }
 }

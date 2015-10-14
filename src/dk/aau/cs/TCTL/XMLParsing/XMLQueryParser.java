@@ -2,6 +2,7 @@ package dk.aau.cs.TCTL.XMLParsing;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.lang.NumberFormatException;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
@@ -28,13 +29,11 @@ public class XMLQueryParser {
 
     private Node property;
     private QueryWrapper queryWrapper;
-
     private static final String ERROR_MESSAGE = "Could not parse XML tag: ";
     
     public static boolean parse(Node prop, QueryWrapper queryWrapper){
 
         XMLQueryParser parser = new XMLQueryParser(prop, queryWrapper);
-
         queryWrapper.setName(parser.parsePropertyName());
 
         try{
@@ -49,7 +48,7 @@ public class XMLQueryParser {
     }
 
     final public TCTLAbstractProperty AbstractProperty() throws XMLQueryParseException{
-        Node formula = null;
+        Node formula;
 
         if((formula = findSubNode("formula", property)) != null){
             return parseFormula(formula);
@@ -76,39 +75,39 @@ public class XMLQueryParser {
     private TCTLAbstractProperty parseFormula(Node formula)
         throws XMLQueryParseException{
 
-        TCTLAbstractStateProperty booleanFormula = null;
+        TCTLAbstractStateProperty booleanFormula;
         Node operator = getFirstChildNode(formula);
         Node child = getFirstChildNode(operator);
-        String nodeNameOperator = operator.getNodeName();
-        String nodeNameChild = child.getNodeName();
+        String nodeName = operator.getNodeName();
+        String childNodeName = child.getNodeName();
 
-        if(nodeNameOperator.equals("invariant")){
+        if(nodeName.equals("invariant")){
             booleanFormula = parseBooleanFormula(getFirstChildNode(operator));
             this.queryWrapper.negateQuery();
             return new TCTLEFNode(new TCTLNotNode(booleanFormula));
-        } else if(nodeNameOperator.equals("impossibility")){
+        } else if(nodeName.equals("impossibility")){
             booleanFormula = parseBooleanFormula(getFirstChildNode(operator));
             this.queryWrapper.negateQuery();
             return new TCTLEFNode(booleanFormula);
-        } else if(nodeNameOperator.equals("possibility")){
+        } else if(nodeName.equals("possibility")){
             booleanFormula = parseBooleanFormula(getFirstChildNode(operator));
             return new TCTLEFNode(booleanFormula);
-        } else if(nodeNameOperator.equals("exists-path")){
-            if (nodeNameChild.equals("finally")){
+        } else if(nodeName.equals("exists-path")){
+            if (childNodeName.equals("finally")){
                 booleanFormula = parseBooleanFormula(getFirstChildNode(child));
                 return new TCTLEFNode(booleanFormula);
             } else{
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeNameOperator);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
-        } else if(nodeNameOperator.equals("all-paths")){
-            if (nodeNameChild.equals("globally")){
+        } else if(nodeName.equals("all-paths")){
+            if (childNodeName.equals("globally")){
                 booleanFormula = parseBooleanFormula(getFirstChildNode(child));
                 return new TCTLAGNode(booleanFormula);
             } else{
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeNameOperator);
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
         }
-        throw new XMLQueryParseException(ERROR_MESSAGE + nodeNameOperator);
+        throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
     }
 
     private TCTLAbstractStateProperty parseBooleanFormula(Node booleanFormula)
@@ -124,19 +123,23 @@ public class XMLQueryParser {
         } else if(nodeName.equals("false")){
             return new TCTLFalseNode();
         } else if(nodeName.equals("negation")){
-            if(getChildCount(booleanFormula) == 1){
-                TCTLAbstractStateProperty booleanFormulaChild =
-                    parseBooleanFormula(getFirstChildNode(booleanFormula));
-                return new TCTLNotNode(booleanFormulaChild);
-            } else{
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-        } else if(nodeName.equals("conjunction") || nodeName.equals("disjunction")){
-            if(getChildCount(booleanFormula) < 2){
+            children = getAllChildren(booleanFormula);
+
+            if(children.size() != 1){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
+            TCTLAbstractStateProperty booleanFormulaChild =
+                parseBooleanFormula(getFirstChildNode(booleanFormula));
+
+            return new TCTLNotNode(booleanFormulaChild);
+        } else if(nodeName.equals("conjunction") || nodeName.equals("disjunction")){
             children = getAllChildren(booleanFormula);
+
+            if(children.size() < 2){
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
+            }
+
             ArrayList<TCTLAbstractStateProperty> boolExpList = 
                 new ArrayList<TCTLAbstractStateProperty>();
 
@@ -214,11 +217,12 @@ public class XMLQueryParser {
             nodeName.equals("integer-lt") || nodeName.equals("integer-le") ||
             nodeName.equals("integer-gt") || nodeName.equals("integer-ge")){
 
-            if(getChildCount(booleanFormula) != 2){
+            children = getAllChildren(booleanFormula);
+
+            if(children.size() != 2){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
 
-            children = getAllChildren(booleanFormula);
             TCTLAbstractStateProperty subformula1 = parseIntegerExpression(children.get(0));
             TCTLAbstractStateProperty subformula2 = parseIntegerExpression(children.get(1));
 
@@ -243,17 +247,27 @@ public class XMLQueryParser {
     private TCTLAbstractStateProperty parseIntegerExpression(Node integerExpression)
         throws XMLQueryParseException{
 
-        ArrayList<Node> children = null;
+        ArrayList<Node> children;
         String nodeName = integerExpression.getNodeName(); 
 
         if(nodeName.equals("integer-constant")){
-            String value = null;
+            String value;
+            int result;
+            
             if((value = getText(integerExpression)) == null){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
-            return new TCTLConstNode(Integer.parseInt(value));
+
+            try{
+                result = Integer.parseInt(value);
+            } catch (NumberFormatException e){
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
+            }
+
+            return new TCTLConstNode(result);
         } else if(nodeName.equals("tokens-count")){
             children = getAllChildren(integerExpression);
+
             if(children.size() < 1){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
@@ -303,9 +317,7 @@ public class XMLQueryParser {
                 new ArrayList<TCTLAbstractStateProperty>();
 
             intExpList.add(parseIntegerExpression(children.get(0)));
-
             intExpList.add(new AritmeticOperator("-"));
-
             intExpList.add(parseIntegerExpression(children.get(1)));
             
             return new TCTLTermListNode(intExpList);
