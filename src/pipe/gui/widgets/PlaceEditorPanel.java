@@ -45,6 +45,7 @@ import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
+import dk.aau.cs.gui.undo.MakePlaceNewSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
@@ -685,30 +686,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 			
 			/** Creating a new shared place **/
-			// Current solution does not accept reusing the name of underlying place.	
 			if(makeNewSharedCheckBox.isSelected()){
-				SharedPlace newSharedPlace = null;
-				try{
-					newSharedPlace = new SharedPlace(newName);
-				}catch(RequireException e){
-					JOptionPane.showMessageDialog(this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				SharedPlacesAndTransitionsPanel sharedPanel = context.tabContent().getSharedPlacesAndTransitionsPanel();
-				if(!sharedPanel.addSharedPlace(newSharedPlace, newName)){
-					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				// Make the underlying place shared - NOTE: this is copied from above..
-				Command command = new MakePlaceSharedCommand(context.activeModel(), newSharedPlace, place.underlyingPlace(), place, context.tabContent());
+				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent());
 				context.undoManager().addEdit(command);
 				try{
-					command.redo(); // this method does not allow the use of a name already existing.
+					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this,"Another place in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}	
 			}   	

@@ -422,15 +422,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		guiDialog.setVisible(true);
 	}
 
-	public boolean addSharedPlace(SharedPlace place, String name){
-		try{
-			sharedPlacesListModel.addElement(place);
-		}catch(RequireException e){
-			return false;
-		}
-		undoManager.addNewEdit(new AddSharedPlaceCommand(sharedPlacesListModel, place));
-		nameGenerator.updateIndicesForAllModels(name);
-		return true;
+	public void removeSharedPlace(SharedPlace place){
+		sharedPlacesListModel.removeElement(place);
+	}
+	
+	public void addSharedPlace(SharedPlace place){
+		sharedPlacesListModel.addElement(place);
 	}
 	
 	public SharedPlacesListModel getSharedPlacesListModel(){
