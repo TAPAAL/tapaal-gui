@@ -22,8 +22,11 @@ import dk.aau.cs.translations.ReductionOption;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException; 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -47,19 +50,37 @@ public class XMLQueryLoader extends QueryLoader{
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document doc;
-
+        
         try {
             db = dbf.newDocumentBuilder();
-            doc = db.parse(file);
         } catch(ParserConfigurationException e){
             Logger.log(e);
             createDialogBox(e.getMessage(), "Parse Exception");
             return queries;
+        }
+
+        db.setErrorHandler(new ErrorHandler() {
+            @Override
+            public void warning(SAXParseException e) throws SAXException {}
+
+            @Override
+            public void fatalError(SAXParseException e) throws SAXException { throw e; }
+
+            @Override
+            public void error(SAXParseException e) throws SAXException { throw e; }
+        });
+            
+        try{
+            doc = db.parse(file);
         } catch (SAXException e){
             Logger.log(e);
             createDialogBox(e.getMessage(), "Parse Exception");
             return queries;
         } catch (IOException e){
+            Logger.log(e);
+            createDialogBox(e.getMessage(), "Parse Exception");
+            return queries;
+        } catch (IllegalArgumentException e){
             Logger.log(e);
             createDialogBox(e.getMessage(), "Parse Exception");
             return queries;
@@ -131,11 +152,7 @@ public class XMLQueryLoader extends QueryLoader{
         if(loader.faultyQueries.size() > 0){
             StringBuilder errorMessage = new StringBuilder();
 
-            if(loader.faultyQueries.size() == 1){
-                errorMessage.append("The following query could not be imported:");
-            } else{
-                errorMessage.append("The following queries could not be imported:");
-            }
+            errorMessage.append("We can parse and import only the reachability cardinality and reachability deadlock XML queries.");
             
             errorMessage.append(System.lineSeparator());
 

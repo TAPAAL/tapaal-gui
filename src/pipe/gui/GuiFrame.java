@@ -356,12 +356,12 @@ public class GuiFrame extends JFrame implements Observer {
 		importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('X', shortcutkey));
 
 		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
-				"Import SUMO queries in a plain text format", "ctrl R"));
-		importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
+				"Import SUMO queries in a plain text format",""));
+		//importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
 
 		addMenuItem(importMenu, importXMLAction = new FileAction("XML queries (.xml)", 
-				"Import MCC queries in XML format", "ctrl C"));
-		importXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('C', shortcutkey));
+				"Import MCC queries in XML format", "ctrl R"));
+		importXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
 
 		fileMenu.add(importMenu);
 
