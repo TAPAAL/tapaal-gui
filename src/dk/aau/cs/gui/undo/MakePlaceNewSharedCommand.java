@@ -20,17 +20,16 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
 
 public class MakePlaceNewSharedCommand extends Command {
-	//private final SharedPlace sharedPlace;
 	private final String newSharedName;
 	private final TimedPlace place;
 	private final TimedArcPetriNet tapn;
 	private final TimedPlaceComponent placeComponent;
-	SharedPlace sharedPlace;
 	private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
 	private final List<TimedToken> oldTokens;
-	private TabContent currentTab;
+	private final TabContent currentTab;
 	private SharedPlacesAndTransitionsPanel sharedPanel;
-	
+	private SharedPlace sharedPlace;
+
 	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(newSharedName != null, "newSharedName cannot be null");
@@ -42,11 +41,11 @@ public class MakePlaceNewSharedCommand extends Command {
 		this.newSharedName = newSharedName;
 		this.place = place;
 		this.placeComponent = placeComponent;
-		oldTokens = place.tokens();
+		this.sharedPlace = null;
 		this.currentTab = currentTab;
-		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
-		
 		this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
+		oldTokens = place.tokens();
+		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
 	
 	@Override
