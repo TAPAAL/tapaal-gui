@@ -430,8 +430,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		sharedPlacesListModel.addElement(place);
 	}
 	
-	public SharedPlacesListModel getSharedPlacesListModel(){
-		return sharedPlacesListModel;
+	public void removeSharedTransition(SharedTransition transition){
+		sharedTransitionsListModel.removeElement(transition);
+	}
+	
+	public void addSharedTransition(SharedTransition transition){
+		sharedTransitionsListModel.addElement(transition);
 	}
 
 	public class SharedPlacesListModel extends AbstractListModel {
