@@ -65,7 +65,7 @@ public class MakePlaceNewSharedCommand extends Command {
 	}
 
 	@Override
-	public void undo() {
+	public void undo() {		
 		sharedPanel.removeSharedPlace(sharedPlace);
 		updateArcs(sharedPlace, place);
 		tapn.remove(sharedPlace);
