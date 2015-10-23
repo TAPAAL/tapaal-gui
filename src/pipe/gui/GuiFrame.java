@@ -96,6 +96,7 @@ import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
+import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -123,8 +124,9 @@ public class GuiFrame extends JFrame implements Observer {
 	private JComboBox zoomComboBox;
 
 	private FileAction createAction, openAction, closeAction, saveAction,
-	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction, exportPNGAction,
-	exportPSAction, exportToTikZAction, exportToPNMLAction, exportTraceAction, importTraceAction;
+	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction,
+        importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
+        exportToPNMLAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -354,8 +356,12 @@ public class GuiFrame extends JFrame implements Observer {
 		importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('X', shortcutkey));
 
 		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
-				"Import SUMO queries in a plain text format", "ctrl R"));
-		importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
+				"Import SUMO queries in a plain text format",""));
+		//importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
+
+		addMenuItem(importMenu, importXMLAction = new FileAction("XML queries (.xml)", 
+				"Import MCC queries in XML format", "ctrl R"));
+		importXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
 
 		fileMenu.add(importMenu);
 
@@ -2354,20 +2360,20 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
-		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-		buffer.append("\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2014\n\n");
+		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Jakob Dyhr, Louise Foshammer,\nMalte Neve-Graesboell, ");
+		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen,\nJacob J. Jensen, Peter G. Jensen, ");
+		buffer.append("Mads Johannsen, Kenneth Y. Joergensen,\nMikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen, Jiri Srba,\nMathias G. Soerensen and Jakob H. Taankvist\n");
+		buffer.append("Aalborg University 2009-2015\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2014\n\n");
+		buffer.append("Aalborg University 2011-2015\n\n");
 		buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2014\n\n");
+                buffer.append("Aalborg University 2012-2015\n\n");
 		buffer.append("TAPAAL Untimed Engine (verifypn):\n");
                 buffer.append("Jonas F. Jensen, Thomas S. Nielsen, Lars K. Oestergaard and Jiri Srba\n");
-                buffer.append("Aalborg University 2014\n\n");
+                buffer.append("Aalborg University 2014-2015\n\n");
 		buffer.append("\n");
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
@@ -2490,6 +2496,14 @@ public class GuiFrame extends JFrame implements Observer {
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
 						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
+					}
+				}
+			} else if(this == importXMLAction){
+				File[] files = new FileBrowser("Import XML queries", "xml", CreateGui.userPath).openFiles();
+				for(File f : files){
+					if(f.exists() && f.isFile() && f.canRead()){
+						CreateGui.userPath = f.getParent();
+						XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
 					}
 				}
 			}
