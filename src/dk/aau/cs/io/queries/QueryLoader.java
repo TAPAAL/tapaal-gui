@@ -19,6 +19,8 @@ public abstract class QueryLoader {
 	protected static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	
 	protected boolean firstQueryParsingWarning = true;
+
+        protected boolean showErrorMessage = true;
 	
 	protected TimedArcPetriNetNetwork network;
 	
@@ -46,7 +48,7 @@ public abstract class QueryLoader {
 			}
 		}
 		
-		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning) {
+		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning && showErrorMessage) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		}
