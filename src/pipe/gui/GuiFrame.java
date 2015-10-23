@@ -2360,20 +2360,20 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
-		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-		buffer.append("\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2014\n\n");
+		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Jakob Dyhr, Louise Foshammer,\nMalte Neve-Graesboell, ");
+		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen,\nJacob J. Jensen, Peter G. Jensen, ");
+		buffer.append("Mads Johannsen, Kenneth Y. Joergensen,\nMikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen, Jiri Srba,\nMathias G. Soerensen and Jakob H. Taankvist\n");
+		buffer.append("Aalborg University 2009-2015\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2014\n\n");
+		buffer.append("Aalborg University 2011-2015\n\n");
 		buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2014\n\n");
+                buffer.append("Aalborg University 2012-2015\n\n");
 		buffer.append("TAPAAL Untimed Engine (verifypn):\n");
                 buffer.append("Jonas F. Jensen, Thomas S. Nielsen, Lars K. Oestergaard and Jiri Srba\n");
-                buffer.append("Aalborg University 2014\n\n");
+                buffer.append("Aalborg University 2014-2015\n\n");
 		buffer.append("\n");
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
