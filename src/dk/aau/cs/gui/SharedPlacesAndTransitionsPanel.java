@@ -423,7 +423,9 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	public void removeSharedPlace(SharedPlace place){
-		sharedPlacesListModel.removeElement(place);
+		if(sharedPlacesListModel.network.getSharedPlaceByName(place.name()) != null){
+			sharedPlacesListModel.removeElement(place);
+		}
 	}
 	
 	public void addSharedPlace(SharedPlace place){
@@ -431,7 +433,9 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 	
 	public void removeSharedTransition(SharedTransition transition){
-		sharedTransitionsListModel.removeElement(transition);
+		if(sharedTransitionsListModel.network.getSharedTransitionByName(transition.name()) != null){
+			sharedTransitionsListModel.removeElement(transition);
+		}
 	}
 	
 	public void addSharedTransition(SharedTransition transition){

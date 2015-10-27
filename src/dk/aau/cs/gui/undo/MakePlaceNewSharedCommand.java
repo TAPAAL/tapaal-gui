@@ -62,6 +62,7 @@ public class MakePlaceNewSharedCommand extends Command {
 		placeComponent.setUnderlyingPlace(sharedPlace);
 		
 		updateQueries(place, sharedPlace);
+		
 	}
 
 	@Override
