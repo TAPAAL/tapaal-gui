@@ -62,12 +62,13 @@ public class MakePlaceNewSharedCommand extends Command {
 		placeComponent.setUnderlyingPlace(sharedPlace);
 		
 		updateQueries(place, sharedPlace);
-		
 	}
 
 	@Override
-	public void undo() {		
-		sharedPanel.removeSharedPlace(sharedPlace);
+	public void undo() {	
+		if(sharedPlace != null){
+			sharedPanel.removeSharedPlace(sharedPlace);
+		}
 		updateArcs(sharedPlace, place);
 		tapn.remove(sharedPlace);
 		tapn.add(place);
@@ -75,6 +76,7 @@ public class MakePlaceNewSharedCommand extends Command {
 		placeComponent.setUnderlyingPlace(place);
 		
 		undoQueryChanges(sharedPlace, place);
+	
 	}
 
 	private void updateArcs(TimedPlace toReplace, TimedPlace replacement) {

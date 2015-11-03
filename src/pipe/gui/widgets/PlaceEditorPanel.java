@@ -73,10 +73,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private TimedPlaceComponent place;
 	private Context context;
-
+	private boolean makeNewShared = false;
+	
 	private Vector<TimedPlace> sharedPlaces;
 	private int maxNumberOfPlacesToShowAtOnce = 20;
-	
+
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
 		place = placeComponent;
@@ -128,7 +129,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				doOK();
+				if(doOK()){
+					exit();
+				}
 			}
 		});
 		rootPane.setDefaultButton(okButton);
@@ -143,8 +146,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				exit();
 			}
 		});
-		
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -195,7 +197,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 		
 		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
-		
+
 		nameTextField.setText(place.underlyingPlace().name());
 		nameTextField.selectAll();
 		attributesCheckBox.setSelected(place.getAttributesVisible());
@@ -250,9 +252,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
-		basicPropertiesPanel.add(sharedCheckBox, gridBagConstraints);		
-		
-		/** create new shared button **/
+		basicPropertiesPanel.add(sharedCheckBox, gridBagConstraints);
+
 		makeSharedButton = new javax.swing.JButton();
 		makeSharedButton.setText("Make shared");
 		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));
@@ -261,18 +262,25 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		
 		makeSharedButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				makeNewShared();
+				makeNewShared = true;
+				if(doOK()){
+					setupInitialState();
+					makeSharedButton.setEnabled(false);
+					sharedCheckBox.setEnabled(true);
+					sharedCheckBox.setSelected(true);
+					switchToNameDropDown();
+					sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
+				}
+				makeNewShared = false;
 			}
 		});
 		
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		basicPropertiesPanel.add(makeSharedButton, gridBagConstraints);
-		/** end new shared button **/
-		
 		
 		nameLabel = new javax.swing.JLabel("Name:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -589,8 +597,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void switchToNameDropDown() {
-		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
-		
 		basicPropertiesPanel.remove(nameTextField);
 		GridBagConstraints gbc = new java.awt.GridBagConstraints();
 		gbc.gridx = 1;
@@ -649,16 +655,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 	}
 
-	private void doOK() {
+	private boolean doOK() {
 		// Check urgent constrain
 		if(!invariantInf.isSelected() && !isUrgencyOK()){
-			return;
+			return false;
 		}
 
 		int newMarking = (Integer)markingSpinner.getValue();
 		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
 			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
-			return;
+			return false;
 		}
 
 		context.undoManager().newEdit(); // new "transaction""
@@ -674,7 +680,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}catch(RequireException e){
 				context.undoManager().undo();
 				JOptionPane.showMessageDialog(this,"Another place in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+				return false;
 			}		
 		}else if(!sharedCheckBox.isSelected()){
 			if(underlyingPlace.isShared()){
@@ -689,20 +695,34 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			if(context.activeModel().isNameUsed(newName) && !oldName.equalsIgnoreCase(newName)){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+				return false;
 			}
 			
-			Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
-			context.undoManager().addEdit(renameCommand);
-			try{ // set name
-				renameCommand.redo();
-			}catch(RequireException e){
-				context.undoManager().undo(); 
-				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+			/** Creating a new shared place **/
+			if(makeNewShared){
+				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent());
+				context.undoManager().addEdit(command);
+				try{
+					command.redo();
+				}catch(RequireException e){
+					context.undoManager().undo();
+					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}	
+			}   	
+			
+			else {
+				Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
+				context.undoManager().addEdit(renameCommand);
+				try{ // set name
+					renameCommand.redo();
+				}catch(RequireException e){
+					context.undoManager().undo(); 
+					JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				context.nameGenerator().updateIndices(context.activeModel(), newName);
 			}
-			context.nameGenerator().updateIndices(context.activeModel(), newName);
-		
 		}
 
 
@@ -726,7 +746,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		place.repaint();
 
 		context.network().buildConstraints();
-		exit();
+		
+		
+		return true;
 	}
 
 	private TimeInvariant constructInvariant() {
@@ -748,39 +770,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void exit() {
 		rootPane.getParent().setVisible(false);
 	}
-	
-	private void makeNewShared(){
-		String newName = nameTextField.getText();
-		String oldName = place.underlyingPlace().name();
 
-		context.undoManager().newEdit();
-
-		if(context.activeModel().isNameUsed(newName) && !oldName.equalsIgnoreCase(newName)){
-			context.undoManager().undo(); 
-			JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}	
-		
-		Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent());
-		
-		context.undoManager().addEdit(command);
-		try{
-			command.redo();
-		}catch(RequireException e){
-			context.undoManager().undo();
-			JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		setupInitialState();
-
-		makeSharedButton.setEnabled(false);
-		sharedCheckBox.setEnabled(true);
-		sharedCheckBox.setSelected(true);
-		
-		switchToNameDropDown();
-		sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());		
-	}
-	
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;
@@ -801,3 +791,4 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private JRadioButton normalInvRadioButton;
 	private JRadioButton constantInvRadioButton;
 }
+
