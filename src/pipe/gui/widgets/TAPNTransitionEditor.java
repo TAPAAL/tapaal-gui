@@ -69,28 +69,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
-		//makeNewSharedCheckBox = new JCheckBox("Make new shared"); // TODO: Delete
-		sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
-		ArrayList<SharedTransition> usedTransitions = new ArrayList<SharedTransition>();
 		
-		for (TimedTransition tt : context.activeModel().transitions()){
-			if(tt.isShared()){
-				usedTransitions.add(tt.sharedTransition());
-			}
-		}
 		
-		sharedTransitions.removeAll(usedTransitions);
-		if (transition.underlyingTransition().isShared()){
-			sharedTransitions.add(transition.underlyingTransition().sharedTransition());
-		}
 		
-		Collections.sort(sharedTransitions, new Comparator<SharedTransition>() {
-			public int compare(SharedTransition o1, SharedTransition o2) {
-				return o1.name().compareToIgnoreCase(o2.name());
-			}
-		});
+		
 		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
-		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
 		sharedTransitionsComboBox.addActionListener(new ActionListener() {
 			@Override
@@ -120,7 +103,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				}
 			}		
 		});
-		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
@@ -129,7 +111,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);	
 		
 		
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
 		makeSharedButton = new javax.swing.JButton();
 		makeSharedButton.setText("Make shared");
 		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));
@@ -140,12 +121,13 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				makeNewShared = true;
 				if(okButtonHandler(evt)){
-					//setupInitialState();
+					setupInitialState();
 					makeSharedButton.setEnabled(false);
 					sharedCheckBox.setEnabled(true);
 					sharedCheckBox.setSelected(true);
 					switchToNameDropDown();
 					//sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
+					sharedTransitionsComboBox.setSelectedItem(transition.underlyingTransition());
 				}
 				makeNewShared = false;
 			}
@@ -178,7 +160,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 		});
 		
-		urgentCheckBox.setSelected(transition.isUrgent());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 2;
@@ -204,8 +185,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
-				"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
@@ -264,7 +243,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(5, 0, 8, 3);
 		add(buttonPanel, gridBagConstraints);
 
-		nameTextField.setText(transition.getName());
+		setupInitialState();
 		if(transition.underlyingTransition().isShared()){
 			switchToNameDropDown();
 			sharedCheckBox.setSelected(true);
@@ -273,6 +252,37 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			switchToNameTextField();
 		}
 	}	
+	
+	private void setupInitialState(){
+		sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
+		ArrayList<SharedTransition> usedTransitions = new ArrayList<SharedTransition>();
+		
+		for (TimedTransition tt : context.activeModel().transitions()){
+			if(tt.isShared()){
+				usedTransitions.add(tt.sharedTransition());
+			}
+		}
+		
+		sharedTransitions.removeAll(usedTransitions);
+		if (transition.underlyingTransition().isShared()){
+			sharedTransitions.add(transition.underlyingTransition().sharedTransition());
+		}
+		
+		Collections.sort(sharedTransitions, new Comparator<SharedTransition>() {
+			public int compare(SharedTransition o1, SharedTransition o2) {
+				return o1.name().compareToIgnoreCase(o2.name());
+			}
+		});
+		nameTextField.setText(transition.getName());
+
+		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
+		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
+		urgentCheckBox.setSelected(transition.isUrgent());
+
+		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
+				"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
+	}
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
 		for(TimedInputArc arc : context.activeModel().inputArcs()){
@@ -392,20 +402,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return false;
 			}
 		}
-		else if(makeNewSharedCheckBox.isSelected()){
-			/** Creating a new shared transition **/
-			if(makeNewSharedCheckBox.isSelected()){
-				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent());
-				context.undoManager().addEdit(command);
-				try{
-					command.redo();
-				}catch(RequireException e){
-					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
-				}	
-			}   	
-		}else{			
+		else{			
 			if(transition.underlyingTransition().model().isNameUsed(newName) && (wasShared || !transition.underlyingTransition().name().equalsIgnoreCase(newName))){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
@@ -426,6 +423,19 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return false;
 			}
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
+			
+			/** Creating a new shared transition **/
+			if(makeNewShared){
+				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent());
+				context.undoManager().addEdit(command);
+				try{
+					command.redo();
+				}catch(RequireException e){
+					context.undoManager().undo();
+					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}	
+			}  
 		}
 		
 		if(transition.isUrgent() != urgentCheckBox.isSelected()){
