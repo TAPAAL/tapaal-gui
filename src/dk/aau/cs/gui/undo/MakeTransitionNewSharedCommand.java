@@ -36,17 +36,18 @@ public class MakeTransitionNewSharedCommand extends Command {
 		sharedPanel.addSharedTransition(sharedTransition);			
 		sharedTransition.makeShared(timedTransition);
 		
-		if(!tapn.transitions().contains(timedTransition)){
-			tapn.add(timedTransition); // adding it back in. Not sure this is the correct approach.
-		}
+		tapn.add(timedTransition);
+		
 	}
 
 	@Override
 	public void undo() {
-		if(!tapn.transitions().contains(timedTransition)){
-			tapn.add(timedTransition);
+		tapn.add(timedTransition);
+		
+		if(sharedTransition != null){
+			sharedPanel.removeSharedTransition(sharedTransition);
 		}
-		sharedPanel.removeSharedTransition(sharedTransition);				
+		
 		timedTransition.unshare();
 		timedTransition.setName(oldName);
 	}
