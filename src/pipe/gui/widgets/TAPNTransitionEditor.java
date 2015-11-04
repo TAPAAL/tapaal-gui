@@ -282,7 +282,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		}else{
 			switchToNameTextField();
 		}
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 	}
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
@@ -431,7 +431,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this,"A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}	
 			}  

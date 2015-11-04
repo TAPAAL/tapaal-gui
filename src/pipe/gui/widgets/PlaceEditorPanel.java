@@ -196,7 +196,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		sharedCheckBox.setEnabled(sharedPlaces.size() > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 		
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedTransitions(place.underlyingPlace()));
 
 		nameTextField.setText(place.underlyingPlace().name());
 		nameTextField.selectAll();
@@ -716,6 +716,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
+					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}	
 			}
