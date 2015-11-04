@@ -18,6 +18,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.RequireException;
 
 public class MakePlaceNewSharedCommand extends Command {
 	private final String newSharedName;
@@ -29,7 +30,7 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final TabContent currentTab;
 	private SharedPlacesAndTransitionsPanel sharedPanel;
 	private SharedPlace sharedPlace;
-
+	
 	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(newSharedName != null, "newSharedName cannot be null");
@@ -51,7 +52,7 @@ public class MakePlaceNewSharedCommand extends Command {
 	@Override
 	public void redo() {
 		tapn.remove(place);
-		
+
 		if(sharedPlace == null){
 			sharedPlace = new SharedPlace(newSharedName);
 		}
@@ -76,7 +77,6 @@ public class MakePlaceNewSharedCommand extends Command {
 		placeComponent.setUnderlyingPlace(place);
 		
 		undoQueryChanges(sharedPlace, place);
-	
 	}
 
 	private void updateArcs(TimedPlace toReplace, TimedPlace replacement) {

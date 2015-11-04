@@ -696,9 +696,19 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
-			}
+			}   	
 			
-			/** Creating a new shared place **/
+			Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
+			context.undoManager().addEdit(renameCommand);
+			try{ // set name
+				renameCommand.redo();
+			}catch(RequireException e){
+				context.undoManager().undo(); 
+				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+			context.nameGenerator().updateIndices(context.activeModel(), newName);
+		
 			if(makeNewShared){
 				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent());
 				context.undoManager().addEdit(command);
@@ -706,22 +716,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}	
-			}   	
-			
-			else {
-				Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
-				context.undoManager().addEdit(renameCommand);
-				try{ // set name
-					renameCommand.redo();
-				}catch(RequireException e){
-					context.undoManager().undo(); 
-					JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				context.nameGenerator().updateIndices(context.activeModel(), newName);
 			}
 		}
 
