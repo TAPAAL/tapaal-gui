@@ -65,10 +65,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		rotationComboBox = new javax.swing.JComboBox();
 		buttonPanel = new javax.swing.JPanel();
 		cancelButton = new javax.swing.JButton();
+		makeSharedButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
-		makeNewSharedCheckBox = new JCheckBox("Make new shared");
+		//makeNewSharedCheckBox = new JCheckBox("Make new shared"); // TODO: Delete
 		sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
 		ArrayList<SharedTransition> usedTransitions = new ArrayList<SharedTransition>();
 		
@@ -112,8 +113,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				JCheckBox box = (JCheckBox)arg0.getSource();
 				if(box.isSelected()){
 					switchToNameDropDown();
+					makeSharedButton.setEnabled(false);
 				}else{
 					switchToNameTextField();
+					makeSharedButton.setEnabled(true);
 				}
 			}		
 		});
@@ -123,29 +126,37 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);
-
-
-		makeNewSharedCheckBox.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				JCheckBox box = (JCheckBox)arg0.getSource();
-				if(box.isSelected()){
-					sharedCheckBox.setSelected(false);
-					sharedCheckBox.setEnabled(false);
-					switchToNameTextField();
-				}else{
-					sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);	
+		
+		
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
+		makeSharedButton = new javax.swing.JButton();
+		makeSharedButton.setText("Make shared");
+		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));
+		makeSharedButton.setMinimumSize(new java.awt.Dimension(110, 25));
+		makeSharedButton.setPreferredSize(new java.awt.Dimension(110, 25));
+		
+		makeSharedButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				makeNewShared = true;
+				if(okButtonHandler(evt)){
+					//setupInitialState();
+					makeSharedButton.setEnabled(false);
+					sharedCheckBox.setEnabled(true);
+					sharedCheckBox.setSelected(true);
+					switchToNameDropDown();
+					//sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 				}
-			}		
-		});		
+				makeNewShared = false;
+			}
+		});
 		
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
-		transitionEditorPanel.add(makeNewSharedCheckBox, gridBagConstraints);
-		
-		
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+		transitionEditorPanel.add(makeSharedButton, gridBagConstraints);
 		
 		nameLabel.setText("Name:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -214,7 +225,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				okButtonHandler(evt);
+				if(okButtonHandler(evt)){
+					exit();
+				}
 			}
 		});
 
@@ -352,12 +365,12 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		return true;
 	}
 
-	private void okButtonHandler(java.awt.event.ActionEvent evt) {
+	private boolean okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
 		
 		// Check urgent constrain
 		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
-			return;
+			return false;
 		}
 			
 		context.undoManager().newEdit(); // new "transaction""
@@ -376,7 +389,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}catch(RequireException e){
 				context.undoManager().undo();
 				JOptionPane.showMessageDialog(this,"Another transition in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+				return false;
 			}
 		}
 		else if(makeNewSharedCheckBox.isSelected()){
@@ -389,7 +402,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				}catch(RequireException e){
 					context.undoManager().undo();
 					JOptionPane.showMessageDialog(this,"The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
+					return false;
 				}	
 			}   	
 		}else{			
@@ -398,7 +411,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				JOptionPane.showMessageDialog(this,
 						"The specified name is already used by another place or transition.",
 						"Error", JOptionPane.ERROR_MESSAGE);
-				return;
+				return false;
 			}
 
 			String oldName = transition.underlyingTransition().name();
@@ -410,7 +423,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				JOptionPane.showMessageDialog(this,
 						"Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 						"Error", JOptionPane.ERROR_MESSAGE);
-				return;
+				return false;
 			}
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		}
@@ -440,7 +453,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				context.undoManager().addEdit(transition.rotate(angle));
 			}
 		}
-		exit();
+		return true;
 	}
 
 	private void exit() {
@@ -456,6 +469,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JLabel nameLabel;
 	private javax.swing.JTextField nameTextField;
 	private javax.swing.JButton okButton;
+	private javax.swing.JButton makeSharedButton;
 	private javax.swing.JComboBox rotationComboBox;
 	private javax.swing.JLabel rotationLabel;
 	private javax.swing.JPanel transitionEditorPanel;
@@ -464,5 +478,5 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JCheckBox urgentCheckBox;
 	private javax.swing.JCheckBox makeNewSharedCheckBox;
 	private Vector<SharedTransition> sharedTransitions;
-
+	private boolean makeNewShared = false;
 }
