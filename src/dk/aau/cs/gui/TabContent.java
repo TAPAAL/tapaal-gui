@@ -148,6 +148,10 @@ public class TabContent extends JSplitPane {
 
 	}
 	
+	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
+		return sharedPTPanel;
+	}
+	
 	public TemplateExplorer getTemplateExplorer(){
 		return templateExplorer;
 	}

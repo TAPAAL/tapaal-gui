@@ -19,6 +19,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListDataEvent;
@@ -31,6 +32,7 @@ import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 
 import dk.aau.cs.gui.components.NonsearchableJList;
+import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortSharedPlacesCommand;
 import dk.aau.cs.gui.undo.SortSharedTransitionsCommand;
@@ -38,6 +40,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.RequireException;
 
 public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
@@ -419,6 +422,25 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		guiDialog.setVisible(true);
 	}
 
+	public void removeSharedPlace(SharedPlace place){
+		if(sharedPlacesListModel.network.getSharedPlaceByName(place.name()) != null){
+			sharedPlacesListModel.removeElement(place);
+		}
+	}
+	
+	public void addSharedPlace(SharedPlace place){
+		sharedPlacesListModel.addElement(place);
+	}
+	
+	public void removeSharedTransition(SharedTransition transition){
+		if(sharedTransitionsListModel.network.getSharedTransitionByName(transition.name()) != null){
+			sharedTransitionsListModel.removeElement(transition);
+		}
+	}
+	
+	public void addSharedTransition(SharedTransition transition){
+		sharedTransitionsListModel.addElement(transition);
+	}
 
 	public class SharedPlacesListModel extends AbstractListModel {
 		private static final long serialVersionUID = 1L;
