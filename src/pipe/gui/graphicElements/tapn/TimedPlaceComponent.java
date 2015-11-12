@@ -309,6 +309,12 @@ public class TimedPlaceComponent extends Place {
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
 			pnName.setName(place.name());
+			
+			if (attributesVisible){
+				pnName.setVisible(true);
+			} else {
+				pnName.setVisible(false);
+			}
 
 			if (!(place.invariant().upperBound() instanceof InfBound) && attributesVisible) {
 				pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));

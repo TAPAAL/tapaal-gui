@@ -311,6 +311,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		placeElement.setAttribute("markingOffsetX",	(inputPlace.getMarkingOffsetXObject() != null ? String.valueOf(inputPlace.getMarkingOffsetXObject()) : ""));
 		placeElement.setAttribute("markingOffsetY",	(inputPlace.getMarkingOffsetYObject() != null ? String.valueOf(inputPlace.getMarkingOffsetYObject()) : ""));
 		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
+		placeElement.setAttribute("visible", (inputPlace.getAttributesVisible() ? "true" : "false"));
 
 		return placeElement;
 	}
@@ -350,6 +351,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
+		transitionElement.setAttribute("visible", (inputTransition.getAttributesVisible() ? "true" : "false"));
 
 		return transitionElement;
 	}

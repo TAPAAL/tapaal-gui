@@ -49,7 +49,6 @@ public class TAPNTransitionHandler extends TransitionHandler {
 	@Override
 	public JPopupMenu getPopup(MouseEvent e) {
 		JPopupMenu popup = super.getPopup(e);
-		popup.remove(1); // the show attributes menu point
 
 		return popup;
 	}

@@ -406,7 +406,7 @@ public class Transition extends PlaceTransitionObject {
 	@Override
 	public void toggleAttributesVisible() {
 		attributesVisible = !attributesVisible;
-		pnName.setText(getText());
+		update(true);
 	}
 
 	@Override

@@ -50,6 +50,7 @@ public class TimedTransitionComponent extends Transition {
 		this.transition = transition;
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
+		attributesVisible = true;
 	}
 
 	public TimedTransitionComponent(double positionXInput,
@@ -61,6 +62,7 @@ public class TimedTransitionComponent extends Transition {
 				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
 		listener = timedTransitionListener();
+		attributesVisible = true;
 	}
 
 	private TimedTransitionListener timedTransitionListener(){
@@ -160,6 +162,11 @@ public class TimedTransitionComponent extends Transition {
 	public void update(boolean displayConstantNames) {
 		if(transition != null) {
 			pnName.setName(transition.name());
+			if (attributesVisible){
+				pnName.setVisible(true);
+			} else {
+				pnName.setVisible(false);
+			}
 			pnName.zoomUpdate(zoom);
 		}
 		else {
