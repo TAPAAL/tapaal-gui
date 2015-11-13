@@ -141,15 +141,11 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 				TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
 				if(place != null){
 					for(Arc arc : place.getPreset()){
-						Command cmd = createDeleteArcCommand(template, arc, tab.drawingSurface()); 
-						cmd.redo();
-						undoManager.addEdit(cmd);
+						deleteArc(arc, template);
 					}
 
 					for(Arc arc : place.getPostset()){
-						Command cmd = createDeleteArcCommand(template, arc, tab.drawingSurface());
-						cmd.redo();
-						undoManager.addEdit(cmd);
+						deleteArc(arc, template);
 					}
 
 					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel(), tab.drawingSurface());
@@ -213,13 +209,27 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
 		}
 	}
-
+	
+	private void deleteArc(Arc arc, Template template){
+		Command cmd = createDeleteArcCommand(template, arc, tab.drawingSurface()); 
+		cmd.redo();
+		undoManager.addEdit(cmd);
+	}
+	
 	private void deleteSharedTransition(boolean deleteFromTemplates) {
 		SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(sharedTransition.name());
 				if(transition != null){
+					for(Arc arc : transition.getPreset()){
+						deleteArc(arc, template);
+					}
+
+					for(Arc arc : transition.getPostset()){
+						deleteArc(arc, template);
+					}
+
 					undoManager.addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
 					transition.delete();
 				}
