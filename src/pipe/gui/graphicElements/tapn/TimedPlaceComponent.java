@@ -309,14 +309,8 @@ public class TimedPlaceComponent extends Place {
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
 			pnName.setName(place.name());
-			
-			if (attributesVisible){
-				pnName.setVisible(true);
-			} else {
-				pnName.setVisible(false);
-			}
 
-			if (!(place.invariant().upperBound() instanceof InfBound) && attributesVisible) {
+			if (!(place.invariant().upperBound() instanceof InfBound)) {
 				pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
 			}else{
 				pnName.setText("");
@@ -334,6 +328,8 @@ public class TimedPlaceComponent extends Place {
 			}else{
 				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
+			
+			pnName.displayName(attributesVisible);
 			
 		} else {
 			pnName.setName("");

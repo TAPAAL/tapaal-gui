@@ -69,7 +69,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
-		attributesCheckBox = new JCheckBox("Show transition attributes");
+		attributesCheckBox = new JCheckBox("Show transition name");
 		
 		
 		
@@ -476,6 +476,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		if(transition.getAttributesVisible() && !attributesCheckBox.isSelected() || (!transition.getAttributesVisible() && attributesCheckBox.isSelected())) {
 			transition.toggleAttributesVisible();
 		}
+		
+		transition.update(true);
 		
 		return true;
 	}

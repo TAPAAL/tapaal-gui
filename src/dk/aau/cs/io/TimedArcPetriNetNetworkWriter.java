@@ -304,14 +304,14 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		placeElement.setAttribute("positionX", (inputPlace.getPositionXObject() != null ? String.valueOf(inputPlace.getPositionXObject()) : ""));
 		placeElement.setAttribute("positionY", (inputPlace.getPositionYObject() != null ? String.valueOf(inputPlace.getPositionYObject())	: ""));
 		placeElement.setAttribute("name", inputPlace.underlyingPlace().name());
+		placeElement.setAttribute("displayName", (inputPlace.getAttributesVisible() ? "true" : "false"));
 		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
 		placeElement.setAttribute("nameOffsetX", (inputPlace.getNameOffsetXObject() != null ? String.valueOf(inputPlace.getNameOffsetXObject()) : ""));
 		placeElement.setAttribute("nameOffsetY", (inputPlace.getNameOffsetYObject() != null ? String.valueOf(inputPlace.getNameOffsetYObject()) : ""));
 		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
 		placeElement.setAttribute("markingOffsetX",	(inputPlace.getMarkingOffsetXObject() != null ? String.valueOf(inputPlace.getMarkingOffsetXObject()) : ""));
 		placeElement.setAttribute("markingOffsetY",	(inputPlace.getMarkingOffsetYObject() != null ? String.valueOf(inputPlace.getMarkingOffsetYObject()) : ""));
-		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
-		placeElement.setAttribute("visible", (inputPlace.getAttributesVisible() ? "true" : "false"));
+		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());	
 
 		return placeElement;
 	}
@@ -346,12 +346,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("nameOffsetX", (inputTransition.getNameOffsetXObject() != null ? String.valueOf(inputTransition.getNameOffsetXObject()) : ""));
 		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
 		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
+		transitionElement.setAttribute("displayName", (inputTransition.getAttributesVisible() ? "true" : "false"));
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
 		transitionElement.setAttribute("infiniteServer", "false");
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
-		transitionElement.setAttribute("visible", (inputTransition.getAttributesVisible() ? "true" : "false"));
 
 		return transitionElement;
 	}
