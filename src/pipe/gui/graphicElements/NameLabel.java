@@ -121,5 +121,12 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 		}
 		return null;
 	}
-
+	
+	public void displayName(boolean display){
+		if(display && name != null && text != null){
+			super.setText(name + text);
+		} else if(!display && text != null){
+			super.setText(text);
+		}
+	}
 }

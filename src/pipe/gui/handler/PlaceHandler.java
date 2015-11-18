@@ -59,9 +59,9 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Place) myObject));
 		if (((Place) myObject).getAttributesVisible()) {
-			menuItem.setText("Hide Attributes");
+			menuItem.setText("Hide Place Name");
 		} else {
-			menuItem.setText("Show Attributes");
+			menuItem.setText("Show Place Name");
 		}
 		popup.insert(menuItem, index++);
 		popup.insert(new JPopupMenu.Separator(), index);

@@ -75,9 +75,9 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Transition) myObject));
 		if (((Transition) myObject).getAttributesVisible()) {
-			menuItem.setText("Hide Attributes");
+			menuItem.setText("Hide Transition Name");
 		} else {
-			menuItem.setText("Show Attributes");
+			menuItem.setText("Show Transition Name");
 		}
 		popup.insert(menuItem, index++);
 		popup.insert(new JPopupMenu.Separator(), index);

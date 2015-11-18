@@ -392,6 +392,7 @@ public class TapnXmlLoader {
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
 		int angle = Integer.parseInt(transition.getAttribute("angle"));
 		int priority = Integer.parseInt(transition.getAttribute("priority"));
+		boolean displayName = transition.getAttribute("displayName").equals("false") ? false : true;
 
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
@@ -420,6 +421,10 @@ public class TapnXmlLoader {
 				nameOffsetXInput, nameOffsetYInput, true,
 				infiniteServer, angle, priority);
 		transitionComponent.setUnderlyingTransition(t);
+		
+		if (!displayName){
+			transitionComponent.setAttributesVisible(false);
+		}
 		return transitionComponent;
 	}
 
@@ -434,6 +439,7 @@ public class TapnXmlLoader {
 		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
 		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
 		String invariant = place.getAttribute("invariant");
+		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
 		
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
@@ -470,6 +476,10 @@ public class TapnXmlLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput, nameOffsetYInput, initialMarkingInput, markingOffsetXInput, markingOffsetYInput, 0);
 		placeComponent.setUnderlyingPlace(p);
+		
+		if (!displayName){
+			placeComponent.setAttributesVisible(false);
+		}
 
 		return placeComponent;
 	}

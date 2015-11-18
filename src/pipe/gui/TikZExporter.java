@@ -167,8 +167,10 @@ public class TikZExporter {
 
 			out.append("\\node[transition");
 			out.append(angle);
-			out.append(",label=135:");
-			out.append(exportMathName(trans.getName()));
+			if (trans.getAttributesVisible()){
+				out.append(",label=135:");
+				out.append(exportMathName(trans.getName()));
+			}			
 			out.append("] at (");
 			out.append(RoundCoordinate(trans.getPositionX()));
 			out.append(',');
@@ -202,8 +204,11 @@ public class TikZExporter {
 			String invariant = getPlaceInvariantString(place);
 			String tokensInPlace = getTokenListStringFor(place);
 
-			out.append("\\node[place,label=135:");
-			out.append(exportMathName(place.getName()));
+			out.append("\\node[place");
+			if (place.getAttributesVisible()){
+				out.append(",label=135:");
+				out.append(exportMathName(place.getName()));
+			}	
 			out.append(',');
 			out.append(invariant);
 			out.append(tokensInPlace);

@@ -69,7 +69,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
-		
+		attributesCheckBox = new JCheckBox("Show transition name");
 		
 		
 		
@@ -243,6 +243,15 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(5, 0, 8, 3);
 		add(buttonPanel, gridBagConstraints);
 
+		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
+		
 		setupInitialState();
 
 	}	
@@ -283,6 +292,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			switchToNameTextField();
 		}
 		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		attributesCheckBox.setSelected(transition.getAttributesVisible());
 	}
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
@@ -462,6 +472,13 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				context.undoManager().addEdit(transition.rotate(angle));
 			}
 		}
+		
+		if(transition.getAttributesVisible() && !attributesCheckBox.isSelected() || (!transition.getAttributesVisible() && attributesCheckBox.isSelected())) {
+			transition.toggleAttributesVisible();
+		}
+		
+		transition.update(true);
+		
 		return true;
 	}
 
@@ -488,4 +505,5 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JCheckBox makeNewSharedCheckBox;
 	private Vector<SharedTransition> sharedTransitions;
 	private boolean makeNewShared = false;
+	private javax.swing.JCheckBox attributesCheckBox;
 }

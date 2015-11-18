@@ -326,7 +326,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
 
-		attributesCheckBox = new javax.swing.JCheckBox("Show place attributes");
+		attributesCheckBox = new javax.swing.JCheckBox("Show place name");
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -722,8 +722,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		}
 
-
-
 		if(newMarking != place.underlyingPlace().numberOfTokens()){
 			Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
 			command.redo();
@@ -740,10 +738,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		if ((place.getAttributesVisible() && !attributesCheckBox.isSelected()) || (!place.getAttributesVisible() && attributesCheckBox.isSelected())) {
 			place.toggleAttributesVisible();
 		}
+		place.update(true);
 		place.repaint();
 
 		context.network().buildConstraints();
-		
 		
 		return true;
 	}
