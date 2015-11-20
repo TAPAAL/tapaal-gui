@@ -127,7 +127,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					sharedCheckBox.setSelected(true);
 					switchToNameDropDown();
 					sharedTransitionsComboBox.setSelectedItem(transition.underlyingTransition());
-					urgentCheckBox.setSelected(transition.isUrgent());
 				}
 				makeNewShared = false;
 			}
@@ -447,7 +446,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}  
 		}
 		
-		if(transition.isUrgent() != urgentCheckBox.isSelected()){
+		if(transition.isUrgent() != urgentCheckBox.isSelected() || makeNewShared){
 			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
