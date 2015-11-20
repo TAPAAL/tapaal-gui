@@ -94,10 +94,10 @@ public class Pipe {
 
 	public static final int MAX_NODES = 20000;
 
-	public static final int verifytaMinRev = 5200;
+	public static final int verifytaMinRev = 5648;
 	public static final String verifytapnMinRev = "1.3.0";
-	public static final String verifydtapnMinRev = "3.1.3";
-	public static final String verifypnMinRev = "1.1.1";
+	public static final String verifydtapnMinRev = "3.2.0";
+	public static final String verifypnMinRev = "1.2.0";
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
