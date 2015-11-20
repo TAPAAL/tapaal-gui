@@ -121,12 +121,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				makeNewShared = true;
 				if(okButtonHandler(evt)){
-					setupInitialState();
+					
 					makeSharedButton.setEnabled(false);
 					sharedCheckBox.setEnabled(true);
 					sharedCheckBox.setSelected(true);
-					switchToNameDropDown();
-					sharedTransitionsComboBox.setSelectedItem(transition.underlyingTransition());
+					setupInitialState();
 				}
 				makeNewShared = false;
 			}
@@ -442,11 +441,12 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					context.undoManager().undo();
 					JOptionPane.showMessageDialog(this,"A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
-				}	
+				}
+				transition.setUrgent(urgentCheckBox.isSelected());
 			}  
 		}
 		
-		if(transition.isUrgent() != urgentCheckBox.isSelected() || makeNewShared){
+		if(transition.isUrgent() != urgentCheckBox.isSelected()){
 			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
