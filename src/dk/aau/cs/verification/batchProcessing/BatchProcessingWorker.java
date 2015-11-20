@@ -210,6 +210,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			if(exiting()) return;
 			query = query.copy();
 			query.setReductionOption(r);
+			
+			// UPPAAL does not recognize: SearchOption.DEFAULT
+			if(query.getSearchOption() == SearchOption.DEFAULT){
+				query.setSearchOption(SearchOption.HEURISTIC);
+			}
+			
 			processQuery(file, composedModel, query);
 		}
 		
