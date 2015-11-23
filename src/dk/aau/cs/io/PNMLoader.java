@@ -92,6 +92,8 @@ public class PNMLoader {
 			return load(new FileInputStream(file));
 		} catch (FileNotFoundException e){
 			return null;
+		} catch (NullPointerException e){
+			throw new FormatException("the PNML file contains unknown tags");
 		}
 	}
 	
