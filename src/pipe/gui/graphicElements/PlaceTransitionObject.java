@@ -382,14 +382,20 @@ Cloneable {
 		if (selectable && !selected) {
 			selected = true;
 
-			Iterator<Arc> arcsFrom = connectFrom.iterator();
-			while (arcsFrom.hasNext()) {
-				arcsFrom.next().select();
+			// Select arcs that are connected from this object to another selected object.
+			for (Arc arc : getPostset()) {
+				if(arc.getTarget().isSelected()){
+					arc.select();
+					arc.selectPath();
+				}
 			}
 
-			Iterator<Arc> arcsTo = connectTo.iterator();
-			while (arcsTo.hasNext()) {
-				arcsTo.next().select();
+			// Select arcs that are connected to this object from another selected object.
+			for (Arc arc : getPreset()) {
+				if(arc.getSource().isSelected()){
+					arc.select();
+					arc.selectPath();
+				}
 			}
 			repaint();
 		}

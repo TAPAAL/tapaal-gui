@@ -16,8 +16,15 @@ import java.util.ArrayList;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
+import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 
 /**
@@ -74,8 +81,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 			clearSelection();
 		}
 
-		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
+		// Get all the place and transition objects in the current window
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPlaceTransitionObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			pnObject.select(selectionRectangle);
 		}
