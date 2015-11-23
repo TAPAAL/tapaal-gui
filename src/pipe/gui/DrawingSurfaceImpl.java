@@ -431,6 +431,16 @@ Printable, DrawingSurface {
 	public ArrayList<PetriNetObject> getPNObjects() {
 		return petriNetObjects;
 	}
+	
+	public ArrayList<PetriNetObject> getPlaceTransitionObjects(){
+		ArrayList<PetriNetObject> result = new ArrayList<PetriNetObject>();
+		for (PetriNetObject pnObject : petriNetObjects) {
+			if((pnObject instanceof PlaceTransitionObject)){
+				result.add(pnObject);
+			}
+		}
+		return result;
+	}
 
 	@Override
 	public void remove(Component comp) {

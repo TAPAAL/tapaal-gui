@@ -74,8 +74,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 			clearSelection();
 		}
 
-		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
+		// Get all the place and transition objects in the current window
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPlaceTransitionObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			pnObject.select(selectionRectangle);
 		}

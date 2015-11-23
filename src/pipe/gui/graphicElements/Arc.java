@@ -294,6 +294,12 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		}
 		return false;
 	}
+	
+	public void selectPath(){
+		if (selectable) {
+			myPath.selectAllPoints();
+		}
+	}
 
 	@Override
 	public int getLayerOffset() {

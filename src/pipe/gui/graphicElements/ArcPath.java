@@ -377,6 +377,12 @@ public class ArcPath implements Shape, Cloneable {
 	public void selectPoint(int index) {
 		(pathPoints.get(index)).select();
 	}
+	
+	public void selectAllPoints(){
+		for(int i = 0; i < pathPoints.size(); i++){
+			selectPoint(i);
+		}
+	}
 
 	public int getNumPoints() {
 		return pathPoints.size();
