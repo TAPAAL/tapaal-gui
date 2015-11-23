@@ -16,15 +16,8 @@ import java.util.ArrayList;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
-import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 
 /**
