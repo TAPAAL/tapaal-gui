@@ -1509,7 +1509,6 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.setFile(file, freeSpace);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(), 
