@@ -93,7 +93,7 @@ public class PNMLoader {
 		} catch (FileNotFoundException e){
 			return null;
 		} catch (NullPointerException e){
-			throw new FormatException("the PNML file contains unknown tags");
+			throw new FormatException("the PNML file cannot be parsed due to syntax errors");
 		}
 	}
 	
