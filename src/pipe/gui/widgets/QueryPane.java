@@ -165,7 +165,7 @@ public class QueryPane extends JPanel {
 		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
 			editQueryButton.setEnabled(false);
 			verifyButton.setEnabled(false);
-			removeQueryButton.setEnabled(false);
+			removeQueryButton.setEnabled(true);
 		} else {
 			editQueryButton.setEnabled(true);
 			verifyButton.setEnabled(true);
