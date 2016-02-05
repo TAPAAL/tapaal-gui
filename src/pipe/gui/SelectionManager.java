@@ -122,10 +122,10 @@ public class SelectionManager extends javax.swing.JComponent implements
 		Point point = null;
 		Point topleft = null;
 
-		// Get all the objects in the current window
+		// Get all the objects in the current window, ignoring Arcs
 		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
 		for (PetriNetObject pnObject : pnObjects) {
-			if (pnObject.isSelected()) {
+			if (pnObject.isSelected() && !(pnObject instanceof Arc)) {
 				point = pnObject.getLocation();
 				if (topleft == null) {
 					topleft = point;
