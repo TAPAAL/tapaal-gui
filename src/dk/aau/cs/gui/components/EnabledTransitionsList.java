@@ -6,37 +6,29 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.GraphicAttribute;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
-import pipe.gui.Animator;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
@@ -54,6 +46,7 @@ public class EnabledTransitionsList extends JPanel{
 	JList transitionsList;
 	JScrollPane scrollPane;
 	TransitionListItem lastSelected;
+	String previousHighlightedId;
 
 	public void initPanel(){
 		transitions = new DefaultListModel();
@@ -69,12 +62,26 @@ public class EnabledTransitionsList extends JPanel{
 				}
 			}
 		});
+		
+		
+		transitionsList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e){
+				TransitionListItem highlightedItem = (TransitionListItem)transitionsList.getSelectedValue();
+				
+				if(highlightedItem != null && !e.getValueIsAdjusting() 
+						&& !highlightedItem.getTransition().getId().equals(previousHighlightedId)){
+					highlightedItem.getTransition().blink();
+					previousHighlightedId = highlightedItem.getTransition().getId();
+				}
+			}
+		});
 
 		scrollPane = new JScrollPane(transitionsList);
 
 		this.add(scrollPane, BorderLayout.CENTER);
 	}
-
+	
 	public void startReInit(){
 		lastSelected = (TransitionListItem)transitionsList.getSelectedValue();
 		transitions.clear();

@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -12,10 +14,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import javax.swing.Timer;
 
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
@@ -43,6 +45,8 @@ public class Transition extends PlaceTransitionObject {
 	protected boolean enabled = false;
 	public boolean blueTransition = false;
 	public boolean highlighted = false;
+	private Timer blinkTimer;
+	private int blinkCount;
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
@@ -492,9 +496,25 @@ public class Transition extends PlaceTransitionObject {
 		 toReturn.updateBounds();
 
 		 return toReturn;
-
-
-
 	 }
-
+	 
+	 public void blink(){
+		 if(blinkTimer == null) { initBlinkTimer(); }
+		 blinkCount = 0;
+		 blinkTimer.start();
+	 }
+	 
+	 private void initBlinkTimer(){
+		 blinkTimer = new Timer(400, new ActionListener() {			 
+		      public void actionPerformed(ActionEvent evt) {		    	  		    	  
+		    	  if(blinkCount < 2 ){
+		    		  setVisible(!isVisible());
+		    		  blinkCount++;		    	  
+		    	  } else {
+		    		  setVisible(true); // Ensures that transition is always visible after last blink
+		    		  blinkTimer.stop();
+		    	  }
+		      }
+		 });
+	 }
 }
