@@ -62,6 +62,7 @@ public class TabContent extends JSplitPane {
 	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	protected HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 	protected JScrollPane drawingSurfaceScroller;
+	protected JScrollPane editorSplitPaneScroller;
 	protected DrawingSurfaceImpl drawingSurface;
 	protected File appFile;
 	private JPanel drawingSurfaceDummy;
@@ -138,7 +139,7 @@ public class TabContent extends JSplitPane {
 		createAnimatorSplitPane(netType);
 
 		this.setOrientation(HORIZONTAL_SPLIT);
-		this.setLeftComponent(editorSplitPane);
+		this.setLeftComponent(editorSplitPaneScroller);
 		this.setRightComponent(drawingSurfaceScroller);
 
 		this.setContinuousLayout(true);
@@ -211,7 +212,13 @@ public class TabContent extends JSplitPane {
 		editorSplitPane.add(queries, queriesName);
 		editorSplitPane.add(constantsPanel, constantsName);
 		
-		this.setLeftComponent(editorSplitPane);
+		editorSplitPaneScroller = new JScrollPane(editorSplitPane);
+		editorSplitPaneScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		editorSplitPaneScroller.setWheelScrollingEnabled(true);
+		editorSplitPaneScroller.getVerticalScrollBar().setUnitIncrement(10);
+		editorSplitPaneScroller.getHorizontalScrollBar().setUnitIncrement(10);
+		editorSplitPaneScroller.setBorder(null);
+		this.setLeftComponent(editorSplitPaneScroller);
 		
 		editorSplitPane.repaint();
 	}
@@ -422,9 +429,7 @@ public class TabContent extends JSplitPane {
 		}
 
 		templateExplorer.switchToEditorMode();
-
-		this.setLeftComponent(editorSplitPane);
-
+		this.setLeftComponent(editorSplitPaneScroller);
 		drawingSurface.repaintAll();
 	}
 
