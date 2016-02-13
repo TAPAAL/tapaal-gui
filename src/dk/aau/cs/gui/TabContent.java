@@ -63,6 +63,7 @@ public class TabContent extends JSplitPane {
 	protected HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 	protected JScrollPane drawingSurfaceScroller;
 	protected JScrollPane editorSplitPaneScroller;
+	protected JScrollPane animatorSplitPaneScroller;
 	protected DrawingSurfaceImpl drawingSurface;
 	protected File appFile;
 	private JPanel drawingSurfaceDummy;
@@ -380,6 +381,14 @@ public class TabContent extends JSplitPane {
 				transitionFireing.getMinimumSize().height));
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
+		
+		animatorSplitPaneScroller = new JScrollPane(animatorSplitPane);
+		animatorSplitPaneScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		animatorSplitPaneScroller.setWheelScrollingEnabled(true);
+		animatorSplitPaneScroller.getVerticalScrollBar().setUnitIncrement(10);
+		animatorSplitPaneScroller.getHorizontalScrollBar().setUnitIncrement(10);
+		animatorSplitPaneScroller.setBorder(null);
+		animatorSplitPaneScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
@@ -404,7 +413,7 @@ public class TabContent extends JSplitPane {
 		templateExplorer.switchToAnimationMode();
 		showEnabledTransitionsList(showEnabledTransitions);
 		
-		this.setLeftComponent(animatorSplitPane);
+		this.setLeftComponent(animatorSplitPaneScroller);
 
 	}
 
