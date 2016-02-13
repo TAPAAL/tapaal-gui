@@ -218,6 +218,7 @@ public class TabContent extends JSplitPane {
 		editorSplitPaneScroller.getVerticalScrollBar().setUnitIncrement(10);
 		editorSplitPaneScroller.getHorizontalScrollBar().setUnitIncrement(10);
 		editorSplitPaneScroller.setBorder(null);
+		editorSplitPaneScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.setLeftComponent(editorSplitPaneScroller);
 		
 		editorSplitPane.repaint();
