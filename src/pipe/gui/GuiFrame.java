@@ -1169,7 +1169,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	// set frame objects by array index
-	private void setObjects(int index) {
+	public void setObjects(int index) {
 		appView = CreateGui.getDrawingSurface(index);
 	}
 
