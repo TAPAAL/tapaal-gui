@@ -117,11 +117,14 @@ public class TabComponent extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					int index = pane.indexOfTabComponent(TabComponent.this);
 					if(pane.getTabCount() > 0 && CreateGui.getApp().checkForSave(index)){
-						if(pane.getTabCount() == 1) CreateGui.getApp().setGUIMode(GUIMode.noNet);
+						if(pane.getTabCount() == 1) { CreateGui.getApp().setGUIMode(GUIMode.noNet); }
 
 						//Close the gui part first, else we get an error bug #826578
 						pane.removeTabAt(index);
 						CreateGui.removeTab(index);
+						
+						//Update DrawingSurfaceImpl manually. Bug #1543124
+						CreateGui.getApp().setObjects(pane.getSelectedIndex());
 						
 						CreateGui.getApp().activateSelectAction();
 					}
