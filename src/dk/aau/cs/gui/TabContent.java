@@ -213,16 +213,24 @@ public class TabContent extends JSplitPane {
 		editorSplitPane.add(queries, queriesName);
 		editorSplitPane.add(constantsPanel, constantsName);
 		
-		editorSplitPaneScroller = new JScrollPane(editorSplitPane);
-		editorSplitPaneScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		editorSplitPaneScroller.setWheelScrollingEnabled(true);
-		editorSplitPaneScroller.getVerticalScrollBar().setUnitIncrement(10);
-		editorSplitPaneScroller.getHorizontalScrollBar().setUnitIncrement(10);
-		editorSplitPaneScroller.setBorder(null);
-		editorSplitPaneScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		editorSplitPaneScroller = createLeftScrollPane(editorSplitPane);
 		this.setLeftComponent(editorSplitPaneScroller);
 		
 		editorSplitPane.repaint();
+	}
+	
+	private JScrollPane createLeftScrollPane(JPanel panel){
+		JScrollPane scroller = new JScrollPane(panel);
+		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		scroller.setWheelScrollingEnabled(true);
+		scroller.getVerticalScrollBar().setUnitIncrement(10);
+		scroller.getHorizontalScrollBar().setUnitIncrement(10);
+		scroller.setBorder(null);
+		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroller.setMinimumSize(new Dimension(
+				panel.getMinimumSize().width,
+				panel.getMinimumSize().height));
+		return scroller;
 	}
 
 	public void selectFirstActiveTemplate() {
@@ -382,13 +390,7 @@ public class TabContent extends JSplitPane {
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
 		
-		animatorSplitPaneScroller = new JScrollPane(animatorSplitPane);
-		animatorSplitPaneScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		animatorSplitPaneScroller.setWheelScrollingEnabled(true);
-		animatorSplitPaneScroller.getVerticalScrollBar().setUnitIncrement(10);
-		animatorSplitPaneScroller.getHorizontalScrollBar().setUnitIncrement(10);
-		animatorSplitPaneScroller.setBorder(null);
-		animatorSplitPaneScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
