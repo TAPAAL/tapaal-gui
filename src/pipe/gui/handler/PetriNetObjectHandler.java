@@ -137,7 +137,9 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 */
 	@Override
 	public void mouseDragged(MouseEvent e) {
-
+		int previousX = myObject.getX();
+		int previousY = myObject.getY();
+		
 		if (!SwingUtilities.isLeftMouseButton(e)) {
 			return;
 		}
@@ -152,10 +154,12 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			// Calculate translation in mouse
 			int transX = Grid.getModifiedX(e.getX() - dragInit.x);
 			int transY = Grid.getModifiedY(e.getY() - dragInit.y);
-			totalX += transX;
-			totalY += transY;
 			((DrawingSurfaceImpl) contentPane).getSelectionObject()
 					.translateSelection(transX, transY);
+			
+			//Only register the actual distance and direction moved (in case of dragging past edge)
+			totalX += myObject.getX() - previousX;
+			totalY += myObject.getY() - previousY;
 		}
 	}
 
