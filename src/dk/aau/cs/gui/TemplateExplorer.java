@@ -140,7 +140,7 @@ public class TemplateExplorer extends JPanel {
 		initButtonsPanel();
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Components"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-	    this.setToolTipText("List of compoments. Click a component to display it.");
+	    this.setToolTipText("List of components. Click a component to display it.");
 		addCreatedComponents(hideButtons);
 		
 		this.addComponentListener(new ComponentListener() {

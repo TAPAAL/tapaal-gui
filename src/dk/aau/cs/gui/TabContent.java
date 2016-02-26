@@ -62,6 +62,8 @@ public class TabContent extends JSplitPane {
 	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	protected HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 	protected JScrollPane drawingSurfaceScroller;
+	protected JScrollPane editorSplitPaneScroller;
+	protected JScrollPane animatorSplitPaneScroller;
 	protected DrawingSurfaceImpl drawingSurface;
 	protected File appFile;
 	private JPanel drawingSurfaceDummy;
@@ -138,7 +140,7 @@ public class TabContent extends JSplitPane {
 		createAnimatorSplitPane(netType);
 
 		this.setOrientation(HORIZONTAL_SPLIT);
-		this.setLeftComponent(editorSplitPane);
+		this.setLeftComponent(editorSplitPaneScroller);
 		this.setRightComponent(drawingSurfaceScroller);
 
 		this.setContinuousLayout(true);
@@ -211,9 +213,24 @@ public class TabContent extends JSplitPane {
 		editorSplitPane.add(queries, queriesName);
 		editorSplitPane.add(constantsPanel, constantsName);
 		
-		this.setLeftComponent(editorSplitPane);
+		editorSplitPaneScroller = createLeftScrollPane(editorSplitPane);
+		this.setLeftComponent(editorSplitPaneScroller);
 		
 		editorSplitPane.repaint();
+	}
+	
+	private JScrollPane createLeftScrollPane(JPanel panel){
+		JScrollPane scroller = new JScrollPane(panel);
+		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		scroller.setWheelScrollingEnabled(true);
+		scroller.getVerticalScrollBar().setUnitIncrement(10);
+		scroller.getHorizontalScrollBar().setUnitIncrement(10);
+		scroller.setBorder(null);
+		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroller.setMinimumSize(new Dimension(
+				panel.getMinimumSize().width,
+				panel.getMinimumSize().height));
+		return scroller;
 	}
 
 	public void selectFirstActiveTemplate() {
@@ -372,6 +389,8 @@ public class TabContent extends JSplitPane {
 				transitionFireing.getMinimumSize().height));
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
+		
+		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
@@ -396,7 +415,7 @@ public class TabContent extends JSplitPane {
 		templateExplorer.switchToAnimationMode();
 		showEnabledTransitionsList(showEnabledTransitions);
 		
-		this.setLeftComponent(animatorSplitPane);
+		this.setLeftComponent(animatorSplitPaneScroller);
 
 	}
 
@@ -422,9 +441,7 @@ public class TabContent extends JSplitPane {
 		}
 
 		templateExplorer.switchToEditorMode();
-
-		this.setLeftComponent(editorSplitPane);
-
+		this.setLeftComponent(editorSplitPaneScroller);
 		drawingSurface.repaintAll();
 	}
 
