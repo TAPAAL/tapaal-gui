@@ -46,7 +46,6 @@ public class EnabledTransitionsList extends JPanel{
 	JList transitionsList;
 	JScrollPane scrollPane;
 	TransitionListItem lastSelected;
-	String previousHighlightedId;
 
 	public void initPanel(){
 		transitions = new DefaultListModel();
@@ -60,19 +59,12 @@ public class EnabledTransitionsList extends JPanel{
 					fireSelectedTransition();
 					CreateGui.getApp().setRandomAnimationMode(false);
 				}
-			}
-		});
-		
-		
-		transitionsList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e){
-				TransitionListItem highlightedItem = (TransitionListItem)transitionsList.getSelectedValue();
 				
-				if(highlightedItem != null && !e.getValueIsAdjusting() 
-						&& !highlightedItem.getTransition().getId().equals(previousHighlightedId)){
-					highlightedItem.getTransition().blink();
-					previousHighlightedId = highlightedItem.getTransition().getId();
+				if(e.getClickCount() == 1){
+					TransitionListItem highlightedItem = (TransitionListItem)transitionsList.getSelectedValue();
+					if(highlightedItem != null){
+						highlightedItem.getTransition().blink();
+					}
 				}
 			}
 		});

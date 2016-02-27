@@ -505,9 +505,9 @@ public class Transition extends PlaceTransitionObject {
 	 }
 	 
 	 private void initBlinkTimer(){
-		 blinkTimer = new Timer(400, new ActionListener() {			 
+		 blinkTimer = new Timer(150, new ActionListener() {			 
 		      public void actionPerformed(ActionEvent evt) {		    	  		    	  
-		    	  if(blinkCount < 2 ){
+		    	  if(blinkCount <= 2 ){
 		    		  setVisible(!isVisible());
 		    		  blinkCount++;		    	  
 		    	  } else {
