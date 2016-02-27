@@ -250,8 +250,7 @@ public class Animator {
 				if(previousInUntimedTrace.equals(lastStep.toString())){
 					untimedAnimationHistory.stepBackwards();
 				}
-			}
-
+			}			
 			tab.network().setMarking(markings.get(currentMarkingIndex - 1));
 
 			activeGuiModel().repaintPlaces();
@@ -293,8 +292,7 @@ public class Animator {
 				if(nextInUntimedTrace.equals(nextStep.toString())){
 					untimedAnimationHistory.stepForward();
 				}
-			}
-
+			}			
 			tab.network().setMarking(markings.get(currentMarkingIndex + 1));
 
 			activeGuiModel().repaintPlaces();
@@ -305,6 +303,22 @@ public class Animator {
 			activeGuiModel().redrawVisibleTokenLists();
 			reportBlockingPlaces();
 
+		}
+	}	
+	
+	/**
+	 * Make the selected transition in the animation box blink, based on the
+	 * list element label
+	 */
+	
+	public void blinkSelected(String label){
+		if(label.contains(".")){
+			label = label.split("\\.")[1];
+		}
+		
+		Transition t = activeGuiModel().getTransitionByName(label);
+		if(t != null){
+			t.blink();
 		}
 	}
 	

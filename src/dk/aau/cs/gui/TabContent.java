@@ -317,6 +317,8 @@ public class TabContent extends JSplitPane {
 								.setAnimationButtonsEnabled();
 							}
 						}
+						
+						anim.blinkSelected((String)animBox.getSelectedValue());
 					}
 				}
 				// Remove focus
