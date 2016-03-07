@@ -58,7 +58,7 @@ public class ProcessRunner {
 		
 		try {
 			Logger.log("Running: "+ file + " " + arguments);
-			process = Runtime.getRuntime().exec(file + " " + arguments);
+			process = Runtime.getRuntime().exec(getCmdArray());
 			MemoryMonitor.attach(process);
 		} catch (IOException e1) {
 			error = true;
@@ -95,5 +95,15 @@ public class ProcessRunner {
 				.getString()));
 
 		runningTime = endTimeMs - startTimeMs;
+	}
+	
+	// Return array containing executable path and arguments
+	private String[] getCmdArray(){
+		String[] argSplit = arguments.split("\\s+");		
+		String[] cmdArray = new String[1 + argSplit.length];
+		cmdArray[0] = file;
+		System.arraycopy(argSplit, 0, cmdArray, 1, argSplit.length);
+		
+		return cmdArray;
 	}
 }
