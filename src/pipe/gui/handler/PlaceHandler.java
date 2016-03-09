@@ -101,7 +101,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 				}
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
 					int x = Zoomer.getZoomedValue(((Place) myObject).getNameOffsetXObject().intValue(), myObject.getZoom());
