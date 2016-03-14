@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -376,10 +377,12 @@ public class QueryPane extends JPanel {
 		listModel.removeElement(queryToRemove);
 	}
 
-	private class QueryCellRenderer extends JLabel implements ListCellRenderer {
+	private class QueryCellRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = 3071924451912979500L;
 
+		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			Component superRenderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if(value instanceof TAPNQuery)
 				setText(((TAPNQuery)value).getName());
 			else
@@ -399,7 +402,7 @@ public class QueryPane extends JPanel {
 				setToolTipText("Double-click or press the edit button to edit this query");
 			setFont(list.getFont());
 			setOpaque(true);
-			return this;
+			return superRenderer;
 		}
 	}
 

@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -288,6 +289,10 @@ public class GuiFrame extends JFrame implements Observer {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
 					UIManager.setLookAndFeel(info.getClassName());
+					UIManager.getLookAndFeelDefaults().put("List[Selected].textBackground", new Color(57, 105, 138));
+					UIManager.getLookAndFeelDefaults().put("List[Selected].textForeground", new Color(255,255,255));
+					UIManager.getLookAndFeelDefaults().put("List.background", new Color(255,255,255));
+									
 					break;
 				}
 			}
