@@ -63,7 +63,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 * Displays the popup menu
 	 */
 	private void checkForPopup(MouseEvent e) {
-		if (SwingUtilities.isRightMouseButton(e)) {
+		if (SwingUtilities.isRightMouseButton(e) && CreateGui.getApp().getMode() == ElementType.SELECT) {
 			JPopupMenu m = getPopup(e);
 			if (m != null) {
 				m.show(myObject, e.getX(), e.getY());

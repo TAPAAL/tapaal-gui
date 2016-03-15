@@ -97,7 +97,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 				}
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
 					int x = Zoomer.getZoomedValue(((Transition) myObject)
