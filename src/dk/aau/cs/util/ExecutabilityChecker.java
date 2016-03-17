@@ -8,7 +8,7 @@ public class ExecutabilityChecker {
 	public static void check(String path) throws IllegalArgumentException{
 		int rcode = -1;
 		try {
-			Process p = Runtime.getRuntime().exec(path + " -v");
+			Process p = Runtime.getRuntime().exec(new String[] { path, "-v" });
 			
 			// Because some native platforms only provide limited buffer size 
 			// for standard input and output streams, failure to promptly write 
