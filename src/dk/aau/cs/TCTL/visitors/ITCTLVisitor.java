@@ -3,12 +3,16 @@ package dk.aau.cs.TCTL.visitors;
 import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAXNode;
+import dk.aau.cs.TCTL.TCTLAUNode;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLEXNode;
+import dk.aau.cs.TCTL.TCTLEUNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
@@ -23,10 +27,18 @@ public interface ITCTLVisitor {
 	void visit(TCTLAFNode afNode, Object context);
 
 	void visit(TCTLAGNode agNode, Object context);
+	
+	void visit(TCTLAXNode axNode, Object context);
+	
+	void visit(TCTLAUNode auNode, Object context);
 
 	void visit(TCTLEFNode efNode, Object context);
 
 	void visit(TCTLEGNode egNode, Object context);
+	
+	void visit(TCTLEXNode exNode, Object context);
+	
+	void visit(TCTLEUNode euNode, Object context);
 
 	void visit(TCTLNotNode notNode, Object context);
 
