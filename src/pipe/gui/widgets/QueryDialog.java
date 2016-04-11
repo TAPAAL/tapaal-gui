@@ -82,6 +82,8 @@ import pipe.gui.Zoomer;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAXNode;
+import dk.aau.cs.TCTL.TCTLAUNode;
 import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
@@ -91,6 +93,8 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLEXNode;
+import dk.aau.cs.TCTL.TCTLEUNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
@@ -170,8 +174,12 @@ public class QueryDialog extends JPanel {
 	private ButtonGroup quantificationRadioButtonGroup;
 	private JRadioButton existsDiamond;
 	private JRadioButton existsBox;
+	private JRadioButton existsNext;
+	private JRadioButton existsUntil;
 	private JRadioButton forAllDiamond;
 	private JRadioButton forAllBox;
+	private JRadioButton forAllNext;
+	private JRadioButton forAllUntil;
 
 	private JTextPane queryField;
 
@@ -950,7 +958,7 @@ public class QueryDialog extends JPanel {
 		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
 		editQueryButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);
 		enableEditingButtons();
-
+		
 		queryChanged();
 	}
 
@@ -1500,6 +1508,170 @@ public class QueryDialog extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+	}
+	
+	private void initCTLQuantificationPanel() {
+		quantificationPanel = new JPanel(new GridBagLayout());
+		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
+		quantificationRadioButtonGroup = new ButtonGroup();
+		approximationRadioButtonGroup = new ButtonGroup();
+
+		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
+		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
+		existsNext = new JRadioButton("(EX) There is a transition firing after which the reached marking satisfies:");
+		existsUntil = new JRadioButton("(EU) There is a computation where the first formula holds until the second one holds:");
+		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
+		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
+		forAllNext = new JRadioButton("(AX) After any transition firing the reached marking satisfies:");
+		forAllUntil = new JRadioButton("(AU) On every computation the first formula holds until the second one holds:");
+
+		//Add tool tips 
+		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
+		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
+		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
+		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
+
+		quantificationRadioButtonGroup.add(existsDiamond);
+		quantificationRadioButtonGroup.add(existsBox);
+		quantificationRadioButtonGroup.add(existsNext);
+		quantificationRadioButtonGroup.add(existsUntil);
+		quantificationRadioButtonGroup.add(forAllDiamond);
+		quantificationRadioButtonGroup.add(forAllBox);
+		quantificationRadioButtonGroup.add(forAllNext);
+		quantificationRadioButtonGroup.add(forAllUntil);
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		quantificationPanel.add(existsDiamond, gbc);
+
+		gbc.gridy = 1;
+		quantificationPanel.add(existsBox, gbc);
+		
+		gbc.gridy = 2;
+		quantificationPanel.add(existsNext, gbc);
+		
+		gbc.gridy = 3;
+		quantificationPanel.add(existsUntil, gbc);
+
+		gbc.gridy = 4;
+		quantificationPanel.add(forAllDiamond, gbc);
+
+		gbc.gridy = 5;
+		quantificationPanel.add(forAllBox, gbc);
+		
+		gbc.gridy = 6;
+		quantificationPanel.add(forAllNext, gbc);
+		
+		gbc.gridy = 7;
+		quantificationPanel.add(forAllUntil, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.VERTICAL;
+		queryPanel.add(quantificationPanel, gbc);
+
+		// Add action listeners to the query options
+		existsBox.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+
+		existsDiamond.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+		
+		existsNext.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLEXNode property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+		
+		existsUntil.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLEUNode property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+						getSpecificChildOfProperty(0, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+
+		forAllBox.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+
+		forAllDiamond.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+		
+		forAllNext.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLAXNode property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+		
+		forAllUntil.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				TCTLAUNode property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+						getSpecificChildOfProperty(0, currentSelection.getObject()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
