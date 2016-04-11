@@ -71,6 +71,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -165,6 +166,7 @@ public class QueryDialog extends JPanel {
 	// Query Name Panel;
 	private JPanel namePanel;
 	private JButton advancedButton;
+	private JComboBox<TAPNQuery.QueryCategory> categoryBox;
 
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
@@ -430,6 +432,7 @@ public class QueryDialog extends JPanel {
 		boolean reduction = useReduction.isSelected();
 
 		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		query.setCategory((TAPNQuery.QueryCategory)categoryBox.getSelectedItem());
 		
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
@@ -1033,9 +1036,12 @@ public class QueryDialog extends JPanel {
 		initReductionOptionsPanel();
 		initOverApproximationPanel();
 		initButtonPanel(option);
+		
+		
 
-		if(queryToCreateFrom != null)
+		if(queryToCreateFrom != null) {
 			setupFromQuery(queryToCreateFrom);
+		}
 		
 		refreshTraceOptions();
 		setEnabledReductionOptions();
@@ -1056,6 +1062,10 @@ public class QueryDialog extends JPanel {
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
 		queryName.setText(queryToCreateFrom.getName());
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
+		
+		if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.CTL){
+			toCTLQuery();
+		}
 
 		setupQuantificationFromQuery(queryToCreateFrom);
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
@@ -1281,19 +1291,19 @@ public class QueryDialog extends JPanel {
 	private JPanel createQueryTypePanel(){
 		JPanel panel = new JPanel();		
 		
-		final JComboBox<String> box = new JComboBox<String>();
-		box.setToolTipText(TOOL_TIP_QUERYTYPE);
-		box.addItem(QUERY_TYPE_DEFAULT);
-		if(supportCTLQueryType()) box.addItem(QUERY_TYPE_CTL);
+		categoryBox = new JComboBox<TAPNQuery.QueryCategory>();
+		categoryBox.setToolTipText(TOOL_TIP_QUERYTYPE);
+		categoryBox.addItem(TAPNQuery.QueryCategory.Default);
+		if(supportCTLQueryType()) { categoryBox.addItem(TAPNQuery.QueryCategory.CTL); }
 		
-		box.addActionListener(new ActionListener() {
+		categoryBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				switch(box.getSelectedItem().toString()){
-					case(QUERY_TYPE_DEFAULT):
+				switch((TAPNQuery.QueryCategory)categoryBox.getSelectedItem()){
+					case Default:
 						Logger.log("You selected Default");
 						toDefaultQuery();
 						break;
-					case(QUERY_TYPE_CTL):
+					case CTL:
 						Logger.log("You selected CTL");
 						toCTLQuery();
 						break;
@@ -1304,7 +1314,7 @@ public class QueryDialog extends JPanel {
 		
 
 		panel.add(new JLabel("Query type: "));
-		panel.add(box);
+		panel.add(categoryBox);
 	
 		return panel;
 	}
@@ -1382,12 +1392,14 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void toDefaultQuery(){
+		this.categoryBox.setSelectedIndex(0);
         this.quantificationPanel.setVisible(false);
         this.initQuantificationPanel();
         this.guiDialog.pack();
 	}
 	
 	private void toCTLQuery(){
+		this.categoryBox.setSelectedIndex(1);
         this.quantificationPanel.setVisible(false);
         this.initCTLQuantificationPanel();
         this.guiDialog.pack();

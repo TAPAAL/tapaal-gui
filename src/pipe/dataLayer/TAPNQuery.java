@@ -1,5 +1,6 @@
 package pipe.dataLayer;
 
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -29,6 +30,10 @@ public class TAPNQuery {
 	public enum WorkflowMode{
 		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS
 	}
+	
+	public enum QueryCategory{
+		Default, CTL
+	}
 
 	private String name;
 	private int capacity;
@@ -44,8 +49,9 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
-        private long strongSoundnessBound;
-        private boolean useReduction;
+    private long strongSoundnessBound;
+    private boolean useReduction;
+    private QueryCategory queryCategory = QueryCategory.Default;
 
 	
 	private boolean enableOverApproximation = false;
@@ -348,14 +354,19 @@ public class TAPNQuery {
 		this.workflow = workflow;
 	}
         
-        public long getStrongSoundnessBound(){
-            return strongSoundnessBound;
-        }
-        
-        public void setStrongSoundnessBound(long newval) {
-            strongSoundnessBound = newval;
-        }
-            
-            
-	
+    public long getStrongSoundnessBound(){
+        return strongSoundnessBound;
+    }
+    
+    public void setStrongSoundnessBound(long newval) {
+        strongSoundnessBound = newval;
+    }
+    
+    public void setCategory(QueryCategory category){
+    	this.queryCategory = category;
+    }
+    
+    public QueryCategory getCategory(){
+    	return this.queryCategory;
+    }
 }
