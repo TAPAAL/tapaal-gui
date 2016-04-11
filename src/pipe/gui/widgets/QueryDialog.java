@@ -1274,11 +1274,11 @@ public class QueryDialog extends JPanel {
 				switch(box.getSelectedItem().toString()){
 					case(QUERY_TYPE_DEFAULT):
 						Logger.log("You selected Default");
-						initQueryPanel();
+						toDefaultQuery();
 						break;
 					case(QUERY_TYPE_CTL):
 						Logger.log("You selected CTL");
-						initCTLQueryPanel();
+						toCTLQuery();
 						break;
 					default: break;
 				}
@@ -1364,8 +1364,16 @@ public class QueryDialog extends JPanel {
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
 
-	private void initCTLQueryPanel(){
-		
+	private void toDefaultQuery(){
+        this.quantificationPanel.setVisible(false);
+        this.initQuantificationPanel();
+        this.guiDialog.pack();
+	}
+	
+	private void toCTLQuery(){
+        this.quantificationPanel.setVisible(false);
+        this.initCTLQuantificationPanel();
+        this.guiDialog.pack();
 	}
 	
 	private void initQueryPanel() {
