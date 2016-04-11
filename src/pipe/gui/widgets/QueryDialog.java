@@ -859,6 +859,24 @@ public class QueryDialog extends JPanel {
 			heuristicSearch.setEnabled(true);
 			randomSearch.setEnabled(true);
 		}
+		
+		if(categoryBox.getSelectedItem() == TAPNQuery.QueryCategory.CTL){
+			breadthFirstSearch.setEnabled(true);
+			depthFirstSearch.setEnabled(true);
+			heuristicSearch.setEnabled(false);
+			randomSearch.setEnabled(false);
+			
+			if(heuristicSearch.isSelected()){
+				heuristicSearch.setSelected(false);
+				depthFirstSearch.setSelected(true);
+				currentselected = depthFirstSearch; 
+			}
+			if(randomSearch.isSelected()){
+				randomSearch.setSelected(false);
+				depthFirstSearch.setSelected(true);
+				currentselected = depthFirstSearch;
+			}
+		}
 
 		String reductionOptionString = getReductionOptionAsString();
 		if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
@@ -1242,9 +1260,8 @@ public class QueryDialog extends JPanel {
 		
 		topButtonPanel.add(advancedButton);
 		topButtonPanel.add(infoButton);
-
+		namePanel.add(queryTypePanel);
 		splitter.add(namePanel, BorderLayout.LINE_START);
-		splitter.add(queryTypePanel);
 		splitter.add(topButtonPanel, BorderLayout.LINE_END);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
