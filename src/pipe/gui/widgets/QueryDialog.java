@@ -111,6 +111,7 @@ import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Constant;
@@ -149,6 +150,9 @@ public class QueryDialog extends JPanel {
 
 	private static final long serialVersionUID = 7852107237344005546L;
 
+	private static final String QUERY_TYPE_DEFAULT = "Default";
+	private static final String QUERY_TYPE_CTL = "CTL";
+	
 	public enum QueryDialogueOption {
 		VerifyNow, Save, Export
 	}
@@ -367,6 +371,9 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 	
+	//Tool tips for query types
+	private final static String TOOL_TIP_QUERYTYPE = "Choose a query type";
+	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		this.tapnNetwork = tapnNetwork;
@@ -549,7 +556,6 @@ public class QueryDialog extends JPanel {
 		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 
 		Container contentPane = guiDialog.getContentPane();
-
 		// 1 Set layout
 		//contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		contentPane.setLayout(new GridBagLayout());
@@ -1161,6 +1167,9 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
+		
+		JPanel queryTypePanel = createQueryTypePanel();
+		
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		advancedButton.addActionListener(new ActionListener() {
@@ -1230,10 +1239,12 @@ public class QueryDialog extends JPanel {
 		});
 		JPanel topButtonPanel = new JPanel(new FlowLayout());
 		topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		
 		topButtonPanel.add(advancedButton);
 		topButtonPanel.add(infoButton);
 
 		splitter.add(namePanel, BorderLayout.LINE_START);
+		splitter.add(queryTypePanel);
 		splitter.add(topButtonPanel, BorderLayout.LINE_END);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -1244,7 +1255,43 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
 	}
+	
+	// Check if net supports CTL queries
+	private boolean supportCTLQueryType(){
+		return tapnNetwork.isUntimed();
+	}
+	
+	private JPanel createQueryTypePanel(){
+		JPanel panel = new JPanel();		
+		
+		final JComboBox<String> box = new JComboBox<String>();
+		box.setToolTipText(TOOL_TIP_QUERYTYPE);
+		box.addItem(QUERY_TYPE_DEFAULT);
+		if(supportCTLQueryType()) box.addItem(QUERY_TYPE_CTL);
+		
+		box.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switch(box.getSelectedItem().toString()){
+					case(QUERY_TYPE_DEFAULT):
+						Logger.log("You selected Default");
+						initQueryPanel();
+						break;
+					case(QUERY_TYPE_CTL):
+						Logger.log("You selected CTL");
+						initCTLQueryPanel();
+						break;
+					default: break;
+				}
+			}
+		});
+		
 
+		panel.add(new JLabel("Query type: "));
+		panel.add(box);
+	
+		return panel;
+	}
+	
 	public static void setAdvancedView(boolean advanced){
 		advancedView = advanced;
 	}
@@ -1317,6 +1364,10 @@ public class QueryDialog extends JPanel {
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
 
+	private void initCTLQueryPanel(){
+		
+	}
+	
 	private void initQueryPanel() {
 		queryPanel = new JPanel(new GridBagLayout());
 		queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
