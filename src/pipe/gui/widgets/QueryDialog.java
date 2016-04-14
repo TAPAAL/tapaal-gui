@@ -1332,14 +1332,14 @@ public class QueryDialog extends JPanel {
 		if(changeState){
 			setAdvancedView(!advancedView);
 		}
-
+		boolean ctlMode = categoryBox.getSelectedItem() == TAPNQuery.QueryCategory.CTL;
 		Point location = guiDialog.getLocation();
 
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
 		openComposedNetButton.setVisible(advancedView);
-		overApproximationOptionsPanel.setVisible(advancedView);
+		overApproximationOptionsPanel.setVisible(advancedView && !ctlMode);
 		
 		if(advancedView){
 			advancedButton.setText("Simple view");
@@ -1392,17 +1392,21 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void toDefaultQuery(){
-		this.categoryBox.setSelectedIndex(0);
+		this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.Default);
         this.quantificationPanel.setVisible(false);
         this.initQuantificationPanel();
-        this.guiDialog.pack();
+        toggleAdvancedSimpleView(false);
+        updateSearchStrategies();
+        QueryDialog.guiDialog.pack();
 	}
 	
 	private void toCTLQuery(){
-		this.categoryBox.setSelectedIndex(1);
+		this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.CTL);
         this.quantificationPanel.setVisible(false);
         this.initCTLQuantificationPanel();
-        this.guiDialog.pack();
+        toggleAdvancedSimpleView(false);
+        updateSearchStrategies();
+        QueryDialog.guiDialog.pack();
 	}
 	
 	private void initQueryPanel() {
