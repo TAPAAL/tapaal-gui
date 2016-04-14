@@ -34,6 +34,10 @@ public class TAPNQuery {
 	public enum QueryCategory{
 		Default, CTL
 	}
+	
+	public enum AlgorithmOption{
+		CERTAIN_ZERO, LOCAL
+	}
 
 	private String name;
 	private int capacity;
@@ -51,7 +55,8 @@ public class TAPNQuery {
 	private WorkflowMode workflow;
     private long strongSoundnessBound;
     private boolean useReduction;
-    private QueryCategory queryCategory = QueryCategory.Default;
+    private QueryCategory queryCategory = QueryCategory.Default;             // Used by the CTL engine
+    private AlgorithmOption algorithmOption = AlgorithmOption.CERTAIN_ZERO;  // Used by the CTL engine
 
 	
 	private boolean enableOverApproximation = false;
@@ -368,5 +373,13 @@ public class TAPNQuery {
     
     public QueryCategory getCategory(){
     	return this.queryCategory;
+    }
+    
+    public void setAlgorithmOption(AlgorithmOption option){
+    	this.algorithmOption = option;
+    }
+    
+    public AlgorithmOption getAlgorithmOption(){
+    	return this.algorithmOption;
     }
 }

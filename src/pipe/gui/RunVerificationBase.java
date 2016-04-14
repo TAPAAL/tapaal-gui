@@ -90,6 +90,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
+		
+		clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
 
 		if(options.useOverApproximation() &&
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
@@ -104,7 +106,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			if(!verifypn.setup()){
 				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 			}else{
-				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true, ModelReduction.AGGRESSIVE, options.enableOverApproximation(), options.enableUnderApproximation(), options.approximationDenominator()), transformedModel, clonedQuery);
+				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true, ModelReduction.AGGRESSIVE, options.enableOverApproximation(), options.enableUnderApproximation(), options.approximationDenominator(), dataLayerQuery.getAlgorithmOption()), transformedModel, clonedQuery);
 				if(!overapprox_result.error() && (
 						(query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
 						(query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))

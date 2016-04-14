@@ -7,6 +7,7 @@ import java.io.PrintStream;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -21,7 +22,13 @@ import dk.aau.cs.translations.ReductionOption;
 public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
 		File modelFile = createTempFile(".xml");
-		File queryFile = createTempFile(".q");
+		File queryFile;
+		if (query.getCategory() == QueryCategory.CTL){
+			queryFile = createTempFile(".xml");
+		} else {
+			queryFile = createTempFile(".q");
+		}
+		
 
 		return export(model, query, modelFile, queryFile, null);
 	}

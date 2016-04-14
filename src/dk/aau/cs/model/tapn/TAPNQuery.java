@@ -6,10 +6,12 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 public class TAPNQuery {
 	private TCTLAbstractProperty property;
 	private int extraTokens = 0;
+	private QueryCategory queryCategory = QueryCategory.Default;
 
 	public TCTLAbstractProperty getProperty() {
 		return property;
@@ -43,4 +45,12 @@ public class TAPNQuery {
 	public void setProperty(TCTLAbstractProperty newProperty){
 		this.property = newProperty;
 	}
+	
+	public void setCategory(QueryCategory category){
+    	this.queryCategory = category;
+    }
+    
+    public QueryCategory getCategory(){
+    	return this.queryCategory;
+    }
 }
