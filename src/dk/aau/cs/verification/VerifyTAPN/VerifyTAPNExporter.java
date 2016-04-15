@@ -19,6 +19,8 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+
 public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
 		File modelFile = createTempFile(".xml");
@@ -44,17 +46,14 @@ public class VerifyTAPNExporter {
 			modelStream.close();
 			
 			PrintStream queryStream = new PrintStream(queryFile);
-			queryStream.append(query.getProperty().toString());
-			queryStream.close();
-			
-			VerifyTAPNOptions options = null;
-			if(dataLayerQuery == null){
-				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true, false, false, 1);
-			}else if(dataLayerQuery.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useGCD(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie(), dataLayerQuery.useOverApproximation(), dataLayerQuery.isOverApproximationEnabled(), dataLayerQuery.isUnderApproximationEnabled(), dataLayerQuery.approximationDenominator());
+			if (query.getCategory() == QueryCategory.CTL){
+				CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+				queryStream.append(XMLVisitor.getXMLQueryFor(query));
 			} else {
-				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useOverApproximation(), dataLayerQuery.isOverApproximationEnabled(), dataLayerQuery.isUnderApproximationEnabled(), dataLayerQuery.approximationDenominator());
+				queryStream.append(query.getProperty().toString());
 			}
+			
+			queryStream.close();
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
