@@ -67,10 +67,13 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import com.apple.laf.AquaButtonRadioUI.RadioButtonBorder;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -80,6 +83,7 @@ import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
 import pipe.gui.Zoomer;
+import sun.org.mozilla.javascript.internal.debug.Debugger;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -242,6 +246,8 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useGCD;
 	private JCheckBox useOverApproximation;
 	private JCheckBox useReduction;
+	private JRadioButton useCZ;
+	private JRadioButton useLocal;
 	
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
@@ -250,6 +256,7 @@ public class QueryDialog extends JPanel {
 	private JRadioButton overApproximationEnable;
 	private JRadioButton underApproximationEnable;
 	private CustomJSpinner overApproximationDenominator;
+	private ButtonGroup algorithmRadioButtonGroup;
 	
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
@@ -278,6 +285,7 @@ public class QueryDialog extends JPanel {
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private String name_UNTIMED_CTL = "TAPAAL: Untimed Engine (verifypn) CTL";
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
@@ -433,13 +441,21 @@ public class QueryDialog extends JPanel {
 
 		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
 		query.setCategory((TAPNQuery.QueryCategory)categoryBox.getSelectedItem());
-		
+		query.setAlgorithmOption(getSelectedAlgorithm());
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
 		return query;
 	}
-
+	private AlgorithmOption getSelectedAlgorithm(){
+		if(useCZ.isSelected()){
+			return AlgorithmOption.CERTAIN_ZERO;
+		} else if(useLocal.isSelected()){
+			return AlgorithmOption.LOCAL;
+		}
+		return null;
+	}
+	
 	private boolean getSymmetry() {
 		return symmetryReduction.isSelected();
 	}
@@ -496,6 +512,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPNdiscreteVerification;
 		else if (reductionOptionString.equals(name_UNTIMED))
 			return ReductionOption.VerifyPN;
+		else if (reductionOptionString.equals(name_UNTIMED_CTL))
+			return ReductionOption.VerifyPNCTL;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -731,84 +749,90 @@ public class QueryDialog extends JPanel {
 		ArrayList<String> options = new ArrayList<String>();
 		
 		disableSymmetryUpdate = true;
-
-		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
-			options.add(name_UNTIMED);
+		TAPNQuery.QueryCategory currentMode = (QueryCategory) categoryBox.getSelectedItem();
+	
+		if(currentMode == TAPNQuery.QueryCategory.CTL){
+			options.add(name_UNTIMED_CTL);
 		}
-		
-		if(useTimeDarts != null){
-			if(hasForcedDisabledTimeDarts){
-				hasForcedDisabledTimeDarts = false;
-				useTimeDarts.setSelected(true);
+		else if(currentMode == TAPNQuery.QueryCategory.Default){
+			if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
+				options.add(name_UNTIMED);
 			}
-            useTimeDarts.setEnabled(true);     
-        }
-		
-		if(useGCD != null){
-			if(hasForcedDisabledGCD){
-				hasForcedDisabledGCD = false;
-				useGCD.setSelected(true);
+			
+			if(useTimeDarts != null){
+				if(hasForcedDisabledTimeDarts){
+					hasForcedDisabledTimeDarts = false;
+					useTimeDarts.setSelected(true);
+				}
+	            useTimeDarts.setEnabled(true);     
+	        }
+			
+			if(useGCD != null){
+				if(hasForcedDisabledGCD){
+					hasForcedDisabledGCD = false;
+					useGCD.setSelected(true);
+				}
+	            useGCD.setEnabled(true);     
+	        }
+			
+	        if (fastestTraceRadioButton.isSelected()) {
+	        	options.add(name_DISCRETE);
+	        } else if (queryHasDeadlock()) {
+	            if (tapnNetwork.isNonStrict()) {
+	                options.add(name_DISCRETE);
+	                // disable timedarts if liveness and deadlock prop
+	                if((getQuantificationSelection().equals("E[]") || 
+	                        getQuantificationSelection().equals("A<>"))){
+	                    if (useTimeDarts != null) {
+	                    	if(useTimeDarts.isSelected()){
+	                    		hasForcedDisabledTimeDarts = true;
+	                    	}
+	                        useTimeDarts.setEnabled(false);
+	                        useTimeDarts.setSelected(false);
+	                    }
+	                }
+	            }
+	            if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+	                if (isNetDegree2 && !hasInhibitorArcs) {
+	                	options.add(name_COMBI);
+	                	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
+	                		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
+	                	}
+	                }
+	            }
+	            
+			} else if(tapnNetwork.hasWeights()){
+				if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
+				}
+				options.add(name_COMBI);
+			} else if(tapnNetwork.hasUrgentTransitions()){
+				if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
+				}
+				options.add(name_COMBI);
+			} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+				if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
+				}
+				options.add(name_COMBI);
+				if(isNetDegree2 && !hasInhibitorArcs)
+					options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
+				else
+					options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
+			} else if(tapnNetwork.hasInhibitorArcs()) {
+				options.add( name_verifyTAPN );
+				if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
+				}					
+				options.addAll(Arrays.asList(name_COMBI, name_BROADCAST, name_BROADCASTDEG2 ));
+			} else {
+				options.add( name_verifyTAPN);
+				if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
+				}
+				options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
 			}
-            useGCD.setEnabled(true);     
-        }
-		
-        if (fastestTraceRadioButton.isSelected()) {
-        	options.add(name_DISCRETE);
-        } else if (queryHasDeadlock()) {
-            if (tapnNetwork.isNonStrict()) {
-                options.add(name_DISCRETE);
-                // disable timedarts if liveness and deadlock prop
-                if((getQuantificationSelection().equals("E[]") || 
-                        getQuantificationSelection().equals("A<>"))){
-                    if (useTimeDarts != null) {
-                    	if(useTimeDarts.isSelected()){
-                    		hasForcedDisabledTimeDarts = true;
-                    	}
-                        useTimeDarts.setEnabled(false);
-                        useTimeDarts.setSelected(false);
-                    }
-                }
-            }
-            if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-                if (isNetDegree2 && !hasInhibitorArcs) {
-                	options.add(name_COMBI);
-                	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
-                		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-                	}
-                }
-            }
-            
-		} else if(tapnNetwork.hasWeights()){
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.add(name_COMBI);
-		} else if(tapnNetwork.hasUrgentTransitions()){
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.add(name_COMBI);
-		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.add(name_COMBI);
-			if(isNetDegree2 && !hasInhibitorArcs)
-				options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
-			else
-				options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-		} else if(tapnNetwork.hasInhibitorArcs()) {
-			options.add( name_verifyTAPN );
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}					
-			options.addAll(Arrays.asList(name_COMBI, name_BROADCAST, name_BROADCASTDEG2 ));
-		} else {
-			options.add( name_verifyTAPN);
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
 		}
 
 		reductionOption.removeAllItems();
@@ -1036,8 +1060,6 @@ public class QueryDialog extends JPanel {
 		initReductionOptionsPanel();
 		initOverApproximationPanel();
 		initButtonPanel(option);
-		
-		
 
 		if(queryToCreateFrom != null) {
 			setupFromQuery(queryToCreateFrom);
@@ -1064,7 +1086,7 @@ public class QueryDialog extends JPanel {
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 		
 		if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.CTL){
-			toCTLQuery();
+			changeCategory(TAPNQuery.QueryCategory.CTL);
 		}
 
 		setupQuantificationFromQuery(queryToCreateFrom);
@@ -1090,8 +1112,10 @@ public class QueryDialog extends JPanel {
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
 		boolean symmetry = queryToCreateFrom.useSymmetry();
-
-		if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
+		
+		if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPNCTL) {
+			reduction = name_UNTIMED_CTL;
+		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
 			reduction = name_BROADCAST;
 		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			reduction = name_BROADCASTDEG2;
@@ -1300,18 +1324,15 @@ public class QueryDialog extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				switch((TAPNQuery.QueryCategory)categoryBox.getSelectedItem()){
 					case Default:
-						Logger.log("You selected Default");
-						toDefaultQuery();
+						changeCategory(TAPNQuery.QueryCategory.Default);
 						break;
 					case CTL:
-						Logger.log("You selected CTL");
-						toCTLQuery();
+						changeCategory(TAPNQuery.QueryCategory.CTL);
 						break;
 					default: break;
 				}
 			}
 		});
-		
 
 		panel.add(new JLabel("Query type: "));
 		panel.add(categoryBox);
@@ -1334,7 +1355,6 @@ public class QueryDialog extends JPanel {
 		}
 		boolean ctlMode = categoryBox.getSelectedItem() == TAPNQuery.QueryCategory.CTL;
 		Point location = guiDialog.getLocation();
-
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
@@ -1390,23 +1410,29 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
-
-	private void toDefaultQuery(){
-		this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.Default);
-        this.quantificationPanel.setVisible(false);
-        this.initQuantificationPanel();
-        toggleAdvancedSimpleView(false);
-        updateSearchStrategies();
-        QueryDialog.guiDialog.pack();
-	}
 	
-	private void toCTLQuery(){
-		this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.CTL);
-        this.quantificationPanel.setVisible(false);
-        this.initCTLQuantificationPanel();
-        toggleAdvancedSimpleView(false);
-        updateSearchStrategies();
-        QueryDialog.guiDialog.pack();
+	private void changeCategory(TAPNQuery.QueryCategory category){
+
+		if(category == TAPNQuery.QueryCategory.Default){
+			this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.Default);
+	        this.quantificationPanel.setVisible(false);
+	        this.initQuantificationPanel();
+		}
+		if(category == TAPNQuery.QueryCategory.CTL){
+			this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.CTL);
+	        this.quantificationPanel.setVisible(false);
+	        this.initCTLQuantificationPanel();
+		}
+		
+		// Refresh verification options
+		setEnabledReductionOptions();
+		clearSelection();
+		updateSelection();
+		queryChanged();
+		
+		toggleAdvancedSimpleView(false);
+		updateSearchStrategies();
+		QueryDialog.guiDialog.pack();
 	}
 	
 	private void initQueryPanel() {
@@ -2650,8 +2676,39 @@ public class QueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(0, 10, 0, 10);
 		add(reductionOptionsPanel, gbc);
-	}
+		
+		algorithmRadioButtonGroup = new ButtonGroup();
+				
+		useCZ = new JRadioButton("Certain zero on-the-fly algorithm (recommended)");
+		useLocal = new JRadioButton("Local on-the-fly algorithm");
+	
+		useCZ.setVisible(true);
+		useLocal.setVisible(true);
+		
+		useCZ.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
+		useLocal.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
+		
+		useCZ.setSelected(true);
 
+		algorithmRadioButtonGroup.add(useCZ);
+		algorithmRadioButtonGroup.add(useLocal);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useCZ, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useLocal, gbc);
+		
+	}
+	
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
@@ -2661,8 +2718,19 @@ public class QueryDialog extends JPanel {
 		refreshOverApproximationOption();
 		updateSearchStrategies();
 		refreshExportButtonText();
+		refreshAlgorithms();
 	}
-
+	private void refreshAlgorithms(){
+		ReductionOption reduction = getReductionOption();
+		if(reduction == null){
+			useCZ.setVisible(false);
+			useLocal.setVisible(false);
+		} else if(reduction.equals(ReductionOption.VerifyPNCTL)){
+			useCZ.setVisible(true);
+			useLocal.setVisible(true);
+		}
+	}
+	
 	private void refreshDiscreteInclusion() {
 		ReductionOption reduction = getReductionOption();
 		if(reduction == null){
@@ -2763,7 +2831,11 @@ public class QueryDialog extends JPanel {
 			useTimeDarts.setSelected(true);
 		}
 		
+		useCZ.setVisible(false);
+		useLocal.setVisible(false);
+		
 		useReduction.setVisible(false);
+		useOverApproximation.setVisible(true);
 		
 		if(reductionOption.getSelectedItem() == null){
 			useGCD.setVisible(false);
@@ -2798,6 +2870,12 @@ public class QueryDialog extends JPanel {
 			
 			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
 				useReduction.setVisible(true);
+			} else if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED_CTL)){
+				symmetryReduction.setVisible(false);
+				useOverApproximation.setVisible(false);
+				useGCD.setVisible(false);
+				useCZ.setVisible(true);
+				useLocal.setVisible(true);
 			}
 		}
 	}

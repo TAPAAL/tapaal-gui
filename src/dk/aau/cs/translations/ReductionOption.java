@@ -17,5 +17,6 @@ public enum ReductionOption {
 	VerifyPNApprox,
 	VerifyPNReduce,
 	BatchProcessingKeepQueryOption,
-	BatchProcessingUserDefinedReductions
+	BatchProcessingUserDefinedReductions,
+	VerifyPNCTL
 }
