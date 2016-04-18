@@ -322,6 +322,16 @@ public class TimedArcPetriNet {
 		}
 		return null;
 	}
+	
+	public List<TimedInputArc> getInputArcsToTransition(TimedTransition transition){
+		List<TimedInputArc> arcList = new ArrayList<TimedInputArc>();
+		for (TimedInputArc inputArc : inputArcs){
+			if (inputArc.destination().equals(transition)){
+				arcList.add(inputArc);
+			}
+		}
+		return null;
+	}
 
 	public TimedOutputArc getOutputArcFromTransitionAndPlace(TimedTransition transition, TimedPlace place) {
 		for(TimedOutputArc outputArc : outputArcs) {
@@ -338,6 +348,16 @@ public class TimedArcPetriNet {
 		}
 		return null;
 	}
+	
+	public List<TransportArc> getTransportArcsToTransition(TimedTransition transition){
+		List<TransportArc> arcList = new ArrayList<TransportArc>();
+		for (TransportArc transArc : transportArcs){
+			if (transArc.transition().equals(transition)){
+				arcList.add(transArc);
+			}
+		}
+		return null;
+	}
 
 	public TimedInhibitorArc getInhibitorArcFromPlaceAndTransition(TimedPlace place, TimedTransition transition) {
 		for(TimedInhibitorArc inhibArc : inhibitorArcs) {
@@ -345,6 +365,16 @@ public class TimedArcPetriNet {
 				return inhibArc;
 		}
 
+		return null;
+	}
+	
+	public List<TimedInhibitorArc> getInhibitorArcsToTransition(TimedTransition transition){
+		List<TimedInhibitorArc> arcList = new ArrayList<TimedInhibitorArc>();
+		for (TimedInhibitorArc inhibArc : inhibitorArcs){
+			if (inhibArc.destination().equals(transition)){
+				arcList.add(inhibArc);
+			}
+		}
 		return null;
 	}
 
