@@ -238,14 +238,6 @@ public class CTLQueryDialog extends JPanel {
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
-	private JCheckBox symmetryReduction;
-	private JCheckBox discreteInclusion;
-	private JButton selectInclusionPlacesButton;
-	private JCheckBox useTimeDarts;
-	private JCheckBox usePTrie;
-	private JCheckBox useGCD;
-	private JCheckBox useOverApproximation;
-	private JCheckBox useReduction;
 	private JRadioButton useCZ;
 	private JRadioButton useLocal;
 	
@@ -285,7 +277,7 @@ public class CTLQueryDialog extends JPanel {
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
-	private String name_UNTIMED_CTL = "TAPAAL: Untimed Engine (verifypn) CTL";
+	
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
@@ -426,25 +418,21 @@ public class CTLQueryDialog extends JPanel {
 
 		String name = getQueryComment();
 		int capacity = getCapacity();
-
 		TAPNQuery.TraceOption traceOption = getTraceOption();
-
 		TAPNQuery.SearchOption searchOption = getSearchOption();
-
 		ReductionOption reductionOptionToSet = getReductionOption();
-		boolean symmetry = getSymmetry();
-		boolean timeDarts = useTimeDarts.isSelected();
-		boolean pTrie = usePTrie.isSelected();
-		boolean gcd = useGCD.isSelected();
-		boolean overApproximation = useOverApproximation.isSelected();
-		boolean reduction = useReduction.isSelected();
+
+		// These are only set because the TAPNQuery constructor needs them. Should make a new constructor. 
+		boolean symmetry = false;
+		boolean timeDarts = false;
+		boolean pTrie = false;
+		boolean gcd = false;
+		boolean overApproximation = false;
+		boolean reduction = false;
 
 		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
-		query.setCategory((TAPNQuery.QueryCategory)categoryBox.getSelectedItem());
+		query.setCategory(TAPNQuery.QueryCategory.CTL);
 		query.setAlgorithmOption(getSelectedAlgorithm());
-		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
-			query.setDiscreteInclusion(discreteInclusion.isSelected());
-		}
 		return query;
 	}
 	private AlgorithmOption getSelectedAlgorithm(){
@@ -454,10 +442,6 @@ public class CTLQueryDialog extends JPanel {
 			return AlgorithmOption.LOCAL;
 		}
 		return null;
-	}
-	
-	private boolean getSymmetry() {
-		return symmetryReduction.isSelected();
 	}
 
 	private int getCapacity() {
@@ -512,8 +496,6 @@ public class CTLQueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPNdiscreteVerification;
 		else if (reductionOptionString.equals(name_UNTIMED))
 			return ReductionOption.VerifyPN;
-		else if (reductionOptionString.equals(name_UNTIMED_CTL))
-			return ReductionOption.VerifyPNCTL;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -742,120 +724,10 @@ public class CTLQueryDialog extends JPanel {
 			openComposedNetButton.setEnabled(false);
 		}
 	}
-
-	private void setEnabledReductionOptions(){
-		String reductionOptionString = getReductionOptionAsString();
-
-		ArrayList<String> options = new ArrayList<String>();
-		
-		disableSymmetryUpdate = true;
-		TAPNQuery.QueryCategory currentMode = (QueryCategory) categoryBox.getSelectedItem();
 	
-		if(currentMode == TAPNQuery.QueryCategory.CTL){
-			options.add(name_UNTIMED_CTL);
-		}
-		else if(currentMode == TAPNQuery.QueryCategory.Default){
-			if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
-				options.add(name_UNTIMED);
-			}
-			
-			if(useTimeDarts != null){
-				if(hasForcedDisabledTimeDarts){
-					hasForcedDisabledTimeDarts = false;
-					useTimeDarts.setSelected(true);
-				}
-	            useTimeDarts.setEnabled(true);     
-	        }
-			
-			if(useGCD != null){
-				if(hasForcedDisabledGCD){
-					hasForcedDisabledGCD = false;
-					useGCD.setSelected(true);
-				}
-	            useGCD.setEnabled(true);     
-	        }
-			
-	        if (fastestTraceRadioButton.isSelected()) {
-	        	options.add(name_DISCRETE);
-	        } else if (queryHasDeadlock()) {
-	            if (tapnNetwork.isNonStrict()) {
-	                options.add(name_DISCRETE);
-	                // disable timedarts if liveness and deadlock prop
-	                if((getQuantificationSelection().equals("E[]") || 
-	                        getQuantificationSelection().equals("A<>"))){
-	                    if (useTimeDarts != null) {
-	                    	if(useTimeDarts.isSelected()){
-	                    		hasForcedDisabledTimeDarts = true;
-	                    	}
-	                        useTimeDarts.setEnabled(false);
-	                        useTimeDarts.setSelected(false);
-	                    }
-	                }
-	            }
-	            if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-	                if (isNetDegree2 && !hasInhibitorArcs) {
-	                	options.add(name_COMBI);
-	                	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
-	                		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-	                	}
-	                }
-	            }
-	            
-			} else if(tapnNetwork.hasWeights()){
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.add(name_COMBI);
-			} else if(tapnNetwork.hasUrgentTransitions()){
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.add(name_COMBI);
-			} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.add(name_COMBI);
-				if(isNetDegree2 && !hasInhibitorArcs)
-					options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
-				else
-					options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-			} else if(tapnNetwork.hasInhibitorArcs()) {
-				options.add( name_verifyTAPN );
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}					
-				options.addAll(Arrays.asList(name_COMBI, name_BROADCAST, name_BROADCASTDEG2 ));
-			} else {
-				options.add( name_verifyTAPN);
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
-			}
-		}
-
+	private void setEnabledReductionOptions(){
 		reductionOption.removeAllItems();
-
-		boolean selectedOptionStillAvailable = false;	
-		TraceOption trace = getTraceOption();
-		for (String s : options) {
-			reductionOption.addItem(s);
-			if (s.equals(reductionOptionString)) {
-				selectedOptionStillAvailable = true;
-			}
-		}
-
-		if (selectedOptionStillAvailable) {
-			reductionOption.setSelectedItem(reductionOptionString);
-			if(trace == TraceOption.SOME && someTraceRadioButton.isEnabled()){
-				someTraceRadioButton.setSelected(true);
-			}else if(trace == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled()){
-				fastestTraceRadioButton.setSelected(true);
-			}
-		}
-		
-		disableSymmetryUpdate = false;
+		reductionOption.addItem(name_UNTIMED);
 	}
 
 	private void updateSearchStrategies(){
@@ -1111,44 +983,13 @@ public class CTLQueryDialog extends JPanel {
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
-		boolean symmetry = queryToCreateFrom.useSymmetry();
-		
-		if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPNCTL) {
-			reduction = name_UNTIMED_CTL;
-		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
-			reduction = name_BROADCAST;
-		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
-			reduction = name_BROADCASTDEG2;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			reduction = name_DISCRETE;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
+	
+		if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
 			reduction = name_UNTIMED;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.COMBI){
-			reduction = name_COMBI;
-		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
-				reduction = name_STANDARD;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
-				reduction = name_OPTIMIZEDSTANDARD;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPN) {
-				reduction = name_verifyTAPN;
-			}
-		} else {
-			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
-				reduction = name_OPTIMIZEDSTANDARD;
-			}
 		}
 
 		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
-		symmetryReduction.setSelected(symmetry);
-		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
-		usePTrie.setSelected(queryToCreateFrom.usePTrie());
-		useGCD.setSelected(queryToCreateFrom.useGCD());
-		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
-		useReduction.setSelected(queryToCreateFrom.useReduction());
-		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
-		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1425,7 +1266,6 @@ public class CTLQueryDialog extends JPanel {
 		}
 		
 		// Refresh verification options
-		setEnabledReductionOptions();
 		clearSelection();
 		updateSelection();
 		queryChanged();
@@ -2565,111 +2405,6 @@ public class CTLQueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 
-		symmetryReduction = new JCheckBox("Use symmetry reduction");
-		symmetryReduction.setSelected(true);
-		symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(symmetryReduction, gbc);
-
-		discreteInclusion = new JCheckBox("Use discrete inclusion");
-		discreteInclusion.setVisible(true);
-		discreteInclusion.setToolTipText(TOOL_TIP_DISCRETE_INCLUSION);
-		discreteInclusion.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
-			}
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(discreteInclusion, gbc);
-
-		selectInclusionPlacesButton = new JButton("Select Inclusion Places");
-		selectInclusionPlacesButton.setEnabled(false);
-		selectInclusionPlacesButton.setToolTipText(TOOL_TIP_SELECT_INCLUSION_PLACES);
-		selectInclusionPlacesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
-			}
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-
-		useTimeDarts = new JCheckBox("Use Time Darts");
-		useTimeDarts.setSelected(true);
-		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useTimeDarts, gbc);
-		
-		useGCD = new JCheckBox("Use GCD");
-		useGCD.setSelected(true);
-		useGCD.setToolTipText(TOOL_TIP_GCD);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useGCD, gbc);
-		
-		usePTrie = new JCheckBox("Use PTrie");
-		usePTrie.setSelected(true);
-		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-
-		useReduction = new JCheckBox("Apply net reductions");
-		useReduction.setSelected(true);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(useReduction, gbc);
-		
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(usePTrie, gbc);
-
-		useOverApproximation = new JCheckBox("Use untimed state-equations check");
-		useOverApproximation.setSelected(true);
-		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useOverApproximation, gbc);
-
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -2712,39 +2447,8 @@ public class CTLQueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
-		refreshSymmetryReduction();
-		refreshDiscreteOptions();
-		refreshDiscreteInclusion();
-		refreshOverApproximationOption();
 		updateSearchStrategies();
 		refreshExportButtonText();
-		refreshAlgorithms();
-	}
-	private void refreshAlgorithms(){
-		ReductionOption reduction = getReductionOption();
-		if(reduction == null){
-			useCZ.setVisible(false);
-			useLocal.setVisible(false);
-		} else if(reduction.equals(ReductionOption.VerifyPNCTL)){
-			useCZ.setVisible(true);
-			useLocal.setVisible(true);
-		}
-	}
-	
-	private void refreshDiscreteInclusion() {
-		ReductionOption reduction = getReductionOption();
-		if(reduction == null){
-			discreteInclusion.setVisible(false);
-			selectInclusionPlacesButton.setVisible(false);
-		}
-		else if(reduction.equals(ReductionOption.VerifyTAPN)){
-			discreteInclusion.setVisible(true);
-			selectInclusionPlacesButton.setVisible(true);
-			//queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
-		}else{
-			discreteInclusion.setVisible(false);
-			selectInclusionPlacesButton.setVisible(false);
-		}
 	}
 
 	private void refreshExportButtonText() {
@@ -2768,122 +2472,9 @@ public class CTLQueryDialog extends JPanel {
 		}
 	}
 
-	private void refreshSymmetryReduction() {
-		if(disableSymmetryUpdate){
-			return;
-		}
-		else if(reductionOption.getSelectedItem() == null){
-			symmetryReduction.setVisible(false);
-		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
-			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(true);
-			symmetryReduction.setEnabled(false);
-		}
-		else if((((String)reductionOption.getSelectedItem()).equals(name_COMBI) ||
-				((String)reductionOption.getSelectedItem()).equals(name_OPTIMIZEDSTANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_STANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCAST) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)) &&
-				(!noApproximationEnable.isSelected() ||
-				someTraceRadioButton.isSelected()) 
-				){
-			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(false);
-			symmetryReduction.setEnabled(false);
-		} else {
-			symmetryReduction.setVisible(true);
-			if(!symmetryReduction.isEnabled())	symmetryReduction.setSelected(true);
-			symmetryReduction.setEnabled(true);
-		}
-	}
-
-	private void refreshOverApproximationOption() {
-		if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
-			useOverApproximation.setSelected(false);
-			useOverApproximation.setEnabled(false);
-		}else{
-			if(!useOverApproximation.isEnabled()){
-				useOverApproximation.setSelected(true);
-			}
-			useOverApproximation.setEnabled(true);
-		}
-		
-		if(fastestTraceRadioButton.isSelected()){
-			noApproximationEnable.setEnabled(true);
-			noApproximationEnable.setSelected(true);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
-			overApproximationDenominator.setEnabled(false);
-		}
-		else{
-			noApproximationEnable.setEnabled(true);
-			overApproximationEnable.setEnabled(true);
-			underApproximationEnable.setEnabled(true);
-			overApproximationDenominator.setEnabled(true);
-		}
-	}
-
-	private void refreshDiscreteOptions(){
-		useTimeDarts.setEnabled(true);
-		if(hasForcedDisabledTimeDarts){
-			hasForcedDisabledTimeDarts = false;
-			useTimeDarts.setSelected(true);
-		}
-		
-		useCZ.setVisible(false);
-		useLocal.setVisible(false);
-		
-		useReduction.setVisible(false);
-		useOverApproximation.setVisible(true);
-		
-		if(reductionOption.getSelectedItem() == null){
-			useGCD.setVisible(false);
-			usePTrie.setVisible(false);
-			useTimeDarts.setVisible(false);
-		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
-			useGCD.setVisible(true);
-			usePTrie.setVisible(true);
-			useTimeDarts.setVisible(true);
-			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected()){
-				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
-				useTimeDarts.setSelected(false);
-				useTimeDarts.setEnabled(false);
-			}
-			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
-				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
-				useGCD.setSelected(false);
-				useGCD.setEnabled(false);
-			}
-
-			// Disable time darts for EG/AF with deadlock
-			if(queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))){
-				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
-				useTimeDarts.setSelected(false);
-				useTimeDarts.setEnabled(false);
-			}
-		} else {
-			useGCD.setVisible(false);
-			usePTrie.setVisible(false);
-			useTimeDarts.setVisible(false);
-			
-			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
-				useReduction.setVisible(true);
-			} else if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED_CTL)){
-				symmetryReduction.setVisible(false);
-				useOverApproximation.setVisible(false);
-				useGCD.setVisible(false);
-				useCZ.setVisible(true);
-				useLocal.setVisible(true);
-			}
-		}
-	}
-
 
 	private void queryChanged(){
 		setEnabledReductionOptions();
-		refreshOverApproximationOption();
 	}
 
 	
