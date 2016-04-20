@@ -238,18 +238,10 @@ public class CTLQueryDialog extends JPanel {
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
+	private ButtonGroup algorithmRadioButtonGroup;
 	private JRadioButton useCZ;
 	private JRadioButton useLocal;
-	
-	// Approximation options panel
-	private JPanel overApproximationOptionsPanel;
-	private ButtonGroup approximationRadioButtonGroup;
-	private JRadioButton noApproximationEnable;
-	private JRadioButton overApproximationEnable;
-	private JRadioButton underApproximationEnable;
-	private CustomJSpinner overApproximationDenominator;
-	private ButtonGroup algorithmRadioButtonGroup;
-	
+
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -429,8 +421,11 @@ public class CTLQueryDialog extends JPanel {
 		boolean gcd = false;
 		boolean overApproximation = false;
 		boolean reduction = false;
-
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		boolean overApproximationEnable = false;
+		boolean underApproximationEnable = false;
+		int overApproximationDenominator = 0;
+		
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable, underApproximationEnable, overApproximationDenominator);
 		query.setCategory(TAPNQuery.QueryCategory.CTL);
 		query.setAlgorithmOption(getSelectedAlgorithm());
 		return query;
@@ -930,7 +925,6 @@ public class CTLQueryDialog extends JPanel {
 		initQueryPanel();
 		initUppaalOptionsPanel();
 		initReductionOptionsPanel();
-		initOverApproximationPanel();
 		initButtonPanel(option);
 
 		if(queryToCreateFrom != null) {
@@ -965,20 +959,6 @@ public class CTLQueryDialog extends JPanel {
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
-		setupApproximationOptionsFromQuery(queryToCreateFrom);
-	}
-	
-	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-		if (queryToCreateFrom.isOverApproximationEnabled())
-			overApproximationEnable.setSelected(true);
-		else if (queryToCreateFrom.isUnderApproximationEnabled())
-			underApproximationEnable.setSelected(true);
-		else
-			noApproximationEnable.setSelected(true);
-		
-		if (queryToCreateFrom.approximationDenominator() > 0) {
-			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
-		}
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1021,10 +1001,8 @@ public class CTLQueryDialog extends JPanel {
 			existsDiamond.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
-			noApproximationEnable.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
-			noApproximationEnable.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
 		}
@@ -1200,7 +1178,6 @@ public class CTLQueryDialog extends JPanel {
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
 		openComposedNetButton.setVisible(advancedView);
-		overApproximationOptionsPanel.setVisible(advancedView && !ctlMode);
 		
 		if(advancedView){
 			advancedButton.setText("Simple view");
@@ -1385,7 +1362,6 @@ public class CTLQueryDialog extends JPanel {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
-		approximationRadioButtonGroup = new ButtonGroup();
 
 		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
@@ -1479,7 +1455,6 @@ public class CTLQueryDialog extends JPanel {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
-		approximationRadioButtonGroup = new ButtonGroup();
 
 		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
@@ -2309,74 +2284,6 @@ public class CTLQueryDialog extends JPanel {
 
 	}
 	
-	
-	
-	
-	
-	private void initOverApproximationPanel() {
-		overApproximationOptionsPanel = new JPanel(new GridBagLayout());
-		overApproximationOptionsPanel.setVisible(false);
-		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Approximation Options"));
-		approximationRadioButtonGroup = new ButtonGroup();
-		
-		noApproximationEnable = new JRadioButton("Exact analysis");
-		noApproximationEnable.setVisible(true);
-		noApproximationEnable.setSelected(true);
-		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
-		
-		overApproximationEnable = new JRadioButton("Over-approximation");
-		overApproximationEnable.setVisible(true);
-		overApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
-		
-		underApproximationEnable = new JRadioButton("Under-approximation");
-		underApproximationEnable.setVisible(true);
-		underApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_UNDER);
-
-		approximationRadioButtonGroup.add(noApproximationEnable);
-		approximationRadioButtonGroup.add(overApproximationEnable);
-		approximationRadioButtonGroup.add(underApproximationEnable);
-		
-		Enumeration<AbstractButton> buttons = approximationRadioButtonGroup.getElements(); 
-		
-		while(buttons.hasMoreElements()){
-			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
-			});
-		}
-		
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		
-		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
-		
-		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
-		overApproximationDenominator.setMaximumSize(new Dimension(65, 30));
-		overApproximationDenominator.setMinimumSize(new Dimension(65, 30));
-		overApproximationDenominator.setPreferredSize(new Dimension(65, 30));
-		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
-		
-		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(approximationDenominatorLabel, gridBagConstraints);
-		overApproximationOptionsPanel.add(overApproximationDenominator);
-	
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new Insets(5,10,5,10);
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		
-		add(overApproximationOptionsPanel, gridBagConstraints);
-	}
-
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
@@ -2557,17 +2464,6 @@ public class CTLQueryDialog extends JPanel {
 					if (xmlFile != null && queryFile != null) {
 						ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(CTLQueryDialog.this.tapnNetwork);
-						
-						if (overApproximationEnable.isSelected())
-						{
-							OverApproximation overaprx = new OverApproximation();
-							overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-						}
-						else if (underApproximationEnable.isSelected())
-						{
-							UnderApproximation underaprx = new UnderApproximation();
-							underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-						}						
 
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
@@ -2611,16 +2507,6 @@ public class CTLQueryDialog extends JPanel {
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);
 					querySaved = true;	//Setting this to true will make sure that new values will be used.
-					if (overApproximationEnable.isSelected())
-					{
-						OverApproximation overaprx = new OverApproximation();
-						overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-					}
-					else if (underApproximationEnable.isSelected())
-					{
-						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposer) composer).getGuiModel());
-					}
 					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
