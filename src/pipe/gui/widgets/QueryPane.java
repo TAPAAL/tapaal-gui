@@ -38,6 +38,7 @@ import pipe.gui.undo.AddQueryCommand;
 import pipe.gui.undo.RemoveQueryCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
@@ -312,7 +313,13 @@ public class QueryPane extends JPanel {
 		addQueryButton.setToolTipText(toolTipNewQuery);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+				TAPNQuery q = null;
+				if(tabContent.network().isUntimed()){
+					// TODO: Make pop-up asking for CTL query dialog
+					q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+				} else{
+					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+				}
 				if (q != null) {
 					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
 					addQuery(q);
