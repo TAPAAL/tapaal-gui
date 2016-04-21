@@ -148,16 +148,10 @@ public class CTLQueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Open composed net";
 	
-	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
-	private static final String SOME_TRACE_STRING = "Some trace       ";
-	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
 	private static final String SHARED = "Shared";
 
 	private static final long serialVersionUID = 7852107237344005546L;
 
-	private static final String QUERY_TYPE_DEFAULT = "Default";
-	private static final String QUERY_TYPE_CTL = "CTL";
-	
 	public enum QueryDialogueOption {
 		VerifyNow, Save, Export
 	}
@@ -170,7 +164,6 @@ public class CTLQueryDialog extends JPanel {
 	// Query Name Panel;
 	private JPanel namePanel;
 	private JButton advancedButton;
-	private JComboBox<TAPNQuery.QueryCategory> categoryBox;
 
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
@@ -181,15 +174,15 @@ public class CTLQueryDialog extends JPanel {
 	private JPanel queryPanel;
 
 	private JPanel quantificationPanel;
-	private ButtonGroup quantificationRadioButtonGroup;
-	private JRadioButton existsDiamond;
-	private JRadioButton existsBox;
-	private JRadioButton existsNext;
-	private JRadioButton existsUntil;
-	private JRadioButton forAllDiamond;
-	private JRadioButton forAllBox;
-	private JRadioButton forAllNext;
-	private JRadioButton forAllUntil;
+	private ButtonGroup quantificationButtonGroup;
+	private JButton existsDiamond;
+	private JButton existsBox;
+	private JButton existsNext;
+	private JButton existsUntil;
+	private JButton forAllDiamond;
+	private JButton forAllBox;
+	private JButton forAllNext;
+	private JButton forAllUntil;
 
 	private JTextPane queryField;
 
@@ -226,14 +219,6 @@ public class CTLQueryDialog extends JPanel {
 	private JRadioButton depthFirstSearch;
 	private JRadioButton randomSearch;
 	private JRadioButton heuristicSearch;
-
-	// Trace options panel
-	private JPanel traceOptionsPanel;
-
-	private ButtonGroup traceRadioButtonGroup;
-	private JRadioButton noTraceRadioButton;
-	private JRadioButton someTraceRadioButton;
-	private JRadioButton fastestTraceRadioButton;
 	
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
@@ -276,10 +261,6 @@ public class CTLQueryDialog extends JPanel {
 	private JTextField queryName;
 
 	private static Boolean advancedView = false;
-	
-	private static boolean hasForcedDisabledTimeDarts = false;
-	private static boolean hasForcedDisabledGCD = false;
-	private static boolean disableSymmetryUpdate = false;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -296,9 +277,14 @@ public class CTLQueryDialog extends JPanel {
 	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
 	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Available only for some verification engines.)";
 	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maxiaml trace there is marking that satisfies the given property. (Available only for some verification engines.)";
-
 	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
-
+	
+	private static final String TOOL_TIP_EXISTS_UNTIL = "There is a computation where the first formula holds until the second one holds.";
+	private static final String TOOL_TIP_EXISTS_NEXT = "There is a transition firing after which the reached marking satisfies the given property.";
+	private static final String TOOL_TIP_FORALL_UNTIL = "On every computation the first formula holds until the second one holds";
+	private static final String TOOL_TIP_FORALL_NEXT = "After any transition firing the reached marking satisfies the given property.";
+	
+	
 	//Tool tips for logic panel
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
 	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
@@ -330,26 +316,14 @@ public class CTLQueryDialog extends JPanel {
 
 	//Tool tips for reduction options panel
 	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose a verification engine.";
-	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "Apply automatic symmetry reduction.";
-	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform a more advanced inclusion check."; 
-	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
-	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
-	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
-	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
-	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
-
+	
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
 			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
-
-	//Tool tips for trace options panel
-	private final static String TOOL_TIP_FASTEST_TRACE = "Show a fastest concrete trace if applicable (verification can be slower with this trace option).";
-	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable.";
-	private final static String TOOL_TIP_NO_TRACE = "Do not display any trace information.";
-
+	
 	//Tool tips for buttom panel
 	private final static String TOOL_TIP_SAVE_BUTTON = "Save the query.";
 	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
@@ -362,8 +336,6 @@ public class CTLQueryDialog extends JPanel {
 	//Tool tips for approximation panel
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
-	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
-	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 	
 	//Tool tips for query types
 	private final static String TOOL_TIP_QUERYTYPE = "Choose a query type";
@@ -410,7 +382,7 @@ public class CTLQueryDialog extends JPanel {
 
 		String name = getQueryComment();
 		int capacity = getCapacity();
-		TAPNQuery.TraceOption traceOption = getTraceOption();
+		TAPNQuery.TraceOption traceOption = TraceOption.NONE;
 		TAPNQuery.SearchOption searchOption = getSearchOption();
 		ReductionOption reductionOptionToSet = getReductionOption();
 
@@ -447,20 +419,7 @@ public class CTLQueryDialog extends JPanel {
 		return ((JTextField) namePanel.getComponent(1)).getText();
 	}
 
-	private TraceOption getTraceOption() {
-		if(someTraceRadioButton.isSelected())
-			return TraceOption.SOME;
-		if(fastestTraceRadioButton.isSelected())
-			return TraceOption.FASTEST;
-		else
-			return TraceOption.NONE;
-	}
-
 	private SearchOption getSearchOption() {
-		if(fastestTraceRadioButton.isSelected()){
-			return SearchOption.DEFAULT;
-		}
-			
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
 		else if(randomSearch.isSelected())
@@ -499,45 +458,12 @@ public class CTLQueryDialog extends JPanel {
 		return (String)reductionOption.getSelectedItem();
 	}
 
-	private void refreshTraceOptions() {
-		if(reductionOption.getSelectedItem() == null){
-			return;
-		}
-
-		fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && !queryHasDeadlock() && !(newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode));
-		
-		someTraceRadioButton.setEnabled(true);
-		noTraceRadioButton.setEnabled(true);
-
-		if(getTraceOption() == TraceOption.FASTEST) {
-			if(fastestTraceRadioButton.isEnabled()){
-				fastestTraceRadioButton.setSelected(true);
-			} else {
-				someTraceRadioButton.setSelected(true);
-			}
-		}
-	}
-
 	private void resetQuantifierSelectionButtons() {
-		quantificationRadioButtonGroup.clearSelection();
+		//quantificationRadioButtonGroup.clearSelection();
 	}
 
 	private void exit() {
 		rootPane.getParent().setVisible(false);
-	}
-
-	public String getQuantificationSelection() {
-		if (existsDiamond.isSelected()) {
-			return "E<>";
-		} else if (existsBox.isSelected()) {
-			return "E[]";
-		} else if (forAllDiamond.isSelected()) {
-			return "A<>";
-		} else if (forAllBox.isSelected()) {
-			return "A[]";
-		} else {
-			return "";
-		}
 	}
 
 	public boolean queryHasDeadlock(){
@@ -654,22 +580,16 @@ public class CTLQueryDialog extends JPanel {
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
 			// because a different atomic proposition was selected
 			userChangedAtomicPropSelection = false;
-			if(placeNode.getTemplate().equals(""))
+			if(placeNode.getTemplate().equals("")){
 				templateBox.setSelectedItem(SHARED);
-			else
+			}
+			else{
 				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
+			}
 			placesBox.setSelectedItem(placeNode.getPlace());
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(placeMarkingNode.getConstant());
 			userChangedAtomicPropSelection = true;
-		} else if (currentSelection.getObject() instanceof TCTLEFNode) {
-			existsDiamond.setSelected(true);
-		} else if (currentSelection.getObject() instanceof TCTLEGNode) {
-			existsBox.setSelected(true);
-		} else if (currentSelection.getObject() instanceof TCTLAGNode) {
-			forAllBox.setSelected(true);
-		} else if (currentSelection.getObject() instanceof TCTLAFNode) {
-			forAllDiamond.setSelected(true);
 		}
 	}
 
@@ -741,50 +661,23 @@ public class CTLQueryDialog extends JPanel {
 			currentselected = randomSearch;
 		}
 		
-		if(fastestTraceRadioButton.isSelected()){
-			breadthFirstSearch.setEnabled(false);
-			depthFirstSearch.setEnabled(false);
-			heuristicSearch.setEnabled(false);
-			randomSearch.setEnabled(false);
-			return;
-		}else{
-			breadthFirstSearch.setEnabled(true);
-			depthFirstSearch.setEnabled(true);
-			heuristicSearch.setEnabled(true);
-			randomSearch.setEnabled(true);
-		}
+		breadthFirstSearch.setEnabled(true);
+		depthFirstSearch.setEnabled(true);
+		heuristicSearch.setEnabled(false);
+		randomSearch.setEnabled(false);
 		
-		if(categoryBox.getSelectedItem() == TAPNQuery.QueryCategory.CTL){
-			breadthFirstSearch.setEnabled(true);
-			depthFirstSearch.setEnabled(true);
-			heuristicSearch.setEnabled(false);
-			randomSearch.setEnabled(false);
-			
-			if(heuristicSearch.isSelected()){
-				heuristicSearch.setSelected(false);
-				depthFirstSearch.setSelected(true);
-				currentselected = depthFirstSearch; 
-			}
-			if(randomSearch.isSelected()){
-				randomSearch.setSelected(false);
-				depthFirstSearch.setSelected(true);
-				currentselected = depthFirstSearch;
-			}
-		}
-
-		String reductionOptionString = getReductionOptionAsString();
+		// TODO: Should breadthFirstSearch be disabled here?
+		/*
 		if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			breadthFirstSearch.setEnabled(false);
-			if(!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))){
-				heuristicSearch.setEnabled(false);
-			}
 		}
-
+		 */
+		
 		if(!currentselected.isEnabled()){
-			if(heuristicSearch.isEnabled()){
-				heuristicSearch.setSelected(true);
-			} else {
+			if(depthFirstSearch.isEnabled()){
 				depthFirstSearch.setSelected(true);
+			} else {
+				breadthFirstSearch.setSelected(true);
 			}
 		}
 	}
@@ -794,6 +687,11 @@ public class CTLQueryDialog extends JPanel {
 		existsDiamond.setEnabled(false);
 		forAllBox.setEnabled(false);
 		forAllDiamond.setEnabled(false);
+		existsUntil.setEnabled(false);
+		existsNext.setEnabled(false);
+		forAllUntil.setEnabled(false);
+		forAllNext.setEnabled(false);
+		
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
@@ -812,6 +710,11 @@ public class CTLQueryDialog extends JPanel {
 		existsDiamond.setEnabled(true);
 		forAllBox.setEnabled(true);
 		forAllDiamond.setEnabled(true);
+		existsUntil.setEnabled(true);
+		existsNext.setEnabled(true);
+		forAllUntil.setEnabled(true);
+		forAllNext.setEnabled(true);
+		
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
@@ -826,10 +729,15 @@ public class CTLQueryDialog extends JPanel {
 	}
 
 	private void enableOnlyStateButtons() {
-		existsBox.setEnabled(false);
-		existsDiamond.setEnabled(false);
-		forAllBox.setEnabled(false);
-		forAllDiamond.setEnabled(false);
+		existsBox.setEnabled(true);
+		existsDiamond.setEnabled(true);
+		forAllBox.setEnabled(true);
+		forAllDiamond.setEnabled(true);
+		existsUntil.setEnabled(true);
+		existsNext.setEnabled(true);
+		forAllUntil.setEnabled(true);
+		forAllNext.setEnabled(true);
+		
 		conjunctionButton.setEnabled(true);
 		disjunctionButton.setEnabled(true);
 		negationButton.setEnabled(true);
@@ -931,7 +839,6 @@ public class CTLQueryDialog extends JPanel {
 			setupFromQuery(queryToCreateFrom);
 		}
 		
-		refreshTraceOptions();
 		setEnabledReductionOptions();
 		
 		rootPane.setDefaultButton(saveAndVerifyButton);
@@ -950,15 +857,8 @@ public class CTLQueryDialog extends JPanel {
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
 		queryName.setText(queryToCreateFrom.getName());
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
-		
-		if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.CTL){
-			changeCategory(TAPNQuery.QueryCategory.CTL);
-		}
-
-		setupQuantificationFromQuery(queryToCreateFrom);
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
-		setupTraceOptionsFromQuery(queryToCreateFrom);
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -972,16 +872,6 @@ public class CTLQueryDialog extends JPanel {
 		reductionOption.setSelectedItem(reduction);
 	}
 
-	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-		if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
-			someTraceRadioButton.setSelected(true);
-		} else if (queryToCreateFrom.getTraceOption() == TraceOption.FASTEST) {
-			fastestTraceRadioButton.setSelected(true);
-		} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE) {
-			noTraceRadioButton.setSelected(true);
-		}
-	}
-
 	private void setupSearchOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.getSearchOption() == SearchOption.BFS) {
 			breadthFirstSearch.setSelected(true);
@@ -991,20 +881,6 @@ public class CTLQueryDialog extends JPanel {
 			randomSearch.setSelected(true);
 		} else if (queryToCreateFrom.getSearchOption() == SearchOption.HEURISTIC){
 			heuristicSearch.setSelected(true);
-		}
-	}
-
-	private void setupQuantificationFromQuery(TAPNQuery queryToCreateFrom) {
-		// bit of a hack, possible because quantifier node is always the first
-		// node (we cant have nested quantifiers)	
-		if (queryToCreateFrom.getProperty() instanceof TCTLEFNode) {
-			existsDiamond.setSelected(true);
-		} else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
-			existsBox.setSelected(true);
-		} else if (queryToCreateFrom.getProperty() instanceof TCTLAFNode) {
-			forAllDiamond.setSelected(true);
-		} else if (queryToCreateFrom.getProperty() instanceof TCTLAGNode) {
-			forAllBox.setSelected(true);
 		}
 	}
 
@@ -1038,8 +914,6 @@ public class CTLQueryDialog extends JPanel {
 
 			}
 		});
-		
-		JPanel queryTypePanel = createQueryTypePanel();
 		
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
@@ -1113,7 +987,6 @@ public class CTLQueryDialog extends JPanel {
 		
 		topButtonPanel.add(advancedButton);
 		topButtonPanel.add(infoButton);
-		namePanel.add(queryTypePanel);
 		splitter.add(namePanel, BorderLayout.LINE_START);
 		splitter.add(topButtonPanel, BorderLayout.LINE_END);
 
@@ -1125,40 +998,7 @@ public class CTLQueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
 	}
-	
-	// Check if net supports CTL queries
-	private boolean supportCTLQueryType(){
-		return tapnNetwork.isUntimed();
-	}
-	
-	private JPanel createQueryTypePanel(){
-		JPanel panel = new JPanel();		
-		
-		categoryBox = new JComboBox<TAPNQuery.QueryCategory>();
-		categoryBox.setToolTipText(TOOL_TIP_QUERYTYPE);
-		categoryBox.addItem(TAPNQuery.QueryCategory.Default);
-		if(supportCTLQueryType()) { categoryBox.addItem(TAPNQuery.QueryCategory.CTL); }
-		
-		categoryBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				switch((TAPNQuery.QueryCategory)categoryBox.getSelectedItem()){
-					case Default:
-						changeCategory(TAPNQuery.QueryCategory.Default);
-						break;
-					case CTL:
-						changeCategory(TAPNQuery.QueryCategory.CTL);
-						break;
-					default: break;
-				}
-			}
-		});
 
-		panel.add(new JLabel("Query type: "));
-		panel.add(categoryBox);
-	
-		return panel;
-	}
-	
 	public static void setAdvancedView(boolean advanced){
 		advancedView = advanced;
 	}
@@ -1172,7 +1012,6 @@ public class CTLQueryDialog extends JPanel {
 		if(changeState){
 			setAdvancedView(!advancedView);
 		}
-		boolean ctlMode = categoryBox.getSelectedItem() == TAPNQuery.QueryCategory.CTL;
 		Point location = guiDialog.getLocation();
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
@@ -1227,29 +1066,6 @@ public class CTLQueryDialog extends JPanel {
 		gridBagConstraints.weightx = 0;
 		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
-	}
-	
-	private void changeCategory(TAPNQuery.QueryCategory category){
-
-		if(category == TAPNQuery.QueryCategory.Default){
-			this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.Default);
-	        this.quantificationPanel.setVisible(false);
-	        this.initQuantificationPanel();
-		}
-		if(category == TAPNQuery.QueryCategory.CTL){
-			this.categoryBox.setSelectedItem(TAPNQuery.QueryCategory.CTL);
-	        this.quantificationPanel.setVisible(false);
-	        this.initCTLQuantificationPanel();
-		}
-		
-		// Refresh verification options
-		clearSelection();
-		updateSelection();
-		queryChanged();
-		
-		toggleAdvancedSimpleView(false);
-		updateSearchStrategies();
-		CTLQueryDialog.guiDialog.pack();
 	}
 	
 	private void initQueryPanel() {
@@ -1358,7 +1174,144 @@ public class CTLQueryDialog extends JPanel {
 		queryPanel.add(queryScrollPane, gbc);
 	}
 
-	private void initQuantificationPanel() {
+	private void initQuantificationPanel(){
+		// Instantiate panel
+		quantificationPanel = new JPanel(new GridBagLayout());
+		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
+		quantificationButtonGroup = new ButtonGroup();
+		
+		// Instantiate buttons
+		existsDiamond = new JButton("EF");
+		existsBox = new JButton("EG");
+		forAllDiamond = new JButton("AF");
+		forAllBox = new JButton("AG");
+		existsUntil = new JButton("EU");
+		existsNext = new JButton("EX");
+		forAllUntil = new JButton("AU");
+		forAllNext = new JButton("AX");
+		
+		// Add tool-tips
+		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
+		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
+		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
+		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
+		existsUntil.setToolTipText(TOOL_TIP_EXISTS_UNTIL);
+		existsNext.setToolTipText(TOOL_TIP_EXISTS_NEXT);
+		forAllUntil.setToolTipText(TOOL_TIP_FORALL_UNTIL);
+		forAllNext.setToolTipText(TOOL_TIP_FORALL_NEXT);
+		
+		// Add buttons to panel
+		quantificationButtonGroup.add(existsDiamond);
+		quantificationButtonGroup.add(existsBox);
+		quantificationButtonGroup.add(forAllDiamond);
+		quantificationButtonGroup.add(forAllBox);
+		quantificationButtonGroup.add(existsUntil);
+		quantificationButtonGroup.add(existsNext);
+		quantificationButtonGroup.add(forAllUntil);
+		quantificationButtonGroup.add(forAllNext);
+		
+		// Place buttons in GUI
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+	
+		// First column of buttons
+		gbc.gridy = 0;
+		quantificationPanel.add(existsDiamond, gbc);
+		gbc.gridy = 1;
+		quantificationPanel.add(existsBox, gbc);
+		gbc.gridy = 2;
+		quantificationPanel.add(existsUntil, gbc);
+		gbc.gridy = 3;
+		quantificationPanel.add(existsNext, gbc);
+
+		// Second column of buttons
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		quantificationPanel.add(forAllDiamond, gbc);
+		gbc.gridy = 1;
+		quantificationPanel.add(forAllBox, gbc);
+		gbc.gridy = 2;
+		quantificationPanel.add(forAllUntil, gbc);
+		gbc.gridy = 3;
+		quantificationPanel.add(forAllNext, gbc);
+		
+		// Add quantification panel to query panel
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.VERTICAL;
+		queryPanel.add(quantificationPanel, gbc);
+		
+		// Action Listeners
+		existsBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+			}
+		});
+
+		existsDiamond.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+			}
+		});
+
+		forAllBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+			}
+		});
+
+		forAllDiamond.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+			}
+		});
+		
+		existsNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+			}
+		});
+		
+		existsUntil.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+						getSpecificChildOfProperty(2, currentSelection.getObject())));
+			}
+		});
+		
+		forAllNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+			}
+		});
+		
+		forAllUntil.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addPropertyToQuery(new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+						getSpecificChildOfProperty(2, currentSelection.getObject())));
+			}
+		});
+	}
+	
+	private void addPropertyToQuery(TCTLAbstractPathProperty property){
+		UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+		newProperty = newProperty.replace(currentSelection.getObject(),	property);
+		updateSelection(property);
+		undoSupport.postEdit(edit);
+		queryChanged();
+	}
+	
+	private void initQuantificationPanelOld() {
+		
+		ButtonGroup quantificationRadioButtonGroup;
+		JRadioButton existsDiamond;
+		JRadioButton existsBox;
+		JRadioButton forAllDiamond;
+		JRadioButton forAllBox;
+		
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
@@ -1403,7 +1356,6 @@ public class CTLQueryDialog extends JPanel {
 
 		// Add action listeners to the query options
 		existsBox.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
@@ -1452,6 +1404,17 @@ public class CTLQueryDialog extends JPanel {
 	}
 	
 	private void initCTLQuantificationPanel() {
+		ButtonGroup quantificationRadioButtonGroup;
+		JRadioButton forAllNext;
+		JRadioButton forAllUntil;
+		JRadioButton existsNext;
+		JRadioButton existsUntil;
+		JRadioButton forAllDiamond;
+		JRadioButton forAllBox;
+		JRadioButton existsDiamond;
+		JRadioButton existsBox;
+		
+		
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
@@ -2170,7 +2133,6 @@ public class CTLQueryDialog extends JPanel {
 		uppaalOptionsPanel = new JPanel(new GridBagLayout());
 
 		initSearchOptionsPanel();
-		initTraceOptionsPanel();
 		initBoundednessCheckPanel();
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -2225,62 +2187,6 @@ public class CTLQueryDialog extends JPanel {
 		gridBagConstraints.insets = new Insets(0, 5, 0, 0);
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
-
-	}
-
-	private void initTraceOptionsPanel() {
-		traceOptionsPanel = new JPanel(new GridBagLayout());
-		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
-		traceRadioButtonGroup = new ButtonGroup();
-		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
-		noTraceRadioButton = new JRadioButton("No trace");
-		fastestTraceRadioButton = new JRadioButton("Fastest trace");
-		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
-		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
-		fastestTraceRadioButton.setToolTipText(TOOL_TIP_FASTEST_TRACE);
-		traceRadioButtonGroup.add(fastestTraceRadioButton);
-		traceRadioButtonGroup.add(someTraceRadioButton);
-		traceRadioButtonGroup.add(noTraceRadioButton);
-
-		fastestTraceRadioButton.setEnabled(false);
-		someTraceRadioButton.setEnabled(false);
-		noTraceRadioButton.setSelected(true);
-		
-		Enumeration<AbstractButton> buttons = traceRadioButtonGroup.getElements(); 
-		
-		while(buttons.hasMoreElements()){
-			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					setEnabledReductionOptions();
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
-			});
-		}
-
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
-
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
-		
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
-
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
 	
@@ -2353,7 +2259,6 @@ public class CTLQueryDialog extends JPanel {
 	
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
-		refreshTraceOptions();
 		updateSearchStrategies();
 		refreshExportButtonText();
 	}
