@@ -1,8 +1,6 @@
 package dk.aau.cs.TCTL.visitors;
 
 import java.util.List;
-
-import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAUNode;
@@ -20,20 +18,19 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
-import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.TCTL.visitors.QueryVisitor.QueryType;
 import dk.aau.cs.model.tapn.TAPNQuery;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.TransportArc;
 
 public class CTLQueryVisitor extends VisitorBase {
 	
 	private static final String XML_HEADER 			= "<?xml version=\"1.0\"?>\n";
+	private static final String XML_PROPSET 			= "property-set";
+	private static final String XML_PROP				= "property";
+	private static final String XML_PROPID			= "id";
+	private static final String XML_PROPDESC			= "description";
+	private static final String XML_FORMULA			= "formula";	
 	private static final String XML_ALLPATHS			= "all-paths";
 	private static final String XML_EXISTSPATH	 	= "exists-path";
 	private static final String XML_NEGATION			= "negation";
@@ -45,22 +42,34 @@ public class CTLQueryVisitor extends VisitorBase {
 	private static final String XML_UNTIL 			= "until";
 	private static final String XML_BEFORE 			= "before";
 	private static final String XML_REACH 			= "reach";
+	private static final String XML_DEADLOCK 			= "deadlock";
+	private static final String XML_INTEGERLT 		= "integer-lt";
 	private static final String XML_INTEGERLE 		= "integer-le";
+	private static final String XML_INTEGEREQ			= "integer-eq";
+	private static final String XML_INTEGERNE 		= "integer-ne";
+	private static final String XML_INTEGERGT 		= "integer-gt";
+	private static final String XML_INTEGERGE			= "integer-ge";
+	private static final String XML_ISFIREABLE		= "is-fireable";
 	private static final String XML_INTEGERCONSTANT 	= "integer-constant";
 	private static final String XML_TOKENSCOUNT 		= "tokens-count";
 	private static final String XML_PLACE 			= "place";
+	private static final String XML_TRANSITION		= "transition";
 	
 	private StringBuffer XMLQuery;
-	private TimedArcPetriNet model;
 	
-	public CTLQueryVisitor(TimedArcPetriNet model){
-		this.model = model;
-		this.XMLQuery = new StringBuffer(XML_HEADER);
+	public CTLQueryVisitor(){
+		this.XMLQuery = new StringBuffer();
 	}
 	
 	public String getXMLQueryFor(TAPNQuery tapnQuery) {
+		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " xmlns=\"\"") + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
 		tapnQuery.getProperty().accept(this, null);
+		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
 		return XMLQuery.toString();
+	}
+	
+	private String queryInfo(){
+		return wrapInTag("TAPNQuery\n", XML_PROPID) + wrapInTag("TAPAAL generated query\n", XML_PROPDESC);
 	}
 	
 	public void visit(TCTLAFNode afNode, Object context) {
@@ -122,6 +131,12 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLOrListNode orListNode, Object context) {
 		createList(orListNode.getProperties(), context, XML_DISJUNCTION);
 	}
+	
+	public void visit(TCTLPlusListNode plusListNode, Object context) {
+		if (plusListNode.getProperties().get(0) instanceof TCTLTransitionNode){
+			createList(plusListNode.getProperties(), context, XML_ISFIREABLE);
+		}
+	}
 
 	private void createList(List<TCTLAbstractStateProperty> properties, Object context, String seperator) {
 		XMLQuery.append(startTag(seperator));
@@ -146,31 +161,10 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
 		XMLQuery.append(wrapInTag(wrapInTag("2\n", XML_INTEGERCONSTANT) + wrapInTag("1\n", XML_INTEGERCONSTANT),XML_INTEGERLE));
 	}
-	/*
+	
 	public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) {
-		String transitionFireability;
-		XMLQuery.append(startTag(XML_NEGATION) + startTag(XML_DISJUNCTION));
-		
-		for (TimedTransition transition : model.transitions()){
-			transitionFireability = "";
-			for (TimedInputArc arc : model.getInputArcsToTransition(transition)){
-				
-			}
-			for (TransportArc arc : model.getTransportArcsToTransition(transition)){
-				
-			}
-			
-			if (transitionFireability.isEmpty()){ // Skip inhibitor arc check if there are no input arcs to the transition
-				continue;
-			}
-			
-			for (TimedInhibitorArc arc : model.getInhibitorArcsToTransition(transition)){
-				
-			}
-		}
-		
-		XMLQuery.append(startTag(XML_DISJUNCTION) + startTag(XML_NEGATION));
-	}*/
+		XMLQuery.append(emptyElement(XML_DEADLOCK));
+	}
 	
 	public void visit(TCTLConstNode tctlConstNode, Object context){
 		XMLQuery.append(wrapInTag(String.valueOf(tctlConstNode.getConstant()) + "\n", XML_INTEGERCONSTANT));
@@ -180,16 +174,42 @@ public class CTLQueryVisitor extends VisitorBase {
 		XMLQuery.append(wrapInTag(wrapInTag(tctlPlaceNode.getPlace() + "\n", XML_PLACE), XML_TOKENSCOUNT));
 	}
 	
+	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
+		XMLQuery.append(wrapInTag(tctlTransitionNode.getTransition() + "\n", XML_TRANSITION));
+	}
+	
 	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
 			Object context) {
+		String op = new String();
 		
-		if (atomicPropositionNode.getOp().equals("<=")){
-			XMLQuery.append(startTag(XML_INTEGERLE));
-			atomicPropositionNode.getLeft().accept(this, context);
-			atomicPropositionNode.getRight().accept(this, context);
-			XMLQuery.append(endTag(XML_INTEGERLE));
+		switch(atomicPropositionNode.getOp()){
+			case "<":
+				op = XML_INTEGERLT;
+				break;
+			case "<=":
+				op = XML_INTEGERLE;
+				break;
+			case "==":
+				op = XML_INTEGEREQ;
+				break;
+			case "!=":
+				op = XML_INTEGERNE;
+				break;
+			case ">":
+				op = XML_INTEGERGT;
+				break;
+			case ">=":
+				op = XML_INTEGERGE;
+				break;
+			default:
+				break;			
 		}
+		
+		XMLQuery.append(startTag(op));
+		atomicPropositionNode.getLeft().accept(this, context);
+		atomicPropositionNode.getRight().accept(this, context);
+		XMLQuery.append(endTag(op));
 	}
 	
 	private String wrapInTag(String str, String tag){
@@ -199,6 +219,9 @@ public class CTLQueryVisitor extends VisitorBase {
 		return "<" + tag + ">\n";
 	}
 	private String endTag(String tag){
-		return "<\\" + tag + ">\n";
+		return "</" + tag + ">\n";
+	}
+	private String emptyElement(String tag){
+		return startTag(tag + "/");
 	}
 }

@@ -22,6 +22,7 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 
 public abstract class VisitorBase implements ITCTLVisitor {
@@ -69,6 +70,7 @@ public abstract class VisitorBase implements ITCTLVisitor {
 	}
 
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){ }
+	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){ }
 	public void visit(TCTLConstNode tctlConstNode, Object context){ }
 
 	public void visit(TCTLTermListNode tctlTermListNode, Object context){

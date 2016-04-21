@@ -6,22 +6,25 @@ import java.util.Map;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.widgets.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 	private ModelReduction modelReduction;
+	private QueryCategory queryCategory;
 	private AlgorithmOption algorithmOption;
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, AlgorithmOption algorithmOption) {
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.modelReduction = modelReduction;
+		this.queryCategory = queryCategory;
 		this.algorithmOption = algorithmOption;
 	}
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, AlgorithmOption algorithmOption) {
-		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, enableUnderApproximation, approximationDenominator, algorithmOption);
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption) {
+		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption);
 	}
 
 	@Override
@@ -44,8 +47,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			result.append(" -r 2 ");
 			break;
 		default:
-			break;
-			
+			break;			
+		}
+		if (this.queryCategory == QueryCategory.CTL){
+			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
+			result.append(" -x 1");
 		}
 		return result.toString();
 	}
