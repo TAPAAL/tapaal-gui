@@ -134,7 +134,7 @@ import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
-public class QueryDialog extends JPanel {
+public class CTLQueryDialog extends JPanel {
 
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
@@ -235,26 +235,10 @@ public class QueryDialog extends JPanel {
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
-	private JCheckBox symmetryReduction;
-	private JCheckBox discreteInclusion;
-	private JButton selectInclusionPlacesButton;
-	private JCheckBox useTimeDarts;
-	private JCheckBox usePTrie;
-	private JCheckBox useGCD;
-	private JCheckBox useOverApproximation;
-	private JCheckBox useReduction;
+	private ButtonGroup algorithmRadioButtonGroup;
 	private JRadioButton useCZ;
 	private JRadioButton useLocal;
-	
-	// Approximation options panel
-	private JPanel overApproximationOptionsPanel;
-	private ButtonGroup approximationRadioButtonGroup;
-	private JRadioButton noApproximationEnable;
-	private JRadioButton overApproximationEnable;
-	private JRadioButton underApproximationEnable;
-	private CustomJSpinner overApproximationDenominator;
-	private ButtonGroup algorithmRadioButtonGroup;
-	
+
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -282,7 +266,7 @@ public class QueryDialog extends JPanel {
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
-	private String name_UNTIMED_CTL = "TAPAAL: Untimed Engine (verifypn) CTL";
+	
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
@@ -381,7 +365,7 @@ public class QueryDialog extends JPanel {
 	//Tool tips for query types
 	private final static String TOOL_TIP_QUERYTYPE = "Choose a query type";
 	
-	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
+	public CTLQueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
@@ -423,25 +407,24 @@ public class QueryDialog extends JPanel {
 
 		String name = getQueryComment();
 		int capacity = getCapacity();
-
 		TAPNQuery.TraceOption traceOption = getTraceOption();
-
 		TAPNQuery.SearchOption searchOption = getSearchOption();
-
 		ReductionOption reductionOptionToSet = getReductionOption();
-		boolean symmetry = getSymmetry();
-		boolean timeDarts = useTimeDarts.isSelected();
-		boolean pTrie = usePTrie.isSelected();
-		boolean gcd = useGCD.isSelected();
-		boolean overApproximation = useOverApproximation.isSelected();
-		boolean reduction = useReduction.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
-		query.setCategory((TAPNQuery.QueryCategory)categoryBox.getSelectedItem());
+		// These are only set because the TAPNQuery constructor needs them. Should make a new constructor. 
+		boolean symmetry = false;
+		boolean timeDarts = false;
+		boolean pTrie = false;
+		boolean gcd = false;
+		boolean overApproximation = false;
+		boolean reduction = false;
+		boolean overApproximationEnable = false;
+		boolean underApproximationEnable = false;
+		int overApproximationDenominator = 0;
+		
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable, underApproximationEnable, overApproximationDenominator);
+		query.setCategory(TAPNQuery.QueryCategory.CTL);
 		query.setAlgorithmOption(getSelectedAlgorithm());
-		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
-			query.setDiscreteInclusion(discreteInclusion.isSelected());
-		}
 		return query;
 	}
 	private AlgorithmOption getSelectedAlgorithm(){
@@ -451,10 +434,6 @@ public class QueryDialog extends JPanel {
 			return AlgorithmOption.LOCAL;
 		}
 		return null;
-	}
-	
-	private boolean getSymmetry() {
-		return symmetryReduction.isSelected();
 	}
 
 	private int getCapacity() {
@@ -509,8 +488,6 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPNdiscreteVerification;
 		else if (reductionOptionString.equals(name_UNTIMED))
 			return ReductionOption.VerifyPN;
-		else if (reductionOptionString.equals(name_UNTIMED_CTL))
-			return ReductionOption.VerifyPNCTL;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -571,7 +548,7 @@ public class QueryDialog extends JPanel {
 					"No reduction option", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
-		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
+		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit CTL Query", true);
 
 		Container contentPane = guiDialog.getContentPane();
 		// 1 Set layout
@@ -579,7 +556,7 @@ public class QueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels);
+		CTLQueryDialog queryDialogue = new CTLQueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -739,120 +716,10 @@ public class QueryDialog extends JPanel {
 			openComposedNetButton.setEnabled(false);
 		}
 	}
-
-	private void setEnabledReductionOptions(){
-		String reductionOptionString = getReductionOptionAsString();
-
-		ArrayList<String> options = new ArrayList<String>();
-		
-		disableSymmetryUpdate = true;
-		TAPNQuery.QueryCategory currentMode = (QueryCategory) categoryBox.getSelectedItem();
 	
-		if(currentMode == TAPNQuery.QueryCategory.CTL){
-			options.add(name_UNTIMED_CTL);
-		}
-		else if(currentMode == TAPNQuery.QueryCategory.Default){
-			if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
-				options.add(name_UNTIMED);
-			}
-			
-			if(useTimeDarts != null){
-				if(hasForcedDisabledTimeDarts){
-					hasForcedDisabledTimeDarts = false;
-					useTimeDarts.setSelected(true);
-				}
-	            useTimeDarts.setEnabled(true);     
-	        }
-			
-			if(useGCD != null){
-				if(hasForcedDisabledGCD){
-					hasForcedDisabledGCD = false;
-					useGCD.setSelected(true);
-				}
-	            useGCD.setEnabled(true);     
-	        }
-			
-	        if (fastestTraceRadioButton.isSelected()) {
-	        	options.add(name_DISCRETE);
-	        } else if (queryHasDeadlock()) {
-	            if (tapnNetwork.isNonStrict()) {
-	                options.add(name_DISCRETE);
-	                // disable timedarts if liveness and deadlock prop
-	                if((getQuantificationSelection().equals("E[]") || 
-	                        getQuantificationSelection().equals("A<>"))){
-	                    if (useTimeDarts != null) {
-	                    	if(useTimeDarts.isSelected()){
-	                    		hasForcedDisabledTimeDarts = true;
-	                    	}
-	                        useTimeDarts.setEnabled(false);
-	                        useTimeDarts.setSelected(false);
-	                    }
-	                }
-	            }
-	            if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-	                if (isNetDegree2 && !hasInhibitorArcs) {
-	                	options.add(name_COMBI);
-	                	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
-	                		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-	                	}
-	                }
-	            }
-	            
-			} else if(tapnNetwork.hasWeights()){
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.add(name_COMBI);
-			} else if(tapnNetwork.hasUrgentTransitions()){
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.add(name_COMBI);
-			} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.add(name_COMBI);
-				if(isNetDegree2 && !hasInhibitorArcs)
-					options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
-				else
-					options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-			} else if(tapnNetwork.hasInhibitorArcs()) {
-				options.add( name_verifyTAPN );
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}					
-				options.addAll(Arrays.asList(name_COMBI, name_BROADCAST, name_BROADCASTDEG2 ));
-			} else {
-				options.add( name_verifyTAPN);
-				if(tapnNetwork.isNonStrict()){
-					options.add(name_DISCRETE);
-				}
-				options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
-			}
-		}
-
+	private void setEnabledReductionOptions(){
 		reductionOption.removeAllItems();
-
-		boolean selectedOptionStillAvailable = false;	
-		TraceOption trace = getTraceOption();
-		for (String s : options) {
-			reductionOption.addItem(s);
-			if (s.equals(reductionOptionString)) {
-				selectedOptionStillAvailable = true;
-			}
-		}
-
-		if (selectedOptionStillAvailable) {
-			reductionOption.setSelectedItem(reductionOptionString);
-			if(trace == TraceOption.SOME && someTraceRadioButton.isEnabled()){
-				someTraceRadioButton.setSelected(true);
-			}else if(trace == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled()){
-				fastestTraceRadioButton.setSelected(true);
-			}
-		}
-		
-		disableSymmetryUpdate = false;
+		reductionOption.addItem(name_UNTIMED);
 	}
 
 	private void updateSearchStrategies(){
@@ -1055,7 +922,6 @@ public class QueryDialog extends JPanel {
 		initQueryPanel();
 		initUppaalOptionsPanel();
 		initReductionOptionsPanel();
-		initOverApproximationPanel();
 		initButtonPanel(option);
 
 		if(queryToCreateFrom != null) {
@@ -1090,62 +956,17 @@ public class QueryDialog extends JPanel {
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
-		setupApproximationOptionsFromQuery(queryToCreateFrom);
-	}
-	
-	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-		if (queryToCreateFrom.isOverApproximationEnabled())
-			overApproximationEnable.setSelected(true);
-		else if (queryToCreateFrom.isUnderApproximationEnabled())
-			underApproximationEnable.setSelected(true);
-		else
-			noApproximationEnable.setSelected(true);
-		
-		if (queryToCreateFrom.approximationDenominator() > 0) {
-			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
-		}
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
-		boolean symmetry = queryToCreateFrom.useSymmetry();
-		
-		if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPNCTL) {
-			reduction = name_UNTIMED_CTL;
-		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
-			reduction = name_BROADCAST;
-		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
-			reduction = name_BROADCASTDEG2;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			reduction = name_DISCRETE;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
+	
+		if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
 			reduction = name_UNTIMED;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.COMBI){
-			reduction = name_COMBI;
-		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
-				reduction = name_STANDARD;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
-				reduction = name_OPTIMIZEDSTANDARD;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPN) {
-				reduction = name_verifyTAPN;
-			}
-		} else {
-			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
-				reduction = name_OPTIMIZEDSTANDARD;
-			}
 		}
 
 		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
-		symmetryReduction.setSelected(symmetry);
-		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
-		usePTrie.setSelected(queryToCreateFrom.usePTrie());
-		useGCD.setSelected(queryToCreateFrom.useGCD());
-		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
-		useReduction.setSelected(queryToCreateFrom.useReduction());
-		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
-		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1177,10 +998,8 @@ public class QueryDialog extends JPanel {
 			existsDiamond.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
-			noApproximationEnable.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
-			noApproximationEnable.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
 		}
@@ -1232,7 +1051,7 @@ public class QueryDialog extends JPanel {
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
 		infoButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(QueryDialog.this, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(CTLQueryDialog.this, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
 			}
 
 			private Object getMessageComponent(){
@@ -1356,7 +1175,6 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
 		openComposedNetButton.setVisible(advancedView);
-		overApproximationOptionsPanel.setVisible(advancedView && !ctlMode);
 		
 		if(advancedView){
 			advancedButton.setText("Simple view");
@@ -1422,14 +1240,13 @@ public class QueryDialog extends JPanel {
 		}
 		
 		// Refresh verification options
-		setEnabledReductionOptions();
 		clearSelection();
 		updateSelection();
 		queryChanged();
 		
 		toggleAdvancedSimpleView(false);
 		updateSearchStrategies();
-		QueryDialog.guiDialog.pack();
+		CTLQueryDialog.guiDialog.pack();
 	}
 	
 	private void initQueryPanel() {
@@ -1542,7 +1359,6 @@ public class QueryDialog extends JPanel {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
-		approximationRadioButtonGroup = new ButtonGroup();
 
 		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
@@ -1636,7 +1452,6 @@ public class QueryDialog extends JPanel {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
-		approximationRadioButtonGroup = new ButtonGroup();
 
 		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
@@ -2466,74 +2281,6 @@ public class QueryDialog extends JPanel {
 
 	}
 	
-	
-	
-	
-	
-	private void initOverApproximationPanel() {
-		overApproximationOptionsPanel = new JPanel(new GridBagLayout());
-		overApproximationOptionsPanel.setVisible(false);
-		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Approximation Options"));
-		approximationRadioButtonGroup = new ButtonGroup();
-		
-		noApproximationEnable = new JRadioButton("Exact analysis");
-		noApproximationEnable.setVisible(true);
-		noApproximationEnable.setSelected(true);
-		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
-		
-		overApproximationEnable = new JRadioButton("Over-approximation");
-		overApproximationEnable.setVisible(true);
-		overApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
-		
-		underApproximationEnable = new JRadioButton("Under-approximation");
-		underApproximationEnable.setVisible(true);
-		underApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_UNDER);
-
-		approximationRadioButtonGroup.add(noApproximationEnable);
-		approximationRadioButtonGroup.add(overApproximationEnable);
-		approximationRadioButtonGroup.add(underApproximationEnable);
-		
-		Enumeration<AbstractButton> buttons = approximationRadioButtonGroup.getElements(); 
-		
-		while(buttons.hasMoreElements()){
-			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
-			});
-		}
-		
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		
-		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
-		
-		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
-		overApproximationDenominator.setMaximumSize(new Dimension(65, 30));
-		overApproximationDenominator.setMinimumSize(new Dimension(65, 30));
-		overApproximationDenominator.setPreferredSize(new Dimension(65, 30));
-		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
-		
-		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(approximationDenominatorLabel, gridBagConstraints);
-		overApproximationOptionsPanel.add(overApproximationDenominator);
-	
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new Insets(5,10,5,10);
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		
-		add(overApproximationOptionsPanel, gridBagConstraints);
-	}
-
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
@@ -2561,111 +2308,6 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
-
-		symmetryReduction = new JCheckBox("Use symmetry reduction");
-		symmetryReduction.setSelected(true);
-		symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(symmetryReduction, gbc);
-
-		discreteInclusion = new JCheckBox("Use discrete inclusion");
-		discreteInclusion.setVisible(true);
-		discreteInclusion.setToolTipText(TOOL_TIP_DISCRETE_INCLUSION);
-		discreteInclusion.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
-			}
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(discreteInclusion, gbc);
-
-		selectInclusionPlacesButton = new JButton("Select Inclusion Places");
-		selectInclusionPlacesButton.setEnabled(false);
-		selectInclusionPlacesButton.setToolTipText(TOOL_TIP_SELECT_INCLUSION_PLACES);
-		selectInclusionPlacesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
-			}
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-
-		useTimeDarts = new JCheckBox("Use Time Darts");
-		useTimeDarts.setSelected(true);
-		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useTimeDarts, gbc);
-		
-		useGCD = new JCheckBox("Use GCD");
-		useGCD.setSelected(true);
-		useGCD.setToolTipText(TOOL_TIP_GCD);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useGCD, gbc);
-		
-		usePTrie = new JCheckBox("Use PTrie");
-		usePTrie.setSelected(true);
-		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-
-		useReduction = new JCheckBox("Apply net reductions");
-		useReduction.setSelected(true);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(useReduction, gbc);
-		
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(usePTrie, gbc);
-
-		useOverApproximation = new JCheckBox("Use untimed state-equations check");
-		useOverApproximation.setSelected(true);
-		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useOverApproximation, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -2709,39 +2351,8 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
-		refreshSymmetryReduction();
-		refreshDiscreteOptions();
-		refreshDiscreteInclusion();
-		refreshOverApproximationOption();
 		updateSearchStrategies();
 		refreshExportButtonText();
-		refreshAlgorithms();
-	}
-	private void refreshAlgorithms(){
-		ReductionOption reduction = getReductionOption();
-		if(reduction == null){
-			useCZ.setVisible(false);
-			useLocal.setVisible(false);
-		} else if(reduction.equals(ReductionOption.VerifyPNCTL)){
-			useCZ.setVisible(true);
-			useLocal.setVisible(true);
-		}
-	}
-	
-	private void refreshDiscreteInclusion() {
-		ReductionOption reduction = getReductionOption();
-		if(reduction == null){
-			discreteInclusion.setVisible(false);
-			selectInclusionPlacesButton.setVisible(false);
-		}
-		else if(reduction.equals(ReductionOption.VerifyTAPN)){
-			discreteInclusion.setVisible(true);
-			selectInclusionPlacesButton.setVisible(true);
-			//queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
-		}else{
-			discreteInclusion.setVisible(false);
-			selectInclusionPlacesButton.setVisible(false);
-		}
 	}
 
 	private void refreshExportButtonText() {
@@ -2765,122 +2376,9 @@ public class QueryDialog extends JPanel {
 		}
 	}
 
-	private void refreshSymmetryReduction() {
-		if(disableSymmetryUpdate){
-			return;
-		}
-		else if(reductionOption.getSelectedItem() == null){
-			symmetryReduction.setVisible(false);
-		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
-			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(true);
-			symmetryReduction.setEnabled(false);
-		}
-		else if((((String)reductionOption.getSelectedItem()).equals(name_COMBI) ||
-				((String)reductionOption.getSelectedItem()).equals(name_OPTIMIZEDSTANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_STANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCAST) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)) &&
-				(!noApproximationEnable.isSelected() ||
-				someTraceRadioButton.isSelected()) 
-				){
-			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(false);
-			symmetryReduction.setEnabled(false);
-		} else {
-			symmetryReduction.setVisible(true);
-			if(!symmetryReduction.isEnabled())	symmetryReduction.setSelected(true);
-			symmetryReduction.setEnabled(true);
-		}
-	}
-
-	private void refreshOverApproximationOption() {
-		if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
-			useOverApproximation.setSelected(false);
-			useOverApproximation.setEnabled(false);
-		}else{
-			if(!useOverApproximation.isEnabled()){
-				useOverApproximation.setSelected(true);
-			}
-			useOverApproximation.setEnabled(true);
-		}
-		
-		if(fastestTraceRadioButton.isSelected()){
-			noApproximationEnable.setEnabled(true);
-			noApproximationEnable.setSelected(true);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
-			overApproximationDenominator.setEnabled(false);
-		}
-		else{
-			noApproximationEnable.setEnabled(true);
-			overApproximationEnable.setEnabled(true);
-			underApproximationEnable.setEnabled(true);
-			overApproximationDenominator.setEnabled(true);
-		}
-	}
-
-	private void refreshDiscreteOptions(){
-		useTimeDarts.setEnabled(true);
-		if(hasForcedDisabledTimeDarts){
-			hasForcedDisabledTimeDarts = false;
-			useTimeDarts.setSelected(true);
-		}
-		
-		useCZ.setVisible(false);
-		useLocal.setVisible(false);
-		
-		useReduction.setVisible(false);
-		useOverApproximation.setVisible(true);
-		
-		if(reductionOption.getSelectedItem() == null){
-			useGCD.setVisible(false);
-			usePTrie.setVisible(false);
-			useTimeDarts.setVisible(false);
-		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
-			useGCD.setVisible(true);
-			usePTrie.setVisible(true);
-			useTimeDarts.setVisible(true);
-			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected()){
-				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
-				useTimeDarts.setSelected(false);
-				useTimeDarts.setEnabled(false);
-			}
-			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
-				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
-				useGCD.setSelected(false);
-				useGCD.setEnabled(false);
-			}
-
-			// Disable time darts for EG/AF with deadlock
-			if(queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))){
-				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
-				useTimeDarts.setSelected(false);
-				useTimeDarts.setEnabled(false);
-			}
-		} else {
-			useGCD.setVisible(false);
-			usePTrie.setVisible(false);
-			useTimeDarts.setVisible(false);
-			
-			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
-				useReduction.setVisible(true);
-			} else if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED_CTL)){
-				symmetryReduction.setVisible(false);
-				useOverApproximation.setVisible(false);
-				useGCD.setVisible(false);
-				useCZ.setVisible(true);
-				useLocal.setVisible(true);
-			}
-		}
-	}
-
 
 	private void queryChanged(){
 		setEnabledReductionOptions();
-		refreshOverApproximationOption();
 	}
 
 	
@@ -2962,18 +2460,7 @@ public class QueryDialog extends JPanel {
 
 					if (xmlFile != null && queryFile != null) {
 						ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-						
-						if (overApproximationEnable.isSelected())
-						{
-							OverApproximation overaprx = new OverApproximation();
-							overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-						}
-						else if (underApproximationEnable.isSelected())
-						{
-							UnderApproximation underaprx = new UnderApproximation();
-							underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-						}						
+						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(CTLQueryDialog.this.tapnNetwork);
 
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
@@ -3017,16 +2504,6 @@ public class QueryDialog extends JPanel {
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);
 					querySaved = true;	//Setting this to true will make sure that new values will be used.
-					if (overApproximationEnable.isSelected())
-					{
-						OverApproximation overaprx = new OverApproximation();
-						overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-					}
-					else if (underApproximationEnable.isSelected())
-					{
-						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposer) composer).getGuiModel());
-					}
 					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
