@@ -1,9 +1,12 @@
 package dk.aau.cs.io;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,11 +22,16 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
@@ -36,6 +44,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -240,7 +249,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	
 	private void appendQueries(Document document, Element root) {
 		for (TAPNQuery query : queries) {
-			Element newQuery = createQueryElement(query, document);
+			Element newQuery;
+			if (query.getCategory() == QueryCategory.CTL){
+				newQuery = createCTLQueryElement(query, document);
+			} else {
+				newQuery = createQueryElement(query, document);
+			}
 			root.appendChild(newQuery);
 		}
 	}
@@ -273,6 +287,54 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
 		
 		return queryElement;
+	}
+	
+	private Element createCTLQueryElement(TAPNQuery query, Document document) {
+		Require.that(query != null, "Error: query was null");
+		Require.that(document != null, "Error: document was null");
+
+		Element queryElement = document.createElement("query");
+
+		Node queryFormula = XMLQueryStringToElement(new CTLQueryVisitor().getXMLQueryFor(query.getProperty()));
+		queryElement.appendChild(document.importNode(queryFormula, true));
+		
+		queryElement.setAttribute("name", query.getName());
+		queryElement.setAttribute("capacity", "" + query.getCapacity());
+		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
+		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
+		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
+		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
+		queryElement.setAttribute("gcd", "" + query.useGCD());
+		queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
+		queryElement.setAttribute("pTrie", "" + query.usePTrie());
+		queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
+		queryElement.setAttribute("active", "" + query.isActive());
+		queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
+		queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
+		queryElement.setAttribute("reduction", "" + query.useReduction());
+		queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
+		queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
+		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
+		
+		return queryElement;
+	}
+	
+	private Node XMLQueryStringToElement(String formulaString){
+		try {
+			return DocumentBuilderFactory
+			    .newInstance()
+			    .newDocumentBuilder()
+			    .parse(new ByteArrayInputStream(formulaString.getBytes()))
+			    .getDocumentElement().getElementsByTagName("formula").item(0);
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			System.out
+			.println(e.toString() + " thrown in savePNML() "
+					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
+		}
+			
+		return null;
 	}
 
 	private String getInclusionPlacesString(TAPNQuery query) {

@@ -5,6 +5,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAUNode;
 import dk.aau.cs.TCTL.TCTLAXNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
@@ -61,9 +62,9 @@ public class CTLQueryVisitor extends VisitorBase {
 		this.XMLQuery = new StringBuffer();
 	}
 	
-	public String getXMLQueryFor(TAPNQuery tapnQuery) {
+	public String getXMLQueryFor(TCTLAbstractProperty property) {
 		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " xmlns=\"\"") + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
-		tapnQuery.getProperty().accept(this, null);
+		property.accept(this, null);
 		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
 		return XMLQuery.toString();
 	}
