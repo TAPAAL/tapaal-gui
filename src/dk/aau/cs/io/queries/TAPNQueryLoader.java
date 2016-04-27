@@ -20,6 +20,10 @@ import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
+import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -71,7 +75,11 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
 
 		TCTLAbstractProperty query;
-		query = parseQueryProperty(queryElement.getAttribute("query"));
+		if (queryElement.getElementsByTagName("formula").item(0) != null){
+			query = parseCTLQueryProperty(queryElement);
+		} else {
+			query = parseQueryProperty(queryElement.getAttribute("query"));
+		}
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
@@ -172,6 +180,18 @@ public class TAPNQueryLoader extends QueryLoader{
 			discreteInclusion = false;
 		}
 		return discreteInclusion;	
+	}
+	
+	private TCTLAbstractProperty parseCTLQueryProperty(Node queryElement){
+		TCTLAbstractProperty query = null;
+		
+		try {
+			query = XMLQueryParser.parse(queryElement);
+		} catch (XMLQueryParseException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		return query;
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
