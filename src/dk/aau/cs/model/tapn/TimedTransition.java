@@ -14,7 +14,7 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimedTransition extends TAPNElement {
-	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
 	private String name;
 	private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
