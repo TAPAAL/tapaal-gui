@@ -101,8 +101,10 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.TCTLConstNode;
@@ -1244,51 +1246,85 @@ public class CTLQueryDialog extends JPanel {
 		// Action Listeners
 		existsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				}
 			}
 		});
 
 		existsDiamond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				}
 			}
 		});
 
 		forAllBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				}
 			}
 		});
 
 		forAllDiamond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				}
 			}
 		});
 		
 		existsNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				}
 			}
 		});
 		
 		existsUntil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(2, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+							getSpecificChildOfProperty(2, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+							getSpecificChildOfProperty(2, currentSelection.getObject())));
+				}
 			}
 		});
 		
 		forAllNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject())));
+				}
 			}
 		});
 		
 		forAllUntil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addPropertyToQuery(new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(2, currentSelection.getObject())));
+				if (currentSelection.getObject() instanceof TCTLStatePlaceHolder){
+					addPropertyToQuery(new TCTLPathToStateConverter(new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+							getSpecificChildOfProperty(2, currentSelection.getObject()))));
+				} else {
+					addPropertyToQuery(new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+							getSpecificChildOfProperty(2, currentSelection.getObject())));
+				}
 			}
 		});
 	}
@@ -1301,277 +1337,12 @@ public class CTLQueryDialog extends JPanel {
 		queryChanged();
 	}
 	
-	private void initQuantificationPanelOld() {
-		
-		ButtonGroup quantificationRadioButtonGroup;
-		JRadioButton existsDiamond;
-		JRadioButton existsBox;
-		JRadioButton forAllDiamond;
-		JRadioButton forAllBox;
-		
-		quantificationPanel = new JPanel(new GridBagLayout());
-		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
-		quantificationRadioButtonGroup = new ButtonGroup();
-
-		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
-		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
-		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
-		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
-
-		//Add tool tips 
-		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
-		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
-		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
-		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
-
-		quantificationRadioButtonGroup.add(existsDiamond);
-		quantificationRadioButtonGroup.add(existsBox);
-		quantificationRadioButtonGroup.add(forAllDiamond);
-		quantificationRadioButtonGroup.add(forAllBox);
-
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		quantificationPanel.add(existsDiamond, gbc);
-
-		gbc.gridy = 1;
-		quantificationPanel.add(existsBox, gbc);
-
-		gbc.gridy = 2;
-		quantificationPanel.add(forAllDiamond, gbc);
-
-		gbc.gridy = 3;
-		quantificationPanel.add(forAllBox, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		queryPanel.add(quantificationPanel, gbc);
-
-		// Add action listeners to the query options
-		existsBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-
-		existsDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-
-		forAllBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-
-		forAllDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-	}
-	
-	private void initCTLQuantificationPanel() {
-		ButtonGroup quantificationRadioButtonGroup;
-		JRadioButton forAllNext;
-		JRadioButton forAllUntil;
-		JRadioButton existsNext;
-		JRadioButton existsUntil;
-		JRadioButton forAllDiamond;
-		JRadioButton forAllBox;
-		JRadioButton existsDiamond;
-		JRadioButton existsBox;
-		
-		
-		quantificationPanel = new JPanel(new GridBagLayout());
-		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
-		quantificationRadioButtonGroup = new ButtonGroup();
-
-		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
-		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
-		existsNext = new JRadioButton("(EX) There is a transition firing after which the reached marking satisfies:");
-		existsUntil = new JRadioButton("(EU) There is a computation where the first formula holds until the second one holds:");
-		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
-		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
-		forAllNext = new JRadioButton("(AX) After any transition firing the reached marking satisfies:");
-		forAllUntil = new JRadioButton("(AU) On every computation the first formula holds until the second one holds:");
-
-		//Add tool tips 
-		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
-		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
-		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
-		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
-
-		quantificationRadioButtonGroup.add(existsDiamond);
-		quantificationRadioButtonGroup.add(existsBox);
-		quantificationRadioButtonGroup.add(existsNext);
-		quantificationRadioButtonGroup.add(existsUntil);
-		quantificationRadioButtonGroup.add(forAllDiamond);
-		quantificationRadioButtonGroup.add(forAllBox);
-		quantificationRadioButtonGroup.add(forAllNext);
-		quantificationRadioButtonGroup.add(forAllUntil);
-
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		quantificationPanel.add(existsDiamond, gbc);
-
-		gbc.gridy = 1;
-		quantificationPanel.add(existsBox, gbc);
-		
-		gbc.gridy = 2;
-		quantificationPanel.add(existsNext, gbc);
-		
-		gbc.gridy = 3;
-		quantificationPanel.add(existsUntil, gbc);
-
-		gbc.gridy = 4;
-		quantificationPanel.add(forAllDiamond, gbc);
-
-		gbc.gridy = 5;
-		quantificationPanel.add(forAllBox, gbc);
-		
-		gbc.gridy = 6;
-		quantificationPanel.add(forAllNext, gbc);
-		
-		gbc.gridy = 7;
-		quantificationPanel.add(forAllUntil, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		queryPanel.add(quantificationPanel, gbc);
-
-		// Add action listeners to the query options
-		existsBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-
-		existsDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-		
-		existsNext.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEXNode property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-		
-		existsUntil.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEUNode property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(0, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-
-		forAllBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-
-		forAllDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-		
-		forAllNext.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAXNode property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
-		
-		forAllUntil.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAUNode property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(0, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		});
+	private void addPropertyToQuery(TCTLAbstractStateProperty property){
+		UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+		newProperty = newProperty.replace(currentSelection.getObject(),	property);
+		updateSelection(property);
+		undoSupport.postEdit(edit);
+		queryChanged();
 	}
 
 	private void initLogicPanel() {
@@ -1650,6 +1421,15 @@ public class CTLQueryDialog extends JPanel {
 						updateSelection(andListNode);
 						undoSupport.postEdit(edit);
 					}
+				} else if (currentSelection.getObject() instanceof TCTLPathPlaceHolder) {					
+					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+					andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()),	ph);
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(andListNode);
+					
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), stateConverter);
+					newProperty = newProperty.replace(currentSelection.getObject(), stateConverter);
+					updateSelection(stateConverter);
+					undoSupport.postEdit(edit);	
 				}
 				queryChanged();
 			}
@@ -1695,6 +1475,14 @@ public class CTLQueryDialog extends JPanel {
 						updateSelection(orListNode);
 						undoSupport.postEdit(edit);
 					}
+				} else if (currentSelection.getObject() instanceof TCTLPathPlaceHolder) {					
+					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+					orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()),	ph);
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(orListNode);		
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), stateConverter);
+					newProperty = newProperty.replace(currentSelection.getObject(), stateConverter);
+					updateSelection(stateConverter);
+					undoSupport.postEdit(edit);	
 				}
 				queryChanged();
 			}
@@ -1704,11 +1492,21 @@ public class CTLQueryDialog extends JPanel {
 		negationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(), property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
+				if (currentSelection.getObject() instanceof TCTLPathPlaceHolder) {					
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(property);
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), stateConverter);
+					newProperty = newProperty.replace(currentSelection.getObject(), stateConverter);
+					updateSelection(stateConverter);
+					undoSupport.postEdit(edit);
+					queryChanged();
+					
+				} else {				
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+					newProperty = newProperty.replace(currentSelection.getObject(), property);
+					updateSelection(property);
+					undoSupport.postEdit(edit);
+					queryChanged();
+				}
 			}
 		});
 	}
@@ -2272,11 +2070,12 @@ public class CTLQueryDialog extends JPanel {
 
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
-			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+			/*if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
 				enableOnlyPathButtons();
 			} else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
 				enableOnlyStateButtons();
-			}
+			}*/
+			enableOnlyStateButtons();
 			updateQueryButtonsAccordingToSelection();
 		}
 	}

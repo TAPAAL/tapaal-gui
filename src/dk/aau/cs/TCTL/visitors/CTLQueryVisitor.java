@@ -18,6 +18,7 @@ import dk.aau.cs.TCTL.TCTLEXNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
@@ -124,6 +125,10 @@ public class CTLQueryVisitor extends VisitorBase {
 		euNode.getRight().accept(this, context);
 		XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + startTag(XML_EXISTSPATH));
 	}
+	
+	public void visit(TCTLPathToStateConverter pathConverter, Object context) {
+		pathConverter.getProperty().accept(this, context);
+	}
 
 	public void visit(TCTLAndListNode andListNode, Object context) {
 		createList(andListNode.getProperties(), context, XML_CONJUNCTION);
@@ -191,7 +196,7 @@ public class CTLQueryVisitor extends VisitorBase {
 			case "<=":
 				op = XML_INTEGERLE;
 				break;
-			case "==":
+			case "=":
 				op = XML_INTEGEREQ;
 				break;
 			case "!=":

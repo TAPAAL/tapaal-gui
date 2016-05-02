@@ -18,9 +18,11 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
@@ -42,6 +44,8 @@ public abstract class VisitorBase implements ITCTLVisitor {
 	public void visit(TCTLEXNode exNode, Object context) { exNode.getProperty().accept(this, context); }
 	public void visit(TCTLEUNode euNode, Object context) { euNode.getLeft().accept(this, context);
 															euNode.getRight().accept(this, context);}
+	public void visit(TCTLPathToStateConverter pathConverter, Object context) { pathConverter.getProperty().accept(this, context); }
+	public void visit(TCTLStateToPathConverter stateConverter, Object context) { stateConverter.getProperty().accept(this, context); }
 	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) {}
 	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) {}
 	public void visit(TCTLTrueNode tctlTrueNode, Object context) { }

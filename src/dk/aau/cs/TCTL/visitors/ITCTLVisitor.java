@@ -17,9 +17,11 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
@@ -40,6 +42,10 @@ public interface ITCTLVisitor {
 	void visit(TCTLEXNode exNode, Object context);
 	
 	void visit(TCTLEUNode euNode, Object context);
+	
+	void visit(TCTLPathToStateConverter pathConverter, Object context);
+	
+	void visit(TCTLStateToPathConverter stateConverter, Object context);
 
 	void visit(TCTLNotNode notNode, Object context);
 
