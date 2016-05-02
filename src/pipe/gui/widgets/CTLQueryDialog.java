@@ -863,6 +863,15 @@ public class CTLQueryDialog extends JPanel {
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
+		setupAlgorithmOptionsFromQuery(queryToCreateFrom);
+	}
+	
+	private void setupAlgorithmOptionsFromQuery(TAPNQuery queryToCreateFrom){
+		if(queryToCreateFrom.getAlgorithmOption() == TAPNQuery.AlgorithmOption.CERTAIN_ZERO){
+			useCZ.setSelected(true);
+		} else if(queryToCreateFrom.getAlgorithmOption() == TAPNQuery.AlgorithmOption.LOCAL){
+			useLocal.setSelected(true);
+		}
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
