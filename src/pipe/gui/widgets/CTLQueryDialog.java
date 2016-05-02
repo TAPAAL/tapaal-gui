@@ -334,6 +334,11 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
 	
+	//Tool tips for algorithms
+	private final static String TOOL_TIP_ALGORITHM_CERTAIN_ZERO = "Use certain zero on-the-fly algorithm";
+	private final static String TOOL_TIP_ALGORITHM_LOCAL = "Use local on-the-fly algorithm";
+	
+	
 	//Tool tips for query types
 	private final static String TOOL_TIP_QUERYTYPE = "Choose a query type";
 	
@@ -1951,7 +1956,8 @@ public class CTLQueryDialog extends JPanel {
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
 		editQueryButton = new JButton("Edit query");
-
+		editQueryButton.setEnabled(false); //TODO: This should be re-enabled once the CTL parser is made. 
+		
 		//Add tool tips
 		deleteButton.setToolTipText(TOOL_TIP_DELETEBUTTON);
 		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
@@ -2191,7 +2197,7 @@ public class CTLQueryDialog extends JPanel {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-		Dimension d = new Dimension(898, 100);
+		Dimension d = new Dimension(772, 100);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
@@ -2214,24 +2220,18 @@ public class CTLQueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(0, 10, 0, 10);
-		add(reductionOptionsPanel, gbc);
 		
 		algorithmRadioButtonGroup = new ButtonGroup();
 				
-		useCZ = new JRadioButton("Certain zero on-the-fly algorithm (recommended)");
+		useCZ = new JRadioButton("Certain zero on-the-fly algorithm");
 		useLocal = new JRadioButton("Local on-the-fly algorithm");
 	
 		useCZ.setVisible(true);
 		useLocal.setVisible(true);
 		
-		useCZ.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
-		useLocal.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
+		//TODO: Make tool-tips more descriptive
+		useCZ.setToolTipText(TOOL_TIP_ALGORITHM_CERTAIN_ZERO);
+		useLocal.setToolTipText(TOOL_TIP_ALGORITHM_LOCAL);
 		
 		useCZ.setSelected(true);
 
@@ -2251,6 +2251,13 @@ public class CTLQueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(useLocal, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 10, 0, 10);
+		add(reductionOptionsPanel, gbc);
 		
 	}
 	
@@ -2272,11 +2279,9 @@ public class CTLQueryDialog extends JPanel {
 
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
-			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-				enableOnlyPathButtons();
-			} else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				enableOnlyStateButtons();
-			}
+			
+			enableOnlyStateButtons();
+			
 			updateQueryButtonsAccordingToSelection();
 		}
 	}
