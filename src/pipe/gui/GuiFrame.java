@@ -127,7 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction,
         importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
-        exportToPNMLAction, exportTraceAction, importTraceAction;
+        exportToPNMLAction, exportToXMLAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -388,6 +388,9 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(exportMenu, exportToPNMLAction = new FileAction("PNML",
 				"Export the net to PNML format", "ctrl D"));
 		exportToPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('D', shortcutkey));
+		addMenuItem(exportMenu, exportToXMLAction = new FileAction("XML Queries",
+				"Export the queries to XML format", "ctrl H"));
+		exportToXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('H', shortcutkey));
 		
 		fileMenu.add(exportMenu);
 
@@ -1139,6 +1142,7 @@ public class GuiFrame extends JFrame implements Observer {
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
 		exportToPNMLAction.setEnabled(enable);
+		exportToXMLAction.setEnabled(enable);
 
 		exportTraceAction.setEnabled(enable);
 		importTraceAction.setEnabled(enable);
@@ -2533,6 +2537,10 @@ public class GuiFrame extends JFrame implements Observer {
                                         }
                                         Export.exportGuiView(appView, Export.PNML, null);
                                 }
+			} else if (this == exportToXMLAction) {
+				if (canNetBeSavedAndShowMessage()) {
+					Export.exportGuiView(appView, Export.QUERY, null);
+				}
 			} else if (this == exportPSAction) {
                                 if (canNetBeSavedAndShowMessage()) {
                                         Export.exportGuiView(appView, Export.POSTSCRIPT, null);

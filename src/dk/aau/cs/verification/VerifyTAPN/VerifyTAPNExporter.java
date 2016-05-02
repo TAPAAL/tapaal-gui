@@ -58,8 +58,6 @@ public class VerifyTAPNExporter {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
 		}
-		
-	
 		return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 	}
 	

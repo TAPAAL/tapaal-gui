@@ -11,8 +11,10 @@ import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -30,12 +32,15 @@ import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.DOMException;
 
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
+import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.widgets.FileBrowser;
@@ -52,6 +57,7 @@ public class Export {
 	public static final int PRINTER = 3;
 	public static final int TIKZ = 5;
 	public static final int PNML = 6;
+	public static final int QUERY = 7;	
 
 	private static void toPnml(DrawingSurfaceImpl g, String filename) 
 			throws NullPointerException, DOMException, TransformerConfigurationException, 
@@ -72,6 +78,21 @@ public class Export {
 
 		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
 			currentTab.network().setMarking(currentMarking);
+		}
+	}
+	
+	private static void toQueryXML(DrawingSurfaceImpl g, String filename){
+		try{			
+			TabContent currentTab = CreateGui.getCurrentTab();
+			Iterator<TAPNQuery> queryIterator = currentTab.queries().iterator();
+			PrintStream queryStream = new PrintStream(filename);
+			CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+			
+			queryStream.append(XMLVisitor.getXMLQueriesFor(queryIterator));
+			
+			queryStream.close();
+		} catch(FileNotFoundException e) {
+			System.err.append("An error occurred while exporting the queries to XML.");
 		}
 	}
 
@@ -148,7 +169,10 @@ public class Export {
 					filename += "tex";
 				case PNML:
 					filename += "pnml";
+				case QUERY:
+					filename += "xml";
 				}
+				
 			}
 		}
 
@@ -201,6 +225,12 @@ public class Export {
 				.saveFile();
 				if (filename != null) {
 					toPnml(g, filename);
+				}
+			case QUERY:
+				filename = new FileBrowser("Query XML file", "xml", filename)
+				.saveFile();
+				if (filename != null) {
+					toQueryXML(g, filename);
 				}
 			}
 		} catch (Exception e) {

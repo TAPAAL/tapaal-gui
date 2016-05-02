@@ -1,5 +1,6 @@
 package dk.aau.cs.TCTL.visitors;
 
+import java.util.Iterator;
 import java.util.List;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -59,14 +60,24 @@ public class CTLQueryVisitor extends VisitorBase {
 	
 	private StringBuffer XMLQuery;
 	
-	public CTLQueryVisitor(){
-		this.XMLQuery = new StringBuffer();
-	}
-	
 	public String getXMLQueryFor(TCTLAbstractProperty property) {
+		this.XMLQuery = new StringBuffer();
 		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " xmlns=\"\"") + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
 		property.accept(this, null);
 		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
+		return XMLQuery.toString();
+	}
+	
+	public String getXMLQueriesFor(Iterator<pipe.dataLayer.TAPNQuery> iterator){
+		this.XMLQuery = new StringBuffer();
+		
+		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " xmlns=\"\""));
+		while (iterator.hasNext()){
+			XMLQuery.append(startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
+			iterator.next().getProperty().accept(this, null);
+			XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
+		}
+		XMLQuery.append(endTag(XML_PROPSET));
 		return XMLQuery.toString();
 	}
 	
