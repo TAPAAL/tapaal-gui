@@ -1240,7 +1240,7 @@ public class CTLQueryDialog extends JPanel {
 		// Second column of buttons
 		gbc.gridx = 2;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(0,10,5,0);
+		gbc.insets = new Insets(0,0,5,0);
 		quantificationPanel.add(forAllDiamond, gbc);
 		gbc.gridy = 1;
 		quantificationPanel.add(forAllBox, gbc);
@@ -1531,7 +1531,7 @@ public class CTLQueryDialog extends JPanel {
 	private void initPredicationConstructionPanel() {
 		predicatePanel = new JPanel(new GridBagLayout());
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
-		predicatePanel.setPreferredSize(new Dimension(300, 150));
+		//predicatePanel.setPreferredSize(new Dimension(300, 150));
 
 		placesBox = new JComboBox();
 		Dimension d = new Dimension(125, 27);
@@ -1625,8 +1625,8 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 3;
-		addPredicateButton.setPreferredSize(dim);
-		addPredicateButton.setMinimumSize(dim);
+		//addPredicateButton.setPreferredSize(dim);
+		//addPredicateButton.setMinimumSize(dim);
 		predicatePanel.add(addPredicateButton, gbc);
 
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
@@ -1643,14 +1643,14 @@ public class CTLQueryDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -63, 0,0);
+		gbc.insets = new Insets(0, -38, 0,0);
 		predicatePanel.add(truePredicateButton, gbc);
 
 		falsePredicateButton = new JButton("False");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -95, 0,0);
+		gbc.insets = new Insets(0, -88, 0,0);
 		predicatePanel.add(falsePredicateButton, gbc);
 
 		deadLockPredicateButton = new JButton("Deadlock");
