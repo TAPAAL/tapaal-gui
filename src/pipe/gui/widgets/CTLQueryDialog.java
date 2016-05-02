@@ -1041,6 +1041,11 @@ public class CTLQueryDialog extends JPanel {
 		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Boundedness Options"));
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
+		
+		Dimension d = new Dimension(450
+				, 100);
+		boundednessCheckPanel.setPreferredSize(d);
+		boundednessCheckPanel.setMinimumSize(d);
 
 		numberOfExtraTokensInNet = new CustomJSpinner(4, 0, Integer.MAX_VALUE);	
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
@@ -1065,13 +1070,13 @@ public class CTLQueryDialog extends JPanel {
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 0;
+		gridBagConstraints.weightx = 1;
 		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
-	
+
 	private void initQueryPanel() {
 		queryPanel = new JPanel(new GridBagLayout());
 		queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
@@ -1111,7 +1116,7 @@ public class CTLQueryDialog extends JPanel {
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		Dimension d = new Dimension(750, 80);
+		Dimension d = new Dimension(810, 80);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
@@ -1183,6 +1188,8 @@ public class CTLQueryDialog extends JPanel {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationButtonGroup = new ButtonGroup();
+		Dimension d = new Dimension(150, 100);
+		quantificationPanel.setPreferredSize(d);
 		
 		// Instantiate buttons
 		existsDiamond = new JButton("EF");
@@ -1221,6 +1228,7 @@ public class CTLQueryDialog extends JPanel {
 	
 		// First column of buttons
 		gbc.gridy = 0;
+		gbc.insets = new Insets(0,0,5,0);
 		quantificationPanel.add(existsDiamond, gbc);
 		gbc.gridy = 1;
 		quantificationPanel.add(existsBox, gbc);
@@ -1230,8 +1238,9 @@ public class CTLQueryDialog extends JPanel {
 		quantificationPanel.add(existsNext, gbc);
 
 		// Second column of buttons
-		gbc.gridx = 1;
+		gbc.gridx = 2;
 		gbc.gridy = 0;
+		gbc.insets = new Insets(0,10,5,0);
 		quantificationPanel.add(forAllDiamond, gbc);
 		gbc.gridy = 1;
 		quantificationPanel.add(forAllBox, gbc);
@@ -1353,6 +1362,8 @@ public class CTLQueryDialog extends JPanel {
 	private void initLogicPanel() {
 		logicButtonPanel = new JPanel(new GridBagLayout());
 		logicButtonPanel.setBorder(BorderFactory.createTitledBorder("Logic"));
+		Dimension d = new Dimension(100, 100);
+		logicButtonPanel.setPreferredSize(d);
 
 		logicButtonGroup = new ButtonGroup();
 		conjunctionButton = new JButton("and");
@@ -1373,6 +1384,7 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		logicButtonPanel.add(conjunctionButton, gbc);
 
 		gbc.gridy = 1;
@@ -1519,6 +1531,7 @@ public class CTLQueryDialog extends JPanel {
 	private void initPredicationConstructionPanel() {
 		predicatePanel = new JPanel(new GridBagLayout());
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
+		predicatePanel.setPreferredSize(new Dimension(300, 150));
 
 		placesBox = new JComboBox();
 		Dimension d = new Dimension(125, 27);
@@ -1612,6 +1625,8 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 3;
+		addPredicateButton.setPreferredSize(dim);
+		addPredicateButton.setMinimumSize(dim);
 		predicatePanel.add(addPredicateButton, gbc);
 
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
@@ -1628,14 +1643,14 @@ public class CTLQueryDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -38, 0,0);
+		gbc.insets = new Insets(0, -63, 0,0);
 		predicatePanel.add(truePredicateButton, gbc);
 
 		falsePredicateButton = new JButton("False");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -88, 0,0);
+		gbc.insets = new Insets(0, -95, 0,0);
 		predicatePanel.add(falsePredicateButton, gbc);
 
 		deadLockPredicateButton = new JButton("Deadlock");
@@ -1747,6 +1762,7 @@ public class CTLQueryDialog extends JPanel {
 		// Editing buttons panel
 		editingButtonPanel = new JPanel(new GridBagLayout());
 		editingButtonPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
+		editingButtonPanel.setPreferredSize(new Dimension(260, 150));
 
 		editingButtonsGroup = new ButtonGroup();
 		deleteButton = new JButton("Delete selection");
@@ -1770,14 +1786,17 @@ public class CTLQueryDialog extends JPanel {
 		editingButtonsGroup.add(editQueryButton);
 
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		editingButtonPanel.add(undoButton, gbc);
 
 		gbc.gridx = 1;
+		gbc.insets = new Insets(0, 10, 5, 0);
 		editingButtonPanel.add(redoButton, gbc);
 
+		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 2;
@@ -1995,7 +2014,7 @@ public class CTLQueryDialog extends JPanel {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-		Dimension d = new Dimension(772, 100);
+		Dimension d = new Dimension(810, 100);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
