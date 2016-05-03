@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
@@ -378,9 +379,15 @@ public class VerifyPN implements ModelChecker{
 			return buffer.toString();
 		}
 		
-		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery queryType) {
-			VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, queryType);
-			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
+		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
+			Tuple<QueryResult, Stats> result = null;
+			if (query.getCategory() == QueryCategory.CTL){
+				VerifyTAPNCTLOutputParser outputParser = new VerifyTAPNCTLOutputParser(totalTokens, extraTokens, query);
+				result = outputParser.parseOutput(output);
+			} else {
+				VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, query);
+				result = outputParser.parseOutput(output);
+			}
 			return result;
 		}
 		
