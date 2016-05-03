@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -54,6 +55,7 @@ public class TAPNQueryLoader extends QueryLoader{
 	}
 	
 	private TAPNQuery parseTAPNQuery(Element queryElement, TimedArcPetriNetNetwork network) {
+		boolean isCTL = false;
 		String comment = getQueryComment(queryElement);
 		TraceOption traceOption = getQueryTraceOption(queryElement);
 		SearchOption searchOption = getQuerySearchOption(queryElement);
@@ -77,6 +79,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
 			query = parseCTLQueryProperty(queryElement);
+			isCTL = true;
 		} else {
 			query = parseQueryProperty(queryElement.getAttribute("query"));
 		}
@@ -85,6 +88,9 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
+			if (isCTL){
+				parsedQuery.setCategory(QueryCategory.CTL);
+			}
 			return parsedQuery;
 		} else
 			return null;
