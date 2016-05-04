@@ -15,6 +15,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
+import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -97,7 +98,7 @@ public class XMLQueryLoader extends QueryLoader{
             this.faultyQueries.add(queryWrapper);
 
             // Update queryWrapper name and property
-            if(!XMLQueryParser.parse(prop, queryWrapper)){
+            if(!XMLCTLQueryParser.parse(prop, queryWrapper)){
                 queries.add(null); 
                 continue; 
             }

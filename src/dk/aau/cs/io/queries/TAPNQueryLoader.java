@@ -13,7 +13,6 @@ import org.w3c.dom.NodeList;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -22,6 +21,7 @@ import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
+import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
@@ -55,7 +55,6 @@ public class TAPNQueryLoader extends QueryLoader{
 	}
 	
 	private TAPNQuery parseTAPNQuery(Element queryElement, TimedArcPetriNetNetwork network) {
-		boolean isCTL = false;
 		String comment = getQueryComment(queryElement);
 		TraceOption traceOption = getQueryTraceOption(queryElement);
 		SearchOption searchOption = getQuerySearchOption(queryElement);
@@ -79,7 +78,6 @@ public class TAPNQueryLoader extends QueryLoader{
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
 			query = parseCTLQueryProperty(queryElement);
-			isCTL = true;
 		} else {
 			query = parseQueryProperty(queryElement.getAttribute("query"));
 		}
@@ -88,9 +86,6 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			if (isCTL){
-				parsedQuery.setCategory(QueryCategory.CTL);
-			}
 			return parsedQuery;
 		} else
 			return null;
@@ -192,7 +187,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		TCTLAbstractProperty query = null;
 		
 		try {
-			query = XMLQueryParser.parse(queryElement);
+			query = XMLCTLQueryParser.parse(queryElement);
 		} catch (XMLQueryParseException e) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 		}
