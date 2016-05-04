@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -79,6 +80,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
+		AlgorithmOption algorithmOption = AlgorithmOption.valueOf(queryElement.getAttribute("algorithmOption"));
 
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
@@ -92,6 +94,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			parsedQuery.setCategory(detectCategory(query));
+			parsedQuery.setAlgorithmOption(algorithmOption);
 			return parsedQuery;
 		} else
 			return null;
