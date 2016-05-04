@@ -103,6 +103,7 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.TCTLTrueNode;
@@ -811,8 +812,10 @@ public class CTLQueryDialog extends JPanel {
 		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
 			Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
+			ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
+			list.add(new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()));
 			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-					new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
+					new TCTLPlusListNode(list), 
 					(String) relationalOperatorBox.getSelectedItem(),
 					new TCTLConstNode((Integer) placeMarking.getValue()));
 			if (!property.equals(currentSelection.getObject())) {
@@ -1692,8 +1695,10 @@ public class CTLQueryDialog extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
+				ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
+				list.add(new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()));
 				TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-						new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
+						new TCTLPlusListNode(list), 
 						(String) relationalOperatorBox.getSelectedItem(),
 						new TCTLConstNode((Integer) placeMarking.getValue()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);

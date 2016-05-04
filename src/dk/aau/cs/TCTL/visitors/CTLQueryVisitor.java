@@ -152,6 +152,8 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLPlusListNode plusListNode, Object context) {
 		if (plusListNode.getProperties().get(0) instanceof TCTLTransitionNode){
 			createList(plusListNode.getProperties(), context, XML_ISFIREABLE);
+		} else if (plusListNode.getProperties().get(0) instanceof TCTLPlaceNode){
+			createList(plusListNode.getProperties(), context, XML_TOKENSCOUNT);
 		}
 	}
 
@@ -188,7 +190,7 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-		XMLQuery.append(wrapInTag(wrapInTag(tctlPlaceNode.getPlace() + "\n", XML_PLACE), XML_TOKENSCOUNT));
+		XMLQuery.append(wrapInTag(tctlPlaceNode.getPlace() + "\n", XML_PLACE));
 	}
 	
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){

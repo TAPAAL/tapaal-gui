@@ -349,7 +349,7 @@ public class XMLCTLQueryParser {
             TCTLAbstractStateProperty subformula2 = parseIntegerExpression(children.get(1));
 
             if(nodeName.equals("integer-eq")){
-                return new TCTLAtomicPropositionNode(subformula1, "==", subformula2);
+                return new TCTLAtomicPropositionNode(subformula1, "=", subformula2);
             } else if(nodeName.equals("integer-ne")){
                 return new TCTLAtomicPropositionNode(subformula1, "!=", subformula2);
             } else if(nodeName.equals("integer-lt")){
