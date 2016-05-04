@@ -1,6 +1,7 @@
 package dk.aau.cs.io.queries;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -18,7 +19,11 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
@@ -86,9 +91,34 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
+			parsedQuery.setCategory(detectCategory(query));
 			return parsedQuery;
 		} else
 			return null;
+	}
+	
+	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query){
+        StringPosition[] children = query.getChildren();
+		
+        // If query is root and state property
+        if(query instanceof TCTLAbstractStateProperty){
+        	if(((TCTLAbstractStateProperty) query).getParent() == null){
+        		return TAPNQuery.QueryCategory.CTL;
+        	}
+        }
+        
+		if(query instanceof TCTLStateToPathConverter ||
+				query instanceof TCTLPathToStateConverter){
+			return TAPNQuery.QueryCategory.CTL;
+		}
+
+        // If any property has been converted
+		for (StringPosition child : children) {
+			if(TAPNQueryLoader.detectCategory(child.getObject()) == TAPNQuery.QueryCategory.CTL){
+				return TAPNQuery.QueryCategory.CTL;
+			} 
+		}
+		return TAPNQuery.QueryCategory.Default;
 	}
 	
 	private InclusionPlaces getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
