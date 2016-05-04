@@ -108,7 +108,7 @@ public class CTLQueryVisitor extends VisitorBase {
 		auNode.getLeft().accept(this, context);
 		XMLQuery.append(endTag(XML_BEFORE) + startTag(XML_REACH));
 		auNode.getRight().accept(this, context);
-		XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + startTag(XML_ALLPATHS));
+		XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + endTag(XML_ALLPATHS));
 	}
 
 	public void visit(TCTLEFNode efNode, Object context) {
@@ -134,7 +134,7 @@ public class CTLQueryVisitor extends VisitorBase {
 		euNode.getLeft().accept(this, context);
 		XMLQuery.append(endTag(XML_BEFORE) + startTag(XML_REACH));
 		euNode.getRight().accept(this, context);
-		XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + startTag(XML_EXISTSPATH));
+		XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + endTag(XML_EXISTSPATH));
 	}
 	
 	public void visit(TCTLPathToStateConverter pathConverter, Object context) {
