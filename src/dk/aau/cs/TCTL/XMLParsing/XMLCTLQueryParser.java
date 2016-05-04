@@ -145,12 +145,12 @@ public class XMLCTLQueryParser {
                
                 TCTLAbstractProperty before = parseFormula(getFirstChildNode(children.get(0)));
                 TCTLAbstractProperty reach = parseFormula(getFirstChildNode(children.get(1)));
-               
+                
                 if(before instanceof TCTLAbstractPathProperty){
                 	before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)before);
                 }
                 if(reach instanceof TCTLAbstractPathProperty){
-                	before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
+                	reach = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
                 }
                     
             	return new TCTLEUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
@@ -192,7 +192,7 @@ public class XMLCTLQueryParser {
                 	before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)before);
                 }
                 if(reach instanceof TCTLAbstractPathProperty){
-                	before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
+                	reach = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
                 }
                     
             	return new TCTLAUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
