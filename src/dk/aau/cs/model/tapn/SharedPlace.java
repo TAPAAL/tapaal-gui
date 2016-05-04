@@ -12,7 +12,7 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
-	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_/=][a-zA-Z0-9_/=]*$");
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
 	private TimeInvariant invariant;
