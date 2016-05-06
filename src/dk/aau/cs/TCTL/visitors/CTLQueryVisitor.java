@@ -190,7 +190,8 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-		XMLQuery.append(wrapInTag(tctlPlaceNode.getPlace() + "\n", XML_PLACE));
+		String placeName = tctlPlaceNode.getTemplate().isEmpty() ? tctlPlaceNode.getPlace() : tctlPlaceNode.getTemplate() + "_" + tctlPlaceNode.getPlace();
+		XMLQuery.append(wrapInTag(placeName + "\n", XML_PLACE));
 	}
 	
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
