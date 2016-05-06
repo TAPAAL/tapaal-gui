@@ -402,7 +402,7 @@ public class XMLCTLQueryParser {
                 new ArrayList<TCTLAbstractStateProperty>();
 
             for(Node n : children){
-                String placeName = getText(n);
+                String placeName = getText(n).replace("\n", "");;
                 places.add(new TCTLPlaceNode(placeName));
             }
 
