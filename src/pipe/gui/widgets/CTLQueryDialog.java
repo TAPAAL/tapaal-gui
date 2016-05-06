@@ -512,6 +512,14 @@ public class CTLQueryDialog extends JPanel {
 			return new TCTLStatePlaceHolder();
 		}
 	}
+	
+	private TCTLAbstractPathProperty getPathProperty(TCTLAbstractProperty property) {
+		if (property instanceof TCTLAbstractPathProperty) {
+			return (TCTLAbstractPathProperty) property.copy();
+		} else {
+			return new TCTLPathPlaceHolder();
+		}
+	}
 
 	private TCTLAbstractStateProperty getSpecificChildOfProperty(int number, TCTLAbstractProperty property) {
 		StringPosition[] children = property.getChildren();
@@ -533,10 +541,13 @@ public class CTLQueryDialog extends JPanel {
 	private void updateSelection() {
 		int index = queryField.getCaretPosition();
 		StringPosition position = newProperty.objectAt(index);
+		
 		if (position == null)
 			return;
+		
 		queryField.select(position.getStart(), position.getEnd());
 		currentSelection = position;
+				
 		if(currentSelection != null) {
 			setEnabledOptionsAccordingToCurrentReduction();
 		} else {
@@ -1450,9 +1461,11 @@ public class CTLQueryDialog extends JPanel {
 						updateSelection(andListNode);
 						undoSupport.postEdit(edit);
 					}
-				} else if (currentSelection.getObject() instanceof TCTLPathPlaceHolder) {					
+					
+				} else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {					
 					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-					andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()),	ph);
+					TCTLPathToStateConverter convertedRoot = new TCTLPathToStateConverter(getPathProperty(currentSelection.getObject()));
+					andListNode = new TCTLAndListNode(convertedRoot, ph);
 					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(andListNode);
 					
 					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), stateConverter);
@@ -1504,9 +1517,10 @@ public class CTLQueryDialog extends JPanel {
 						updateSelection(orListNode);
 						undoSupport.postEdit(edit);
 					}
-				} else if (currentSelection.getObject() instanceof TCTLPathPlaceHolder) {					
+				} else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {					
 					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-					orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()),	ph);
+					TCTLPathToStateConverter convertedRoot = new TCTLPathToStateConverter(getPathProperty(currentSelection.getObject()));
+					orListNode = new TCTLOrListNode(convertedRoot, ph);
 					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(orListNode);		
 					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), stateConverter);
 					newProperty = newProperty.replace(currentSelection.getObject(), stateConverter);
@@ -1521,7 +1535,10 @@ public class CTLQueryDialog extends JPanel {
 		negationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
-				if (currentSelection.getObject() instanceof TCTLPathPlaceHolder) {					
+				
+				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {					
+					TCTLPathToStateConverter convertedRoot = new TCTLPathToStateConverter(getPathProperty(currentSelection.getObject()));
+					property = new TCTLNotNode(convertedRoot);
 					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(property);
 					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), stateConverter);
 					newProperty = newProperty.replace(currentSelection.getObject(), stateConverter);
@@ -1701,11 +1718,12 @@ public class CTLQueryDialog extends JPanel {
 						new TCTLPlusListNode(list), 
 						(String) relationalOperatorBox.getSelectedItem(),
 						new TCTLConstNode((Integer) placeMarking.getValue()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(), property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
+				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(property);
+					addPropertyToQuery(stateConverter);
+				} else {
+					addPropertyToQuery(property);
+				}
 			}
 		}
 
@@ -1713,34 +1731,38 @@ public class CTLQueryDialog extends JPanel {
 
 		truePredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLTrueNode trueNode = new TCTLTrueNode();
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), trueNode);
-				newProperty = newProperty.replace(currentSelection.getObject(), trueNode);
-				updateSelection(trueNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
+				TCTLTrueNode property = new TCTLTrueNode();
+				
+				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(property);
+					addPropertyToQuery(stateConverter);
+				} else {
+					addPropertyToQuery(property);
+				}
 			}
 		});
 
 		falsePredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLFalseNode falseNode = new TCTLFalseNode();
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), falseNode);
-				newProperty = newProperty.replace(currentSelection.getObject(), falseNode);
-				updateSelection(falseNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
+				TCTLFalseNode property = new TCTLFalseNode();
+				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(property);
+					addPropertyToQuery(stateConverter);
+				} else {
+					addPropertyToQuery(property);
+				}
 			}
 		});
 
 		deadLockPredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLDeadlockNode deadLockNode = new TCTLDeadlockNode();
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), deadLockNode);
-				newProperty = newProperty.replace(currentSelection.getObject(), deadLockNode);
-				updateSelection(deadLockNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
+				TCTLDeadlockNode property = new TCTLDeadlockNode();
+				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+					TCTLStateToPathConverter stateConverter = new TCTLStateToPathConverter(property);
+					addPropertyToQuery(stateConverter);
+				} else {
+					addPropertyToQuery(property);
+				}
 			}
 		});
 

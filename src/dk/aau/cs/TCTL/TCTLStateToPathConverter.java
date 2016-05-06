@@ -24,10 +24,10 @@ public class TCTLStateToPathConverter extends TCTLAbstractPathProperty{
 		property = new TCTLStatePlaceHolder();
 		property.setParent(this);
 	}
-
+	
 	@Override
 	public boolean isSimpleProperty() {
-		return false;
+		return property.isSimpleProperty();
 	}
 
 	@Override
@@ -91,5 +91,28 @@ public class TCTLStateToPathConverter extends TCTLAbstractPathProperty{
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();
 
+	}
+	
+	@Override
+	public StringPosition objectAt(int index) {
+		StringPosition[] children = getChildren();
+		
+		for (int i = 0; i < children.length; i++) {
+			StringPosition child = children[i];
+			if (child.getStart() <= index && index <= child.getEnd()) {
+				children = child.getObject().getChildren();
+				break;
+			}
+		}
+		
+		for (int i = 0; i < children.length; i++) {
+			StringPosition child = children[i];
+			if (child.getStart() <= index && index <= child.getEnd()) {
+				int start = child.getStart();
+				return child.getObject().objectAt(index - start).addOffset(
+						start);
+			}
+		}
+		return new StringPosition(0, toString().length(), this);
 	}
 }

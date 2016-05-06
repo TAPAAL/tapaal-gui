@@ -27,7 +27,7 @@ public class TCTLPathToStateConverter extends TCTLAbstractStateProperty{
 
 	@Override
 	public boolean isSimpleProperty() {
-		return false;
+		return property.isSimpleProperty();
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class TCTLPathToStateConverter extends TCTLAbstractStateProperty{
 			return this;
 		}
 	}
-
+	
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
@@ -86,10 +86,10 @@ public class TCTLPathToStateConverter extends TCTLAbstractStateProperty{
 		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
 	
-
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();
 
 	}
+	
 }
