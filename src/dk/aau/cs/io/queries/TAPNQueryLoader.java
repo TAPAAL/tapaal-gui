@@ -97,6 +97,9 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setCategory(detectCategory(query));
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
+				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
+		                network.activeTemplates().get(0).name());
+				parsedQuery.getProperty().accept(rt, null);
 			}
 			return parsedQuery;
 		} else

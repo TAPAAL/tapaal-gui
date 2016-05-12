@@ -402,8 +402,14 @@ public class XMLCTLQueryParser {
                 new ArrayList<TCTLAbstractStateProperty>();
 
             for(Node n : children){
-                String placeName = getText(n).replace("\n", "");;
-                places.add(new TCTLPlaceNode(placeName));
+                String[] splits = getText(n).replace("\n", "").split("\\.");
+                
+                // Check if place contains a template name
+                if(splits.length > 1){
+                	places.add(new TCTLPlaceNode(splits[0], splits[1]));
+                } else {
+                	places.add(new TCTLPlaceNode(splits[0]));
+                }
             }
 
             return new TCTLPlusListNode(places);

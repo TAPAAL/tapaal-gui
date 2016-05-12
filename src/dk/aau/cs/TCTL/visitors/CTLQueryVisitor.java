@@ -29,6 +29,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 public class CTLQueryVisitor extends VisitorBase {
 	
 	private static final String XML_HEADER 			= "<?xml version=\"1.0\"?>\n";
+	private static final String XML_NS 				= "xmlns=\"http://tapaal.net/\"";
 	private static final String XML_PROPSET 			= "property-set";
 	private static final String XML_PROP				= "property";
 	private static final String XML_PROPID			= "id";
@@ -62,7 +63,7 @@ public class CTLQueryVisitor extends VisitorBase {
 	
 	public String getXMLQueryFor(TCTLAbstractProperty property) {
 		this.XMLQuery = new StringBuffer();
-		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " xmlns=\"\"") + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
+		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS ) + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
 		property.accept(this, null);
 		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
 		return XMLQuery.toString();
@@ -71,7 +72,7 @@ public class CTLQueryVisitor extends VisitorBase {
 	public String getXMLQueriesFor(Iterator<pipe.dataLayer.TAPNQuery> iterator){
 		this.XMLQuery = new StringBuffer();
 		
-		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " xmlns=\"\""));
+		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS));
 		while (iterator.hasNext()){
 			XMLQuery.append(startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
 			iterator.next().getProperty().accept(this, null);
@@ -190,7 +191,10 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-		XMLQuery.append(wrapInTag(tctlPlaceNode.getPlace() + "\n", XML_PLACE));
+		String placeName = (tctlPlaceNode.getTemplate().isEmpty() ?
+				tctlPlaceNode.getPlace() :
+				tctlPlaceNode.getTemplate() + "." + tctlPlaceNode.getPlace());
+		XMLQuery.append(wrapInTag(placeName + "\n", XML_PLACE));
 	}
 	
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
