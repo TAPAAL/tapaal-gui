@@ -329,7 +329,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			    .newDocumentBuilder()
 			    .parse(new ByteArrayInputStream(formulaString.getBytes()))
 			    .getDocumentElement().getElementsByTagName("formula").item(0);
-		} catch (SAXException | IOException | ParserConfigurationException e) {
+		} catch (SAXException e) {
+			System.out
+			.println(e.toString() + " thrown in savePNML() "
+					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
+		} catch (IOException e) {
+			System.out
+			.println(e.toString() + " thrown in savePNML() "
+					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
+		} catch (ParserConfigurationException e) {
 			System.out
 			.println(e.toString() + " thrown in savePNML() "
 					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
