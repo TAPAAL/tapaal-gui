@@ -92,7 +92,12 @@ public class XMLCTLQueryParser {
         TCTLAbstractProperty childProperty;
         Node child = getFirstChildNode(property);
         String nodeName = property.getNodeName();
-        String childNodeName = child.getNodeName();
+        
+        String childNodeName = "";
+        if(child != null){
+        	childNodeName = child.getNodeName();
+        }
+        
         ArrayList<Node> children;
 
         if(nodeName.equals("invariant")){
