@@ -22,8 +22,12 @@ import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAUNode;
+import dk.aau.cs.TCTL.TCTLAXNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLEUNode;
+import dk.aau.cs.TCTL.TCTLEXNode;
 import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -121,6 +125,13 @@ public class TAPNQueryLoader extends QueryLoader{
 			return TAPNQuery.QueryCategory.CTL;
 		}
 
+		if(query instanceof TCTLEUNode ||
+				query instanceof TCTLEXNode ||
+				query instanceof TCTLAUNode ||
+				query instanceof TCTLAXNode){
+			return TAPNQuery.QueryCategory.CTL;
+		}
+		
         // If any property has been converted
 		for (StringPosition child : children) {
 			if(TAPNQueryLoader.detectCategory(child.getObject()) == TAPNQuery.QueryCategory.CTL){
