@@ -586,11 +586,24 @@ public class CTLQueryDialog extends JPanel {
 	private void updateQueryButtonsAccordingToSelection() {
 		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
-			if(!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode)){
+			if(!(node.getRight() instanceof TCTLConstNode &&
+					(node.getLeft() instanceof TCTLPlaceNode || 
+							// Checks if the left side is a list of place nodes, and if it only contains at least one place node
+							(node.getLeft() instanceof TCTLPlusListNode && 
+							((TCTLPlusListNode)node.getLeft()).getProperties().size() > 0 &&
+							((TCTLPlusListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)))){
 				return;
 			}
-			TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+			
 			TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+			TCTLPlaceNode placeNode = null;
+			
+			if(node.getLeft() instanceof TCTLPlusListNode){ // if the left side is a list of place nodes
+				placeNode = (TCTLPlaceNode)((TCTLPlusListNode)node.getLeft()).getProperties().get(0);
+			} else{
+				placeNode = (TCTLPlaceNode) node.getLeft();
+			}
+			
 			
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
@@ -602,7 +615,7 @@ public class CTLQueryDialog extends JPanel {
 			else{
 				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
 			}
-			placesBox.setSelectedItem(placeNode.getPlace());
+			placesBox.setSelectedItem(placeNode.getPlace()); 
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(placeMarkingNode.getConstant());
 			userChangedAtomicPropSelection = true;

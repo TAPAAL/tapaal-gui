@@ -7,7 +7,7 @@ import java.io.PrintStream;
 public class Logger {
 
 	static PrintStream logDevice = System.out;
-	static boolean enableDebug = false;
+	static boolean enableDebug = true;
 
 	public static void changeLogDevice(PrintStream l) {
 		logDevice = l;
