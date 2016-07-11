@@ -297,6 +297,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
+			changedQuery.setCategory(query.getCategory());
+			changedQuery.setAlgorithmOption(query.getAlgorithmOption());
 			return changedQuery;
 		}
 		
@@ -396,9 +398,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {		
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
+		queryToVerify.setCategory(query.getCategory());
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
 		
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens());
+		clonedQuery.setCategory(query.getCategory());
 		MapQueryToNewNames(clonedQuery, composedModel.value2());
 		
 		VerificationOptions options = getVerificationOptionsFromQuery(query);

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,17 +19,24 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
+import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.io.IdResolver;
+import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.IntWeight;
@@ -63,7 +71,7 @@ public class BatchProcessingLoader {
 	private IdResolver idResolver = new IdResolver();
 	
 	private NameGenerator nameGenerator = new NameGenerator();
-
+	
 	public BatchProcessingLoader() {
 		presetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
 		postsetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
@@ -497,20 +505,30 @@ public class BatchProcessingLoader {
 		boolean isOverApproximationEnabled = getApproximationOption(queryElement, "enableOverApproximation", false);
 		boolean isUnderApproximationEnabled = getApproximationOption(queryElement, "enableUnderApproximation", false);
 		int approximationDenominator = getApproximationValue(queryElement, "approximationDenominator", 2);
-		boolean active = getActiveStatus(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
-		boolean reduction = getReductionOption(queryElement, "reduction", true);
+		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
-		
+		boolean reduction = getReductionOption(queryElement, "reduction", true);
+		String algorithmOption = queryElement.getAttribute("algorithmOption");
+
 		TCTLAbstractProperty query;
-		query = parseQueryProperty(queryElement.getAttribute("query"));
+		if (queryElement.getElementsByTagName("formula").item(0) != null){
+			query = parseCTLQueryProperty(queryElement);
+		} else {
+			query = parseQueryProperty(queryElement.getAttribute("query"));
+		}
 
 		if (query != null) {
-			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, 
-					extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
+			parsedQuery.setCategory(TAPNQueryLoader.detectCategory(query));
+			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
+				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
+				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
+		                network.activeTemplates().get(0).name());
+				parsedQuery.getProperty().accept(rt, null);
+			}
 			return parsedQuery;
 		} else
 			return null;
@@ -605,6 +623,18 @@ public class BatchProcessingLoader {
 			result = defaultValue;
 		}
 		return result;	
+	}
+	
+	private TCTLAbstractProperty parseCTLQueryProperty(Node queryElement){
+		TCTLAbstractProperty query = null;
+		
+		try {
+			query = XMLCTLQueryParser.parse(queryElement);
+		} catch (XMLQueryParseException e) {
+			System.err.println("No query was specified: " + e.getStackTrace().toString());
+		}
+		
+		return query;
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
