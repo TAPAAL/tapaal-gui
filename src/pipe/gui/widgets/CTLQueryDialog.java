@@ -81,6 +81,7 @@ import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
 import pipe.gui.Zoomer;
+import pipe.gui.widgets.QueryDialog.QueryConstructionEdit;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -1476,11 +1477,15 @@ public class CTLQueryDialog extends JPanel {
 			TCTLAbstractProperty parentNode = prop.getParent();
 
 			if (parentNode instanceof TCTLAndListNode) {
-				// current selection is child of an andList node => add
-				// new placeholder conjunct to it
+				// current selection is child of an orList node => add
+				// new placeholder disjunct to it
 				andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
 				andListNode.addConjunct(new TCTLStatePlaceHolder());
-				addPropertyToQuery(andListNode);
+				UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
+				newProperty = newProperty.replace(parentNode, andListNode);
+				updateSelection(andListNode);
+				undoSupport.postEdit(edit);
+				queryChanged();
 			} else {
 				TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 				andListNode = new TCTLAndListNode(selectedProperty,	ph);
@@ -1506,7 +1511,12 @@ public class CTLQueryDialog extends JPanel {
 				// new placeholder disjunct to it
 				orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
 				orListNode.addDisjunct(new TCTLStatePlaceHolder());
-				addPropertyToQuery(orListNode);
+				UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
+				newProperty = newProperty.replace(parentNode, orListNode);
+				updateSelection(orListNode);
+				undoSupport.postEdit(edit);
+				queryChanged();
+				
 			} else {
 				TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 				orListNode = new TCTLOrListNode(selectedProperty,	ph);
