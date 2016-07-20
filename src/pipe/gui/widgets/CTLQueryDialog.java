@@ -107,7 +107,7 @@ import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
@@ -1745,7 +1745,7 @@ public class CTLQueryDialog extends JPanel {
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
 		editQueryButton = new JButton("Edit query");
-		editQueryButton.setEnabled(false); //TODO: This should be re-enabled once the CTL parser is made. 
+		editQueryButton.setEnabled(true);
 		
 		//Add tool tips
 		deleteButton.setToolTipText(TOOL_TIP_DELETEBUTTON);
@@ -1797,10 +1797,10 @@ public class CTLQueryDialog extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (queryField.isEditable()) { // in edit mode, this button is now the parse query button.
 					// User has potentially altered the query, so try to parse it
-					TCTLAbstractProperty newQuery = null;
+					TCTLAbstractPathProperty newQuery = null;
 
 					try {
-						newQuery = TAPAALQueryParser.parse(queryField.getText());
+						newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),
