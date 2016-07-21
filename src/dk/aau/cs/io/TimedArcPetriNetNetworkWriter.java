@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,9 +22,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import pipe.dataLayer.DataLayer;
@@ -45,6 +42,7 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -97,6 +95,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		// Create Transformer with XSL Source File
 		transformer = TransformerFactory.newInstance().newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 		DOMSource source = new DOMSource(document);
 
 		StreamResult result = new StreamResult(os);
@@ -106,7 +105,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	}
 
 	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
-		Require.that(file != null, "Error: file to save to was null");;
+		Require.that(file != null, "Error: file to save to was null");
 		
 		try {
 			ByteArrayOutputStream os = savePNML();
@@ -323,6 +322,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	}
 	
 	private Node XMLQueryStringToElement(String formulaString){
+		
 		try {
 			return DocumentBuilderFactory
 			    .newInstance()

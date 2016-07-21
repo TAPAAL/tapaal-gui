@@ -2,6 +2,7 @@ package dk.aau.cs.TCTL.visitors;
 
 import java.util.Iterator;
 import java.util.List;
+
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAUNode;
@@ -24,11 +25,11 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.io.XMLFormatter;
 
 public class CTLQueryVisitor extends VisitorBase {
 	
-	private static final String XML_HEADER 			= "<?xml version=\"1.0\"?>\n";
+	private static final String XML_HEADER 			= "<?xml version=\"1.0\"?>";
 	private static final String XML_NS 				= "xmlns=\"http://tapaal.net/\"";
 	private static final String XML_PROPSET 			= "property-set";
 	private static final String XML_PROP				= "property";
@@ -66,7 +67,8 @@ public class CTLQueryVisitor extends VisitorBase {
 		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS ) + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
 		property.accept(this, null);
 		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
-		return XMLQuery.toString();
+		XMLFormatter formatter = new XMLFormatter();
+		return formatter.format(XMLQuery.toString());
 	}
 	
 	public String getXMLQueriesFor(Iterator<pipe.dataLayer.TAPNQuery> iterator){
@@ -74,16 +76,17 @@ public class CTLQueryVisitor extends VisitorBase {
 		
 		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS));
 		while (iterator.hasNext()){
-			XMLQuery.append(startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
+			XMLQuery.append(startTagInline(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
 			iterator.next().getProperty().accept(this, null);
 			XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
 		}
 		XMLQuery.append(endTag(XML_PROPSET));
-		return XMLQuery.toString();
+		XMLFormatter formatter = new XMLFormatter();
+		return formatter.format(XMLQuery.toString());
 	}
 	
 	private String queryInfo(){
-		return wrapInTag("TAPNQuery\n", XML_PROPID) + wrapInTag("TAPAAL generated query\n", XML_PROPDESC);
+		return wrapInTag("TAPNQuery", XML_PROPID) + wrapInTag("TAPAAL generated query", XML_PROPDESC);
 	}
 	
 	public void visit(TCTLAFNode afNode, Object context) {
@@ -175,11 +178,11 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLTrueNode tctlTrueNode, Object context) {		
-		XMLQuery.append(wrapInTag(wrapInTag("1\n", XML_INTEGERCONSTANT) + wrapInTag("1\n", XML_INTEGERCONSTANT),XML_INTEGERLE));
+		XMLQuery.append(wrapInTag(wrapInTag("1", XML_INTEGERCONSTANT) + wrapInTag("1", XML_INTEGERCONSTANT),XML_INTEGERLE));
 	}
 	
 	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
-		XMLQuery.append(wrapInTag(wrapInTag("2\n", XML_INTEGERCONSTANT) + wrapInTag("1\n", XML_INTEGERCONSTANT),XML_INTEGERLE));
+		XMLQuery.append(wrapInTag(wrapInTag("2", XML_INTEGERCONSTANT) + wrapInTag("1", XML_INTEGERCONSTANT),XML_INTEGERLE));
 	}
 	
 	public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) {
@@ -187,18 +190,18 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLConstNode tctlConstNode, Object context){
-		XMLQuery.append(wrapInTag(String.valueOf(tctlConstNode.getConstant()) + "\n", XML_INTEGERCONSTANT));
+		XMLQuery.append(wrapInTag(String.valueOf(tctlConstNode.getConstant()) + "", XML_INTEGERCONSTANT));
 	}
 	
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
 		String placeName = (tctlPlaceNode.getTemplate().isEmpty() ?
 				tctlPlaceNode.getPlace() :
 				tctlPlaceNode.getTemplate() + "." + tctlPlaceNode.getPlace());
-		XMLQuery.append(wrapInTag(placeName + "\n", XML_PLACE));
+		XMLQuery.append(wrapInTag(placeName + "", XML_PLACE));
 	}
 	
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
-		XMLQuery.append(wrapInTag(tctlTransitionNode.getTransition() + "\n", XML_TRANSITION));
+		XMLQuery.append(wrapInTag(tctlTransitionNode.getTransition() + "", XML_TRANSITION));
 	}
 	
 	@Override
@@ -232,13 +235,16 @@ public class CTLQueryVisitor extends VisitorBase {
 	private String wrapInTag(String str, String tag){
 		return startTag(tag) + str + endTag(tag);
 	}
+	private String startTagInline(String tag){
+		return "<" + tag + ">";
+	}
 	private String startTag(String tag){
-		return "<" + tag + ">\n";
+		return "<" + tag + ">";
 	}
 	private String endTag(String tag){
-		return "</" + tag + ">\n";
+		return "</" + tag + ">";
 	}
 	private String emptyElement(String tag){
 		return startTag(tag + "/");
-	}
+	}	
 }
