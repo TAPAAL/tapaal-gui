@@ -534,7 +534,11 @@ public class CTLQueryDialog extends JPanel {
 				}
 			}
 		}
-		return new TCTLStatePlaceHolder();
+		if(property instanceof TCTLAbstractPathProperty){
+			return new TCTLStatePlaceHolder();
+		} else {
+			return (TCTLAbstractStateProperty) property;
+		}
 	}
 
 	// Update current selection based on position of the caret in the string
@@ -567,7 +571,9 @@ public class CTLQueryDialog extends JPanel {
 
 		StringPosition position;
 
-		if (newProperty.containsPlaceHolder()) {
+		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode){
+			position = newProperty.indexOf(newSelection);
+		} else if (newProperty.containsPlaceHolder()) {
 			TCTLAbstractProperty ph = newProperty.findFirstPlaceHolder();
 			position = newProperty.indexOf(ph);
 		} else {

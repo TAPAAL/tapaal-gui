@@ -59,7 +59,7 @@ public class TCTLPathToStateConverter extends TCTLAbstractStateProperty{
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
 			TCTLAbstractProperty object2) {
-		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
+		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty) object2;
 		} else {
 			property = property.replace(object1, object2);
