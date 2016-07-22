@@ -534,7 +534,7 @@ public class CTLQueryDialog extends JPanel {
 				}
 			}
 		}
-		if(property instanceof TCTLAbstractPathProperty){
+		if(property instanceof TCTLAbstractPathProperty | property instanceof TCTLStatePlaceHolder){
 			return new TCTLStatePlaceHolder();
 		} else {
 			return (TCTLAbstractStateProperty) property;
