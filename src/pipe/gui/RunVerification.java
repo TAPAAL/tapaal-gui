@@ -40,6 +40,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
@@ -265,8 +266,11 @@ public class RunVerification extends RunVerificationBase {
 		gbc.insets = new Insets(0,0,15,0);
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
-		
-		if(modelChecker.supportsStats() && !result.isOverApproximationResult()){
+
+		// TODO remove this when the engine outputs statistics
+		Boolean isCTLQuery = result.getQueryResult().getQuery().getCategory() == TAPNQuery.QueryCategory.CTL;
+
+		if(modelChecker.supportsStats() && !result.isOverApproximationResult() && !isCTLQuery){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
