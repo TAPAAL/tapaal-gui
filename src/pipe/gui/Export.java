@@ -167,10 +167,13 @@ public class Export {
 					break;
 				case TIKZ:
 					filename += "tex";
+					break;
 				case PNML:
 					filename += "pnml";
+					break;
 				case QUERY:
 					filename += "xml";
+					break;
 				}
 				
 			}
@@ -226,12 +229,14 @@ public class Export {
 				if (filename != null) {
 					toPnml(g, filename);
 				}
+				break;
 			case QUERY:
 				filename = new FileBrowser("Query XML file", "xml", filename)
 				.saveFile();
 				if (filename != null) {
 					toQueryXML(g, filename);
 				}
+				break;
 			}
 		} catch (Exception e) {
 			// There was some problem with the action
