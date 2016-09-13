@@ -26,6 +26,7 @@ import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.io.XMLFormatter;
+import pipe.dataLayer.TAPNQuery;
 
 public class CTLQueryVisitor extends VisitorBase {
 	
@@ -64,9 +65,9 @@ public class CTLQueryVisitor extends VisitorBase {
 	
 	private StringBuffer XMLQuery;
 	
-	public String getXMLQueryFor(TCTLAbstractProperty property) {
+	public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
 		this.XMLQuery = new StringBuffer();
-		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS ) + startTag(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
+		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS ) + startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
 		property.accept(this, null);
 		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
 		XMLFormatter formatter = new XMLFormatter();
@@ -78,8 +79,9 @@ public class CTLQueryVisitor extends VisitorBase {
 		
 		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS));
 		while (iterator.hasNext()){
-			XMLQuery.append(startTagInline(XML_PROP) + queryInfo() + startTag(XML_FORMULA));
-			iterator.next().getProperty().accept(this, null);
+		    TAPNQuery query = iterator.next();
+			XMLQuery.append(startTagInline(XML_PROP) + queryInfo(query.getName()) + startTag(XML_FORMULA));
+			query.getProperty().accept(this, null);
 			XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
 		}
 		XMLQuery.append(endTag(XML_PROPSET));
@@ -87,8 +89,9 @@ public class CTLQueryVisitor extends VisitorBase {
 		return formatter.format(XMLQuery.toString());
 	}
 	
-	private String queryInfo(){
-		return wrapInTag("TAPNQuery", XML_PROPID) + wrapInTag("TAPAAL generated query", XML_PROPDESC);
+	private String queryInfo(String queryName){
+		String nameToPrint = (queryName == null) ? "Query Comment/Name Here" : queryName;
+		return wrapInTag(nameToPrint, XML_PROPID) + wrapInTag(nameToPrint, XML_PROPDESC);
 	}
 	
 	public void visit(TCTLAFNode afNode, Object context) {
