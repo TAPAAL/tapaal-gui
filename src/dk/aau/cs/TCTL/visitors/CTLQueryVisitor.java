@@ -48,6 +48,8 @@ public class CTLQueryVisitor extends VisitorBase {
 	private static final String XML_BEFORE 			= "before";
 	private static final String XML_REACH 			= "reach";
 	private static final String XML_DEADLOCK 			= "deadlock";
+	private static final String XML_TRUE 			= "true";
+	private static final String XML_FALSE 			= "false";
 	private static final String XML_INTEGERLT 		= "integer-lt";
 	private static final String XML_INTEGERLE 		= "integer-le";
 	private static final String XML_INTEGEREQ			= "integer-eq";
@@ -178,11 +180,11 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLTrueNode tctlTrueNode, Object context) {		
-		XMLQuery.append(wrapInTag(wrapInTag("1", XML_INTEGERCONSTANT) + wrapInTag("1", XML_INTEGERCONSTANT),XML_INTEGERLE));
+		XMLQuery.append(emptyElement(XML_TRUE));
 	}
 	
 	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
-		XMLQuery.append(wrapInTag(wrapInTag("2", XML_INTEGERCONSTANT) + wrapInTag("1", XML_INTEGERCONSTANT),XML_INTEGERLE));
+		XMLQuery.append(emptyElement(XML_FALSE));
 	}
 	
 	public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) {
