@@ -534,11 +534,8 @@ public class CTLQueryDialog extends JPanel {
 				}
 			}
 		}
-		if(property instanceof TCTLAbstractPathProperty | property instanceof TCTLStatePlaceHolder){
-			return new TCTLStatePlaceHolder();
-		} else {
-			return (TCTLAbstractStateProperty) property;
-		}
+
+		return new TCTLStatePlaceHolder();
 	}
 
 	// Update current selection based on position of the caret in the string
@@ -1428,107 +1425,165 @@ public class CTLQueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(logicButtonPanel, gbc);
 
-		// Add Action listener for logic buttons
 		conjunctionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				TCTLAndListNode andListNode = null;
-				TCTLAbstractProperty selectedProperty = currentSelection.getObject();
-				if (selectedProperty instanceof TCTLAbstractPathProperty) {
-					selectedProperty = ConvertToStateProperty((TCTLAbstractPathProperty)selectedProperty);
+				if (currentSelection.getObject() instanceof TCTLAndListNode) {
+					andListNode = new TCTLAndListNode((TCTLAndListNode) currentSelection.getObject());
+					andListNode.addConjunct(new TCTLStatePlaceHolder());
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
+					newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
+					updateSelection(andListNode);
+					undoSupport.postEdit(edit);
+				} else if (currentSelection.getObject() instanceof TCTLOrListNode) {
+					andListNode = new TCTLAndListNode(((TCTLOrListNode) currentSelection.getObject()).getProperties());
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
+					newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
+					updateSelection(andListNode);
+					undoSupport.postEdit(edit);
+				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
+							.getObject();
+					TCTLAbstractProperty parentNode = prop.getParent();
+
+					if (parentNode instanceof TCTLAndListNode) {
+						// current selection is child of an andList node => add
+						// new placeholder conjunct to it
+						andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
+						andListNode.addConjunct(new TCTLStatePlaceHolder());
+						UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
+						newProperty = newProperty.replace(parentNode, andListNode);
+						updateSelection(andListNode);
+						undoSupport.postEdit(edit);
+					} else {
+						TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+						andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()),	ph);
+						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
+						newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
+						updateSelection(andListNode);
+						undoSupport.postEdit(edit);
+					}
+				} else if (currentSelection.getObject() instanceof TCTLStateToPathConverter){
+                    TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+
+                    TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter)currentSelection.getObject()).getProperty();
+
+                    if (prop instanceof TCTLAndListNode){
+                        andListNode = new TCTLAndListNode((TCTLAndListNode) prop);
+                        andListNode.addConjunct(new TCTLStatePlaceHolder());
+					} else if (prop instanceof TCTLOrListNode){
+						andListNode = new TCTLAndListNode(((TCTLOrListNode)prop).getProperties());
+					} else {
+						andListNode = new TCTLAndListNode(getStateProperty(prop), ph);
+					}
+
+                    TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
+                    UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+                    newProperty = newProperty.replace(currentSelection.getObject(),	property);
+                    updateSelection(property);
+                    undoSupport.postEdit(edit);
+				} else if(currentSelection.getObject() instanceof  TCTLAbstractPathProperty){
+					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+					andListNode = new TCTLAndListNode(getStateProperty(
+							new TCTLPathToStateConverter((TCTLAbstractPathProperty)currentSelection.getObject())), ph);
+
+					TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+					newProperty = newProperty.replace(currentSelection.getObject(),	property);
+					updateSelection(property);
+					undoSupport.postEdit(edit);
 				}
-				createConjunctionNode(andListNode, (TCTLAbstractStateProperty)selectedProperty);
+				queryChanged();
 			}
+
 		});
-		
 
 		disjunctionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLOrListNode orListNode = null;;
-				TCTLAbstractProperty selectedProperty = currentSelection.getObject();
-				if (selectedProperty instanceof TCTLAbstractPathProperty) {
-					selectedProperty = ConvertToStateProperty((TCTLAbstractPathProperty)selectedProperty);
+				TCTLOrListNode orListNode;
+				if (currentSelection.getObject() instanceof TCTLOrListNode) {
+					orListNode = new TCTLOrListNode((TCTLOrListNode) currentSelection.getObject());
+					orListNode.addDisjunct(new TCTLStatePlaceHolder());
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
+					newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
+					updateSelection(orListNode);
+					undoSupport.postEdit(edit);
+				} else if (currentSelection.getObject() instanceof TCTLAndListNode) {
+					orListNode = new TCTLOrListNode(((TCTLAndListNode) currentSelection.getObject()).getProperties());
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
+					newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
+					updateSelection(orListNode);
+					undoSupport.postEdit(edit);
+				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection.getObject();
+					TCTLAbstractProperty parentNode = prop.getParent();
+
+					if (parentNode instanceof TCTLOrListNode) {
+						// current selection is child of an orList node => add
+						// new placeholder disjunct to it
+						orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
+						orListNode.addDisjunct(new TCTLStatePlaceHolder());
+						UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
+						newProperty = newProperty.replace(parentNode, orListNode);
+						updateSelection(orListNode);
+						undoSupport.postEdit(edit);
+					} else {
+						TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+						orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()),	ph);
+						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
+						newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
+						updateSelection(orListNode);
+						undoSupport.postEdit(edit);
+					}
+				} else if (currentSelection.getObject() instanceof TCTLStateToPathConverter){
+                    TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+
+                    TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter)currentSelection.getObject()).getProperty();
+
+                    if (prop instanceof TCTLOrListNode){
+                        orListNode = new TCTLOrListNode((TCTLOrListNode) prop);
+                        orListNode.addDisjunct(new TCTLStatePlaceHolder());
+					} else if (prop instanceof TCTLAndListNode){
+						orListNode = new TCTLOrListNode(((TCTLAndListNode)prop).getProperties());
+					} else {
+						orListNode = new TCTLOrListNode(getStateProperty(prop), ph);
+					}
+
+                    TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
+                    UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+                    newProperty = newProperty.replace(currentSelection.getObject(),	property);
+                    updateSelection(property);
+                    undoSupport.postEdit(edit);
+				} else if(currentSelection.getObject() instanceof  TCTLAbstractPathProperty){
+					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+					orListNode = new TCTLOrListNode(getStateProperty(
+							new TCTLPathToStateConverter((TCTLAbstractPathProperty)currentSelection.getObject())), ph);
+
+					TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+					newProperty = newProperty.replace(currentSelection.getObject(),	property);
+					updateSelection(property);
+					undoSupport.postEdit(edit);
 				}
-				createDisjunctionNode(orListNode, (TCTLAbstractStateProperty)selectedProperty);
+				queryChanged();
 			}
+
 		});
 
 		negationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Make sure root is state property
 				TCTLAbstractStateProperty root;
-				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {	
+				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
 					root = ConvertToStateProperty(getPathProperty(currentSelection.getObject()));
 				} else{
 					root = getStateProperty(currentSelection.getObject());
 				}
-				
+
 				TCTLNotNode property = new TCTLNotNode(root);
 				addPropertyToQuery(property);
 			}
 		});
-	}
-	
-	private void createConjunctionNode(TCTLAndListNode andListNode, TCTLAbstractStateProperty selectedProperty){
-		if (selectedProperty instanceof TCTLAndListNode) {
-			andListNode = new TCTLAndListNode((TCTLAndListNode) selectedProperty);
-			andListNode.addConjunct(new TCTLStatePlaceHolder());
-			addPropertyToQuery(andListNode);
-			
-		} else if (selectedProperty instanceof TCTLOrListNode) {
-			andListNode = new TCTLAndListNode(((TCTLOrListNode) selectedProperty).getProperties());
-			addPropertyToQuery(andListNode);
-
-		} else if (selectedProperty instanceof TCTLAbstractStateProperty) {
-			TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) selectedProperty;
-			TCTLAbstractProperty parentNode = prop.getParent();
-
-			if (parentNode instanceof TCTLAndListNode) {
-				// current selection is child of an orList node => add
-				// new placeholder disjunct to it
-				andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
-				andListNode.addConjunct(new TCTLStatePlaceHolder());
-				UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
-				newProperty = newProperty.replace(parentNode, andListNode);
-				updateSelection(andListNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			} else {
-				TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-				andListNode = new TCTLAndListNode(selectedProperty,	ph);
-				addPropertyToQuery(andListNode);
-			}
-		}
-	}
-	
-	private void createDisjunctionNode(TCTLOrListNode orListNode, TCTLAbstractStateProperty selectedProperty){		
-		if (selectedProperty instanceof TCTLOrListNode) {
-			orListNode = new TCTLOrListNode((TCTLOrListNode) selectedProperty);
-			orListNode.addDisjunct(new TCTLStatePlaceHolder());
-			addPropertyToQuery(orListNode);
-		} else if (selectedProperty instanceof TCTLAndListNode) {
-			orListNode = new TCTLOrListNode(((TCTLAndListNode) selectedProperty).getProperties());
-			addPropertyToQuery(orListNode);
-		} else if (selectedProperty instanceof TCTLAbstractStateProperty) {
-			TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) selectedProperty;
-			TCTLAbstractProperty parentNode = prop.getParent();
-
-			if (parentNode instanceof TCTLOrListNode) {
-				// current selection is child of an orList node => add
-				// new placeholder disjunct to it
-				orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
-				orListNode.addDisjunct(new TCTLStatePlaceHolder());
-				UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
-				newProperty = newProperty.replace(parentNode, orListNode);
-				updateSelection(orListNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
-				
-			} else {
-				TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-				orListNode = new TCTLOrListNode(selectedProperty,	ph);
-				addPropertyToQuery(orListNode);
-			}
-		}
 	}
 	
 	private void initPredicationConstructionPanel() {

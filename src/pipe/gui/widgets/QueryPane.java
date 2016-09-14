@@ -172,7 +172,7 @@ public class QueryPane extends JPanel {
 		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
 			editQueryButton.setEnabled(false);
 			verifyButton.setEnabled(false);
-			removeQueryButton.setEnabled(true);
+			removeQueryButton.setEnabled(false);
 		} else {
 			editQueryButton.setEnabled(true);
 			verifyButton.setEnabled(true);
@@ -304,7 +304,9 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
 				undoManager.addNewEdit(new RemoveQueryCommand(query, tabContent));
-				listModel.remove(queryList.getSelectedIndex());
+				if(listModel.getSize() > 0 && query != null){
+					listModel.remove(queryList.getSelectedIndex());
+				}
 			}
 		});
 		gbc = new GridBagConstraints();
