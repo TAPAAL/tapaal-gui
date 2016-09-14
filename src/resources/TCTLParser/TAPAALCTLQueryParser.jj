@@ -210,14 +210,20 @@ TCTLAbstractStateProperty AtomicProposition() :
 	TCTLAbstractStateProperty left; 
 	TCTLAbstractStateProperty right; 
 	Token op;
+    ArrayList<TCTLAbstractStateProperty> forSingleChild = new ArrayList<TCTLAbstractStateProperty>();
 }
 {
 	( 
 		left = AritmeticExpr() op = <OP> right = AritmeticExpr()
 	)
-	{ 	
-		return new TCTLAtomicPropositionNode(left, op.image, right);
-	}
+	{
+		if (left instanceof  TCTLPlaceNode){
+            forSingleChild.add(left);
+            return new TCTLAtomicPropositionNode(new TCTLPlusListNode(forSingleChild), op.image, right);
+        } else {
+            return new TCTLAtomicPropositionNode(left, op.image, right);
+        }
+      }
 }
 
 TCTLAbstractStateProperty AritmeticExpr() : 

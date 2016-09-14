@@ -243,10 +243,16 @@ thisProp = new TCTLDeadlockNode();
   final public TCTLAbstractStateProperty AtomicProposition() throws ParseException {TCTLAbstractStateProperty left;
         TCTLAbstractStateProperty right;
         Token op;
+    ArrayList<TCTLAbstractStateProperty> forSingleChild = new ArrayList<TCTLAbstractStateProperty>();
     left = AritmeticExpr();
     op = jj_consume_token(OP);
     right = AritmeticExpr();
-{if ("" != null) return new TCTLAtomicPropositionNode(left, op.image, right);}
+if (left instanceof  TCTLPlaceNode){
+            forSingleChild.add(left);
+            {if ("" != null) return new TCTLAtomicPropositionNode(new TCTLPlusListNode(forSingleChild), op.image, right);}
+        } else {
+            {if ("" != null) return new TCTLAtomicPropositionNode(left, op.image, right);}
+        }
     throw new Error("Missing return statement in function");
   }
 
@@ -353,21 +359,6 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_8()
- {
-    if (jj_scan_token(PLUS)) return true;
-    if (jj_3R_7()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_5()
- {
-    if (jj_3R_6()) return true;
-    if (jj_scan_token(OP)) return true;
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
   private boolean jj_3R_13()
  {
     if (jj_scan_token(25)) return true;
@@ -405,6 +396,14 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     return false;
   }
 
+  private boolean jj_3R_5()
+ {
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(OP)) return true;
+    if (jj_3R_6()) return true;
+    return false;
+  }
+
   private boolean jj_3R_6()
  {
     if (jj_3R_7()) return true;
@@ -438,6 +437,13 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     if (jj_3R_13()) return true;
     }
     }
+    return false;
+  }
+
+  private boolean jj_3R_8()
+ {
+    if (jj_scan_token(PLUS)) return true;
+    if (jj_3R_7()) return true;
     return false;
   }
 
