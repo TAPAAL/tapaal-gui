@@ -568,9 +568,7 @@ public class CTLQueryDialog extends JPanel {
 
 		StringPosition position;
 
-		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode){
-			position = newProperty.indexOf(newSelection);
-		} else if (newProperty.containsPlaceHolder()) {
+		if (newProperty.containsPlaceHolder()) {
 			TCTLAbstractProperty ph = newProperty.findFirstPlaceHolder();
 			position = newProperty.indexOf(ph);
 		} else {
