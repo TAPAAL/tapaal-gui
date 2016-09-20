@@ -387,7 +387,7 @@ public class VerifyPN implements ModelChecker{
 				VerifyTAPNCTLOutputParser outputParser = new VerifyTAPNCTLOutputParser(totalTokens, extraTokens, query);
 				result = outputParser.parseOutput(output);
 			} else {
-				VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, query);
+				VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, query);
 				result = outputParser.parseOutput(output);
 			}
 			return result;
