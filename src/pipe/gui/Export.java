@@ -172,7 +172,8 @@ public class Export {
 					filename += "pnml";
 					break;
 				case QUERY:
-					filename += "xml";
+					filename = filename.substring(0, dotpos);
+					filename += "-queries.xml";
 					break;
 				}
 				
@@ -231,8 +232,7 @@ public class Export {
 				}
 				break;
 			case QUERY:
-				filename = new FileBrowser("Query XML file", "xml", filename)
-				.saveFile();
+				filename = new FileBrowser("Query XML file", "xml", filename).saveFile(CreateGui.appGui.getCurrentTabName().replaceAll(".xml", "-queries"));
 				if (filename != null) {
 					toQueryXML(g, filename);
 				}
