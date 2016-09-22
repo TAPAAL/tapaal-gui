@@ -1663,7 +1663,7 @@ public class CTLQueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		predicatePanel.add(placesBox, gbc);
 
-		String[] relationalSymbols = { "=", "<=", "<", ">=", ">" };
+		String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
 		relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
 
 		gbc.gridx = 1;
