@@ -201,6 +201,9 @@ TCTLAbstractStateProperty Factor() :
 		| LOOKAHEAD(AtomicProposition())
 		thisProp = AtomicProposition() 
 		| "(" thisProp = OrExpr() ")"
+		| LOOKAHEAD(AbstractPathProperty()) {
+		thisProp = new TCTLPathToStateConverter(AbstractPathProperty()); }
+
 	)
 	{ return thisProp; }
 }

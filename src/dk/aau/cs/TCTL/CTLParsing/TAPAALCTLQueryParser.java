@@ -100,21 +100,10 @@ public class TAPAALCTLQueryParser implements TAPAALCTLQueryParserConstants {
 {if ("" != null) return new TCTLAXNode(child);}
       break;
       }
-    case TRUE:
-    case FALSE:
-    case DEADLOCK:
-    case NOT:
-    case NUM:
-    case IDENT:
-    case 25:{
-      child = OrExpr();
-{if ("" != null) return new TCTLStateToPathConverter(child);}
-      break;
-      }
     default:
       jj_la1[0] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+      child = OrExpr();
+{if ("" != null) return new TCTLStateToPathConverter(child);}
     }
     throw new Error("Missing return statement in function");
   }
@@ -183,19 +172,10 @@ conjunctions.add(currentChild);
 {if ("" != null) return new TCTLPathToStateConverter(childConverter);}
       break;
       }
-    case TRUE:
-    case FALSE:
-    case DEADLOCK:
-    case NUM:
-    case IDENT:{
-      child = Factor();
-{if ("" != null) return child;}
-      break;
-      }
     default:
       jj_la1[3] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+      child = Factor();
+{if ("" != null) return child;}
     }
     throw new Error("Missing return statement in function");
   }
@@ -231,8 +211,7 @@ thisProp = new TCTLDeadlockNode();
           }
         default:
           jj_la1[5] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
+thisProp = new TCTLPathToStateConverter(AbstractPathProperty());
         }
       }
     }
@@ -359,34 +338,6 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_13()
- {
-    if (jj_scan_token(25)) return true;
-    if (jj_3R_6()) return true;
-    if (jj_scan_token(26)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_10()
- {
-    if (jj_scan_token(MULT)) return true;
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12()
- {
-    if (jj_scan_token(NUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_scan_token(IDENT)) return true;
-    if (jj_scan_token(27)) return true;
-    return false;
-  }
-
   private boolean jj_3R_11()
  {
     Token xsp;
@@ -447,6 +398,34 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     return false;
   }
 
+  private boolean jj_3R_13()
+ {
+    if (jj_scan_token(25)) return true;
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(26)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10()
+ {
+    if (jj_scan_token(MULT)) return true;
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12()
+ {
+    if (jj_scan_token(NUM)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_scan_token(IDENT)) return true;
+    if (jj_scan_token(27)) return true;
+    return false;
+  }
+
   private boolean jj_3_1()
  {
     if (jj_3R_5()) return true;
@@ -470,7 +449,7 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x20c9efe,0x2000,0x4000,0x20c800e,0xe,0x2000000,0x10000,0x20000,0x20c0000,};
+      jj_la1_0 = new int[] {0x1ef0,0x2000,0x4000,0x2008000,0xe,0x2000000,0x10000,0x20000,0x20c0000,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
