@@ -524,6 +524,9 @@ public class CTLQueryDialog extends JPanel {
 
 	private TCTLAbstractStateProperty getSpecificChildOfProperty(int number, TCTLAbstractProperty property) {
 		StringPosition[] children = property.getChildren();
+        if(property instanceof TCTLAbstractStateProperty){
+            return (TCTLAbstractStateProperty) property;
+        }
 		int count = 0;
 		for (int i = 0; i < children.length; i++) {
 			TCTLAbstractProperty child = children[i].getObject();
@@ -1228,7 +1231,7 @@ public class CTLQueryDialog extends JPanel {
 		quantificationButtonGroup = new ButtonGroup();
 		Dimension d = new Dimension(150, 100);
 		quantificationPanel.setPreferredSize(d);
-		
+
 		// Instantiate buttons
 		existsDiamond = new JButton("EF");
 		existsBox = new JButton("EG");
@@ -1238,7 +1241,7 @@ public class CTLQueryDialog extends JPanel {
 		existsNext = new JButton("EX");
 		forAllUntil = new JButton("AU");
 		forAllNext = new JButton("AX");
-		
+
 		// Add tool-tips
 		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
 		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
@@ -1248,7 +1251,7 @@ public class CTLQueryDialog extends JPanel {
 		existsNext.setToolTipText(TOOL_TIP_EXISTS_NEXT);
 		forAllUntil.setToolTipText(TOOL_TIP_FORALL_UNTIL);
 		forAllNext.setToolTipText(TOOL_TIP_FORALL_NEXT);
-		
+
 		// Add buttons to panel
 		quantificationButtonGroup.add(existsDiamond);
 		quantificationButtonGroup.add(existsBox);
@@ -1258,12 +1261,12 @@ public class CTLQueryDialog extends JPanel {
 		quantificationButtonGroup.add(existsNext);
 		quantificationButtonGroup.add(forAllUntil);
 		quantificationButtonGroup.add(forAllNext);
-		
+
 		// Place buttons in GUI
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-	
+
 		// First column of buttons
 		gbc.gridy = 0;
 		gbc.insets = new Insets(0,0,5,0);
@@ -1286,7 +1289,7 @@ public class CTLQueryDialog extends JPanel {
 		quantificationPanel.add(forAllUntil, gbc);
 		gbc.gridy = 3;
 		quantificationPanel.add(forAllNext, gbc);
-		
+
 		// Add quantification panel to query panel
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -1294,7 +1297,7 @@ public class CTLQueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(quantificationPanel, gbc);
-		
+
 		// Action Listeners
 		existsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1305,58 +1308,56 @@ public class CTLQueryDialog extends JPanel {
 
 		existsDiamond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));			
-				addPropertyToQuery(property);
-
+                TCTLAbstractPathProperty property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                addPropertyToQuery(property);
 			}
 		});
 
 		forAllBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));			
-				addPropertyToQuery(property);
+                TCTLAbstractPathProperty property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                addPropertyToQuery(property);
 			}
 		});
 
 		forAllDiamond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));			
-				addPropertyToQuery(property);
-
+                TCTLAbstractPathProperty property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                addPropertyToQuery(property);
 			}
 		});
-		
+
 		existsNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));			
-				addPropertyToQuery(property);
+                TCTLAbstractPathProperty property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                addPropertyToQuery(property);
 			}
 		});
-		
+
 		existsUntil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLAbstractPathProperty property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(2, currentSelection.getObject()));			
+						getSpecificChildOfProperty(2, currentSelection.getObject()));
 				addPropertyToQuery(property);
 			}
 		});
-		
+
 		forAllNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));			
+				TCTLAbstractPathProperty property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
 				addPropertyToQuery(property);
 			}
 		});
-		
+
 		forAllUntil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLAbstractPathProperty property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(2, currentSelection.getObject()));			
+						getSpecificChildOfProperty(2, currentSelection.getObject()));
 				addPropertyToQuery(property);
 			}
 		});
 	}
-	
+
 	private void addPropertyToQuery(TCTLAbstractPathProperty property){
 		if (currentSelection.getObject() instanceof TCTLAbstractStateProperty){
 			addPropertyToQuery(ConvertToStateProperty(property));
