@@ -524,9 +524,6 @@ public class CTLQueryDialog extends JPanel {
 
 	private TCTLAbstractStateProperty getSpecificChildOfProperty(int number, TCTLAbstractProperty property) {
 		StringPosition[] children = property.getChildren();
-        if(property instanceof TCTLAbstractStateProperty){
-            return (TCTLAbstractStateProperty) property;
-        }
 		int count = 0;
 		for (int i = 0; i < children.length; i++) {
 			TCTLAbstractProperty child = children[i].getObject();
@@ -1301,58 +1298,100 @@ public class CTLQueryDialog extends JPanel {
 		// Action Listeners
 		existsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLEGNode((TCTLAbstractStateProperty) currentSelection.getObject());
+                } else {
+                    property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
 				addPropertyToQuery(property);
 			}
 		});
 
 		existsDiamond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLEFNode((TCTLAbstractStateProperty)currentSelection.getObject());
+                } else {
+                    property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
                 addPropertyToQuery(property);
 			}
 		});
 
 		forAllBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAGNode((TCTLAbstractStateProperty)currentSelection.getObject());
+                } else{
+                    property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
                 addPropertyToQuery(property);
 			}
 		});
 
 		forAllDiamond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAFNode((TCTLAbstractStateProperty)currentSelection.getObject());
+                } else {
+                    property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
                 addPropertyToQuery(property);
 			}
 		});
 
 		existsNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLEXNode((TCTLAbstractStateProperty)currentSelection.getObject());
+                } else {
+                    property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
                 addPropertyToQuery(property);
 			}
 		});
 
 		existsUntil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(2, currentSelection.getObject()));
+                TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty){
+                    property = new TCTLEUNode((TCTLAbstractStateProperty)currentSelection.getObject(),
+                            new TCTLStatePlaceHolder());
+                } else {
+                    property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                            getSpecificChildOfProperty(2, currentSelection.getObject()));
+                }
 				addPropertyToQuery(property);
 			}
 		});
 
 		forAllNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+				TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAXNode((TCTLAbstractStateProperty)currentSelection.getObject());
+                } else {
+                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
 				addPropertyToQuery(property);
 			}
 		});
 
 		forAllUntil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLAbstractPathProperty property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-						getSpecificChildOfProperty(2, currentSelection.getObject()));
+				TCTLAbstractPathProperty property;
+                if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAUNode((TCTLAbstractStateProperty)currentSelection.getObject(),
+                            new TCTLStatePlaceHolder());
+                } else{
+                    property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                            getSpecificChildOfProperty(2, currentSelection.getObject()));
+                }
 				addPropertyToQuery(property);
 			}
 		});
