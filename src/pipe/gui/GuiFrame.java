@@ -140,7 +140,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showBlueTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
+	private ViewAction showTokenAgeAction, showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showBlueTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
 	private JMenuItem statistics;
@@ -168,6 +168,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private JCheckBoxMenuItem showBlueTransitionsCheckBox;
 	private JCheckBoxMenuItem showConstantsCheckBox;
 	private JCheckBoxMenuItem showToolTipsCheckBox;
+	private JCheckBoxMenuItem showTokenAgeCheckBox;
 
 	private boolean showComponents = true;
 	private boolean showConstants = true;
@@ -175,7 +176,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showEnabledTransitions = true;
 	private boolean showBlueTransitions = true;
 	private boolean showToolTips = true;
-
+	private boolean showTokenAge = true;
 
 	private GUIMode guiMode = GUIMode.noNet;
 	private JMenu importMenu, exportMenu, zoomMenu;
@@ -272,8 +273,13 @@ public class GuiFrame extends JFrame implements Observer {
 		BlueTransitionControl.setDefaultIsRandomTransition(prefs.getBlueTransitionIsRandomTransition());
 
 		showToolTips = prefs.getShowToolTips();
+
 		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
 			CreateGui.toggleShowZeroToInfinityIntervals();
+		}
+
+		if(CreateGui.showTokenAge() != prefs.getShowTokenAge()){
+			CreateGui.toggleShowTokenAge();
 		}
 
 		Dimension dimension = prefs.getWindowSize();
@@ -622,6 +628,11 @@ public class GuiFrame extends JFrame implements Observer {
 				showToolTipsCheckBox = new JCheckBoxMenuItem());
 		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('7', shortcutkey));
 
+		addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
+						453246, "Show/hide the age of tokens","ctrl 8",true),
+				showTokenAgeCheckBox = new JCheckBoxMenuItem());
+		showTokenAgeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('8', shortcutkey));
+
 		viewMenu.addSeparator();
 
 		addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
@@ -797,6 +808,9 @@ public class GuiFrame extends JFrame implements Observer {
 		if(!CreateGui.showZeroToInfinityIntervals()){
 			showZeroToInfinityIntervalsCheckBox.doClick();
 		}
+		if(!CreateGui.showTokenAge()){
+			showTokenAgeCheckBox.doClick();
+		}
 		//BlueTransitions
 		showBlueTransitions(advanced);
 		BlueTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
@@ -818,6 +832,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		prefs.setShowEnabledTrasitions(showEnabledTransitions);
 		prefs.setShowBlueTransitions(showBlueTransitions);
+		prefs.setShowTokenAge(showTokenAge);
 		prefs.setBlueTransitionDelayMode(BlueTransitionControl.getDefaultDelayMode());
 		prefs.setBlueTransitionGranularity(BlueTransitionControl.getDefaultGranularity());
 		prefs.setBlueTransitionIsRandomTransition(BlueTransitionControl.isRandomTransition());
@@ -1160,6 +1175,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showEnabledTransitionsAction.setEnabled(enable);
 		showBlueTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
+		showTokenAgeAction.setEnabled(enable);
 		showAdvancedWorkspaceAction.setEnabled(enable);
 		showSimpleWorkspaceAction.setEnabled(enable);
 		saveWorkSpaceAction.setEnabled(enable);
@@ -1256,7 +1272,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public boolean isShowingToolTips(){
 		return showToolTips;
-	}	
+	}
+
+	public void toggleTokenAge(){
+		CreateGui.toggleShowTokenAge();
+		Preferences.getInstance().setShowTokenAge(CreateGui.showTokenAge());
+		appView.repaintAll();
+	}
 
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
@@ -2346,6 +2368,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleBlueTransitions();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
+			} else if (this == showTokenAgeAction) {
+				toggleTokenAge();
 			} else if (this == showAdvancedWorkspaceAction){
 				showAdvancedWorkspace(true);
 			} else if (this == showSimpleWorkspaceAction){
