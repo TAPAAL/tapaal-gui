@@ -23,7 +23,6 @@ import java.util.Locale;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
-import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
@@ -203,81 +202,53 @@ public class TimedPlaceComponent extends Place {
         // structure sees how many markings there are and fills the place in
         // with the appropriate number or tokens.
         if(drawDots) {
-            // Token dot position offsets
-            int leftX = 7;
-            int rightX = 19;
-            int topY = 7;
-            int botY = 19;
-            int middleX = 13;
-            int middleY = 13;
-            int xPos;
-            int yPos;
-
+			int xPos, yPos;
             switch(marking){
                 case 5:
-                    g.fillOval(x + middleX, y + middleY, tWidth, tHeight); // middle
+                    g.fillOval(x + tMiddleX, y + tMiddleY, tWidth, tHeight); // middle
                 /* falls through */
                 case 4:
-                    if(marking == 5) { // top left
-                        xPos = x + leftX;
-                        yPos = y + topY;
-                    } else {                  // top left
-                        xPos = x + leftX;
-                        yPos = y + topY;
-                    }
-                    g.fillOval(xPos, yPos, tWidth, tHeight);
+                    g.fillOval(x + tLeftX, y + tTopY, tWidth, tHeight); // top left
                 /* falls through */
                 case 3:
-                    if (marking == 5) {         // top right
-                        xPos = x + rightX;
-                        yPos = y + topY;
-                    } else if (marking == 4){ // top right
-                        xPos = x + rightX;
-                        yPos = y + topY;
-                    } else {                           // top left
-                        xPos = x + leftX;
-                        yPos = y + topY;
+                    if (marking == 5 || marking == 4) {
+                        xPos = x + tRightX;	// top right
+                        yPos = y + tTopY;
+                    } else {
+                        xPos = x + tLeftX;		// top left
+                        yPos = y + tTopY;
                     }
                     g.fillOval(xPos, yPos, tWidth, tHeight);
                 /* falls through */
                 case 2:
-                    if (marking == 5){
-                        xPos = x + leftX;       // bottom left
-                        yPos = y + botY;
-                    } else if (marking == 4){
-                        xPos = x + leftX;       // bottom left
-                        yPos = y + botY;
+                    if (marking == 5 || marking == 4){
+                        xPos = x + tLeftX;       // bottom left
+                        yPos = y + tBotY;
                     } else if (marking == 3){
-                        xPos = x + middleX; // middle
-                        yPos = y + middleY;
+                        xPos = x + tMiddleX;   // middle
+                        yPos = y + tMiddleY;
                     } else {
-                        xPos = x + leftX;       // left middle
-                        yPos = y + middleY;
+                        xPos = x + tLeftX;       // left middle
+                        yPos = y + tMiddleY;
                     }
                     g.fillOval(xPos, yPos, tWidth, tHeight);
                 /* falls through */
                 case 1:
-                    if(marking == 5){
-                        xPos = x + rightX;    // bottom right
-                        yPos = y + botY;
-                    } else if (marking == 4){
-                        xPos = x + rightX;    // bottom right
-                        yPos = y + botY;
-                    } else if (marking == 3){
-                        xPos = x + rightX;    // bottom right
-                        yPos = y + botY;
+                    if(marking == 5 || marking == 4 || marking == 3){
+                        xPos = x + tRightX;    // bottom right
+                        yPos = y + tBotY;
                     } else if (marking == 2){
-                        xPos = x + rightX;    // right middle
-                        yPos = y + middleY;
+                        xPos = x + tRightX;    // right middle
+                        yPos = y + tMiddleY;
                     } else {
-                        xPos = x + middleX; // middle
-                        yPos = y + middleY;
+                        xPos = x + tMiddleX; // middle
+                        yPos = y + tMiddleY;
                     }
                     g.fillOval(xPos, yPos, tWidth, tHeight);
                 case 0:
                     break;
             }
-        } else {
+        } else {	// print token age
             switch (marking) {
                 case 2:
                     if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
