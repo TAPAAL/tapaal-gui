@@ -31,8 +31,8 @@ public class Place extends PlaceTransitionObject {
 	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
-	public static int tWidth = 4;
-	public static int tHeight = 4;
+	public static int tWidth = 5;
+	public static int tHeight = 5;
 
 	// Token dot position offsets
 	public static int tLeftX = 7;

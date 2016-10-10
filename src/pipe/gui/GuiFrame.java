@@ -176,7 +176,6 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showEnabledTransitions = true;
 	private boolean showBlueTransitions = true;
 	private boolean showToolTips = true;
-	private boolean showTokenAge = true;
 
 	private GUIMode guiMode = GUIMode.noNet;
 	private JMenu importMenu, exportMenu, zoomMenu;
@@ -629,7 +628,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('7', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
-						453246, "Show/hide the age of tokens","ctrl 8",true),
+						453246, "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)","ctrl 8",true),
 				showTokenAgeCheckBox = new JCheckBoxMenuItem());
 		showTokenAgeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('8', shortcutkey));
 
@@ -832,7 +831,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		prefs.setShowEnabledTrasitions(showEnabledTransitions);
 		prefs.setShowBlueTransitions(showBlueTransitions);
-		prefs.setShowTokenAge(showTokenAge);
+		prefs.setShowTokenAge(CreateGui.showTokenAge());
 		prefs.setBlueTransitionDelayMode(BlueTransitionControl.getDefaultDelayMode());
 		prefs.setBlueTransitionGranularity(BlueTransitionControl.getDefaultGranularity());
 		prefs.setBlueTransitionIsRandomTransition(BlueTransitionControl.isRandomTransition());
