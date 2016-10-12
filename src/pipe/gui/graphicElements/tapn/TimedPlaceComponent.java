@@ -189,14 +189,13 @@ public class TimedPlaceComponent extends Place {
             // only draw dots if there're 1-5 tokens.
             drawDots = (marking > 0 && marking < 6);
 
-            // if there're 1 or 2 tokens, and any token's age is > 0, do not draw dots
-            if(marking > 0 && marking < 3){
-                for (TimedToken token : myTokens) {
-                    if (token.age().compareTo(BigDecimal.valueOf(0)) != 0) {
-                        drawDots = false; break;
-                    }
-                }
-            }
+            // if any token's age is > 0, do not draw dots
+			for (TimedToken token : myTokens) {
+				if (token.age().compareTo(BigDecimal.valueOf(0)) != 0) {
+					drawDots = false;
+					break;
+				}
+			}
         }
 
         // structure sees how many markings there are and fills the place in
