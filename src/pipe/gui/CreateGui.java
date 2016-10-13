@@ -39,6 +39,7 @@ public class CreateGui {
 	private static boolean usingGTKFileBrowser = true;
 	
 	private static boolean showZeroToInfinityIntervals = true;
+	private static boolean showTokenAge = true;
 
 	public static String imgPath, userPath; // useful for stuff
 	
@@ -345,7 +346,15 @@ public class CreateGui {
 	public static boolean showZeroToInfinityIntervals() {
 		return showZeroToInfinityIntervals;
 	}
-	
+
+	public static boolean showTokenAge(){
+		return showTokenAge;
+	}
+
+	public static void toggleShowTokenAge(){
+		showTokenAge = !showTokenAge;
+	}
+
 	public static void verifyQuery() {
 		TabContent tab = getCurrentTab();
 		if (tab.isQueryPossible()) {

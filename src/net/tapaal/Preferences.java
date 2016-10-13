@@ -127,6 +127,14 @@ public class Preferences {
 		return pref.getBoolean("showToolTips", true);
 	}
 
+	public void setShowTokenAge(boolean show){
+		pref.putBoolean("showTokenAge", show);
+	}
+
+	public boolean getShowTokenAge(){
+		return pref.getBoolean("showTokenAge", true);
+	}
+
 	public void setWindowSize(Dimension size) {
 		try{
 			saveSerilizableObject("appSize", size);

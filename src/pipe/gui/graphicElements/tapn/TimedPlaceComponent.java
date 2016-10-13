@@ -47,7 +47,6 @@ import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 
 public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
-
 	private dk.aau.cs.model.tapn.TimedPlace place;
 	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
 
@@ -140,6 +139,7 @@ public class TimedPlaceComponent extends Place {
 			if (!first)
 				buffer.append(", ");
 			buffer.append(df.format(token.age()));
+
 			first = false;
 		}
 		buffer.append('}');
@@ -170,59 +170,122 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	protected void paintTokens(Graphics g) {
-		DecimalFormat df = new DecimalFormat();
-		df.setMinimumFractionDigits(1);
-		df.setMaximumFractionDigits(1);
-		df.setRoundingMode(RoundingMode.DOWN);
+        DecimalFormat df = new DecimalFormat();
+        df.setMinimumFractionDigits(1);
+        df.setMaximumFractionDigits(1);
+        df.setRoundingMode(RoundingMode.DOWN);
 
-		Insets insets = getInsets();
-		int x = insets.left;
-		int y = insets.top;
+        Insets insets = getInsets();
+        int x = insets.left;
+        int y = insets.top;
 
-		// int marking = getCurrentMarking();
-		List<TimedToken> myTokens = place.tokens();
-		int marking = place.numberOfTokens();
+        // int marking = getCurrentMarking();
+        List<TimedToken> myTokens = place.tokens();
+        int marking = place.numberOfTokens();
 
-		// structure sees how many markings there are and fills the place in
-		// with the appropriate number.
-		switch (marking) {
-		case 2:
-			if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
-				g.setFont(new Font("new font", Font.PLAIN, 11));
-				g.drawString(df.format(myTokens.get(1).age()), x + 17 - 12,
-						y + 13 + 1);
-			} else {
-				g.drawString(df.format(myTokens.get(1).age()), x + 17 - 10,
-						y + 13 + 1);
+        // Decide whether or not to draw tokens as dots
+        boolean drawDots = false;
+        if(!CreateGui.showTokenAge()) {
+            // only draw dots if there're 1-5 tokens.
+            drawDots = (marking > 0 && marking < 6);
+
+            // if any token's age is > 0, do not draw dots
+			for (TimedToken token : myTokens) {
+				if (token.age().compareTo(BigDecimal.valueOf(0)) != 0) {
+					drawDots = false;
+					break;
+				}
 			}
-			// g.fillOval(x + 18, y + 6, tWidth, tHeight);
-			/* falls through */
-		case 1:
-			if (myTokens.get(0).age().compareTo(BigDecimal.valueOf(9)) > 0) {
-				g.setFont(new Font("new font", Font.PLAIN, 11));
-				g.drawString(df.format(myTokens.get(0).age()), x + 11 - 6,
-						y + 20 + 6);
-			} else {
-				g.drawString(df.format(myTokens.get(0).age()), x + 11 - 4,
-						y + 20 + 6);
-			}
-			// g.fillOval(x + 12, y + 13, tWidth, tHeight);
-			break;
-		case 0:
-			break;
-		default:
-			if (marking > 999) {
-				// XXX could be better...
-				g.drawString("#" + String.valueOf(marking), x, y + 20);
-			} else if (marking > 99) {
-				g.drawString("#" + String.valueOf(marking), x, y + 20);
-			} else if (marking > 9) {
-				g.drawString("#" + String.valueOf(marking), x + 2, y + 20);
-			} else {
-				g.drawString("#" + String.valueOf(marking), x + 6, y + 20);
-			}
-			break;
-		}
+        }
+
+        // structure sees how many markings there are and fills the place in
+        // with the appropriate number or tokens.
+        if(drawDots) {
+			int xPos, yPos;
+            switch(marking){
+                case 5:
+                    g.fillOval(x + tMiddleX, y + tMiddleY, tWidth, tHeight); // middle
+                /* falls through */
+                case 4:
+                    g.fillOval(x + tLeftX, y + tTopY, tWidth, tHeight); // top left
+                /* falls through */
+                case 3:
+                    if (marking == 5 || marking == 4) {
+                        xPos = x + tRightX;	// top right
+                        yPos = y + tTopY;
+                    } else {
+                        xPos = x + tLeftX;		// top left
+                        yPos = y + tTopY;
+                    }
+                    g.fillOval(xPos, yPos, tWidth, tHeight);
+                /* falls through */
+                case 2:
+                    if (marking == 5 || marking == 4){
+                        xPos = x + tLeftX;       // bottom left
+                        yPos = y + tBotY;
+                    } else if (marking == 3){
+                        xPos = x + tMiddleX;   // middle
+                        yPos = y + tMiddleY;
+                    } else {
+                        xPos = x + tLeftX;       // left middle
+                        yPos = y + tMiddleY;
+                    }
+                    g.fillOval(xPos, yPos, tWidth, tHeight);
+                /* falls through */
+                case 1:
+                    if(marking == 5 || marking == 4 || marking == 3){
+                        xPos = x + tRightX;    // bottom right
+                        yPos = y + tBotY;
+                    } else if (marking == 2){
+                        xPos = x + tRightX;    // right middle
+                        yPos = y + tMiddleY;
+                    } else {
+                        xPos = x + tMiddleX; // middle
+                        yPos = y + tMiddleY;
+                    }
+                    g.fillOval(xPos, yPos, tWidth, tHeight);
+                case 0:
+                    break;
+            }
+        } else {	// print token age
+            switch (marking) {
+                case 2:
+                    if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
+                        g.setFont(new Font("new font", Font.PLAIN, 11));
+                        g.drawString(df.format(myTokens.get(1).age()), x + 17 - 12,
+                                y + 13 + 1);
+                    } else {
+                        g.drawString(df.format(myTokens.get(1).age()), x + 17 - 10,
+                                y + 13 + 1);
+                    }
+
+                /* falls through */
+                case 1:
+                    if (myTokens.get(0).age().compareTo(BigDecimal.valueOf(9)) > 0) {
+                        g.setFont(new Font("new font", Font.PLAIN, 11));
+                        g.drawString(df.format(myTokens.get(0).age()), x + 11 - 6,
+                                y + 20 + 6);
+                    } else {
+                        g.drawString(df.format(myTokens.get(0).age()), x + 11 - 4,
+                                y + 20 + 6);
+                    }
+
+                case 0:
+                    break;
+                default:
+                    if (marking > 999) {
+                        // XXX could be better...
+                        g.drawString("#" + String.valueOf(marking), x, y + 20);
+                    } else if (marking > 99) {
+                        g.drawString("#" + String.valueOf(marking), x, y + 20);
+                    } else if (marking > 9) {
+                        g.drawString("#" + String.valueOf(marking), x + 2, y + 20);
+                    } else {
+                        g.drawString("#" + String.valueOf(marking), x + 6, y + 20);
+                    }
+                    break;
+            }
+        }
 	}
 
 	public Command setInvariant(TimeInvariant inv) {
