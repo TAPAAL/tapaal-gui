@@ -755,7 +755,7 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.add(workflowDialog);
 
 		//Stip off timing information
-		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Strip time information", "Strip off timing information", null));
+		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Strip timing information", "Open the net in a new tab and strip off all timing information", null));
 		stripTimeDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				duplicateTab((TabContent) appTab.getSelectedComponent());
