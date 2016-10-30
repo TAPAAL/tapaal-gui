@@ -67,6 +67,7 @@ import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
@@ -757,8 +758,8 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Strip time information", "Strip off timing information", null));
 		stripTimeDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Logger.log("Strip time information clicked");
-				duplicateCurrentTab();
+				duplicateTab((TabContent) appTab.getSelectedComponent());
+				convertToUntimedTab((TabContent) appTab.getSelectedComponent());
 			}
 		});
 		toolsMenu.add(stripTimeDialog);
@@ -1556,9 +1557,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
-	public void duplicateCurrentTab() {
-		int currentlySelected = appTab.getSelectedIndex();
-		TabContent tabToDuplicate = (TabContent) appTab.getSelectedComponent();
+	public void duplicateTab(TabContent tabToDuplicate) {
+		int index = appTab.indexOfComponent(tabToDuplicate);
 
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				tabToDuplicate.network(),
@@ -1569,12 +1569,28 @@ public class GuiFrame extends JFrame implements Observer {
 
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-			String composedName = appTab.getTitleAt(currentlySelected);
+			String composedName = appTab.getTitleAt(index);
 			composedName = composedName.replace(".xml", "");
 			composedName += "-untimed";
 			CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			System.console().printf(e1.getMessage());
+		}
+	}
+
+	public void convertToUntimedTab(TabContent tab){
+		for(Template template : tab.allTemplates()){
+			// Make place token age invariant infinite
+			for(TimedPlace place : template.model().places()){
+				place.setInvariant(TimeInvariant.LESS_THAN_INFINITY);
+			}
+			// Make output arc guards infinite
+			for(Arc arc : template.guiModel().getArcs()){
+				if(arc instanceof TimedOutputArcComponent) {
+					TimedOutputArcComponent arcComp = (TimedOutputArcComponent) arc;
+					arcComp.setGuardAndWeight(TimeInterval.ZERO_INF, arcComp.getWeight());
+				}
+			}
 		}
 	}
 
