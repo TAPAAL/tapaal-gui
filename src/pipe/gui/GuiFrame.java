@@ -69,6 +69,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -755,7 +756,7 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.add(workflowDialog);
 
 		//Stip off timing information
-		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Strip timing information", "Open the net in a new tab and strip off all timing information", null));
+		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", null));
 		stripTimeDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				duplicateTab((TabContent) appTab.getSelectedComponent());
@@ -1584,13 +1585,24 @@ public class GuiFrame extends JFrame implements Observer {
 			for(TimedPlace place : template.model().places()){
 				place.setInvariant(TimeInvariant.LESS_THAN_INFINITY);
 			}
-			// Make output arc guards infinite
+			// Make transitions non-urgent
+			for(TimedTransition transition : template.model().transitions()){
+				transition.setUrgent(false);
+			}
+
 			for(Arc arc : template.guiModel().getArcs()){
+				// Make output arc guards infinite
 				if(arc instanceof TimedOutputArcComponent) {
 					TimedOutputArcComponent arcComp = (TimedOutputArcComponent) arc;
 					arcComp.setGuardAndWeight(TimeInterval.ZERO_INF, arcComp.getWeight());
 				}
+				// Replace transport arcs with regular arcs (in progess)
+				if(arc instanceof TimedTransportArcComponent){
+					PlaceTransitionObject source = arc.getSource();
+					PlaceTransitionObject target = arc.getTarget();
+				}
 			}
+
 		}
 	}
 
