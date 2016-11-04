@@ -50,6 +50,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.sun.jdi.connect.Transport;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
@@ -62,16 +63,12 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
+import pipe.gui.undo.DeleteTransportArcCommand;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -1581,6 +1578,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void convertToUntimedTab(TabContent tab){
 		for(Template template : tab.allTemplates()){
+			ArrayList<TimedTransportArcComponent> transportArcComponents = new ArrayList<>();
 			// Make place token age invariant infinite
 			for(TimedPlace place : template.model().places()){
 				place.setInvariant(TimeInvariant.LESS_THAN_INFINITY);
@@ -1596,14 +1594,120 @@ public class GuiFrame extends JFrame implements Observer {
 					TimedOutputArcComponent arcComp = (TimedOutputArcComponent) arc;
 					arcComp.setGuardAndWeight(TimeInterval.ZERO_INF, arcComp.getWeight());
 				}
-				// Replace transport arcs with regular arcs (in progess)
+
+				// Add and process transport arcs in separate list to avoid delete errors
 				if(arc instanceof TimedTransportArcComponent){
-					PlaceTransitionObject source = arc.getSource();
-					PlaceTransitionObject target = arc.getTarget();
+					TimedTransportArcComponent arcComp = (TimedTransportArcComponent) arc;
+					transportArcComponents.add(arcComp);
 				}
 			}
 
+			// Replace transport arcs with regular arcs
+			for(TimedTransportArcComponent arc : transportArcComponents){
+				// Input arc
+				if(arc.getSource() instanceof Place) {
+					TimedPlace source = template.model().getPlaceByName(arc.getSource().getName());
+					TimedTransition destination = template.model().getTransitionByName(arc.getTarget().getName());
+
+					TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight());
+					template.model().add(addedArc);
+
+					// GUI
+					DataLayer guiModel = template.guiModel();
+					Place guiSource = guiModel.getPlaceByName(arc.getSource().getName());
+					Transition guiTarget = guiModel.getTransitionByName(arc.getTarget().getName());
+					Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
+							0d,
+							0d,
+							0d,
+							0d,
+							guiSource,
+							guiTarget,
+							arc.getWeight().value(),
+							arc.getSource().getName() + "_to_" + arc.getTarget().getName(),
+							false
+					));
+
+					// Build ArcPath
+					Place oldGuiSource = guiModel.getPlaceByName(arc.getSource().getName());
+					Transition oldGuiTarget = guiModel.getTransitionByName(arc.getTarget().getName());
+					ArcPath newArcPath = createArcPath(guiModel, oldGuiSource, oldGuiTarget, newArc);
+
+					// Set arcPath, guiModel and connectors
+					((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setArcPath(newArcPath);
+					newArc.setGuiModel(guiModel);
+					newArc.updateArcPosition();
+					guiModel.addPetriNetObject(newArc);
+					guiSource.addConnectFrom(newArc);
+					guiTarget.addConnectTo(newArc);
+
+				}
+				// Output arc
+				else if(arc.getSource() instanceof Transition){
+					TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
+					TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
+
+					TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight());
+					template.model().add(addedArc);
+
+					// GUI
+					DataLayer guiModel = template.guiModel();
+					Place guiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
+					Transition guiSource = guiModel.getTransitionByName(arc.getSource().getName());
+					Arc newArc = new TimedOutputArcComponent(
+							0d,
+							0d,
+							0d,
+							0d,
+							guiSource,
+							guiTarget,
+							arc.getWeight().value(),
+							arc.getSource().getName() + "_to_" + arc.getTarget().getName(),
+							false
+					);
+
+					// Build ArcPath
+					Place oldGuiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
+					Transition oldGuiSource = guiModel.getTransitionByName(arc.getSource().getName());
+					ArcPath newArcPath = createArcPath(guiModel, oldGuiSource, oldGuiTarget, newArc);
+
+					// Set arcPath, guiModel and connectors
+					((TimedOutputArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setArcPath(newArcPath);
+					newArc.setGuiModel(guiModel);
+					newArc.updateArcPosition();
+					guiModel.addPetriNetObject(newArc);
+					guiSource.addConnectFrom(newArc);
+					guiTarget.addConnectTo(newArc);
+
+					// Delete the transport arc
+					arc.delete();
+				}
+			}
+
+			// TODO: Repaint  arcs
+
 		}
+	}
+
+	private ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc) {
+		Arc guiArc = currentGuiModel.getArcByEndpoints(source, target);
+		ArcPath arcPath = guiArc.getArcPath();
+		int arcPathPointsNum = arcPath.getNumPoints();
+
+		// Build ArcPath
+		ArcPath newArcPath = new ArcPath(arc);
+		for(int k = 0; k < arcPathPointsNum; k++) {
+			ArcPathPoint point = arcPath.getArcPathPoint(k);
+			newArcPath.addPoint(
+					point.getPoint().x,
+					point.getPoint().y,
+					point.getPointType()
+			);
+		}
+
+		return newArcPath;
 	}
 
 	private void undoAddTab(int currentlySelected) {
