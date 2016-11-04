@@ -1686,8 +1686,7 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 			}
 
-			// TODO: Repaint  arcs
-
+			setGUIMode(GUIMode.draw);
 		}
 	}
 
