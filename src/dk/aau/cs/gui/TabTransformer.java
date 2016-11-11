@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class TabTransformer {
     static public void removeTimingInformation(TabContent tab){
         for(Template template : tab.allTemplates()){
-            ArrayList<TimedTransportArcComponent> transportArcComponents = new ArrayList<>();
+            ArrayList<TimedTransportArcComponent> transportArcComponents = new ArrayList<TimedTransportArcComponent>();
             // Make place token age invariant infinite
             for(TimedPlace place : template.model().places()){
                 place.setInvariant(TimeInvariant.LESS_THAN_INFINITY);

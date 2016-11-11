@@ -50,7 +50,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.sun.jdi.connect.Transport;
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.Preferences;
