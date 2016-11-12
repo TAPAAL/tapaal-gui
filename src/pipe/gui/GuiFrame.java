@@ -14,22 +14,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.Action;
@@ -58,6 +49,9 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import dk.aau.cs.gui.TabTransformer;
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 
@@ -69,14 +63,12 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
+import pipe.gui.undo.DeleteTransportArcCommand;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -98,9 +90,6 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -133,7 +122,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
-	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction;
+	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction, stripTimeDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private SpacingAction incSpacingAction, decSpacingAction;
 	private DeleteAction deleteAction;
@@ -763,12 +752,21 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(workflowDialog);
 
+		//Stip off timing information
+		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));
+		stripTimeDialog.setMnemonic('e');
+		stripTimeDialog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				duplicateTab((TabContent) appTab.getSelectedComponent());
+				convertToUntimedTab((TabContent) appTab.getSelectedComponent());
+			}
+		});
+		toolsMenu.add(stripTimeDialog);
 
 		toolsMenu.addSeparator();
 
 		//JMenuItem engineSelection = new JMenuItem("Verification engines");
-		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));				
-		engineSelection.setMnemonic('e');		
+		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",null));
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new EngineDialogPanel().showDialog();				
@@ -1040,6 +1038,7 @@ public class GuiFrame extends JFrame implements Observer {
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			workflowDialogAction.setEnabled(true);
+			stripTimeDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
@@ -1084,6 +1083,7 @@ public class GuiFrame extends JFrame implements Observer {
 			verifyAction.setEnabled(false);
 
 			workflowDialogAction.setEnabled(false);
+			stripTimeDialogAction.setEnabled(false);
 
 			// Remove constant highlight
 			CreateGui.getCurrentTab().removeConstantHighlights();
@@ -1127,6 +1127,7 @@ public class GuiFrame extends JFrame implements Observer {
 			redoAction.setEnabled(false);
 
 			workflowDialogAction.setEnabled(false);
+			stripTimeDialogAction.setEnabled(false);
 
 			enableAllActions(false);
 			break;
@@ -1550,8 +1551,32 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
+	}
 
+	private void duplicateTab(TabContent tabToDuplicate) {
+		int index = appTab.indexOfComponent(tabToDuplicate);
 
+		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+				tabToDuplicate.network(),
+				tabToDuplicate.allTemplates(),
+				tabToDuplicate.queries(),
+				tabToDuplicate.network().constants()
+		);
+
+		try {
+			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+			String composedName = appTab.getTitleAt(index);
+			composedName = composedName.replace(".xml", "");
+			composedName += "-untimed";
+			CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+		} catch (Exception e1) {
+			System.console().printf(e1.getMessage());
+		}
+	}
+
+	private void convertToUntimedTab(TabContent tab){
+		TabTransformer.removeTimingInformation(tab);
+		setGUIMode(GuiFrame.GUIMode.draw);
 	}
 
 	private void undoAddTab(int currentlySelected) {
