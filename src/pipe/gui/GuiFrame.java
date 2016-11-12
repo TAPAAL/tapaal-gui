@@ -753,7 +753,8 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.add(workflowDialog);
 
 		//Stip off timing information
-		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", null));
+		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));
+		stripTimeDialog.setMnemonic('e');
 		stripTimeDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				duplicateTab((TabContent) appTab.getSelectedComponent());
@@ -765,8 +766,7 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.addSeparator();
 
 		//JMenuItem engineSelection = new JMenuItem("Verification engines");
-		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));				
-		engineSelection.setMnemonic('e');		
+		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",null));
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new EngineDialogPanel().showDialog();				
