@@ -24,7 +24,6 @@ public class AnimationHistoryComponent extends JList {
 		super();
 		setModel(new DefaultListModel());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		reset();
 		
 		for (MouseListener listener : getMouseListeners()) {
 			removeMouseListener(listener);
