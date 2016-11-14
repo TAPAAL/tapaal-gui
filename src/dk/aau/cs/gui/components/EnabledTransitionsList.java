@@ -1,6 +1,5 @@
 package dk.aau.cs.gui.components;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -21,8 +20,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
@@ -80,7 +77,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void reInitDone(){
-		if(CreateGui.getCurrentTab().getBlueTransitionControl().isRandomTransitionMode()){
+		if(CreateGui.getCurrentTab().getDelayEnabledTransitionControl().isRandomTransitionMode()){
 			selectRandom();
 			return;
 		}
@@ -115,7 +112,7 @@ public class EnabledTransitionsList extends JPanel{
 	public void addTransition(Template template, Transition transition){
 		TransitionListItem item = new TransitionListItem(transition, template);
 
-		transition.isBlueTransition();
+		transition.isDelayEnabled();
 		if(!transitions.contains(item)){
 			transitions.addElement(item);
 		}
@@ -180,7 +177,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		public String toString(){
-			if(CreateGui.getApp().isShowingBlueTransitions()){
+			if(CreateGui.getApp().isShowingDelayEnabledTransitions()){
 				return toString(true);
 			} else {
 				return toString(false);
@@ -243,7 +240,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 	}
 
-	//This class creates the stippled line shown between the enabled transitions and the blue transitions
+	//This class creates the stippled line shown between the enabled transitions and the delay-enabled transitions
 	class EnabledTransitionListCellRenderer extends DefaultListCellRenderer{
 
 		private static final long serialVersionUID = -835675414373311136L;

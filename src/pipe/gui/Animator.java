@@ -36,7 +36,6 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
-import pipe.gui.AnimationHistoryComponent;
 
 public class Animator {
 	private ArrayList<TAPNNetworkTraceStep> actionHistory;
@@ -146,7 +145,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && !isUrgentTransitionEnabled)) {
+			if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -162,7 +161,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true)) || !tempTransition.isBlueTransition(true) || (tempTransition.isBlueTransition(true) && isUrgentTransitionEnabled)) {
+			if (!(tempTransition.isEnabled(true)) || !tempTransition.isDelayEnabledTransition(true) || (tempTransition.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -189,7 +188,7 @@ public class Animator {
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions() && !isUrgentTransitionEnabled)) {
+				if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
 					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
@@ -209,7 +208,7 @@ public class Animator {
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
 				tempTransition.setEnabledFalse();
-				tempTransition.setBlueTransitionFalse();
+				tempTransition.setDelayEnabledTransitionFalse();
 				activeGuiModel().notifyObservers();
 				tempTransition.repaint();
 			}
@@ -323,14 +322,14 @@ public class Animator {
 	}
 	
 	public void dFireTransition(TimedTransition transition){
-		if(!CreateGui.getApp().isShowingBlueTransitions() || isUrgentTransitionEnabled()){
+		if(!CreateGui.getApp().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
 			fireTransition(transition);
 			return;
 		}
 		
 		TimeInterval dInterval = transition.getdInterval();
 		
-		BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
+		BigDecimal delayGranularity = CreateGui.getCurrentTab().getDelayEnabledTransitionControl().getValue();
 		//Make sure the granularity is small enough
 		BigDecimal lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 		if(!dInterval.IsLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
@@ -342,7 +341,7 @@ public class Animator {
 		if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
 		} else {
-			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
+			BigDecimal delay = CreateGui.getCurrentTab().getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
 			if(delay != null){
 				if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
 					if(!letTimePass(delay)){

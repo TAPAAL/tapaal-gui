@@ -67,8 +67,6 @@ import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
-import pipe.gui.undo.DeleteTransportArcCommand;
-import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -129,7 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, timedPlaceAction;
-	private ViewAction showTokenAgeAction, showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showBlueTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
+	private ViewAction showTokenAgeAction, showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction, showDelayEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
 	private JMenuItem statistics;
@@ -154,7 +152,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private JCheckBoxMenuItem showComponentsCheckBox;
 	private JCheckBoxMenuItem showQueriesCheckBox;
 	private JCheckBoxMenuItem showEnabledTransitionsCheckBox;
-	private JCheckBoxMenuItem showBlueTransitionsCheckBox;
+	private JCheckBoxMenuItem showDelayEnabledTransitionsCheckBox;
 	private JCheckBoxMenuItem showConstantsCheckBox;
 	private JCheckBoxMenuItem showToolTipsCheckBox;
 	private JCheckBoxMenuItem showTokenAgeCheckBox;
@@ -163,7 +161,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showConstants = true;
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
-	private boolean showBlueTransitions = true;
+	private boolean showDelayEnabledTransitions = true;
 	private boolean showToolTips = true;
 
 	private GUIMode guiMode = GUIMode.noNet;
@@ -255,10 +253,10 @@ public class GuiFrame extends JFrame implements Observer {
 		showConstants = prefs.getShowConstants();
 
 		showEnabledTransitions = prefs.getShowEnabledTransitions();
-		showBlueTransitions = prefs.getShowBlueTransitions();
-		BlueTransitionControl.setDefaultDelayMode(prefs.getBlueTransitionDelayMode());
-		BlueTransitionControl.setDefaultGranularity(prefs.getBlueTransitionGranularity());
-		BlueTransitionControl.setDefaultIsRandomTransition(prefs.getBlueTransitionIsRandomTransition());
+		showDelayEnabledTransitions = prefs.getShowDelayEnabledTransitions();
+		DelayEnabledTransitionControl.setDefaultDelayMode(prefs.getDelayEnabledTransitionDelayMode());
+		DelayEnabledTransitionControl.setDefaultGranularity(prefs.getDelayEnabledTransitionGranularity());
+		DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
 
 		showToolTips = prefs.getShowToolTips();
 
@@ -601,10 +599,10 @@ public class GuiFrame extends JFrame implements Observer {
 				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, showBlueTransitions, showBlueTransitionsAction = new ViewAction("Display future-enabled transitions",
+		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
 				453247, "Highlight transitions which can be enabled after a delay","ctrl 5",true),
-				showBlueTransitionsCheckBox = new JCheckBoxMenuItem());
-		showBlueTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
+				showDelayEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
+		showDelayEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
 				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true),
@@ -808,11 +806,11 @@ public class GuiFrame extends JFrame implements Observer {
 		if(!CreateGui.showTokenAge()){
 			showTokenAgeCheckBox.doClick();
 		}
-		//BlueTransitions
-		showBlueTransitions(advanced);
-		BlueTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
-		BlueTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
-		BlueTransitionControl.getInstance().setRandomTransitionMode(false);
+		//Delay-enabled Transitions
+		showDelayEnabledTransitions(advanced);
+		DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
+		DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
+		DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
 	}
 
 	public void saveWorkspace(){
@@ -828,11 +826,11 @@ public class GuiFrame extends JFrame implements Observer {
 		prefs.setShowConstants(showConstants);
 
 		prefs.setShowEnabledTrasitions(showEnabledTransitions);
-		prefs.setShowBlueTransitions(showBlueTransitions);
+		prefs.setShowDelayEnabledTransitions(showDelayEnabledTransitions);
 		prefs.setShowTokenAge(CreateGui.showTokenAge());
-		prefs.setBlueTransitionDelayMode(BlueTransitionControl.getDefaultDelayMode());
-		prefs.setBlueTransitionGranularity(BlueTransitionControl.getDefaultGranularity());
-		prefs.setBlueTransitionIsRandomTransition(BlueTransitionControl.isRandomTransition());
+		prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
+		prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
+		prefs.setDelayEnabledTransitionIsRandomTransition(DelayEnabledTransitionControl.isRandomTransition());
 
 		JOptionPane.showMessageDialog(this, 
 				"The workspace has now been saved into your preferences.\n" 
@@ -1031,7 +1029,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
-			showBlueTransitionsAction.setEnabled(false);
+			showDelayEnabledTransitionsAction.setEnabled(false);
 
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
@@ -1173,7 +1171,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showQueriesAction.setEnabled(enable);
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
-		showBlueTransitionsAction.setEnabled(enable);
+		showDelayEnabledTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
 		showTokenAgeAction.setEnabled(enable);
 		showAdvancedWorkspaceAction.setEnabled(enable);
@@ -1304,13 +1302,13 @@ public class GuiFrame extends JFrame implements Observer {
 		showEnabledTransitionsList(!showEnabledTransitions);
 	}
 
-	public void showBlueTransitions(boolean enable){
-		showBlueTransitions = enable;
-		CreateGui.getCurrentTab().showBlueTransitions(enable);
-		showBlueTransitionsCheckBox.setSelected(enable);
+	public void showDelayEnabledTransitions(boolean enable){
+		showDelayEnabledTransitions = enable;
+		CreateGui.getCurrentTab().showDelayEnabledTransitions(enable);
+		showDelayEnabledTransitionsCheckBox.setSelected(enable);
 	}
-	public void toggleBlueTransitions(){
-		showBlueTransitions(!showBlueTransitions);
+	public void toggleDelayEnabledTransitions(){
+		showDelayEnabledTransitions(!showDelayEnabledTransitions);
 	}
 
 	public void saveOperation(boolean forceSave){
@@ -2388,8 +2386,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleZeroToInfinityIntervals();
 			} else if (this == showEnabledTransitionsAction) {
 				toggleEnabledTransitionsList();
-			} else if (this == showBlueTransitionsAction) {
-				toggleBlueTransitions();
+			} else if (this == showDelayEnabledTransitionsAction) {
+				toggleDelayEnabledTransitions();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
 			} else if (this == showTokenAgeAction) {
@@ -2735,8 +2733,8 @@ public class GuiFrame extends JFrame implements Observer {
 		return appTab.getTitleAt(appTab.getSelectedIndex());
 	}
 
-	public boolean isShowingBlueTransitions() {
-		return showBlueTransitions;
+	public boolean isShowingDelayEnabledTransitions() {
+		return showDelayEnabledTransitions;
 	}
 
 }
