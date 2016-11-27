@@ -16,26 +16,26 @@ import pipe.gui.widgets.EscapableDialog;
 public class AnimationSettings{
 
 	private static JDialog dialog;
-	private static BlueTransitionControl blue;
+	private static DelayEnabledTransitionControl delayEnabled;
 	private static SimulationControl simControl;
 	
 	private static JPanel getContent(){
 		JPanel content = new JPanel(new BorderLayout());
 		 
-		blue = BlueTransitionControl.getInstance();
+		delayEnabled = DelayEnabledTransitionControl.getInstance();
 		simControl = SimulationControl.getInstance();
 		simControl.showCheckbox(true);
 		
 		simControl.addRandomSimulationActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(simControl.randomSimulation()){
-					blue.randomMode.setSelected(true);
+					delayEnabled.randomMode.setSelected(true);
 				}
 				CreateGui.getTransitionFireingComponent().updateFireButton();
 			}
 		});
 		
-		content.add(blue, BorderLayout.NORTH);
+		content.add(delayEnabled, BorderLayout.NORTH);
 		content.add(simControl, BorderLayout.SOUTH);
 		return content;
 	}

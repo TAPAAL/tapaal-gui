@@ -1,16 +1,12 @@
 package dk.aau.cs.gui.components;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,7 +14,7 @@ import javax.swing.JPanel;
 
 import pipe.dataLayer.Template;
 import pipe.gui.AnimationSettings;
-import pipe.gui.BlueTransitionControl;
+import pipe.gui.DelayEnabledTransitionControl;
 import pipe.gui.CreateGui;
 import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
@@ -30,7 +26,7 @@ public class TransitionFireingComponent extends JPanel {
 	private JButton fireButton;
 	private JButton settingsButton;
 
-	public TransitionFireingComponent(boolean showBlueTransitions) {
+	public TransitionFireingComponent(boolean showDelayEnabledTransitions) {
 		super(new GridBagLayout());
 
 		enabledTransitionsList = new EnabledTransitionsList();
@@ -56,7 +52,7 @@ public class TransitionFireingComponent extends JPanel {
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
 		fireButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(SimulationControl.getInstance().randomSimulation() && CreateGui.getApp().isShowingBlueTransitions()){
+				if(SimulationControl.getInstance().randomSimulation() && CreateGui.getApp().isShowingDelayEnabledTransitions()){
 					SimulationControl.startSimulation();
 				} else {
 					fireSelectedTransition();
@@ -102,7 +98,7 @@ public class TransitionFireingComponent extends JPanel {
 		gbc.anchor = GridBagConstraints.SOUTHWEST;
 		this.add(fireButton, gbc);
 
-		showBlueTransitions(showBlueTransitions);
+		showDelayEnabledTransitions(showDelayEnabledTransitions);
 	}
 
 	public static final String FIRE_BUTTON_DEACTIVATED_TOOL_TIP = "No transitions are enabled";
@@ -121,7 +117,7 @@ public class TransitionFireingComponent extends JPanel {
 		fireButton.setEnabled(true);
 		
 		//If random simulation is enabled
-		if(CreateGui.getApp().isShowingBlueTransitions() && SimulationControl.getInstance().randomSimulation()){
+		if(CreateGui.getApp().isShowingDelayEnabledTransitions() && SimulationControl.getInstance().randomSimulation()){
 			fireButton.setText("Simulate");
 			
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){
@@ -132,7 +128,7 @@ public class TransitionFireingComponent extends JPanel {
 				fireButton.setToolTipText(SIMULATE_ACTIVATED_TOOL_TIP);
 			}
 		} else { //If random simulation is not enabled.
-			fireButton.setText(CreateGui.getApp().isShowingBlueTransitions() ? "Delay & Fire" : "Fire");
+			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions() ? "Delay & Fire" : "Fire");
 
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){
 				fireButton.setEnabled(false);
@@ -157,11 +153,11 @@ public class TransitionFireingComponent extends JPanel {
 		enabledTransitionsList.reInitDone();
 	}
 
-	public BlueTransitionControl getBlueTransitionControl() {
-		return BlueTransitionControl.getInstance();
+	public DelayEnabledTransitionControl getDelayEnabledTransitionControl() {
+		return DelayEnabledTransitionControl.getInstance();
 	}
 
-	public void showBlueTransitions(boolean enable) {
+	public void showDelayEnabledTransitions(boolean enable) {
 		settingsButton.setVisible(enable);
 		updateFireButton();
 	}

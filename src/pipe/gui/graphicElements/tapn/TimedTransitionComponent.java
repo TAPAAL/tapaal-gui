@@ -114,7 +114,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	@Override
-	public boolean isBlueTransition() {
+	public boolean isDelayEnabled() {
 		return transition.isDEnabled();
 	}
 	
