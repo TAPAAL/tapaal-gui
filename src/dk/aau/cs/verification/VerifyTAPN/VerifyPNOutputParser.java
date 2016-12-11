@@ -32,6 +32,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final Pattern ruleBApplicationPattern = Pattern.compile("\\s*Applications of rule B:\\s*(\\d+)\\s*");
 	private static final Pattern ruleCApplicationPattern = Pattern.compile("\\s*Applications of rule C:\\s*(\\d+)\\s*");
 	private static final Pattern ruleDApplicationPattern = Pattern.compile("\\s*Applications of rule D:\\s*(\\d+)\\s*");
+	private static final Pattern ruleEApplicationPattern = Pattern.compile("\\s*Applications of rule E:\\s*(\\d+)\\s*");
 	
 	
 	public VerifyPNOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
@@ -48,6 +49,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 		int ruleB = 0;
 		int ruleC = 0;
 		int ruleD = 0;
+		int ruleE = 0;
 		boolean reductionUsed = false;
 		boolean result = false;
 		boolean foundResult = false;
@@ -131,12 +133,17 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 					if(matcher.find()){
 						ruleD = Integer.valueOf(matcher.group(1));
 					}
+					
+					matcher = ruleEApplicationPattern.matcher(line);
+					if(matcher.find()){
+						ruleE = Integer.valueOf(matcher.group(1));
+					}
 				}
 			}
 			
 			if(!foundResult) return null;
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD) : null;
+			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD, ruleE) : null;
 			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
 			return value; 
 		} catch (Exception e) {

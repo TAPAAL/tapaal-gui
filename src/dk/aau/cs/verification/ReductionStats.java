@@ -7,14 +7,16 @@ public class ReductionStats {
 	private int ruleB;
 	private int ruleC;
 	private int ruleD;
+	private int ruleE;
 	
-	public ReductionStats(int removedTransitions, int removedPlaces, int ruleA, int ruleB, int ruleC, int ruleD) {
+	public ReductionStats(int removedTransitions, int removedPlaces, int ruleA, int ruleB, int ruleC, int ruleD, int ruleE) {
 		this.removedTrantitions = removedTransitions;
 		this.removedPlaces = removedPlaces;
 		this.ruleA = ruleA;
 		this.ruleB = ruleB;
 		this.ruleC = ruleC;
 		this.ruleD = ruleD;
+		this.ruleE = ruleE;
 	}
 	
 	public int getRemovedTrantitions() {
@@ -41,6 +43,10 @@ public class ReductionStats {
 		return ruleD;
 	}
 	
+	public int getRuleE() {
+		return ruleE;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();		
@@ -52,7 +58,7 @@ public class ReductionStats {
 		buffer.append(removedTrantitions);
 		buffer.append(System.getProperty("line.separator"));
 		
-		buffer.append("Applications of rules A, B, C, D: (");
+		buffer.append("Applications of rules A, B, C, D, E: (");
 		buffer.append(ruleA);
 		buffer.append(", ");
 		buffer.append(ruleB);
@@ -60,6 +66,8 @@ public class ReductionStats {
 		buffer.append(ruleC);
 		buffer.append(", ");
 		buffer.append(ruleD);
+		buffer.append(", ");
+		buffer.append(ruleE);
 		buffer.append(")");
 		
 		return buffer.toString();
