@@ -5,6 +5,7 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.RunningVerificationDialog;
@@ -17,14 +18,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
-import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -46,27 +39,36 @@ public class Verifier {
 		verifytapn.setup();
 		return verifytapn;
 	}
-	
+
 	private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
 		VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
 		verifydtapn.setup();
 		return verifydtapn;
 	}
-	
+
 	private static VerifyPN getVerifyPN() {
 		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
 		verifypn.setup();
 		return verifypn;
 	}
-	
+
+	private static VerifyPNCTL getVerifyPNCTL() {
+		VerifyPNCTL verifypn = new VerifyPNCTL(new FileFinderImpl(), new MessengerImpl());
+		verifypn.setup();
+		return verifypn;
+	}
+
 	private static ModelChecker getModelChecker(TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
 			return getVerifyTAPN();
 		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			return getVerifydTAPN();
-		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN && query.getCategory() == TAPNQuery.QueryCategory.Default){
 			return getVerifyPN();
-		} else{
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN && query.getCategory() == TAPNQuery.QueryCategory.CTL){
+			return getVerifyPNCTL();
+		}
+		else{
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
 		}
 	}
