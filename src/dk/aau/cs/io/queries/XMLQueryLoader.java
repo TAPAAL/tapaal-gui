@@ -166,8 +166,10 @@ public class XMLQueryLoader extends QueryLoader{
             for(QueryWrapper q : loader.faultyQueries){
                 errorMessage.append(System.lineSeparator());
                 errorMessage.append(q.getNameAndException());
-                if(!q.hasException()){
+                if(!q.hasException() && loader.queryUsingNonexistentPlaceFound){
                     errorMessage.append("  Reason: place not found in model");
+                } else if (!q.hasException() && loader.queryUsingNonexistentTransitionFound){
+                    errorMessage.append("  Reason: transition not found in model");
                 }
             }
 

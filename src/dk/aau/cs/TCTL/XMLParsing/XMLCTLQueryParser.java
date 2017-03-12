@@ -27,6 +27,7 @@ import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLAFNode;
 
@@ -366,6 +367,28 @@ public class XMLCTLQueryParser {
             } else if(nodeName.equals("integer-ge")){
                 return new TCTLAtomicPropositionNode(subformula1, ">=", subformula2);
             }
+        } else if (nodeName.equals("is-fireable")){
+        	children = getAllChildren(property);
+
+            if(children.size() > 1){
+                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
+            }
+            
+            ArrayList<TCTLAbstractStateProperty> transitions = new ArrayList<TCTLAbstractStateProperty>();
+
+            for(Node n : children){
+                String[] splits = getText(n).replace("\n", "").split("\\.");
+                
+                // Check if transition contains a template name
+                if(splits.length > 1){
+                	transitions.add(new TCTLTransitionNode(splits[0], splits[1]));
+                } else {
+                	transitions.add(new TCTLTransitionNode(splits[0]));
+                }
+            }
+
+			return new TCTLPlusListNode(transitions);
+
         } else{
         	parseFormula(property);
         }

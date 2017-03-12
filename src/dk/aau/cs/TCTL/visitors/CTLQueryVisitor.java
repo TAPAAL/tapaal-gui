@@ -1,6 +1,5 @@
 package dk.aau.cs.TCTL.visitors;
 
-import java.util.Iterator;
 import java.util.List;
 
 import dk.aau.cs.TCTL.TCTLAFNode;
@@ -26,37 +25,35 @@ import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.io.XMLFormatter;
-import pipe.dataLayer.TAPNQuery;
 
 public class CTLQueryVisitor extends VisitorBase {
 	
-	private static final String XML_HEADER 			= "<?xml version=\"1.0\"?>";
-	private static final String XML_NS 				= "xmlns=\"http://tapaal.net/\"";
-	private static final String XML_PROPSET 			= "property-set";
-	private static final String XML_PROP				= "property";
+	private static final String XML_NS 			= "xmlns=\"http://tapaal.net/\"";
+	private static final String XML_PROPSET 		= "property-set";
+	private static final String XML_PROP			= "property";
 	private static final String XML_PROPID			= "id";
-	private static final String XML_PROPDESC			= "description";
+	private static final String XML_PROPDESC		= "description";
 	private static final String XML_FORMULA			= "formula";	
-	private static final String XML_ALLPATHS			= "all-paths";
+	private static final String XML_ALLPATHS		= "all-paths";
 	private static final String XML_EXISTSPATH	 	= "exists-path";
-	private static final String XML_NEGATION			= "negation";
+	private static final String XML_NEGATION		= "negation";
 	private static final String XML_CONJUNCTION 		= "conjunction";
 	private static final String XML_DISJUNCTION 		= "disjunction";
-	private static final String XML_GLOBALLY			= "globally";
+	private static final String XML_GLOBALLY		= "globally";
 	private static final String XML_FINALLY			= "finally";
-	private static final String XML_NEXT				= "next";
+	private static final String XML_NEXT			= "next";
 	private static final String XML_UNTIL 			= "until";
 	private static final String XML_BEFORE 			= "before";
 	private static final String XML_REACH 			= "reach";
-	private static final String XML_DEADLOCK 			= "deadlock";
+	private static final String XML_DEADLOCK 		= "deadlock";
 	private static final String XML_TRUE 			= "true";
 	private static final String XML_FALSE 			= "false";
 	private static final String XML_INTEGERLT 		= "integer-lt";
 	private static final String XML_INTEGERLE 		= "integer-le";
-	private static final String XML_INTEGEREQ			= "integer-eq";
+	private static final String XML_INTEGEREQ		= "integer-eq";
 	private static final String XML_INTEGERNE 		= "integer-ne";
 	private static final String XML_INTEGERGT 		= "integer-gt";
-	private static final String XML_INTEGERGE			= "integer-ge";
+	private static final String XML_INTEGERGE               = "integer-ge";
 	private static final String XML_ISFIREABLE		= "is-fireable";
 	private static final String XML_INTEGERCONSTANT 	= "integer-constant";
 	private static final String XML_TOKENSCOUNT 		= "tokens-count";
@@ -64,30 +61,34 @@ public class CTLQueryVisitor extends VisitorBase {
 	private static final String XML_TRANSITION		= "transition";
 	
 	private StringBuffer XMLQuery;
+        
+        public CTLQueryVisitor() {
+            this.XMLQuery = new StringBuffer();
+        }
+        
+        public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
+            buildXMLQuery(property, queryName);
+            return getFormatted();
+        }
 	
-	public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
-		this.XMLQuery = new StringBuffer();
-		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS ) + startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
+	public void buildXMLQuery(TCTLAbstractProperty property, String queryName) {
+                XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
 		property.accept(this, null);
-		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP) + endTag(XML_PROPSET));
-		XMLFormatter formatter = new XMLFormatter();
-		return formatter.format(XMLQuery.toString());
+		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));              
 	}
-	
-	public String getXMLQueriesFor(Iterator<pipe.dataLayer.TAPNQuery> iterator){
-		this.XMLQuery = new StringBuffer();
-		
-		XMLQuery.append(XML_HEADER + startTag(XML_PROPSET + " " + XML_NS));
-		while (iterator.hasNext()){
-		    TAPNQuery query = iterator.next();
-			XMLQuery.append(startTagInline(XML_PROP) + queryInfo(query.getName()) + startTag(XML_FORMULA));
-			query.getProperty().accept(this, null);
-			XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
-		}
-		XMLQuery.append(endTag(XML_PROPSET));
-		XMLFormatter formatter = new XMLFormatter();
-		return formatter.format(XMLQuery.toString());
-	}
+        
+        public String getFormatted() {
+            XMLFormatter formatter = new XMLFormatter();
+            return formatter.format(getStartTag() + XMLQuery.toString() + getEndTag());
+        }
+        
+        public String getStartTag(){
+            return startTag(XML_PROPSET + " " + XML_NS) + "\n";
+        }
+        
+        public String getEndTag(){
+            return endTag(XML_PROPSET) + "\n";
+        }
 	
 	private String queryInfo(String queryName){
 		String nameToPrint = (queryName == null) ? "Query Comment/Name Here" : queryName;
@@ -199,14 +200,11 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-		String placeName = (tctlPlaceNode.getTemplate().isEmpty() ?
-				tctlPlaceNode.getPlace() :
-				tctlPlaceNode.getTemplate() + "." + tctlPlaceNode.getPlace());
-		XMLQuery.append(wrapInTag(placeName + "", XML_PLACE));
+		XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
 	}
 	
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
-		XMLQuery.append(wrapInTag(tctlTransitionNode.getTransition() + "", XML_TRANSITION));
+		XMLQuery.append(wrapInTag(tctlTransitionNode.toString() + "", XML_TRANSITION));
 	}
 	
 	@Override
@@ -239,9 +237,6 @@ public class CTLQueryVisitor extends VisitorBase {
 	
 	private String wrapInTag(String str, String tag){
 		return startTag(tag) + str + endTag(tag);
-	}
-	private String startTagInline(String tag){
-		return "<" + tag + ">";
 	}
 	private String startTag(String tag){
 		return "<" + tag + ">";

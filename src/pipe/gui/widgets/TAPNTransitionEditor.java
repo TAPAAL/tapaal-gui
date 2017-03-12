@@ -17,6 +17,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
+import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
@@ -99,6 +100,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					makeSharedButton.setEnabled(false);
 				}else{
 					switchToNameTextField();
+                                        nameTextField.setText(transition.underlyingTransition().isShared()? 
+                                                CreateGui.getDrawingSurface().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
 					makeSharedButton.setEnabled(true);
 				}
 			}		
@@ -402,9 +405,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		
 		if(sharedCheckBox.isSelected()){	
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
-			context.undoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition()));
+                        Command command = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
+			context.undoManager().addEdit(command);
 			try{
-				selectedTransition.makeShared(transition.underlyingTransition());
+				command.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
 				JOptionPane.showMessageDialog(this,"Another transition in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
@@ -422,7 +426,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			String oldName = transition.underlyingTransition().name();
 			try{ // set name
 				transition.underlyingTransition().setName(newName);
-				context.undoManager().addEdit(new RenameTimedTransitionCommand(transition.underlyingTransition(), oldName, newName));
+				context.undoManager().addEdit(new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName));
 			}catch(RequireException e){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,

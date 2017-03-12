@@ -82,16 +82,15 @@ public class TCTLEGNode extends TCTLAbstractPathProperty {
 	public boolean containsPlaceHolder() {
 		return property.containsPlaceHolder();
 	}
-
-	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		return property.containsAtomicPropWithSpecificPlace(placeName);
-	}
 	
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
 
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+		return property.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
+	}
+	
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();

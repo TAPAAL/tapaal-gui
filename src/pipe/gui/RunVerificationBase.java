@@ -13,6 +13,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.approximation.ApproximationWorker;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
@@ -149,8 +150,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	}
 
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
-		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
-		query.getProperty().accept(visitor, null);
+		RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
+                RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);
+		query.getProperty().accept(placeVisitor, null);
+                query.getProperty().accept(transitionVisitor, null);
 	}
 
 	@Override

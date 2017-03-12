@@ -19,6 +19,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.approximation.ApproximationWorker;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
@@ -452,8 +453,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 	
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
-		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
-		query.getProperty().accept(visitor, null);
+		RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
+                RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);
+		query.getProperty().accept(placeVisitor, null);
+                query.getProperty().accept(transitionVisitor, null);
 	}
 
 	private Verifyta getVerifyta() {

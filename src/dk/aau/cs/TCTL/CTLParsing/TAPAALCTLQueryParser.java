@@ -9,6 +9,7 @@ import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -106,7 +107,7 @@ public class TAPAALCTLQueryParser implements TAPAALCTLQueryParserConstants {
 {if ("" != null) return new TCTLStateToPathConverter(child);}
     }
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty OrExpr() throws ParseException {TCTLAbstractStateProperty currentChild;
         ArrayList<TCTLAbstractStateProperty> disjunctions = new ArrayList<TCTLAbstractStateProperty>();
@@ -129,7 +130,7 @@ disjunctions.add(currentChild);
     }
 {if ("" != null) return disjunctions.size() == 1 ? currentChild : new TCTLOrListNode(disjunctions);}
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty AndExpr() throws ParseException {TCTLAbstractStateProperty currentChild;
         ArrayList<TCTLAbstractStateProperty> conjunctions = new ArrayList<TCTLAbstractStateProperty>();
@@ -152,7 +153,7 @@ conjunctions.add(currentChild);
     }
 {if ("" != null) return conjunctions.size() == 1 ? currentChild : new TCTLAndListNode(conjunctions);}
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty NotExpr() throws ParseException {TCTLAbstractStateProperty child;
         TCTLAbstractPathProperty childConverter;
@@ -178,9 +179,12 @@ conjunctions.add(currentChild);
 {if ("" != null) return child;}
     }
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty Factor() throws ParseException {TCTLAbstractStateProperty thisProp;
+    ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
+        Token temp = null;
+    Token transition;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case TRUE:{
       jj_consume_token(TRUE);
@@ -199,10 +203,22 @@ thisProp = new TCTLDeadlockNode();
       }
     default:
       jj_la1[4] = jj_gen;
-      if (jj_2_1(2147483647)) {
+      if (jj_2_2(2147483647)) {
         thisProp = AtomicProposition();
       } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case IDENT:{
+          if (jj_2_1(2)) {
+            temp = jj_consume_token(IDENT);
+            jj_consume_token(27);
+          } else {
+            ;
+          }
+          transition = jj_consume_token(IDENT);
+list.add(new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image));
+            thisProp = new TCTLPlusListNode(list);
+          break;
+          }
         case 25:{
           jj_consume_token(25);
           thisProp = OrExpr();
@@ -217,7 +233,7 @@ thisProp = new TCTLPathToStateConverter(AbstractPathProperty());
     }
 {if ("" != null) return thisProp;}
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty AtomicProposition() throws ParseException {TCTLAbstractStateProperty left;
         TCTLAbstractStateProperty right;
@@ -233,7 +249,7 @@ if (left instanceof  TCTLPlaceNode){
             {if ("" != null) return new TCTLAtomicPropositionNode(left, op.image, right);}
         }
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty AritmeticExpr() throws ParseException {TCTLAbstractStateProperty currentChild;
         ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
@@ -258,7 +274,7 @@ terms.add(new AritmeticOperator(op.image));
     }
 {if ("" != null) return terms.size() == 1 ? currentChild : new TCTLPlusListNode(terms);}
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty AritmeticTerm() throws ParseException {TCTLAbstractStateProperty currentChild;
         ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<TCTLAbstractStateProperty>();
@@ -283,23 +299,23 @@ factors.add(new AritmeticOperator(op.image));
     }
 {if ("" != null) return factors.size() == 1 ? currentChild : new TCTLTermListNode(factors);}
     throw new Error("Missing return statement in function");
-  }
+}
 
   final public TCTLAbstractStateProperty AritmeticFactor() throws ParseException {TCTLAbstractStateProperty thisProp;
-        Token template = null;
+        Token temp = null;
         Token place;
         Token op;
         Token num;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case IDENT:{
-      if (jj_2_2(2)) {
-        template = jj_consume_token(IDENT);
+      if (jj_2_3(2)) {
+        temp = jj_consume_token(IDENT);
         jj_consume_token(27);
       } else {
         ;
       }
       place = jj_consume_token(IDENT);
-thisProp = new TCTLPlaceNode(template == null ? "" : template.image, place.image);
+thisProp = new TCTLPlaceNode(temp == null ? "" : temp.image, place.image);
       break;
       }
     case NUM:{
@@ -320,12 +336,12 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     }
 {if ("" != null) return thisProp;}
     throw new Error("Missing return statement in function");
-  }
+}
 
   private boolean jj_2_1(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_1(); }
+    try { return (!jj_3_1()); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(0, xla); }
   }
@@ -333,37 +349,17 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
   private boolean jj_2_2(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_2(); }
+    try { return (!jj_3_2()); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_11()
+  private boolean jj_2_3(int xla)
  {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_2()) jj_scanpos = xsp;
-    if (jj_scan_token(IDENT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_5()
- {
-    if (jj_3R_6()) return true;
-    if (jj_scan_token(OP)) return true;
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_6()
- {
-    if (jj_3R_7()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_8()) { jj_scanpos = xsp; break; }
-    }
-    return false;
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_3()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(2, xla); }
   }
 
   private boolean jj_3R_7()
@@ -388,6 +384,13 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     if (jj_3R_13()) return true;
     }
     }
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_scan_token(IDENT)) return true;
+    if (jj_scan_token(27)) return true;
     return false;
   }
 
@@ -419,16 +422,44 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     return false;
   }
 
-  private boolean jj_3_2()
+  private boolean jj_3_3()
  {
     if (jj_scan_token(IDENT)) return true;
     if (jj_scan_token(27)) return true;
     return false;
   }
 
-  private boolean jj_3_1()
+  private boolean jj_3R_11()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_3()) jj_scanpos = xsp;
+    if (jj_scan_token(IDENT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_5()
+ {
+    if (jj_3R_6()) return true;
+    if (jj_scan_token(OP)) return true;
+    if (jj_3R_6()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
  {
     if (jj_3R_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_6()
+ {
+    if (jj_3R_7()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_8()) { jj_scanpos = xsp; break; }
+    }
     return false;
   }
 
@@ -446,168 +477,168 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
   final private int[] jj_la1 = new int[9];
   static private int[] jj_la1_0;
   static {
-      jj_la1_init_0();
-   }
-   private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1ef0,0x2000,0x4000,0x2008000,0xe,0x2000000,0x10000,0x20000,0x20c0000,};
-   }
-  final private JJCalls[] jj_2_rtns = new JJCalls[2];
+	   jj_la1_init_0();
+	}
+	private static void jj_la1_init_0() {
+	   jj_la1_0 = new int[] {0x1ef0,0x2000,0x4000,0x2008000,0xe,0x2080000,0x10000,0x20000,0x20c0000,};
+	}
+  final private JJCalls[] jj_2_rtns = new JJCalls[3];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
   /** Constructor with InputStream. */
   public TAPAALCTLQueryParser(java.io.InputStream stream) {
-     this(stream, null);
+	  this(stream, null);
   }
   /** Constructor with InputStream and supplied encoding */
   public TAPAALCTLQueryParser(java.io.InputStream stream, String encoding) {
-    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-    token_source = new TAPAALCTLQueryParserTokenManager(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+	 try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
+	 token_source = new TAPAALCTLQueryParserTokenManager(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
   public void ReInit(java.io.InputStream stream) {
-     ReInit(stream, null);
+	  ReInit(stream, null);
   }
   /** Reinitialise. */
   public void ReInit(java.io.InputStream stream, String encoding) {
-    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-    token_source.ReInit(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+	 try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
+	 token_source.ReInit(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Constructor. */
   public TAPAALCTLQueryParser(java.io.Reader stream) {
-    jj_input_stream = new SimpleCharStream(stream, 1, 1);
-    token_source = new TAPAALCTLQueryParserTokenManager(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+	 jj_input_stream = new SimpleCharStream(stream, 1, 1);
+	 token_source = new TAPAALCTLQueryParserTokenManager(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
   public void ReInit(java.io.Reader stream) {
 	if (jj_input_stream == null) {
-      jj_input_stream = new SimpleCharStream(stream, 1, 1);
-   } else {
-      jj_input_stream.ReInit(stream, 1, 1);
-   }
-   if (token_source == null) {
+	   jj_input_stream = new SimpleCharStream(stream, 1, 1);
+	} else {
+	   jj_input_stream.ReInit(stream, 1, 1);
+	}
+	if (token_source == null) {
  token_source = new TAPAALCTLQueryParserTokenManager(jj_input_stream);
-   }
+	}
 
-    token_source.ReInit(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+	 token_source.ReInit(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Constructor with generated Token Manager. */
   public TAPAALCTLQueryParser(TAPAALCTLQueryParserTokenManager tm) {
-    token_source = tm;
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+	 token_source = tm;
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
   public void ReInit(TAPAALCTLQueryParserTokenManager tm) {
-    token_source = tm;
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 9; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+	 token_source = tm;
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 9; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
-    Token oldToken;
-    if ((oldToken = token).next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
-    jj_ntk = -1;
-    if (token.kind == kind) {
-      jj_gen++;
-      if (++jj_gc > 100) {
-        jj_gc = 0;
-        for (int i = 0; i < jj_2_rtns.length; i++) {
-          JJCalls c = jj_2_rtns[i];
-          while (c != null) {
-            if (c.gen < jj_gen) c.first = null;
-            c = c.next;
-          }
-        }
-      }
-      return token;
-    }
-    token = oldToken;
-    jj_kind = kind;
-    throw generateParseException();
+	 Token oldToken;
+	 if ((oldToken = token).next != null) token = token.next;
+	 else token = token.next = token_source.getNextToken();
+	 jj_ntk = -1;
+	 if (token.kind == kind) {
+	   jj_gen++;
+	   if (++jj_gc > 100) {
+		 jj_gc = 0;
+		 for (int i = 0; i < jj_2_rtns.length; i++) {
+		   JJCalls c = jj_2_rtns[i];
+		   while (c != null) {
+			 if (c.gen < jj_gen) c.first = null;
+			 c = c.next;
+		   }
+		 }
+	   }
+	   return token;
+	 }
+	 token = oldToken;
+	 jj_kind = kind;
+	 throw generateParseException();
   }
 
   @SuppressWarnings("serial")
   static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(int kind) {
-    if (jj_scanpos == jj_lastpos) {
-      jj_la--;
-      if (jj_scanpos.next == null) {
-        jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
-      } else {
-        jj_lastpos = jj_scanpos = jj_scanpos.next;
-      }
-    } else {
-      jj_scanpos = jj_scanpos.next;
-    }
-    if (jj_rescan) {
-      int i = 0; Token tok = token;
-      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
-      if (tok != null) jj_add_error_token(kind, i);
-    }
-    if (jj_scanpos.kind != kind) return true;
-    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
-    return false;
+	 if (jj_scanpos == jj_lastpos) {
+	   jj_la--;
+	   if (jj_scanpos.next == null) {
+		 jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
+	   } else {
+		 jj_lastpos = jj_scanpos = jj_scanpos.next;
+	   }
+	 } else {
+	   jj_scanpos = jj_scanpos.next;
+	 }
+	 if (jj_rescan) {
+	   int i = 0; Token tok = token;
+	   while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+	   if (tok != null) jj_add_error_token(kind, i);
+	 }
+	 if (jj_scanpos.kind != kind) return true;
+	 if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+	 return false;
   }
 
 
 /** Get the next Token. */
   final public Token getNextToken() {
-    if (token.next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
-    jj_ntk = -1;
-    jj_gen++;
-    return token;
+	 if (token.next != null) token = token.next;
+	 else token = token.next = token_source.getNextToken();
+	 jj_ntk = -1;
+	 jj_gen++;
+	 return token;
   }
 
 /** Get the specific Token. */
   final public Token getToken(int index) {
-    Token t = token;
-    for (int i = 0; i < index; i++) {
-      if (t.next != null) t = t.next;
-      else t = t.next = token_source.getNextToken();
-    }
-    return t;
+	 Token t = token;
+	 for (int i = 0; i < index; i++) {
+	   if (t.next != null) t = t.next;
+	   else t = t.next = token_source.getNextToken();
+	 }
+	 return t;
   }
 
   private int jj_ntk_f() {
-    if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
-    else
-      return (jj_ntk = jj_nt.kind);
+	 if ((jj_nt=token.next) == null)
+	   return (jj_ntk = (token.next=token_source.getNextToken()).kind);
+	 else
+	   return (jj_ntk = jj_nt.kind);
   }
 
   private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
@@ -617,75 +648,83 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
   private int jj_endpos;
 
   private void jj_add_error_token(int kind, int pos) {
-    if (pos >= 100) {
-       return;
-    }
+	 if (pos >= 100) {
+		return;
+	 }
 
-    if (pos == jj_endpos + 1) {
-      jj_lasttokens[jj_endpos++] = kind;
-    } else if (jj_endpos != 0) {
-      jj_expentry = new int[jj_endpos];
+	 if (pos == jj_endpos + 1) {
+	   jj_lasttokens[jj_endpos++] = kind;
+	 } else if (jj_endpos != 0) {
+	   jj_expentry = new int[jj_endpos];
 
-      for (int i = 0; i < jj_endpos; i++) {
-        jj_expentry[i] = jj_lasttokens[i];
-      }
+	   for (int i = 0; i < jj_endpos; i++) {
+		 jj_expentry[i] = jj_lasttokens[i];
+	   }
 
-      for (int[] oldentry : jj_expentries) {
-        if (oldentry.length == jj_expentry.length) {
-          boolean isMatched = true;
+	   for (int[] oldentry : jj_expentries) {
+		 if (oldentry.length == jj_expentry.length) {
+		   boolean isMatched = true;
 
-          for (int i = 0; i < jj_expentry.length; i++) {
-            if (oldentry[i] != jj_expentry[i]) {
-              isMatched = false;
-              break;
-            }
+		   for (int i = 0; i < jj_expentry.length; i++) {
+			 if (oldentry[i] != jj_expentry[i]) {
+			   isMatched = false;
+			   break;
+			 }
 
-          }
-          if (isMatched) {
-            jj_expentries.add(jj_expentry);
-            break;
-          }
-        }
-      }
+		   }
+		   if (isMatched) {
+			 jj_expentries.add(jj_expentry);
+			 break;
+		   }
+		 }
+	   }
 
-      if (pos != 0) {
-        jj_lasttokens[(jj_endpos = pos) - 1] = kind;
-      }
-    }
+	   if (pos != 0) {
+		 jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+	   }
+	 }
   }
 
   /** Generate ParseException. */
   public ParseException generateParseException() {
-    jj_expentries.clear();
-    boolean[] la1tokens = new boolean[28];
-    if (jj_kind >= 0) {
-      la1tokens[jj_kind] = true;
-      jj_kind = -1;
-    }
-    for (int i = 0; i < 9; i++) {
-      if (jj_la1[i] == jj_gen) {
-        for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & (1<<j)) != 0) {
-            la1tokens[j] = true;
-          }
-        }
-      }
-    }
-    for (int i = 0; i < 28; i++) {
-      if (la1tokens[i]) {
-        jj_expentry = new int[1];
-        jj_expentry[0] = i;
-        jj_expentries.add(jj_expentry);
-      }
-    }
-    jj_endpos = 0;
-    jj_rescan_token();
-    jj_add_error_token(0, 0);
-    int[][] exptokseq = new int[jj_expentries.size()][];
-    for (int i = 0; i < jj_expentries.size(); i++) {
-      exptokseq[i] = jj_expentries.get(i);
-    }
-    return new ParseException(token, exptokseq, tokenImage);
+	 jj_expentries.clear();
+	 boolean[] la1tokens = new boolean[28];
+	 if (jj_kind >= 0) {
+	   la1tokens[jj_kind] = true;
+	   jj_kind = -1;
+	 }
+	 for (int i = 0; i < 9; i++) {
+	   if (jj_la1[i] == jj_gen) {
+		 for (int j = 0; j < 32; j++) {
+		   if ((jj_la1_0[i] & (1<<j)) != 0) {
+			 la1tokens[j] = true;
+		   }
+		 }
+	   }
+	 }
+	 for (int i = 0; i < 28; i++) {
+	   if (la1tokens[i]) {
+		 jj_expentry = new int[1];
+		 jj_expentry[0] = i;
+		 jj_expentries.add(jj_expentry);
+	   }
+	 }
+	 jj_endpos = 0;
+	 jj_rescan_token();
+	 jj_add_error_token(0, 0);
+	 int[][] exptokseq = new int[jj_expentries.size()][];
+	 for (int i = 0; i < jj_expentries.size(); i++) {
+	   exptokseq[i] = jj_expentries.get(i);
+	 }
+	 return new ParseException(token, exptokseq, tokenImage);
+  }
+
+  private int trace_indent = 0;
+  private boolean trace_enabled;
+
+/** Trace enabled. */
+  final public boolean trace_enabled() {
+	 return trace_enabled;
   }
 
   /** Enable tracing. */
@@ -697,44 +736,45 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
   }
 
   private void jj_rescan_token() {
-    jj_rescan = true;
-    for (int i = 0; i < 2; i++) {
-      try {
-        JJCalls p = jj_2_rtns[i];
+	 jj_rescan = true;
+	 for (int i = 0; i < 3; i++) {
+	   try {
+		 JJCalls p = jj_2_rtns[i];
 
-        do {
-          if (p.gen > jj_gen) {
-            jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
-            switch (i) {
-              case 0: jj_3_1(); break;
-              case 1: jj_3_2(); break;
-            }
-          }
-          p = p.next;
-        } while (p != null);
+		 do {
+		   if (p.gen > jj_gen) {
+			 jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
+			 switch (i) {
+			   case 0: jj_3_1(); break;
+			   case 1: jj_3_2(); break;
+			   case 2: jj_3_3(); break;
+			 }
+		   }
+		   p = p.next;
+		 } while (p != null);
 
-        } catch(LookaheadSuccess ls) { }
-    }
-    jj_rescan = false;
+		 } catch(LookaheadSuccess ls) { }
+	 }
+	 jj_rescan = false;
   }
 
   private void jj_save(int index, int xla) {
-    JJCalls p = jj_2_rtns[index];
-    while (p.gen > jj_gen) {
-      if (p.next == null) { p = p.next = new JJCalls(); break; }
-      p = p.next;
-    }
+	 JJCalls p = jj_2_rtns[index];
+	 while (p.gen > jj_gen) {
+	   if (p.next == null) { p = p.next = new JJCalls(); break; }
+	   p = p.next;
+	 }
 
-    p.gen = jj_gen + xla - jj_la; 
-    p.first = token;
-    p.arg = xla;
+	 p.gen = jj_gen + xla - jj_la; 
+	 p.first = token;
+	 p.arg = xla;
   }
 
   static final class JJCalls {
-    int gen;
-    Token first;
-    int arg;
-    JJCalls next;
+	 int gen;
+	 Token first;
+	 int arg;
+	 JJCalls next;
   }
 
 }

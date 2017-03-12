@@ -84,12 +84,6 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		return left.containsAtomicPropWithSpecificPlace(placeName) || 
-				right.containsAtomicPropWithSpecificPlace(placeName);
-	}
-
-	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		TCTLAbstractProperty rightP = right.findFirstPlaceHolder(); 
 		
@@ -100,5 +94,10 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		return right.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName) ||
 				left.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
-
+	
+	
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+		return right.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName) ||
+				left.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
+	}
 }

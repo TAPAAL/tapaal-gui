@@ -162,23 +162,22 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		visitor.visit(this, context);
 
 	}
-
-	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		boolean atomicPropFound = false;
-
-		for (TCTLAbstractStateProperty p : properties) {
-			atomicPropFound = atomicPropFound || p.containsAtomicPropWithSpecificPlace(placeName);
-		}
-
-		return atomicPropFound;
-	}
 	
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		boolean atomicPropFound = false;
 
 		for (TCTLAbstractStateProperty p : properties) {
 			atomicPropFound = atomicPropFound || p.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+		}
+
+		return atomicPropFound;
+	}
+	
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+		boolean atomicPropFound = false;
+
+		for (TCTLAbstractStateProperty p : properties) {
+			atomicPropFound = atomicPropFound || p.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
 		}
 
 		return atomicPropFound;
