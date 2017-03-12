@@ -31,7 +31,6 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
@@ -80,7 +79,7 @@ public class VerifyPN implements ModelChecker{
 			buffer.append("</html>");
 			return buffer.toString();
 		}
-		
+
 		public String getPath() {
 			return verifypnpath;
 		}
@@ -384,7 +383,7 @@ public class VerifyPN implements ModelChecker{
 		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
 			Tuple<QueryResult, Stats> result = null;
 			if (query.getCategory() == QueryCategory.CTL){
-				VerifyTAPNCTLOutputParser outputParser = new VerifyTAPNCTLOutputParser(totalTokens, extraTokens, query);
+				VerifyPNCTLOutputParser outputParser = new VerifyPNCTLOutputParser(totalTokens, extraTokens, query);
 				result = outputParser.parseOutput(output);
 			} else {
 				VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, query);
