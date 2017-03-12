@@ -13,8 +13,10 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
+import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
@@ -108,13 +110,17 @@ public class XMLQueryLoader extends QueryLoader{
                 ReductionOption.VerifyPN, true, false, true, true, true, true, 
                 HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
 
+            RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
+                network.activeTemplates().get(0).name());
             query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp()));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL){
             	query.setSearchOption(SearchOption.DFS);
             	query.setUseReduction(false);
             }
-                                
+            
+            query.getProperty().accept(rt, null);
+                    
             queries.add(query);
         }
 
