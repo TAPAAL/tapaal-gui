@@ -424,9 +424,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 
 			String oldName = transition.underlyingTransition().name();
+                        transition.underlyingTransition().setName(newName);
+                        Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
+                        context.undoManager().addEdit(renameCommand);
 			try{ // set name
-				transition.underlyingTransition().setName(newName);
-				context.undoManager().addEdit(new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName));
+                                renameCommand.redo();
 			}catch(RequireException e){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
