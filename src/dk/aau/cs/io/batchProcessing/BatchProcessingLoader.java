@@ -25,14 +25,12 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
-import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.io.IdResolver;
@@ -525,9 +523,6 @@ public class BatchProcessingLoader {
 			parsedQuery.setCategory(TAPNQueryLoader.detectCategory(query));
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
-				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
-		                network.activeTemplates().get(0).name());
-				parsedQuery.getProperty().accept(rt, null);
 			}
 			return parsedQuery;
 		} else

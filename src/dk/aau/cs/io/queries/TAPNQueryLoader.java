@@ -34,7 +34,6 @@ import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
-import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -100,9 +99,6 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setCategory(detectCategory(query));
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
-				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
-		                network.activeTemplates().get(0).name());
-				parsedQuery.getProperty().accept(rt, null);
 			}
 			return parsedQuery;
 		} else
