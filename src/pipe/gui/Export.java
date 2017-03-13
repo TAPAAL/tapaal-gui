@@ -33,14 +33,17 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.DOMException;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.PNMLWriter;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.widgets.FileBrowser;
@@ -82,13 +85,21 @@ public class Export {
 	}
 	
 	private static void toQueryXML(DrawingSurfaceImpl g, String filename){
-		try{			
+		try{
 			TabContent currentTab = CreateGui.getCurrentTab();
-			Iterator<TAPNQuery> queryIterator = currentTab.queries().iterator();
-			PrintStream queryStream = new PrintStream(filename);
+                        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
+                        NameMapping mapping = composer.transformModel(currentTab.network()).value2();
+                        Iterator<TAPNQuery> queryIterator = currentTab.queries().iterator();
+                        PrintStream queryStream = new PrintStream(filename);
 			CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-			
-			queryStream.append(XMLVisitor.getXMLQueriesFor(queryIterator));
+                        
+                        while(queryIterator.hasNext()){
+                            TAPNQuery clonedQuery = queryIterator.next().copy();
+                            clonedQuery.getProperty().accept(new RenameAllPlacesVisitor(mapping), null);
+                            clonedQuery.getProperty().accept(new RenameAllTransitionsVisitor(mapping), null);
+                            XMLVisitor.buildXMLQuery(clonedQuery.getProperty(), clonedQuery.getName());
+                        }
+                        queryStream.print(XMLVisitor.getFormatted());
 			
 			queryStream.close();
 		} catch(FileNotFoundException e) {

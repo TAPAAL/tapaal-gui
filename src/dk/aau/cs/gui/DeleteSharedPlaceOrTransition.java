@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
+import dk.aau.cs.TCTL.visitors.ContainsSharedTransitionVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.gui.undo.Command;
@@ -117,7 +118,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private void deleteSharedPlace(boolean deleteFromTemplates) {
 		SharedPlace sharedPlace = (SharedPlace)list.getSelectedValue();
-		Collection<TAPNQuery> affectedQueries = findAffectedQueries(sharedPlace);
+		Collection<TAPNQuery> affectedQueries = findAffectedPlaceQueries(sharedPlace);
 		if(affectedQueries.size() > 0){
 			StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
 			buffer.append(System.getProperty("line.separator"));
@@ -183,9 +184,23 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}
 	}
 
-	private Collection<TAPNQuery> findAffectedQueries(SharedPlace sharedPlace) {
+	private Collection<TAPNQuery> findAffectedPlaceQueries(SharedPlace sharedPlace) {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 		ContainsSharedPlaceVisitor visitor = new ContainsSharedPlaceVisitor(sharedPlace.name());
+
+		for(TAPNQuery query : tab.queries()){
+			BooleanResult result = new BooleanResult();
+			query.getProperty().accept(visitor, result);
+			if(result.result()){
+				queries.add(query);
+			}
+		}
+		return queries;
+	}
+        
+        private Collection<TAPNQuery> findAffectedTransitionQueries(SharedTransition sharedTransition) {
+		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
+		ContainsSharedTransitionVisitor visitor = new ContainsSharedTransitionVisitor(sharedTransition.name());
 
 		for(TAPNQuery query : tab.queries()){
 			BooleanResult result = new BooleanResult();
@@ -218,6 +233,25 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	
 	private void deleteSharedTransition(boolean deleteFromTemplates) {
 		SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
+                Collection<TAPNQuery> affectedQueries = findAffectedTransitionQueries(sharedTransition);
+		if(affectedQueries.size() > 0){
+                    StringBuffer buffer = new StringBuffer("The following queries contains the shared transition and will also be deleted:");
+                    buffer.append(System.getProperty("line.separator"));
+                    buffer.append(System.getProperty("line.separator"));
+
+                    for(TAPNQuery query : affectedQueries){
+                            buffer.append(query.getName());
+                            buffer.append(System.getProperty("line.separator"));
+                    }
+                    buffer.append(System.getProperty("line.separator"));
+                    buffer.append("Do you want to continue?");
+                    int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if(choice == JOptionPane.NO_OPTION) return;
+
+                    Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
+                    cmd.redo();
+                    undoManager.addEdit(cmd);
+		}
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(sharedTransition.name());
@@ -248,7 +282,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			for(TimedTransition transition : copy){
 				String name = nameGenerator.getNewTransitionName(transition.model());
 				// We add this invisible transition renaming to avoid problems with undo
-				undoManager.addEdit(new RenameTimedTransitionCommand(transition, name, transition.name())); 
+				undoManager.addEdit(new RenameTimedTransitionCommand(tab, transition, name, transition.name())); 
 			}
 		}
 	}

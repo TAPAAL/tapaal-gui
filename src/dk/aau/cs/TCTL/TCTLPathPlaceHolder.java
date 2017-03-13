@@ -49,12 +49,11 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 		visitor.visit(this, context);
 	}
 
-	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return false;
 	}
 	
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
 		return false;
 	}
 

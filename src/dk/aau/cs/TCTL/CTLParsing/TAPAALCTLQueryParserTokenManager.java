@@ -7,6 +7,7 @@ import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -30,7 +31,7 @@ import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 
 /** Token Manager. */
-@SuppressWarnings("unused")public class TAPAALCTLQueryParserTokenManager implements TAPAALCTLQueryParserConstants {
+public class TAPAALCTLQueryParserTokenManager implements TAPAALCTLQueryParserConstants {
 
   /** Debug output. */
   public  java.io.PrintStream debugStream = System.out;
@@ -581,9 +582,6 @@ private int jjMoveNfa_0(int startState, int curPos)
       catch(java.io.IOException e) { return curPos; }
    }
 }
-static final int[] jjnextStates = {
-   65, 67, 68, 70, 58, 60, 61, 63, 
-};
 
 /** Token literal values. */
 public static final String[] jjstrLiteralImages = {
@@ -604,7 +602,9 @@ protected Token jjFillToken()
    beginColumn = input_stream.getBeginColumn();
    endLine = input_stream.getEndLine();
    endColumn = input_stream.getEndColumn();
-   t = Token.newToken(jjmatchedKind, curTokenImage);
+   t = Token.newToken(jjmatchedKind);
+   t.kind = jjmatchedKind;
+   t.image = curTokenImage;
 
    t.beginLine = beginLine;
    t.endLine = endLine;
@@ -613,6 +613,9 @@ protected Token jjFillToken()
 
    return t;
 }
+static final int[] jjnextStates = {
+   65, 67, 68, 70, 58, 60, 61, 63, 
+};
 
 int curLexState = 0;
 int defaultLexState = 0;
@@ -687,6 +690,31 @@ public Token getNextToken()
   }
 }
 
+void SkipLexicalActions(Token matchedToken)
+{
+   switch(jjmatchedKind)
+   {
+      default :
+         break;
+   }
+}
+void MoreLexicalActions()
+{
+   jjimageLen += (lengthOfMatch = jjmatchedPos + 1);
+   switch(jjmatchedKind)
+   {
+      default :
+         break;
+   }
+}
+void TokenLexicalActions(Token matchedToken)
+{
+   switch(jjmatchedKind)
+   {
+      default :
+         break;
+   }
+}
 private void jjCheckNAdd(int state)
 {
    if (jjrounds[state] != jjround)
@@ -728,7 +756,9 @@ private void jjCheckNAddTwoStates(int state1, int state2)
   {
 
 
-    jjmatchedPos = jjnewStateCnt = 0;
+    jjmatchedPos =
+    jjnewStateCnt =
+    0;
     curLexState = defaultLexState;
     input_stream = stream;
     ReInitRounds();
@@ -759,9 +789,16 @@ private void jjCheckNAddTwoStates(int state1, int state2)
       curLexState = lexState;
   }
 
+
 /** Lexer state names. */
 public static final String[] lexStateNames = {
    "DEFAULT",
+};
+
+/** Lex State array. */
+public static final int[] jjnewLexState = {
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+   -1, -1, -1, 
 };
 static final long[] jjtoToken = {
    0xe1fffffL, 
@@ -769,11 +806,19 @@ static final long[] jjtoToken = {
 static final long[] jjtoSkip = {
    0x1e00000L, 
 };
+static final long[] jjtoSpecial = {
+   0x0L, 
+};
+static final long[] jjtoMore = {
+   0x0L, 
+};
     protected SimpleCharStream  input_stream;
 
     private final int[] jjrounds = new int[71];
     private final int[] jjstateSet = new int[2 * 71];
-
-    
+    private final StringBuilder jjimage = new StringBuilder();
+    private StringBuilder image = jjimage;
+    private int jjimageLen;
+    private int lengthOfMatch;
     protected int curChar;
 }

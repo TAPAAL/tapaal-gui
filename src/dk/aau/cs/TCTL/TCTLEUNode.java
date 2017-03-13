@@ -106,15 +106,14 @@ public class TCTLEUNode extends TCTLAbstractPathProperty {
 				|| right.containsPlaceHolder();
 	}
 
-	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		return left.containsAtomicPropWithSpecificPlace(placeName)
-				|| right.containsAtomicPropWithSpecificPlace(placeName);
-	}
-	
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return left.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)
 				|| right.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+	}
+	
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+		return right.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName) ||
+				left.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -192,6 +193,9 @@ TCTLAbstractStateProperty NotExpr() :
 TCTLAbstractStateProperty Factor() :
 {
 	TCTLAbstractStateProperty thisProp; 
+    ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
+	Token temp = null;
+    Token transition;
 }
 {
 	(
@@ -200,6 +204,9 @@ TCTLAbstractStateProperty Factor() :
 		| <DEADLOCK> {thisProp = new TCTLDeadlockNode(); }
 		| LOOKAHEAD(AtomicProposition())
 		thisProp = AtomicProposition() 
+        | [ LOOKAHEAD(2) temp = <IDENT> "." ] transition = <IDENT> { 
+            list.add(new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image));
+            thisProp = new TCTLPlusListNode(list); }
 		| "(" thisProp = OrExpr() ")"
 		| LOOKAHEAD(AbstractPathProperty()) {
 		thisProp = new TCTLPathToStateConverter(AbstractPathProperty()); }
@@ -270,14 +277,14 @@ TCTLAbstractStateProperty AritmeticTerm() :
 TCTLAbstractStateProperty AritmeticFactor() : 
 {
 	TCTLAbstractStateProperty thisProp; 
-	Token template = null;
+	Token temp = null;
 	Token place;
 	Token op;
 	Token num;
 }
 {
 	(
-		[ LOOKAHEAD(2) template = <IDENT> "." ] place = <IDENT> { thisProp = new TCTLPlaceNode(template == null ? "" : template.image, place.image); }
+		[ LOOKAHEAD(2) temp = <IDENT> "." ] place = <IDENT> { thisProp = new TCTLPlaceNode(temp == null ? "" : temp.image, place.image); }
 		| num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); } 
 		| "(" thisProp = AritmeticExpr() ")"
 	)

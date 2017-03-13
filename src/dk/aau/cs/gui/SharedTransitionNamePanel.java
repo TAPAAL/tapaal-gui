@@ -17,6 +17,8 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import pipe.gui.undo.UndoManager;
+import pipe.dataLayer.TAPNQuery;
+import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.gui.undo.AddSharedTransitionCommand;
 import dk.aau.cs.gui.undo.RenameSharedTransitionCommand;
@@ -33,19 +35,21 @@ public class SharedTransitionNamePanel extends JPanel {
 
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
+        private final Context context;
 	
 	JButton okButton;
 
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator) {
-		this(rootPane, sharedTransitionsListModel, undoManager, nameGenerator, null);
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context) {
+		this(rootPane, sharedTransitionsListModel, undoManager, nameGenerator, context, null);
 	}
 	
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, SharedTransition transitionToEdit) {
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context, SharedTransition transitionToEdit) {
 		this.rootPane = rootPane;
 		listModel = sharedTransitionsListModel;
 		this.undoManager = undoManager;
 		this.nameGenerator = nameGenerator;
 		this.transitionToEdit = transitionToEdit;
+                this.context = context;
 		initComponents();	
 	}
 
@@ -157,9 +161,13 @@ public class SharedTransitionNamePanel extends JPanel {
 					nameField.requestFocusInWindow();
 					return false;
 				}
+                                
+                                for(TAPNQuery query : context.queries()){
+					query.getProperty().accept(new RenameSharedTransitionVisitor(oldName, name), null);
+				}
 				
 				listModel.updatedName();
-				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, oldName, name, listModel));
+				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, context.tabContent(), oldName, name, listModel));
 				return true;
 			}
 			private boolean addNewSharedTransition(String name) {

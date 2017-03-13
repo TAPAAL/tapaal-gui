@@ -41,14 +41,15 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		return false;
-	}
-
-	@Override
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(
 			String templateName, String placeName) {
 		return false;
+	}
+	
+	@Override
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(
+			String templateName, String transitionName) {
+		return transition.equals(transitionName) && template.equals(templateName);
 	}
 
 	@Override

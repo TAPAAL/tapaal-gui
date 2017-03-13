@@ -1,7 +1,6 @@
 package dk.aau.cs.io.queries;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -31,10 +30,10 @@ import dk.aau.cs.TCTL.TCTLEXNode;
 import dk.aau.cs.TCTL.TCTLPathToStateConverter;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
-import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
-import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -111,14 +110,14 @@ public class TAPNQueryLoader extends QueryLoader{
 	}
 	
 	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query){
-        StringPosition[] children = query.getChildren();
-		
-        // If query is root and state property
-        if(query instanceof TCTLAbstractStateProperty){
-        	if(((TCTLAbstractStateProperty) query).getParent() == null){
-        		return TAPNQuery.QueryCategory.CTL;
-        	}
-        }
+                StringPosition[] children = query.getChildren();
+
+                // If query is root and state property
+                if(query instanceof TCTLAbstractStateProperty){
+                        if(((TCTLAbstractStateProperty) query).getParent() == null){
+                                return TAPNQuery.QueryCategory.CTL;
+                        }
+                }
         
 		if(query instanceof TCTLStateToPathConverter ||
 				query instanceof TCTLPathToStateConverter){
@@ -131,8 +130,20 @@ public class TAPNQueryLoader extends QueryLoader{
 				query instanceof TCTLAXNode){
 			return TAPNQuery.QueryCategory.CTL;
 		}
+                
+                // If query is a fireability query
+                if(query instanceof TCTLTransitionNode) {
+                    return TAPNQuery.QueryCategory.CTL;
+                }
+                if(query instanceof TCTLPlusListNode){
+                        for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
+                                if(TAPNQueryLoader.detectCategory(sp) == TAPNQuery.QueryCategory.CTL){
+                                    return TAPNQuery.QueryCategory.CTL;
+                                }
+                        }
+		}
 		
-        // If any property has been converted
+                // If any property has been converted
 		for (StringPosition child : children) {
 			if(TAPNQueryLoader.detectCategory(child.getObject()) == TAPNQuery.QueryCategory.CTL){
 				return TAPNQuery.QueryCategory.CTL;

@@ -12,8 +12,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -23,20 +21,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -72,16 +66,12 @@ import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
-import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
 import pipe.gui.Zoomer;
-import pipe.gui.widgets.QueryDialog.QueryConstructionEdit;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -92,7 +82,6 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
@@ -103,29 +92,30 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLPathToStateConverter;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
+import dk.aau.cs.TCTL.visitors.FixAbbrivTransitionNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
-import dk.aau.cs.approximation.OverApproximation;
-import dk.aau.cs.approximation.UnderApproximation;
-import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -134,7 +124,6 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
-import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
@@ -204,7 +193,7 @@ public class CTLQueryDialog extends JPanel {
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
 	private JComboBox templateBox;
-	private JComboBox placesBox;
+	private JComboBox placesTransitionsBox;
 	private JComboBox relationalOperatorBox;
 	private CustomJSpinner placeMarking;
 	private JButton truePredicateButton;
@@ -292,7 +281,7 @@ public class CTLQueryDialog extends JPanel {
 	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
 
 	//Tool tips for query panel
-	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
+	private static final String TOOL_TIP_PLACESTRANSITIONSBOX = "Choose a place or transition for the predicate.";
 	private static final String TOOL_TIP_TEMPLATEBOX = "Choose a component considered for this predicate.";
 	private static final String TOOL_TIP_RELATIONALOPERATORBOX = "Choose a relational operator comparing the number of tokens in the chosen place.";
 	private static final String TOOL_TIP_PLACEMARKING = "Choose a number of tokens.";
@@ -617,7 +606,7 @@ public class CTLQueryDialog extends JPanel {
 			else{
 				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
 			}
-			placesBox.setSelectedItem(placeNode.getPlace()); 
+			placesTransitionsBox.setSelectedItem(placeNode.getPlace()); 
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(placeMarkingNode.getConstant());
 			userChangedAtomicPropSelection = true;
@@ -727,7 +716,7 @@ public class CTLQueryDialog extends JPanel {
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
-		placesBox.setEnabled(false);
+		placesTransitionsBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
@@ -750,7 +739,7 @@ public class CTLQueryDialog extends JPanel {
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
-		placesBox.setEnabled(false);
+		placesTransitionsBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
@@ -773,21 +762,32 @@ public class CTLQueryDialog extends JPanel {
 		disjunctionButton.setEnabled(true);
 		negationButton.setEnabled(true);
 		templateBox.setEnabled(true);
-		placesBox.setEnabled(true);
-		relationalOperatorBox.setEnabled(true);
-		placeMarking.setEnabled(true);
+		placesTransitionsBox.setEnabled(true);
+		//relationalOperatorBox.setEnabled(true);
+		//placeMarking.setEnabled(true);
 		truePredicateButton.setEnabled(true);
 		falsePredicateButton.setEnabled(true);
 		deadLockPredicateButton.setEnabled(true);
 		setEnablednessOfAddPredicateButton();
+		setEnablednessOfOperatorAndMarkingBoxes();
 
 	}
 
 	private void setEnablednessOfAddPredicateButton() {
-		if (placesBox.getSelectedItem() == null)
+		if (placesTransitionsBox.getSelectedItem() == null)
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
+	}
+	
+	private void setEnablednessOfOperatorAndMarkingBoxes(){
+		if (transitionIsSelected()){
+			placeMarking.setEnabled(false);
+			relationalOperatorBox.setEnabled(false);
+		} else{
+			placeMarking.setEnabled(true);
+			relationalOperatorBox.setEnabled(true);
+		}
 	}
 
 	private void disableEditingButtons() {
@@ -835,21 +835,31 @@ public class CTLQueryDialog extends JPanel {
 	}
 
 	private void updateQueryOnAtomicPropositionChange() {
-		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
+		if (currentSelection != null && 
+				(currentSelection.getObject() instanceof TCTLAtomicPropositionNode || currentSelection.getObject() instanceof TCTLPlusListNode)) {
 			Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
 			ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
-			list.add(new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()));
-			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-					new TCTLPlusListNode(list), 
-					(String) relationalOperatorBox.getSelectedItem(),
-					new TCTLConstNode((Integer) placeMarking.getValue()));
-			if (!property.equals(currentSelection.getObject())) {
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
+			TCTLAbstractStateProperty property;
+			
+			if (transitionIsSelected()){
+                            list.add(new TCTLTransitionNode(template, (String) placesTransitionsBox.getSelectedItem()));
+                            property = new TCTLPlusListNode(list);
+			} else {
+                            list.add(new TCTLPlaceNode(template, (String) placesTransitionsBox.getSelectedItem()));
+                            property = new TCTLAtomicPropositionNode(
+                                new TCTLPlusListNode(list), 
+                                (String) relationalOperatorBox.getSelectedItem(),
+                                new TCTLConstNode((Integer) placeMarking.getValue()));
 			}
+			
+			if (!property.equals(currentSelection.getObject())) {
+                            UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+                            newProperty = newProperty.replace(currentSelection.getObject(),	property);
+                            updateSelection(property);
+                            undoSupport.postEdit(edit);
+			}
+			
 			queryChanged();
 		}
 	}
@@ -1629,15 +1639,15 @@ public class CTLQueryDialog extends JPanel {
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 		//predicatePanel.setPreferredSize(new Dimension(300, 150));
 
-		placesBox = new JComboBox();
+		placesTransitionsBox = new JComboBox();
 		Dimension d = new Dimension(125, 27);
-		placesBox.setMaximumSize(d);
-		placesBox.setPreferredSize(d);
+		placesTransitionsBox.setMaximumSize(d);
+		placesTransitionsBox.setPreferredSize(d);
 
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
-		if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
+		if(tapnNetwork.numberOfSharedPlaces() > 0 || tapnNetwork.numberOfSharedTransitions() > 0) items.add(SHARED);
 
 		templateBox = new JComboBox(new DefaultComboBoxModel(items));
 		templateBox.addActionListener(new ActionListener() {
@@ -1647,42 +1657,50 @@ public class CTLQueryDialog extends JPanel {
 				if(!templateBox.getSelectedItem().equals(SHARED)){
 					TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getSelectedItem();
 					if (!tapn.equals(currentlySelected)) {
-						Vector<String> placeNames = new Vector<String>();
+						Vector<String> placeTransitionNames = new Vector<String>();
 						for (TimedPlace place : tapn.places()) {
 							if(!place.isShared()){
-								placeNames.add(place.name());
+								placeTransitionNames.add(place.name());
+							}
+						}						
+						for (TimedTransition transition : tapn.transitions()) {
+							if(!transition.isShared()){
+								placeTransitionNames.add(transition.name());
 							}
 						}
-
-						Collections.sort(placeNames, new Comparator<String>() {
+						Collections.sort(placeTransitionNames, new Comparator<String>() {
 							public int compare(String o1, String o2) {
 								return o1.compareToIgnoreCase(o2);
 							}
 						});
-						placesBox.setModel(new DefaultComboBoxModel(placeNames));
+						placesTransitionsBox.setModel(new DefaultComboBoxModel(placeTransitionNames));
 
 						currentlySelected = tapn;
 						setEnablednessOfAddPredicateButton();
-						if (userChangedAtomicPropSelection && placeNames.size() > 0)
+						if (userChangedAtomicPropSelection && placeTransitionNames.size() > 0)
 							updateQueryOnAtomicPropositionChange();
 					}
 				}else{
-					Vector<String> placeNames = new Vector<String>();
+					Vector<String> placeTransitionNames = new Vector<String>();
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
-						placeNames.add(place.name());
+						placeTransitionNames.add(place.name());
 					}
-					Collections.sort(placeNames, new Comparator<String>() {
+					for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
+						placeTransitionNames.add(transition.name());
+					}
+					Collections.sort(placeTransitionNames, new Comparator<String>() {
 						public int compare(String o1, String o2) {
 							return o1.compareToIgnoreCase(o2);
 						}
 					});
-					placesBox.setModel(new DefaultComboBoxModel(placeNames));
+					placesTransitionsBox.setModel(new DefaultComboBoxModel(placeTransitionNames));
 
 					currentlySelected = SHARED;
 					setEnablednessOfAddPredicateButton();
-					if (userChangedAtomicPropSelection && placeNames.size() > 0)
+					if (userChangedAtomicPropSelection && placeTransitionNames.size() > 0)
 						updateQueryOnAtomicPropositionChange();
 				}
+				setEnablednessOfOperatorAndMarkingBoxes();
 			}
 		});
 		Dimension dim = new Dimension(235, 27);
@@ -1701,7 +1719,7 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		predicatePanel.add(placesBox, gbc);
+		predicatePanel.add(placesTransitionsBox, gbc);
 
 		String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
 		relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
@@ -1764,7 +1782,7 @@ public class CTLQueryDialog extends JPanel {
 		queryPanel.add(predicatePanel, gbc);
 
 		//Add tool tips for predicate panel
-		placesBox.setToolTipText(TOOL_TIP_PLACESBOX);
+		placesTransitionsBox.setToolTipText(TOOL_TIP_PLACESTRANSITIONSBOX);
 		templateBox.setToolTipText(TOOL_TIP_TEMPLATEBOX);
 		relationalOperatorBox.setToolTipText(TOOL_TIP_RELATIONALOPERATORBOX);
 		placeMarking.setToolTipText(TOOL_TIP_PLACEMARKING);
@@ -1780,18 +1798,21 @@ public class CTLQueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 				ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
-				list.add(new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()));
-				TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-						new TCTLPlusListNode(list), 
-						(String) relationalOperatorBox.getSelectedItem(),
-						new TCTLConstNode((Integer) placeMarking.getValue()));
 				
-				addPropertyToQuery(property);
-				
+				if (transitionIsSelected()){
+					list.add(new TCTLTransitionNode(template, (String) placesTransitionsBox.getSelectedItem()));
+					TCTLPlusListNode property = new TCTLPlusListNode(list);
+					addPropertyToQuery(property);
+				} else {
+					list.add(new TCTLPlaceNode(template, (String) placesTransitionsBox.getSelectedItem()));
+					TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
+							new TCTLPlusListNode(list), 
+							(String) relationalOperatorBox.getSelectedItem(),
+							new TCTLConstNode((Integer) placeMarking.getValue()));
+					addPropertyToQuery(property);
+				}	
 			}
-		}
-
-				);
+		});
 
 		truePredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1814,11 +1835,12 @@ public class CTLQueryDialog extends JPanel {
 			}
 		});
 
-		placesBox.addActionListener(new ActionListener() {
+		placesTransitionsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (userChangedAtomicPropSelection) {
 					updateQueryOnAtomicPropositionChange();
 				}
+				setEnablednessOfOperatorAndMarkingBoxes();
 			}
 		});
 
@@ -1840,6 +1862,23 @@ public class CTLQueryDialog extends JPanel {
 		});
 
 		templateBox.setSelectedIndex(0); // Fills placesBox with correct places. Must be called here to ensure addPredicateButton is not null
+	}
+	
+	private boolean transitionIsSelected(){		
+		String itemName = (String)placesTransitionsBox.getSelectedItem();
+                if (itemName == null) return false;
+		boolean transitionSelected = false;
+		boolean sharedTransitionSelected = false;
+		for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
+                    if (tapn.getTransitionByName(itemName) != null) {
+                        transitionSelected = true;
+                        break;
+                    }
+		}
+		if (!transitionSelected){
+                    sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName)!= null ? true : false;			
+		}
+		return transitionSelected || sharedTransitionSelected;
 	}
 
 	private void initQueryEditingPanel() {
@@ -1930,7 +1969,9 @@ public class CTLQueryDialog extends JPanel {
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
 						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
 							for(TimedPlace p : tapn.places()) {
-								templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+                                                                if(!p.isShared()){
+                                                                    templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+                                                                }
 							}
 						}
 
@@ -1938,18 +1979,39 @@ public class CTLQueryDialog extends JPanel {
 							templatePlaceNames.add(new Tuple<String, String>("", p.name()));
 						}
 
-                                                FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery);
+                                                FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery); 
+						VerifyPlaceNamesVisitor placeNameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
+						VerifyPlaceNamesVisitor.Context c1 = placeNameChecker.verifyPlaceNames(newQuery);
                                                 
-						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
+                                                // check correct transition names are used in atomic propositions
+						ArrayList<Tuple<String,String>> templateTransitionNames = new ArrayList<Tuple<String,String>>();
+						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
+							for(TimedTransition t : tapn.transitions()) {
+                                                                if(!t.isShared()){
+                                                                    templateTransitionNames.add(new Tuple<String, String>(tapn.name(), t.name()));
+                                                                }
+							}
+						}
 
-						VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(newQuery);
+						for(SharedTransition t : tapnNetwork.sharedTransitions()) {
+							templateTransitionNames.add(new Tuple<String, String>("", t.name()));
+						}
 
-						if (!c.getResult()) {
+                                                FixAbbrivTransitionNames.fixAbbrivTransitionNames(templateTransitionNames, newQuery);                                                
+						VerifyTransitionNamesVisitor transitionNameChecker = new VerifyTransitionNamesVisitor(templateTransitionNames);
+						VerifyTransitionNamesVisitor.Context c2 = transitionNameChecker.verifyTransitionNames(newQuery);
+
+						if (!c1.getResult() || !c2.getResult()) {
 							StringBuilder s = new StringBuilder();
-							s.append("The following places were used in the query, but are not present in your model:\n\n");
+							s.append("The following places or transitions were used in the query, but are not present in your model:\n\n");
 
-							for (String placeName : c.getIncorrectPlaceNames()) {
+							for (String placeName : c1.getIncorrectPlaceNames()) {
 								s.append(placeName);
+								s.append('\n');
+							}
+                                                        
+                                                        for (String transitionNames : c2.getIncorrectTransitionNames()) {
+								s.append(transitionNames);
 								s.append('\n');
 							}
 
@@ -2274,8 +2336,10 @@ public class CTLQueryDialog extends JPanel {
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
 
-						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
-						clonedQuery.getProperty().accept(visitor, null);
+						RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(transformedModel.value2());
+                                                RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(transformedModel.value2());
+						clonedQuery.getProperty().accept(placeVisitor, null);
+                                                clonedQuery.getProperty().accept(transitionVisitor, null);
 
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();

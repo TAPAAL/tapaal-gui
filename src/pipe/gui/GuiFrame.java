@@ -75,6 +75,7 @@ import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -2054,6 +2055,16 @@ public class GuiFrame extends JFrame implements Observer {
 					if(!place.underlyingPlace().isShared()){
 						for (TAPNQuery q : queries) {
 							if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+								queriesAffected = true;
+								queriesToDelete.add(q);
+							}
+						}
+					}
+				} else if (pn instanceof TimedTransitionComponent){
+					TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+					if(!transition.underlyingTransition().isShared()){
+						for (TAPNQuery q : queries) {
+							if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
 								queriesAffected = true;
 								queriesToDelete.add(q);
 							}

@@ -53,20 +53,21 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(
+			String templateName, String placeName) {
 		for(TCTLAbstractStateProperty factor : factors){
-			if(factor.containsAtomicPropWithSpecificPlace(placeName)){
+			if(factor.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)){
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	@Override
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(
-			String templateName, String placeName) {
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(
+			String templateName, String transitionName) {
 		for(TCTLAbstractStateProperty factor : factors){
-			if(factor.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)){
+			if(factor.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName)){
 				return true;
 			}
 		}
