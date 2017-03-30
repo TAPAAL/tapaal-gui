@@ -85,6 +85,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
 		String algorithmOption = queryElement.getAttribute("algorithmOption");
+		boolean isCTL = isCTLQuery(queryElement);
 
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
@@ -97,7 +98,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			parsedQuery.setCategory(detectCategory(query));
+			parsedQuery.setCategory(detectCategory(query, isCTL));
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
@@ -109,7 +110,9 @@ public class TAPNQueryLoader extends QueryLoader{
 			return null;
 	}
 	
-	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query){
+	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL){
+                if (isCTL) return TAPNQuery.QueryCategory.CTL;
+                
                 StringPosition[] children = query.getChildren();
 
                 // If query is root and state property
@@ -137,7 +140,7 @@ public class TAPNQueryLoader extends QueryLoader{
                 }
                 if(query instanceof TCTLPlusListNode){
                         for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
-                                if(TAPNQueryLoader.detectCategory(sp) == TAPNQuery.QueryCategory.CTL){
+                                if(TAPNQueryLoader.detectCategory(sp, isCTL) == TAPNQuery.QueryCategory.CTL){
                                     return TAPNQuery.QueryCategory.CTL;
                                 }
                         }
@@ -145,7 +148,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		
                 // If any property has been converted
 		for (StringPosition child : children) {
-			if(TAPNQueryLoader.detectCategory(child.getObject()) == TAPNQuery.QueryCategory.CTL){
+			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL) == TAPNQuery.QueryCategory.CTL){
 				return TAPNQuery.QueryCategory.CTL;
 			} 
 		}
@@ -191,6 +194,19 @@ public class TAPNQueryLoader extends QueryLoader{
 		}
 		
 		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
+	}
+        
+	private boolean isCTLQuery(Element queryElement) {
+		if(!queryElement.hasAttribute("type")){
+			return false;
+		}
+		boolean result;
+		try {
+			result = queryElement.getAttribute("type").equals("CTL");
+		} catch(Exception e) {
+			result = false;
+		}
+		return result;
 	}
 
 	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {

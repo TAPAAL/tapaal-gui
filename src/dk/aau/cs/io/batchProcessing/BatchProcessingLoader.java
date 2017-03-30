@@ -510,7 +510,8 @@ public class BatchProcessingLoader {
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
 		String algorithmOption = queryElement.getAttribute("algorithmOption");
-
+		boolean isCTL = isCTLQuery(queryElement);
+                
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
 			query = parseCTLQueryProperty(queryElement);
@@ -522,7 +523,7 @@ public class BatchProcessingLoader {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			parsedQuery.setCategory(TAPNQueryLoader.detectCategory(query));
+			parsedQuery.setCategory(TAPNQueryLoader.detectCategory(query, isCTL));
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
@@ -613,6 +614,19 @@ public class BatchProcessingLoader {
 		}
 		
 		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
+	}
+        
+	private boolean isCTLQuery(Element queryElement) {
+		if(!queryElement.hasAttribute("type")){
+			return false;
+		}
+		boolean result;
+		try {
+			result = queryElement.getAttribute("type").equals("CTL");
+		} catch(Exception e) {
+			result = false;
+		}
+		return result;
 	}
 	
 	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {

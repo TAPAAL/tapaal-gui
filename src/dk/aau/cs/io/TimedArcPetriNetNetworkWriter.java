@@ -42,7 +42,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -298,6 +297,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
+		queryElement.setAttribute("type", "CTL");
 		queryElement.setAttribute("capacity", "" + query.getCapacity());
 		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
 		queryElement.setAttribute("searchOption", "" + query.getSearchOption());

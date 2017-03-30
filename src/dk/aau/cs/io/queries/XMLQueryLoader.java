@@ -112,7 +112,7 @@ public class XMLQueryLoader extends QueryLoader{
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp()));
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), false));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL){
             	query.setSearchOption(SearchOption.DFS);
