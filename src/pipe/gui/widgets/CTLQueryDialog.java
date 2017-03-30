@@ -195,6 +195,7 @@ public class CTLQueryDialog extends JPanel {
 	private JComboBox templateBox;
 	private JComboBox placesTransitionsBox;
 	private JComboBox relationalOperatorBox;
+	private JLabel transitionIsEnabledLabel;
 	private CustomJSpinner placeMarking;
 	private JButton truePredicateButton;
 	private JButton falsePredicateButton;
@@ -782,11 +783,13 @@ public class CTLQueryDialog extends JPanel {
 	
 	private void setEnablednessOfOperatorAndMarkingBoxes(){
 		if (transitionIsSelected()){
-			placeMarking.setEnabled(false);
-			relationalOperatorBox.setEnabled(false);
+			placeMarking.setVisible(false);
+			relationalOperatorBox.setVisible(false);
+			transitionIsEnabledLabel.setVisible(true);
 		} else{
-			placeMarking.setEnabled(true);
-			relationalOperatorBox.setEnabled(true);
+			transitionIsEnabledLabel.setVisible(false);
+			placeMarking.setVisible(true);
+			relationalOperatorBox.setVisible(true);
 		}
 	}
 
@@ -811,7 +814,7 @@ public class CTLQueryDialog extends JPanel {
 		updateSelection(newProperty);
 		resetButton.setText("Reset Query");
 		editQueryButton.setText("Edit Query");
-
+		transitionIsEnabledLabel.setEnabled(true);
 		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
 		editQueryButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);
 		enableEditingButtons();
@@ -823,6 +826,7 @@ public class CTLQueryDialog extends JPanel {
 		setQueryFieldEditable(true);
 		resetButton.setText("Parse query");
 		editQueryButton.setText("Cancel");
+		transitionIsEnabledLabel.setEnabled(false);
 		resetButton.setToolTipText(TOOL_TIP_PARSE_QUERY);
 		editQueryButton.setToolTipText(TOOL_TIP_CANCEL_QUERY);
 		clearSelection();
@@ -1721,10 +1725,12 @@ public class CTLQueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		predicatePanel.add(placesTransitionsBox, gbc);
 
+		gbc.gridx = 1;				
+		transitionIsEnabledLabel = new JLabel(" is enabled");
+		predicatePanel.add(transitionIsEnabledLabel, gbc);
+		
 		String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
 		relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
-
-		gbc.gridx = 1;
 		predicatePanel.add(relationalOperatorBox, gbc);
 
 		placeMarking = new CustomJSpinner(0);
@@ -1734,7 +1740,7 @@ public class CTLQueryDialog extends JPanel {
 
 		gbc.gridx = 2;
 		predicatePanel.add(placeMarking, gbc);
-
+		
 		addPredicateButton = new JButton("Add predicate to the query");
 		gbc.gridx = 0;
 		gbc.gridy = 2;
