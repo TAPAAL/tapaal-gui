@@ -5,15 +5,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Transition;
 
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class AnimationHistoryComponent extends JList {
@@ -24,7 +21,6 @@ public class AnimationHistoryComponent extends JList {
 		super();
 		setModel(new DefaultListModel());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		reset();
 		
 		for (MouseListener listener : getMouseListeners()) {
 			removeMouseListener(listener);
@@ -165,7 +161,7 @@ public class AnimationHistoryComponent extends JList {
 		}
 		for (Template t : CreateGui.getCurrentTab().activeTemplates()){
 			for(Transition trans : t.guiModel().getTransitions()){
-				if(trans.isEnabled(true) || trans.isBlueTransition(true)){
+				if(trans.isEnabled(true) || trans.isDelayEnabledTransition(true)){
 					return;
 				}
 			}

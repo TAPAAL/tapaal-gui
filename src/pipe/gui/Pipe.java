@@ -32,6 +32,7 @@ public class Pipe {
 
 	public static final Color ENABLED_TRANSITION_COLOUR = new Color(192, 0, 0);
 	public static final Color BLUE_TRANSITION_COLOR = new Color(0, 0, 192);
+	public static final Color YELLOW_TRANSITION_COLOR = new Color(243, 156, 18);
 	public static final Color ELEMENT_LINE_COLOUR = Color.BLACK;
 	public static final Color ELEMENT_FILL_COLOUR = Color.WHITE;
 	public static final Color SELECTION_LINE_COLOUR = new Color(0, 0, 192);

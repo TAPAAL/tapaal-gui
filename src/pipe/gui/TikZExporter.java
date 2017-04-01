@@ -163,7 +163,7 @@ public class TikZExporter {
 		for (Transition trans : transitions) {
 			String angle = "";
 			if (trans.getAngle() != 0)
-				angle = ",rotate=" + String.valueOf(trans.getAngle());
+				angle = ",rotate=" + String.valueOf(trans.getAngle() + 90);
 
 			out.append("\\node[transition");
 			out.append(angle);

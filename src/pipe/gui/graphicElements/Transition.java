@@ -43,7 +43,7 @@ public class Transition extends PlaceTransitionObject {
 	
 	// Animation Suff
 	protected boolean enabled = false;
-	public boolean blueTransition = false;
+	public boolean delayEnabled = false;
 	public boolean highlighted = false;
 	private Timer blinkTimer;
 	private int blinkCount;
@@ -104,8 +104,8 @@ public class Transition extends PlaceTransitionObject {
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		} else if (blueTransition && CreateGui.getApp().isShowingBlueTransitions() && !Animator.isUrgentTransitionEnabled()) {
-			g2.setPaint(Pipe.BLUE_TRANSITION_COLOR);
+		} else if (delayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
+			g2.setPaint(Pipe.YELLOW_TRANSITION_COLOR);
 		} else if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -173,17 +173,17 @@ public class Transition extends PlaceTransitionObject {
 		return enabled;
 	}
 
-	public boolean isBlueTransition(boolean animationStatus){
+	public boolean isDelayEnabledTransition(boolean animationStatus){
 		if(animationStatus){
-			blueTransition = isBlueTransition();
-			return blueTransition;
+			delayEnabled = isDelayEnabled();
+			return delayEnabled;
 		}
 		return false;
 	}
 	
 	//Dummy is overridden
-	public boolean isBlueTransition(){
-		return blueTransition;
+	public boolean isDelayEnabled(){
+		return delayEnabled;
 	}
 	
 	//Dummy is overridden
@@ -192,8 +192,8 @@ public class Transition extends PlaceTransitionObject {
 	}
 	
 	/* Called at the end of animation to reset Transitions to false */
-	public void setBlueTransitionFalse(){
-		blueTransition = false;
+	public void setDelayEnabledTransitionFalse(){
+		delayEnabled = false;
 	}
 	
 	/**

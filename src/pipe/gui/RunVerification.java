@@ -36,6 +36,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -55,7 +56,7 @@ import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
 
-public class RunVerification extends RunVerificationBase {
+public class RunVerification extends RunVerificationBase {	
 	private IconSelector iconSelector;
 	private VerificationCallback callback;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
@@ -153,17 +154,19 @@ public class RunVerification extends RunVerificationBase {
                 }
                     
 		//Setup table
-                JTable table;
+                TableModel model;
+                
                 if (transitionPanel) {
                     String[] columnNames = {"Count", "Transition"};
                     Object[][] data = extractArrayFromTransitionStatistics(result);
-                    table = new JTable(data, columnNames);
+                    model = new NonEditableModel(data, columnNames);
                 } else {
                     String[] columnNames = {"Max Tokens", "Place"};
                     Object[][] data = extractArrayFromPlaceBoundStatistics(result);
-                    table = new JTable(data, columnNames);
+                    model = new NonEditableModel(data, columnNames);
                 }
-
+                JTable table = new JTable(model);
+                
                 Comparator<Object> comparator = new Comparator<Object>() {
                 @Override
                 public int compare(Object oo1, Object oo2) {
@@ -393,5 +396,15 @@ public class RunVerification extends RunVerificationBase {
 		return panel;
 	}
 	
-	
+	private class NonEditableModel extends DefaultTableModel {
+
+		private static final long serialVersionUID = -8992683250003224211L;
+		NonEditableModel(Object[][] data, String[] columnNames) {
+	        super(data, columnNames);
+	    }
+	    @Override
+	    public boolean isCellEditable(int row, int column) {
+	        return false;
+	    }
+	}
 }

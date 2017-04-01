@@ -1,17 +1,11 @@
 package dk.aau.cs.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.XMLEncoder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +23,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
-import org.jdesktop.swingx.MultiSplitLayout.Node;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import pipe.dataLayer.DataLayer;
@@ -39,7 +32,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.Animator;
-import pipe.gui.BlueTransitionControl;
+import pipe.gui.DelayEnabledTransitionControl;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
@@ -48,7 +41,6 @@ import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
-import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -334,7 +326,7 @@ public class TabContent extends JSplitPane {
 		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
 	}
 	
-	private final static String blueTransitionControlName = "blueTransitionControl"; 
+	private final static String delayEnabledTransitionControlName = "delayEnabledTransitionControl";
 
 	private void createAnimatorSplitPane(NetType netType) {
 		if (animBox == null)
@@ -455,8 +447,8 @@ public class TabContent extends JSplitPane {
 		return animControlerBox;
 	}
 	
-	public BlueTransitionControl getBlueTransitionControl(){
-		return transitionFireing.getBlueTransitionControl();
+	public DelayEnabledTransitionControl getDelayEnabledTransitionControl(){
+		return transitionFireing.getDelayEnabledTransitionControl();
 	}
 
 	public void addAbstractAnimationPane() {
@@ -516,7 +508,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	private void createTransitionFireing() {
-		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingBlueTransitions());
+		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions());
 	}
 
 	public TransitionFireingComponent getTransitionFireingComponent() {
@@ -698,8 +690,8 @@ public class TabContent extends JSplitPane {
 		}
 	}
 	
-	public void showBlueTransitions(boolean enable){
-		transitionFireing.showBlueTransitions(enable);
+	public void showDelayEnabledTransitions(boolean enable){
+		transitionFireing.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 		
 		CreateGui.getAnimator().updateFireableTransitions();

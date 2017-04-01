@@ -127,6 +127,14 @@ public class Preferences {
 		return pref.getBoolean("showToolTips", true);
 	}
 
+	public void setShowTokenAge(boolean show){
+		pref.putBoolean("showTokenAge", show);
+	}
+
+	public boolean getShowTokenAge(){
+		return pref.getBoolean("showTokenAge", true);
+	}
+
 	public void setWindowSize(Dimension size) {
 		try{
 			saveSerilizableObject("appSize", size);
@@ -205,37 +213,37 @@ public class Preferences {
 		return pref.getBoolean("enabledTransitionsPanel", true);
 	}
 
-	public void setShowBlueTransitions(boolean show){
-		pref.putBoolean("enabledBlueTransitions", show);
+	public void setShowDelayEnabledTransitions(boolean show){
+		pref.putBoolean("delayEnabledTransitions", show);
 	}
 
-	public boolean getShowBlueTransitions(){
-		return pref.getBoolean("enabledBlueTransitions", true);
+	public boolean getShowDelayEnabledTransitions(){
+		return pref.getBoolean("delayEnabledTransitions", true);
 	}
 	
-	public void setBlueTransitionGranularity(BigDecimal granularity){
-		pref.put("blueTransitionGranularity", granularity.toString());
+	public void setDelayEnabledTransitionGranularity(BigDecimal granularity){
+		pref.put("delayEnabledTransitionGranularity", granularity.toString());
 	}
 	
-	public BigDecimal getBlueTransitionGranularity(){
-		return new BigDecimal(pref.get("blueTransitionGranularity", "0.1"));
+	public BigDecimal getDelayEnabledTransitionGranularity(){
+		return new BigDecimal(pref.get("delayEnabledTransitionGranularity", "0.1"));
 		
 	}
 	
-	public void setBlueTransitionDelayMode(DelayMode delayMode){
+	public void setDelayEnabledTransitionDelayMode(DelayMode delayMode){
 		if(delayMode instanceof ManualDelayMode){
-			pref.putInt("blueTransitionDelayMode", 0);
+			pref.putInt("delayEnabledTransitionDelayMode", 0);
 		} else if(delayMode instanceof RandomDelayMode){
-			pref.putInt("blueTransitionDelayMode", 1);
+			pref.putInt("delayEnabledTransitionDelayMode", 1);
 		} else if(delayMode instanceof ShortestDelayMode){
-			pref.putInt("blueTransitionDelayMode", 2);
+			pref.putInt("delayEnabledTransitionDelayMode", 2);
 		} else {
 			throw new IllegalArgumentException("Can only save ManualDelayMode, RandomDelayMode and ShortestDelayMode");
 		}
 	}
 	
-	public DelayMode getBlueTransitionDelayMode(){
-		switch (pref.getInt("blueTransitionDelayMode", 2)) {
+	public DelayMode getDelayEnabledTransitionDelayMode(){
+		switch (pref.getInt("delayEnabledTransitionDelayMode", 2)) {
 		case 0: return ManualDelayMode.getInstance();
 		case 1: return RandomDelayMode.getInstance();
 		case 2: return ShortestDelayMode.getInstance();
@@ -244,12 +252,12 @@ public class Preferences {
 		}
 	}
 	
-	public void setBlueTransitionIsRandomTransition(boolean isRandomTransition){
-		pref.putBoolean("blueTransitionRandomTransition", isRandomTransition);
+	public void setDelayEnabledTransitionIsRandomTransition(boolean isRandomTransition){
+		pref.putBoolean("delayEnabledTransitionRandomTransition", isRandomTransition);
 	}
 	
-	public boolean getBlueTransitionIsRandomTransition() {
-		return pref.getBoolean("blueTransitionRandomTransition", false);
+	public boolean getDelayEnabledTransitionIsRandomTransition() {
+		return pref.getBoolean("delayEnabledTransitionRandomTransition", false);
 	}
 
 	public void setSimulatorModelRoot(Split model){

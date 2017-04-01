@@ -153,7 +153,7 @@ public class TimedOutputArcComponent extends Arc {
 	public TimedOutputArcComponent copy() {
 		return new TimedOutputArcComponent(this);
 	}
-	
+
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
 		Weight oldWeight = getWeight();

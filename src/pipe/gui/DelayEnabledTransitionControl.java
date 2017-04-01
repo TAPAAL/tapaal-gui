@@ -1,8 +1,6 @@
 package pipe.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,7 +26,7 @@ import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 
-public class BlueTransitionControl extends JPanel{
+public class DelayEnabledTransitionControl extends JPanel{
 
 	private static final long serialVersionUID = -5735674907635981304L;
 	private static DelayMode defaultDelayMode = ShortestDelayMode.getInstance();
@@ -36,16 +34,16 @@ public class BlueTransitionControl extends JPanel{
 	private static boolean defaultIsRandomTrasition;
 	
 	JLabel precitionLabel;
-	JSlider bluePrecision;
+	JSlider delayEnabledPrecision;
 	JLabel delayModeLabel;
 	JComboBox delayMode;
 	JCheckBox randomMode;
 	
-	private BlueTransitionControl() {
+	private DelayEnabledTransitionControl() {
 		super(new GridBagLayout());
 		
 		//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
-		bluePrecision = new JSlider(JSlider.HORIZONTAL, 0, 5, 4);
+		delayEnabledPrecision = new JSlider(JSlider.HORIZONTAL, 0, 5, 4);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(new Integer(0), new JLabel("0.00001"));
 		labelTable.put(new Integer(1), new JLabel("0.0001"));
@@ -54,13 +52,13 @@ public class BlueTransitionControl extends JPanel{
 		labelTable.put(new Integer(4), new JLabel("0.1"));
 		labelTable.put(new Integer(5), new JLabel("1"));
 		
-		bluePrecision.setLabelTable(labelTable);
-		bluePrecision.setSnapToTicks(true);
-		bluePrecision.setMajorTickSpacing(1);
-		bluePrecision.setPaintLabels(true);
-		bluePrecision.setPaintTicks(true);
-		bluePrecision.setPaintTrack(false);
-		bluePrecision.setPreferredSize(new Dimension(340, bluePrecision.getPreferredSize().height));
+		delayEnabledPrecision.setLabelTable(labelTable);
+		delayEnabledPrecision.setSnapToTicks(true);
+		delayEnabledPrecision.setMajorTickSpacing(1);
+		delayEnabledPrecision.setPaintLabels(true);
+		delayEnabledPrecision.setPaintTicks(true);
+		delayEnabledPrecision.setPaintTrack(false);
+		delayEnabledPrecision.setPreferredSize(new Dimension(340, delayEnabledPrecision.getPreferredSize().height));
 		setValue(defaultGranularity);
 		//UIManager.put("Slider.paintValue", false);
 		//UIManager.getLookAndFeelDefaults().put("Slider.paintValue", false);
@@ -73,7 +71,7 @@ public class BlueTransitionControl extends JPanel{
 			sliderUIClass = Class.forName("javax.swing.plaf.synth.SynthSliderUI");
 			Field paintValue = sliderUIClass.getDeclaredField("paintValue");
 	        paintValue.setAccessible(true);
-	        paintValue.set(bluePrecision.getUI(), false);
+	        paintValue.set(delayEnabledPrecision.getUI(), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
@@ -101,7 +99,7 @@ public class BlueTransitionControl extends JPanel{
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		add(bluePrecision, gbc);
+		add(delayEnabledPrecision, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
@@ -142,11 +140,11 @@ public class BlueTransitionControl extends JPanel{
 
 	//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
 	public BigDecimal getValue(){ 
-		return new BigDecimal(1.0/(Math.pow(10.0, (5.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
+		return new BigDecimal(1.0/(Math.pow(10.0, (5.0- delayEnabledPrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
 	}
 	
 	public void setValue(BigDecimal value){
-		bluePrecision.setValue(getValueFromDecimal(value));
+		delayEnabledPrecision.setValue(getValueFromDecimal(value));
 	}
 	
 	public DelayMode getDelayMode(){
@@ -169,11 +167,11 @@ public class BlueTransitionControl extends JPanel{
 		randomMode.setSelected(randomTransition);
 	}
 	
-	private static BlueTransitionControl instance;
+	private static DelayEnabledTransitionControl instance;
 	private static JButton closeDialogButton;
 	private static JDialog dialog;
 	
-	public static void showBlueTransitionDialog(){
+	public static void showDelayEnabledTransitionDialog(){
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		closeDialogButton = new JButton("Close");
@@ -205,9 +203,9 @@ public class BlueTransitionControl extends JPanel{
 		dialog.setVisible(true);
 	}
 	
-	public static BlueTransitionControl getInstance(){
+	public static DelayEnabledTransitionControl getInstance(){
 		if(instance == null){
-			instance = new BlueTransitionControl();
+			instance = new DelayEnabledTransitionControl();
 		}
 		return instance;
 	}
@@ -236,8 +234,8 @@ public class BlueTransitionControl extends JPanel{
 		}
 	}
 
-	public static void setDefaultIsRandomTransition(boolean blueTransitionIsRandomTransition) {
-		defaultIsRandomTrasition = blueTransitionIsRandomTransition;
+	public static void setDefaultIsRandomTransition(boolean delayEnabledTransitionIsRandomTransition) {
+		defaultIsRandomTrasition = delayEnabledTransitionIsRandomTransition;
 	}
 	
 	public static boolean isRandomTransition(){
@@ -252,7 +250,7 @@ public class BlueTransitionControl extends JPanel{
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		precitionLabel.setEnabled(enabled);
-		bluePrecision.setEnabled(enabled);
+		delayEnabledPrecision.setEnabled(enabled);
 		delayModeLabel.setEnabled(enabled);
 		delayMode.setEnabled(enabled);
 		randomMode.setEnabled(enabled);
