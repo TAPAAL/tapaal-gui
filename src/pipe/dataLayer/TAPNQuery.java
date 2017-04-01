@@ -53,10 +53,10 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
-    private long strongSoundnessBound;
-    private boolean useReduction;
-    private QueryCategory queryCategory = QueryCategory.Default;             // Used by the CTL engine
-    private AlgorithmOption algorithmOption = AlgorithmOption.CERTAIN_ZERO;  // Used by the CTL engine
+	private long strongSoundnessBound;
+	private boolean useReduction;
+	private QueryCategory queryCategory = QueryCategory.Default;             // Used by the CTL engine
+	private AlgorithmOption algorithmOption = AlgorithmOption.CERTAIN_ZERO;  // Used by the CTL engine
 
 	
 	private boolean enableOverApproximation = false;
@@ -340,6 +340,7 @@ public class TAPNQuery {
 		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, denominator);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
+		copy.setCategory(queryCategory);
 		
 		return copy;
 	}
