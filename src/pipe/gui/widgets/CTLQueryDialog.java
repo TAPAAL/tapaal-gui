@@ -764,8 +764,8 @@ public class CTLQueryDialog extends JPanel {
 		negationButton.setEnabled(true);
 		templateBox.setEnabled(true);
 		placesTransitionsBox.setEnabled(true);
-		//relationalOperatorBox.setEnabled(true);
-		//placeMarking.setEnabled(true);
+		relationalOperatorBox.setEnabled(true);
+		placeMarking.setEnabled(true);
 		truePredicateButton.setEnabled(true);
 		falsePredicateButton.setEnabled(true);
 		deadLockPredicateButton.setEnabled(true);
@@ -1494,8 +1494,7 @@ public class CTLQueryDialog extends JPanel {
 					updateSelection(andListNode);
 					undoSupport.postEdit(edit);
 				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
-							.getObject();
+					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection.getObject();
 					TCTLAbstractProperty parentNode = prop.getParent();
 
 					if (parentNode instanceof TCTLAndListNode) {
@@ -1516,24 +1515,24 @@ public class CTLQueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				} else if (currentSelection.getObject() instanceof TCTLStateToPathConverter){
-                    TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 
-                    TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter)currentSelection.getObject()).getProperty();
+					TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter)currentSelection.getObject()).getProperty();
 
-                    if (prop instanceof TCTLAndListNode){
-                        andListNode = new TCTLAndListNode((TCTLAndListNode) prop);
-                        andListNode.addConjunct(new TCTLStatePlaceHolder());
+					if (prop instanceof TCTLAndListNode){
+						andListNode = new TCTLAndListNode((TCTLAndListNode) prop);
+						andListNode.addConjunct(new TCTLStatePlaceHolder());
 					} else if (prop instanceof TCTLOrListNode){
 						andListNode = new TCTLAndListNode(((TCTLOrListNode)prop).getProperties());
 					} else {
 						andListNode = new TCTLAndListNode(getStateProperty(prop), ph);
 					}
 
-                    TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
-                    UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-                    newProperty = newProperty.replace(currentSelection.getObject(),	property);
-                    updateSelection(property);
-                    undoSupport.postEdit(edit);
+					TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
+					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+					newProperty = newProperty.replace(currentSelection.getObject(),	property);
+					updateSelection(property);
+					undoSupport.postEdit(edit);
 				} else if(currentSelection.getObject() instanceof  TCTLAbstractPathProperty){
 					TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 					andListNode = new TCTLAndListNode(getStateProperty(
@@ -1644,7 +1643,7 @@ public class CTLQueryDialog extends JPanel {
 		//predicatePanel.setPreferredSize(new Dimension(300, 150));
 
 		placesTransitionsBox = new JComboBox();
-		Dimension d = new Dimension(125, 27);
+		Dimension d = new Dimension(121, 27);
 		placesTransitionsBox.setMaximumSize(d);
 		placesTransitionsBox.setPreferredSize(d);
 
@@ -1707,47 +1706,42 @@ public class CTLQueryDialog extends JPanel {
 				setEnablednessOfOperatorAndMarkingBoxes();
 			}
 		});
-		Dimension dim = new Dimension(235, 27);
-		templateBox.setMaximumSize(dim);
-		templateBox.setMinimumSize(dim);
-		templateBox.setPreferredSize(dim);
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 3;
-		gbc.anchor = GridBagConstraints.WEST;
-		predicatePanel.add(templateBox, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+				
+		JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		predicatePanel.add(templateRow, gbc);
+		templateBox.setPreferredSize(new Dimension(235, 27));
+		templateRow.add(templateBox);
+		
+		JPanel placeTransitionRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		predicatePanel.add(placesTransitionsBox, gbc);
-
-		gbc.gridx = 1;				
-		transitionIsEnabledLabel = new JLabel(" is enabled");
-		predicatePanel.add(transitionIsEnabledLabel, gbc);
+		predicatePanel.add(placeTransitionRow, gbc);
+		placeTransitionRow.add(placesTransitionsBox);
 		
 		String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
 		relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
-		predicatePanel.add(relationalOperatorBox, gbc);
+		relationalOperatorBox.setPreferredSize(new Dimension(52, 30));
+		placeTransitionRow.add(relationalOperatorBox);
 
 		placeMarking = new CustomJSpinner(0);
-		placeMarking.setMaximumSize(new Dimension(60, 30));
-		placeMarking.setMinimumSize(new Dimension(60, 30));
-		placeMarking.setPreferredSize(new Dimension(60, 30));
-
-		gbc.gridx = 2;
-		predicatePanel.add(placeMarking, gbc);
+		placeMarking.setPreferredSize(new Dimension(52, 30));
+		placeTransitionRow.add(placeMarking);
 		
-		addPredicateButton = new JButton("Add predicate to the query");
-		gbc.gridx = 0;
+		transitionIsEnabledLabel = new JLabel(" is enabled");
+		transitionIsEnabledLabel.setPreferredSize(new Dimension(109, 30));
+		placeTransitionRow.add(transitionIsEnabledLabel);
+		
+		JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		gbc.gridy = 2;
-		gbc.gridwidth = 3;
-		//addPredicateButton.setPreferredSize(dim);
-		//addPredicateButton.setMinimumSize(dim);
-		predicatePanel.add(addPredicateButton, gbc);
+		predicatePanel.add(addPredicateRow, gbc);
+		addPredicateButton = new JButton("Add predicate to the query");
+		addPredicateButton.setPreferredSize(new Dimension(235, 27));
+		addPredicateRow.add(addPredicateButton);
 
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
 		separator.setEnabled(true);
@@ -1759,27 +1753,17 @@ public class CTLQueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		predicatePanel.add(separator,gbc);
 
+		JPanel trueFalseDeadlock = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		truePredicateButton = new JButton("True");
+		falsePredicateButton = new JButton("False");
+		deadLockPredicateButton = new JButton("Deadlock");
+		trueFalseDeadlock.add(truePredicateButton);
+		trueFalseDeadlock.add(falsePredicateButton);
+		trueFalseDeadlock.add(deadLockPredicateButton);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -38, 0,0);
-		predicatePanel.add(truePredicateButton, gbc);
-
-		falsePredicateButton = new JButton("False");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -88, 0,0);
-		predicatePanel.add(falsePredicateButton, gbc);
-
-		deadLockPredicateButton = new JButton("Deadlock");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 4;
-		gbc.gridwidth = 3;
-		gbc.insets = new Insets(0, -35, 0,0);
-		predicatePanel.add(deadLockPredicateButton, gbc);
+		predicatePanel.add(trueFalseDeadlock, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;

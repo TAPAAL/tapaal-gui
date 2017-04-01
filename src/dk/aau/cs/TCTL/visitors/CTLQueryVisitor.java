@@ -25,6 +25,7 @@ import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.io.XMLFormatter;
+import java.util.ArrayList;
 
 public class CTLQueryVisitor extends VisitorBase {
 	
@@ -200,7 +201,14 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 	
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-		XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+		if (tctlPlaceNode.getParent() instanceof TCTLPlusListNode) {
+		    XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+		} else {
+		    XMLQuery.append(startTag(XML_TOKENSCOUNT));
+		    XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+		    XMLQuery.append(endTag(XML_TOKENSCOUNT));
+		}
+		    
 	}
 	
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
