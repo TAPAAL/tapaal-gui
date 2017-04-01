@@ -1715,7 +1715,7 @@ public class CTLQueryDialog extends JPanel {
 				
 		JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		predicatePanel.add(templateRow, gbc);
-		templateBox.setPreferredSize(new Dimension(235, 27));
+		templateBox.setPreferredSize(new Dimension(292, 27));
 		templateRow.add(templateBox);
 		
 		JPanel placeTransitionRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -1725,22 +1725,22 @@ public class CTLQueryDialog extends JPanel {
 		
 		String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
 		relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
-		relationalOperatorBox.setPreferredSize(new Dimension(52, 30));
+		relationalOperatorBox.setPreferredSize(new Dimension(80, 27));
 		placeTransitionRow.add(relationalOperatorBox);
 
 		placeMarking = new CustomJSpinner(0);
-		placeMarking.setPreferredSize(new Dimension(52, 30));
+		placeMarking.setPreferredSize(new Dimension(80, 27));
 		placeTransitionRow.add(placeMarking);
 		
 		transitionIsEnabledLabel = new JLabel(" is enabled");
-		transitionIsEnabledLabel.setPreferredSize(new Dimension(109, 30));
+		transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
 		placeTransitionRow.add(transitionIsEnabledLabel);
 		
 		JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		gbc.gridy = 2;
 		predicatePanel.add(addPredicateRow, gbc);
 		addPredicateButton = new JButton("Add predicate to the query");
-		addPredicateButton.setPreferredSize(new Dimension(235, 27));
+		addPredicateButton.setPreferredSize(new Dimension(292, 27));
 		addPredicateRow.add(addPredicateButton);
 
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
@@ -1757,12 +1757,16 @@ public class CTLQueryDialog extends JPanel {
 		truePredicateButton = new JButton("True");
 		falsePredicateButton = new JButton("False");
 		deadLockPredicateButton = new JButton("Deadlock");
+		truePredicateButton.setPreferredSize(new Dimension(90, 27));
+		falsePredicateButton.setPreferredSize(new Dimension(90, 27));
+		deadLockPredicateButton.setPreferredSize(new Dimension(103, 27));
 		trueFalseDeadlock.add(truePredicateButton);
 		trueFalseDeadlock.add(falsePredicateButton);
 		trueFalseDeadlock.add(deadLockPredicateButton);
 		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
+		gbc.gridx = 2;
 		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.CENTER;
 		predicatePanel.add(trueFalseDeadlock, gbc);
 
 		gbc = new GridBagConstraints();
