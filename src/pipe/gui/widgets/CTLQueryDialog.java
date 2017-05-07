@@ -1997,7 +1997,7 @@ public class CTLQueryDialog extends JPanel {
 
 						if (!c1.getResult() || !c2.getResult()) {
 							StringBuilder s = new StringBuilder();
-							s.append("The following places or transitions were used in the query, but are not present in your model:\n\n");
+							s.append("The following places or transitions could not be added to the query:\n\n");
 
 							for (String placeName : c1.getIncorrectPlaceNames()) {
 								s.append(placeName);
