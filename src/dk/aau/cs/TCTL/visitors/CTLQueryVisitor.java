@@ -145,18 +145,13 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLTermListNode termListNode, Object context) {
 		assert  termListNode.getProperties().get(1) instanceof AritmeticOperator;
 		AritmeticOperator operator =  (AritmeticOperator)termListNode.getProperties().get(1);
-		switch (operator.toString()){
-			case "+":
-				createList(termListNode.getProperties(), context, XML_INTEGERSUM);
-				break;
-			case "*":
-				createList(termListNode.getProperties(), context, XML_INTEGERPRODUCT);
-				break;
-			case "-":
-				createList(termListNode.getProperties(), context, XML_INTEGERDIFFERENCE);
-				break;
-			default:
-				break;
+		String op = operator.toString();
+		if (op.equals("+")) {
+		    createList(termListNode.getProperties(), context, XML_INTEGERSUM);
+		} else if (op.equals("*")) {
+		    createList(termListNode.getProperties(), context, XML_INTEGERPRODUCT);
+		} else if (op.equals("-")) {
+		    createList(termListNode.getProperties(), context, XML_INTEGERDIFFERENCE);
 		}
 	}
 
