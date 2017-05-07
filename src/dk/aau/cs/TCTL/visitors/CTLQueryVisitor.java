@@ -2,28 +2,7 @@ package dk.aau.cs.TCTL.visitors;
 
 import java.util.List;
 
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAUNode;
-import dk.aau.cs.TCTL.TCTLAXNode;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLEUNode;
-import dk.aau.cs.TCTL.TCTLEXNode;
-import dk.aau.cs.TCTL.TCTLFalseNode;
-import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathToStateConverter;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.TCTLTransitionNode;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
-import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.io.XMLFormatter;
 import java.util.ArrayList;
 
@@ -60,7 +39,10 @@ public class CTLQueryVisitor extends VisitorBase {
 	private static final String XML_TOKENSCOUNT 		= "tokens-count";
 	private static final String XML_PLACE 			= "place";
 	private static final String XML_TRANSITION		= "transition";
-	
+	private static final String XML_INTEGERSUM = "integer-sum";
+	private static final String XML_INTEGERPRODUCT = "integer-product";
+	private static final String XML_INTEGERDIFFERENCE = "integer-difference";
+
 	private StringBuffer XMLQuery;
         
         public CTLQueryVisitor() {
@@ -159,7 +141,25 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLOrListNode orListNode, Object context) {
 		createList(orListNode.getProperties(), context, XML_DISJUNCTION);
 	}
-	
+
+	public void visit(TCTLTermListNode termListNode, Object context) {
+		assert  termListNode.getProperties().get(1) instanceof AritmeticOperator;
+		AritmeticOperator operator =  (AritmeticOperator)termListNode.getProperties().get(1);
+		switch (operator.toString()){
+			case "+":
+				createList(termListNode.getProperties(), context, XML_INTEGERSUM);
+				break;
+			case "*":
+				createList(termListNode.getProperties(), context, XML_INTEGERPRODUCT);
+				break;
+			case "-":
+				createList(termListNode.getProperties(), context, XML_INTEGERDIFFERENCE);
+				break;
+			default:
+				break;
+		}
+	}
+
 	public void visit(TCTLPlusListNode plusListNode, Object context) {
 		if (plusListNode.getProperties().get(0) instanceof TCTLTransitionNode){
 			createList(plusListNode.getProperties(), context, XML_ISFIREABLE);
@@ -199,7 +199,7 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLConstNode tctlConstNode, Object context){
 		XMLQuery.append(wrapInTag(String.valueOf(tctlConstNode.getConstant()) + "", XML_INTEGERCONSTANT));
 	}
-	
+
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
 		if (tctlPlaceNode.getParent() instanceof TCTLPlusListNode) {
 		    XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
@@ -208,9 +208,8 @@ public class CTLQueryVisitor extends VisitorBase {
 		    XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
 		    XMLQuery.append(endTag(XML_TOKENSCOUNT));
 		}
-		    
 	}
-	
+
 	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
 		XMLQuery.append(wrapInTag(tctlTransitionNode.toString() + "", XML_TRANSITION));
 	}

@@ -441,7 +441,8 @@ public class XMLCTLQueryParser {
             }
 
             return new TCTLPlusListNode(places);
-        } else if(nodeName.equals("integer-sum") || nodeName.equals("integer-product")){
+        } else if(nodeName.equals("integer-sum") || nodeName.equals("integer-product") || nodeName.equals("integer-difference")){
+
             children = getAllChildren(integerExpression);
             Iterator<Node> itr = children.iterator();
 
@@ -459,26 +460,13 @@ public class XMLCTLQueryParser {
                 if(itr.hasNext()){
                     if(nodeName.equals("integer-sum")){
                         intExpList.add(new AritmeticOperator("+"));
-                    } else{
+                    } else if(nodeName.equals("integer-product")){
                         intExpList.add(new AritmeticOperator("*"));
+                    } else{
+                        intExpList.add(new AritmeticOperator("-"));
                     }
                 }
             }
-            
-            return new TCTLTermListNode(intExpList);
-        } else if(nodeName.equals("integer-difference")){
-            children = getAllChildren(integerExpression);
-
-            if(children.size() != 2){
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-
-            ArrayList<TCTLAbstractStateProperty> intExpList = 
-                new ArrayList<TCTLAbstractStateProperty>();
-
-            intExpList.add(parseIntegerExpression(children.get(0)));
-            intExpList.add(new AritmeticOperator("-"));
-            intExpList.add(parseIntegerExpression(children.get(1)));
             
             return new TCTLTermListNode(intExpList);
         }

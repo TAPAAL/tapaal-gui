@@ -252,7 +252,7 @@ TCTLAbstractStateProperty AritmeticExpr() :
 			terms.add(currentChild); 
 		}
 	)*
-	{ return terms.size() == 1 ? currentChild : new TCTLPlusListNode(terms); }
+	{ return terms.size() == 1 ? currentChild : new TCTLTermListNode(terms); }
 }
 
 TCTLAbstractStateProperty AritmeticTerm() : 
