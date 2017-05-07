@@ -104,7 +104,9 @@ TOKEN :
 
 TOKEN :
 {
-	<PLUS: "+" | "-">
+	<PLUS: "+">
+    |
+	<MINUS: "-">
 	|
 	<MULT: "*">
 }
@@ -243,10 +245,29 @@ TCTLAbstractStateProperty AritmeticExpr() :
 	Token op;
 }
 {
+	currentChild = AritmeticMinusExpr()
+	{ terms.add(currentChild); }
+	( 
+		op = <PLUS> currentChild = AritmeticMinusExpr()
+		{ 
+			terms.add(new AritmeticOperator(op.image));
+			terms.add(currentChild); 
+		}
+	)*
+	{ return terms.size() == 1 ? currentChild : new TCTLTermListNode(terms); }
+}
+
+TCTLAbstractStateProperty AritmeticMinusExpr() : 
+{
+	TCTLAbstractStateProperty currentChild; 
+	ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
+	Token op;
+}
+{
 	currentChild = AritmeticTerm()
 	{ terms.add(currentChild); }
 	( 
-		op = <PLUS> currentChild = AritmeticTerm()
+		op = <MINUS> currentChild = AritmeticTerm()
 		{ 
 			terms.add(new AritmeticOperator(op.image));
 			terms.add(currentChild); 

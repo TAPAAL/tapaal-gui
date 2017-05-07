@@ -43,13 +43,15 @@ public interface TAPAALCTLQueryParserConstants {
   /** RegularExpression Id. */
   int PLUS = 16;
   /** RegularExpression Id. */
-  int MULT = 17;
+  int MINUS = 17;
   /** RegularExpression Id. */
-  int NUM = 18;
+  int MULT = 18;
   /** RegularExpression Id. */
-  int IDENT = 19;
+  int NUM = 19;
   /** RegularExpression Id. */
-  int OP = 20;
+  int IDENT = 20;
+  /** RegularExpression Id. */
+  int OP = 21;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -72,7 +74,8 @@ public interface TAPAALCTLQueryParserConstants {
     "<OR>",
     "<AND>",
     "<NOT>",
-    "<PLUS>",
+    "\"+\"",
+    "\"-\"",
     "\"*\"",
     "<NUM>",
     "<IDENT>",
