@@ -576,42 +576,53 @@ public class CTLQueryDialog extends JPanel {
 	}
 
 	private void updateQueryButtonsAccordingToSelection() {
-		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
-			if(!(node.getRight() instanceof TCTLConstNode &&
+		TCTLAbstractProperty current = currentSelection.getObject();
+		if(current instanceof TCTLStateToPathConverter){
+			current = ((TCTLStateToPathConverter) current).getProperty();
+		}
+
+		if (current instanceof TCTLAtomicPropositionNode) {
+			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
+
+			if(node.getRight() instanceof TCTLConstNode &&
 					(node.getLeft() instanceof TCTLPlaceNode || 
 							// Checks if the left side is a list of place nodes, and if it only contains at least one place node
 							(node.getLeft() instanceof TCTLPlusListNode && 
 							((TCTLPlusListNode)node.getLeft()).getProperties().size() > 0 &&
-							((TCTLPlusListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)))){
-				return;
+							((TCTLPlusListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode))){
+				TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+				TCTLPlaceNode placeNode = null;
+
+				if(node.getLeft() instanceof TCTLPlusListNode){ // if the left side is a list of place nodes
+					placeNode = (TCTLPlaceNode)((TCTLPlusListNode)node.getLeft()).getProperties().get(0);
+				} else{
+					placeNode = (TCTLPlaceNode) node.getLeft();
+				}
+
+
+				// bit of a hack to prevent posting edits to the undo manager when
+				// we programmatically change the selection in the atomic proposition comboboxes etc.
+				// because a different atomic proposition was selected
+				userChangedAtomicPropSelection = false;
+				if(placeNode.getTemplate().equals("")){
+					templateBox.setSelectedItem(SHARED);
+				}
+				else{
+					templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
+				}
+				placesTransitionsBox.setSelectedItem(placeNode.getPlace());
+				relationalOperatorBox.setSelectedItem(node.getOp());
+				placeMarking.setValue(placeMarkingNode.getConstant());
+				userChangedAtomicPropSelection = true;
 			}
-			
-			TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
-			TCTLPlaceNode placeNode = null;
-			
-			if(node.getLeft() instanceof TCTLPlusListNode){ // if the left side is a list of place nodes
-				placeNode = (TCTLPlaceNode)((TCTLPlusListNode)node.getLeft()).getProperties().get(0);
-			} else{
-				placeNode = (TCTLPlaceNode) node.getLeft();
+		} else if(current instanceof TCTLPlusListNode){
+			TCTLPlusListNode list = (TCTLPlusListNode) current;
+			if(list.getProperties().size() > 0 && list.getProperties().get(0) instanceof TCTLTransitionNode) {
+				placesTransitionsBox.setSelectedItem(((TCTLTransitionNode) list.getProperties().get(0)).getTransition());
+				userChangedAtomicPropSelection = true;
 			}
-			
-			
-			// bit of a hack to prevent posting edits to the undo manager when
-			// we programmatically change the selection in the atomic proposition comboboxes etc.
-			// because a different atomic proposition was selected
-			userChangedAtomicPropSelection = false;
-			if(placeNode.getTemplate().equals("")){
-				templateBox.setSelectedItem(SHARED);
-			}
-			else{
-				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
-			}
-			placesTransitionsBox.setSelectedItem(placeNode.getPlace()); 
-			relationalOperatorBox.setSelectedItem(node.getOp());
-			placeMarking.setValue(placeMarkingNode.getConstant());
-			userChangedAtomicPropSelection = true;
 		}
+		setEnablednessOfOperatorAndMarkingBoxes();
 	}
 
 	private void deleteSelection() {
