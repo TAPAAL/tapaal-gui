@@ -100,6 +100,7 @@ import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
 import dk.aau.cs.TCTL.visitors.FixAbbrivTransitionNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
@@ -576,6 +577,8 @@ public class CTLQueryDialog extends JPanel {
 	}
 
 	private void updateQueryButtonsAccordingToSelection() {
+		setEnablednessOfOperatorAndMarkingBoxes();
+
 		TCTLAbstractProperty current = currentSelection.getObject();
 		if(current instanceof TCTLStateToPathConverter){
 			current = ((TCTLStateToPathConverter) current).getProperty();
@@ -589,12 +592,17 @@ public class CTLQueryDialog extends JPanel {
 							// Checks if the left side is a list of place nodes, and if it only contains at least one place node
 							(node.getLeft() instanceof TCTLPlusListNode && 
 							((TCTLPlusListNode)node.getLeft()).getProperties().size() > 0 &&
-							((TCTLPlusListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode))){
+							((TCTLPlusListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)) ||
+							(node.getLeft() instanceof TCTLTermListNode && 
+							((TCTLTermListNode)node.getLeft()).getProperties().size() > 0 &&
+							((TCTLTermListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)){
 				TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
 				TCTLPlaceNode placeNode = null;
 
 				if(node.getLeft() instanceof TCTLPlusListNode){ // if the left side is a list of place nodes
 					placeNode = (TCTLPlaceNode)((TCTLPlusListNode)node.getLeft()).getProperties().get(0);
+				} else if (node.getLeft() instanceof TCTLTermListNode) {
+					placeNode = (TCTLPlaceNode)((TCTLTermListNode)node.getLeft()).getProperties().get(0);
 				} else{
 					placeNode = (TCTLPlaceNode) node.getLeft();
 				}
@@ -622,7 +630,6 @@ public class CTLQueryDialog extends JPanel {
 				userChangedAtomicPropSelection = true;
 			}
 		}
-		setEnablednessOfOperatorAndMarkingBoxes();
 	}
 
 	private void deleteSelection() {
