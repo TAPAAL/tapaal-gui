@@ -614,8 +614,7 @@ public class CTLQueryDialog extends JPanel {
 				userChangedAtomicPropSelection = false;
 				if(placeNode.getTemplate().equals("")){
 					templateBox.setSelectedItem(SHARED);
-				}
-				else{
+				} else {
 					templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
 				}
 				placesTransitionsBox.setSelectedItem(placeNode.getPlace());
@@ -626,7 +625,14 @@ public class CTLQueryDialog extends JPanel {
 		} else if(current instanceof TCTLPlusListNode){
 			TCTLPlusListNode list = (TCTLPlusListNode) current;
 			if(list.getProperties().size() > 0 && list.getProperties().get(0) instanceof TCTLTransitionNode) {
-				placesTransitionsBox.setSelectedItem(((TCTLTransitionNode) list.getProperties().get(0)).getTransition());
+				TCTLTransitionNode transitionNode = (TCTLTransitionNode)list.getProperties().get(0);
+				userChangedAtomicPropSelection = false;
+				if(transitionNode.getTemplate().equals("")){
+					templateBox.setSelectedItem(SHARED);
+				} else {
+					templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
+				}
+				placesTransitionsBox.setSelectedItem(transitionNode.getTransition());
 				userChangedAtomicPropSelection = true;
 			}
 		}
