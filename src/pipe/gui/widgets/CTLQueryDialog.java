@@ -596,7 +596,6 @@ public class CTLQueryDialog extends JPanel {
 							(node.getLeft() instanceof TCTLTermListNode && 
 							((TCTLTermListNode)node.getLeft()).getProperties().size() > 0 &&
 							((TCTLTermListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)){
-				TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
 				TCTLPlaceNode placeNode = null;
 
 				if(node.getLeft() instanceof TCTLPlusListNode){ // if the left side is a list of place nodes
@@ -619,7 +618,10 @@ public class CTLQueryDialog extends JPanel {
 				}
 				placesTransitionsBox.setSelectedItem(placeNode.getPlace());
 				relationalOperatorBox.setSelectedItem(node.getOp());
-				placeMarking.setValue(placeMarkingNode.getConstant());
+				if(node.getRight() instanceof TCTLConstNode) {
+				    TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+				    placeMarking.setValue(placeMarkingNode.getConstant());
+				}
 				userChangedAtomicPropSelection = true;
 			}
 		} else if(current instanceof TCTLPlusListNode){
