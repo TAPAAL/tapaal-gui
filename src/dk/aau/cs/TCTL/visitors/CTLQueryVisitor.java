@@ -143,8 +143,8 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 
 	public void visit(TCTLTermListNode termListNode, Object context) {
-		assert  termListNode.getProperties().get(1) instanceof AritmeticOperator;
-		AritmeticOperator operator =  (AritmeticOperator)termListNode.getProperties().get(1);
+		assert termListNode.getProperties().get(1) instanceof AritmeticOperator;
+		AritmeticOperator operator = (AritmeticOperator)termListNode.getProperties().get(1);
 		String op = operator.toString();
 		if (op.equals("+")) {
 		    createList(termListNode.getProperties(), context, XML_INTEGERSUM);
@@ -152,14 +152,6 @@ public class CTLQueryVisitor extends VisitorBase {
 		    createList(termListNode.getProperties(), context, XML_INTEGERPRODUCT);
 		} else if (op.equals("-")) {
 		    createList(termListNode.getProperties(), context, XML_INTEGERDIFFERENCE);
-		}
-	}
-
-	public void visit(TCTLPlusListNode plusListNode, Object context) {
-		if (plusListNode.getProperties().get(0) instanceof TCTLTransitionNode){
-			createList(plusListNode.getProperties(), context, XML_ISFIREABLE);
-		} else if (plusListNode.getProperties().get(0) instanceof TCTLPlaceNode){
-			createList(plusListNode.getProperties(), context, XML_TOKENSCOUNT);
 		}
 	}
 
@@ -196,17 +188,15 @@ public class CTLQueryVisitor extends VisitorBase {
 	}
 
 	public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-		if (tctlPlaceNode.getParent() instanceof TCTLPlusListNode) {
-		    XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
-		} else {
-		    XMLQuery.append(startTag(XML_TOKENSCOUNT));
-		    XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
-		    XMLQuery.append(endTag(XML_TOKENSCOUNT));
-		}
+		XMLQuery.append(startTag(XML_TOKENSCOUNT));
+		XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+		XMLQuery.append(endTag(XML_TOKENSCOUNT));
 	}
 
-	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
+	public void visit(TCTLTransitionNode tctlTransitionNode, Object context){		
+		XMLQuery.append(startTag(XML_ISFIREABLE));
 		XMLQuery.append(wrapInTag(tctlTransitionNode.toString() + "", XML_TRANSITION));
+		XMLQuery.append(endTag(XML_ISFIREABLE));
 	}
 	
 	@Override

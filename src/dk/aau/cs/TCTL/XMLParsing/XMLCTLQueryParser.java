@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.lang.NumberFormatException;
 
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -368,27 +367,36 @@ public class XMLCTLQueryParser {
                 return new TCTLAtomicPropositionNode(subformula1, ">=", subformula2);
             }
         } else if (nodeName.equals("is-fireable")){
-        	children = getAllChildren(property);
+	    // Construct a nested disjunction of transitions.
+	    
+	    children = getAllChildren(property);
 
-            if(children.size() > 1){
+            if(children.isEmpty()){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-            
-            ArrayList<TCTLAbstractStateProperty> transitions = new ArrayList<TCTLAbstractStateProperty>();
-
-            for(Node n : children){
-                String[] splits = getText(n).replace("\n", "").split("\\.");
-                
-                // Check if transition contains a template name
+            } else if(children.size() == 1) {
+		String[] splits = getText(children.get(0)).replace("\n", "").split("\\.");
+		
+		// Check if transition contains a template name
                 if(splits.length > 1){
-                	transitions.add(new TCTLTransitionNode(splits[0], splits[1]));
+		    return new TCTLTransitionNode(splits[0], splits[1]);
                 } else {
-                	transitions.add(new TCTLTransitionNode(splits[0]));
+		    return new TCTLTransitionNode(splits[0]);
                 }
-            }
-
-			return new TCTLPlusListNode(transitions);
-
+	    } else {
+		ArrayList<TCTLAbstractStateProperty> transitions = new ArrayList<TCTLAbstractStateProperty>();
+		
+		for(Node n : children) {
+		    String[] splits = getText(n).replace("\n", "").split("\\.");
+		    
+		    // Check if transition contains a template name
+		    if(splits.length > 1){
+			transitions.add(new TCTLTransitionNode(splits[0], splits[1]));
+		    } else {
+			transitions.add(new TCTLTransitionNode(splits[0]));
+		    }
+		}
+		return new TCTLOrListNode(transitions);
+	    }
         } else{
         	parseFormula(property);
         }
@@ -424,23 +432,36 @@ public class XMLCTLQueryParser {
 
             if(children.size() < 1){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-
-            ArrayList<TCTLAbstractStateProperty> places = 
-                new ArrayList<TCTLAbstractStateProperty>();
-
-            for(Node n : children){
-                String[] splits = getText(n).replace("\n", "").split("\\.");
-                
-                // Check if place contains a template name
+            } else if (children.size() == 1) {
+		String[] splits = getText(children.get(0)).replace("\n", "").split("\\.");
+		// Check if place contains a template name
                 if(splits.length > 1){
-                	places.add(new TCTLPlaceNode(splits[0], splits[1]));
+		   return new TCTLPlaceNode(splits[0], splits[1]);
                 } else {
-                	places.add(new TCTLPlaceNode(splits[0]));
+		    return new TCTLPlaceNode(splits[0]);
                 }
-            }
+	    }
+	    
+	    ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
+	    Iterator<Node> itr = children.iterator();
 
-            return new TCTLPlusListNode(places);
+	    while(itr.hasNext()){
+                Node n = itr.next();
+		String[] splits = getText(n).replace("\n", "").split("\\.");
+		
+		// Check if place contains a template name
+                if(splits.length > 1){
+		    terms.add(new TCTLPlaceNode(splits[0], splits[1]));
+                } else {
+		    terms.add(new TCTLPlaceNode(splits[0]));
+                }
+		
+                if(itr.hasNext()){
+		    terms.add(new AritmeticOperator("+"));
+                }
+	    }
+
+            return new TCTLTermListNode(terms);
         } else if(nodeName.equals("integer-sum") || nodeName.equals("integer-product") || nodeName.equals("integer-difference")){
 
             children = getAllChildren(integerExpression);

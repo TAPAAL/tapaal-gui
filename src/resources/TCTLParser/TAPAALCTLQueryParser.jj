@@ -25,7 +25,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 import dk.aau.cs.TCTL.AritmeticOperator;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
@@ -195,7 +194,6 @@ TCTLAbstractStateProperty NotExpr() :
 TCTLAbstractStateProperty Factor() :
 {
 	TCTLAbstractStateProperty thisProp; 
-    ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
 	Token temp = null;
     Token transition;
 }
@@ -206,9 +204,8 @@ TCTLAbstractStateProperty Factor() :
 		| <DEADLOCK> {thisProp = new TCTLDeadlockNode(); }
 		| LOOKAHEAD(AtomicProposition())
 		thisProp = AtomicProposition() 
-        | [ LOOKAHEAD(2) temp = <IDENT> "." ] transition = <IDENT> { 
-            list.add(new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image));
-            thisProp = new TCTLPlusListNode(list); }
+                | [ LOOKAHEAD(2) temp = <IDENT> "." ] transition = <IDENT> { 
+                thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image); }
 		| "(" thisProp = OrExpr() ")"
 		| LOOKAHEAD(AbstractPathProperty()) {
 		thisProp = new TCTLPathToStateConverter(AbstractPathProperty()); }
@@ -222,20 +219,14 @@ TCTLAbstractStateProperty AtomicProposition() :
 	TCTLAbstractStateProperty left; 
 	TCTLAbstractStateProperty right; 
 	Token op;
-    ArrayList<TCTLAbstractStateProperty> forSingleChild = new ArrayList<TCTLAbstractStateProperty>();
 }
 {
 	( 
 		left = AritmeticExpr() op = <OP> right = AritmeticExpr()
 	)
 	{
-		if (left instanceof  TCTLPlaceNode){
-            forSingleChild.add(left);
-            return new TCTLAtomicPropositionNode(new TCTLPlusListNode(forSingleChild), op.image, right);
-        } else {
-            return new TCTLAtomicPropositionNode(left, op.image, right);
+                return new TCTLAtomicPropositionNode(left, op.image, right);
         }
-      }
 }
 
 TCTLAbstractStateProperty AritmeticExpr() : 

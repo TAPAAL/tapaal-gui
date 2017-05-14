@@ -92,7 +92,6 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLPathToStateConverter;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
@@ -577,67 +576,50 @@ public class CTLQueryDialog extends JPanel {
 	}
 
 	private void updateQueryButtonsAccordingToSelection() {
-		setEnablednessOfOperatorAndMarkingBoxes();
-
 		TCTLAbstractProperty current = currentSelection.getObject();
 		if(current instanceof TCTLStateToPathConverter){
-			current = ((TCTLStateToPathConverter) current).getProperty();
+		    current = ((TCTLStateToPathConverter)current).getProperty();
 		}
-
+		
 		if (current instanceof TCTLAtomicPropositionNode) {
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
-
-			if(node.getRight() instanceof TCTLConstNode &&
-					(node.getLeft() instanceof TCTLPlaceNode || 
-							// Checks if the left side is a list of place nodes, and if it only contains at least one place node
-							(node.getLeft() instanceof TCTLPlusListNode && 
-							((TCTLPlusListNode)node.getLeft()).getProperties().size() > 0 &&
-							((TCTLPlusListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)) ||
-							(node.getLeft() instanceof TCTLTermListNode && 
-							((TCTLTermListNode)node.getLeft()).getProperties().size() > 0 &&
-							((TCTLTermListNode)node.getLeft()).getProperties().get(0) instanceof TCTLPlaceNode)){
-				TCTLPlaceNode placeNode = null;
-
-				if(node.getLeft() instanceof TCTLPlusListNode){ // if the left side is a list of place nodes
-					placeNode = (TCTLPlaceNode)((TCTLPlusListNode)node.getLeft()).getProperties().get(0);
-				} else if (node.getLeft() instanceof TCTLTermListNode) {
-					placeNode = (TCTLPlaceNode)((TCTLTermListNode)node.getLeft()).getProperties().get(0);
-				} else{
-					placeNode = (TCTLPlaceNode) node.getLeft();
-				}
-
-
-				// bit of a hack to prevent posting edits to the undo manager when
-				// we programmatically change the selection in the atomic proposition comboboxes etc.
-				// because a different atomic proposition was selected
-				userChangedAtomicPropSelection = false;
-				if(placeNode.getTemplate().equals("")){
-					templateBox.setSelectedItem(SHARED);
-				} else {
-					templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
-				}
-				placesTransitionsBox.setSelectedItem(placeNode.getPlace());
-				relationalOperatorBox.setSelectedItem(node.getOp());
-				if(node.getRight() instanceof TCTLConstNode) {
-				    TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
-				    placeMarking.setValue(placeMarkingNode.getConstant());
-				}
-				userChangedAtomicPropSelection = true;
+		    TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
+		    
+		    // bit of a hack to prevent posting edits to the undo manager when
+		    // we programmatically change the selection in the atomic proposition comboboxes etc.
+		    // because a different atomic proposition was selected
+		    userChangedAtomicPropSelection = false;
+		    if (node.getLeft() instanceof TCTLPlaceNode) {
+			TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+			if(placeNode.getTemplate().equals("")){
+			    templateBox.setSelectedItem(SHARED);
+			} else {
+			    templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
 			}
-		} else if(current instanceof TCTLPlusListNode){
-			TCTLPlusListNode list = (TCTLPlusListNode) current;
-			if(list.getProperties().size() > 0 && list.getProperties().get(0) instanceof TCTLTransitionNode) {
-				TCTLTransitionNode transitionNode = (TCTLTransitionNode)list.getProperties().get(0);
-				userChangedAtomicPropSelection = false;
-				if(transitionNode.getTemplate().equals("")){
-					templateBox.setSelectedItem(SHARED);
-				} else {
-					templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
-				}
-				placesTransitionsBox.setSelectedItem(transitionNode.getTransition());
-				userChangedAtomicPropSelection = true;
-			}
+			placesTransitionsBox.setSelectedItem(placeNode.getPlace());
+		    } else {
+			placesTransitionsBox.setSelectedIndex(0);
+		    }
+		    
+		    relationalOperatorBox.setSelectedItem(node.getOp());
+
+		    if(node.getRight() instanceof TCTLConstNode) {
+			TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+			placeMarking.setValue(placeMarkingNode.getConstant());
+		    }
+		    userChangedAtomicPropSelection = true;
+		} else if (current instanceof TCTLTransitionNode) {
+		    TCTLTransitionNode transitionNode = (TCTLTransitionNode)current;
+		    userChangedAtomicPropSelection = false;
+		    if(transitionNode.getTemplate().equals("")){
+			    templateBox.setSelectedItem(SHARED);
+		    } else {
+			    templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
+		    }
+		    placesTransitionsBox.setSelectedItem(transitionNode.getTransition());
+		    userChangedAtomicPropSelection = true;
 		}
+		
+		setEnablednessOfOperatorAndMarkingBoxes();
 	}
 
 	private void deleteSelection() {
@@ -866,19 +848,17 @@ public class CTLQueryDialog extends JPanel {
 
 	private void updateQueryOnAtomicPropositionChange() {
 		if (currentSelection != null && 
-				(currentSelection.getObject() instanceof TCTLAtomicPropositionNode || currentSelection.getObject() instanceof TCTLPlusListNode)) {
+			(currentSelection.getObject() instanceof TCTLAtomicPropositionNode || 
+			currentSelection.getObject() instanceof TCTLTransitionNode)) {
 			Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
-			ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
 			TCTLAbstractStateProperty property;
 			
 			if (transitionIsSelected()){
-                            list.add(new TCTLTransitionNode(template, (String) placesTransitionsBox.getSelectedItem()));
-                            property = new TCTLPlusListNode(list);
+                            property = new TCTLTransitionNode(template, (String) placesTransitionsBox.getSelectedItem());
 			} else {
-                            list.add(new TCTLPlaceNode(template, (String) placesTransitionsBox.getSelectedItem()));
                             property = new TCTLAtomicPropositionNode(
-                                new TCTLPlusListNode(list), 
+				new TCTLPlaceNode(template, (String) placesTransitionsBox.getSelectedItem()),
                                 (String) relationalOperatorBox.getSelectedItem(),
                                 new TCTLConstNode((Integer) placeMarking.getValue()));
 			}
@@ -1820,15 +1800,12 @@ public class CTLQueryDialog extends JPanel {
 				ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
 				
 				if (transitionIsSelected()){
-					list.add(new TCTLTransitionNode(template, (String) placesTransitionsBox.getSelectedItem()));
-					TCTLPlusListNode property = new TCTLPlusListNode(list);
-					addPropertyToQuery(property);
+					addPropertyToQuery(new TCTLTransitionNode(template, (String) placesTransitionsBox.getSelectedItem()));
 				} else {
-					list.add(new TCTLPlaceNode(template, (String) placesTransitionsBox.getSelectedItem()));
 					TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-							new TCTLPlusListNode(list), 
-							(String) relationalOperatorBox.getSelectedItem(),
-							new TCTLConstNode((Integer) placeMarking.getValue()));
+						new TCTLPlaceNode(template, (String) placesTransitionsBox.getSelectedItem()), 
+						(String) relationalOperatorBox.getSelectedItem(),
+						new TCTLConstNode((Integer) placeMarking.getValue()));
 					addPropertyToQuery(property);
 				}	
 			}

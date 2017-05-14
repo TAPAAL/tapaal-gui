@@ -526,9 +526,9 @@ public class BatchProcessingLoader {
 			parsedQuery.setCategory(TAPNQueryLoader.detectCategory(query, isCTL));
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
-				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
-		                network.activeTemplates().get(0).name());
-				parsedQuery.getProperty().accept(rt, null);
+//				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
+//		                network.activeTemplates().get(0).name());
+//				parsedQuery.getProperty().accept(rt, null);
 			}
 			return parsedQuery;
 		} else

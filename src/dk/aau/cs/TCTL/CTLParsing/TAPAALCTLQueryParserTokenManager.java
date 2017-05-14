@@ -4,7 +4,6 @@ package dk.aau.cs.TCTL.CTLParsing;
 import java.io.StringReader;
 import java.util.ArrayList;
 import dk.aau.cs.TCTL.AritmeticOperator;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;

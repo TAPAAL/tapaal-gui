@@ -6,7 +6,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 import dk.aau.cs.TCTL.AritmeticOperator;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
@@ -182,7 +181,6 @@ conjunctions.add(currentChild);
 }
 
   final public TCTLAbstractStateProperty Factor() throws ParseException {TCTLAbstractStateProperty thisProp;
-    ArrayList<TCTLAbstractStateProperty> list = new ArrayList<TCTLAbstractStateProperty>();
         Token temp = null;
     Token transition;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -215,8 +213,7 @@ thisProp = new TCTLDeadlockNode();
             ;
           }
           transition = jj_consume_token(IDENT);
-list.add(new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image));
-            thisProp = new TCTLPlusListNode(list);
+thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image);
           break;
           }
         case 26:{
@@ -238,16 +235,10 @@ thisProp = new TCTLPathToStateConverter(AbstractPathProperty());
   final public TCTLAbstractStateProperty AtomicProposition() throws ParseException {TCTLAbstractStateProperty left;
         TCTLAbstractStateProperty right;
         Token op;
-    ArrayList<TCTLAbstractStateProperty> forSingleChild = new ArrayList<TCTLAbstractStateProperty>();
     left = AritmeticExpr();
     op = jj_consume_token(OP);
     right = AritmeticExpr();
-if (left instanceof  TCTLPlaceNode){
-            forSingleChild.add(left);
-            {if ("" != null) return new TCTLAtomicPropositionNode(new TCTLPlusListNode(forSingleChild), op.image, right);}
-        } else {
-            {if ("" != null) return new TCTLAtomicPropositionNode(left, op.image, right);}
-        }
+{if ("" != null) return new TCTLAtomicPropositionNode(left, op.image, right);}
     throw new Error("Missing return statement in function");
 }
 
@@ -387,52 +378,6 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     finally { jj_save(2, xla); }
   }
 
-  private boolean jj_3R_10()
- {
-    if (jj_3R_12()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_13()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_12()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_14()) {
-    jj_scanpos = xsp;
-    if (jj_3R_15()) {
-    jj_scanpos = xsp;
-    if (jj_3R_16()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    if (jj_scan_token(IDENT)) return true;
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9()
- {
-    if (jj_scan_token(PLUS)) return true;
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11()
- {
-    if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_10()) return true;
-    return false;
-  }
-
   private boolean jj_3R_16()
  {
     if (jj_scan_token(26)) return true;
@@ -448,23 +393,16 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
     return false;
   }
 
-  private boolean jj_3R_6()
+  private boolean jj_3_1()
  {
-    if (jj_3R_7()) return true;
-    if (jj_scan_token(OP)) return true;
-    if (jj_3R_7()) return true;
+    if (jj_scan_token(IDENT)) return true;
+    if (jj_scan_token(28)) return true;
     return false;
   }
 
   private boolean jj_3R_15()
  {
     if (jj_scan_token(NUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_6()) return true;
     return false;
   }
 
@@ -503,6 +441,59 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
       xsp = jj_scanpos;
       if (jj_3R_11()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  private boolean jj_3R_10()
+ {
+    if (jj_3R_12()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_13()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_12()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_14()) {
+    jj_scanpos = xsp;
+    if (jj_3R_15()) {
+    jj_scanpos = xsp;
+    if (jj_3R_16()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_9()
+ {
+    if (jj_scan_token(PLUS)) return true;
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_6()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_6()
+ {
+    if (jj_3R_7()) return true;
+    if (jj_scan_token(OP)) return true;
+    if (jj_3R_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11()
+ {
+    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_10()) return true;
     return false;
   }
 
