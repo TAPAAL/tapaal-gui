@@ -46,12 +46,8 @@ public class VerifyTAPNExporter {
 			modelStream.close();
 			
 			PrintStream queryStream = new PrintStream(queryFile);
-			if (query.getCategory() == QueryCategory.CTL){
-				CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-				queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-			} else {
-				queryStream.append(query.getProperty().toString());
-			}
+			CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+			queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
 			
 			queryStream.close();
 		} catch(FileNotFoundException e) {

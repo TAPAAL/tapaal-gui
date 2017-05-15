@@ -34,14 +34,13 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append("-k ");
 		result.append(extraTokens+tokensInModel);
 		result.append(traceMap.get(traceOption));
-		result.append(" -m 0 ");	// Disable memory limit to ensure similar behaviour to other engines
 		result.append(searchMap.get(searchOption));
-		result.append(useOverApproximation()? "":" -d ");	// Disable over-approximation if disabled
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
 			break;
 		case NO_REDUCTION:
+			result.append(" -r 0 ");
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
@@ -51,8 +50,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		}
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			result.append(" -x 1");
 		}
+		result.append(" -x 1");
+		System.out.println(result.toString());
 		return result.toString();
 	}
 
@@ -66,11 +66,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
 	private static final Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
-		map.put(SearchOption.BFS, "-s BFS");
-		map.put(SearchOption.DFS, "-s DFS");
-		map.put(SearchOption.RANDOM, "-s RDFS");
-		map.put(SearchOption.HEURISTIC, "-s BestFS");
-		map.put(SearchOption.OVERAPPROXIMATE, "-s OverApprox");
+		map.put(SearchOption.BFS, " -s BFS");
+		map.put(SearchOption.DFS, " -s DFS");
+		map.put(SearchOption.RANDOM, " -s RDFS");
+		map.put(SearchOption.HEURISTIC, " -s BestFS");
+		map.put(SearchOption.OVERAPPROXIMATE, " -s OverApprox");
 
 		return map;
 	}

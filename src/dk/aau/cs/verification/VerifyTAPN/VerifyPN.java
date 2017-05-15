@@ -382,9 +382,10 @@ public class VerifyPN implements ModelChecker{
 		
 		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
 			Tuple<QueryResult, Stats> result = null;
-			if (query.getCategory() == QueryCategory.CTL){
+			if (output.contains("Processed N. Edges:")){
 				VerifyPNCTLOutputParser outputParser = new VerifyPNCTLOutputParser(totalTokens, extraTokens, query);
 				result = outputParser.parseOutput(output);
+				result.value1().isCTL=true;
 			} else {
 				VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, query);
 				result = outputParser.parseOutput(output);

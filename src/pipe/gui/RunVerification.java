@@ -271,7 +271,7 @@ public class RunVerification extends RunVerificationBase {
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
 
 		// TODO remove this when the engine outputs statistics
-		Boolean isCTLQuery = result.getQueryResult().getQuery().getCategory() == TAPNQuery.QueryCategory.CTL;
+		Boolean isCTLQuery = result.getQueryResult().isCTL;
 
 		if(modelChecker.supportsStats() && !result.isOverApproximationResult() && !isCTLQuery){
 			gbc = new GridBagConstraints();
