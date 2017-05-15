@@ -99,7 +99,6 @@ import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
 import dk.aau.cs.TCTL.visitors.FixAbbrivTransitionNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;

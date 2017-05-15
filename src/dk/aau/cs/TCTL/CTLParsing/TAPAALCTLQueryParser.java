@@ -165,13 +165,6 @@ conjunctions.add(currentChild);
 {if ("" != null) return new TCTLNotNode(child);}
       break;
       }
-    case 26:{
-      jj_consume_token(26);
-      childConverter = AbstractPathProperty();
-      jj_consume_token(27);
-{if ("" != null) return new TCTLPathToStateConverter(childConverter);}
-      break;
-      }
     default:
       jj_la1[3] = jj_gen;
       child = Factor();
@@ -182,7 +175,7 @@ conjunctions.add(currentChild);
 
   final public TCTLAbstractStateProperty Factor() throws ParseException {TCTLAbstractStateProperty thisProp;
         Token temp = null;
-    Token transition;
+        Token transition;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case TRUE:{
       jj_consume_token(TRUE);
@@ -514,7 +507,7 @@ thisProp = new TCTLConstNode(Integer.parseInt(num.image));
 	   jj_la1_init_0();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x1ef0,0x2000,0x4000,0x4008000,0xe,0x4100000,0x10000,0x20000,0x40000,0x4180000,};
+	   jj_la1_0 = new int[] {0x1ef0,0x2000,0x4000,0x8000,0xe,0x4100000,0x10000,0x20000,0x40000,0x4180000,};
 	}
   final private JJCalls[] jj_2_rtns = new JJCalls[3];
   private boolean jj_rescan = false;

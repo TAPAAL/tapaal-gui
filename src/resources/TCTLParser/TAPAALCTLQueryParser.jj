@@ -187,15 +187,15 @@ TCTLAbstractStateProperty NotExpr() :
 }
 {
 	<NOT> "(" child = OrExpr() ")" { return new TCTLNotNode(child); }
-    | "(" childConverter = AbstractPathProperty() ")" { return new TCTLPathToStateConverter(childConverter); }
 	| child = Factor() { return child; }
+        | "(" childConverter = AbstractPathProperty() ")" { return new TCTLPathToStateConverter(childConverter); }
 }
 
 TCTLAbstractStateProperty Factor() :
 {
 	TCTLAbstractStateProperty thisProp; 
 	Token temp = null;
-    Token transition;
+        Token transition;
 }
 {
 	(
