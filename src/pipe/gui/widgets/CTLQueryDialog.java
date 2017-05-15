@@ -596,7 +596,9 @@ public class CTLQueryDialog extends JPanel {
 			}
 			placesTransitionsBox.setSelectedItem(placeNode.getPlace());
 		    } else {
-			placesTransitionsBox.setSelectedIndex(0);
+			if (placesTransitionsBox.getItemCount() > 0){
+			    placesTransitionsBox.setSelectedIndex(0);
+			}
 		    }
 		    
 		    relationalOperatorBox.setSelectedItem(node.getOp());
