@@ -52,7 +52,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
 		}
 		result.append(" -x 1");
-		System.out.println(result.toString());
 		return result.toString();
 	}
 

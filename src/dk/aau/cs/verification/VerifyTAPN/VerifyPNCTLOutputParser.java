@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
@@ -17,7 +18,7 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 
     private static final Pattern configurationsPattern = Pattern.compile("\\s*Configurations:\\s*(\\d+)\\s*");
     private static final Pattern markingsPattern = Pattern.compile("\\s*Markings:\\s*(\\d+)\\s*");
-    private static final Pattern edgesPattern = Pattern.compile("\\s*Edges:\\s*(\\d+)\\s*");
+    private static final Pattern edgesPattern = Pattern.compile("\\t+Edges:\\s*(\\d+)\\s*");
 
     private static final Pattern processedEdgesPattern = Pattern.compile("\\s*Processed Edges:\\s*(\\d+)\\s*");
     private static final Pattern processedNEdgesPattern = Pattern.compile("\\s*Processed N. Edges:\\s*(\\d+)\\s*");
@@ -40,7 +41,6 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 	    boolean result = false;
 		boolean foundResult = false;
 		String[] lines = output.split(System.getProperty("line.separator"));
-
         try {
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
