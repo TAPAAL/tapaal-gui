@@ -86,6 +86,9 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
 		String algorithmOption = queryElement.getAttribute("algorithmOption");
 		boolean isCTL = isCTLQuery(queryElement);
+		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
+		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
+		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
 
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
@@ -99,6 +102,9 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			parsedQuery.setCategory(detectCategory(query, isCTL));
+			parsedQuery.setUseSiphontrap(siphontrap);
+			parsedQuery.setUseQueryReduction(queryReduction);
+			parsedQuery.setUseStubbornReduction(stubborn);
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 //				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 

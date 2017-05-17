@@ -317,6 +317,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
 		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
 		queryElement.setAttribute("algorithmOption", "" + query.getAlgorithmOption());
+		queryElement.setAttribute("useSiphonTrapAnalysis", "" + query.isSiphontrapEnabled());
+		queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
+		queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
 		
 		return queryElement;
 	}

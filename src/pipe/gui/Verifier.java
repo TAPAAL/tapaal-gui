@@ -154,9 +154,13 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), 
+				query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound(), 
+				query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(),query.getCategory(), query.getAlgorithmOption());
+			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), 
+				query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), 
+				query.approximationDenominator(),query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled(), query.isStubbornReductionEnabled());
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		}

@@ -125,6 +125,7 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import javax.swing.JCheckBox;
 
 public class CTLQueryDialog extends JPanel {
 
@@ -213,9 +214,10 @@ public class CTLQueryDialog extends JPanel {
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
-	private ButtonGroup algorithmRadioButtonGroup;
-	private JRadioButton useCZ;
-	private JRadioButton useLocal;
+	private ButtonGroup verifOptionsRadioButtonGroup;
+	private JCheckBox useSiphonTrap;
+	private JCheckBox useQueryReduction;
+	private JCheckBox useStubbornReduction;
 
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
@@ -327,9 +329,10 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
 	
-	//Tool tips for algorithms
-	private final static String TOOL_TIP_ALGORITHM_CERTAIN_ZERO = "Use certain zero on-the-fly algorithm";
-	private final static String TOOL_TIP_ALGORITHM_LOCAL = "Use local on-the-fly algorithm";
+	//Tool tips for verification options
+	private final static String TOOL_TIP_USE_SIPHONTRAP = "";
+	private final static String TOOL_TIP_USE_QUERY_REDUCTION = "";
+	private final static String TOOL_TIP_USE_STUBBORN_REDUCTION = "";
 	
 	
 	//Tool tips for query types
@@ -394,16 +397,10 @@ public class CTLQueryDialog extends JPanel {
 		
 		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable, underApproximationEnable, overApproximationDenominator);
 		query.setCategory(TAPNQuery.QueryCategory.CTL);
-		query.setAlgorithmOption(getSelectedAlgorithm());
+		query.setUseSiphontrap(useSiphonTrap.isSelected());
+		query.setUseQueryReduction(useQueryReduction.isSelected());
+		query.setUseStubbornReduction(useStubbornReduction.isSelected());
 		return query;
-	}
-	private AlgorithmOption getSelectedAlgorithm(){
-		if(useCZ.isSelected()){
-			return AlgorithmOption.CERTAIN_ZERO;
-		} else if(useLocal.isSelected()){
-			return AlgorithmOption.LOCAL;
-		}
-		return null;
 	}
 
 	private int getCapacity() {
@@ -913,15 +910,6 @@ public class CTLQueryDialog extends JPanel {
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
-		setupAlgorithmOptionsFromQuery(queryToCreateFrom);
-	}
-	
-	private void setupAlgorithmOptionsFromQuery(TAPNQuery queryToCreateFrom){
-		if(queryToCreateFrom.getAlgorithmOption() == TAPNQuery.AlgorithmOption.CERTAIN_ZERO){
-			useCZ.setSelected(true);
-		} else if(queryToCreateFrom.getAlgorithmOption() == TAPNQuery.AlgorithmOption.LOCAL){
-			useLocal.setSelected(true);
-		}
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -933,6 +921,9 @@ public class CTLQueryDialog extends JPanel {
 
 		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
+		useSiphonTrap.setSelected(queryToCreateFrom.isSiphontrapEnabled());
+		useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
+		useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
 	}
 
 	private void setupSearchOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2158,7 +2149,7 @@ public class CTLQueryDialog extends JPanel {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-		Dimension d = new Dimension(810, 100);
+		Dimension d = new Dimension(810, 120);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
@@ -2182,44 +2173,48 @@ public class CTLQueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 		
-		algorithmRadioButtonGroup = new ButtonGroup();
-				
-		useCZ = new JRadioButton("Certain zero on-the-fly algorithm");
-		useLocal = new JRadioButton("Local on-the-fly algorithm");
-	
-		useCZ.setVisible(true);
-		useLocal.setVisible(true);
-		
-		//TODO: Make tool-tips more descriptive
-		useCZ.setToolTipText(TOOL_TIP_ALGORITHM_CERTAIN_ZERO);
-		useLocal.setToolTipText(TOOL_TIP_ALGORITHM_LOCAL);
-		
-		useCZ.setSelected(true);
+		verifOptionsRadioButtonGroup = new ButtonGroup();
 
-		algorithmRadioButtonGroup.add(useCZ);
-		algorithmRadioButtonGroup.add(useLocal);
+		useSiphonTrap = new JCheckBox("Use siphon-trap analysis");
+		useQueryReduction = new JCheckBox("Use query reduction");
+		useStubbornReduction = new JCheckBox("Use stubborn reduction");
+		useSiphonTrap.setVisible(true);
+		useQueryReduction.setVisible(true);
+		useStubbornReduction.setVisible(true);
+		useSiphonTrap.setSelected(false);
+		useQueryReduction.setSelected(true);
+		useStubbornReduction.setSelected(true);
+		useSiphonTrap.setToolTipText(TOOL_TIP_USE_SIPHONTRAP);
+		useQueryReduction.setToolTipText(TOOL_TIP_USE_QUERY_REDUCTION);
+		useStubbornReduction.setToolTipText(TOOL_TIP_USE_STUBBORN_REDUCTION);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useCZ, gbc);
+		reductionOptionsPanel.add(useSiphonTrap, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useLocal, gbc);
+		reductionOptionsPanel.add(useQueryReduction, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useStubbornReduction, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(0, 10, 0, 10);
-		add(reductionOptionsPanel, gbc);
-		
+		add(reductionOptionsPanel, gbc);	
 	}
 	
 	protected void setEnabledOptionsAccordingToCurrentReduction() {

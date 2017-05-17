@@ -67,6 +67,10 @@ public class TAPNQuery {
 
 	private TCTLAbstractProperty property = null;
 	private boolean isActive = true;
+	
+	private boolean useSiphontrap = false; 
+	private boolean useQueryReduction = true; 
+	private boolean useStubbornReduction = true;
 
 	/**
 	 * @param name
@@ -90,8 +94,19 @@ public class TAPNQuery {
 	public boolean isUnderApproximationEnabled() {
 		return this.enableUnderApproximation;
 	}
-
 	
+	public boolean isSiphontrapEnabled() {
+		return this.useSiphontrap;
+	}
+	
+	public boolean isQueryReductionEnabled() {
+		return this.useQueryReduction;
+	}
+	
+	public boolean isStubbornReductionEnabled() {
+		return this.useStubbornReduction;
+	}
+
 	public int approximationDenominator() {
 		return this.denominator;
 	}
@@ -211,6 +226,18 @@ public class TAPNQuery {
 		this.useReduction = useReduction;
 	}
 	
+	public void setUseSiphontrap(boolean useSiphontrap) {
+		this.useSiphontrap = useSiphontrap;
+	}
+	
+	public void setUseQueryReduction(boolean useQueryReduction) {
+		this.useQueryReduction = useQueryReduction;
+	}
+	
+	public void setUseStubbornReduction(boolean useStubbornReduction) {
+		this.useStubbornReduction = useStubbornReduction;
+	}
+	
 	public boolean useReduction(){
 		return useReduction;
 	}
@@ -322,6 +349,9 @@ public class TAPNQuery {
 		extrapolationOption = newQuery.getExtrapolationOption();
 		discreteInclusion = newQuery.discreteInclusion();
 		inclusionPlaces = newQuery.inclusionPlaces();
+		useSiphontrap = newQuery.isSiphontrapEnabled();
+		useQueryReduction = newQuery.isQueryReductionEnabled();
+		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 	}
 
 	public InclusionPlaces inclusionPlaces() {
@@ -341,6 +371,9 @@ public class TAPNQuery {
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		copy.setCategory(queryCategory);
+		copy.setUseSiphontrap(this.isQueryReductionEnabled());
+		copy.setUseQueryReduction(this.isQueryReductionEnabled());
+		copy.setUseStubbornReduction(this.isStubbornReductionEnabled());
 		
 		return copy;
 	}

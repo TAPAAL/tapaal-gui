@@ -15,16 +15,27 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private ModelReduction modelReduction;
 	private QueryCategory queryCategory;
 	private AlgorithmOption algorithmOption;
+	private boolean useSiphontrap = false; 
+	private boolean useQueryReduction = true; 
+	private boolean useStubbornReduction = true;
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption) {
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, 
+		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
+		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
 		this.algorithmOption = algorithmOption;
+		this.useSiphontrap = siphontrap;
+		this.useQueryReduction = queryReduction;
+		this.useStubbornReduction = stubbornReduction;
 	}
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption) {
-		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption);
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, 
+		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
+		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
+		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction);
 	}
 
 	@Override
@@ -52,6 +63,15 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
 		}
 		result.append(" -x 1");
+		if (this.useSiphontrap) {
+			result.append(" -a 10 ");
+		}
+		if (!this.useQueryReduction) {
+			result.append(" -q 0 ");
+		}
+		if (!this.useStubbornReduction) {
+			result.append(" -p ");
+		}
 		System.out.println(result.toString());
 		return result.toString();
 	}
