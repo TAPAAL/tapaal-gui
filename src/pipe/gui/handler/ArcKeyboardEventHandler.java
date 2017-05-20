@@ -43,7 +43,7 @@ public class ArcKeyboardEventHandler extends KeyAdapter {
 
 			if ((CreateGui.getApp().getMode() == ElementType.FAST_PLACE)
 					|| (CreateGui.getApp().getMode() == ElementType.FAST_TRANSITION)) {
-				CreateGui.getApp().resetMode();
+				CreateGui.getApp().endFastMode();
 			}
 			aView.repaint();
 			break;

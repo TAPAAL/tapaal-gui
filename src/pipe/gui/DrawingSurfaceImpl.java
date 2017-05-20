@@ -44,7 +44,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 Printable, DrawingSurface {
 	private static final long serialVersionUID = 4434596266503933386L;
 	private boolean netChanged = false;
-    private boolean animationmode = false;
+	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
 	public PlaceTransitionObject createPTO;
@@ -600,14 +600,16 @@ Printable, DrawingSurface {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if(app.getGUIMode().equals(GUIMode.animation)) return;
-			
+
+			// check for control down here enables it to attach the arc being drawn to an existing place/transition
+
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
 				Pipe.ElementType mode = app.getMode();
 				switch (mode) {
-                case PLACE:
+				case PLACE:
 					PlaceTransitionObject pto = newPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
@@ -618,15 +620,19 @@ Printable, DrawingSurface {
 					break;
 
 				case TAPNPLACE:
+					// create place
 					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedPlaceCommand(
 									(TimedPlaceComponent) pto2, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-                        app.setMode(ElementType.TAPNARC);
-                        getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
+						// connect arc
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto2).mouseReleased(e);
 						app.setFastMode(ElementType.FAST_TRANSITION);
+						// enter fast mode
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -643,14 +649,18 @@ Printable, DrawingSurface {
 					}
 					break;
 				case TAPNTRANS:
+					// create transition
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedTransitionCommand(
 									(TimedTransitionComponent) pto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-                        app.setMode(ElementType.TAPNARC);
-                        getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
+						// connect arc
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						// enter fast mode
 						app.setFastMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
@@ -692,36 +702,44 @@ Printable, DrawingSurface {
 					dragStart = new Point(start);
 					break;
 
-                case FAST_TRANSITION:
-                    pto = newTAPNTransition(e.getPoint());
-                    getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) pto, model, guiModel, view));
-                    app.setMode(ElementType.TAPNARC);
-                    getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+				case FAST_TRANSITION:
+					// create transition
+					pto = newTAPNTransition(e.getPoint());
+					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) pto, model, guiModel, view));
+					app.setMode(ElementType.TAPNARC);
+					getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
 
-                    if (e.isControlDown()) {
-                        pnObject.dispatchEvent(e);
-                        app.setMode(ElementType.TAPNARC);
-                        getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
-                        app.setFastMode(ElementType.FAST_PLACE);
-                    } else{
-                        app.endFastMode();
-                    }
-                    break;
-                case FAST_PLACE:
-                    PlaceTransitionObject pto3 = newTimedPlace(e.getPoint());
-                    getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) pto3, model, guiModel, view));
-                    app.setMode(ElementType.TAPNARC);
-                    getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+					if (e.isControlDown()) {
+						// connect arc
+						pnObject.dispatchEvent(e);
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						// enter fast mode
+						app.setFastMode(ElementType.FAST_PLACE);
+					} else{
+						app.endFastMode();
+					}
+					break;
+				case FAST_PLACE:
+					// create place
+					PlaceTransitionObject pto3 = newTimedPlace(e.getPoint());
+					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) pto3, model, guiModel, view));
+					app.setMode(ElementType.TAPNARC);
+					getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
 
-                    if (e.isControlDown()) {
-                        pnObject.dispatchEvent(e);
-                        app.setMode(ElementType.TAPNARC);
-                        getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
-                        app.setFastMode(ElementType.FAST_TRANSITION);
-                    } else{
-                        app.endFastMode();
-                    }
-                    break;
+					if (e.isControlDown()) {
+						// connect arc
+						pnObject.dispatchEvent(e);
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+						// enter fast mode
+						app.setFastMode(ElementType.FAST_TRANSITION);
+					} else{
+						app.endFastMode();
+					}
+					break;
 				default:
 					break;
 				}
@@ -733,12 +751,12 @@ Printable, DrawingSurface {
 		}
 
 		private MouseListener getPlaceTransitionObjectHandlerOf(PlaceTransitionObject obj){
-            for (MouseListener listener : obj.getMouseListeners()) {
-                if (listener instanceof PlaceTransitionObjectHandler)
-                    return listener;
-            }
-            return null;
-        }
+			for (MouseListener listener : obj.getMouseListeners()) {
+				if (listener instanceof PlaceTransitionObjectHandler)
+					return listener;
+			}
+			return null;
+		}
 
 		private void addPoint(final Arc createArc, final MouseEvent e) {
 			int x = Grid.getModifiedX(e.getX());
