@@ -715,9 +715,11 @@ public class QueryDialog extends JPanel {
 		
 		disableSymmetryUpdate = true;
 
+		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
 		}
+		*/
 		
 		if(useTimeDarts != null){
 			if(hasForcedDisabledTimeDarts){
