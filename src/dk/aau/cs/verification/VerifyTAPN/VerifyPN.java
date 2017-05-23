@@ -56,6 +56,7 @@ public class VerifyPN implements ModelChecker{
 		private Messenger messenger;
 
 		private ProcessRunner runner;
+		private boolean ctlOutput = false;
 		
 		public VerifyPN(FileFinder fileFinder, Messenger messenger) {
 			this.fileFinder = fileFinder;
@@ -68,15 +69,22 @@ public class VerifyPN implements ModelChecker{
 		
 		public String getStatsExplanation(){
 			StringBuffer buffer = new StringBuffer("<html>");
-			buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
-			buffer.append("time a successor is calculated, this number is incremented)<br/>");
-			buffer.append("<br/>");
-			buffer.append("<b>Explored markings:</b> The number of markings taken out<br/>");
-			buffer.append("of the waiting list during the search.<br />");
-			buffer.append("<br/>");
-			buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
-			buffer.append("passed/waiting list at the end of verification.<br />");
-			buffer.append("</html>");
+			if(ctlOutput){
+				buffer.append("The number of configurations, markings and hyper-edges explored during<br />" +
+						"the on-the-fly generation of the dependency graph for the given net and<br />" +
+						"query before a conclusive answer was reached.");
+				buffer.append("</html>");
+			} else {
+				buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
+				buffer.append("time a successor is calculated, this number is incremented)<br/>");
+				buffer.append("<br/>");
+				buffer.append("<b>Explored markings:</b> The number of markings taken out<br/>");
+				buffer.append("of the waiting list during the search.<br />");
+				buffer.append("<br/>");
+				buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
+				buffer.append("passed/waiting list at the end of verification.<br />");
+				buffer.append("</html>");
+			}
 			return buffer.toString();
 		}
 
@@ -316,7 +324,8 @@ public class VerifyPN implements ModelChecker{
 				String standardOutput = readOutput(runner.standardOutput());
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
-				
+				ctlOutput = queryResult.value1().isCTL;
+
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {

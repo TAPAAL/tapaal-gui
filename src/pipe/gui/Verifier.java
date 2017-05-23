@@ -52,21 +52,13 @@ public class Verifier {
 		return verifypn;
 	}
 
-	private static VerifyPNCTL getVerifyPNCTL() {
-		VerifyPNCTL verifypn = new VerifyPNCTL(new FileFinderImpl(), new MessengerImpl());
-		verifypn.setup();
-		return verifypn;
-	}
-
 	private static ModelChecker getModelChecker(TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
 			return getVerifyTAPN();
 		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			return getVerifydTAPN();
-		} else if(query.getReductionOption() == ReductionOption.VerifyPN && query.getCategory() == TAPNQuery.QueryCategory.Default){
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
 			return getVerifyPN();
-		} else if(query.getReductionOption() == ReductionOption.VerifyPN && query.getCategory() == TAPNQuery.QueryCategory.CTL){
-			return getVerifyPNCTL();
 		}
 		else{
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
