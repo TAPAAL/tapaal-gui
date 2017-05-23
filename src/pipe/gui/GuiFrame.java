@@ -1750,6 +1750,15 @@ public class GuiFrame extends JFrame implements Observer {
 		setMode(old_mode);
 	}
 
+	public void endFastMode(){
+		if(timedPlaceAction.isSelected())
+			mode=ElementType.TAPNPLACE;
+		else if(transAction.isSelected())
+			mode=ElementType.TAPNTRANS;
+		else
+			mode=ElementType.SELECT;
+	}
+
 	public void setFastMode(Pipe.ElementType _mode) {
 		old_mode = mode;
 		setMode(_mode);
