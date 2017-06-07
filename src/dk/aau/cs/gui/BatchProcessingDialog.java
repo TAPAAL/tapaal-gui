@@ -1634,7 +1634,7 @@ public class BatchProcessingDialog extends JDialog {
 				
 				VerificationOptions options = currentWorker.getVerificationOptionsFromQuery(query);
 				s.append("\n\nEngine flags: \n");
-				s.append(options.toString() + "\n");	
+				s.append(options.toString());	
 			}
 			return s.toString();
 		}
