@@ -72,7 +72,12 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
-		
+
+		// user canceled
+		if (fc.getFile() == null) {
+			return null;
+		}
+
 		// Fixes bug:1648076 for OS X 
 		if(fc.getDirectory().endsWith(suggestedName+"."+ext+"/")){
 			fc.setDirectory(fc.getDirectory().replaceAll(suggestedName+"."+ext+"/", ""));
