@@ -74,6 +74,11 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.StringComparator;
+import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
@@ -1626,6 +1631,10 @@ public class BatchProcessingDialog extends JDialog {
 				} else {
 					s.append(name_BROADCAST);
 				}
+				
+				VerificationOptions options = currentWorker.getVerificationOptionsFromQuery(query);
+				s.append("\n\nEngine flags: \n");
+				s.append(options.toString() + "\n");	
 			}
 			return s.toString();
 		}

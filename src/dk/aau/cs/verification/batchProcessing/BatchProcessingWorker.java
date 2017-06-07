@@ -428,7 +428,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return getVerifyta();
 	}
 
-	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
+	public VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
