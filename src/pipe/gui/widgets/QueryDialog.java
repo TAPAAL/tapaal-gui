@@ -411,10 +411,10 @@ public class QueryDialog extends JPanel {
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
 		boolean gcd = useGCD.isSelected();
-		boolean overApproximation = useOverApproximation.isSelected();
+		//boolean overApproximation = useOverApproximation.isSelected();
 		boolean reduction = useReduction.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, false, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
 		
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
@@ -1081,7 +1081,7 @@ public class QueryDialog extends JPanel {
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
 		usePTrie.setSelected(queryToCreateFrom.usePTrie());
 		useGCD.setSelected(queryToCreateFrom.useGCD());
-		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
+		//useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
 		useReduction.setSelected(queryToCreateFrom.useReduction());
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
@@ -2371,16 +2371,16 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
 
-		useOverApproximation = new JCheckBox("Use untimed state-equations check");
-		useOverApproximation.setSelected(true);
-		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useOverApproximation, gbc);
+//		useOverApproximation = new JCheckBox("Use untimed state-equations check");
+//		useOverApproximation.setSelected(true);
+//		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
+//
+//		gbc = new GridBagConstraints();
+//		gbc.gridx = 2;
+//		gbc.gridy = 2;
+//		gbc.anchor = GridBagConstraints.WEST;
+//		gbc.insets = new Insets(0,5,0,5);
+//		reductionOptionsPanel.add(useOverApproximation, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -2469,15 +2469,15 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshOverApproximationOption() {
-		if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
-			useOverApproximation.setSelected(false);
-			useOverApproximation.setEnabled(false);
-		}else{
-			if(!useOverApproximation.isEnabled()){
-				useOverApproximation.setSelected(true);
-			}
-			useOverApproximation.setEnabled(true);
-		}
+//		if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+//			useOverApproximation.setSelected(false);
+//			useOverApproximation.setEnabled(false);
+//		}else{
+//			if(!useOverApproximation.isEnabled()){
+//				useOverApproximation.setSelected(true);
+//			}
+//			useOverApproximation.setEnabled(true);
+//		}
 		
 		if(fastestTraceRadioButton.isSelected()){
 			noApproximationEnable.setEnabled(true);
