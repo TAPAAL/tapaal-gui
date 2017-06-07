@@ -1186,7 +1186,7 @@ public class CTLQueryDialog extends JPanel {
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		Dimension d = new Dimension(810, 80);
+		Dimension d = new Dimension(880, 80);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
