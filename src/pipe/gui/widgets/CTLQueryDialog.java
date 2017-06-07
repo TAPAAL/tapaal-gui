@@ -202,6 +202,7 @@ public class CTLQueryDialog extends JPanel {
 	private JCheckBox useSiphonTrap;
 	private JCheckBox useQueryReduction;
 	private JCheckBox useStubbornReduction;
+	private JCheckBox useReduction;
 
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
@@ -319,6 +320,7 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
 	
 	//Tool tips for verification options
+	private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "";
 	private final static String TOOL_TIP_USE_SIPHONTRAP = "";
 	private final static String TOOL_TIP_USE_QUERY_REDUCTION = "";
 	private final static String TOOL_TIP_USE_STUBBORN_REDUCTION = "";
@@ -380,7 +382,7 @@ public class CTLQueryDialog extends JPanel {
 		boolean pTrie = false;
 		boolean gcd = false;
 		boolean overApproximation = false;
-		boolean reduction = false;
+		boolean reduction = useReduction.isSelected();
 		boolean overApproximationEnable = false;
 		boolean underApproximationEnable = false;
 		int overApproximationDenominator = 0;
@@ -938,6 +940,7 @@ public class CTLQueryDialog extends JPanel {
 		useSiphonTrap.setSelected(queryToCreateFrom.isSiphontrapEnabled());
 		useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
 		useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
+		useReduction.setSelected(queryToCreateFrom.useReduction());
 	}
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2240,15 +2243,19 @@ public class CTLQueryDialog extends JPanel {
 		
 		verifOptionsRadioButtonGroup = new ButtonGroup();
 
+		useReduction = new JCheckBox("Apply net reductions");		
 		useSiphonTrap = new JCheckBox("Use siphon-trap analysis");
 		useQueryReduction = new JCheckBox("Use query reduction");
 		useStubbornReduction = new JCheckBox("Use stubborn reduction");
+		useReduction.setVisible(true);
 		useSiphonTrap.setVisible(true);
 		useQueryReduction.setVisible(true);
 		useStubbornReduction.setVisible(true);
+		useReduction.setSelected(true);
 		useSiphonTrap.setSelected(false);
 		useQueryReduction.setSelected(true);
 		useStubbornReduction.setSelected(true);
+		useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
 		useSiphonTrap.setToolTipText(TOOL_TIP_USE_SIPHONTRAP);
 		useQueryReduction.setToolTipText(TOOL_TIP_USE_QUERY_REDUCTION);
 		useStubbornReduction.setToolTipText(TOOL_TIP_USE_STUBBORN_REDUCTION);
@@ -2257,19 +2264,26 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useSiphonTrap, gbc);
+		gbc.insets = new Insets(0,5,0,5);	
+		reductionOptionsPanel.add(useReduction, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useQueryReduction, gbc);
+		reductionOptionsPanel.add(useSiphonTrap, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useQueryReduction, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(useStubbornReduction, gbc);

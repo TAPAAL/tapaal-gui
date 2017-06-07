@@ -116,7 +116,7 @@ public class XMLQueryLoader extends QueryLoader{
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL){
             	query.setSearchOption(SearchOption.DFS);
-            	query.setUseReduction(false);
+            	query.setUseReduction(true);
             }
             
             query.getProperty().accept(rt, null);
