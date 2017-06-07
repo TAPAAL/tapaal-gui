@@ -20,30 +20,9 @@ import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -125,7 +104,6 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
-import javax.swing.JCheckBox;
 
 public class CTLQueryDialog extends JPanel {
 
@@ -210,7 +188,13 @@ public class CTLQueryDialog extends JPanel {
 	private JRadioButton depthFirstSearch;
 	private JRadioButton randomSearch;
 	private JRadioButton heuristicSearch;
-	
+
+	// Trace options panel
+	private JPanel traceOptionsPanel;
+	private ButtonGroup traceRadioButtonGroup;
+	private JRadioButton noTraceRadioButton;
+	private JRadioButton someTraceRadioButton;
+
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
@@ -315,7 +299,12 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
-	
+
+	//Tool tips for trace options panel
+	private final static String TOOL_TIP_FASTEST_TRACE = "Show a fastest concrete trace if applicable (verification can be slower with this trace option).";
+	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable.";
+	private final static String TOOL_TIP_NO_TRACE = "Do not display any trace information.";
+
 	//Tool tips for buttom panel
 	private final static String TOOL_TIP_SAVE_BUTTON = "Save the query.";
 	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
@@ -380,7 +369,8 @@ public class CTLQueryDialog extends JPanel {
 
 		String name = getQueryComment();
 		int capacity = getCapacity();
-		TAPNQuery.TraceOption traceOption = TraceOption.NONE;
+
+		TAPNQuery.TraceOption traceOption = getTraceOption();
 		TAPNQuery.SearchOption searchOption = getSearchOption();
 		ReductionOption reductionOptionToSet = getReductionOption();
 
@@ -409,6 +399,13 @@ public class CTLQueryDialog extends JPanel {
 
 	private String getQueryComment() {
 		return ((JTextField) namePanel.getComponent(1)).getText();
+	}
+
+	private TraceOption getTraceOption() {
+		if(someTraceRadioButton.isSelected())
+			return TraceOption.SOME;
+		else
+			return TraceOption.NONE;
 	}
 
 	private SearchOption getSearchOption() {
@@ -448,6 +445,21 @@ public class CTLQueryDialog extends JPanel {
 
 	private String getReductionOptionAsString() {
 		return (String)reductionOption.getSelectedItem();
+	}
+
+	private void refreshTraceOptions() {
+		if(reductionOption.getSelectedItem() == null){
+			return;
+		}
+
+		someTraceRadioButton.setEnabled(true);
+		noTraceRadioButton.setEnabled(true);
+
+		if(getTraceOption() == TraceOption.NONE) {
+			noTraceRadioButton.setSelected(true);
+		} else {
+			someTraceRadioButton.setSelected(true);
+		}
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -889,7 +901,8 @@ public class CTLQueryDialog extends JPanel {
 		if(queryToCreateFrom != null) {
 			setupFromQuery(queryToCreateFrom);
 		}
-		
+
+		refreshTraceOptions();
 		setEnabledReductionOptions();
 		
 		rootPane.setDefaultButton(saveAndVerifyButton);
@@ -908,7 +921,8 @@ public class CTLQueryDialog extends JPanel {
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
 		queryName.setText(queryToCreateFrom.getName());
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
-		setupSearchOptionsFromQuery(queryToCreateFrom);		
+		setupSearchOptionsFromQuery(queryToCreateFrom);
+		setupTraceOptionsFromQuery(queryToCreateFrom);
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 	}
 
@@ -924,6 +938,14 @@ public class CTLQueryDialog extends JPanel {
 		useSiphonTrap.setSelected(queryToCreateFrom.isSiphontrapEnabled());
 		useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
 		useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
+	}
+
+	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+		if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
+			someTraceRadioButton.setSelected(true);
+		} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE) {
+			noTraceRadioButton.setSelected(true);
+		}
 	}
 
 	private void setupSearchOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1091,11 +1113,6 @@ public class CTLQueryDialog extends JPanel {
 		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Boundedness Options"));
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
-		
-		Dimension d = new Dimension(450
-				, 100);
-		boundednessCheckPanel.setPreferredSize(d);
-		boundednessCheckPanel.setMinimumSize(d);
 
 		numberOfExtraTokensInNet = new CustomJSpinner(4, 0, Integer.MAX_VALUE);	
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
@@ -1120,9 +1137,9 @@ public class CTLQueryDialog extends JPanel {
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
+		gridBagConstraints.weightx = 0;
 		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
@@ -2088,6 +2105,7 @@ public class CTLQueryDialog extends JPanel {
 		uppaalOptionsPanel = new JPanel(new GridBagLayout());
 
 		initSearchOptionsPanel();
+		initTraceOptionsPanel();
 		initBoundednessCheckPanel();
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -2142,6 +2160,53 @@ public class CTLQueryDialog extends JPanel {
 		gridBagConstraints.insets = new Insets(0, 5, 0, 0);
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
+
+	}
+
+	private void initTraceOptionsPanel() {
+		traceOptionsPanel = new JPanel(new GridBagLayout());
+		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
+		traceRadioButtonGroup = new ButtonGroup();
+		someTraceRadioButton = new JRadioButton("Some trace");
+		noTraceRadioButton = new JRadioButton("No trace");
+		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
+		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
+		traceRadioButtonGroup.add(someTraceRadioButton);
+		traceRadioButtonGroup.add(noTraceRadioButton);
+
+		someTraceRadioButton.setEnabled(false);
+		noTraceRadioButton.setSelected(true);
+
+		Enumeration<AbstractButton> buttons = traceRadioButtonGroup.getElements();
+
+		while(buttons.hasMoreElements()){
+			AbstractButton button = buttons.nextElement();
+			button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					setEnabledReductionOptions();
+					setEnabledOptionsAccordingToCurrentReduction();
+				}
+			});
+		}
+
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
+
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
+
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
 	
@@ -2219,6 +2284,7 @@ public class CTLQueryDialog extends JPanel {
 	
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
+		refreshTraceOptions();
 		updateSearchStrategies();
 		refreshExportButtonText();
 	}
