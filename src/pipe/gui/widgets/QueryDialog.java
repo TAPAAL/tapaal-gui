@@ -476,8 +476,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_DISCRETE))
 			return ReductionOption.VerifyTAPNdiscreteVerification;
-		else if (reductionOptionString.equals(name_UNTIMED))
-			return ReductionOption.VerifyPN;
+//		else if (reductionOptionString.equals(name_UNTIMED))
+//			return ReductionOption.VerifyPN;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -1057,8 +1057,8 @@ public class QueryDialog extends JPanel {
 			reduction = name_BROADCASTDEG2;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			reduction = name_DISCRETE;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
-			reduction = name_UNTIMED;
+//		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
+//			reduction = name_UNTIMED;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.COMBI){
 			reduction = name_COMBI;
 		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
@@ -2533,10 +2533,10 @@ public class QueryDialog extends JPanel {
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
-			
-			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
-				useReduction.setVisible(true);
-			}
+
+//			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
+//				useReduction.setVisible(true);
+//			}
 		}
 	}
 
