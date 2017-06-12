@@ -325,8 +325,9 @@ public class QueryPane extends JPanel {
 				String optionText = "Do you want to create a CTL or Reachability query?";
 				
 				// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
-				Object[] options = {"CTL",
-	                    "Reachability"};
+				Object[] options = {
+					"CTL (use for untimed nets)",
+					"Reachability (use for timed nets)"};
 				
 				TAPNQuery q = null;
 				if(netIsUntimed){
