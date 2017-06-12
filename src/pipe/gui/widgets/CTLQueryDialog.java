@@ -1027,7 +1027,7 @@ public class CTLQueryDialog extends JPanel {
 				return scrollPane;  
 			}
 
-			private String getHelpMessage(){ 
+			private String getHelpMessage(){
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 				StringBuffer buffer = new StringBuffer();
 				buffer.append("<html>");
@@ -1041,25 +1041,19 @@ public class CTLQueryDialog extends JPanel {
 				buffer.append("<b>Search Strategy Options</b><br/>");
 				buffer.append("A search strategy determines how the chosen verification engine performs the search. The possible search strategies are: ");
 				buffer.append("<ul>");
-				buffer.append("<li>Heuristic Search<br/> If available, the search is guided according to the query so that the most likely places where the query is satisfied are visited first. If discrete inclusion optimization is not enabled or the heuristic search is not available, this strategy performs a breadth first search. ");
-				buffer.append("If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places where the engine checks for discrete inclusion.</li>");
-				buffer.append("<li>Breadth First Search<br/>Explores markings in a breadth first manner.</li>");
+				buffer.append("<li>Heuristic Search<br/> If available, the search is guided according to the query so that the most likely places where the query is satisfied are visited first. For CTL queries that cannot be simplified to reachability queries, the engine will run DFS if heuristic strategy is selected.");
+				buffer.append("<li>Breadth First Search<br/>Explores markings in a breadth first manner. Only available for pure reachability queries, for CTL queries use DFS.</li>");
 				buffer.append("<li>Depth First Search<br/>Explores markings in a depth first manner.</li>");
-				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space.</li>");
+				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space. Only available for pure reachability queries, for CTL queries use DFS.</li>");
 				buffer.append("</ul>");
 				buffer.append("<br/>");
 				buffer.append("<b>Verification Options</b><br/>");
-				buffer.append("TAPAAL supports verification via its own included engines verifytapn and verifydtapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
-				buffer.append("The TAPAAL engine verifytapn supports also the discrete inclusion optimization. ");
-				buffer.append("On some models this technique gives a considerable speedup. ");
-				buffer.append("The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. ");
-				buffer.append("The discrete verification engine verifydtapn performs a point-wise exploration of the state space but can be used only for models that do not contain strict intervals as in this situation it is guaranteed to give the same answers as the continuous time engine verifytapn. This discrete engine has options to handle delays in semi-symbolic way (time darts) recommended for models with larger constants and it has a memory optimization option feature (PTrie) that preserves lots of memory at the expense of a slightly longer verification time.");
-				buffer.append("The different UPPAAL verification methods perform reductions to networks of timed automata. The broadcast reductions supports ");
-				buffer.append("all query types, while standard and optimized standard support only EF and AG queries but can be sometimes faster.");
-				buffer.append("<br/>");				
+				buffer.append("For CTL queries TAPAAL uses its own untimed engine. If your net is untimed, we recommend that you always use the CTL query creation dialog even for reachability queries. Here you can select whether structural reduction prior to the state-space exploration should be used, whether to use siphon-trap analysis for detecting deadlock freedom, and whether to apply query reductions and use stubborn sets during the state-space exploration.");
+				buffer.append("<br/>");
 				buffer.append("</html>");
-				return buffer.toString(); 
+				return buffer.toString();
 			}
+
 		});
 		JPanel topButtonPanel = new JPanel(new FlowLayout());
 		topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
