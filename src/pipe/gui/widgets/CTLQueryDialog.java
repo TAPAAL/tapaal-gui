@@ -702,9 +702,9 @@ public class CTLQueryDialog extends JPanel {
 			currentselected = randomSearch;
 		}
 		
-		breadthFirstSearch.setEnabled(true);
+		breadthFirstSearch.setEnabled(false);
 		depthFirstSearch.setEnabled(true);
-		heuristicSearch.setEnabled(false);
+		heuristicSearch.setEnabled(true);
 		randomSearch.setEnabled(false);
 		
 		// TODO: Should breadthFirstSearch be disabled here?
