@@ -1,14 +1,8 @@
 package pipe.gui;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -20,6 +14,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.GuiFrame.GUIMode;
@@ -31,19 +26,8 @@ import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.handler.AnimationHandler;
-import pipe.gui.handler.AnnotationNoteHandler;
-import pipe.gui.handler.ArcHandler;
-import pipe.gui.handler.LabelHandler;
-import pipe.gui.handler.PlaceHandler;
-import pipe.gui.handler.TAPNTransitionHandler;
-import pipe.gui.handler.TimedArcHandler;
-import pipe.gui.handler.TransitionHandler;
-import pipe.gui.handler.TransportArcHandler;
+import pipe.gui.graphicElements.tapn.*;
+import pipe.gui.handler.*;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.AddTimedPlaceCommand;
 import pipe.gui.undo.AddTimedTransitionCommand;
@@ -59,9 +43,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 Printable, DrawingSurface {
 	private static final long serialVersionUID = 4434596266503933386L;
-
 	private boolean netChanged = false;
-
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
@@ -618,10 +600,13 @@ Printable, DrawingSurface {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if(app.getGUIMode().equals(GUIMode.animation)) return;
-			
+
+			// check for control down here enables it to attach the arc being drawn to an existing place/transition
+
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
+
 				Pipe.ElementType mode = app.getMode();
 				switch (mode) {
 				case PLACE:
@@ -635,13 +620,19 @@ Printable, DrawingSurface {
 					break;
 
 				case TAPNPLACE:
+					// create place
 					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedPlaceCommand(
 									(TimedPlaceComponent) pto2, model,
 									guiModel, view));
 					if (e.isControlDown()) {
+						// connect arc
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto2).mouseReleased(e);
 						app.setFastMode(ElementType.FAST_TRANSITION);
+						// enter fast mode
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -658,12 +649,18 @@ Printable, DrawingSurface {
 					}
 					break;
 				case TAPNTRANS:
+					// create transition
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedTransitionCommand(
 									(TimedTransitionComponent) pto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
+						// connect arc
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						// enter fast mode
 						app.setFastMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
@@ -705,6 +702,44 @@ Printable, DrawingSurface {
 					dragStart = new Point(start);
 					break;
 
+				case FAST_TRANSITION:
+					// create transition
+					pto = newTAPNTransition(e.getPoint());
+					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) pto, model, guiModel, view));
+					app.setMode(ElementType.TAPNARC);
+					getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+
+					if (e.isControlDown()) {
+						// connect arc
+						pnObject.dispatchEvent(e);
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						// enter fast mode
+						app.setFastMode(ElementType.FAST_PLACE);
+					} else{
+						app.endFastMode();
+					}
+					break;
+				case FAST_PLACE:
+					// create place
+					PlaceTransitionObject pto3 = newTimedPlace(e.getPoint());
+					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) pto3, model, guiModel, view));
+					app.setMode(ElementType.TAPNARC);
+					getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+
+					if (e.isControlDown()) {
+						// connect arc
+						pnObject.dispatchEvent(e);
+						app.setMode(ElementType.TAPNARC);
+						getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
+						getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+						// enter fast mode
+						app.setFastMode(ElementType.FAST_TRANSITION);
+					} else{
+						app.endFastMode();
+					}
+					break;
 				default:
 					break;
 				}
@@ -713,6 +748,14 @@ Printable, DrawingSurface {
 				dragStart = new Point(start);
 			}
 			updatePreferredSize();
+		}
+
+		private MouseListener getPlaceTransitionObjectHandlerOf(PlaceTransitionObject obj){
+			for (MouseListener listener : obj.getMouseListeners()) {
+				if (listener instanceof PlaceTransitionObjectHandler)
+					return listener;
+			}
+			return null;
 		}
 
 		private void addPoint(final Arc createArc, final MouseEvent e) {
