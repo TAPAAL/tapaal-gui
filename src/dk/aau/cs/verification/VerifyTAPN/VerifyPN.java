@@ -331,7 +331,7 @@ public class VerifyPN implements ModelChecker{
 				} else {
 					boolean approximationResult = (!(query.getCategory() == QueryCategory.CTL)) // Update this when engine outputs CTL statistics
 							&& queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
-					
+
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
 					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult); 
 				}
@@ -345,7 +345,7 @@ public class VerifyPN implements ModelChecker{
 			TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 			
 			if (trace == null) {
-				if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
+				if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE && query.getCategory() != QueryCategory.CTL) {
 					if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || 
 							(query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
 							(query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || 

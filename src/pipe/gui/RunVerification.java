@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.GuiFrame.GUIMode;
@@ -340,7 +341,13 @@ public class RunVerification extends RunVerificationBase {
 			gbc.anchor = GridBagConstraints.WEST;
 
             panel.add(new JLabel(toHTML((result.getCTLStatsAsString()))),gbc);
-
+			if(options.traceOption() == TAPNQuery.TraceOption.SOME){
+				gbc.gridx = 0;
+				gbc.gridy = 2;
+				gbc.insets = new Insets(0,0,15,0);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(new JLabel(toHTML((result.getTraceErrorAsString()))),gbc);
+			}
 			JButton infoButton = new JButton("Explanation");
 			infoButton.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent arg0) {
