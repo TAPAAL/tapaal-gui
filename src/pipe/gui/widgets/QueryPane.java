@@ -322,12 +322,12 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {				
 				int openCTLDialog = JOptionPane.YES_OPTION;
 				boolean netIsUntimed = tabContent.network().isUntimed();
-				String optionText = "Do you want to create a CTL or Reachability query?";
+				String optionText = "Do you want to create a CTL query (use for untimed nets) \n or a Reachability query (use for timed nets)?";
 				
 				// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
 				Object[] options = {
-					"CTL (use for untimed nets)",
-					"Reachability (use for timed nets)"};
+					"CTL",
+					"Reachability"};
 				
 				TAPNQuery q = null;
 				if(netIsUntimed){
