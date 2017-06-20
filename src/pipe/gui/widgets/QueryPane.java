@@ -361,15 +361,34 @@ public class QueryPane extends JPanel {
 	}
 
 	public void showEditDialog() {
+		int openCTLDialog = JOptionPane.YES_OPTION;
+		boolean netIsUntimed = tabContent.network().isUntimed();
+		String optionText = "The net is untimed and the query can be converted for the use with untimed CTL engine.\nDo you want to convert the query (recommended answer is yes if you plan to use only untimed net)?";
+
+		// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
+		Object[] options = {
+				"yes",
+				"no"};
+
 		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
 		TAPNQuery newQuery = null;
-		
+
 		if(q.isActive()) {
-			if(q.getCategory() == TAPNQuery.QueryCategory.CTL){
-				newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
-			} else{
-				newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+			if(netIsUntimed){
+				openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+				if(openCTLDialog == JOptionPane.YES_OPTION){
+					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+				} else if(openCTLDialog == JOptionPane.NO_OPTION){
+					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+				}
+			} else {
+				if(q.getCategory() == TAPNQuery.QueryCategory.CTL) {
+					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+				} else {
+					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+				}
 			}
+
 			if (newQuery != null)
 				updateQuery(q, newQuery);
 		}
