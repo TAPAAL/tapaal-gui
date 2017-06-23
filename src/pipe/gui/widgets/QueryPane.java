@@ -374,7 +374,7 @@ public class QueryPane extends JPanel {
 		TAPNQuery newQuery = null;
 
 		if(q.isActive()) {
-			if(netIsUntimed){
+			if(netIsUntimed && q.getCategory() != TAPNQuery.QueryCategory.CTL){
 				openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 				if(openCTLDialog == JOptionPane.YES_OPTION){
 					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
