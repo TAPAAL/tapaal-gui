@@ -107,4 +107,12 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
 
 		return sb.toString().trim();
 	}
+	
+	@Override
+	public boolean isSimpleProperty() {
+		if(factors.size() > 1)
+		    return false;
+		else
+		    return true;
+	}
 }
