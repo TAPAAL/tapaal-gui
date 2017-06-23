@@ -40,6 +40,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -324,14 +325,22 @@ public class VerifyPN implements ModelChecker{
 				String standardOutput = readOutput(runner.standardOutput());
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
-				ctlOutput = queryResult.value1().isCTL;
 
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
+					ctlOutput = queryResult.value1().isCTL;
 					boolean approximationResult = (!(query.getCategory() == QueryCategory.CTL)) // Update this when engine outputs CTL statistics
 							&& queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
-
+					
+					if(approximationResult && !model.value1().isUntimed()){
+					    boolean satisfied = queryResult.value1().isQuerySatisfied();
+					    
+					    if ((satisfied && query.queryType() == QueryType.EF) || (!satisfied && query.queryType() == QueryType.AG)){
+						return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+					    }
+					}
+					
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
 					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult); 
 				}

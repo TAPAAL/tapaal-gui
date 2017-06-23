@@ -61,8 +61,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		}
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
+			result.append(" -x 1");
 		}
-		result.append(" -x 1");
+		
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
 		}
