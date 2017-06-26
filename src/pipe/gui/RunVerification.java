@@ -90,6 +90,8 @@ public class RunVerification extends RunVerificationBase {
 	
 					CreateGui.getAnimator().SetTrace(result.getTrace());
 	
+				} else if (options.traceOption() != TAPNQuery.TraceOption.NONE){
+				    messenger.displayInfoMessage("Traces are available only for reachability queries, not for CTL queries.");
 				}
 			}
 
@@ -341,13 +343,6 @@ public class RunVerification extends RunVerificationBase {
 			gbc.anchor = GridBagConstraints.WEST;
 
             panel.add(new JLabel(toHTML((result.getCTLStatsAsString()))),gbc);
-			if(options.traceOption() == TAPNQuery.TraceOption.SOME){
-				gbc.gridx = 0;
-				gbc.gridy = 2;
-				gbc.insets = new Insets(0,0,15,0);
-				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(new JLabel(toHTML((result.getTraceErrorAsString()))),gbc);
-			}
 			JButton infoButton = new JButton("Explanation");
 			infoButton.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent arg0) {

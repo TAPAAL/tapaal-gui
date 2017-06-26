@@ -195,12 +195,6 @@ public class VerificationResult<TTrace> {
 		return isOverApproximationResult;
 	}
 
-	public String getTraceErrorAsString(){
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("Unable to create trace from CTL query.");
-		return buffer.toString();
-	}
-
 	public String getCTLStatsAsString(){
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Explored configurations: ");
