@@ -82,6 +82,7 @@ import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
 import dk.aau.cs.TCTL.visitors.FixAbbrivTransitionNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.IsReachabilityVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
@@ -454,13 +455,20 @@ public class CTLQueryDialog extends JPanel {
 			return;
 		}
 
-		someTraceRadioButton.setEnabled(true);
-		noTraceRadioButton.setEnabled(true);
+		if(queryIsReachability()){
+			someTraceRadioButton.setEnabled(true);
+			noTraceRadioButton.setEnabled(true);
 
-		if(getTraceOption() == TraceOption.NONE) {
-			noTraceRadioButton.setSelected(true);
+			if(getTraceOption() == TraceOption.NONE) {
+				noTraceRadioButton.setSelected(true);
+			} else {
+				someTraceRadioButton.setSelected(true);
+			}
+
 		} else {
-			someTraceRadioButton.setSelected(true);
+			someTraceRadioButton.setEnabled(false);
+			noTraceRadioButton.setEnabled(false);
+			noTraceRadioButton.setSelected(true);
 		}
 	}
 
@@ -474,6 +482,9 @@ public class CTLQueryDialog extends JPanel {
 
 	public boolean queryHasDeadlock(){
 		return new HasDeadlockVisitor().hasDeadLock(newProperty);
+	}
+	public boolean queryIsReachability(){
+		return new IsReachabilityVisitor().isReachability(newProperty);
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
