@@ -304,7 +304,7 @@ public class CTLQueryDialog extends JPanel {
 
 	//Tool tips for trace options panel
 	private final static String TOOL_TIP_FASTEST_TRACE = "Show a fastest concrete trace if applicable (verification can be slower with this trace option).";
-	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable.";
+	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable. (only available for EF/AG reachability queries)";
 	private final static String TOOL_TIP_NO_TRACE = "Do not display any trace information.";
 
 	//Tool tips for buttom panel
