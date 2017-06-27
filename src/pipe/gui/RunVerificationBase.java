@@ -113,8 +113,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					SearchOption.OVERAPPROXIMATE, true, ModelReduction.AGGRESSIVE, options.enableOverApproximation(), options.enableUnderApproximation(), 
 					options.approximationDenominator(),dataLayerQuery.getCategory(), dataLayerQuery.getAlgorithmOption(), dataLayerQuery.isSiphontrapEnabled(),
 					dataLayerQuery.isQueryReductionEnabled(), dataLayerQuery.isStubbornReductionEnabled()), transformedModel, clonedQuery);
-				if(!overapprox_result.error() && (
-						(query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
+				if(!overapprox_result.error() && model.isUntimed() || (
+						(overapprox_result.getQueryResult() != null && query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
 						(query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
 						){
 					VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 

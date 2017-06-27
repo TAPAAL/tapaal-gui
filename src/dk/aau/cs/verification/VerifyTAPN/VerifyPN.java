@@ -330,19 +330,9 @@ public class VerifyPN implements ModelChecker{
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
 					ctlOutput = queryResult.value1().isCTL;
-					boolean approximationResult = (!(query.getCategory() == QueryCategory.CTL)) // Update this when engine outputs CTL statistics
-							&& queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
-					
-					if(approximationResult && !model.value1().isUntimed()){
-					    boolean satisfied = queryResult.value1().isQuerySatisfied();
-					    
-					    if ((satisfied && query.queryType() == QueryType.EF) || (!satisfied && query.queryType() == QueryType.AG)){
-						return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
-					    }
-					}
-					
+					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult); 
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult);
 				}
 			}
 		}
@@ -352,19 +342,7 @@ public class VerifyPN implements ModelChecker{
 			
 			VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 			TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-			
-			if (trace == null) {
-				if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE && query.getCategory() != QueryCategory.CTL) {
-					if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || 
-							(query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
-							(query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || 
-							(query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())){
-						return null;
-					} else{
-						messenger.displayErrorMessage("Verifypn cannot generate the requested trace for the model. Try another trace option.");
-					}
-				}
-			} 
+
 			return trace;
 		}
 

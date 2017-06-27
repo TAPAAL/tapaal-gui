@@ -89,9 +89,6 @@ public class RunVerification extends RunVerificationBase {
 					CreateGui.getApp().setGUIMode(GUIMode.animation);
 	
 					CreateGui.getAnimator().SetTrace(result.getTrace());
-	
-				} else if (options.traceOption() != TAPNQuery.TraceOption.NONE){
-				    messenger.displayInfoMessage("Traces are available only for reachability queries, not for CTL queries.");
 				}
 			}
 
