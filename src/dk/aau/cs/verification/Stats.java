@@ -72,6 +72,7 @@ public class Stats {
 	public Stats(long configurations, long markings, long edges, long processedEdges, long processedNEdges, long exploredConfigurations){
         this.configurations = configurations;
         this.markings = markings;
+	this.discovered = markings;
         this.edges = edges;
         this.processedEdges = processedEdges;
         this.processedNEdges = processedNEdges;
