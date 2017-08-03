@@ -11,6 +11,15 @@ public class IsReachabilityVisitor extends VisitorBase {
 
     public boolean isReachability(TCTLAbstractProperty query){
         Context c = new Context();
+        TCTLAbstractProperty newQuery = query;
+        if(query instanceof TCTLStateToPathConverter) { // Remove the first converters.
+            if(((TCTLStateToPathConverter) query).getProperty() instanceof TCTLPathToStateConverter) {
+                TCTLPathToStateConverter child = (TCTLPathToStateConverter)((TCTLStateToPathConverter) query).getProperty();
+                query = child.getProperty();
+            } else {
+                return false;
+            }
+        }
         query.accept(this, c);
         return (c.isReachability && c.nTempOp == 1);
     }
