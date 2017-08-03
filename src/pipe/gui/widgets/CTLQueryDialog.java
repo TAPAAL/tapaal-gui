@@ -297,7 +297,7 @@ public class CTLQueryDialog extends JPanel {
 	
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
-			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
+			"If heuristic search is not applicable, DFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
