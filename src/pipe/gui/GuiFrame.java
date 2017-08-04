@@ -2435,7 +2435,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showAbout() {
 		StringBuffer buffer = new StringBuffer("About " + TAPAAL.getProgramName());
 		buffer.append("\n\n");
-		buffer.append("TAPAAL is a tool for editing, simulation and verification of timed-arc Petri nets.\n");
+		buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
 		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
@@ -2443,17 +2443,23 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Jakob Dyhr, Louise Foshammer,\nMalte Neve-Graesboell, ");
 		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen,\nJacob J. Jensen, Peter G. Jensen, ");
 		buffer.append("Mads Johannsen, Kenneth Y. Joergensen,\nMikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen, Jiri Srba,\nMathias G. Soerensen and Jakob H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2015\n\n");
+		buffer.append("Aalborg University 2009-2017\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2015\n\n");
+		buffer.append("Aalborg University 2011-2017\n\n");
 		buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2015\n\n");
+                buffer.append("Aalborg University 2012-2017\n\n");
 		buffer.append("TAPAAL Untimed Engine (verifypn):\n");
-                buffer.append("Jonas F. Jensen, Thomas S. Nielsen, Lars K. Oestergaard and Jiri Srba\n");
-                buffer.append("Aalborg University 2014-2015\n\n");
+                buffer.append("Frederik Meyer Boenneland, Jakob Dyhr, Peter Fogh, ");
+                buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, ");
+                buffer.append("Tobias S. Jepsen, Mads Johannsen,\nIsabella Kaufmann, ");
+                buffer.append("Soeren M. Nielsen, Thomas S. Nielsen,\nLars K. Oestergaard, ");
+                buffer.append("Samuel Pastva and Jiri Srba\n");
+                buffer.append("Aalborg University 2014-2017\n\n");
+
+
 		buffer.append("\n");
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
