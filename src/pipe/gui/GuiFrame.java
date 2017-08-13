@@ -70,8 +70,6 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -1704,8 +1702,10 @@ public class GuiFrame extends JFrame implements Observer {
 
 			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
-			if (this.guiMode.equals(GUIMode.animation))
+			if (this.guiMode.equals(GUIMode.animation)) {
 				CreateGui.getAnimator().restoreModel();
+				hideComponentWindow();
+			}
 
 			CreateGui.switchToEditorComponents();
 			showComponents(showComponents);
@@ -1755,6 +1755,20 @@ public class GuiFrame extends JFrame implements Observer {
 		// Enable actions based on GUI mode
 		enableGUIActions();
 
+	}
+
+	public void hideComponentWindow(){
+		ArrayList<PetriNetObject> selection = CreateGui.getView().getPNObjects();
+
+		for (PetriNetObject pn : selection) {
+			if (pn instanceof TimedPlaceComponent) {
+				TimedPlaceComponent place = (TimedPlaceComponent)pn;
+				place.showAgeOfTokens(false);
+			} else if (pn instanceof TimedTransitionComponent){
+				TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+				transition.showDInterval(false);
+			}
+		}
 	}
 
 	public void resetMode() {
