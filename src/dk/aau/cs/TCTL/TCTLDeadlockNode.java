@@ -23,12 +23,11 @@ public class TCTLDeadlockNode extends TCTLAbstractStateProperty {
 		visitor.visit(this, context);
 	}
 
-
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return false;
 	}
-
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+	
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
 		return false;
 	}
 

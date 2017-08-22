@@ -476,8 +476,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_DISCRETE))
 			return ReductionOption.VerifyTAPNdiscreteVerification;
-		else if (reductionOptionString.equals(name_UNTIMED))
-			return ReductionOption.VerifyPN;
+//		else if (reductionOptionString.equals(name_UNTIMED))
+//			return ReductionOption.VerifyPN;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -715,9 +715,11 @@ public class QueryDialog extends JPanel {
 		
 		disableSymmetryUpdate = true;
 
+		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
 		}
+		*/
 		
 		if(useTimeDarts != null){
 			if(hasForcedDisabledTimeDarts){
@@ -1055,8 +1057,8 @@ public class QueryDialog extends JPanel {
 			reduction = name_BROADCASTDEG2;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			reduction = name_DISCRETE;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
-			reduction = name_UNTIMED;
+//		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
+//			reduction = name_UNTIMED;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.COMBI){
 			reduction = name_COMBI;
 		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
@@ -1186,7 +1188,7 @@ public class QueryDialog extends JPanel {
 				return scrollPane;  
 			}
 
-			private String getHelpMessage(){ 
+			private String getHelpMessage(){
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 				StringBuffer buffer = new StringBuffer();
 				buffer.append("<html>");
@@ -1208,16 +1210,19 @@ public class QueryDialog extends JPanel {
 				buffer.append("</ul>");
 				buffer.append("<br/>");
 				buffer.append("<b>Verification Options</b><br/>");
-				buffer.append("TAPAAL supports verification via its own included engines verifytapn and verifydtapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
+				buffer.append("TAPAAL supports verification via its own included engines verifytapn and verifydtapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation). If you work with an untimed net, we recommend that you use the CTL query creation dialog and use the untimed verifypn engine.");
 				buffer.append("The TAPAAL engine verifytapn supports also the discrete inclusion optimization. ");
 				buffer.append("On some models this technique gives a considerable speedup. ");
 				buffer.append("The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. ");
 				buffer.append("The discrete verification engine verifydtapn performs a point-wise exploration of the state space but can be used only for models that do not contain strict intervals as in this situation it is guaranteed to give the same answers as the continuous time engine verifytapn. This discrete engine has options to handle delays in semi-symbolic way (time darts) recommended for models with larger constants and it has a memory optimization option feature (PTrie) that preserves lots of memory at the expense of a slightly longer verification time.");
 				buffer.append("The different UPPAAL verification methods perform reductions to networks of timed automata. The broadcast reductions supports ");
 				buffer.append("all query types, while standard and optimized standard support only EF and AG queries but can be sometimes faster.");
-				buffer.append("<br/>");				
+				buffer.append("<br/>");
+				buffer.append("<b>Approximation Options</b><br/>");
+				buffer.append("TAPAAL allows to approximate the time intervals on edges by deviding them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer.");
+				buffer.append("<br/>");
 				buffer.append("</html>");
-				return buffer.toString(); 
+				return buffer.toString();
 			}
 		});
 		JPanel topButtonPanel = new JPanel(new FlowLayout());
@@ -2531,10 +2536,10 @@ public class QueryDialog extends JPanel {
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
-			
-			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
-				useReduction.setVisible(true);
-			}
+
+//			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
+//				useReduction.setVisible(true);
+//			}
 		}
 	}
 

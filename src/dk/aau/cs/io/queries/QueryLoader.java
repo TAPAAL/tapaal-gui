@@ -9,9 +9,12 @@ import javax.swing.JOptionPane;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Tuple;
 
 public abstract class QueryLoader {
@@ -19,6 +22,8 @@ public abstract class QueryLoader {
 	protected static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	
 	protected boolean firstQueryParsingWarning = true;
+	boolean queryUsingNonexistentPlaceFound = false;
+	boolean queryUsingNonexistentTransitionFound = false;
 
         protected boolean showErrorMessage = true;
 	
@@ -32,8 +37,8 @@ public abstract class QueryLoader {
 		ArrayList<TAPNQuery> queries = getQueries();
 		
 		ArrayList<Tuple<String, String>> templatePlaceNames = getPlaceNames(network);
-		
-		boolean queryUsingNonexistentPlaceFound = false;
+		ArrayList<Tuple<String, String>> templateTransitionNames = getTransitionNames(network);
+
 		Iterator<TAPNQuery> iterator = queries.iterator();
 		while(iterator.hasNext()){
 			TAPNQuery query = iterator.next();	
@@ -45,10 +50,16 @@ public abstract class QueryLoader {
 			if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
 				queryUsingNonexistentPlaceFound = true;
 				iterator.remove();
+			} else if(!doesTransitionsUsedInQueryExist(query, templateTransitionNames)){
+				queryUsingNonexistentTransitionFound = true;
+				iterator.remove();
 			}
 		}
 		
 		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning && showErrorMessage) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			firstQueryParsingWarning = false;
+		} else if(queryUsingNonexistentTransitionFound && firstQueryParsingWarning && showErrorMessage){
 			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		}
@@ -70,10 +81,33 @@ public abstract class QueryLoader {
 		return templatePlaceNames;
 	}
 	
+	private ArrayList<Tuple<String, String>> getTransitionNames(TimedArcPetriNetNetwork network) {
+		ArrayList<Tuple<String,String>> templateTransitionNames = new ArrayList<Tuple<String,String>>();
+		for(TimedArcPetriNet tapn : network.allTemplates()) {
+			for(TimedTransition t : tapn.transitions()) {
+				templateTransitionNames.add(new Tuple<String, String>(tapn.name(), t.name()));
+			}
+		}
+		
+		for(SharedTransition t : network.sharedTransitions()) {
+			templateTransitionNames.add(new Tuple<String, String>("", t.name()));
+		}
+		return templateTransitionNames;
+	}
+	
 	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
 		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
 		VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(query.getProperty());
+		
+		return c.getResult();
+		
+	}
+	
+	private boolean doesTransitionsUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templateTransitionNames) {
+		VerifyTransitionNamesVisitor nameChecker = new VerifyTransitionNamesVisitor(templateTransitionNames);
+
+		VerifyTransitionNamesVisitor.Context c = nameChecker.verifyTransitionNames(query.getProperty());
 		
 		return c.getResult();
 		

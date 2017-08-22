@@ -77,8 +77,8 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public void setPointLocation(float x, float y) {
-		double realX = Zoomer.getUnzoomedValue(x, zoom);
-		double realY = Zoomer.getUnzoomedValue(y, zoom);
+		double realX = Zoomer.getUnzoomedValue(x, myArcPath.getArc().getZoom());
+		double realY = Zoomer.getUnzoomedValue(y, myArcPath.getArc().getZoom());
 		getRealPoint().setLocation(realX, realY);
 		point.setLocation(x, y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2

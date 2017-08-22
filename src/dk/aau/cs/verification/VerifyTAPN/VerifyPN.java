@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
@@ -30,7 +31,6 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
@@ -40,6 +40,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -56,6 +57,7 @@ public class VerifyPN implements ModelChecker{
 		private Messenger messenger;
 
 		private ProcessRunner runner;
+		private boolean ctlOutput = false;
 		
 		public VerifyPN(FileFinder fileFinder, Messenger messenger) {
 			this.fileFinder = fileFinder;
@@ -68,18 +70,25 @@ public class VerifyPN implements ModelChecker{
 		
 		public String getStatsExplanation(){
 			StringBuffer buffer = new StringBuffer("<html>");
-			buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
-			buffer.append("time a successor is calculated, this number is incremented)<br/>");
-			buffer.append("<br/>");
-			buffer.append("<b>Explored markings:</b> The number of markings taken out<br/>");
-			buffer.append("of the waiting list during the search.<br />");
-			buffer.append("<br/>");
-			buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
-			buffer.append("passed/waiting list at the end of verification.<br />");
-			buffer.append("</html>");
+			if(ctlOutput){
+				buffer.append("The number of configurations, markings and hyper-edges explored during<br />" +
+						"the on-the-fly generation of the dependency graph for the given net and<br />" +
+						"query before a conclusive answer was reached.");
+				buffer.append("</html>");
+			} else {
+				buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
+				buffer.append("time a successor is calculated, this number is incremented)<br/>");
+				buffer.append("<br/>");
+				buffer.append("<b>Explored markings:</b> The number of markings taken out<br/>");
+				buffer.append("of the waiting list during the search.<br />");
+				buffer.append("<br/>");
+				buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
+				buffer.append("passed/waiting list at the end of verification.<br />");
+				buffer.append("</html>");
+			}
 			return buffer.toString();
 		}
-		
+
 		public String getPath() {
 			return verifypnpath;
 		}
@@ -316,13 +325,14 @@ public class VerifyPN implements ModelChecker{
 				String standardOutput = readOutput(runner.standardOutput());
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
-				
+
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
+					ctlOutput = queryResult.value1().isCTL;
 					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult); 
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult);
 				}
 			}
 		}
@@ -332,19 +342,7 @@ public class VerifyPN implements ModelChecker{
 			
 			VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 			TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-			
-			if (trace == null) {
-				if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
-					if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || 
-							(query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
-							(query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || 
-							(query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())){
-						return null;
-					} else{
-						messenger.displayErrorMessage("Verifypn cannot generate the requested trace for the model. Try another trace option.");
-					}
-				}
-			} 
+
 			return trace;
 		}
 
@@ -378,9 +376,16 @@ public class VerifyPN implements ModelChecker{
 			return buffer.toString();
 		}
 		
-		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery queryType) {
-			VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, queryType);
-			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
+		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
+			Tuple<QueryResult, Stats> result = null;
+			if (output.contains("Processed N. Edges:")){
+				VerifyPNCTLOutputParser outputParser = new VerifyPNCTLOutputParser(totalTokens, extraTokens, query);
+				result = outputParser.parseOutput(output);
+				result.value1().isCTL=true;
+			} else {
+				VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, query);
+				result = outputParser.parseOutput(output);
+			}
 			return result;
 		}
 		
@@ -390,6 +395,9 @@ public class VerifyPN implements ModelChecker{
 		}
 	
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
+			if(query.getCategory() == QueryCategory.CTL){
+				return true;
+			}
 			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
 				return false;
 			}

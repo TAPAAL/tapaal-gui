@@ -476,7 +476,7 @@ Printable, DrawingSurface {
 	// This function should always be called after a change in zoom.
 	public void zoomTo(Point point) {
 
-		int zoomPercent = zoomControl.getPercent();
+		int zoomPercent = getZoom();
 
 		JViewport viewport = (JViewport) getParent();		
 
@@ -485,7 +485,7 @@ Printable, DrawingSurface {
 		//Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
 		for (int i = 0; i < children.length; i++) {
 			if (children[i] instanceof Zoomable) {
-				((Zoomable) children[i]).zoomUpdate(zoomControl.getPercent());
+				((Zoomable) children[i]).zoomUpdate(zoomPercent);
 			}
 		}
 		

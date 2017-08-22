@@ -40,7 +40,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
@@ -87,7 +89,6 @@ public class RunVerification extends RunVerificationBase {
 					CreateGui.getApp().setGUIMode(GUIMode.animation);
 	
 					CreateGui.getAnimator().SetTrace(result.getTrace());
-	
 				}
 			}
 
@@ -260,7 +261,7 @@ public class RunVerification extends RunVerificationBase {
         
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -268,8 +269,11 @@ public class RunVerification extends RunVerificationBase {
 		gbc.insets = new Insets(0,0,15,0);
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
-		
-		if(modelChecker.supportsStats() && !result.isOverApproximationResult()){
+
+		// TODO remove this when the engine outputs statistics
+		Boolean isCTLQuery = result.getQueryResult().isCTL;
+
+		if(modelChecker.supportsStats() && !result.isOverApproximationResult() && !isCTLQuery){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
@@ -328,6 +332,26 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
 			}
+		} else if (modelChecker.supportsStats() && !result.isOverApproximationResult() && isCTLQuery){
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0,0,15,0);
+			gbc.anchor = GridBagConstraints.WEST;
+
+            panel.add(new JLabel(toHTML((result.getCTLStatsAsString()))),gbc);
+			JButton infoButton = new JButton("Explanation");
+			infoButton.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent arg0) {
+					JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+			gbc = new GridBagConstraints();
+			gbc.gridx = 1;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0,0,15,0);
+			gbc.anchor = GridBagConstraints.EAST;
+			panel.add(infoButton, gbc);
 		}
 		
 		if(result.isOverApproximationResult()){

@@ -19,6 +19,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
@@ -47,6 +48,16 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 				if(!place.underlyingPlace().isShared()){
 					for (TAPNQuery q : queries) {
 						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
+					}
+				}
+			} else if (pn instanceof TimedTransitionComponent){
+				TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+				if(!transition.underlyingTransition().isShared()){
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
 							queriesAffected = true;
 							queriesToDelete.add(q);
 						}

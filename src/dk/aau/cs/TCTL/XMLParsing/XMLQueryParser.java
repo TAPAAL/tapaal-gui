@@ -46,6 +46,12 @@ public class XMLQueryParser {
 
         return true;
     }
+    
+    public static TCTLAbstractProperty parse(Node prop) throws XMLQueryParseException{
+    	XMLQueryParser parser = new XMLQueryParser(prop);
+    	
+        return parser.AbstractProperty();
+    }
 
     final public TCTLAbstractProperty AbstractProperty() throws XMLQueryParseException{
         Node formula;
@@ -257,6 +263,8 @@ public class XMLQueryParser {
             if((value = getText(integerExpression)) == null){
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
+            
+            value = value.replace("\n", "");
 
             try{
                 result = Integer.parseInt(value);
@@ -413,5 +421,9 @@ public class XMLQueryParser {
     public XMLQueryParser(Node prop, QueryWrapper qw){
         this.property = prop;
         this.queryWrapper = qw;
+    }
+    
+    public XMLQueryParser(Node prop){
+    	this.property = prop;
     }
 }

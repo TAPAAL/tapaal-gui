@@ -194,4 +194,19 @@ public class VerificationResult<TTrace> {
 	public boolean isOverApproximationResult(){
 		return isOverApproximationResult;
 	}
+
+	public String getCTLStatsAsString(){
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("Explored configurations: ");
+		buffer.append(stats.getConfigurations());
+		buffer.append(System.getProperty("line.separator"));
+
+		buffer.append("Explored markings: ");
+		buffer.append(stats.getMarkings());
+		buffer.append(System.getProperty("line.separator"));
+
+		buffer.append("Explored hyper-edges: ");
+		buffer.append(stats.getEdges());
+		return buffer.toString();
+	}
 }

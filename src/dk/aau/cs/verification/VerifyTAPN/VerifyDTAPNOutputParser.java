@@ -63,14 +63,14 @@ public class VerifyDTAPNOutputParser {
 			while (matcher.find()) {
 				transitionStats.add(new Tuple<String,Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
 			}
-                        matcher = placeBoundPattern.matcher(output);
-                        while (matcher.find()) {
-                            placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
-                        }
-                        matcher = placeBoundPatternUnknown.matcher(output);
-                        while (matcher.find()) {
-                            placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
-                        }
+			matcher = placeBoundPattern.matcher(output);
+			while (matcher.find()) {
+				placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+			}
+			matcher = placeBoundPatternUnknown.matcher(output);
+			while (matcher.find()) {
+				placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
+			}
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
 				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true; }

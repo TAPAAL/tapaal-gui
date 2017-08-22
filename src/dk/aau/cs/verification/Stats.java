@@ -19,6 +19,15 @@ public class Stats {
 	private long discovered;
 	private long explored;
 	private long stored;
+
+    // CTL stats
+    private long configurations;
+    private long markings;
+    private long edges;
+    private long processedEdges;
+    private long processedNEdges;
+    private long exploredConfigurations;
+
 	private int minExecutionTime;
 	private int maxExecutionTime;
 	private ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking;
@@ -57,6 +66,17 @@ public class Stats {
 	public Stats(long discovered, long explored, long stored)
 	{
 		this(discovered, explored, stored, new ArrayList<Tuple<String,Integer>>(), new ArrayList<Tuple<String,Integer>>());
+	}
+
+	// CTL stats
+	public Stats(long configurations, long markings, long edges, long processedEdges, long processedNEdges, long exploredConfigurations){
+        this.configurations = configurations;
+        this.markings = markings;
+	this.discovered = markings;
+        this.edges = edges;
+        this.processedEdges = processedEdges;
+        this.processedNEdges = processedNEdges;
+        this.exploredConfigurations = exploredConfigurations;
 	}
 	
 	public Integer transitionsCount() {
@@ -98,7 +118,27 @@ public class Stats {
 	public ReductionStats getReductionStats(){
 		return reductionStats;
 	}
-	
+
+    public long getConfigurations() {
+        return configurations;
+    }
+    public long getMarkings() {
+        return markings;
+    }
+    public long getEdges() {
+        return edges;
+    }
+
+    public long getProcessedEdges() {
+        return processedEdges;
+    }
+    public long getProcessedNEdges() {
+        return processedNEdges;
+    }
+    public long getExploredConfigurations() {
+        return exploredConfigurations;
+    }
+
 	public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){
 		return coveredMarking;
 	}

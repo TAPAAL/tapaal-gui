@@ -15,6 +15,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
+import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -97,7 +98,7 @@ public class XMLQueryLoader extends QueryLoader{
             this.faultyQueries.add(queryWrapper);
 
             // Update queryWrapper name and property
-            if(!XMLQueryParser.parse(prop, queryWrapper)){
+            if(!XMLCTLQueryParser.parse(prop, queryWrapper)){
                 queries.add(null); 
                 continue; 
             }
@@ -111,7 +112,13 @@ public class XMLQueryLoader extends QueryLoader{
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
-
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), false));
+            
+            if(query.getCategory() == TAPNQuery.QueryCategory.CTL){
+            	query.setSearchOption(SearchOption.DFS);
+            	query.setUseReduction(true);
+            }
+            
             query.getProperty().accept(rt, null);
                     
             queries.add(query);
@@ -159,8 +166,10 @@ public class XMLQueryLoader extends QueryLoader{
             for(QueryWrapper q : loader.faultyQueries){
                 errorMessage.append(System.lineSeparator());
                 errorMessage.append(q.getNameAndException());
-                if(!q.hasException()){
+                if(!q.hasException() && loader.queryUsingNonexistentPlaceFound){
                     errorMessage.append("  Reason: place not found in model");
+                } else if (!q.hasException() && loader.queryUsingNonexistentTransitionFound){
+                    errorMessage.append("  Reason: transition not found in model");
                 }
             }
 

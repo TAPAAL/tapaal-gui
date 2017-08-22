@@ -26,7 +26,8 @@ public class VerifyPlaceNamesVisitor extends VisitorBase {
 	public void visit(TCTLPlaceNode placeNode, Object context) {
 		Context c = (Context) context;
 		if (!templatePlaceNames.contains(new Tuple<String,String>(placeNode.getTemplate(), placeNode.getPlace()))) {
-			c.addIncorrectPlaceName(placeNode.getTemplate() + "." + placeNode.getPlace());
+                        String temp = placeNode.getTemplate() != "" ? placeNode.getTemplate() + "." : "";
+			c.addIncorrectPlaceName(temp + placeNode.getPlace());
 			c.setResult(false);
 		}
 	}

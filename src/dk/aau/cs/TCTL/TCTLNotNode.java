@@ -74,14 +74,13 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
 	}
-
-	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-		return property.containsAtomicPropWithSpecificPlace(placeName);
-	}
 	
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+	}
+	
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+		return property.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
 	}
 
 	@Override

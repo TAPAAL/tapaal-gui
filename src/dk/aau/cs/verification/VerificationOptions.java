@@ -2,6 +2,7 @@ package dk.aau.cs.verification;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.gui.widgets.InclusionPlaces;
 
 public interface VerificationOptions {

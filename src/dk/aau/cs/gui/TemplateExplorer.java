@@ -387,6 +387,15 @@ public class TemplateExplorer extends JPanel {
 						}
 					}
 				}
+				
+				for (TimedTransition t : template.model().transitions()) {
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate(template.model().name(), t.name())) {
+							queriesToDelete.add(q);
+						}
+					}
+				}
+				
 				return queriesToDelete;
 			}
 			

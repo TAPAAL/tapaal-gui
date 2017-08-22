@@ -53,20 +53,21 @@ public class TCTLPlusListNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
-	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(
+			String templateName, String placeName) {
 		for(TCTLAbstractStateProperty term : terms){
-			if(term.containsAtomicPropWithSpecificPlace(placeName)){
+			if(term.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)){
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	@Override
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(
-			String templateName, String placeName) {
+	public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(
+			String templateName, String transitionName) {
 		for(TCTLAbstractStateProperty term : terms){
-			if(term.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)){
+			if(term.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName)){
 				return true;
 			}
 		}
@@ -107,10 +108,5 @@ public class TCTLPlusListNode extends TCTLAbstractStateProperty {
 		}
 		
 		return sb.toString().trim();
-	}
-	
-	@Override
-	public boolean isSimpleProperty() {
-		return parent instanceof TCTLAtomicPropositionNode;
 	}
 }

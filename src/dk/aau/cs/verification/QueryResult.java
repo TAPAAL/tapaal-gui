@@ -10,6 +10,7 @@ public class QueryResult {
 	private TAPNQuery query;
 	private BoundednessAnalysisResult boundednessAnalysis;
 
+	public boolean isCTL = false;
 	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){
 		this.satisfied = satisfied;
 		this.boundednessAnalysis = boundednessAnalysis;

@@ -11,15 +11,30 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAUNode;
+import dk.aau.cs.TCTL.TCTLAXNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLEUNode;
+import dk.aau.cs.TCTL.TCTLEXNode;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
+import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
+import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -69,17 +84,81 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
+		String algorithmOption = queryElement.getAttribute("algorithmOption");
+		boolean isCTL = isCTLQuery(queryElement);
+		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
+		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
+		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
 
 		TCTLAbstractProperty query;
-		query = parseQueryProperty(queryElement.getAttribute("query"));
+		if (queryElement.getElementsByTagName("formula").item(0) != null){
+			query = parseCTLQueryProperty(queryElement);
+		} else {
+			query = parseQueryProperty(queryElement.getAttribute("query"));
+		}
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
+			parsedQuery.setCategory(detectCategory(query, isCTL));
+			parsedQuery.setUseSiphontrap(siphontrap);
+			parsedQuery.setUseQueryReduction(queryReduction);
+			parsedQuery.setUseStubbornReduction(stubborn);
+			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
+				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
+//				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
+//		                network.activeTemplates().get(0).name());
+//				parsedQuery.getProperty().accept(rt, null);
+			}
 			return parsedQuery;
 		} else
 			return null;
+	}
+	
+	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL){
+                if (isCTL) return TAPNQuery.QueryCategory.CTL;
+                
+                StringPosition[] children = query.getChildren();
+
+                // If query is root and state property
+                if(query instanceof TCTLAbstractStateProperty){
+                        if(((TCTLAbstractStateProperty) query).getParent() == null){
+                                return TAPNQuery.QueryCategory.CTL;
+                        }
+                }
+        
+		if(query instanceof TCTLStateToPathConverter ||
+				query instanceof TCTLPathToStateConverter){
+			return TAPNQuery.QueryCategory.CTL;
+		}
+
+		if(query instanceof TCTLEUNode ||
+				query instanceof TCTLEXNode ||
+				query instanceof TCTLAUNode ||
+				query instanceof TCTLAXNode){
+			return TAPNQuery.QueryCategory.CTL;
+		}
+                
+                // If query is a fireability query
+                if(query instanceof TCTLTransitionNode) {
+                    return TAPNQuery.QueryCategory.CTL;
+                }
+                if(query instanceof TCTLPlusListNode){
+                        for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
+                                if(TAPNQueryLoader.detectCategory(sp, isCTL) == TAPNQuery.QueryCategory.CTL){
+                                    return TAPNQuery.QueryCategory.CTL;
+                                }
+                        }
+		}
+		
+                // If any property has been converted
+		for (StringPosition child : children) {
+			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL) == TAPNQuery.QueryCategory.CTL){
+				return TAPNQuery.QueryCategory.CTL;
+			} 
+		}
+		return TAPNQuery.QueryCategory.Default;
 	}
 	
 	private InclusionPlaces getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
@@ -121,6 +200,19 @@ public class TAPNQueryLoader extends QueryLoader{
 		}
 		
 		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
+	}
+        
+	private boolean isCTLQuery(Element queryElement) {
+		if(!queryElement.hasAttribute("type")){
+			return false;
+		}
+		boolean result;
+		try {
+			result = queryElement.getAttribute("type").equals("CTL");
+		} catch(Exception e) {
+			result = false;
+		}
+		return result;
 	}
 
 	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {
@@ -172,6 +264,18 @@ public class TAPNQueryLoader extends QueryLoader{
 			discreteInclusion = false;
 		}
 		return discreteInclusion;	
+	}
+	
+	private TCTLAbstractProperty parseCTLQueryProperty(Node queryElement){
+		TCTLAbstractProperty query = null;
+		
+		try {
+			query = XMLCTLQueryParser.parse(queryElement);
+		} catch (XMLQueryParseException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		return query;
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {

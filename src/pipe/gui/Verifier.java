@@ -5,6 +5,7 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.RunningVerificationDialog;
@@ -17,14 +18,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
-import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -46,19 +39,19 @@ public class Verifier {
 		verifytapn.setup();
 		return verifytapn;
 	}
-	
+
 	private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
 		VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
 		verifydtapn.setup();
 		return verifydtapn;
 	}
-	
+
 	private static VerifyPN getVerifyPN() {
 		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
 		verifypn.setup();
 		return verifypn;
 	}
-	
+
 	private static ModelChecker getModelChecker(TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
 			return getVerifyTAPN();
@@ -66,7 +59,8 @@ public class Verifier {
 			return getVerifydTAPN();
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
 			return getVerifyPN();
-		} else{
+		}
+		else{
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
 		}
 	}
@@ -152,9 +146,13 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), 
+				query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound(), 
+				query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), 
+				query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), 
+				query.approximationDenominator(),query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled(), query.isStubbornReductionEnabled());
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
 		}

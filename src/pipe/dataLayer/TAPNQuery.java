@@ -1,5 +1,6 @@
 package pipe.dataLayer;
 
+import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -29,6 +30,14 @@ public class TAPNQuery {
 	public enum WorkflowMode{
 		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS
 	}
+	
+	public enum QueryCategory{
+		Default, CTL
+	}
+	
+	public enum AlgorithmOption{
+		CERTAIN_ZERO, LOCAL
+	}
 
 	private String name;
 	private int capacity;
@@ -44,8 +53,10 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
-        private long strongSoundnessBound;
-        private boolean useReduction;
+	private long strongSoundnessBound;
+	private boolean useReduction;
+	private QueryCategory queryCategory = QueryCategory.Default;             // Used by the CTL engine
+	private AlgorithmOption algorithmOption = AlgorithmOption.CERTAIN_ZERO;  // Used by the CTL engine
 
 	
 	private boolean enableOverApproximation = false;
@@ -56,6 +67,10 @@ public class TAPNQuery {
 
 	private TCTLAbstractProperty property = null;
 	private boolean isActive = true;
+	
+	private boolean useSiphontrap = false; 
+	private boolean useQueryReduction = true; 
+	private boolean useStubbornReduction = true;
 
 	/**
 	 * @param name
@@ -79,8 +94,19 @@ public class TAPNQuery {
 	public boolean isUnderApproximationEnabled() {
 		return this.enableUnderApproximation;
 	}
-
 	
+	public boolean isSiphontrapEnabled() {
+		return this.useSiphontrap;
+	}
+	
+	public boolean isQueryReductionEnabled() {
+		return this.useQueryReduction;
+	}
+	
+	public boolean isStubbornReductionEnabled() {
+		return this.useStubbornReduction;
+	}
+
 	public int approximationDenominator() {
 		return this.denominator;
 	}
@@ -200,6 +226,18 @@ public class TAPNQuery {
 		this.useReduction = useReduction;
 	}
 	
+	public void setUseSiphontrap(boolean useSiphontrap) {
+		this.useSiphontrap = useSiphontrap;
+	}
+	
+	public void setUseQueryReduction(boolean useQueryReduction) {
+		this.useQueryReduction = useQueryReduction;
+	}
+	
+	public void setUseStubbornReduction(boolean useStubbornReduction) {
+		this.useStubbornReduction = useStubbornReduction;
+	}
+	
 	public boolean useReduction(){
 		return useReduction;
 	}
@@ -311,6 +349,9 @@ public class TAPNQuery {
 		extrapolationOption = newQuery.getExtrapolationOption();
 		discreteInclusion = newQuery.discreteInclusion();
 		inclusionPlaces = newQuery.inclusionPlaces();
+		useSiphontrap = newQuery.isSiphontrapEnabled();
+		useQueryReduction = newQuery.isQueryReductionEnabled();
+		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 	}
 
 	public InclusionPlaces inclusionPlaces() {
@@ -329,6 +370,10 @@ public class TAPNQuery {
 		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, denominator);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
+		copy.setCategory(queryCategory);
+		copy.setUseSiphontrap(this.isQueryReductionEnabled());
+		copy.setUseQueryReduction(this.isQueryReductionEnabled());
+		copy.setUseStubbornReduction(this.isStubbornReductionEnabled());
 		
 		return copy;
 	}
@@ -348,14 +393,27 @@ public class TAPNQuery {
 		this.workflow = workflow;
 	}
         
-        public long getStrongSoundnessBound(){
-            return strongSoundnessBound;
-        }
-        
-        public void setStrongSoundnessBound(long newval) {
-            strongSoundnessBound = newval;
-        }
-            
-            
-	
+    public long getStrongSoundnessBound(){
+        return strongSoundnessBound;
+    }
+    
+    public void setStrongSoundnessBound(long newval) {
+        strongSoundnessBound = newval;
+    }
+    
+    public void setCategory(QueryCategory category){
+    	this.queryCategory = category;
+    }
+    
+    public QueryCategory getCategory(){
+    	return this.queryCategory;
+    }
+    
+    public void setAlgorithmOption(AlgorithmOption option){
+    	this.algorithmOption = option;
+    }
+    
+    public AlgorithmOption getAlgorithmOption(){
+    	return this.algorithmOption;
+    }
 }
