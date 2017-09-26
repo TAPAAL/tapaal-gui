@@ -88,8 +88,10 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		else if(reduction == ReductionOption.DEGREE2BROADCAST)
 			return "K";
 		else if(reduction == ReductionOption.VerifyPN || reduction == ReductionOption.VerifyPNApprox || reduction == ReductionOption.VerifyPNReduce){
-			if(result.query().useReduction())	return "N";
-			return result.query().useOverApproximation()? "M":"L";
+			return "L";
+		//	if(reduction == ReductionOption.VerifyPN || reduction == ReductionOption.VerifyPNApprox || reduction == ReductionOption.VerifyPNReduce){
+		//	if(result.query().useReduction())	return "N";
+	        //		return result.query().useOverApproximation()? "M":"L";
 		}else
 			return "";
 	}
