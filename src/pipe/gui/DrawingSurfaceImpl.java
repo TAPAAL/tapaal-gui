@@ -53,11 +53,6 @@ Printable, DrawingSurface {
 
 	private AnimationHandler animationHandler = new AnimationHandler();
 
-	// When i'm using GNU/Linux, isMetaDown() doesn't return true when I press
-	// "Windows key". I don't know if a problem of my configuration or what.
-	// metaDown is used in this case
-	boolean metaDown = false;
-
 	private SelectionManager selection;
 	private UndoManager undoManager;
 	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
@@ -382,11 +377,6 @@ Printable, DrawingSurface {
 	public void removeAll() {
 		petriNetObjects.clear();
 		super.removeAll();
-	}
-
-	//
-	public void setMetaDown(boolean down) {
-		metaDown = down;
 	}
 
 	public Point getPointer() {

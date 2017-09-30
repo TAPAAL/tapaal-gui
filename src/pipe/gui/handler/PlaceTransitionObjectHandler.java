@@ -46,7 +46,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	private static final String ERROR_MSG_TWO_ARCS = "We do not allow two arcs from a place to a transition or a transition to a place.";
 	private DataLayer guiModel;
 	private TimedArcPetriNet model;
-	ArcKeyboardEventHandler keyHandler = null;
 
 	public PlaceTransitionObjectHandler(Container contentpane,
 			PlaceTransitionObject obj, DataLayer guiModel,
@@ -70,15 +69,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		CreateGui.getView().createArc = newArc;
 		// addPetriNetObject a handler for shift & esc actions drawing arc
 		// this is removed when the arc is finished drawing:
-		keyHandler = new ArcKeyboardEventHandler(newArc);
-		newArc.addKeyListener(keyHandler);
 		newArc.requestFocusInWindow();
 		newArc.setSelectable(false);
+		newArc.enableDrawingKeyBindings();
 	}
-	// Call this function to cleanup temporary key handlers for an new arc object
+
+	// Disable key bindings that are only available when drawing arcs.
 	private void freeArc(Arc newArc){
-		newArc.removeKeyListener(keyHandler);
-		keyHandler = null;
+		newArc.disableDrawingKeyBindings();
 		CreateGui.getView().createArc = null;
 	}
 
@@ -194,10 +192,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					undoManager.addNewEdit(new AddTimedInhibitorArcCommand(
 							createTAPNInhibitorArc, model, guiModel, view));
 
-					// arc is drawn, remove handler:
 					freeArc(createTAPNInhibitorArc);
-					
-					
 				}
 
 			break;
@@ -296,7 +291,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						guiModel.addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
 
-						// arc is drawn, remove handlers:
 						freeArc(transportArcToCreate);
 						
 						// Create the next arc
@@ -361,12 +355,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 										guiModel, 
 										view));
 
-						// arc is drawn, remove handlers:
 						freeArc(transportArcToCreate);
 
 						arc2.setGroupNr(arc1.getGroupNr());
-
-						
 					}
 
 				}
@@ -470,8 +461,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								model, guiModel, view));
 
 					}
-					// arc is drawn, remove handler:
-					// arc is drawn, remove handlers:
+
 					freeArc(timedArcToCreate);
 				}
 			break;
@@ -488,7 +478,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
 		arc.delete();
-		// arc is drawn, remove handlers:
 		freeArc(arc);
 		
 		view.remove(arc);
