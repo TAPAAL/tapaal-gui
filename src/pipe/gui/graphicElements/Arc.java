@@ -1,9 +1,10 @@
 package pipe.gui.graphicElements;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 
-import javax.swing.JLayeredPane;
+import javax.swing.*;
 
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
@@ -339,4 +340,48 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		return super.clone();
 	}
 
+	/**
+	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
+	 * and action names are mapped to action objects. The key bindings are disabled when the
+	 * arc object is deleted, or the arc is connected to a place/transition.
+	 */
+	public void enableDrawingKeyBindings() {
+		InputMap iMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap aMap = this.getActionMap();
+
+		// Bind keyboard keys to action names.
+		iMap.put(KeyStroke.getKeyStroke("ESCAPE"), "deleteArc");
+		iMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteArc");
+
+		// Associate action names with actions.
+		aMap.put("deleteArc", new DeleteAction(this));
+	}
+
+	public void disableDrawingKeyBindings() {
+		this.getInputMap().clear();
+		this.getActionMap().clear();
+	}
+
+	private class DeleteAction extends AbstractAction {
+		Arc arcBeingDraw;
+
+		DeleteAction(Arc arc) {
+			arcBeingDraw = arc;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			DrawingSurfaceImpl aView = CreateGui.getView();
+			if (aView.createArc == arcBeingDraw) {
+				aView.createArc = null;
+				delete();
+
+				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE)
+						|| (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
+					CreateGui.getApp().endFastMode();
+				}
+				aView.repaint();
+			}
+		}
+	}
 }
