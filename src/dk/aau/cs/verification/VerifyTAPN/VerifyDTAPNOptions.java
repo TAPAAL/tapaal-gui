@@ -14,49 +14,31 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         private long workflowbound;
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
-
-	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
-			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
-			boolean pTrie, WorkflowMode workflowMode,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, enableOverApproximation, enableUnderApproximation, approximationDenominator);
-		this.workflow = workflowMode;
-	}
-	
-	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
-			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
-			boolean pTrie, boolean useOverApproximation,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
-	}
+	private boolean useStubbornReduction = true;
 	
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator,
+			boolean stubbornReduction) {
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
-	}
-
-	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
-			SearchOption search, boolean symmetry, boolean discreteInclusion, boolean gcd,
-			boolean timeDarts, boolean pTrie, boolean useOverApproximation,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useOverApproximation, discreteInclusion, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
 			boolean pTrie, boolean useOverApproximation, boolean discreteInclusion,
 			InclusionPlaces inclusionPlaces, WorkflowMode workflow, long workflowbound,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator,
+			boolean stubbornReduction) {
 		super(extraTokens, traceOption, search, symmetry, useOverApproximation, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;
 		this.workflow = workflow;
 		this.gcd = gcd;
-                this.workflowbound = workflowbound;
+		this.workflowbound = workflowbound;
+		this.useStubbornReduction = stubbornReduction;
 	}
 	
 	@Override
@@ -69,6 +51,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		result.append(' ');
 		result.append("-p ");
 		result.append(pTrie ? "1" : "0");
+		if (! useStubbornReduction) {
+			result.append(" -i");
+		}
 		if(workflow == WorkflowMode.WORKFLOW_SOUNDNESS){
 			result.append(" -w 1");
 		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){

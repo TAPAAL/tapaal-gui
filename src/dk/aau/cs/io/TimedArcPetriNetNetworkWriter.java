@@ -283,7 +283,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
 		queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
 		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
-		
+		queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
+
 		return queryElement;
 	}
 	

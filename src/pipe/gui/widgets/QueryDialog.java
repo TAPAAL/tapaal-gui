@@ -228,6 +228,7 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useGCD;
 	private JCheckBox useOverApproximation;
 	private JCheckBox useReduction;
+	private JCheckBox useStubbornReduction;
 	
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
@@ -329,6 +330,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
+	private final static String TOOL_TIP_STUBBORN_REDUCTION = "Apply partial order reduction";
 	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
 
@@ -414,8 +416,29 @@ public class QueryDialog extends JPanel {
 		boolean overApproximation = useOverApproximation.isSelected();
 		boolean reduction = useReduction.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
-		
+		TAPNQuery query = new TAPNQuery(
+				name,
+				capacity,
+				newProperty.copy(),
+				traceOption,
+				searchOption,
+				reductionOptionToSet,
+				symmetry,
+				gcd,
+				timeDarts,
+				pTrie,
+				overApproximation,
+				reduction,
+				/* hashTableSizeToSet */ null,
+				/* extrapolationOptionToSet */null,
+				inclusionPlaces,
+				overApproximationEnable.isSelected(),
+				underApproximationEnable.isSelected(),
+				(Integer) overApproximationDenominator.getValue()
+		);
+
+		query.setUseStubbornReduction(useStubbornReduction.isSelected());
+
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -1080,6 +1103,7 @@ public class QueryDialog extends JPanel {
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
 		usePTrie.setSelected(queryToCreateFrom.usePTrie());
+		useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
 		useGCD.setSelected(queryToCreateFrom.useGCD());
 		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
 		useReduction.setSelected(queryToCreateFrom.useReduction());
@@ -2328,8 +2352,8 @@ public class QueryDialog extends JPanel {
 		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
 
 		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
+		gbc.gridx = 3;
+		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(useTimeDarts, gbc);
@@ -2373,6 +2397,17 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
+
+		useStubbornReduction = new JCheckBox("Use stubborn reduction");
+		useStubbornReduction.setSelected(true);
+		useStubbornReduction.setToolTipText(TOOL_TIP_STUBBORN_REDUCTION);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useStubbornReduction, gbc);
 
 		useOverApproximation = new JCheckBox("Use untimed state-equations check");
 		useOverApproximation.setSelected(true);
@@ -2509,11 +2544,13 @@ public class QueryDialog extends JPanel {
 		if(reductionOption.getSelectedItem() == null){
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
+			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
 		} 
 		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
 			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
+			useStubbornReduction.setVisible(true);
 			useTimeDarts.setVisible(true);
 			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected()){
 				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
@@ -2535,6 +2572,7 @@ public class QueryDialog extends JPanel {
 		} else {
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
+			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
 
 //			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
