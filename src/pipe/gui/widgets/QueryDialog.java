@@ -2361,7 +2361,7 @@ public class QueryDialog extends JPanel {
 		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
 		useTimeDarts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshStubbornReduction();
+				setEnabledOptionsAccordingToCurrentReduction();
 			}
 		});
 
@@ -2548,12 +2548,6 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshDiscreteOptions(){
-		useTimeDarts.setEnabled(true);
-		if(hasForcedDisabledTimeDarts){
-			hasForcedDisabledTimeDarts = false;
-			useTimeDarts.setSelected(true);
-		}
-		
 		useReduction.setVisible(false);
 		
 		if(reductionOption.getSelectedItem() == null){
