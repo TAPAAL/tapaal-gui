@@ -101,7 +101,17 @@ public class Verifier {
 
 		TCTLAbstractProperty inputQuery = input.getProperty();
 
-		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption(), input.useSymmetry(), input.useOverApproximation(), input.isOverApproximationEnabled(), input.isUnderApproximationEnabled(), input.approximationDenominator());
+		VerifytaOptions verifytaOptions = new VerifytaOptions(
+				input.getTraceOption(),
+				input.getSearchOption(),
+				untimedTrace,
+				input.getReductionOption(),
+				input.useSymmetry(),
+				input.useOverApproximation(),
+				input.isOverApproximationEnabled(),
+				input.isUnderApproximationEnabled(),
+				input.approximationDenominator()
+		);
 
 		if (inputQuery == null) {
 			return;
@@ -111,7 +121,12 @@ public class Verifier {
 			RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()), null);
+			thread.execute(
+					verifytaOptions,
+					timedArcPetriNetNetwork,
+					new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()),
+					null
+			);
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -130,7 +145,11 @@ public class Verifier {
 		runVerifyTAPNVerification(tapnNetwork, query, callback, null);
 	}
 
-	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+	public static void runVerifyTAPNVerification(
+			TimedArcPetriNetNetwork tapnNetwork,
+			TAPNQuery query,
+			VerificationCallback callback,
+			HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		ModelChecker verifytapn = getModelChecker(query);
 
 		if (!verifytapn.isCorrectVersion()) {
@@ -146,15 +165,53 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), 
-				query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), query.getStrongSoundnessBound(), 
-				query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+			verifytapnOptions = new VerifyDTAPNOptions(
+					bound,
+					query.getTraceOption(),
+					query.getSearchOption(),
+					query.useSymmetry(),
+					query.useGCD(),
+					query.useTimeDarts(),
+					query.usePTrie(),
+					query.useOverApproximation(),
+					query.discreteInclusion(),
+					query.inclusionPlaces(),
+					query.getWorkflowMode(),
+					query.getStrongSoundnessBound(),
+					query.isOverApproximationEnabled(),
+					query.isUnderApproximationEnabled(),
+					query.approximationDenominator(),
+					query.isStubbornReductionEnabled()
+			);
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation(), 
-				query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), 
-				query.approximationDenominator(),query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled(), query.isStubbornReductionEnabled());
+			verifytapnOptions = new VerifyPNOptions(
+					bound,
+					query.getTraceOption(),
+					query.getSearchOption(),
+					query.useOverApproximation(),
+					query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+					query.isOverApproximationEnabled(),
+					query.isUnderApproximationEnabled(),
+					query.approximationDenominator(),
+					query.getCategory(),
+					query.getAlgorithmOption(),
+					query.isSiphontrapEnabled(),
+					query.isQueryReductionEnabled(),
+					query.isStubbornReductionEnabled()
+			);
 		} else {
-			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+			verifytapnOptions = new VerifyTAPNOptions(
+					bound,
+					query.getTraceOption(),
+					query.getSearchOption(),
+					query.useSymmetry(),
+					query.useOverApproximation(),
+					query.discreteInclusion(),
+					query.inclusionPlaces(),
+					query.isOverApproximationEnabled(),
+					query.isUnderApproximationEnabled(),
+					query.approximationDenominator()
+			);
 		}
 		
 		if (inputQuery == null) {

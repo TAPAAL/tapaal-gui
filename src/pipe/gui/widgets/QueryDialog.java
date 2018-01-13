@@ -228,6 +228,7 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useGCD;
 	private JCheckBox useOverApproximation;
 	private JCheckBox useReduction;
+	private JCheckBox useStubbornReduction;
 	
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
@@ -272,6 +273,7 @@ public class QueryDialog extends JPanel {
 	private static Boolean advancedView = false;
 	
 	private static boolean hasForcedDisabledTimeDarts = false;
+	private static boolean hasForcedDisabledStubbornReduction = false;
 	private static boolean hasForcedDisabledGCD = false;
 	private static boolean disableSymmetryUpdate = false;
 
@@ -329,6 +331,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
+	private final static String TOOL_TIP_STUBBORN_REDUCTION = "Apply partial order reduction (only for EF and AG queries and when Time Darts are disabled).";
 	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
 
@@ -414,8 +417,29 @@ public class QueryDialog extends JPanel {
 		boolean overApproximation = useOverApproximation.isSelected();
 		boolean reduction = useReduction.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, /* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
-		
+		TAPNQuery query = new TAPNQuery(
+				name,
+				capacity,
+				newProperty.copy(),
+				traceOption,
+				searchOption,
+				reductionOptionToSet,
+				symmetry,
+				gcd,
+				timeDarts,
+				pTrie,
+				overApproximation,
+				reduction,
+				/* hashTableSizeToSet */ null,
+				/* extrapolationOptionToSet */null,
+				inclusionPlaces,
+				overApproximationEnable.isSelected(),
+				underApproximationEnable.isSelected(),
+				(Integer) overApproximationDenominator.getValue()
+		);
+
+		query.setUseStubbornReduction(useStubbornReduction.isSelected());
+
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -728,6 +752,14 @@ public class QueryDialog extends JPanel {
 			}
             useTimeDarts.setEnabled(true);     
         }
+
+        if(useStubbornReduction != null){
+			if(hasForcedDisabledStubbornReduction){
+				hasForcedDisabledStubbornReduction = false;
+				useStubbornReduction.setSelected(true);
+			}
+			useStubbornReduction.setEnabled(true);
+		}
 		
 		if(useGCD != null){
 			if(hasForcedDisabledGCD){
@@ -1080,6 +1112,7 @@ public class QueryDialog extends JPanel {
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
 		usePTrie.setSelected(queryToCreateFrom.usePTrie());
+		useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
 		useGCD.setSelected(queryToCreateFrom.useGCD());
 		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
 		useReduction.setSelected(queryToCreateFrom.useReduction());
@@ -2324,12 +2357,17 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
 
 		useTimeDarts = new JCheckBox("Use Time Darts");
-		useTimeDarts.setSelected(true);
+		useTimeDarts.setSelected(false);
 		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
+		useTimeDarts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setEnabledOptionsAccordingToCurrentReduction();
+			}
+		});
 
 		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
+		gbc.gridx = 3;
+		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(useTimeDarts, gbc);
@@ -2374,6 +2412,17 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
 
+		useStubbornReduction = new JCheckBox("Use stubborn reduction");
+		useStubbornReduction.setSelected(true);
+		useStubbornReduction.setToolTipText(TOOL_TIP_STUBBORN_REDUCTION);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useStubbornReduction, gbc);
+
 		useOverApproximation = new JCheckBox("Use untimed state-equations check");
 		useOverApproximation.setSelected(true);
 		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
@@ -2397,6 +2446,7 @@ public class QueryDialog extends JPanel {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
 		refreshSymmetryReduction();
+		refreshStubbornReduction();
 		refreshDiscreteOptions();
 		refreshDiscreteInclusion();
 		refreshOverApproximationOption();
@@ -2498,28 +2548,27 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshDiscreteOptions(){
-		useTimeDarts.setEnabled(true);
-		if(hasForcedDisabledTimeDarts){
-			hasForcedDisabledTimeDarts = false;
-			useTimeDarts.setSelected(true);
-		}
-		
 		useReduction.setVisible(false);
 		
 		if(reductionOption.getSelectedItem() == null){
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
+			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
 		} 
 		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
 			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
+			useStubbornReduction.setVisible(true);
 			useTimeDarts.setVisible(true);
+
 			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected()){
 				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
 			}
+
+			// Disable GCD calculation for EG/AF or deadlock queries
 			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
 				useGCD.setSelected(false);
@@ -2532,14 +2581,31 @@ public class QueryDialog extends JPanel {
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
 			}
+
+			// Disable stubborn reduction for EG/AF queries
+			if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+				if(useStubbornReduction.isSelected())	hasForcedDisabledStubbornReduction = true;
+				useStubbornReduction.setSelected(false);
+				useStubbornReduction.setEnabled(false);
+			}
 		} else {
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
+			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
 
 //			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
 //				useReduction.setVisible(true);
 //			}
+		}
+	}
+
+	private void refreshStubbornReduction(){
+		if(useTimeDarts.isSelected()){
+			useStubbornReduction.setSelected(false);
+			useStubbornReduction.setEnabled(false);
+		} else {
+			useStubbornReduction.setEnabled(true);
 		}
 	}
 

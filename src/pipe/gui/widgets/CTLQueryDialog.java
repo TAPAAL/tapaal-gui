@@ -321,10 +321,10 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
 	
 	//Tool tips for verification options
-	private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "";
-	private final static String TOOL_TIP_USE_SIPHONTRAP = "";
-	private final static String TOOL_TIP_USE_QUERY_REDUCTION = "";
-	private final static String TOOL_TIP_USE_STUBBORN_REDUCTION = "";
+	private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "Apply structural reductions to reduce the size of the net.";
+	private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freeness by using siphon-trap analysis via linear programming.";
+	private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
+	private final static String TOOL_TIP_USE_STUBBORN_REDUCTION = "Use stubborn set reduction for queries where it is applicable.";
 	
 	
 	//Tool tips for query types
