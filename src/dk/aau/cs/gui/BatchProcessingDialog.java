@@ -1608,10 +1608,10 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("\n\n");
 			s.append("Symmetry: ");
 			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
-                        
-            s.append("\n\n");
-            s.append("Stubborn Reduction");
-            s.append(query.isStubbornReductionEnabled() ? "Yes\n\n" : "No\n\n");
+			
+			s.append("\n\n");
+			s.append("Stubborn Reduction");
+			s.append(query.isStubbornReductionEnabled() ? "Yes\n\n" : "No\n\n");
 
 			s.append("Query Property:\n");
                         s.append(query.getProperty().toString());

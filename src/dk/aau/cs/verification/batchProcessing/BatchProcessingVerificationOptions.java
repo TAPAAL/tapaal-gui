@@ -29,7 +29,7 @@ public class BatchProcessingVerificationOptions {
 	private SearchOption searchOption;
 	private QueryPropertyOption queryPropertyOption;
 	private SymmetryOption symmetryOption;
-    private StubbornReductionOption stubbornReductionOption;
+	private StubbornReductionOption stubbornReductionOption;
 	private ApproximationMethodOption approximationMethodOption;
 	private int approximationDenominator = 0;
 	private boolean keepQueryCapacity;
