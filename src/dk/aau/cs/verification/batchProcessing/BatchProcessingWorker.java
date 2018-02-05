@@ -53,6 +53,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.StubbornReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
@@ -259,6 +260,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                             name = query.getName();
                         }
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
+			boolean stubbornReduction = batchProcessingVerificationOptions.stubbornReductionOption() == StubbornReductionOption.KeepQueryOption ? query.isStubbornReductionEnabled() : getStubbornReductionFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			boolean overApproximation = query.isOverApproximationEnabled();
 			boolean underApproximation = query.isUnderApproximationEnabled();
@@ -277,7 +279,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
 			}
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, stubbornReduction, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
 			
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
@@ -295,6 +297,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
 		return batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes;
+	}
+        
+	private boolean getStubbornReductionFromBatchProcessingOptions(){
+		return batchProcessingVerificationOptions.stubbornReductionOption() == StubbornReductionOption.Yes;
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {

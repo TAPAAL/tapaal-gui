@@ -42,7 +42,7 @@ public class VerifytaOptions implements VerificationOptions {
 	public void setSymmetry(boolean newOption) {
 		this.symmetry = newOption;
 	}
-
+        
 	@Override
 	public String toString() {
 		StringBuffer result = new StringBuffer();

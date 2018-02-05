@@ -73,6 +73,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (!this.useStubbornReduction) {
 			result.append(" -p ");
 		}
+ 
 		return result.toString();
 	}
 
