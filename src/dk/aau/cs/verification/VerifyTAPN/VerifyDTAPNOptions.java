@@ -11,10 +11,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean timeDarts;
 	private boolean pTrie;
 	private WorkflowMode workflow;
-	private long workflowbound;
+        private long workflowbound;
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 	private boolean useStubbornReduction = true;
+	
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
