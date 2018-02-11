@@ -168,7 +168,7 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_SymmetryLabel = null;
 	private final static String TOOL_TIP_SymmetryOption = "Choose to override the symmetry reduction in the nets";
 	private final static String TOOL_TIP_StubbornReductionLabel = null;
-	private final static String TOOL_TIP_StubbornReductionOption = "Apply partial order reduction (only for EF nd AG queries and when Time Darts are disabled)";
+	private final static String TOOL_TIP_StubbornReductionOption = "Apply partial order reduction (only for EF and AG queries and when Time Darts are disabled)";
 	private final static String TOOL_TIP_ReductionLabel = null;
 	private final static String TOOL_TIP_ReductionOption = "Choose to override the verification methods in the nets";
 	private final static String TOOL_TIP_TimeoutLabel = null;
@@ -823,7 +823,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(symmetryOption, gbc);
 	}
         
-        private void initStubbornReductionOptionsComponents() {
+	private void initStubbornReductionOptionsComponents() {
 		JLabel stubbornReductionLabel = new JLabel("Stubborn Reduction:");
 		stubbornReductionLabel.setToolTipText(TOOL_TIP_StubbornReductionLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -901,15 +901,16 @@ public class BatchProcessingDialog extends JDialog {
 		else
 			return SymmetryOption.KeepQueryOption;
 	}
-        private StubbornReductionOption getStubbornReductionOption(){
-        String stubbornReductionString = (String) stubbornReductionOption.getSelectedItem();
+	
+	private StubbornReductionOption getStubbornReductionOption(){
+		String stubbornReductionString = (String) stubbornReductionOption.getSelectedItem();
 		if (stubbornReductionString.equals(name_STUBBORNREUDCTION))
 			return StubbornReductionOption.Yes;
 		else if (stubbornReductionString.equals(name_NOSTUBBORNREDUCTION))
 			return StubbornReductionOption.No;
 		else
 			return StubbornReductionOption.KeepQueryOption;
-        }
+	}
 
 	private QueryPropertyOption getQueryPropertyOption() {
 		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
@@ -1610,7 +1611,7 @@ public class BatchProcessingDialog extends JDialog {
 			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
 			
 			s.append("\n\n");
-			s.append("Stubborn Reduction");
+			s.append("Stubborn Reduction: ");
 			s.append(query.isStubbornReductionEnabled() ? "Yes\n\n" : "No\n\n");
 
 			s.append("Query Property:\n");

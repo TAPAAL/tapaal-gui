@@ -279,16 +279,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
 			}
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, stubbornReduction, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
 			
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
-			
+
 			changedQuery.setCategory(query.getCategory());
 			changedQuery.setAlgorithmOption(query.getAlgorithmOption());
 			changedQuery.setUseSiphontrap(query.isSiphontrapEnabled());
 			changedQuery.setUseQueryReduction(query.isQueryReductionEnabled());
-			changedQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
+			changedQuery.setUseStubbornReduction(stubbornReduction);
 			return changedQuery;
 		}
 		
