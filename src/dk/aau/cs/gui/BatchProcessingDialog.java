@@ -84,6 +84,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.StubbornReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
@@ -141,9 +142,11 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_Random = "Random search";
 	private static final String name_KeepQueryOption = "Do not override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
-        private static final String name_EXISTDEADLOCK = "Existence of a deadlock";
+	private static final String name_EXISTDEADLOCK = "Existence of a deadlock";
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
+	private static final String name_STUBBORNREUDCTION = "Yes";
+	private static final String name_NOSTUBBORNREDUCTION = "No";
 	private static final String name_NONE_APPROXIMATION = "None";
 	private static final String name_OVER_APPROXIMATION = "Over-approximation";
 	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
@@ -164,6 +167,8 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_SearchOption = "Choose to override the search options in the nets";
 	private final static String TOOL_TIP_SymmetryLabel = null;
 	private final static String TOOL_TIP_SymmetryOption = "Choose to override the symmetry reduction in the nets";
+	private final static String TOOL_TIP_StubbornReductionLabel = null;
+	private final static String TOOL_TIP_StubbornReductionOption = "Apply partial order reduction (only for EF and AG queries and when Time Darts are disabled)";
 	private final static String TOOL_TIP_ReductionLabel = null;
 	private final static String TOOL_TIP_ReductionOption = "Choose to override the verification methods in the nets";
 	private final static String TOOL_TIP_TimeoutLabel = null;
@@ -228,6 +233,7 @@ public class BatchProcessingDialog extends JDialog {
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
 	private JComboBox symmetryOption;
+	private JComboBox stubbornReductionOption;
 	private JCheckBox noTimeoutCheckbox;
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
@@ -506,6 +512,7 @@ public class BatchProcessingDialog extends JDialog {
 		initQueryPropertyOptionsComponents();
 		initSearchOptionsComponents();
 		initSymmetryOptionsComponents();
+		initStubbornReductionOptionsComponents();
 		initReductionOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
@@ -815,6 +822,31 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(symmetryOption, gbc);
 	}
+        
+	private void initStubbornReductionOptionsComponents() {
+		JLabel stubbornReductionLabel = new JLabel("Stubborn Reduction:");
+		stubbornReductionLabel.setToolTipText(TOOL_TIP_StubbornReductionLabel);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
+		verificationOptionsPanel.add(stubbornReductionLabel, gbc);
+
+		String[] options = new String[] { name_KeepQueryOption, name_STUBBORNREUDCTION,
+				name_NOSTUBBORNREDUCTION };
+		stubbornReductionOption = new JComboBox(options);
+		stubbornReductionOption.setToolTipText(TOOL_TIP_StubbornReductionOption);
+
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.gridwidth = 2;
+		verificationOptionsPanel.add(stubbornReductionOption, gbc);
+	}
 
 	private SearchOption getSearchOption() {
 		if (((String) searchOption.getSelectedItem()).equals(name_DFS))
@@ -851,7 +883,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(),
 				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
-				getSearchOption(), getSymmetryOption(), reductionOption,
+				getSearchOption(), getSymmetryOption(), getStubbornReductionOption(), reductionOption,
 				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.useTimeDartsPTrie(), reductionOptionChooser.useTimeDarts(), 
 				reductionOptionChooser.usePTrie(), getApproximationMethodOption(), getApproximationDenominator(), reductionOptionChooser.getChoosenOptions());
 	}
@@ -868,6 +900,16 @@ public class BatchProcessingDialog extends JDialog {
 			return SymmetryOption.No;
 		else
 			return SymmetryOption.KeepQueryOption;
+	}
+	
+	private StubbornReductionOption getStubbornReductionOption(){
+		String stubbornReductionString = (String) stubbornReductionOption.getSelectedItem();
+		if (stubbornReductionString.equals(name_STUBBORNREUDCTION))
+			return StubbornReductionOption.Yes;
+		else if (stubbornReductionString.equals(name_NOSTUBBORNREDUCTION))
+			return StubbornReductionOption.No;
+		else
+			return StubbornReductionOption.KeepQueryOption;
 	}
 
 	private QueryPropertyOption getQueryPropertyOption() {
@@ -1567,6 +1609,10 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("\n\n");
 			s.append("Symmetry: ");
 			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
+			
+			s.append("\n\n");
+			s.append("Stubborn Reduction: ");
+			s.append(query.isStubbornReductionEnabled() ? "Yes\n\n" : "No\n\n");
 
 			s.append("Query Property:\n");
                         s.append(query.getProperty().toString());

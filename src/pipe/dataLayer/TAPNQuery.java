@@ -192,7 +192,7 @@ public class TAPNQuery {
 	
 	public boolean useSymmetry() {
 		return symmetry;
-	}
+	}    
 	
 	public boolean useGCD(){
 		return gcd;
@@ -278,7 +278,7 @@ public class TAPNQuery {
 
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry,boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, WorkflowMode workflow) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, false, hashTabelSize, extrapolationOption, new InclusionPlaces());
 		this.setWorkflowMode(workflow);
@@ -286,7 +286,7 @@ public class TAPNQuery {
         
         public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry,boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, WorkflowMode workflow, long strongSoundnessBound) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, workflow);
 		this.setStrongSoundnessBound(strongSoundnessBound);
