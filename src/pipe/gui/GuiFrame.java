@@ -25,6 +25,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -32,6 +33,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -77,6 +79,7 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
@@ -743,7 +746,7 @@ public class GuiFrame extends JFrame implements Observer {
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(checkForSaveAll()){
-					BatchProcessingDialog.showBatchProcessingDialog();
+					BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
 				}
 			}
 		});
@@ -1353,7 +1356,7 @@ public class GuiFrame extends JFrame implements Observer {
 		return result;
 	}
 
-	private void saveNet(int index, File outFile) {
+	public void saveNet(int index, File outFile) {
 		try {
 			TabContent currentTab = CreateGui.getTab(index);
 			NetworkMarking currentMarking = null;

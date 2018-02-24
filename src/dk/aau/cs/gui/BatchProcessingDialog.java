@@ -66,6 +66,7 @@ import pipe.gui.FileFinderImpl;
 import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
@@ -241,6 +242,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JComboBox approximationMethodOption;
 	private CustomJSpinner approximationDenominator;
 	private JCheckBox approximationDenominatorCheckbox;
+	private JList ListOfQueries;
 	
 	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -318,9 +320,16 @@ public class BatchProcessingDialog extends JDialog {
 	
 	static BatchProcessingDialog batchProcessingDialog;
 	
-	public static void showBatchProcessingDialog(){
+	/* ListOfQueries is used throughout the class to check if 
+	BatchProcessing was called from QueryPane
+	(should maybe be boolean)
+	*/
+	public static void showBatchProcessingDialog(JList ListOfQueries){
+		if(ListOfQueries.getModel().getSize() != 0) {
+			batchProcessingDialog = null;
+		}
 		if(batchProcessingDialog == null){
-			batchProcessingDialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
+			batchProcessingDialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true, ListOfQueries);
 			batchProcessingDialog.pack();
 			batchProcessingDialog.setPreferredSize(batchProcessingDialog.getSize());
 			//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
@@ -331,16 +340,24 @@ public class BatchProcessingDialog extends JDialog {
 		batchProcessingDialog.setVisible(true);
 	}
 
-	private BatchProcessingDialog(Frame frame, String title, boolean modal) {
+	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList ListOfQueries) {
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
+				if(!(isQueryListEmpty())) {
+					batchProcessingDialog = null;
+				}
 				terminateBatchProcessing();
 			}
 		});
+		this.ListOfQueries = ListOfQueries;
 
 		initComponents();
+		//Runs the BatchProcessing if it is called from the QueryPane
+		if(!(isQueryListEmpty())) {
+			process();
+		}
 	}
 
 	private void initComponents() {
@@ -353,12 +370,26 @@ public class BatchProcessingDialog extends JDialog {
 		initVerificationOptionsPanel();
 		initMonitorPanel();
 		initResultTablePanel();
+		setFileListToTabFile();
 		
 		splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);		
 		splitpane.setResizeWeight(0);
 		splitpane.setDividerSize(10);
 		splitpane.setContinuousLayout(true);
 		setContentPane(splitpane);
+	}
+	
+	private void setFileListToTabFile() {
+		if(!(isQueryListEmpty())) {
+			files.add(QueryPane.getTemporaryFile());
+		}
+	}
+	
+	private boolean isQueryListEmpty() {
+		if(ListOfQueries.getModel().getSize() == 0)
+			return true;
+		else
+			return false;
 	}
 
 	private void initFileListPanel() {
@@ -474,6 +505,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridheight = 2;
 		gbc.insets = new Insets(10, 5, 0, 5);
 		topPanel.add(fileListPanel, gbc);
+		//Hides the file list panel if batch processing is run from the tabcomponent
+		if(!(isQueryListEmpty())) {
+			fileListPanel.setVisible(false);
+		}
 	}
 
 	private void addFiles() {
@@ -528,6 +563,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weightx = 0;
 		gbc.insets = new Insets(10, 0, 0, 5);
 		topPanel.add(verificationOptionsPanel, gbc);
+		//Hides the verification options if batch processing is run from the tabcomponent
+		if(!(isQueryListEmpty())) {
+			verificationOptionsPanel.setVisible(false);
+		}
 	}
 
 	private void initQueryPropertyOptionsComponents() {
@@ -967,6 +1006,11 @@ public class BatchProcessingDialog extends JDialog {
 	private void exit() {
 		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
+		//resets batch processing when exiting
+		//if batch processing was called from the tab
+		if(!(isQueryListEmpty())){
+			batchProcessingDialog = null;
+		}
 	}
 
 	private void initResultTablePanel() {

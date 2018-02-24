@@ -11,9 +11,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -31,17 +34,20 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
+import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.undo.AddQueryCommand;
-import pipe.gui.undo.RemoveQueryCommand;
+import pipe.gui.undo.RemoveQueriesCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
@@ -59,7 +65,9 @@ public class QueryPane extends JPanel {
 	private JPanel buttonsPanel;
 	private DefaultListModel listModel;
 	private JList queryList;
+	private DefaultListModel listModelCopy = new DefaultListModel();
 	private JScrollPane queryScroller;
+	private Messenger messenger =  new MessengerImpl();
 
 	private JButton addQueryButton;
 	private JButton editQueryButton;
@@ -71,14 +79,15 @@ public class QueryPane extends JPanel {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
+	private static File tempFile;
 
 	private static final String toolTipNewQuery = "Create a new query";
 	private static final String toolTipEditQuery="Edit the selected query";
 	private static final String toolTipRemoveQuery="Remove the selected query";
 	private static final String toolTipVerifyQuery="Verify the selected query";
 	private static final String toolTipSortQueries="Sort the queries alphabetically";
-	private final static String toolTipMoveUp = "Move the selected query up";
-	private final static String toolTipMoveDown = "Move the selected query down";
+	private final static String toolTipMoveUp = "Move the selected query up; only one query can be moved at a time";
+	private final static String toolTipMoveDown = "Move the selected query down; only one query can be moved at a time";
 
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
@@ -107,7 +116,7 @@ public class QueryPane extends JPanel {
 
 		queryList = new NonsearchableJList(listModel);
 		queryList.setCellRenderer(new QueryCellRenderer());
-		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		queryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!(e.getValueIsAdjusting())) {
@@ -179,13 +188,13 @@ public class QueryPane extends JPanel {
 			removeQueryButton.setEnabled(true);
 		}
 		int index = queryList.getSelectedIndex();
-		if(index > 0)
+		if(index > 0 && queryList.getSelectedIndices().length == 1)
 			moveUpButton.setEnabled(true);
 		else
 			moveUpButton.setEnabled(false);
 
 
-		if(index < listModel.size()-1)
+		if(index < listModel.size()-1 && queryList.getSelectedIndices().length == 1)
 			moveDownButton.setEnabled(true);
 		else
 			moveDownButton.setEnabled(false);
@@ -211,10 +220,12 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
 
-				if(index > 0) {
+				if(index > 0 && queryList.getModel().getSize() == 1) {
 					swapQueries(index, index-1);
 					queryList.setSelectedIndex(index-1);
 				}
+				else
+					moveUpButton.setEnabled(false);
 			}
 		});
 
@@ -231,10 +242,12 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
 
-				if(index < listModel.size()-1) {
+				if(index < listModel.size()-1 && queryList.getModel().getSize() == 1) {
 					swapQueries(index, index+1);
 					queryList.setSelectedIndex(index+1);
 				}
+				else
+					moveDownButton.setEnabled(false);
 			}
 		});
 
@@ -272,7 +285,10 @@ public class QueryPane extends JPanel {
 		editQueryButton.setPreferredSize(dimension);
 		editQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showEditDialog();
+				if(queryList.getSelectedIndices().length == 1)
+					showEditDialog();
+				else
+					messenger.displayErrorMessage("It is only possible to edit 1 query at a time. Only verification can be done with multiple queries.");
 			}
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -302,11 +318,7 @@ public class QueryPane extends JPanel {
 		removeQueryButton.setPreferredSize(dimension);
 		removeQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
-				undoManager.addNewEdit(new RemoveQueryCommand(query, tabContent));
-				if(listModel.getSize() > 0 && query != null){
-					listModel.remove(queryList.getSelectedIndex());
-				}
+				removeQueries();
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -358,6 +370,16 @@ public class QueryPane extends JPanel {
 		TAPNQuery temp = (TAPNQuery)listModel.get(currentIndex);
 		listModel.set(currentIndex, listModel.get(newIndex));
 		listModel.set(newIndex, temp);
+	}
+	
+	private void removeQueries() {
+		undoManager.addNewEdit(new RemoveQueriesCommand((List<TAPNQuery>) queryList.getSelectedValuesList(), tabContent));
+		if(listModel.getSize() > 0 && isQueryPossible()){
+			for(Object o : queryList.getSelectedValuesList()) {
+				listModel.removeElement(o);
+			}
+			updateQueryButtons();
+		}
 	}
 
 	public void showEditDialog() {
@@ -463,13 +485,58 @@ public class QueryPane extends JPanel {
 
 	private void verifyQuery() {
 		TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
-
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-			Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, this.tabContent.getGuiModels());
-		else
-			Verifier.runUppaalVerification(tabContent.network(), query);
+		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
+		
+		
+		if(NumberOfSelectedElements == 1) {
+			if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
+				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, this.tabContent.getGuiModels());
+			else
+				Verifier.runUppaalVerification(tabContent.network(), query);
+		}
+		else if(NumberOfSelectedElements > 1) {
+			getSelectedQueriesForProcessing();
+			saveNetAndRunBatchProcessing();
+			resetQueriesAfterBatchProcess();		}
 	}
-
+	
+	private void saveNetAndRunBatchProcessing() {
+		//Saves the net in a temporary file which is used in batchProcessing
+		//File is deleted on exit
+		try {
+			tempFile = File.createTempFile(CreateGui.appGui.getCurrentTabName(), ".xml");
+			CreateGui.appGui.saveNet(CreateGui.getTab().getSelectedIndex(), tempFile);
+			BatchProcessingDialog.showBatchProcessingDialog(queryList);
+			tempFile.deleteOnExit();
+			if(tempFile == null) {
+				throw new IOException();
+			}
+		}catch(IOException e) {
+			messenger.displayErrorMessage("Something went wrong");
+		}
+	}
+	
+	private void getSelectedQueriesForProcessing() {
+		for(Object oldQuery : listModel.toArray()) {
+			listModelCopy.addElement(oldQuery);
+		}
+		List<Object> selectedQueries = queryList.getSelectedValuesList();
+		listModel.removeAllElements();
+		for(Object selectedQuery : selectedQueries) {
+			listModel.addElement(selectedQuery);
+		}
+	}
+	
+	private void resetQueriesAfterBatchProcess() {
+		for(Object oldQuery : listModelCopy.toArray()) {
+			listModel.addElement(oldQuery);
+		}
+	}
+	
+	public static File getTemporaryFile() {
+		return tempFile;
+	}
+	
 	public boolean isQueryPossible() {
 		return (queryList.getModel().getSize() > 0 );
 	}
