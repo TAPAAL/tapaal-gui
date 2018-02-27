@@ -528,9 +528,11 @@ public class QueryPane extends JPanel {
 	}
 	
 	private void resetQueriesAfterBatchProcess() {
+		listModel.clear();
 		for(Object oldQuery : listModelCopy.toArray()) {
 			listModel.addElement(oldQuery);
 		}
+		listModelCopy.clear();
 	}
 	
 	public static File getTemporaryFile() {
