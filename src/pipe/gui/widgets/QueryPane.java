@@ -512,7 +512,7 @@ public class QueryPane extends JPanel {
 				throw new IOException();
 			}
 		}catch(IOException e) {
-			messenger.displayErrorMessage("Something went wrong");
+			messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
 		}
 	}
 	
