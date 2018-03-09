@@ -65,7 +65,7 @@ public class QueryPane extends JPanel {
 	private JPanel buttonsPanel;
 	private DefaultListModel listModel;
 	private JList queryList;
-	private DefaultListModel listModelCopy = new DefaultListModel();
+	private List<TAPNQuery> selectedQueries;
 	private JScrollPane queryScroller;
 	private Messenger messenger =  new MessengerImpl();
 
@@ -495,17 +495,17 @@ public class QueryPane extends JPanel {
 				Verifier.runUppaalVerification(tabContent.network(), query);
 		}
 		else if(NumberOfSelectedElements > 1) {
-			getSelectedQueriesForProcessing();
 			saveNetAndRunBatchProcessing();
-			resetQueriesAfterBatchProcess();		}
+		}
 	}
 	
 	private void saveNetAndRunBatchProcessing() {
+		getSelectedQueriesForProcessing();
 		//Saves the net in a temporary file which is used in batchProcessing
 		//File is deleted on exit
 		try {
 			tempFile = File.createTempFile(CreateGui.appGui.getCurrentTabName(), ".xml");
-			CreateGui.appGui.saveNet(CreateGui.getTab().getSelectedIndex(), tempFile);
+			CreateGui.appGui.saveFileToTempFileForMultiQuerySelection(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {
@@ -517,22 +517,7 @@ public class QueryPane extends JPanel {
 	}
 	
 	private void getSelectedQueriesForProcessing() {
-		for(Object oldQuery : listModel.toArray()) {
-			listModelCopy.addElement(oldQuery);
-		}
-		List<Object> selectedQueries = queryList.getSelectedValuesList();
-		listModel.removeAllElements();
-		for(Object selectedQuery : selectedQueries) {
-			listModel.addElement(selectedQuery);
-		}
-	}
-	
-	private void resetQueriesAfterBatchProcess() {
-		listModel.clear();
-		for(Object oldQuery : listModelCopy.toArray()) {
-			listModel.addElement(oldQuery);
-		}
-		listModelCopy.clear();
+		selectedQueries = queryList.getSelectedValuesList();
 	}
 	
 	public static File getTemporaryFile() {
