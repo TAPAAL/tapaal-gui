@@ -122,7 +122,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction,
         importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
-        exportToPNMLAction, exportToXMLAction, exportTraceAction, importTraceAction;
+        exportToPNMLAction, exportToXMLAction, exportTraceAction, importTraceAction, 
+        exportBatchAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -391,6 +392,8 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(exportMenu, exportToXMLAction = new FileAction("XML Queries",
 				"Export the queries to XML format", "ctrl H"));
 		exportToXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('H', shortcutkey));
+		addMenuItem(exportMenu, exportBatchAction = new FileAction("Batch Export to PNML and query XML", "Export multiple queries in XML and PNML format", "ctrl K"));
+		exportBatchAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('K', shortcutkey));
 		
 		fileMenu.add(exportMenu);
 
@@ -1139,6 +1142,7 @@ public class GuiFrame extends JFrame implements Observer {
 			stripTimeDialogAction.setEnabled(false);
 
 			enableAllActions(false);
+
 			break;
 		}
 
@@ -1157,8 +1161,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		saveAction.setEnabled(enable);
 		saveAsAction.setEnabled(enable);
-
-		exportMenu.setEnabled(enable);
+		
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
@@ -2676,6 +2679,9 @@ public class GuiFrame extends JFrame implements Observer {
 				TraceImportExport.exportTrace();
 			} else if(this == importTraceAction){
                                 TraceImportExport.importTrace();
+			}
+			else if(this == exportBatchAction) {
+				ExportBatchDialog.ShowExportBatchDialog();
 			}
 		}
 
