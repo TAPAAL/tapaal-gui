@@ -8,8 +8,10 @@ import javax.swing.SwingWorker;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
 import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
+import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
@@ -372,7 +374,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private void publishResult(String fileName, pipe.dataLayer.TAPNQuery query, String verificationResult, long verificationTime, Stats stats) {
-		BatchProcessingVerificationResult result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
+		BatchProcessingVerificationResult result;		
+		if(fileName.equals(QueryPane.getTemporaryFile().getName())) {
+			//removes numbers from tempFile so it looks good
+			result = new BatchProcessingVerificationResult(CreateGui.appGui.getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
+		} else {
+			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
+		}
 		publish(result);
 	}
 

@@ -505,7 +505,7 @@ public class QueryPane extends JPanel {
 		//File is deleted on exit
 		try {
 			tempFile = File.createTempFile(CreateGui.appGui.getCurrentTabName(), ".xml");
-			CreateGui.appGui.saveFileToTempFileForMultiQuerySelection(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
+			CreateGui.appGui.saveNet(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {

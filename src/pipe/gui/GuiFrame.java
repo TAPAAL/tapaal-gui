@@ -1358,21 +1358,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			TabContent currentTab = CreateGui.getTab(index);
-			NetworkMarking currentMarking = null;
-			if(getGUIMode().equals(GUIMode.animation)){
-				currentMarking = currentTab.network().marking();
-				currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
-			}
-
-			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-					currentTab.network(),
-					currentTab.allTemplates(), 
-					currentTab.queries(), 
-					currentTab.network().constants()
-					);
-
-			tapnWriter.savePNML(outFile);
+			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
 
 			CreateGui.setFile(outFile, index);
 
@@ -1382,9 +1368,6 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getDrawingSurface(index).getUndoManager().clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
-			if(getGUIMode().equals(GUIMode.animation)){
-				currentTab.network().setMarking(currentMarking);
-			}
 		} catch (Exception e) {
 			System.err.println(e);
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
@@ -1393,7 +1376,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 	
-	public void saveFileToTempFileForMultiQuerySelection(int index, File outFile, List<TAPNQuery> queries) {
+	public void saveNet(int index, File outFile, List<TAPNQuery> queries) {
 		try {
 			TabContent currentTab = CreateGui.getTab(index);
 			NetworkMarking currentMarking = null;
@@ -1411,7 +1394,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 			tapnWriter.savePNML(outFile);
 
-			CreateGui.setFile(outFile, index);
 			if(getGUIMode().equals(GUIMode.animation)){
 				currentTab.network().setMarking(currentMarking);
 			}

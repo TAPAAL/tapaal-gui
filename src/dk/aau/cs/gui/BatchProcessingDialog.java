@@ -370,7 +370,7 @@ public class BatchProcessingDialog extends JDialog {
 		initVerificationOptionsPanel();
 		initMonitorPanel();
 		initResultTablePanel();
-		setFileListToTabFile();
+		setFileListToTempFile();
 		
 		splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);		
 		splitpane.setResizeWeight(0);
@@ -379,7 +379,7 @@ public class BatchProcessingDialog extends JDialog {
 		setContentPane(splitpane);
 	}
 	
-	private void setFileListToTabFile() {
+	private void setFileListToTempFile() {
 		if(!(isQueryListEmpty())) {
 			files.add(QueryPane.getTemporaryFile());
 		}
