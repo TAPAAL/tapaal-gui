@@ -1382,7 +1382,11 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			public void fireFileChanged(FileChangedEvent e) {
-				fileStatusLabel.setText(e.fileName());
+				if(!(isQueryListEmpty())) {
+					fileStatusLabel.setText(CreateGui.appGui.getCurrentTabName());
+				}
+				else
+					fileStatusLabel.setText(e.fileName());
 			}
 
 		});
