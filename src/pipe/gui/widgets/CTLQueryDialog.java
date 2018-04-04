@@ -335,7 +335,14 @@ public class CTLQueryDialog extends JPanel {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
-		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
+		
+		// Attempt to parse and possibly transform the string query using the manual edit parser
+		try {
+			newProperty = TAPAALCTLQueryParser.parse(queryToCreateFrom.getProperty().toString());
+		} catch (Throwable ex) {
+			newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
+		}
+		
 		rootPane = me.getRootPane();
 		isNetDegree2 = tapnNetwork.isDegree2();
 		hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
