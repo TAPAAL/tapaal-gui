@@ -421,50 +421,50 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.addSeparator();
 
 		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
-				453243, "Show/hide the list of components.", "ctrl 1", true),
+				 "Show/hide the list of components.", "ctrl 1", true),
 				showComponentsCheckBox = new JCheckBoxMenuItem());
 		showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
-				453244, "Show/hide verification queries.", "ctrl 2", true),
+				 "Show/hide verification queries.", "ctrl 2", true),
 				showQueriesCheckBox= new JCheckBoxMenuItem());
 		showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
-				453245, "Show/hide global constants.", "ctrl 3", true),
+				 "Show/hide global constants.", "ctrl 3", true),
 				showConstantsCheckBox = new JCheckBoxMenuItem());
 		showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
-				453247, "Show/hide the list of enabled transitions","ctrl 4",true),
+				 "Show/hide the list of enabled transitions","ctrl 4",true),
 				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
-				453247, "Highlight transitions which can be enabled after a delay","ctrl 5",true),
+				 "Highlight transitions which can be enabled after a delay","ctrl 5",true),
 				showDelayEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
 		showDelayEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true),
+				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true),
 				showZeroToInfinityIntervalsCheckBox = new JCheckBoxMenuItem());
 		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
-				453246, "Show/hide tool tips when mouse is over an element","ctrl 7",true),
+				"Show/hide tool tips when mouse is over an element","ctrl 7",true),
 				showToolTipsCheckBox = new JCheckBoxMenuItem());
 		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('7', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
-						453246, "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)","ctrl 8",true),
+						"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)","ctrl 8",true),
 				showTokenAgeCheckBox = new JCheckBoxMenuItem());
 		showTokenAgeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('8', shortcutkey));
 
 		viewMenu.addSeparator();
 
-		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
-		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
-		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
+		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", "Show only the most important panels", "", false));
+		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", "Show all panels", "", false));
+		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", "Save the current workspace as the default one", "", false));
 
 		/* Simulator */
 		JMenu animateMenu = new JMenu("Simulator");
@@ -2224,7 +2224,7 @@ public class GuiFrame extends JFrame implements Observer {
 	class ViewAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454638L;
-		ViewAction(String name, int typeID, String tooltip, String keystroke,
+		ViewAction(String name, String tooltip, String keystroke,
 				boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 		}
