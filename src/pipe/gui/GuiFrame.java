@@ -125,7 +125,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private VerificationAction runUppaalVerification;
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
-	private GridAction toggleGrid;
+	private GuiAction toggleGrid;
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction, stripTimeDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private SpacingAction incSpacingAction, decSpacingAction;
@@ -340,7 +340,7 @@ public class GuiFrame extends JFrame implements Observer {
 		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
 		editMenu.addSeparator();
 
-		fileMenu.add( deleteAction = new DeleteAction("Delete",
+		editMenu.add( deleteAction = new DeleteAction("Delete",
 				"Delete selection", "DELETE"));
 
 		// Bind delete to backspace also
@@ -415,8 +415,13 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		viewMenu.addSeparator();
 		
-		viewMenu.add( toggleGrid = new GridAction("Cycle grid",
-				"Change the grid size", "G"));
+		viewMenu.add( toggleGrid = new GuiAction("Cycle grid",
+				"Change the grid size", "G") {
+					public void actionPerformed(ActionEvent arg0) {
+						Grid.increment();
+						repaint();			
+					}		
+		});
 
 		viewMenu.addSeparator();
 
@@ -2080,23 +2085,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
-	class GridAction extends GuiAction {
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 5654512618471549653L;
-
-		GridAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			Grid.increment();
-			repaint();
-		}
-
-	}
 
 	class ToolAction extends GuiAction {
 
