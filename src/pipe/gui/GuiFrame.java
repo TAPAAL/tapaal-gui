@@ -408,17 +408,17 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.add( zoomInAction = new ZoomAction("Zoom in",
 				"Zoom in by 10% ", "ctrl J"));
-		zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("J").getKeyCode(), shortcutkey));
+		zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('J', shortcutkey));
 
 		viewMenu.add( zoomOutAction = new ZoomAction("Zoom out",
 				"Zoom out by 10% ", "ctrl K"));
-		zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("K").getKeyCode(), shortcutkey));
+		zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('K', shortcutkey));
 		viewMenu.add(zoomMenu);
 
 		viewMenu.addSeparator();
 		
 		viewMenu.add(incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ",
-				KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey)) {
+				KeyStroke.getKeyStroke('U', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 1.25;
 				changeSpacing(factor);
