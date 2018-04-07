@@ -126,7 +126,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GuiAction toggleGrid;
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction, stripTimeDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
-	private SpacingAction incSpacingAction, decSpacingAction;
+	private GuiAction incSpacingAction, decSpacingAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
@@ -417,13 +417,25 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 		
-		viewMenu.add( incSpacingAction = new SpacingAction("Increase node spacing",
-				"Increase spacing by 20% ", null));
-		incSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey));
+		viewMenu.add(incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ",
+				KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				double factor = 1.25;
+				changeSpacing(factor);
+				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+			}
+		});
+
+		viewMenu.add(decSpacingAction = new GuiAction("Decrease node spacing", "Decrease spacing by 20% ",
+				KeyStroke.getKeyStroke("shift U")) {
+			public void actionPerformed(ActionEvent arg0) {
+				double factor = 0.8;
+				changeSpacing(factor);
+				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+			}
+		});
 		
-		viewMenu.add( decSpacingAction = new SpacingAction("Decrease node spacing",
-				"Decrease spacing by 20% ", null));
-		decSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift U"));
 
 		
 		viewMenu.addSeparator();
@@ -2187,24 +2199,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 	
-	class SpacingAction extends GuiAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 549331166742882564L;
-
-		SpacingAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			double factor = equals(incSpacingAction)? 1.25 : 0.8;
-			changeSpacing(factor);
-			appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
-		}
-
-	}
+	
 
 	class ViewAction extends GuiAction {
 
