@@ -403,6 +403,7 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomMenu.setIcon(new ImageIcon(Thread.currentThread()
 				.getContextClassLoader().getResource(
 						CreateGui.imgPath + "Zoom.png")));
+		
 		addZoomMenuItems(zoomMenu);
 
 		viewMenu.add( zoomInAction = new ZoomAction("Zoom in",
@@ -434,47 +435,46 @@ public class GuiFrame extends JFrame implements Observer {
 						repaint();			
 					}		
 		});
+		
 
 		viewMenu.addSeparator();
 
-		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
-				 "Show/hide the list of components.", "ctrl 1", true),
-				showComponentsCheckBox = new JCheckBoxMenuItem());
+		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.", "ctrl 1", true);
 		showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
-				 "Show/hide verification queries.", "ctrl 2", true),
-				showQueriesCheckBox= new JCheckBoxMenuItem());
+		showComponentsCheckBox = addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
+		
+		
+		showQueriesCheckBox = addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
+				 "Show/hide verification queries.", "ctrl 2", true));
 		showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
-				 "Show/hide global constants.", "ctrl 3", true),
-				showConstantsCheckBox = new JCheckBoxMenuItem());
+		showConstantsCheckBox = addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
+				 "Show/hide global constants.", "ctrl 3", true));
 		showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
-				 "Show/hide the list of enabled transitions","ctrl 4",true),
-				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
+		showEnabledTransitionsCheckBox = addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
+				 "Show/hide the list of enabled transitions","ctrl 4",true));
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
-				 "Highlight transitions which can be enabled after a delay","ctrl 5",true),
-				showDelayEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
+		showDelayEnabledTransitionsCheckBox = addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
+				 "Highlight transitions which can be enabled after a delay","ctrl 5",true)
+				);
 		showDelayEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true),
-				showZeroToInfinityIntervalsCheckBox = new JCheckBoxMenuItem());
+		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true)
+				);
 		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
-				"Show/hide tool tips when mouse is over an element","ctrl 7",true),
-				showToolTipsCheckBox = new JCheckBoxMenuItem());
+		showToolTipsCheckBox =addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
+				"Show/hide tool tips when mouse is over an element","ctrl 7",true)
+				 );
 		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('7', shortcutkey));
 
-		addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
-						"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)","ctrl 8",true),
-				showTokenAgeCheckBox = new JCheckBoxMenuItem());
+		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
+						"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)","ctrl 8",true)
+				);
 		showTokenAgeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('8', shortcutkey));
 
 		viewMenu.addSeparator();
@@ -837,11 +837,10 @@ public class GuiFrame extends JFrame implements Observer {
 		toolBar.add(zoomComboBox);
 	}
 
-	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
-		return addCheckboxMenuItem(menu, selected, action, new JCheckBoxMenuItem());
-	}
-
-	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action, JCheckBoxMenuItem checkBoxItem) {
+	private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
+		
+		JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem();
+		
 		checkBoxItem.setAction(action);
 		checkBoxItem.setSelected(selected);
 		JMenuItem item = menu.add(checkBoxItem);
@@ -850,7 +849,7 @@ public class GuiFrame extends JFrame implements Observer {
 		if (keystroke != null) {
 			item.setAccelerator(keystroke);
 		}
-		return item;
+		return checkBoxItem;
 	}
 
 	/**
