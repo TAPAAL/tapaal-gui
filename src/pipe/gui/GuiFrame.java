@@ -116,7 +116,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private JToolBar drawingToolBar;
 	private JComboBox zoomComboBox;
 
-	private FileAction createAction, openAction, closeAction, saveAction,
+	private GuiAction createAction;
+	private GuiAction openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction,
         importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
         exportToPNMLAction, exportToXMLAction, exportTraceAction, importTraceAction;
@@ -321,188 +322,20 @@ public class GuiFrame extends JFrame implements Observer {
 	private void buildMenus() {
 		menuBar = new JMenuBar();
 
-		JMenu fileMenu = new JMenu("File");
-		fileMenu.setMnemonic('F');
-
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-		fileMenu.add(createAction = new FileAction("New",
-				"Create a new Petri net", "ctrl N"));
-		createAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('N', shortcutkey));
-
-		fileMenu.add( openAction = new FileAction("Open", "Open",
-				"ctrl O"));
-		openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('O', shortcutkey));
-
-		fileMenu.add( closeAction = new FileAction("Close",
-				"Close the current tab", "ctrl W"));
-		closeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('W', shortcutkey));
-		fileMenu.addSeparator();
-
-		fileMenu.add( saveAction = new FileAction("Save", "Save",
-				"ctrl S"));
-		saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', shortcutkey));
-		fileMenu.add( saveAsAction = new FileAction("Save as",
-				"Save as...", null));
-		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK)));
-
-
-		// Import menu
-		importMenu = new JMenu("Import");
-
-		importMenu.setIcon(new ImageIcon(Thread.currentThread()
-				.getContextClassLoader().getResource(
-						CreateGui.imgPath + "Export.png")));
-		importMenu.add( importPNMLAction = new FileAction("PNML untimed net",
-				"Import an untimed net in the PNML format", "ctrl X"));
-		importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('X', shortcutkey));
-
-		importMenu.add(importSUMOAction = new FileAction("SUMO queries (.txt)", 
-				"Import SUMO queries in a plain text format",""));
-		//importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
-
-		importMenu.add(importXMLAction = new FileAction("XML queries (.xml)", 
-				"Import MCC queries in XML format", "ctrl R"));
-		importXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
-
-		fileMenu.add(importMenu);
-
-		// Export menu
-		exportMenu = new JMenu("Export");
-
-		exportMenu.setIcon(new ImageIcon(Thread.currentThread()
-				.getContextClassLoader().getResource(
-						CreateGui.imgPath + "Export.png")));
-		exportMenu.add( exportPNGAction = new FileAction("PNG",
-				"Export the net to PNG format", "ctrl G"));
-		exportPNGAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('G', shortcutkey));
-		exportMenu.add( exportPSAction = new FileAction("PostScript",
-				"Export the net to PostScript format", "ctrl T"));
-		exportPSAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('T', shortcutkey));
-		exportMenu.add( exportToTikZAction = new FileAction("TikZ",
-				"Export the net to LaTex (TikZ) format", "ctrl L"));
-		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
-		exportMenu.add( exportToPNMLAction = new FileAction("PNML",
-				"Export the net to PNML format", "ctrl D"));
-		exportToPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('D', shortcutkey));
-		exportMenu.add( exportToXMLAction = new FileAction("XML Queries",
-				"Export the queries to XML format", "ctrl H"));
-		exportToXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('H', shortcutkey));
 		
-		fileMenu.add(exportMenu);
+		JMenu fileMenu = buildMenuFiles(shortcutkey);
 
-		fileMenu.addSeparator();
-		fileMenu.add( printAction = new FileAction("Print", "Print",
-				"ctrl P"));
-		printAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('P', shortcutkey));
-		fileMenu.addSeparator();
 
-		// Example files menu
-		try {
-
-			/**
-			 * The next block loads the example nets as InputStream from the resources 
-			 * Notice the check for if we are inside a jar file, as files inside a jar cant
-			 * be listed in the normal way.
-			 * 
-			 *  @author Kenneth Yrke Joergensen <kenneth@yrke.dk>, 2011-06-27
-			 */
-
-			String[] nets = null;
-
-			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
-			if (dirURL != null && dirURL.getProtocol().equals("file")) {
-				/* A file path: easy enough */
-				nets = new File(dirURL.toURI()).list();
-			} 
-
-			if (dirURL == null) {
-				/* 
-				 * In case of a jar file, we can't actually find a directory.
-				 * Have to assume the same jar as clazz.
-				 */
-				String me = this.getName().replace(".", "/")+".class";
-				dirURL = Thread.currentThread().getContextClassLoader().getResource(me);
-			}
-
-			if (dirURL.getProtocol().equals("jar")) {
-				/* A JAR path */
-				String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); //strip out only the JAR file
-				JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-				Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
-				Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
-				while(entries.hasMoreElements()) {
-					String name = entries.nextElement().getName();
-					if (name.startsWith("resources/Example nets/")) { //filter according to the path
-						String entry = name.substring("resources/Example nets/".length());
-						int checkSubdir = entry.indexOf('/');
-						if (checkSubdir >= 0) {
-							// if it is a subdirectory, we just return the directory name
-							entry = entry.substring(0, checkSubdir);
-						}
-						result.add(entry);
-					}
-				}
-				nets = result.toArray(new String[result.size()]);
-			} 
-
-			Arrays.sort(nets, new Comparator<String>() {
-				public int compare(String one, String two) {
-
-					int toReturn = one.compareTo(two);
-					// Special hack to get intro-example first
-					if (one.equals("intro-example.xml")) {
-						toReturn = -1;
-					}
-					if (two.equals("intro-example.xml")) {
-						toReturn = 1;
-					}
-					return toReturn;
-				}
-			});
-
-			// Oliver Haggarty - fixed code here so that if folder contains non
-			// .xml file the Example x counter is not incremented when that file
-			// is ignored
-			if (nets.length > 0) {
-				JMenu exampleMenu = new JMenu("Example nets");
-				exampleMenu.setIcon(new ImageIcon(Thread.currentThread()
-						.getContextClassLoader().getResource(
-								CreateGui.imgPath + "Example.png")));
-				int k = 0;
-				for (int i = 0; i < nets.length; i++) {
-					if (nets[i].toLowerCase().endsWith(".xml")) {
-						//addMenuItem(exampleMenu, new ExampleFileAction(nets[i], (k < 10) ? "ctrl " + (k++) : null));
-
-						ExampleFileAction tmp = new ExampleFileAction(nets[i], nets[i].replace(".xml", ""), null);
-						if (k < 10) {
-
-							//tmp.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke(""+k).getKeyCode(), shortcutkey));
-
-						}
-						k++;
-
-						exampleMenu.add(tmp);
-					}
-				}
-				fileMenu.add(exampleMenu);
-				fileMenu.addSeparator();
-			}
-		} catch (Exception e) {
-			Logger.log("Error getting example files:" + e);
-			e.printStackTrace();
-		}
-		fileMenu.add(exitAction = new FileAction("Exit",
-				"Close the program", "ctrl Q"));
-		exitAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Q', shortcutkey));
+		
 
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
-		fileMenu.add( undoAction = new EditAction("Undo",
+		editMenu.add( undoAction = new EditAction("Undo",
 				"Undo", "ctrl Z"));
 		undoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Z', shortcutkey));
-		fileMenu.add( redoAction = new EditAction("Redo",
+		editMenu.add( redoAction = new EditAction("Redo",
 				"Redo", "ctrl Y"));
 		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
 		editMenu.addSeparator();
@@ -659,10 +492,18 @@ public class GuiFrame extends JFrame implements Observer {
 
 		animateMenu.addSeparator();
 
-		animateMenu.add( exportTraceAction = new FileAction("Export trace",
-				"Export the current trace",""));
-		animateMenu.add( importTraceAction = new FileAction("Import trace",
-				"Import trace to simulator",""));
+		animateMenu.add( exportTraceAction = new GuiAction("Export trace",
+				"Export the current trace","") {
+					public void actionPerformed(ActionEvent arg0) {
+						TraceImportExport.exportTrace();
+					}		
+		});
+		animateMenu.add( importTraceAction = new GuiAction("Import trace",
+				"Import trace to simulator",""){
+			public void actionPerformed(ActionEvent arg0) {
+				TraceImportExport.importTrace();
+			}		
+		});
 
 		/*
 		 * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -712,6 +553,8 @@ public class GuiFrame extends JFrame implements Observer {
 		setJMenuBar(menuBar);
 
 	}
+
+	
 
 	private JMenu buildToolsMenu() {
 		JMenu toolsMenu = new JMenu("Tools");
@@ -2074,28 +1917,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
-	class ExampleFileAction extends GuiAction {
 
-		private static final long serialVersionUID = -5983638671592349736L;
-		private String filename;
-		private String name;
-
-		ExampleFileAction(String file, String name, String keyStroke) {
-			super(name.replace(".xml", ""), "Open example file \""
-					+ name.replace(".xml", "") + "\"", keyStroke);
-			this.filename = file;
-			putValue(SMALL_ICON, new ImageIcon(Thread.currentThread()
-					.getContextClassLoader().getResource(
-							CreateGui.imgPath + "Net.png")));
-			this.name = name;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filename);
-			createNewTabFromFile(file, name);
-		}
-
-	}
 
 	class DeleteAction extends GuiAction {
 
@@ -2531,48 +2353,75 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 
-	class FileAction extends GuiAction {
+	
+	
+	private JMenu buildMenuFiles(int shortcutkey) {
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.setMnemonic('F');
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1438830908690683060L;
+		createAction = new GuiAction("New", "Create a new Petri net", "ctrl N") {
+			public void actionPerformed(ActionEvent arg0) {
+				showNewPNDialog();
+			}
+		};
+		fileMenu.add(createAction);
 
-		// constructor
-		FileAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			if (this == saveAction) {
-                                if (canNetBeSavedAndShowMessage()) {
-                                        saveOperation(false); // code for Save operation
-                                }
-			} else if (this == saveAsAction) {
-                                if (canNetBeSavedAndShowMessage()) {
-                                        saveOperation(true); // code for Save As operations
-                                }
-			} else if (this == openAction) { // code for Open operation
+		fileMenu.add(openAction = new GuiAction("Open", "Open", "ctrl O") {
+			public void actionPerformed(ActionEvent arg0) {
 				File[] files = new FileBrowser(CreateGui.userPath).openFiles();
-				for(File f : files){
-					if(f.exists() && f.isFile() && f.canRead()) {
+				for (File f : files) {
+					if (f.exists() && f.isFile() && f.canRead()) {
 						CreateGui.userPath = f.getParent();
 						createNewTabFromFile(f, false);
 					}
 				}
-			} else if (this == createAction) {
-				showNewPNDialog();
-			} else if ((this == exitAction)) {
-				exit();
-			} else if ((this == closeAction) && (appTab.getTabCount() > 0)
-					&& checkForSave()) {
-				// Set GUI mode to noNet
-				setGUIMode(GUIMode.noNet);
+			}
+		});
 
-				int index = appTab.getSelectedIndex();
-				appTab.remove(index);
-				CreateGui.removeTab(index);
-			} else if (this == importPNMLAction){
+		fileMenu.add(closeAction = new GuiAction("Close", "Close the current tab", "ctrl W") {
+			public void actionPerformed(ActionEvent arg0) {
+
+				if ((appTab.getTabCount() > 0) && checkForSave()) {
+					// Set GUI mode to noNet
+					setGUIMode(GUIMode.noNet);
+
+					int index = appTab.getSelectedIndex();
+					appTab.remove(index);
+					CreateGui.removeTab(index);
+				}
+
+			}
+
+		});
+
+		fileMenu.addSeparator();
+
+		fileMenu.add(saveAction = new GuiAction("Save", "Save", "ctrl S") {
+			public void actionPerformed(ActionEvent arg0) {
+				 if (canNetBeSavedAndShowMessage()) {
+                     saveOperation(false); 
+				 }
+			}			
+		});
+		
+		
+		fileMenu.add(saveAsAction = new GuiAction("Save as", "Save as...", KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK))) {
+			public void actionPerformed(ActionEvent arg0) {
+				if (canNetBeSavedAndShowMessage()) {
+                    saveOperation(true); 
+				}	
+			}
+		});
+
+				
+		// Import menu
+		importMenu = new JMenu("Import");
+		importMenu.setIcon(new ImageIcon(
+				Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")
+		));
+		
+		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
 				File[] files = new FileBrowser("Import PNML", "pnml", CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
@@ -2580,7 +2429,12 @@ public class GuiFrame extends JFrame implements Observer {
 						createNewTabFromFile(f, true);
 					}
 				}
-			} else if(this == importSUMOAction){
+			}
+		});
+		
+
+		importMenu.add(importSUMOAction = new GuiAction("SUMO queries (.txt)", "Import SUMO queries in a plain text format") {
+			public void actionPerformed(ActionEvent arg0) {
 				File[] files = new FileBrowser("Import SUMO", "txt", CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
@@ -2588,55 +2442,203 @@ public class GuiFrame extends JFrame implements Observer {
 						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
 					}
 				}
-			} else if(this == importXMLAction){
-				File[] files = new FileBrowser("Import XML queries", "xml", CreateGui.userPath).openFiles();
-				for(File f : files){
-					if(f.exists() && f.isFile() && f.canRead()){
-						CreateGui.userPath = f.getParent();
-						XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
-					}
+			}
+		});
+
+		importMenu.add(
+				importXMLAction = new GuiAction("XML queries (.xml)", "Import MCC queries in XML format", KeyStroke.getKeyStroke('R', shortcutkey)) {
+					public void actionPerformed(ActionEvent arg0) {
+						File[] files = new FileBrowser("Import XML queries", "xml", CreateGui.userPath).openFiles();
+						for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								CreateGui.userPath = f.getParent();
+								XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
+							}
+						}
+					}	
+				});
+		fileMenu.add(importMenu);
+
+		// Export menu
+		exportMenu = new JMenu("Export");
+		exportMenu.setIcon(new ImageIcon(
+				Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		
+		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				if (canNetBeSavedAndShowMessage()) {
+                    Export.exportGuiView(appView, Export.PNG, null);
 				}
 			}
+		});
 
-			else if (this == exportPNGAction) {
-                                if (canNetBeSavedAndShowMessage()) {
-                                        Export.exportGuiView(appView, Export.PNG, null);
-                                }
-			} else if (this == exportToTikZAction) {
-                                if (canNetBeSavedAndShowMessage()) {
-                                        Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
-                                }
-			} else if (this == exportToPNMLAction) {
-                                if (canNetBeSavedAndShowMessage()) {
-                                        if(Preferences.getInstance().getShowPNMLWarning()) {
-                                                JCheckBox showAgain = new JCheckBox("Do not show this warning.");
-                                                String message = "In the saved PNML all timing information will be lost\n" +
-                                                        	"and the components in the net will be merged into one big net.";
-                                                Object[] dialogContent = {message, showAgain};
-                                                JOptionPane.showMessageDialog(null, dialogContent, 
-                                                        "PNML loss of information", JOptionPane.WARNING_MESSAGE);
-                                                Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
-                                        }
-                                        Export.exportGuiView(appView, Export.PNML, null);
-                                }
-			} else if (this == exportToXMLAction) {
+		exportMenu.add(exportPSAction = new GuiAction("PostScript", "Export the net to PostScript format", KeyStroke.getKeyStroke('T', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				if (canNetBeSavedAndShowMessage()) {
+                    Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+				}
+			}
+		});
+
+
+		exportMenu.add(exportToTikZAction = new GuiAction("TikZ", "Export the net to LaTex (TikZ) format", KeyStroke.getKeyStroke('L', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				if (canNetBeSavedAndShowMessage()) {
+                    Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
+				}
+			}
+		});
+
+
+		exportMenu.add(exportToPNMLAction = new GuiAction("PNML", "Export the net to PNML format", KeyStroke.getKeyStroke('D', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				if (canNetBeSavedAndShowMessage()) {
+                    if(Preferences.getInstance().getShowPNMLWarning()) {
+                            JCheckBox showAgain = new JCheckBox("Do not show this warning.");
+                            String message = "In the saved PNML all timing information will be lost\n" +
+                                    	"and the components in the net will be merged into one big net.";
+                            Object[] dialogContent = {message, showAgain};
+                            JOptionPane.showMessageDialog(null, dialogContent, 
+                                    "PNML loss of information", JOptionPane.WARNING_MESSAGE);
+                            Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
+                    }
+                    Export.exportGuiView(appView, Export.PNML, null);
+				}
+			}
+		});
+		
+		
+		exportMenu.add(exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
 					Export.exportGuiView(appView, Export.QUERY, null);
 				}
-			} else if (this == exportPSAction) {
-                                if (canNetBeSavedAndShowMessage()) {
-                                        Export.exportGuiView(appView, Export.POSTSCRIPT, null);
-                                }
-			} else if (this == printAction) {
-				Export.exportGuiView(appView, Export.PRINTER, null);
-			} else if(this == exportTraceAction){
-				TraceImportExport.exportTrace();
-			} else if(this == importTraceAction){
-                                TraceImportExport.importTrace();
 			}
+		});
+
+
+		fileMenu.add(exportMenu);
+
+		fileMenu.addSeparator();
+		fileMenu.add(printAction = new GuiAction("Print", "Print", KeyStroke.getKeyStroke('P', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				Export.exportGuiView(appView, Export.PRINTER, null);
+			}
+		});
+		
+		fileMenu.addSeparator();
+
+		// Loads example files, retuns null if not found
+		String[] nets = loadTestNets();
+
+		// Oliver Haggarty - fixed code here so that if folder contains non
+		// .xml file the Example x counter is not incremented when that file
+		// is ignored
+		if (nets != null && nets.length > 0) {
+			JMenu exampleMenu = new JMenu("Example nets");
+			exampleMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Example.png")));
+			
+			for (String filename : nets) {
+				if (filename.toLowerCase().endsWith(".xml")) {
+					
+					String netname = filename.replace(".xml", "");
+					
+					GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
+						public void actionPerformed(ActionEvent arg0) {
+							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filename);
+							createNewTabFromFile(file, filename);
+						}
+					};
+					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
+							.getContextClassLoader().getResource(
+									CreateGui.imgPath + "Net.png")));
+					exampleMenu.add(tmp);
+				}
+			}
+			fileMenu.add(exampleMenu);
+			fileMenu.addSeparator();
 		}
 
+		fileMenu.add(exitAction = new GuiAction("Exit", "Close the program", KeyStroke.getKeyStroke('Q', shortcutkey)) {
+			public void actionPerformed(ActionEvent arg0) {
+				exit();
+			}
+		});
+
+		return fileMenu;
 	}
+
+	/**
+	 * The function loads the example nets as InputStream from the resources
+	 * Notice the check for if we are inside a jar file, as files inside a jar cant
+	 * be listed in the normal way.
+	 * 
+	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk>, 2011-06-27
+	 */
+	private String[] loadTestNets() {
+		
+		
+		String[] nets = null;
+
+		try {
+			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
+			if (dirURL != null && dirURL.getProtocol().equals("file")) {
+				/* A file path: easy enough */
+				nets = new File(dirURL.toURI()).list();
+			}
+
+			if (dirURL == null) {
+				/*
+				 * In case of a jar file, we can't actually find a directory. Have to assume the
+				 * same jar as clazz.
+				 */
+				String me = this.getName().replace(".", "/") + ".class";
+				dirURL = Thread.currentThread().getContextClassLoader().getResource(me);
+			}
+
+			if (dirURL.getProtocol().equals("jar")) {
+				/* A JAR path */
+				String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); // strip out only the JAR
+																								// file
+				JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+				Enumeration<JarEntry> entries = jar.entries(); // gives ALL entries in jar
+				Set<String> result = new HashSet<String>(); // avoid duplicates in case it is a subdirectory
+				while (entries.hasMoreElements()) {
+					String name = entries.nextElement().getName();
+					if (name.startsWith("resources/Example nets/")) { // filter according to the path
+						String entry = name.substring("resources/Example nets/".length());
+						int checkSubdir = entry.indexOf('/');
+						if (checkSubdir >= 0) {
+							// if it is a subdirectory, we just return the directory name
+							entry = entry.substring(0, checkSubdir);
+						}
+						result.add(entry);
+					}
+				}
+				nets = result.toArray(new String[result.size()]);
+			}
+
+			Arrays.sort(nets, new Comparator<String>() {
+				public int compare(String one, String two) {
+
+					int toReturn = one.compareTo(two);
+					// Special hack to get intro-example first
+					if (one.equals("intro-example.xml")) {
+						toReturn = -1;
+					}
+					if (two.equals("intro-example.xml")) {
+						toReturn = 1;
+					}
+					return toReturn;
+				}
+			});
+		} catch (Exception e) {
+			Logger.log("Error getting example files:" + e);
+			e.printStackTrace();
+		}
+		return nets;
+	}
+	
 
 	class EditAction extends GuiAction {
 

@@ -28,13 +28,16 @@ public abstract class GuiAction extends AbstractAction {
 	 */
 	private static final long serialVersionUID = 2625265285612924719L;
 
+	public GuiAction(String name, String tooltip) {
+		this(name, tooltip, (KeyStroke)null);
+	}
+
 	public GuiAction(String name, String tooltip, String keystroke) {
 
 		super(name);
 		URL iconURL = null;
 
-		iconURL = Thread.currentThread().getContextClassLoader().getResource(
-				CreateGui.imgPath + name + ".png");
+		iconURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png");
 
 		if (iconURL != null) {
 			putValue(SMALL_ICON, new ImageIcon(iconURL));
@@ -49,8 +52,7 @@ public abstract class GuiAction extends AbstractAction {
 		}
 	}
 
-	public GuiAction(String name, String tooltip, String keystroke,
-			boolean toggleable) {
+	public GuiAction(String name, String tooltip, String keystroke, boolean toggleable) {
 		this(name, tooltip, keystroke);
 		putValue("selected", new Boolean(false));
 	}
@@ -59,8 +61,7 @@ public abstract class GuiAction extends AbstractAction {
 		super(name);
 		URL iconURL = null;
 
-		iconURL = Thread.currentThread().getContextClassLoader().getResource(
-				CreateGui.imgPath + name + ".png");
+		iconURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png");
 
 		if (iconURL != null) {
 			putValue(SMALL_ICON, new ImageIcon(iconURL));
