@@ -122,8 +122,6 @@ public class GuiFrame extends JFrame implements Observer {
         importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
         exportToPNMLAction, exportToXMLAction, exportTraceAction, importTraceAction;
 
-	private VerificationAction runUppaalVerification;
-
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction, stripTimeDialogAction;
@@ -2205,26 +2203,6 @@ public class GuiFrame extends JFrame implements Observer {
 			double factor = equals(incSpacingAction)? 1.25 : 0.8;
 			changeSpacing(factor);
 			appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
-		}
-
-	}
-
-	class VerificationAction extends GuiAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 4588356505465429153L;
-
-		VerificationAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			if (this == runUppaalVerification) {
-				throw new RuntimeException("Dont think this is used");// QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.VerifyNow,
-				// null);
-			}
 		}
 
 	}
