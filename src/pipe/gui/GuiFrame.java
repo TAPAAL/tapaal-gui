@@ -420,7 +420,6 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.add(incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ",
 				KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				double factor = 1.25;
 				changeSpacing(factor);
 				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
