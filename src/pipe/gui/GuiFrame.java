@@ -528,24 +528,24 @@ public class GuiFrame extends JFrame implements Observer {
 		helpMenu.setMnemonic('H');
 
 		helpMenu.add( showHomepage = new HelpAction("Visit TAPAAL home",
-				453257, "Visit the TAPAAL homepage", "_"));
+				"Visit the TAPAAL homepage", "_"));
 
 		helpMenu.add( checkUpdate = new HelpAction("Check for updates",
-				463257, "Check if there is a new version of TAPAAL", "_"));
+				"Check if there is a new version of TAPAAL", "_"));
 
 		helpMenu.addSeparator();
 
 		helpMenu.add( showFAQAction = new HelpAction("Show FAQ",
-				454256, "See TAPAAL frequently asked questions", "_"));
+				"See TAPAAL frequently asked questions", "_"));
 		helpMenu.add( showAskQuestionAction = new HelpAction("Ask a question",
-				453256, "Ask a question about TAPAAL", "_"));
+				"Ask a question about TAPAAL", "_"));
 		helpMenu.add( showReportBugAction = new HelpAction("Report bug",
-				453254, "Report a bug in TAPAAL", "_"));
+				"Report a bug in TAPAAL", "_"));
 
 		helpMenu.addSeparator();
 
 		helpMenu.add( showAboutAction = new HelpAction("About",
-				453246, "Show the About menu", "_"));
+				"Show the About menu", "_"));
 
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
@@ -2309,7 +2309,7 @@ public class GuiFrame extends JFrame implements Observer {
 	class HelpAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454639L;
-		HelpAction(String name, int typeID, String tooltip, String keystroke) {
+		HelpAction(String name, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke, false);
 		}
 
