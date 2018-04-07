@@ -134,7 +134,7 @@ public class GuiFrame extends JFrame implements Observer {
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, timedPlaceAction;
 	private ViewAction showTokenAgeAction, showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction, showDelayEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
-	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
+	private GuiAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
 	private JMenuItem statistics;
 	private JMenuItem verification;
@@ -527,25 +527,44 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu helpMenu = new JMenu("Help");
 		helpMenu.setMnemonic('H');
 
-		helpMenu.add( showHomepage = new HelpAction("Visit TAPAAL home",
-				"Visit the TAPAAL homepage", "_"));
+		helpMenu.add(showHomepage = new GuiAction("Visit TAPAAL home", "Visit the TAPAAL homepage") {
+			public void actionPerformed(ActionEvent arg0) {
+				showInBrowser("http://www.tapaal.net");
+			}
+		});
 
-		helpMenu.add( checkUpdate = new HelpAction("Check for updates",
-				"Check if there is a new version of TAPAAL", "_"));
-
-		helpMenu.addSeparator();
-
-		helpMenu.add( showFAQAction = new HelpAction("Show FAQ",
-				"See TAPAAL frequently asked questions", "_"));
-		helpMenu.add( showAskQuestionAction = new HelpAction("Ask a question",
-				"Ask a question about TAPAAL", "_"));
-		helpMenu.add( showReportBugAction = new HelpAction("Report bug",
-				"Report a bug in TAPAAL", "_"));
+		helpMenu.add(checkUpdate = new GuiAction("Check for updates", "Check if there is a new version of TAPAAL") {
+			public void actionPerformed(ActionEvent arg0) {
+				pipe.gui.CreateGui.checkForUpdate(true);
+			}
+		});
 
 		helpMenu.addSeparator();
 
-		helpMenu.add( showAboutAction = new HelpAction("About",
-				"Show the About menu", "_"));
+		helpMenu.add(showFAQAction = new GuiAction("Show FAQ", "See TAPAAL frequently asked questions", "_") {
+			public void actionPerformed(ActionEvent arg0) {
+				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
+			}
+		});
+		helpMenu.add(showAskQuestionAction = new GuiAction("Ask a question", "Ask a question about TAPAAL", "_") {
+			public void actionPerformed(ActionEvent arg0) {
+				showInBrowser("https://answers.launchpad.net/tapaal/+addquestion");
+
+			}
+		});
+		helpMenu.add(showReportBugAction = new GuiAction("Report bug", "Report a bug in TAPAAL", "_") {
+			public void actionPerformed(ActionEvent arg0) {
+				showInBrowser("https://bugs.launchpad.net/tapaal/+filebug");
+			}
+		});
+
+		helpMenu.addSeparator();
+
+		helpMenu.add(showAboutAction = new GuiAction("About", "Show the About menu", "_") {
+			public void actionPerformed(ActionEvent arg0) {
+				showAbout();
+			}
+		});
 
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
@@ -2306,33 +2325,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
-	class HelpAction extends GuiAction {
 
-		private static final long serialVersionUID = -5145846750992454639L;
-		HelpAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke, false);
-		}
-
-
-		public void actionPerformed(ActionEvent e) {
-			if (this == showAboutAction){
-				showAbout();
-			} else if (this == showAskQuestionAction){ 
-				showInBrowser("https://answers.launchpad.net/tapaal/+addquestion");
-			} else if (this == showReportBugAction){
-				showInBrowser("https://bugs.launchpad.net/tapaal/+filebug");
-			} else if (this == showFAQAction){
-				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
-			} else if (this == showHomepage){
-				showInBrowser("http://www.tapaal.net");
-			} else if (this == checkUpdate) {
-				pipe.gui.CreateGui.checkForUpdate(true);
-			}
-		}
-
-
-
-	}
 
 
 	public void exit(){
