@@ -324,7 +324,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
-		JMenu fileMenu = buildMenuFiles(shortcutkey);
+		
 
 
 		
@@ -510,20 +510,25 @@ public class GuiFrame extends JFrame implements Observer {
 			}		
 		});
 
-		/*
-		 * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
-		 * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
-		 * addMenuItem(animateMenu, randomAnimateAction = new
-		 * AnimateAction("Simulate", Pipe.ANIMATE,
-		 * "Randomly fire a number of transitions", "typed 7",true));
-		 */
 		randomAction = new AnimateAction("Random", ElementType.RANDOM,
 				"Randomly fire a transition", "typed 5");
 		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
 				"Randomly fire a number of transitions", "typed 7", true);
 
 
-		/* The help part */
+		menuBar.add(buildMenuFiles(shortcutkey));
+		menuBar.add(editMenu);
+		menuBar.add(viewMenu);
+		menuBar.add(drawMenu);
+		menuBar.add(animateMenu);
+		menuBar.add(buildToolsMenu());
+		menuBar.add(buildMenuHelp());
+
+		setJMenuBar(menuBar);
+
+	}
+
+	private JMenu buildMenuHelp() {
 		JMenu helpMenu = new JMenu("Help");
 		helpMenu.setMnemonic('H');
 
@@ -541,18 +546,17 @@ public class GuiFrame extends JFrame implements Observer {
 
 		helpMenu.addSeparator();
 
-		helpMenu.add(showFAQAction = new GuiAction("Show FAQ", "See TAPAAL frequently asked questions", "_") {
+		helpMenu.add(showFAQAction = new GuiAction("Show FAQ", "See TAPAAL frequently asked questions") {
 			public void actionPerformed(ActionEvent arg0) {
 				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
 			}
 		});
-		helpMenu.add(showAskQuestionAction = new GuiAction("Ask a question", "Ask a question about TAPAAL", "_") {
+		helpMenu.add(showAskQuestionAction = new GuiAction("Ask a question", "Ask a question about TAPAAL") {
 			public void actionPerformed(ActionEvent arg0) {
 				showInBrowser("https://answers.launchpad.net/tapaal/+addquestion");
-
 			}
 		});
-		helpMenu.add(showReportBugAction = new GuiAction("Report bug", "Report a bug in TAPAAL", "_") {
+		helpMenu.add(showReportBugAction = new GuiAction("Report bug", "Report a bug in TAPAAL") {
 			public void actionPerformed(ActionEvent arg0) {
 				showInBrowser("https://bugs.launchpad.net/tapaal/+filebug");
 			}
@@ -560,22 +564,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 		helpMenu.addSeparator();
 
-		helpMenu.add(showAboutAction = new GuiAction("About", "Show the About menu", "_") {
+		helpMenu.add(showAboutAction = new GuiAction("About", "Show the About menu") {
 			public void actionPerformed(ActionEvent arg0) {
 				showAbout();
 			}
 		});
-
-		menuBar.add(fileMenu);
-		menuBar.add(editMenu);
-		menuBar.add(viewMenu);
-		menuBar.add(drawMenu);
-		menuBar.add(animateMenu);
-		menuBar.add(buildToolsMenu());
-		menuBar.add(helpMenu);
-
-		setJMenuBar(menuBar);
-
+		return helpMenu;
 	}
 
 	
