@@ -326,23 +326,23 @@ public class GuiFrame extends JFrame implements Observer {
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-		addMenuItem(fileMenu, createAction = new FileAction("New",
+		fileMenu.add(createAction = new FileAction("New",
 				"Create a new Petri net", "ctrl N"));
 		createAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('N', shortcutkey));
 
-		addMenuItem(fileMenu, openAction = new FileAction("Open", "Open",
+		fileMenu.add( openAction = new FileAction("Open", "Open",
 				"ctrl O"));
 		openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('O', shortcutkey));
 
-		addMenuItem(fileMenu, closeAction = new FileAction("Close",
+		fileMenu.add( closeAction = new FileAction("Close",
 				"Close the current tab", "ctrl W"));
 		closeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('W', shortcutkey));
 		fileMenu.addSeparator();
 
-		addMenuItem(fileMenu, saveAction = new FileAction("Save", "Save",
+		fileMenu.add( saveAction = new FileAction("Save", "Save",
 				"ctrl S"));
 		saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', shortcutkey));
-		addMenuItem(fileMenu, saveAsAction = new FileAction("Save as",
+		fileMenu.add( saveAsAction = new FileAction("Save as",
 				"Save as...", null));
 		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK)));
 
@@ -353,15 +353,15 @@ public class GuiFrame extends JFrame implements Observer {
 		importMenu.setIcon(new ImageIcon(Thread.currentThread()
 				.getContextClassLoader().getResource(
 						CreateGui.imgPath + "Export.png")));
-		addMenuItem(importMenu, importPNMLAction = new FileAction("PNML untimed net",
+		importMenu.add( importPNMLAction = new FileAction("PNML untimed net",
 				"Import an untimed net in the PNML format", "ctrl X"));
 		importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('X', shortcutkey));
 
-		addMenuItem(importMenu, importSUMOAction = new FileAction("SUMO queries (.txt)", 
+		importMenu.add(importSUMOAction = new FileAction("SUMO queries (.txt)", 
 				"Import SUMO queries in a plain text format",""));
 		//importSUMOAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
 
-		addMenuItem(importMenu, importXMLAction = new FileAction("XML queries (.xml)", 
+		importMenu.add(importXMLAction = new FileAction("XML queries (.xml)", 
 				"Import MCC queries in XML format", "ctrl R"));
 		importXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', shortcutkey));
 
@@ -373,26 +373,26 @@ public class GuiFrame extends JFrame implements Observer {
 		exportMenu.setIcon(new ImageIcon(Thread.currentThread()
 				.getContextClassLoader().getResource(
 						CreateGui.imgPath + "Export.png")));
-		addMenuItem(exportMenu, exportPNGAction = new FileAction("PNG",
+		exportMenu.add( exportPNGAction = new FileAction("PNG",
 				"Export the net to PNG format", "ctrl G"));
 		exportPNGAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('G', shortcutkey));
-		addMenuItem(exportMenu, exportPSAction = new FileAction("PostScript",
+		exportMenu.add( exportPSAction = new FileAction("PostScript",
 				"Export the net to PostScript format", "ctrl T"));
 		exportPSAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('T', shortcutkey));
-		addMenuItem(exportMenu, exportToTikZAction = new FileAction("TikZ",
+		exportMenu.add( exportToTikZAction = new FileAction("TikZ",
 				"Export the net to LaTex (TikZ) format", "ctrl L"));
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
-		addMenuItem(exportMenu, exportToPNMLAction = new FileAction("PNML",
+		exportMenu.add( exportToPNMLAction = new FileAction("PNML",
 				"Export the net to PNML format", "ctrl D"));
 		exportToPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('D', shortcutkey));
-		addMenuItem(exportMenu, exportToXMLAction = new FileAction("XML Queries",
+		exportMenu.add( exportToXMLAction = new FileAction("XML Queries",
 				"Export the queries to XML format", "ctrl H"));
 		exportToXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('H', shortcutkey));
 		
 		fileMenu.add(exportMenu);
 
 		fileMenu.addSeparator();
-		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
+		fileMenu.add( printAction = new FileAction("Print", "Print",
 				"ctrl P"));
 		printAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('P', shortcutkey));
 		fileMenu.addSeparator();
@@ -482,7 +482,7 @@ public class GuiFrame extends JFrame implements Observer {
 						}
 						k++;
 
-						addMenuItem(exampleMenu, tmp);
+						exampleMenu.add(tmp);
 					}
 				}
 				fileMenu.add(exampleMenu);
@@ -492,22 +492,22 @@ public class GuiFrame extends JFrame implements Observer {
 			Logger.log("Error getting example files:" + e);
 			e.printStackTrace();
 		}
-		addMenuItem(fileMenu, exitAction = new FileAction("Exit",
+		fileMenu.add(exitAction = new FileAction("Exit",
 				"Close the program", "ctrl Q"));
 		exitAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Q', shortcutkey));
 
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
-		addMenuItem(editMenu, undoAction = new EditAction("Undo",
+		fileMenu.add( undoAction = new EditAction("Undo",
 				"Undo", "ctrl Z"));
 		undoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Z', shortcutkey));
-		addMenuItem(editMenu, redoAction = new EditAction("Redo",
+		fileMenu.add( redoAction = new EditAction("Redo",
 				"Redo", "ctrl Y"));
 		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
 		editMenu.addSeparator();
 
-		addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
+		fileMenu.add( deleteAction = new DeleteAction("Delete",
 				"Delete selection", "DELETE"));
 
 		// Bind delete to backspace also
@@ -518,35 +518,35 @@ public class GuiFrame extends JFrame implements Observer {
 		/* Draw menu */
 		JMenu drawMenu = new JMenu("Draw");
 		drawMenu.setMnemonic('D');
-		addMenuItem(drawMenu, selectAction = new TypeAction("Select",
+		drawMenu.add( selectAction = new TypeAction("Select",
 				ElementType.SELECT, "Select components (S)", "S", true));
 		drawMenu.addSeparator();
 
-		addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
+		drawMenu.add( timedPlaceAction = new TypeAction("Place",
 				ElementType.TAPNPLACE, "Add a place (P)", "P", true));
 
-		addMenuItem(drawMenu, transAction = new TypeAction("Transition",
+		drawMenu.add( transAction = new TypeAction("Transition",
 				ElementType.TAPNTRANS, "Add a transition (T)", "T", true));
 
-		addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
+		drawMenu.add( timedArcAction = new TypeAction("Arc",
 				ElementType.TAPNARC, "Add an arc (A)", "A", true));
 
-		addMenuItem(drawMenu, transportArcAction = new TypeAction(
+		drawMenu.add( transportArcAction = new TypeAction(
 				"Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
 				true));
 
-		addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor arc",
+		drawMenu.add( inhibarcAction = new TypeAction("Inhibitor arc",
 				ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
-		addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
+		drawMenu.add(annotationAction = new TypeAction("Annotation",
 				ElementType.ANNOTATION, "Add an annotation (N)", "N", true));
 
 		drawMenu.addSeparator();
 
-		addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
+		drawMenu.add( tokenAction = new TypeAction("Add token",
 				ElementType.ADDTOKEN, "Add a token (+)", "typed +", true));
 
-		addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
+		drawMenu.add( deleteTokenAction = new TypeAction(
 				"Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
 				true));
 
@@ -560,29 +560,29 @@ public class GuiFrame extends JFrame implements Observer {
 						CreateGui.imgPath + "Zoom.png")));
 		addZoomMenuItems(zoomMenu);
 
-		addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
+		viewMenu.add( zoomInAction = new ZoomAction("Zoom in",
 				"Zoom in by 10% ", "ctrl J"));
 		zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("J").getKeyCode(), shortcutkey));
 
-		addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
+		viewMenu.add( zoomOutAction = new ZoomAction("Zoom out",
 				"Zoom out by 10% ", "ctrl K"));
 		zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("K").getKeyCode(), shortcutkey));
 		viewMenu.add(zoomMenu);
 
 		viewMenu.addSeparator();
 		
-		addMenuItem(viewMenu, incSpacingAction = new SpacingAction("Increase node spacing",
+		viewMenu.add( incSpacingAction = new SpacingAction("Increase node spacing",
 				"Increase spacing by 20% ", null));
 		incSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("U").getKeyCode(), shortcutkey));
 		
-		addMenuItem(viewMenu, decSpacingAction = new SpacingAction("Decrease node spacing",
+		viewMenu.add( decSpacingAction = new SpacingAction("Decrease node spacing",
 				"Decrease spacing by 20% ", null));
 		decSpacingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift U"));
 
 		
 		viewMenu.addSeparator();
 		
-		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
+		viewMenu.add( toggleGrid = new GridAction("Cycle grid",
 				"Change the grid size", "G"));
 
 		viewMenu.addSeparator();
@@ -629,39 +629,39 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 
-		addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
-		addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
-		addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
+		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
+		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
 
 		/* Simulator */
 		JMenu animateMenu = new JMenu("Simulator");
 		animateMenu.setMnemonic('A');
-		addMenuItem(animateMenu, startAction = new AnimateAction(
+		animateMenu.add( startAction = new AnimateAction(
 				"Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				"M", true));
-		addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
+		animateMenu.add( stepbackwardAction = new AnimateAction("Step backward",
 				ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
-		addMenuItem(animateMenu,
+		animateMenu.add(
 				stepforwardAction = new AnimateAction("Step forward",
 						ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
 
-		addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
+		animateMenu.add( timeAction = new AnimateAction("Delay one time unit",
 				ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 
-		addMenuItem(animateMenu, delayFireAction = new AnimateAction("Delay and fire",
+		animateMenu.add( delayFireAction = new AnimateAction("Delay and fire",
 				ElementType.DELAYFIRE, "Delay and fire selected transition", "F"));
 
-		addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
+		animateMenu.add( prevcomponentAction = new AnimateAction("Previous component",
 				ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
 
-		addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
+		animateMenu.add( nextcomponentAction = new AnimateAction("Next component",
 				ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
 
 		animateMenu.addSeparator();
 
-		addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
+		animateMenu.add( exportTraceAction = new FileAction("Export trace",
 				"Export the current trace",""));
-		addMenuItem(animateMenu, importTraceAction = new FileAction("Import trace",
+		animateMenu.add( importTraceAction = new FileAction("Import trace",
 				"Import trace to simulator",""));
 
 		/*
@@ -681,24 +681,24 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu helpMenu = new JMenu("Help");
 		helpMenu.setMnemonic('H');
 
-		addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
+		helpMenu.add( showHomepage = new HelpAction("Visit TAPAAL home",
 				453257, "Visit the TAPAAL homepage", "_"));
 
-		addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for updates",
+		helpMenu.add( checkUpdate = new HelpAction("Check for updates",
 				463257, "Check if there is a new version of TAPAAL", "_"));
 
 		helpMenu.addSeparator();
 
-		addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
+		helpMenu.add( showFAQAction = new HelpAction("Show FAQ",
 				454256, "See TAPAAL frequently asked questions", "_"));
-		addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a question",
+		helpMenu.add( showAskQuestionAction = new HelpAction("Ask a question",
 				453256, "Ask a question about TAPAAL", "_"));
-		addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report bug",
+		helpMenu.add( showReportBugAction = new HelpAction("Report bug",
 				453254, "Report a bug in TAPAAL", "_"));
 
 		helpMenu.addSeparator();
 
-		addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
+		helpMenu.add( showAboutAction = new HelpAction("About",
 				453246, "Show the About menu", "_"));
 
 		menuBar.add(fileMenu);
@@ -970,16 +970,6 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomComboBox.setAction(action);
 		zoomComboBox.setFocusable(false);
 		toolBar.add(zoomComboBox);
-	}
-
-	private JMenuItem addMenuItem(JMenu menu, Action action) {
-		JMenuItem item = menu.add(action);
-		KeyStroke keystroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-
-		if (keystroke != null) {
-			item.setAccelerator(keystroke);
-		}
-		return item;
 	}
 
 	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
