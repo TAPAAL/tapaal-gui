@@ -323,12 +323,20 @@ public class GuiFrame extends JFrame implements Observer {
 		menuBar = new JMenuBar();
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		
-		
 
+		menuBar.add(buildMenuFiles(shortcutkey));
+		menuBar.add(buildMenuEdit(shortcutkey));
+		menuBar.add(buildMenuView(shortcutkey));
+		menuBar.add(buildMenuDraw());
+		menuBar.add(buildMenuAnimation());
+		menuBar.add(buildMenuTools());
+		menuBar.add(buildMenuHelp());
 
-		
+		setJMenuBar(menuBar);
 
+	}
+
+	private JMenu buildMenuEdit(int shortcutkey) {
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
@@ -347,7 +355,10 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
 		editMenu.getActionMap().put("Delete", deleteAction);
+		return editMenu;
+	}
 
+	private JMenu buildMenuDraw() {
 		/* Draw menu */
 		JMenu drawMenu = new JMenu("Draw");
 		drawMenu.setMnemonic('D');
@@ -382,7 +393,10 @@ public class GuiFrame extends JFrame implements Observer {
 		drawMenu.add( deleteTokenAction = new TypeAction(
 				"Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
 				true));
+		return drawMenu;
+	}
 
+	private JMenu buildMenuView(int shortcutkey) {
 		/* ViewMenu */
 		JMenu viewMenu = new JMenu("View");
 		viewMenu.setMnemonic('V');
@@ -470,7 +484,10 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", "Show only the most important panels", "", false));
 		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", "Show all panels", "", false));
 		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", "Save the current workspace as the default one", "", false));
+		return viewMenu;
+	}
 
+	private JMenu buildMenuAnimation() {
 		/* Simulator */
 		JMenu animateMenu = new JMenu("Simulator");
 		animateMenu.setMnemonic('A');
@@ -514,18 +531,7 @@ public class GuiFrame extends JFrame implements Observer {
 				"Randomly fire a transition", "typed 5");
 		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
 				"Randomly fire a number of transitions", "typed 7", true);
-
-
-		menuBar.add(buildMenuFiles(shortcutkey));
-		menuBar.add(editMenu);
-		menuBar.add(viewMenu);
-		menuBar.add(drawMenu);
-		menuBar.add(animateMenu);
-		menuBar.add(buildToolsMenu());
-		menuBar.add(buildMenuHelp());
-
-		setJMenuBar(menuBar);
-
+		return animateMenu;
 	}
 
 	private JMenu buildMenuHelp() {
@@ -574,7 +580,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	
 
-	private JMenu buildToolsMenu() {
+	private JMenu buildMenuTools() {
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic('t');
 
