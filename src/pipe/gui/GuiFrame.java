@@ -333,11 +333,11 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
 		editMenu.add( undoAction = new EditAction("Undo",
-				"Undo", "ctrl Z"));
-		undoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Z', shortcutkey));
+				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)));
+		
+		
 		editMenu.add( redoAction = new EditAction("Redo",
-				"Redo", "ctrl Y"));
-		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
+				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)));
 		editMenu.addSeparator();
 
 		editMenu.add( deleteAction = new GuiAction("Delete", "Delete selection", "DELETE") {
@@ -411,6 +411,7 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
 		editMenu.getActionMap().put("Delete", deleteAction);
+		
 		return editMenu;
 	}
 
@@ -2592,6 +2593,9 @@ public class GuiFrame extends JFrame implements Observer {
 		private static final long serialVersionUID = 2402602825981305085L;
 
 		EditAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+		EditAction(String name, String tooltip, KeyStroke keystroke) {
 			super(name, tooltip, keystroke);
 		}
 
