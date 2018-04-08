@@ -27,8 +27,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
-
-
 public class CreateGui {
 
 	public static GuiFrame appGui;
@@ -43,9 +41,8 @@ public class CreateGui {
 
 	public static String imgPath, userPath; // useful for stuff
 	
-	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
+	public static Integer MaximalNumberOfTokensAllowed = 999;
 
-	
 	public static void checkForUpdate(boolean forcecheck) {
 		final VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion(forcecheck))  {
@@ -93,7 +90,6 @@ public class CreateGui {
 					dialog.setVisible(false);
 					dialog.dispose();
 					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
-				//    appGui.exit();
 				}
 			});
 		    ignoreButton.addActionListener(new ActionListener() {
@@ -115,8 +111,7 @@ public class CreateGui {
 		
 		imgPath = "resources/Images/";
 
-		// make the initial dir for browsing be My Documents (win), ~ (*nix),
-		// etc
+		// make the initial dir for browsing be My Documents (win), ~ (*nix), etc
 		userPath = null;
 
 		appGui = new GuiFrame(TAPAAL.getProgramName());
@@ -128,28 +123,11 @@ public class CreateGui {
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
-		
-		//TODO
-		/*
-		appTab.addChangeListener(new ChangeListener() {
-			int oldIndex = 0;
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				Split model = getTab(oldIndex).getModelRoot();
-				getCurrentTab().setModelRoot(model);
-				oldIndex = appTab.getSelectedIndex();
-			}
-		});
-		*/
-		
-
 		animator = new Animator();
 
 		appGui.setTab(); // sets Tab properties
 
 		appGui.getContentPane().add(appTab);
-
-		// appGui.createNewTabFromFile(null);
 
 		appGui.setVisible(true);
 		appGui.activateSelectAction();
@@ -271,7 +249,6 @@ public class CreateGui {
 	public static AnimationHistoryComponent getAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getUntimedAnimationHistory();
-
 	}
 
 	public static void addAbstractAnimationPane() {
@@ -282,35 +259,17 @@ public class CreateGui {
 	public static AnimationController getAnimationController() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getAnimationController();
-
 	}
-	
-	
+		
 	public static TransitionFireingComponent getTransitionFireingComponent() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getTransitionFireingComponent();
-
 	}	
 
 	public static void removeAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		tab.removeAbstractAnimationPane();
 	}
-
-	// public static void addAnimationController() {
-	// TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-	// //tab.addAnimationController();
-	// }
-
-	// public static void removeAnimationHistory() {
-	// TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-	// tab.removeAnimationHistory();
-	// }
-	//	
-	// public static void removeAnimationController() {
-	// TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-	// tab.removeAnimationController();
-	// }
 
 	public static AnimationHistoryComponent getAnimationHistory() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
