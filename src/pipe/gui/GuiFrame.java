@@ -153,12 +153,6 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
-	private JCheckBoxMenuItem showComponentsCheckBox;
-	private JCheckBoxMenuItem showQueriesCheckBox;
-	private JCheckBoxMenuItem showEnabledTransitionsCheckBox;
-	private JCheckBoxMenuItem showDelayEnabledTransitionsCheckBox;
-	private JCheckBoxMenuItem showConstantsCheckBox;
-	private JCheckBoxMenuItem showToolTipsCheckBox;
 	private JCheckBoxMenuItem showTokenAgeCheckBox;
 
 	private boolean showComponents = true;
@@ -515,19 +509,19 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.addSeparator();
 
 		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.", KeyStroke.getKeyStroke('1', shortcutkey), true);
-		showComponentsCheckBox = addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
+		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
 		
 		
-		showQueriesCheckBox = addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
+		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
 				 "Show/hide verification queries.", KeyStroke.getKeyStroke('2', shortcutkey), true));
 
-		showConstantsCheckBox = addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
+		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
 				 "Show/hide global constants.", KeyStroke.getKeyStroke('3', shortcutkey), true));
 
-		showEnabledTransitionsCheckBox = addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
+		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
 				 "Show/hide the list of enabled transitions",KeyStroke.getKeyStroke('4', shortcutkey),true));
 
-		showDelayEnabledTransitionsCheckBox = addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
+		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
 				 "Highlight transitions which can be enabled after a delay",KeyStroke.getKeyStroke('5', shortcutkey),true)
 				);
 
@@ -535,7 +529,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.",KeyStroke.getKeyStroke('6', shortcutkey),true)
 				);
 
-		showToolTipsCheckBox =addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
+		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
 				"Show/hide tool tips when mouse is over an element",KeyStroke.getKeyStroke('7', shortcutkey),true)
 				 );
 
@@ -1171,7 +1165,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showQueries(boolean enable){
 		showQueries = enable;
 		CreateGui.getCurrentTab().showQueries(enable);
-		showQueriesCheckBox.setSelected(enable);
+
 	}
 	public void toggleQueries(){
 		showQueries(!showQueries);
@@ -1180,7 +1174,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showConstants(boolean enable){
 		showConstants = enable;
 		CreateGui.getCurrentTab().showConstantsPanel(enable);
-		showConstantsCheckBox.setSelected(enable);
+
 	}
 	public void toggleConstants(){
 		showConstants(!showConstants);
@@ -1189,7 +1183,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showToolTips(boolean enable){
 		showToolTips = enable;
 		Preferences.getInstance().setShowToolTips(showToolTips);
-		showToolTipsCheckBox.setSelected(enable);
+
 		ToolTipManager.sharedInstance().setEnabled(enable);
 		ToolTipManager.sharedInstance().setInitialDelay(400);
 		ToolTipManager.sharedInstance().setReshowDelay(800);
@@ -1218,7 +1212,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showComponents(boolean enable){
 		showComponents = enable;
 		CreateGui.getCurrentTab().showComponents(enable);
-		showComponentsCheckBox.setSelected(enable);
+
 	}
 	public void toggleComponents(){
 		showComponents(!showComponents);
@@ -1227,7 +1221,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
 		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
-		showEnabledTransitionsCheckBox.setSelected(enable);
+
 	}
 	public void toggleEnabledTransitionsList(){
 		showEnabledTransitionsList(!showEnabledTransitions);
@@ -1236,7 +1230,6 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showDelayEnabledTransitions(boolean enable){
 		showDelayEnabledTransitions = enable;
 		CreateGui.getCurrentTab().showDelayEnabledTransitions(enable);
-		showDelayEnabledTransitionsCheckBox.setSelected(enable);
 	}
 	public void toggleDelayEnabledTransitions(){
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
