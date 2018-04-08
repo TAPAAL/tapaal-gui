@@ -1858,24 +1858,14 @@ public class GuiFrame extends JFrame implements Observer {
 			case STEPFORWARD:
 				animBox.stepForward();
 				CreateGui.getAnimator().stepForward();
-				// update mouseOverView
-				for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
-					if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
-						((TimedPlaceComponent) p).showAgeOfTokens(true);
-					}
-				}
+				updateMouseOverInformation();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case STEPBACKWARD:
 				animBox.stepBackwards();
 				CreateGui.getAnimator().stepBack();
-				// update mouseOverView
-				for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
-					if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
-						((TimedPlaceComponent) p).showAgeOfTokens(true);
-					}
-				}
+				updateMouseOverInformation();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 			case PREVCOMPONENT:
@@ -1887,6 +1877,16 @@ public class GuiFrame extends JFrame implements Observer {
 			default:
 				break;
 			}
+		}
+
+		private void updateMouseOverInformation() {
+			// update mouseOverView
+			for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
+				if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
+					((TimedPlaceComponent) p).showAgeOfTokens(true);
+				}
+			}
+			
 		}
 
 		private void actionStartAnimation() {
