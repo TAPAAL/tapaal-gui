@@ -604,7 +604,7 @@ Printable, DrawingSurface {
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(ElementType.FAST_TRANSITION);
+						app.setMode(ElementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -621,7 +621,7 @@ Printable, DrawingSurface {
 						app.setMode(ElementType.TAPNARC);
 						getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto2).mouseReleased(e);
-						app.setFastMode(ElementType.FAST_TRANSITION);
+						app.setMode(ElementType.FAST_TRANSITION);
 						// enter fast mode
 						pnObject.dispatchEvent(e);
 					}
@@ -634,7 +634,7 @@ Printable, DrawingSurface {
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(ElementType.FAST_PLACE);
+						app.setMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -651,7 +651,7 @@ Printable, DrawingSurface {
 						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
 						// enter fast mode
-						app.setFastMode(ElementType.FAST_PLACE);
+						app.setMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -706,7 +706,7 @@ Printable, DrawingSurface {
 						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
 						// enter fast mode
-						app.setFastMode(ElementType.FAST_PLACE);
+						app.setMode(ElementType.FAST_PLACE);
 					} else{
 						app.endFastMode();
 					}
@@ -725,7 +725,7 @@ Printable, DrawingSurface {
 						getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
 						// enter fast mode
-						app.setFastMode(ElementType.FAST_TRANSITION);
+						app.setMode(ElementType.FAST_TRANSITION);
 					} else{
 						app.endFastMode();
 					}

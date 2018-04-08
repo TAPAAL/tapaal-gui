@@ -108,7 +108,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private String frameTitle; // Frame title
 	private GuiFrame appGui;
 	private DrawingSurfaceImpl appView;
-	private Pipe.ElementType mode, prev_mode, old_mode; // *** mode WAS STATIC ***
+	private Pipe.ElementType mode, prev_mode; // *** mode WAS STATIC ***
 	private int newNameCounter = 1;
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
@@ -1691,10 +1691,6 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 
-	public void resetMode() {
-		setMode(old_mode);
-	}
-
 	public void endFastMode(){
 		if(timedPlaceAction.isSelected())
 			mode=ElementType.TAPNPLACE;
@@ -1702,11 +1698,6 @@ public class GuiFrame extends JFrame implements Observer {
 			mode=ElementType.TAPNTRANS;
 		else
 			mode=ElementType.SELECT;
-	}
-
-	public void setFastMode(Pipe.ElementType _mode) {
-		old_mode = mode;
-		setMode(_mode);
 	}
 
 	public void setMode(Pipe.ElementType _mode) {
