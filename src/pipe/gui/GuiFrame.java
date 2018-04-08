@@ -698,7 +698,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		toolsMenu.addSeparator();
 
-		//JMenuItem engineSelection = new JMenuItem("Verification engines");
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",null));
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
