@@ -509,34 +509,41 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 
-		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.", KeyStroke.getKeyStroke('1', shortcutkey), true);
+		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.",
+				KeyStroke.getKeyStroke('1', shortcutkey), true);
 		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
-		
-		
-		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
-				 "Show/hide verification queries.", KeyStroke.getKeyStroke('2', shortcutkey), true));
 
-		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
-				 "Show/hide global constants.", KeyStroke.getKeyStroke('3', shortcutkey), true));
+		showQueriesAction = new ViewAction("Display queries", "Show/hide verification queries.",
+				KeyStroke.getKeyStroke('2', shortcutkey), true);
+		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction);
 
-		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
-				 "Show/hide the list of enabled transitions",KeyStroke.getKeyStroke('4', shortcutkey),true));
+		showConstantsAction = new ViewAction("Display constants", "Show/hide global constants.",
+				KeyStroke.getKeyStroke('3', shortcutkey), true);
+		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction);
 
-		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
-				 "Highlight transitions which can be enabled after a delay",KeyStroke.getKeyStroke('5', shortcutkey),true)
-				);
+		showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
+				"Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true);
+		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction);
 
-		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.",KeyStroke.getKeyStroke('6', shortcutkey),true)
-				);
+		showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
+				"Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('5', shortcutkey),
+				true);
+		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction);
 
-		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
-				"Show/hide tool tips when mouse is over an element",KeyStroke.getKeyStroke('7', shortcutkey),true)
-				 );
+		showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				"Show/hide intervals [0,inf) that do not restrict transition firing in any way.",
+				KeyStroke.getKeyStroke('6', shortcutkey), true);
+		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(),
+				showZeroToInfinityIntervalsAction);
 
-		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
-						"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('8', shortcutkey),true)
-				);
+		showToolTipsAction = new ViewAction("Display tool tips", "Show/hide tool tips when mouse is over an element",
+				KeyStroke.getKeyStroke('7', shortcutkey), true);
+		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction);
+
+		showTokenAgeAction = new ViewAction("Display token age",
+				"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)",
+				KeyStroke.getKeyStroke('8', shortcutkey), true);
+		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction);
 
 		viewMenu.addSeparator();
 
