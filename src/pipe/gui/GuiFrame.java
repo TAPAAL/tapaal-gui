@@ -145,10 +145,6 @@ public class GuiFrame extends JFrame implements Observer {
 	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
 	randomAction, randomAnimateAction, timeAction, delayFireAction, prevcomponentAction, nextcomponentAction;
 
-	public boolean dragging = false;
-
-	private boolean editionAllowed = true;
-
 	public enum GUIMode {
 		draw, animation, noNet
 	}
@@ -1620,7 +1616,6 @@ public class GuiFrame extends JFrame implements Observer {
 			startAction.setSelected(false);
 			CreateGui.getView().changeAnimationMode(false);
 
-			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
 				CreateGui.getAnimator().restoreModel();
@@ -1653,7 +1648,6 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getAnimator().reportBlockingPlaces();
 			CreateGui.getAnimator().setFiringmode("Random");
 
-			setEditionAllowed(false);
 			statusBar.changeText(statusBar.textforAnimation);
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
@@ -1770,12 +1764,9 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public boolean isEditionAllowed() {
-		return editionAllowed;
+		return getGUIMode() == GUIMode.draw;
 	}
 
-	public void setEditionAllowed(boolean flag) {
-		editionAllowed = flag;
-	}
 
 	public void setUndoActionEnabled(boolean flag) {
 		undoAction.setEnabled(flag);
