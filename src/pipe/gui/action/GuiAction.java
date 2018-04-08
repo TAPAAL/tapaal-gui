@@ -103,7 +103,7 @@ public abstract class GuiAction extends AbstractAction {
 		if (b != null) {
 			return b.booleanValue();
 		}
-		return false; // default
+		return false;
 	}
 
 	public void setSelected(boolean selected) {
