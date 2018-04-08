@@ -514,43 +514,34 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 
-		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.", "ctrl 1", true);
-		showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
-
+		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.", KeyStroke.getKeyStroke('1', shortcutkey), true);
 		showComponentsCheckBox = addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
 		
 		
 		showQueriesCheckBox = addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
-				 "Show/hide verification queries.", "ctrl 2", true));
-		showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
+				 "Show/hide verification queries.", KeyStroke.getKeyStroke('2', shortcutkey), true));
 
 		showConstantsCheckBox = addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
-				 "Show/hide global constants.", "ctrl 3", true));
-		showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
+				 "Show/hide global constants.", KeyStroke.getKeyStroke('3', shortcutkey), true));
 
 		showEnabledTransitionsCheckBox = addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
-				 "Show/hide the list of enabled transitions","ctrl 4",true));
-		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
+				 "Show/hide the list of enabled transitions",KeyStroke.getKeyStroke('4', shortcutkey),true));
 
 		showDelayEnabledTransitionsCheckBox = addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
-				 "Highlight transitions which can be enabled after a delay","ctrl 5",true)
+				 "Highlight transitions which can be enabled after a delay",KeyStroke.getKeyStroke('5', shortcutkey),true)
 				);
-		showDelayEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
 		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true)
+				 "Show/hide intervals [0,inf) that do not restrict transition firing in any way.",KeyStroke.getKeyStroke('6', shortcutkey),true)
 				);
-		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
 		showToolTipsCheckBox =addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
-				"Show/hide tool tips when mouse is over an element","ctrl 7",true)
+				"Show/hide tool tips when mouse is over an element",KeyStroke.getKeyStroke('7', shortcutkey),true)
 				 );
-		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('7', shortcutkey));
 
 		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction = new ViewAction("Display token age",
-						"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)","ctrl 8",true)
+						"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('8', shortcutkey),true)
 				);
-		showTokenAgeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('8', shortcutkey));
 
 		viewMenu.addSeparator();
 
@@ -567,6 +558,8 @@ public class GuiFrame extends JFrame implements Observer {
 		animateMenu.add( startAction = new AnimateAction(
 				"Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				"M", true));
+		
+		
 		animateMenu.add( stepbackwardAction = new AnimateAction("Step backward",
 				ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
 		animateMenu.add(
@@ -2201,8 +2194,12 @@ public class GuiFrame extends JFrame implements Observer {
 	class ViewAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454638L;
-		ViewAction(String name, String tooltip, String keystroke,
-				boolean toggleable) {
+
+		ViewAction(String name, String tooltip, String keystroke, boolean toggleable) {
+			super(name, tooltip, keystroke, toggleable);
+		}
+
+		ViewAction(String name, String tooltip, KeyStroke keystroke, boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 		}
 
