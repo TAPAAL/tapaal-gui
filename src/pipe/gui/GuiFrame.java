@@ -466,12 +466,10 @@ public class GuiFrame extends JFrame implements Observer {
 		addZoomMenuItems(zoomMenu);
 
 		viewMenu.add( zoomInAction = new ZoomAction("Zoom in",
-				"Zoom in by 10% ", "ctrl J"));
-		zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('J', shortcutkey));
+				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)));
 
 		viewMenu.add( zoomOutAction = new ZoomAction("Zoom out",
-				"Zoom out by 10% ", "ctrl K"));
-		zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('K', shortcutkey));
+				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)));
 		viewMenu.add(zoomMenu);
 
 		viewMenu.addSeparator();
@@ -2131,6 +2129,9 @@ public class GuiFrame extends JFrame implements Observer {
 		private static final long serialVersionUID = 549331166742882564L;
 
 		ZoomAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+		ZoomAction(String name, String tooltip, KeyStroke keystroke) {
 			super(name, tooltip, keystroke);
 		}
 
