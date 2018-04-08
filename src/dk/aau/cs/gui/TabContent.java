@@ -95,9 +95,6 @@ public class TabContent extends JSplitPane {
 	private Boolean selectedTemplateWasActive = false;
 	
 	private WorkflowDialog workflowDialog = null;
-	
-	//Some nets are so big we can't draw them 
-	private boolean showDrawingSurface;
 
 	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
@@ -139,7 +136,6 @@ public class TabContent extends JSplitPane {
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
 		this.setDividerSize(8);	
-
 	}
 	
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -325,8 +321,6 @@ public class TabContent extends JSplitPane {
 		//Add 10 pixel to the minimumsize of the scrollpane
 		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
 	}
-	
-	private final static String delayEnabledTransitionControlName = "delayEnabledTransitionControl";
 
 	private void createAnimatorSplitPane(NetType netType) {
 		if (animBox == null)
@@ -399,8 +393,7 @@ public class TabContent extends JSplitPane {
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
 		// Inserts dummy to avoid nullpointerexceptions from the displaynode
-		// method
-		// A component can only be on one splitpane at the time
+		// method. A component can only be on one splitpane at the time
 		dummy = new JButton("EditorDummy");
 		dummy.setMinimumSize(templateExplorer.getMinimumSize());
 		dummy.setPreferredSize(templateExplorer.getPreferredSize());
@@ -427,8 +420,7 @@ public class TabContent extends JSplitPane {
 		if (animatorSplitPane != null) {
 
 			// Inserts dummy to avoid nullpointerexceptions from the displaynode
-			// method
-			// A component can only be on one splitpane at the time
+			// method. A component can only be on one splitpane at the time
 			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
@@ -494,7 +486,6 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 		animatorSplitPane.validate();
-
 	}
 
 	private void createAnimationController(NetType netType) {
@@ -599,7 +590,6 @@ public class TabContent extends JSplitPane {
 
 	public void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
-		// constantsPanel.showConstants();
 	}
 
 	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
@@ -703,7 +693,6 @@ public class TabContent extends JSplitPane {
 		templateExplorer.selectFirst();
 		queries.selectFirst();
 		constantsPanel.selectFirst();
-		
 	}	
 	
 	public boolean isQueryPossible() {

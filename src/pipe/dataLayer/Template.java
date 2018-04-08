@@ -37,7 +37,7 @@ public class Template {
 	}
 
 	public void setGuiModel(DataLayer guiModel) {
-		Require.that(guiModel != null, "GuiModel cannot be null");
+		Require.notNull(guiModel, "GuiModel cannot be null");
 		this.guiModel = guiModel;
 	}
 
