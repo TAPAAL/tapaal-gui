@@ -72,7 +72,7 @@ public class TabComponent extends JPanel {
 	public TabComponent(final JTabbedPane pane) {
 		super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-		Require.that(pane != null, "TabbedPane is null");
+		Require.notNull(pane, "TabbedPane is null");
 		
 		this.pane = pane;
 		setOpaque(false);
