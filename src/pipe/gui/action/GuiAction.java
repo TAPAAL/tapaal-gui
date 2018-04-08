@@ -54,14 +54,10 @@ public abstract class GuiAction extends AbstractAction {
 
 	private void setAsToggleable(boolean toggleable) {
 		
-		if (toggleable) {
-			
+		if (toggleable) {		
 			//The key used for storing a Boolean that corresponds to the selected state. This is typically used only for components that have a meaningful selection state. For example, JRadioButton and JCheckBox make use of this but instances of JMenu don't.
 			//https://docs.oracle.com/javase/7/docs/api/javax/swing/Action.html#SELECTED_KEY 
-			putValue("selected", false);
-			
-			//XXX: would have expected it to be SELECTED_KEY rather "selected", however that seems to mess somthing up.
-			
+			putValue(SELECTED_KEY, false);	
 		}
 			
 	}
@@ -102,7 +98,7 @@ public abstract class GuiAction extends AbstractAction {
 	}
 
 	public boolean isSelected() {
-		Boolean b = (Boolean) getValue("selected");
+		Boolean b = (Boolean) getValue(SELECTED_KEY);
 
 		if (b != null) {
 			return b.booleanValue();
@@ -112,10 +108,8 @@ public abstract class GuiAction extends AbstractAction {
 
 	public void setSelected(boolean selected) {
 
-		if (getValue("selected") != null) {
-			putValue("selected", null);
-			putValue("selected", new Boolean(selected));
-
+		if (getValue(SELECTED_KEY) != null) {
+			putValue(SELECTED_KEY, selected);
 		}
 
 	}

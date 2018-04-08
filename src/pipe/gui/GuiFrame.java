@@ -2648,16 +2648,9 @@ public class GuiFrame extends JFrame implements Observer {
 				// toggle buttons like to have images *and* text, nasty
 				setText(null);
 			}
-			a.addPropertyChangeListener(this);
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals("selected")) {
-				Boolean b = (Boolean) evt.getNewValue();
-				if (b != null) {
-					setSelected(b.booleanValue());
-				}
-			}
 		}
 
 	}
