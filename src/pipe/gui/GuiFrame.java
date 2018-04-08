@@ -105,16 +105,17 @@ public class GuiFrame extends JFrame implements Observer {
 	// for zoom combobox and dropdown
 	private final String[] zoomExamples = { "40%", "60%", "80%", "100%",
 			"120%", "140%", "160%", "180%", "200%", "300%" };
-	private String frameTitle; // Frame title
+	
+	private String frameTitle;
 	private GuiFrame appGui;
 	private DrawingSurfaceImpl appView;
-	private Pipe.ElementType mode, prev_mode; // *** mode WAS STATIC ***
+	private Pipe.ElementType mode, prev_mode; 
 	private int newNameCounter = 1;
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
 	private JToolBar drawingToolBar;
-	private JComboBox zoomComboBox;
+	private JComboBox<String> zoomComboBox;
 
 	private GuiAction createAction;
 	private GuiAction openAction, closeAction, saveAction,
@@ -2560,6 +2561,7 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 				}
 				nets = result.toArray(new String[result.size()]);
+				jar.close();
 			}
 
 			Arrays.sort(nets, new Comparator<String>() {
