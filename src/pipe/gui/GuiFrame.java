@@ -545,9 +545,9 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 
-		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", "Show only the most important panels", "", false));
-		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", "Show all panels", "", false));
-		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", "Save the current workspace as the default one", "", false));
+		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", "Show only the most important panels", false));
+		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", "Show all panels", false));
+		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", "Save the current workspace as the default one", false));
 		return viewMenu;
 	}
 
@@ -2201,6 +2201,10 @@ public class GuiFrame extends JFrame implements Observer {
 
 		ViewAction(String name, String tooltip, KeyStroke keystroke, boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
+		}
+		
+		ViewAction(String name, String tooltip, boolean toggleable) {
+			super(name, tooltip, toggleable);
 		}
 
 

@@ -77,6 +77,11 @@ public abstract class GuiAction extends AbstractAction {
 		setAsToggleable(toggleable);
 	}
 	
+	public GuiAction(String name, String tooltip, boolean toggleable) {
+		this(name, tooltip);
+		setAsToggleable(toggleable);
+	}
+	
 	public GuiAction(String name, String tooltip, KeyStroke keyStroke) {
 		super(name);
 		URL iconURL = null;
