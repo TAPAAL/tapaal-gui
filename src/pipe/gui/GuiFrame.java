@@ -127,7 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction, stripTimeDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private GuiAction incSpacingAction, decSpacingAction;
-	private DeleteAction deleteAction;
+	private GuiAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, timedPlaceAction;
@@ -346,8 +346,72 @@ public class GuiFrame extends JFrame implements Observer {
 		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
 		editMenu.addSeparator();
 
-		editMenu.add( deleteAction = new DeleteAction("Delete",
-				"Delete selection", "DELETE"));
+		editMenu.add( deleteAction = new GuiAction("Delete", "Delete selection", "DELETE") {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// check if queries need to be removed
+				ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
+				Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
+				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+
+				boolean queriesAffected = false;
+				for (PetriNetObject pn : selection) {
+					if (pn instanceof TimedPlaceComponent) {
+						TimedPlaceComponent place = (TimedPlaceComponent)pn;
+						if(!place.underlyingPlace().isShared()){
+							for (TAPNQuery q : queries) {
+								if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+									queriesAffected = true;
+									queriesToDelete.add(q);
+								}
+							}
+						}
+					} else if (pn instanceof TimedTransitionComponent){
+						TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+						if(!transition.underlyingTransition().isShared()){
+							for (TAPNQuery q : queries) {
+								if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
+									queriesAffected = true;
+									queriesToDelete.add(q);
+								}
+							}
+						}
+					}
+				}
+				StringBuilder s = new StringBuilder();
+				s.append("The following queries are associated with the currently selected objects:\n\n");
+				for (TAPNQuery q : queriesToDelete) {
+					s.append(q.getName());
+					s.append('\n');
+				}
+				s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+
+				int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+						CreateGui.getApp(), s.toString(), "Warning",
+						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+						: JOptionPane.YES_OPTION;
+
+						if (choice == JOptionPane.YES_OPTION) {
+							appView.getUndoManager().newEdit(); // new "transaction""
+							if (queriesAffected) {
+								TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+								for (TAPNQuery q : queriesToDelete) {
+									Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+									cmd.redo();
+									appView.getUndoManager().addEdit(cmd);
+								}
+							}
+
+							appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+							appView.getSelectionObject().deleteSelection();
+							appView.repaint();
+							CreateGui.getCurrentTab().network().buildConstraints();
+						}
+				
+			}
+			
+		});
 
 		// Bind delete to backspace also
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -1954,76 +2018,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 
-	class DeleteAction extends GuiAction {
 
-		private static final long serialVersionUID = -8592450390507637174L;
-
-		DeleteAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			// check if queries need to be removed
-			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
-			Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
-			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-
-			boolean queriesAffected = false;
-			for (PetriNetObject pn : selection) {
-				if (pn instanceof TimedPlaceComponent) {
-					TimedPlaceComponent place = (TimedPlaceComponent)pn;
-					if(!place.underlyingPlace().isShared()){
-						for (TAPNQuery q : queries) {
-							if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
-								queriesAffected = true;
-								queriesToDelete.add(q);
-							}
-						}
-					}
-				} else if (pn instanceof TimedTransitionComponent){
-					TimedTransitionComponent transition = (TimedTransitionComponent)pn;
-					if(!transition.underlyingTransition().isShared()){
-						for (TAPNQuery q : queries) {
-							if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
-								queriesAffected = true;
-								queriesToDelete.add(q);
-							}
-						}
-					}
-				}
-			}
-			StringBuilder s = new StringBuilder();
-			s.append("The following queries are associated with the currently selected objects:\n\n");
-			for (TAPNQuery q : queriesToDelete) {
-				s.append(q.getName());
-				s.append('\n');
-			}
-			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
-
-			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-					CreateGui.getApp(), s.toString(), "Warning",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-					: JOptionPane.YES_OPTION;
-
-					if (choice == JOptionPane.YES_OPTION) {
-						appView.getUndoManager().newEdit(); // new "transaction""
-						if (queriesAffected) {
-							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-							for (TAPNQuery q : queriesToDelete) {
-								Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
-								cmd.redo();
-								appView.getUndoManager().addEdit(cmd);
-							}
-						}
-
-						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-						appView.getSelectionObject().deleteSelection();
-						appView.repaint();
-						CreateGui.getCurrentTab().network().buildConstraints();
-					}
-		}
-
-	}
 
 	class TypeAction extends GuiAction {
 
