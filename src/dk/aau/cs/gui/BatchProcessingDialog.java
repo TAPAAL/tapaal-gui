@@ -512,7 +512,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets","xml");
+		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets","xml", lastPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
@@ -1026,10 +1026,11 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			private void exportResults() {
-				String filename = new FileBrowser("CSV file", "csv")
+				String filename = new FileBrowser("CSV file", "csv", lastPath)
 						.saveFile("results");
 				if (filename != null) {
 					File exportFile = new File(filename);
+					lastPath = exportFile.getParent();
 					BatchProcessingResultsExporter exporter = new BatchProcessingResultsExporter();
 					try {
 						exporter.exportToCSV(tableModel.getResults(),
