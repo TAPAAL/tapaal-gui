@@ -129,6 +129,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private ZoomAction zoomOutAction, zoomInAction;
 	private SpacingAction incSpacingAction, decSpacingAction;
 	private DeleteAction deleteAction;
+	private SelectAllAction selectAllAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, timedPlaceAction;
@@ -514,6 +515,15 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
 		editMenu.getActionMap().put("Delete", deleteAction);
+		
+		editMenu.addSeparator();
+
+		addMenuItem(editMenu, selectAllAction = new SelectAllAction("Select all",
+			"Select all components", "ctrl A"));
+
+		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
+		editMenu.getActionMap().put("SelectAll", selectAllAction);
 
 		/* Draw menu */
 		JMenu drawMenu = new JMenu("Draw");
@@ -1025,6 +1035,7 @@ public class GuiFrame extends JFrame implements Observer {
 			transAction.setEnabled(true);
 			tokenAction.setEnabled(true);
 			deleteAction.setEnabled(true);
+			selectAllAction.setEnabled(true);
 			selectAction.setEnabled(true);
 			deleteTokenAction.setEnabled(true);
 
@@ -1067,6 +1078,7 @@ public class GuiFrame extends JFrame implements Observer {
 			transAction.setEnabled(false);
 			tokenAction.setEnabled(false);
 			deleteAction.setEnabled(false);
+			selectAllAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
 
@@ -1120,6 +1132,7 @@ public class GuiFrame extends JFrame implements Observer {
 			transAction.setEnabled(false);
 			tokenAction.setEnabled(false);
 			deleteAction.setEnabled(false);
+			selectAllAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
 
@@ -2176,6 +2189,19 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 		}
 
+	}
+
+	class SelectAllAction extends GuiAction {
+
+		private static final long serialVersionUID = -9223372036854775808L;
+
+		SelectAllAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			CreateGui.getView().getSelectionObject().selectAll();
+		}
 	}
 
 	class TypeAction extends GuiAction {
