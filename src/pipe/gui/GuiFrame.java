@@ -216,7 +216,11 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		if (isMac()){ 
-			new SpecialMacHandler();
+			try {
+				new SpecialMacHandler();
+			} catch (NoClassDefFoundError e) {
+				//Failed loading special mac handler, ignore and run program without MacOS integration
+			}
 		}
 
 		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
