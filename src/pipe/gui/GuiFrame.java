@@ -25,6 +25,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -32,6 +33,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -77,6 +79,7 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
@@ -747,7 +750,7 @@ public class GuiFrame extends JFrame implements Observer {
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(checkForSaveAll()){
-					BatchProcessingDialog.showBatchProcessingDialog();
+					BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
 				}
 			}
 		});
@@ -1359,6 +1362,26 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private void saveNet(int index, File outFile) {
 		try {
+			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
+
+			CreateGui.setFile(outFile, index);
+
+			CreateGui.getDrawingSurface(index).setNetChanged(false);
+			appTab.setTitleAt(index, outFile.getName());
+			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
+			CreateGui.getDrawingSurface(index).getUndoManager().clear();
+			undoAction.setEnabled(false);
+			redoAction.setEnabled(false);
+		} catch (Exception e) {
+			System.err.println(e);
+			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
+					"File Output Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
+	
+	public void saveNet(int index, File outFile, List<TAPNQuery> queries) {
+		try {
 			TabContent currentTab = CreateGui.getTab(index);
 			NetworkMarking currentMarking = null;
 			if(getGUIMode().equals(GUIMode.animation)){
@@ -1369,20 +1392,12 @@ public class GuiFrame extends JFrame implements Observer {
 			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 					currentTab.network(),
 					currentTab.allTemplates(), 
-					currentTab.queries(), 
+					queries, 
 					currentTab.network().constants()
 					);
 
 			tapnWriter.savePNML(outFile);
 
-			CreateGui.setFile(outFile, index);
-
-			CreateGui.getDrawingSurface(index).setNetChanged(false);
-			appTab.setTitleAt(index, outFile.getName());
-			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
-			CreateGui.getDrawingSurface(index).getUndoManager().clear();
-			undoAction.setEnabled(false);
-			redoAction.setEnabled(false);
 			if(getGUIMode().equals(GUIMode.animation)){
 				currentTab.network().setMarking(currentMarking);
 			}
