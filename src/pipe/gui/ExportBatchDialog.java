@@ -9,27 +9,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -45,12 +43,12 @@ import pipe.gui.widgets.FileBrowser;
 public class ExportBatchDialog extends JDialog {
 
 	private static final long serialVersionUID = 8346966786414688380L;
-	//Tool tip strings
-	//Tool tips for model panel
-	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch processing";
+
+	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch export";
 	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently selected nets";
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	private final static String TOOL_TIP_ExportFilesButton = "Press to export all nets in PNML and XML format";
+	private final static String TOOL_TIP_UniqueQueryNamesCheckbox = "Give queries unique names when exporting";
 	
 	private JPanel filesButtonsPanel;
 	private JButton addFilesButton;
@@ -60,7 +58,9 @@ public class ExportBatchDialog extends JDialog {
 	private JList fileList;
 	private DefaultListModel listModel;
 	private List<File> files = new ArrayList<File>();
-	private JFileChooser chooser;
+	private String lastPath;
+	private JCheckBox uniqueQueryNames;
+
 
 	static ExportBatchDialog exportBatchDialog;
 	ModelLoader loader = new ModelLoader(new DrawingSurfaceImpl(new DataLayer()));
@@ -70,7 +70,6 @@ public class ExportBatchDialog extends JDialog {
 			exportBatchDialog = new ExportBatchDialog(CreateGui.getApp(), "Batch Export", true);
 			exportBatchDialog.pack();
 			exportBatchDialog.setPreferredSize(exportBatchDialog.getSize());
-			//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
 			exportBatchDialog.setMinimumSize(new Dimension(exportBatchDialog.getWidth(), exportBatchDialog.getHeight()));
 			exportBatchDialog.setLocationRelativeTo(null);
 			exportBatchDialog.setResizable(true);
@@ -79,13 +78,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private ExportBatchDialog(Frame frame, String title, boolean modal) {
-		super(frame, title, modal);
-		
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent we) {
-				
-			}
-		});
+		super(frame, title, modal);	
 		initFileList();
 	}
 	
@@ -106,28 +99,25 @@ public class ExportBatchDialog extends JDialog {
 			}
 		});
 
-		fileList.addListSelectionListener(new ListSelectionListener() {
-
-			public void valueChanged(ListSelectionEvent e) {
-				if (!(e.getValueIsAdjusting())) {
-					if (fileList.getSelectedIndex() == -1) {
-						removeFileButton.setEnabled(false);
-					} else {
-						removeFileButton.setEnabled(true);
-					}
-				}
-			}
-		});
-
 		fileList.setCellRenderer(new FileNameCellRenderer());
-
-		JScrollPane scrollpane = new JScrollPane(fileList);
-		scrollpane.setMinimumSize(new Dimension(175, 225));
-		scrollpane.setPreferredSize(new Dimension(175, 225));
-
 		GridBagConstraints gbc = new GridBagConstraints();
+
+		uniqueQueryNames = new JCheckBox("Unique Query Names", true);
+		uniqueQueryNames.setToolTipText(TOOL_TIP_UniqueQueryNamesCheckbox);
+		
+		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		fileListPanel.add(uniqueQueryNames, gbc);
+
+		JScrollPane scrollpane = new JScrollPane(fileList);
+		scrollpane.setMinimumSize(new Dimension(175, 375));
+		scrollpane.setPreferredSize(new Dimension(175, 375));
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridwidth = 3;
 		gbc.weightx = 1.0;
@@ -181,7 +171,7 @@ public class ExportBatchDialog extends JDialog {
 				enableButtons();
 			}
 		});
-
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 0;
@@ -190,44 +180,22 @@ public class ExportBatchDialog extends JDialog {
 		
 		exportFilesButton = new JButton("Export All Nets and Queries");
 		exportFilesButton.setToolTipText(TOOL_TIP_ExportFilesButton);
-		exportFilesButton.setEnabled(true);
+		exportFilesButton.setEnabled(false);
 		exportFilesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exportFiles();
 				enableButtons();
 			}
-			private void exportFiles() {
-				chooser = new JFileChooser(); 
-			    chooser.setCurrentDirectory(new java.io.File("."));
-			    chooser.setDialogTitle("Export Batch");
-			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			    chooser.setAcceptAllFileFilterUsed(false);
-			    if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && !(files.isEmpty())) { 
-			    	File destinationFile = chooser.getSelectedFile();
-			    	try {
-			    		for(File file : files) {
-					    	Path path = Paths.get(destinationFile.getAbsolutePath() + "/" + file.getName().replaceAll(".xml", ""));
-			    			Files.createDirectories(path);
-			    			exportModel(file, path);
-			    		}
-						
-			    	}
-			    	catch(IOException e){
-						System.err.append("An error occurred while exporting the queries.");
-			    	}
-			    }	    
-			}
 		});
-		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		filesButtonsPanel.add(exportFilesButton);
+		filesButtonsPanel.add(exportFilesButton, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		fileListPanel.add(filesButtonsPanel, gbc);
@@ -240,7 +208,7 @@ public class ExportBatchDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		gbc.gridheight = 2;
 		gbc.insets = new Insets(10, 5, 0, 5);
-
+		
 		setContentPane(fileListPanel);
 	}
 
@@ -250,6 +218,7 @@ public class ExportBatchDialog extends JDialog {
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
 			for (File file : filesArray) {
+				lastPath = file.getParent();
 				if (!files.contains(file)) {
 					files.add(file);
 					listModel.addElement(file);
@@ -272,14 +241,18 @@ public class ExportBatchDialog extends JDialog {
 	
 	private void enableButtons() {
 		fileList.setEnabled(true);
+		uniqueQueryNames.setEnabled(true);
 		addFilesButton.setEnabled(true);
 
 		if (listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			removeFileButton.setEnabled(true);
+			exportFilesButton.setEnabled(true);
+
 		} else {
 			clearFilesButton.setEnabled(false);
 			removeFileButton.setEnabled(false);
+			exportFilesButton.setEnabled(false);
 		}
 
 	}
@@ -288,16 +261,32 @@ public class ExportBatchDialog extends JDialog {
 		listModel.removeAllElements();
 	}
 	
-	private void exportModel(File file, Path path) {
-		try {
+	private void exportFiles() {
+		File destinationFile = new File(new FileBrowser("Export Nets", ".", lastPath).saveFile("Export"));
+		if(destinationFile != null) {
+	    	lastPath = destinationFile.getParent();
+	    	try {
+	    		for(File file : files) {
+			    	Path path = Paths.get(destinationFile.getParent() + "/" + file.getName().replaceAll(".xml", ""));
+	    			Files.createDirectories(path);
+	    			exportModel(file, path);
+	    		}
+		    	new MessengerImpl().displayInfoMessage("The selected nets were exported as PNML and XML query files in " + destinationFile.getParent() + ".");
+	    	}
+	    	catch(Exception e){
+				System.err.append("An error occurred while exporting the nets.");
+	    	}
+		}
+    }	    
+	
+	private void exportModel(File file, Path path) throws Exception {
 			LoadedModel loadedModel = loader.load(file);
 			exportPNML(path, loadedModel);
-			Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", loadedModel.queries());			
-		}
-		catch(Exception e) {
-			new MessengerImpl().displayErrorMessage("There was an error trying to export " + file.getName() + " to PNML and query XML");
-			System.out.println(e);
-		}
+			if(!uniqueQueryNames.isSelected())
+				Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", loadedModel.queries());
+			else {
+				Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", renameQueries(file.getName(), loadedModel.queries()));
+			}
 	}
 	
 	private void exportPNML(Path path, LoadedModel loadedModel) throws DOMException, TransformerConfigurationException, IOException, ParserConfigurationException, TransformerException {
@@ -308,5 +297,18 @@ public class ExportBatchDialog extends JDialog {
 		}
 		PNMLWriter pnmlWriter = new PNMLWriter(loadedModel.network(), guiModel);
 		pnmlWriter.savePNML(f);
+	}
+	
+	private Collection<pipe.dataLayer.TAPNQuery> renameQueries(String fileName, Collection<pipe.dataLayer.TAPNQuery> queries){
+		Collection<pipe.dataLayer.TAPNQuery> renamedQueries = new ArrayList<pipe.dataLayer.TAPNQuery>(); 
+		int index = 1;
+		
+		for(pipe.dataLayer.TAPNQuery query : queries) {
+			pipe.dataLayer.TAPNQuery copy = query;
+			copy.setName((fileName.replaceAll(".xml", "") + "." + query.getName() + "-" + index).replaceAll(" ", "_"));
+			renamedQueries.add(copy);
+		}
+		return renamedQueries;
+		
 	}
 }
