@@ -262,7 +262,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private void exportFiles() {
-		File destinationFile = new File(new FileBrowser("Export Nets", ".", lastPath).saveFile("Export"));
+		File destinationFile = new File(new FileBrowser("Select an export folder", ".", lastPath).saveFile("Export"));
 		if(destinationFile != null) {
 	    	lastPath = destinationFile.getParent();
 	    	try {
