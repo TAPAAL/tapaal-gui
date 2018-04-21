@@ -179,7 +179,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * 
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent e) {	
+	public void mousePressed(MouseEvent e) {
 		CreateGui.getCurrentTab().removeConstantHighlights();
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
@@ -262,6 +262,14 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
 	public void mouseMoved(MouseEvent e) {
+	}
+
+	public void selectAll() {
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
+		for (PetriNetObject pnObject : pnObjects) {
+			pnObject.select(false);
+		}
+		drawingSurface.repaint();
 	}
 
 	public int getSelectionCount() {

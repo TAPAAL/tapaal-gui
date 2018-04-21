@@ -220,7 +220,7 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
 
-				if(index > 0 && queryList.getModel().getSize() == 1) {
+				if(index > 0 && queryList.getSelectedIndices().length == 1) {
 					swapQueries(index, index-1);
 					queryList.setSelectedIndex(index-1);
 				}
@@ -242,7 +242,7 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
 
-				if(index < listModel.size()-1 && queryList.getModel().getSize() == 1) {
+				if(index < listModel.size()-1 && queryList.getSelectedIndices().length == 1) {
 					swapQueries(index, index+1);
 					queryList.setSelectedIndex(index+1);
 				}
@@ -505,7 +505,7 @@ public class QueryPane extends JPanel {
 		//File is deleted on exit
 		try {
 			tempFile = File.createTempFile(CreateGui.appGui.getCurrentTabName(), ".xml");
-			CreateGui.appGui.saveFileToTempFileForMultiQuerySelection(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
+			CreateGui.appGui.saveNet(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {

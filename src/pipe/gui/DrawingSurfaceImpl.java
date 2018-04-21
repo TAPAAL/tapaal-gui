@@ -297,6 +297,21 @@ Printable, DrawingSurface {
 		}
 	}
 
+	public Rectangle calculateBoundingRectangle() {
+		Rectangle rect = new Rectangle(0, 0, -1, -1);
+
+		Component[] components = getComponents();
+		for (int i = 0; i < components.length; i++) {
+			if (components[i].getClass() == SelectionManager.class) {
+				continue; // SelectionObject not included
+			}
+
+			rect.add(components[i].getBounds());
+		}
+
+		return rect;
+	}
+
 	public void changeAnimationMode(boolean status) {
 		animationmode = status;
 		if(status){

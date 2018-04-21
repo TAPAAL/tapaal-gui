@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -136,7 +137,7 @@ public class Export {
 		f.close();
 	}
 
-	public static void toPNG(JComponent g, String filename) throws IOException {
+	public static void toPNG(DrawingSurfaceImpl g, String filename) throws IOException {
 		Iterator<ImageWriter> i = ImageIO.getImageWritersBySuffix("png");
 		if (!i.hasNext()) {
 			throw new RuntimeException("No ImageIO exporters can handle PNG");
@@ -145,7 +146,9 @@ public class Export {
 		File f = new File(filename);
 		BufferedImage img = new BufferedImage(g.getPreferredSize().width, g.getPreferredSize().height, BufferedImage.TYPE_3BYTE_BGR);
 		g.print(img.getGraphics());
-		ImageIO.write(img, "png", f);
+		Rectangle r = g.calculateBoundingRectangle();
+		BufferedImage croppedImg = img.getSubimage(r.x, r.y, r.width, r.height);
+		ImageIO.write(croppedImg, "png", f);
 	}
 
 	private static void toPrinter(DrawingSurfaceImpl g) throws PrintException {
