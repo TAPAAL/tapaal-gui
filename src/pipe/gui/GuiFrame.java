@@ -13,11 +13,13 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -25,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -71,6 +74,7 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
@@ -123,6 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private ZoomAction zoomOutAction, zoomInAction;
 	private SpacingAction incSpacingAction, decSpacingAction;
 	private DeleteAction deleteAction;
+	private SelectAllAction selectAllAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, timedPlaceAction;
@@ -210,14 +215,19 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		if (isMac()){ 
-			new SpecialMacHandler();
+
+			try{
+				new SpecialMacHandler();
+			} catch (NoClassDefFoundError e) {
+				//Failed loading special mac handler, ignore and run program without MacOS integration
+			}
 
 			//XXX Refactor to sperate function, only a test to see of this fixes issues for TAPAAL on Java9 bug #1764383
 			Application app = Application.getApplication();
 			try {
 				Image appImage;
 				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
-						CreateGui.imgPath + "icon.png"));
+					CreateGui.imgPath + "icon.png"));
 				app.setDockIconImage(appImage);
 			} catch (MalformedURLException e) {
 				Logger.log("Error loading Image");
@@ -234,6 +244,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			// Grow size of boxes to add room for the resizer
 			System.setProperty("apple.awt.showGrowBox", "true");
+
 		}
 
 		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
@@ -531,6 +542,15 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
 		editMenu.getActionMap().put("Delete", deleteAction);
+		
+		editMenu.addSeparator();
+
+		addMenuItem(editMenu, selectAllAction = new SelectAllAction("Select all",
+			"Select all components", "ctrl A"));
+
+		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
+		editMenu.getActionMap().put("SelectAll", selectAllAction);
 
 		/* Draw menu */
 		JMenu drawMenu = new JMenu("Draw");
@@ -760,7 +780,7 @@ public class GuiFrame extends JFrame implements Observer {
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(checkForSaveAll()){
-					BatchProcessingDialog.showBatchProcessingDialog();
+					BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
 				}
 			}
 		});
@@ -1042,6 +1062,7 @@ public class GuiFrame extends JFrame implements Observer {
 			transAction.setEnabled(true);
 			tokenAction.setEnabled(true);
 			deleteAction.setEnabled(true);
+			selectAllAction.setEnabled(true);
 			selectAction.setEnabled(true);
 			deleteTokenAction.setEnabled(true);
 
@@ -1084,6 +1105,7 @@ public class GuiFrame extends JFrame implements Observer {
 			transAction.setEnabled(false);
 			tokenAction.setEnabled(false);
 			deleteAction.setEnabled(false);
+			selectAllAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
 
@@ -1137,6 +1159,7 @@ public class GuiFrame extends JFrame implements Observer {
 			transAction.setEnabled(false);
 			tokenAction.setEnabled(false);
 			deleteAction.setEnabled(false);
+			selectAllAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
 
@@ -1372,6 +1395,26 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private void saveNet(int index, File outFile) {
 		try {
+			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
+
+			CreateGui.setFile(outFile, index);
+
+			CreateGui.getDrawingSurface(index).setNetChanged(false);
+			appTab.setTitleAt(index, outFile.getName());
+			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
+			CreateGui.getDrawingSurface(index).getUndoManager().clear();
+			undoAction.setEnabled(false);
+			redoAction.setEnabled(false);
+		} catch (Exception e) {
+			System.err.println(e);
+			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
+					"File Output Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
+	
+	public void saveNet(int index, File outFile, List<TAPNQuery> queries) {
+		try {
 			TabContent currentTab = CreateGui.getTab(index);
 			NetworkMarking currentMarking = null;
 			if(getGUIMode().equals(GUIMode.animation)){
@@ -1382,20 +1425,12 @@ public class GuiFrame extends JFrame implements Observer {
 			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 					currentTab.network(),
 					currentTab.allTemplates(), 
-					currentTab.queries(), 
+					queries, 
 					currentTab.network().constants()
 					);
 
 			tapnWriter.savePNML(outFile);
 
-			CreateGui.setFile(outFile, index);
-
-			CreateGui.getDrawingSurface(index).setNetChanged(false);
-			appTab.setTitleAt(index, outFile.getName());
-			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
-			CreateGui.getDrawingSurface(index).getUndoManager().clear();
-			undoAction.setEnabled(false);
-			redoAction.setEnabled(false);
 			if(getGUIMode().equals(GUIMode.animation)){
 				currentTab.network().setMarking(currentMarking);
 			}
@@ -2195,6 +2230,19 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
+	class SelectAllAction extends GuiAction {
+
+		private static final long serialVersionUID = -9223372036854775808L;
+
+		SelectAllAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			CreateGui.getView().getSelectionObject().selectAll();
+		}
+	}
+
 	class TypeAction extends GuiAction {
 
 		/**
@@ -2471,9 +2519,9 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Sine V. Birch, Joakim Byg, Jakob Dyhr, Louise Foshammer,\nMalte Neve-Graesboell, ");
-		buffer.append("Lasse Jacobsen, Morten Jacobsen, Thomas S. Jacobsen,\nJacob J. Jensen, Peter G. Jensen, ");
-		buffer.append("Mads Johannsen, Kenneth Y. Joergensen,\nMikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen, Jiri Srba,\nMathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
+		buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Graesboell, ");
+		buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
+		buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2018\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
@@ -2486,7 +2534,7 @@ public class GuiFrame extends JFrame implements Observer {
                 buffer.append("Frederik Meyer Boenneland, Jakob Dyhr, Peter Fogh, ");
                 buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, ");
                 buffer.append("Tobias S. Jepsen, Mads Johannsen,\nIsabella Kaufmann, ");
-                buffer.append("Soeren M. Nielsen, Thomas S. Nielsen,\nLars K. Oestergaard, ");
+                buffer.append("Andreas H. Klostergaard, Soeren M. Nielsen,\nThomas S. Nielsen, Lars K. Oestergaard, ");
                 buffer.append("Samuel Pastva and Jiri Srba\n");
                 buffer.append("Aalborg University 2014-2018\n\n");
 
