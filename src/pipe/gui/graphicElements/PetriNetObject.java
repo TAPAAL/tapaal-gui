@@ -100,6 +100,15 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		}
 	}
 
+	public void select(boolean shouldRepaint) {
+	if (selectable && !selected) {
+			selected = true;
+			if (shouldRepaint) {
+				repaint();
+			}
+		}
+	}
+
 	public void deselect() {
 		if (selected) {
 			selected = false;
