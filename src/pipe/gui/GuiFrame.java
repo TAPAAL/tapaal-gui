@@ -142,8 +142,15 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction transportArcAction;
 
 
-	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
-	randomAction, randomAnimateAction, timeAction, delayFireAction, prevcomponentAction, nextcomponentAction;
+	public AnimateAction startAction;
+	public AnimateAction stepforwardAction;
+	public AnimateAction stepbackwardAction;
+	private AnimateAction randomAction;
+	private AnimateAction randomAnimateAction;
+	private AnimateAction timeAction;
+	private AnimateAction delayFireAction;
+	private AnimateAction prevcomponentAction;
+	private AnimateAction nextcomponentAction;
 
 	public enum GUIMode {
 		draw, animation, noNet
@@ -726,7 +733,7 @@ public class GuiFrame extends JFrame implements Observer {
 		return toolsMenu;
 	}
 
-	public void showAdvancedWorkspace(boolean advanced){
+	private void showAdvancedWorkspace(boolean advanced){
 		QueryDialog.setAdvancedView(advanced);
 		showComponents(advanced);
 		showConstants(advanced);
@@ -749,7 +756,7 @@ public class GuiFrame extends JFrame implements Observer {
 		DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
 	}
 
-	public void saveWorkspace(){
+	private void saveWorkspace(){
 		Preferences prefs = Preferences.getInstance();
 
 		prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
@@ -1163,25 +1170,25 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 
-	public void showQueries(boolean enable){
+	private void showQueries(boolean enable){
 		showQueries = enable;
 		CreateGui.getCurrentTab().showQueries(enable);
 
 	}
-	public void toggleQueries(){
+	private void toggleQueries(){
 		showQueries(!showQueries);
 	}
 
-	public void showConstants(boolean enable){
+	private void showConstants(boolean enable){
 		showConstants = enable;
 		CreateGui.getCurrentTab().showConstantsPanel(enable);
 
 	}
-	public void toggleConstants(){
+	private void toggleConstants(){
 		showConstants(!showConstants);
 	}
 
-	public void showToolTips(boolean enable){
+	private void showToolTips(boolean enable){
 		showToolTips = enable;
 		Preferences.getInstance().setShowToolTips(showToolTips);
 
@@ -1190,57 +1197,57 @@ public class GuiFrame extends JFrame implements Observer {
 		ToolTipManager.sharedInstance().setReshowDelay(800);
 		ToolTipManager.sharedInstance().setDismissDelay(60000);
 	}
-	public void toggleToolTips(){
+	private void toggleToolTips(){
 		showToolTips(!showToolTips);
 	}
 
-	public boolean isShowingToolTips(){
+	boolean isShowingToolTips(){
 		return showToolTips;
 	}
 
-	public void toggleTokenAge(){
+	private void toggleTokenAge(){
 		CreateGui.toggleShowTokenAge();
 		Preferences.getInstance().setShowTokenAge(CreateGui.showTokenAge());
 		appView.repaintAll();
 	}
 
-	public void toggleZeroToInfinityIntervals() {
+	private void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
 		Preferences.getInstance().setShowZeroInfIntervals(CreateGui.showZeroToInfinityIntervals());
 		appView.repaintAll();
 	}
 
-	public void showComponents(boolean enable){
+	private void showComponents(boolean enable){
 		showComponents = enable;
 		CreateGui.getCurrentTab().showComponents(enable);
 
 	}
-	public void toggleComponents(){
+	private void toggleComponents(){
 		showComponents(!showComponents);
 	}
 
-	public void showEnabledTransitionsList(boolean enable){
+	private void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
 		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
 
 	}
-	public void toggleEnabledTransitionsList(){
+	private void toggleEnabledTransitionsList(){
 		showEnabledTransitionsList(!showEnabledTransitions);
 	}
 
-	public void showDelayEnabledTransitions(boolean enable){
+	private void showDelayEnabledTransitions(boolean enable){
 		showDelayEnabledTransitions = enable;
 		CreateGui.getCurrentTab().showDelayEnabledTransitions(enable);
 	}
-	public void toggleDelayEnabledTransitions(){
+	private void toggleDelayEnabledTransitions(){
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
 	}
 
-	public void saveOperation(boolean forceSave){
+	private void saveOperation(boolean forceSave){
 		saveOperation(appTab.getSelectedIndex(), forceSave);
 	}
 
-	public boolean saveOperation(int index, boolean forceSaveAs) {
+	private boolean saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getFile(index);
 		boolean result;
 		if (!forceSaveAs && modelFile != null) { // ordinary save
@@ -1671,7 +1678,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
-	public void hideComponentWindow(){
+	private void hideComponentWindow(){
 		ArrayList<PetriNetObject> selection = CreateGui.getView().getPNObjects();
 
 		for (PetriNetObject pn : selection) {
@@ -1706,7 +1713,7 @@ public class GuiFrame extends JFrame implements Observer {
 		return mode;
 	}
 
-	public void restoreMode() {
+	private void restoreMode() {
 		// xxx - This must be refactored when someone findes out excatly what is
 		// gowing on
 		mode = prev_mode;
@@ -2253,7 +2260,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
-	public static void openBrowser(URI url){
+	private static void openBrowser(URI url){
 		//open the default bowser on this page
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
@@ -2660,7 +2667,7 @@ public class GuiFrame extends JFrame implements Observer {
 		stepforwardAction.setEnabled(b);
 	}
 
-	public void showNewPNDialog() {
+	private void showNewPNDialog() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
 				"Create a New Petri Net", true);
