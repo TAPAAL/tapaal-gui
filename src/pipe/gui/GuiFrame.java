@@ -273,7 +273,12 @@ public class GuiFrame extends JFrame implements Observer {
 		// Build menus
 		buildToolbar();
 
-		addWindowListener(new WindowHandler());
+		addWindowListener(new WindowAdapter() {
+			// Handler for window closing event
+			public void windowClosing(WindowEvent e) {
+				exitAction.actionPerformed(null);
+			}
+		});
 
 		this.setForeground(java.awt.Color.BLACK);
 
@@ -2672,12 +2677,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
-	class WindowHandler extends WindowAdapter {
-		// Handler for window closing event
-		public void windowClosing(WindowEvent e) {
-			exitAction.actionPerformed(null);
-		}
-	}
+
 
 	public void setEnabledStepForwardAction(boolean b) {
 		stepforwardAction.setEnabled(b);
