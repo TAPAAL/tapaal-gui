@@ -1,11 +1,6 @@
 package pipe.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -16,13 +11,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import javax.imageio.ImageIO;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -50,6 +43,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.apple.eawt.Application;
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.Preferences;
@@ -217,6 +211,29 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (isMac()){ 
 			new SpecialMacHandler();
+
+			//XXX Refactor to sperate function, only a test to see of this fixes issues for TAPAAL on Java9 bug #1764383
+			Application app = Application.getApplication();
+			try {
+				Image appImage;
+				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
+						CreateGui.imgPath + "icon.png"));
+				app.setDockIconImage(appImage);
+			} catch (MalformedURLException e) {
+				Logger.log("Error loading Image");
+			} catch (IOException e) {
+				Logger.log("Error loading Image");
+			}
+
+			//Set specific settings
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
+
+			// Use native file chooser
+			System.setProperty("apple.awt.fileDialogForDirectories", "false");
+
+			// Grow size of boxes to add room for the resizer
+			System.setProperty("apple.awt.showGrowBox", "true");
 		}
 
 		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
