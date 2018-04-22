@@ -1792,9 +1792,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public void setTitle(String title) {
-		super
-		.setTitle((title == null) ? frameTitle : frameTitle + ": "
-				+ title);
+		super.setTitle((title == null) ? frameTitle : frameTitle + ": " + title);
 	}
 
 	public boolean isEditionAllowed() {
