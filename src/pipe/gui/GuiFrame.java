@@ -1021,14 +1021,14 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getAnimationController().requestFocusInWindow();
 
 			// Event repeater
-			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
-			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_right_hold", stepforwardAction);
-			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
-			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_left_hold", stepbackwardAction);
-			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
-			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_up_hold", prevcomponentAction);
-			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
-			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_down_hold", nextcomponentAction);
+			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
+			CreateGui.getAnimationController().getActionMap().put("_right_hold", stepforwardAction);
+			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
+			CreateGui.getAnimationController().getActionMap().put("_left_hold", stepbackwardAction);
+			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
+			CreateGui.getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
+			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
+			CreateGui.getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
 			exportTraceAction.setEnabled(false);
@@ -1309,7 +1309,6 @@ public class GuiFrame extends JFrame implements Observer {
 			Logger.log(e);
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
-			return;
 		}
 	}
 
@@ -2133,7 +2132,7 @@ public class GuiFrame extends JFrame implements Observer {
 				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
 				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
 				String selectedZoomLevel = null;
-				 
+
 				/*
 				 * Zoom action name overview
 				 * Zoom in: the zoom IN icon in panel has been pressed
