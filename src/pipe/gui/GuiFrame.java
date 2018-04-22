@@ -841,7 +841,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Create panel to put toolbars in
 		JPanel toolBarPanel = new JPanel();
-		toolBarPanel.setLayout(new FlowLayout(0, 0, 0));
+		toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
 		// Add toolbars to pane
 		toolBarPanel.add(toolBar);
@@ -1242,12 +1242,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public boolean saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getFile(index);
-		boolean result = false;
+		boolean result;
 		if (!forceSaveAs && modelFile != null) { // ordinary save
 			saveNet(index, modelFile);
 			result = true;
 		} else { // save as
-			String path = null;
+			String path;
 			if (modelFile != null) {
 				path = modelFile.toString();
 			} else {
@@ -1345,7 +1345,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	public void createNewTabFromFile(InputStream file, String namePrefix) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
-		String name = "";
+		String name;
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
@@ -1411,7 +1411,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	public void createNewTabFromFile(File file, boolean loadPNML) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
-		String name = "";
+		String name;
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
@@ -2119,7 +2119,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			// This is set to true if a valid zoom action is performed
-			boolean didZoom = false;
+			boolean didZoom;
 			try {
 				String actionName = (String) getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
