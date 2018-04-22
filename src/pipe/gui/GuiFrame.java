@@ -2141,22 +2141,26 @@ public class GuiFrame extends JFrame implements Observer {
 				 * Zoom out: the zoom OUT icon in panel has been pressed
 				 * Zoom: a specific zoom level has been chosen in drop down or in the menu.
 				 */
-				if (actionName.equals("Zoom in")) {
-					didZoom = zoomer.zoomIn();
-				} else if (actionName.equals("Zoom out")) {
-					didZoom = zoomer.zoomOut();
-				} else {
-					if (actionName.equals("Zoom")) {
-						selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
-					}
-					if (e.getSource() instanceof JMenuItem) {
-						selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
-					}
+				switch (actionName) {
+					case "Zoom in":
+						didZoom = zoomer.zoomIn();
+						break;
+					case "Zoom out":
+						didZoom = zoomer.zoomOut();
+						break;
+					default:
+						if (actionName.equals("Zoom")) {
+							selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
+						}
+						if (e.getSource() instanceof JMenuItem) {
+							selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
+						}
 
-					//parse selected zoom level, and strip of %.
-					newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%",""));
+						//parse selected zoom level, and strip of %.
+						newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
-					didZoom = zoomer.setZoom(newZoomLevel);
+						didZoom = zoomer.setZoom(newZoomLevel);
+						break;
 				}
 				if (didZoom) {
 					updateZoomCombo();
