@@ -2133,8 +2133,7 @@ public class GuiFrame extends JFrame implements Observer {
 				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
 				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
 				String selectedZoomLevel = null;
-				int newZoomLevel = Pipe.ZOOM_DEFAULT;
-
+				 
 				/*
 				 * Zoom action name overview
 				 * Zoom in: the zoom IN icon in panel has been pressed
@@ -2157,7 +2156,7 @@ public class GuiFrame extends JFrame implements Observer {
 						}
 
 						//parse selected zoom level, and strip of %.
-						newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
+						int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
 						didZoom = zoomer.setZoom(newZoomLevel);
 						break;
