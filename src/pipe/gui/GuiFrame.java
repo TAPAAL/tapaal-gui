@@ -2220,7 +2220,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 	public void showAbout() {
-		StringBuffer buffer = new StringBuffer("About " + TAPAAL.getProgramName());
+		StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
 		buffer.append("\n\n");
 		buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
 		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
