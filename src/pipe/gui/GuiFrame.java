@@ -1825,10 +1825,6 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomComboBox.setSelectedItem(String.valueOf(appView.getZoomController().getPercent()) + "%");
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
-
-	public StatusBar getStatusBar() {
-		return statusBar;
-	}
 	
 	public void changeSpacing(double factor){
 		TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
