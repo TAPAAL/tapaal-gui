@@ -193,7 +193,7 @@ public class GuiFrame extends JFrame implements Observer {
 					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
 					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
-					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
+					Logger.log("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
 					CreateGui.setUsingGTKFileBrowser(false);
 				}
 
@@ -201,7 +201,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 		} catch (Exception exc) {
-			System.err.println("Error loading L&F: " + exc);
+			Logger.log("Error loading L&F: " + exc);
 		}
 
 		if (isMac()){ 
@@ -1299,7 +1299,7 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.network().setMarking(currentMarking);
 			}
 		} catch (Exception e) {
-			System.err.println(e);
+			Logger.log(e);
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -1965,7 +1965,7 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.appGui.setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 				}
 			} catch (Exception e) {
-				System.err.println(e);
+				Logger.log(e);
 				JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				startAction.setSelected(false);
@@ -2374,7 +2374,7 @@ public class GuiFrame extends JFrame implements Observer {
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
-						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
+						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());
 					}
 				}
 			}
@@ -2387,7 +2387,7 @@ public class GuiFrame extends JFrame implements Observer {
 						for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								CreateGui.userPath = f.getParent();
-								XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());;
+								XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());
 							}
 						}
 					}	
