@@ -211,6 +211,7 @@ public class GuiFrame extends JFrame implements Observer {
 		return Platform.isMac();
 	}
 
+	//XXX - guess this will break on java 10?
 	public int getJRE(){
 		return Character.getNumericValue(System.getProperty("java.version").charAt(2));
 	}	
