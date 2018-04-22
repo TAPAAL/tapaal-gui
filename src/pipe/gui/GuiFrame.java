@@ -129,18 +129,22 @@ public class GuiFrame extends JFrame implements Observer {
 	private ZoomAction zoomOutAction, zoomInAction;
 	private GuiAction incSpacingAction, decSpacingAction;
 	private GuiAction deleteAction;
-	private TypeAction annotationAction, arcAction, inhibarcAction,
-	placeAction, transAction, timedtransAction, tokenAction,
-	selectAction, deleteTokenAction, timedPlaceAction;
+
+	private TypeAction annotationAction;
+	private TypeAction inhibarcAction;
+	private TypeAction transAction;
+	private TypeAction tokenAction;
+	private TypeAction selectAction;
+	private TypeAction deleteTokenAction;
+	private TypeAction timedPlaceAction;
+	private TypeAction timedArcAction;
+	private TypeAction transportArcAction;
+
 	private ViewAction showTokenAgeAction, showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction, showDelayEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private GuiAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
 	private JMenuItem statistics;
 	private JMenuItem verification;
-
-	private TypeAction timedArcAction;
-	private TypeAction transportArcAction;
-
 
 	public AnimateAction startAction;
 	public AnimateAction stepforwardAction;
@@ -1721,19 +1725,9 @@ public class GuiFrame extends JFrame implements Observer {
 
 		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
-		if (placeAction != null) {
-			placeAction.setSelected(mode == ElementType.PLACE);
-		}
+		//XXX - why preform null check, is set in constructor?
 		if (transAction != null) {
 			transAction.setSelected(mode == ElementType.IMMTRANS);
-		}
-
-		if (timedtransAction != null) {
-			timedtransAction.setSelected(mode == ElementType.TIMEDTRANS);
-		}
-
-		if (arcAction != null) {
-			arcAction.setSelected(mode == ElementType.ARC);
 		}
 
 		if (timedArcAction != null)
