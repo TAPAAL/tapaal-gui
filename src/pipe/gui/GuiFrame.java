@@ -118,16 +118,34 @@ public class GuiFrame extends JFrame implements Observer {
 	private JComboBox<String> zoomComboBox;
 
 	private GuiAction createAction;
-	private GuiAction openAction, closeAction, saveAction,
-	saveAsAction, exitAction, printAction, importPNMLAction, importSUMOAction,
-        importXMLAction, exportPNGAction, exportPSAction, exportToTikZAction,
-        exportToPNMLAction, exportToXMLAction, exportTraceAction, importTraceAction;
+	private GuiAction openAction;
+	private GuiAction closeAction;
+	private GuiAction saveAction;
+	private GuiAction saveAsAction;
+	private GuiAction exitAction;
+	private GuiAction printAction;
+	private GuiAction importPNMLAction;
+	private GuiAction importSUMOAction;
+	private GuiAction importXMLAction;
+	private GuiAction exportPNGAction;
+	private GuiAction exportPSAction;
+	private GuiAction exportToTikZAction;
+	private GuiAction exportToPNMLAction;
+	private GuiAction exportToXMLAction;
+	private GuiAction exportTraceAction;
+	private GuiAction importTraceAction;
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
-	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction, stripTimeDialogAction;
+	private ToolAction netStatisticsAction;
+	private ToolAction batchProcessingAction;
+	private ToolAction engineSelectionAction;
+	private ToolAction verifyAction;
+	private ToolAction workflowDialogAction;
+	private ToolAction stripTimeDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
-	private GuiAction incSpacingAction, decSpacingAction;
+	private GuiAction incSpacingAction;
+	private GuiAction decSpacingAction;
 	private GuiAction deleteAction;
 
 	private TypeAction annotationAction;
@@ -140,8 +158,23 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
 
-	private ViewAction showTokenAgeAction, showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction, showDelayEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
-	private GuiAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
+	private ViewAction showTokenAgeAction;
+	private ViewAction showComponentsAction;
+	private ViewAction showQueriesAction;
+	private ViewAction showConstantsAction;
+	private ViewAction showZeroToInfinityIntervalsAction;
+	private ViewAction showEnabledTransitionsAction;
+	private ViewAction showDelayEnabledTransitionsAction;
+	private ViewAction showToolTipsAction;
+	private ViewAction showAdvancedWorkspaceAction;
+	private ViewAction showSimpleWorkspaceAction;
+	private ViewAction saveWorkSpaceAction;
+	private GuiAction showAboutAction;
+	private GuiAction showHomepage;
+	private GuiAction showAskQuestionAction;
+	private GuiAction showReportBugAction;
+	private GuiAction showFAQAction;
+	private GuiAction checkUpdate;
 
 	private JMenuItem statistics;
 	private JMenuItem verification;
