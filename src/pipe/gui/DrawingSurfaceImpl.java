@@ -49,7 +49,7 @@ Printable, DrawingSurface {
 	public Arc createArc; // no longer static
 	public PlaceTransitionObject createPTO;
 	
-	protected static final int DRAWING_SURFACE_GROW = 100;
+	private static final int DRAWING_SURFACE_GROW = 100;
 
 	private AnimationHandler animationHandler = new AnimationHandler();
 
@@ -58,9 +58,6 @@ Printable, DrawingSurface {
 	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
-
-	// flag used in fast mode to know if a new PetriNetObject has been created
-	public boolean newPNO = false;
 
 	// flag used in paintComponents() to know if a call to zoom() has been done
 	private boolean doSetViewPosition = true;
@@ -362,7 +359,7 @@ Printable, DrawingSurface {
 		}
 	}
 
-	public void calculateNewBoundsForScrollPane(Rectangle rect) {
+	private void calculateNewBoundsForScrollPane(Rectangle rect) {
 		boolean changed = false;
 		Dimension current = getPreferredSize();
 		
@@ -644,7 +641,7 @@ Printable, DrawingSurface {
 
 				case IMMTRANS:
 				case TIMEDTRANS:
-					boolean timed = (mode == ElementType.TIMEDTRANS ? true : false);
+					boolean timed = (mode == ElementType.TIMEDTRANS);
 					pto = newTransition(e.getPoint(), timed);
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
