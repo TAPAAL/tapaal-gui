@@ -888,7 +888,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	private void addZoomComboBox(JToolBar toolBar, Action action) {
 		Dimension zoomComboBoxDimension = new Dimension(75, 28);
-		zoomComboBox = new JComboBox(zoomExamples);
+		zoomComboBox = new JComboBox<String>(zoomExamples);
 		zoomComboBox.setEditable(true);
 		zoomComboBox.setSelectedItem("100%");
 		zoomComboBox.setMaximumRowCount(zoomExamples.length);
