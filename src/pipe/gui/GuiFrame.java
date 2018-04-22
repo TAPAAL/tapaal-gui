@@ -909,7 +909,7 @@ public class GuiFrame extends JFrame implements Observer {
 	/**
 	 * @author Ben Kirby Takes the method of setting up the Zoom menu out of the
 	 *         main buildMenus method.
-	 * @param JMenu
+	 * @param zoomMenu
 	 *            - the menu to add the submenu to
 	 */
 	private void addZoomMenuItems(JMenu zoomMenu) {
@@ -1382,10 +1382,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * 
-	 * @param filename
-	 *            Filename of net to load, or <b>null</b> to create a new, empty
-	 *            tab
 	 */
 	public void createNewTabFromFile(InputStream file, String namePrefix) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
@@ -1448,10 +1444,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * 
-	 * @param filename
-	 *            Filename of net to load, or <b>null</b> to create a new, empty
-	 *            tab
 	 */
 	public void createNewTabFromFile(File file, boolean loadPNML) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
