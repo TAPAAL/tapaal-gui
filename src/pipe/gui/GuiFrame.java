@@ -137,12 +137,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
-	private ToolAction netStatisticsAction;
-	private ToolAction batchProcessingAction;
-	private ToolAction engineSelectionAction;
-	private ToolAction verifyAction;
-	private ToolAction workflowDialogAction;
-	private ToolAction stripTimeDialogAction;
+	private GuiAction netStatisticsAction;
+	private GuiAction batchProcessingAction;
+	private GuiAction engineSelectionAction;
+	private GuiAction verifyAction;
+	private GuiAction workflowDialogAction;
+	private GuiAction stripTimeDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 
 	private GuiAction incSpacingAction;
@@ -773,62 +773,62 @@ public class GuiFrame extends JFrame implements Observer {
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query",KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)));
-		verification.setMnemonic('m');
-		verification.addActionListener(new ActionListener() {			
+		verification = new JMenuItem(verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				CreateGui.getCurrentTab().verifySelectedQuery();				
+				CreateGui.getCurrentTab().verifySelectedQuery();
 			}
 		});
+		verification.setMnemonic('m');
+
 		toolsMenu.add(verification);	
-		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.",KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)));				
-		statistics.setMnemonic('i');		
-		statistics.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		statistics = new JMenuItem(netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				StatisticsPanel.showStatisticsPanel();
 			}
-		});		
+		});
+		statistics.setMnemonic('i');
 		toolsMenu.add(statistics);		
 
 
 		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
-		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries",KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)));				
-		batchProcessing.setMnemonic('b');				
-		batchProcessing.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new GuiAction("Batch processing", "Batch verification of multiple nets and queries", KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				if(checkForSaveAll()){
 					BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
 				}
 			}
 		});
+		batchProcessing.setMnemonic('b');
 		toolsMenu.add(batchProcessing);
 
-		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)));				
-		workflowDialog.setMnemonic('f');
-		workflowDialog.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				WorkflowDialog.showDialog();
 			}
 		});
+		workflowDialog.setMnemonic('f');
 		toolsMenu.add(workflowDialog);
 
 		//Stip off timing information
-		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new ToolAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));
-		stripTimeDialog.setMnemonic('e');
-		stripTimeDialog.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				duplicateTab((TabContent) appTab.getSelectedComponent());
 				convertToUntimedTab((TabContent) appTab.getSelectedComponent());
 			}
 		});
+		stripTimeDialog.setMnemonic('e');
 		toolsMenu.add(stripTimeDialog);
 
 		toolsMenu.addSeparator();
 
-		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",null));
-		engineSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new EngineDialogPanel().showDialog();				
+		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new EngineDialogPanel().showDialog();
 			}
 		});
 		toolsMenu.add(engineSelection);
@@ -2205,25 +2205,6 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
-
-	class ToolAction extends GuiAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 8910743226610517225L;
-
-		ToolAction(String name, String tooltip, KeyStroke keyStroke) {
-			super(name, tooltip, keyStroke);
-		}
-
-
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
 	class ZoomAction extends GuiAction {
 
 		/**
@@ -2297,7 +2278,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	
 	
-	
+
 	public void showAbout() {
 		StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
 		buffer.append("\n\n");
