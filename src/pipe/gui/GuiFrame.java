@@ -159,17 +159,17 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
 
-	private ViewAction showTokenAgeAction;
-	private ViewAction showComponentsAction;
-	private ViewAction showQueriesAction;
-	private ViewAction showConstantsAction;
-	private ViewAction showZeroToInfinityIntervalsAction;
-	private ViewAction showEnabledTransitionsAction;
-	private ViewAction showDelayEnabledTransitionsAction;
-	private ViewAction showToolTipsAction;
-	private ViewAction showAdvancedWorkspaceAction;
-	private ViewAction showSimpleWorkspaceAction;
-	private ViewAction saveWorkSpaceAction;
+	private GuiAction showTokenAgeAction;
+	private GuiAction showComponentsAction;
+	private GuiAction showQueriesAction;
+	private GuiAction showConstantsAction;
+	private GuiAction showZeroToInfinityIntervalsAction;
+	private GuiAction showEnabledTransitionsAction;
+	private GuiAction showDelayEnabledTransitionsAction;
+	private GuiAction showToolTipsAction;
+	private GuiAction showAdvancedWorkspaceAction;
+	private GuiAction showSimpleWorkspaceAction;
+	private GuiAction saveWorkSpaceAction;
 	private GuiAction showAboutAction;
 	private GuiAction showHomepage;
 	private GuiAction showAskQuestionAction;
@@ -573,47 +573,102 @@ public class GuiFrame extends JFrame implements Observer {
 
 		viewMenu.addSeparator();
 
-		showComponentsAction = new ViewAction("Display components", "Show/hide the list of components.",
-				KeyStroke.getKeyStroke('1', shortcutkey), true);
+		showComponentsAction = new GuiAction("Display components", "Show/hide the list of components.",
+				KeyStroke.getKeyStroke('1', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleComponents();
+			}
+		};
 		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
 
-		showQueriesAction = new ViewAction("Display queries", "Show/hide verification queries.",
-				KeyStroke.getKeyStroke('2', shortcutkey), true);
+		showQueriesAction = new GuiAction("Display queries", "Show/hide verification queries.",
+				KeyStroke.getKeyStroke('2', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleQueries();
+			}
+		};
 		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction);
 
-		showConstantsAction = new ViewAction("Display constants", "Show/hide global constants.",
-				KeyStroke.getKeyStroke('3', shortcutkey), true);
+		showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.",
+				KeyStroke.getKeyStroke('3', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleConstants();
+			}
+		};
 		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction);
 
-		showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
-				"Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true);
+		showEnabledTransitionsAction = new GuiAction("Display enabled transitions",
+				"Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleEnabledTransitionsList();
+			}
+		};
 		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction);
 
-		showDelayEnabledTransitionsAction = new ViewAction("Display future-enabled transitions",
+		showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions",
 				"Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('5', shortcutkey),
-				true);
+				true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleDelayEnabledTransitions();
+			}
+		};
 		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction);
 
-		showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+		showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)",
 				"Show/hide intervals [0,inf) that do not restrict transition firing in any way.",
-				KeyStroke.getKeyStroke('6', shortcutkey), true);
+				KeyStroke.getKeyStroke('6', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleZeroToInfinityIntervals();
+			}
+		};
 		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(),
 				showZeroToInfinityIntervalsAction);
 
-		showToolTipsAction = new ViewAction("Display tool tips", "Show/hide tool tips when mouse is over an element",
-				KeyStroke.getKeyStroke('7', shortcutkey), true);
+		showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element",
+				KeyStroke.getKeyStroke('7', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleToolTips();
+			}
+		};
 		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction);
 
-		showTokenAgeAction = new ViewAction("Display token age",
+		showTokenAgeAction = new GuiAction("Display token age",
 				"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)",
-				KeyStroke.getKeyStroke('8', shortcutkey), true);
+				KeyStroke.getKeyStroke('8', shortcutkey), true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleTokenAge();
+			}
+		};
 		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction);
 
 		viewMenu.addSeparator();
 
-		viewMenu.add( showSimpleWorkspaceAction = new ViewAction("Show simple workspace", "Show only the most important panels", false));
-		viewMenu.add( showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", "Show all panels", false));
-		viewMenu.add( saveWorkSpaceAction = new ViewAction("Save workspace", "Save the current workspace as the default one", false));
+		viewMenu.add( showSimpleWorkspaceAction = new GuiAction("Show simple workspace", "Show only the most important panels", false) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showAdvancedWorkspace(false);
+			}
+		});
+		viewMenu.add( showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showAdvancedWorkspace(true);
+			}
+		});
+		viewMenu.add( saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveWorkspace();
+			}
+		});
 		return viewMenu;
 	}
 
@@ -2242,52 +2297,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	
 	
-
-	class ViewAction extends GuiAction {
-
-		private static final long serialVersionUID = -5145846750992454638L;
-
-		ViewAction(String name, String tooltip, String keystroke, boolean toggleable) {
-			super(name, tooltip, keystroke, toggleable);
-		}
-
-		ViewAction(String name, String tooltip, KeyStroke keystroke, boolean toggleable) {
-			super(name, tooltip, keystroke, toggleable);
-		}
-		
-		ViewAction(String name, String tooltip, boolean toggleable) {
-			super(name, tooltip, toggleable);
-		}
-
-
-		public void actionPerformed(ActionEvent arg0) {
-
-			if (this == showComponentsAction){
-				toggleComponents();
-			} else if (this == showQueriesAction){
-				toggleQueries();
-			} else if (this == showConstantsAction){
-				toggleConstants();
-			} else if (this == showZeroToInfinityIntervalsAction) {
-				toggleZeroToInfinityIntervals();
-			} else if (this == showEnabledTransitionsAction) {
-				toggleEnabledTransitionsList();
-			} else if (this == showDelayEnabledTransitionsAction) {
-				toggleDelayEnabledTransitions();
-			} else if (this == showToolTipsAction) {
-				toggleToolTips();
-			} else if (this == showTokenAgeAction) {
-				toggleTokenAge();
-			} else if (this == showAdvancedWorkspaceAction){
-				showAdvancedWorkspace(true);
-			} else if (this == showSimpleWorkspaceAction){
-				showAdvancedWorkspace(false);
-			} else if (this == saveWorkSpaceAction){
-				saveWorkspace();
-			}
-		}
-
-	}
+	
 	public void showAbout() {
 		StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
 		buffer.append("\n\n");
