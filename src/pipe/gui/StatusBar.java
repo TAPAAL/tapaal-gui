@@ -40,7 +40,7 @@ public class StatusBar extends JPanel {
 			+ "double click to edit";
 
 	public static final String textforDrag = "Drag Mode";
-	
+
 
 	private JLabel label;
 

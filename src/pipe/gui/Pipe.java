@@ -15,8 +15,6 @@ public class Pipe {
 		FAST_TRANSITION, FAST_PLACE, 
 		//Others (refactore?)
 		STEPBACKWARD, STEPFORWARD, START, RANDOM, ANIMATE, TIMEPASS, DELAYFIRE,
-		//Components
-		PREVCOMPONENT, NEXTCOMPONENT
 	}
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;

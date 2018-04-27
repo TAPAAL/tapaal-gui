@@ -190,8 +190,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private AnimateAction randomAnimateAction;
 	private AnimateAction timeAction;
 	private AnimateAction delayFireAction;
-	private AnimateAction prevcomponentAction;
-	private AnimateAction nextcomponentAction;
+	private GuiAction prevcomponentAction;
+	private GuiAction nextcomponentAction;
 
 	public enum GUIMode {
 		draw, animation, noNet
@@ -693,11 +693,21 @@ public class GuiFrame extends JFrame implements Observer {
 		animateMenu.add( delayFireAction = new AnimateAction("Delay and fire",
 				ElementType.DELAYFIRE, "Delay and fire selected transition", "F"));
 
-		animateMenu.add( prevcomponentAction = new AnimateAction("Previous component",
-				ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
+		animateMenu.add( prevcomponentAction = new GuiAction("Previous component",
+				"Previous component", "pressed UP") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getCurrentTab().getTemplateExplorer().selectPrevious();
+			}
+		});
 
-		animateMenu.add( nextcomponentAction = new AnimateAction("Next component",
-				ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
+		animateMenu.add( nextcomponentAction = new GuiAction("Next component",
+				"Next component", "pressed DOWN") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getCurrentTab().getTemplateExplorer().selectNext();
+			}
+		});
 
 		animateMenu.addSeparator();
 
@@ -2024,12 +2034,8 @@ public class GuiFrame extends JFrame implements Observer {
 				updateMouseOverInformation();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
-			case PREVCOMPONENT:
-				CreateGui.getCurrentTab().getTemplateExplorer().selectPrevious();
-				break;
-			case NEXTCOMPONENT:
-				CreateGui.getCurrentTab().getTemplateExplorer().selectNext();
-				break;
+
+
 			default:
 				break;
 			}
