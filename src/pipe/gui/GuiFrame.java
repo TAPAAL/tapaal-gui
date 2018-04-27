@@ -1,11 +1,6 @@
 package pipe.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -21,6 +16,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.Action;
@@ -54,6 +50,7 @@ import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
+import javafx.scene.control.Toggle;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 
@@ -842,20 +839,27 @@ public class GuiFrame extends JFrame implements Observer {
 						"Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
 	}
 
+
 	private void buildToolbar() {
+
+		//XXX .setRequestFocusEnabled(false), removed "border" around tollbar buttons when selcted/focus
+		// https://stackoverflow.com/questions/9361658/disable-jbutton-focus-border and
+		//https://stackoverflow.com/questions/20169436/how-to-prevent-toolbar-button-focus-in-java-swing
+
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);// Inhibit toolbar floating
+		toolBar.setRequestFocusEnabled(false);
 
 		// Basis file operations
-		toolBar.add(createAction);
-		toolBar.add(openAction);
-		toolBar.add(saveAction);
-		toolBar.add(saveAsAction);
+		toolBar.add(createAction).setRequestFocusEnabled(false);
+		toolBar.add(openAction).setRequestFocusEnabled(false);
+		toolBar.add(saveAction).setRequestFocusEnabled(false);
+		toolBar.add(saveAsAction).setRequestFocusEnabled(false);
 
 		// Print
 		toolBar.addSeparator();
-		toolBar.add(printAction);
+		toolBar.add(printAction).setRequestFocusEnabled(false);
 
 		// Copy/past
 		/*
@@ -866,31 +870,33 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Undo/redo
 		toolBar.addSeparator();
-		toolBar.add(deleteAction);
-		toolBar.add(undoAction);
-		toolBar.add(redoAction);
+		toolBar.add(deleteAction).setRequestFocusEnabled(false);
+		toolBar.add(undoAction).setRequestFocusEnabled(false);
+		toolBar.add(redoAction).setRequestFocusEnabled(false);
 
 		// Zoom
 		toolBar.addSeparator();
-		toolBar.add(zoomOutAction);
+		toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
 		addZoomComboBox(toolBar, new ZoomAction("Zoom",
 				"Select zoom percentage ", ""));
-		toolBar.add(zoomInAction);
+		toolBar.add(zoomInAction).setRequestFocusEnabled(false);
 
 		// Modes
 
 		toolBar.addSeparator();
-		toolBar.add(toggleGrid);
+		toolBar.add(toggleGrid).setRequestFocusEnabled(false);
+
 		toolBar.add(new ToggleButton(startAction));
 
 		// Start drawingToolBar
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
 		drawingToolBar.addSeparator();
+		drawingToolBar.setRequestFocusEnabled(false);
 
 		// Normal arraw
-
 		drawingToolBar.add(new ToggleButton(selectAction));
+
 
 		// Drawing elements
 		drawingToolBar.addSeparator();
@@ -1930,11 +1936,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 			animBox = CreateGui.getAnimationHistory();
 
-			// Hack to ensure the toolbar is not in focus
-			if(CreateGui.getAnimationController() != null){
-				CreateGui.getAnimationController().requestFocusInWindow();
-			}
-
 			switch (typeID) {
 			case START:
 				actionStartAnimation();				
@@ -2716,6 +2717,7 @@ public class GuiFrame extends JFrame implements Observer {
 				// toggle buttons like to have images *and* text, nasty
 				setText(null);
 			}
+			this.setRequestFocusEnabled(false);
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) {
