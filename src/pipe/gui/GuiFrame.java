@@ -188,8 +188,8 @@ public class GuiFrame extends JFrame implements Observer {
 	public AnimateAction stepbackwardAction;
 	private AnimateAction randomAction;
 	private AnimateAction randomAnimateAction;
-	private AnimateAction timeAction;
-	private AnimateAction delayFireAction;
+	private GuiAction timeAction;
+	private GuiAction delayFireAction;
 	private GuiAction prevcomponentAction;
 	private GuiAction nextcomponentAction;
 
@@ -687,11 +687,23 @@ public class GuiFrame extends JFrame implements Observer {
 				stepforwardAction = new AnimateAction("Step forward",
 						ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
 
-		animateMenu.add( timeAction = new AnimateAction("Delay one time unit",
-				ElementType.TIMEPASS, "Let time pass one time unit", "W"));
+		animateMenu.add( timeAction = new GuiAction("Delay one time unit",
+				"Let time pass one time unit", "W") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+			}
+		});
 
-		animateMenu.add( delayFireAction = new AnimateAction("Delay and fire",
-				ElementType.DELAYFIRE, "Delay and fire selected transition", "F"));
+		animateMenu.add( delayFireAction = new GuiAction("Delay and fire",
+				"Delay and fire selected transition", "F") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+			}
+		});
 
 		animateMenu.add( prevcomponentAction = new GuiAction("Previous component",
 				"Previous component", "pressed UP") {
@@ -2009,16 +2021,6 @@ public class GuiFrame extends JFrame implements Observer {
 			switch (typeID) {
 			case START:
 				actionStartAnimation();				
-				break;
-
-			case TIMEPASS:
-				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
-				break;
-
-			case DELAYFIRE:
-				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case STEPFORWARD:
