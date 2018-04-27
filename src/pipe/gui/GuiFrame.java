@@ -693,6 +693,7 @@ public class GuiFrame extends JFrame implements Observer {
 			public void actionPerformed(ActionEvent e) {
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				updateMouseOverInformation();
 			}
 		});
 
@@ -702,6 +703,7 @@ public class GuiFrame extends JFrame implements Observer {
 			public void actionPerformed(ActionEvent e) {
 				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				updateMouseOverInformation();
 			}
 		});
 
@@ -2043,15 +2045,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		}
 
-		private void updateMouseOverInformation() {
-			// update mouseOverView
-			for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
-				if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
-					((TimedPlaceComponent) p).showAgeOfTokens(true);
-				}
-			}
-			
-		}
+
 
 		private void actionStartAnimation() {
 			try {
@@ -2117,9 +2111,19 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
+	/**
+	 * Updates the mouseOver label showing token ages in animationmode
+	 * when a "animation" action is happening. "live updates" any mouseOver label
+	 */
+	private void updateMouseOverInformation() {
+		// update mouseOverView
+		for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
+			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
+				((TimedPlaceComponent) p).showAgeOfTokens(true);
+			}
+		}
 
-
-
+	}
 
 
 	class TypeAction extends GuiAction {
