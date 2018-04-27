@@ -109,8 +109,7 @@ public class AnimationController extends JPanel {
 		}
 	}
 
-	GuiAction startAction, stepforwardAction, stepbackwardAction,
-			randomAction, randomAnimateAction, timeAction;
+	GuiAction startAction, stepforwardAction, stepbackwardAction;
 
 	public AnimationController(NetType netType) {
 		startAction = CreateGui.appGui.startAction;
@@ -120,14 +119,6 @@ public class AnimationController extends JPanel {
 
 		stepbackwardAction.setEnabled(false);
 		stepforwardAction.setEnabled(false);
-
-		// timeAction = new AnimateAction("Time", Pipe.TIMEPASS,
-		// "Let Time pass", "_");
-
-		//randomAction = new AnimateAction("Random", ElementType.RANDOM,
-		//		"Randomly fire a transition", "typed 5");
-		//randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
-		//		"Randomly fire a number of transitions", "typed 7", true);
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();

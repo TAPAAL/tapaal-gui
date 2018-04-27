@@ -184,8 +184,6 @@ public class GuiFrame extends JFrame implements Observer {
 	public GuiAction startAction;
 	public GuiAction stepforwardAction;
 	public GuiAction stepbackwardAction;
-	private GuiAction randomAction;
-	private GuiAction randomAnimateAction;
 	private GuiAction timeAction;
 	private GuiAction delayFireAction;
 	private GuiAction prevcomponentAction;
@@ -756,18 +754,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}		
 		});
 
-		randomAction = new GuiAction("Random", "Randomly fire a transition", "typed 5") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
 
-			}
-		};
-		randomAnimateAction = new GuiAction("Simulate", "Randomly fire a number of transitions", "typed 7", true) {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-			}
-		};
 		return animateMenu;
 	}
 
@@ -1762,8 +1749,6 @@ public class GuiFrame extends JFrame implements Observer {
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
 		}
-		randomAction.setEnabled(!on);
-		randomAnimateAction.setSelected(on);
 	}
 
 	/**
