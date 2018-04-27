@@ -12,9 +12,7 @@ public class Pipe {
 		//Others (might refactore)
 		ADDTOKEN, DELTOKEN, SELECT, DELETE, DRAW, GRID, DRAG, CREATING,
 		//Fast modes
-		FAST_TRANSITION, FAST_PLACE, 
-		//Others (refactore?)
-		STEPBACKWARD, STEPFORWARD, START, RANDOM, ANIMATE
+		FAST_TRANSITION, FAST_PLACE
 	}
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;

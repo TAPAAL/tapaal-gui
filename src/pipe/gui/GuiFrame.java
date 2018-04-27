@@ -181,11 +181,11 @@ public class GuiFrame extends JFrame implements Observer {
 	private JMenuItem statistics;
 	private JMenuItem verification;
 
-	public AnimateAction startAction;
-	public AnimateAction stepforwardAction;
-	public AnimateAction stepbackwardAction;
-	private AnimateAction randomAction;
-	private AnimateAction randomAnimateAction;
+	public GuiAction startAction;
+	public GuiAction stepforwardAction;
+	public GuiAction stepbackwardAction;
+	private GuiAction randomAction;
+	private GuiAction randomAnimateAction;
 	private GuiAction timeAction;
 	private GuiAction delayFireAction;
 	private GuiAction prevcomponentAction;
@@ -674,16 +674,36 @@ public class GuiFrame extends JFrame implements Observer {
 		/* Simulator */
 		JMenu animateMenu = new JMenu("Simulator");
 		animateMenu.setMnemonic('A');
-		animateMenu.add( startAction = new AnimateAction(
-				"Simulation mode", ElementType.START, "Toggle simulation mode (M)",
-				"M", true));
+		animateMenu.add( startAction = new GuiAction(
+				"Simulation mode", "Toggle simulation mode (M)",
+				"M", true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleAnimationMode();
+			}
+		});
 		
 		
-		animateMenu.add( stepbackwardAction = new AnimateAction("Step backward",
-				ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
+		animateMenu.add( stepbackwardAction = new GuiAction("Step backward",
+				"Step backward", "pressed LEFT") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getAnimationHistory().stepBackwards();
+				CreateGui.getAnimator().stepBack();
+				updateMouseOverInformation();
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+			}
+		});
 		animateMenu.add(
-				stepforwardAction = new AnimateAction("Step forward",
-						ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
+				stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						CreateGui.getAnimationHistory().stepForward();
+						CreateGui.getAnimator().stepForward();
+						updateMouseOverInformation();
+						CreateGui.getAnimationController().setAnimationButtonsEnabled();
+					}
+				});
 
 		animateMenu.add( timeAction = new GuiAction("Delay one time unit",
 				"Let time pass one time unit", "W") {
@@ -736,10 +756,18 @@ public class GuiFrame extends JFrame implements Observer {
 			}		
 		});
 
-		randomAction = new AnimateAction("Random", ElementType.RANDOM,
-				"Randomly fire a transition", "typed 5");
-		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
-				"Randomly fire a number of transitions", "typed 7", true);
+		randomAction = new GuiAction("Random", "Randomly fire a transition", "typed 5") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		};
+		randomAnimateAction = new GuiAction("Simulate", "Randomly fire a number of transitions", "typed 7", true) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		};
 		return animateMenu;
 	}
 
@@ -1983,69 +2011,6 @@ public class GuiFrame extends JFrame implements Observer {
                 }
                 return false;
         }
-
-	class AnimateAction extends GuiAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 8582324286370859664L;
-		private ElementType typeID;
-		private AnimationHistoryComponent animBox;
-
-		AnimateAction(String name, ElementType typeID, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-			this.typeID = typeID;
-		}
-
-		AnimateAction(String name, ElementType typeID, String tooltip,
-				String keystroke, boolean toggleable) {
-			super(name, tooltip, keystroke, toggleable);
-			this.typeID = typeID;
-		}
-
-		public AnimateAction(String name, ElementType typeID, String tooltip,
-				KeyStroke keyStroke) {
-			super(name, tooltip, keyStroke);
-			this.typeID = typeID;
-
-		}
-
-		public void actionPerformed(ActionEvent ae) {
-			if (appView == null) {
-				return;
-			}
-
-			switch (typeID) {
-			case START:
-				toggleAnimationMode();
-				break;
-
-			case STEPFORWARD:
-				CreateGui.getAnimationHistory().stepForward();
-				CreateGui.getAnimator().stepForward();
-				updateMouseOverInformation();
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
-				break;
-
-			case STEPBACKWARD:
-				CreateGui.getAnimationHistory().stepBackwards();
-				CreateGui.getAnimator().stepBack();
-				updateMouseOverInformation();
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
-				break;
-
-
-			default:
-				break;
-			}
-		}
-
-
-
-
-
-	}
 
 
 	/**

@@ -38,7 +38,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.DocumentFilter.FilterBypass;
 import pipe.dataLayer.NetType;
-import pipe.gui.GuiFrame.AnimateAction;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.DecimalOnlyDocumentFilter;
@@ -110,7 +109,7 @@ public class AnimationController extends JPanel {
 		}
 	}
 
-	AnimateAction startAction, stepforwardAction, stepbackwardAction,
+	GuiAction startAction, stepforwardAction, stepbackwardAction,
 			randomAction, randomAnimateAction, timeAction;
 
 	public AnimationController(NetType netType) {
