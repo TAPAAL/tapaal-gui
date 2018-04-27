@@ -2137,23 +2137,20 @@ public class GuiFrame extends JFrame implements Observer {
 				return;
 			}
 
-			appView.getSelectionObject().disableSelection();
-
 			setMode(typeID);
 			statusBar.changeText(typeID);
 
-			if ((typeID != ElementType.ARC) && (appView.createArc != null)) {
+			//Disable selection and deselect current selection
+			appView.getSelectionObject().disableSelection();
 
+			//If pending arc draw, remove it
+			if (appView.createArc != null) {
 				appView.createArc.delete();
 				appView.createArc = null;
 				appView.repaint();
-
 			}
 
 			if (typeID == ElementType.SELECT) {
-				// disable drawing to eliminate possiblity of connecting arc to
-				// old coord of moved component
-				statusBar.changeText(typeID);
 				appView.getSelectionObject().enableSelection();
 				appView.setCursorType("arrow");
 			} else if (typeID == ElementType.DRAG) {
@@ -2205,9 +2202,11 @@ public class GuiFrame extends JFrame implements Observer {
 						didZoom = zoomer.zoomOut();
 						break;
 					default:
+						//Selected from combobox
 						if (actionName.equals("Zoom")) {
 							selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
 						}
+						//Selected from zoom menu
 						if (e.getSource() instanceof JMenuItem) {
 							selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
 						}
