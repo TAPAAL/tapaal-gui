@@ -133,9 +133,9 @@ Printable, DrawingSurface {
 			add(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == ElementType.SELECT)
+		if(CreateGui.getApp().getMode() == ElementType.SELECT) {
 			this.selection.enableSelection();
-
+		}
 
 	}
 
