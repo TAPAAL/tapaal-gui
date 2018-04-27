@@ -50,7 +50,6 @@ import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
-import javafx.scene.control.Toggle;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 
@@ -76,7 +75,6 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
-import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
@@ -2018,22 +2016,20 @@ public class GuiFrame extends JFrame implements Observer {
 				return;
 			}
 
-			animBox = CreateGui.getAnimationHistory();
-
 			switch (typeID) {
 			case START:
-				actionStartAnimation();				
+				toggleAnimationMode();
 				break;
 
 			case STEPFORWARD:
-				animBox.stepForward();
+				CreateGui.getAnimationHistory().stepForward();
 				CreateGui.getAnimator().stepForward();
 				updateMouseOverInformation();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case STEPBACKWARD:
-				animBox.stepBackwards();
+				CreateGui.getAnimationHistory().stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				updateMouseOverInformation();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -2047,66 +2043,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 
-		private void actionStartAnimation() {
-			try {
 
-				if (!appView.isInAnimationMode()) {
-					if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
-						CreateGui.getCurrentTab().rememberSelectedTemplate();
-						if (CreateGui.getCurrentTab().currentTemplate().isActive()){
-							CreateGui.getCurrentTab().setSelectedTemplateWasActive();
-						}
-						restoreMode();
-						PetriNetObject.ignoreSelection(true);
-						setAnimationMode(!appView.isInAnimationMode());
-						if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {								
-							CreateGui.getCurrentTab().restoreSelectedTemplate();
-							CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
-						}
-						else {
-							CreateGui.getCurrentTab().selectFirstActiveTemplate();
-						}
-						//Enable simulator focus traversal policy							
-						CreateGui.appGui.setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
-					} else {
-						JOptionPane.showMessageDialog(GuiFrame.this, 
-								"You need at least one active template to enter simulation mode",
-								"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
-					}
-
-					stepforwardAction.setEnabled(false);
-					stepbackwardAction.setEnabled(false);
-				} else {
-					setMode(typeID);
-					PetriNetObject.ignoreSelection(false);
-					appView.getSelectionObject().clearSelection();
-					setAnimationMode(!appView.isInAnimationMode());
-					CreateGui.getCurrentTab().restoreSelectedTemplate();
-					//Enable editor focus traversal policy
-					CreateGui.appGui.setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
-				}
-			} catch (Exception e) {
-				Logger.log(e);
-				JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
-				startAction.setSelected(false);
-				appView.changeAnimationMode(false);
-				throw new RuntimeException(e);
-			}
-
-			if(getGUIMode().equals(GUIMode.draw)){
-				activateSelectAction();
-
-				// XXX
-				// This is a fix for bug #812694 where on mac some menues are gray after
-				// changing from simulation mode, when displaying a trace. Showing and 
-				// hiding a menu seems to fix this problem 
-				JDialog a = new JDialog(CreateGui.appGui, false);
-				a.setUndecorated(true);
-				a.setVisible(true);
-				a.dispose();
-			}
-		}
 
 	}
 
@@ -2125,6 +2062,69 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
+	/**
+	 * Starts/Stops Animation mode
+	 */
+	private void toggleAnimationMode() {
+		try {
+
+			if (!appView.isInAnimationMode()) {
+				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+					CreateGui.getCurrentTab().rememberSelectedTemplate();
+					if (CreateGui.getCurrentTab().currentTemplate().isActive()){
+						CreateGui.getCurrentTab().setSelectedTemplateWasActive();
+					}
+					restoreMode();
+					PetriNetObject.ignoreSelection(true);
+					setAnimationMode(!appView.isInAnimationMode());
+					if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {
+						CreateGui.getCurrentTab().restoreSelectedTemplate();
+						CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
+					}
+					else {
+						CreateGui.getCurrentTab().selectFirstActiveTemplate();
+					}
+					//Enable simulator focus traversal policy
+					CreateGui.appGui.setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+				} else {
+					JOptionPane.showMessageDialog(GuiFrame.this,
+							"You need at least one active template to enter simulation mode",
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+				stepforwardAction.setEnabled(false);
+				stepbackwardAction.setEnabled(false);
+			} else {
+				setMode(typeID);
+				PetriNetObject.ignoreSelection(false);
+				appView.getSelectionObject().clearSelection();
+				setAnimationMode(!appView.isInAnimationMode());
+				CreateGui.getCurrentTab().restoreSelectedTemplate();
+				//Enable editor focus traversal policy
+				CreateGui.appGui.setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
+			}
+		} catch (Exception e) {
+			Logger.log(e);
+			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
+					"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
+			startAction.setSelected(false);
+			appView.changeAnimationMode(false);
+			throw new RuntimeException(e);
+		}
+
+		if(getGUIMode().equals(GUIMode.draw)){
+			activateSelectAction();
+
+			// XXX
+			// This is a fix for bug #812694 where on mac some menues are gray after
+			// changing from simulation mode, when displaying a trace. Showing and
+			// hiding a menu seems to fix this problem
+			JDialog a = new JDialog(CreateGui.appGui, false);
+			a.setUndecorated(true);
+			a.setVisible(true);
+			a.dispose();
+		}
+	}
 
 	class TypeAction extends GuiAction {
 
