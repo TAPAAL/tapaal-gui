@@ -178,7 +178,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GuiAction checkUpdate;
 
 
-	private SelectAllAction selectAllAction;
+	private GuiAction selectAllAction;
 
 	private JMenuItem statistics;
 	private JMenuItem verification;
@@ -469,7 +469,12 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.addSeparator();
 
 
-		editMenu.add(selectAllAction = new SelectAllAction("Select all", "Select all components", "ctrl A"));
+		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components", "ctrl A") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getView().getSelectionObject().selectAll();
+			}
+		});
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
 		editMenu.getActionMap().put("SelectAll", selectAllAction);
 
@@ -2052,18 +2057,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 
-	class SelectAllAction extends GuiAction {
 
-		private static final long serialVersionUID = -9223372036854775808L;
-
-		SelectAllAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			CreateGui.getView().getSelectionObject().selectAll();
-		}
-	}
 
 	class TypeAction extends GuiAction {
 
