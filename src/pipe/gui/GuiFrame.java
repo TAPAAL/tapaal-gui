@@ -2095,7 +2095,7 @@ public class GuiFrame extends JFrame implements Observer {
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
 			} else {
-				setMode(typeID);
+				//setMode(ElementType.START);
 				PetriNetObject.ignoreSelection(false);
 				appView.getSelectionObject().clearSelection();
 				setAnimationMode(!appView.isInAnimationMode());
