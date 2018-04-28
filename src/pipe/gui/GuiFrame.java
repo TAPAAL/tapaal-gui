@@ -2209,15 +2209,7 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 				if (didZoom) {
 					updateZoomCombo();
-
-					double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
-							+ (thisView.getWidth() * 0.5), zoomer.getPercent());
-					double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
-							+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-
-					java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
-
-					appView.zoomTo(midpoint);
+					appView.zoomToMidPoint(); //Do Zoom
 				}
 			} catch (ClassCastException cce) {
 				// zoom

@@ -461,6 +461,13 @@ Printable, DrawingSurface {
 		return (new java.awt.Point((int) midpointX, (int) midpointY));
 	}
 
+	void zoomToMidPoint() {
+
+		Point midpoint = midpoint(zoomControl.getPercent());
+		zoomTo(midpoint);
+
+	}
+
 	public void zoomIn() {
 		int zoom = zoomControl.getPercent();
 		if (zoomControl.zoomIn()) {

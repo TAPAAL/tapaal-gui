@@ -8,4 +8,5 @@ public interface DrawingSurface {
 	Component add(Component component);
 
 	void remove(Component component);
+
 }
