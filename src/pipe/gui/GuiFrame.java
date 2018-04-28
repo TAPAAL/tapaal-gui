@@ -105,7 +105,6 @@ public class GuiFrame extends JFrame implements Observer {
 			"120%", "140%", "160%", "180%", "200%", "300%" };
 	
 	private String frameTitle;
-	private GuiFrame appGui;
 	private DrawingSurfaceImpl appView;
 	private Pipe.ElementType mode, prev_mode; 
 	private int newNameCounter = 1;
@@ -1312,8 +1311,8 @@ public class GuiFrame extends JFrame implements Observer {
 					setGUIMode(GUIMode.draw);
 
 					// TODO: change this code... it's ugly :)
-					if (appGui.getMode() == ElementType.SELECT) {
-						appGui.activateSelectAction();
+					if (getMode() == ElementType.SELECT) {
+						activateSelectAction();
 					}
 
 				} else {
@@ -1323,7 +1322,6 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 		});
-		appGui = CreateGui.getApp();
 		appView = CreateGui.getView();
 
 	}
@@ -1983,7 +1981,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		
 		tabContent.currentTemplate().guiModel().repaintAll(true);
-		appGui.appView.updatePreferredSize();
+		appView.updatePreferredSize();
 	}
         
         private boolean canNetBeSavedAndShowMessage() {
@@ -2186,7 +2184,7 @@ public class GuiFrame extends JFrame implements Observer {
 				Zoomer zoomer = appView.getZoomController();
 				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
 				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
-				String selectedZoomLevel = null;
+
 
 				/*
 				 * Zoom action name overview
@@ -2202,6 +2200,8 @@ public class GuiFrame extends JFrame implements Observer {
 						didZoom = zoomer.zoomOut();
 						break;
 					default:
+						String selectedZoomLevel = null;
+
 						//Selected from combobox
 						if (actionName.equals("Zoom")) {
 							selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
