@@ -348,17 +348,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	/**
-	 * This method does build the menus
-	 * 
-	 * @author Dave Patterson - fixed problem on OSX due to invalid character in
-	 *         URI caused by unescaped blank. The code changes one blank
-	 *         character if it exists in the string version of the URL. This way
-	 *         works safely in both OSX and Windows. I also added a
-	 *         printStackTrace if there is an exception caught in the setup for
-	 *         the "Example nets" folder.
-	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk>, 2011-06-28
-	 * 	       Code cleanup, removed unused parts, Refactored help menu, Fixed 
-	 *         loading of Example Nets to work if we create a Jar. 
+	 * Build the menues and actions
 	 **/
 	private void buildMenus() {
 		menuBar = new JMenuBar();
