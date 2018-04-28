@@ -53,7 +53,7 @@ public class TAPAAL {
 		CreateGui.init();
 
 		// Enable debug
-		if (commandline.hasOption("debug")) {
+		if (commandline.hasOption("debug") || TAPAAL.VERSION == "DEV") {
 			Logger.enableLogging(true);
 		}
 
