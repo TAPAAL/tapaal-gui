@@ -101,8 +101,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
-	private final String[] zoomExamples = { "40%", "60%", "80%", "100%",
-			"120%", "140%", "160%", "180%", "200%", "300%" };
+	private final int[] zoomExamples = { 40, 60, 80, 100,
+			120, 140, 160, 180, 200, 300 };
 	
 	private String frameTitle;
 	private DrawingSurfaceImpl appView;
@@ -140,7 +140,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
 	private GuiAction stripTimeDialogAction;
-	private ZoomAction zoomOutAction, zoomInAction;
+	private GuiAction zoomOutAction;
+	private GuiAction zoomInAction;
 
 	private GuiAction incSpacingAction;
 	private GuiAction decSpacingAction;
@@ -516,11 +517,29 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		addZoomMenuItems(zoomMenu);
 
-		viewMenu.add( zoomInAction = new ZoomAction("Zoom in",
-				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)));
+		viewMenu.add( zoomInAction = new GuiAction("Zoom in",
+				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean didZoom = appView.getZoomController().zoomIn();
+				if (didZoom) {
+					updateZoomCombo();
+					appView.zoomToMidPoint(); //Do Zoom
+				}
+			}
+		});
 
-		viewMenu.add( zoomOutAction = new ZoomAction("Zoom out",
-				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)));
+		viewMenu.add( zoomOutAction = new GuiAction("Zoom out",
+				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean didZoom = appView.getZoomController().zoomOut();
+				if (didZoom) {
+					updateZoomCombo();
+					appView.zoomToMidPoint(); //Do Zoom
+				}
+			}
+		});
 		viewMenu.add(zoomMenu);
 
 		viewMenu.addSeparator();
@@ -963,8 +982,20 @@ public class GuiFrame extends JFrame implements Observer {
 		// Zoom
 		toolBar.addSeparator();
 		toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
-		addZoomComboBox(toolBar, new ZoomAction("Zoom",
-				"Select zoom percentage ", ""));
+		addZoomComboBox(toolBar, new GuiAction("Zoom", "Select zoom percentage ", "") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
+				//parse selected zoom level, and strip of %.
+				int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
+
+				boolean didZoom = appView.getZoomController().setZoom(newZoomLevel);
+				if (didZoom) {
+					updateZoomCombo();
+					appView.zoomToMidPoint(); //Do Zoom
+				}
+			}
+		});
 		toolBar.add(zoomInAction).setRequestFocusEnabled(false);
 
 		// Modes
@@ -1029,12 +1060,25 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	private void addZoomMenuItems(JMenu zoomMenu) {
 		for (int i = 0; i <= zoomExamples.length - 1; i++) {
-			ZoomAction a = new ZoomAction(zoomExamples[i], "Select zoom percentage", "");
 
-			JMenuItem newItem = new JMenuItem(a);
+			final int zoomper = zoomExamples[i];
+			GuiAction newZoomAction = new GuiAction(zoomExamples[i] + "%", "Select zoom percentage", "") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					boolean didZoom = appView.getZoomController().setZoom(zoomper);
+					if (didZoom) {
+						updateZoomCombo();
+						appView.zoomToMidPoint(); //Do Zoom
+					}
+				}
+			};
 
-			zoomMenu.add(newItem);
+			//JMenuItem newItem = new JMenuItem(a);
+
+			zoomMenu.add(newZoomAction);
 		}
+
+
 	}
 
 	/**
@@ -1048,7 +1092,14 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	private void addZoomComboBox(JToolBar toolBar, Action action) {
 		Dimension zoomComboBoxDimension = new Dimension(75, 28);
-		zoomComboBox = new JComboBox<String>(zoomExamples);
+
+		String[] zoomExamplesStrings = new String[zoomExamples.length];
+		int i;
+		for (i=0; i < zoomExamples.length; i++) {
+			zoomExamplesStrings[i] = zoomExamples[i] + "%";
+		}
+
+		zoomComboBox = new JComboBox<String>(zoomExamplesStrings);
 		zoomComboBox.setEditable(true);
 		zoomComboBox.setSelectedItem("100%");
 		zoomComboBox.setMaximumRowCount(zoomExamples.length);
@@ -2152,73 +2203,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
-	class ZoomAction extends GuiAction {
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 549331166742882564L;
-
-		ZoomAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-		ZoomAction(String name, String tooltip, KeyStroke keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			// This is set to true if a valid zoom action is performed
-			boolean didZoom;
-			try {
-				String actionName = (String) getValue(NAME);
-				Zoomer zoomer = appView.getZoomController();
-				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
-				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
-
-
-				/*
-				 * Zoom action name overview
-				 * Zoom in: the zoom IN icon in panel has been pressed
-				 * Zoom out: the zoom OUT icon in panel has been pressed
-				 * Zoom: a specific zoom level has been chosen in drop down or in the menu.
-				 */
-				switch (actionName) {
-					case "Zoom in":
-						didZoom = zoomer.zoomIn();
-						break;
-					case "Zoom out":
-						didZoom = zoomer.zoomOut();
-						break;
-					default:
-						String selectedZoomLevel = null;
-
-						//Selected from combobox
-						if (actionName.equals("Zoom")) {
-							selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
-						}
-						//Selected from zoom menu
-						if (e.getSource() instanceof JMenuItem) {
-							selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
-						}
-
-						//parse selected zoom level, and strip of %.
-						int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
-
-						didZoom = zoomer.setZoom(newZoomLevel);
-						break;
-				}
-				if (didZoom) {
-					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
-				}
-			} catch (ClassCastException cce) {
-				// zoom
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-
-	}
 	
 	
 
