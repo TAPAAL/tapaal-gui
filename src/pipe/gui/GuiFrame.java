@@ -132,7 +132,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GuiAction exportTraceAction;
 	private GuiAction importTraceAction;
 
-	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
+	private GuiAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
 	private GuiAction netStatisticsAction;
 	private GuiAction batchProcessingAction;
@@ -372,12 +372,28 @@ public class GuiFrame extends JFrame implements Observer {
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
-		editMenu.add( undoAction = new EditAction("Undo",
-				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)));
+		editMenu.add( undoAction = new GuiAction("Undo",
+				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (CreateGui.getApp().isEditionAllowed()) {
+					appView.getUndoManager().undo();
+					CreateGui.getCurrentTab().network().buildConstraints();
+				}
+			}
+		});
 		
 		
-		editMenu.add( redoAction = new EditAction("Redo",
-				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)));
+		editMenu.add( redoAction = new GuiAction("Redo",
+				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (CreateGui.getApp().isEditionAllowed()) {
+					appView.getUndoManager().redo();
+					CreateGui.getCurrentTab().network().buildConstraints();
+				}
+			}
+		});
 		editMenu.addSeparator();
 
 		editMenu.add( deleteAction = new GuiAction("Delete", "Delete selection", "DELETE") {
@@ -2564,50 +2580,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	
 
-	class EditAction extends GuiAction {
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 2402602825981305085L;
-
-		EditAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-		EditAction(String name, String tooltip, KeyStroke keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-
-			if (CreateGui.getApp().isEditionAllowed()) {
-				/*
-				 * if (this == cutAction) { ArrayList selection =
-				 * appView.getSelectionObject().getSelection();
-				 * appGui.getCopyPasteManager().setUpPaste(selection, appView);
-				 * appView.getUndoManager().newEdit(); // new "transaction""
-				 * appView.getUndoManager().deleteSelection(selection);
-				 * appView.getSelectionObject().deleteSelection();
-				 * pasteAction.setEnabled
-				 * (appGui.getCopyPasteManager().pasteEnabled()); } else if
-				 * (this == copyAction) {
-				 * appGui.getCopyPasteManager().setUpPaste(
-				 * appView.getSelectionObject().getSelection(), appView);
-				 * pasteAction
-				 * .setEnabled(appGui.getCopyPasteManager().pasteEnabled()); }
-				 * else if (this == pasteAction) {
-				 * appView.getSelectionObject().clearSelection();
-				 * appGui.getCopyPasteManager().startPaste(appView); } else
-				 */if (this == undoAction) {
-					 appView.getUndoManager().undo();
-					 CreateGui.getCurrentTab().network().buildConstraints();
-				 } else if (this == redoAction) {
-					 appView.getUndoManager().redo();
-					 CreateGui.getCurrentTab().network().buildConstraints();
-				 }				 
-			}
-		}
-	}
 
 	/**
 	 * A JToggleButton that watches an Action for selection change
