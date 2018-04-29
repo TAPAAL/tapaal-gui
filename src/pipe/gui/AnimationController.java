@@ -348,7 +348,7 @@ public class AnimationController extends JPanel {
 	}
 
 	private void addTimeDelayToHistory() {
-		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animBox = CreateGui.getCurrentTab().getAnimationHistory();
 		try {
 
 			// Hack to allow usage of localised numbes
@@ -437,7 +437,7 @@ public class AnimationController extends JPanel {
 	}
 
 	public void setAnimationButtonsEnabled() {
-		AnimationHistoryComponent animationHistory = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animationHistory = CreateGui.getCurrentTab().getAnimationHistory();
 
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());

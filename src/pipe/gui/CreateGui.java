@@ -244,11 +244,6 @@ public class CreateGui {
 		tab.removeAbstractAnimationPane();
 	}
 
-	public static AnimationHistoryComponent getAnimationHistory() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getAnimationHistory();
-	}
-
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
 	}

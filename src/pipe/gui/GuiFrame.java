@@ -709,7 +709,7 @@ public class GuiFrame extends JFrame implements Observer {
 				"Step backward", "pressed LEFT") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getAnimationHistory().stepBackwards();
+				CreateGui.getCurrentTab().getAnimationHistory().stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				updateMouseOverInformation();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -719,7 +719,7 @@ public class GuiFrame extends JFrame implements Observer {
 				stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						CreateGui.getAnimationHistory().stepForward();
+						CreateGui.getCurrentTab().getAnimationHistory().stepForward();
 						CreateGui.getAnimator().stepForward();
 						updateMouseOverInformation();
 						CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -1792,8 +1792,8 @@ public class GuiFrame extends JFrame implements Observer {
 	public void setRandomAnimationMode(boolean on) {
 
 		if (!(on)) {
-			stepforwardAction.setEnabled(CreateGui.getAnimationHistory().isStepForwardAllowed());
-			stepbackwardAction.setEnabled(CreateGui.getAnimationHistory().isStepBackAllowed());
+			stepforwardAction.setEnabled(CreateGui.getCurrentTab().getAnimationHistory().isStepForwardAllowed());
+			stepbackwardAction.setEnabled(CreateGui.getCurrentTab().getAnimationHistory().isStepBackAllowed());
 
 			CreateGui.getAnimationController().setAnimationButtonsEnabled();
 

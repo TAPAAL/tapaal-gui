@@ -80,7 +80,7 @@ public class Animator {
 		currentAction = -1;
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
-		CreateGui.getAnimationHistory().setSelectedIndex(0);
+		CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(0);
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
@@ -113,7 +113,7 @@ public class Animator {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-			CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+			CreateGui.getCurrentTab().getAnimationHistory().setLastShown(getTrace().getTraceType());
 		}
 	}
 
@@ -267,7 +267,7 @@ public class Animator {
 
 	public void stepForward() {
 		if(currentAction == actionHistory.size()-1 && trace != null){
-			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
+			int selectedIndex = CreateGui.getCurrentTab().getAnimationHistory().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
 
@@ -278,7 +278,7 @@ public class Animator {
 				addToTimedTrace(getTrace().getLoopSteps());
 			}
 
-			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+			CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(selectedIndex);
 			currentAction = action;
 			currentMarkingIndex = markingIndex;
 		}
@@ -514,7 +514,7 @@ public class Animator {
 			removeStoredActions(currentAction + 1);
 
 		tab.network().setMarking(marking);
-		CreateGui.getAnimationHistory().addHistoryItem(action.toString());
+		CreateGui.getCurrentTab().getAnimationHistory().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
 		currentAction++;
@@ -661,7 +661,7 @@ public class Animator {
 			answer = removeSetTrace(true);
 		}
 		if(answer){
-			CreateGui.getAnimationHistory().clearStepsForward();
+			CreateGui.getCurrentTab().getAnimationHistory().clearStepsForward();
 		}
 		return answer;
 	}
