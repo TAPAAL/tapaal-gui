@@ -45,7 +45,7 @@ public class TAPAAL {
 		try {
 			commandline = parser.parse(options, args);
 		} catch (ParseException exp) {
-			System.err.println("There where an error parsing the specifyed arguments");
+			System.err.println("There where an error parsing the specified arguments");
 			System.err.println("Unexpected exception:" + exp.getMessage());
 		}
 
