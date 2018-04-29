@@ -201,6 +201,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showEnabledTransitions = true;
 	private boolean showDelayEnabledTransitions = true;
 	private boolean showToolTips = true;
+	private boolean showZeroToInfinityIntervals = true;
+	private boolean showTokenAge = true;
 
 
 	private JMenu importMenu, exportMenu, zoomMenu;
@@ -307,12 +309,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 		showToolTips = prefs.getShowToolTips();
 
-		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
-			CreateGui.toggleShowZeroToInfinityIntervals();
+		if(showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
+			toggleShowZeroToInfinityIntervals();
 		}
 
-		if(CreateGui.showTokenAge() != prefs.getShowTokenAge()){
-			CreateGui.toggleShowTokenAge();
+		if(showTokenAge() != prefs.getShowTokenAge()){
+			toggleShowTokenAge();
 		}
 
 		Dimension dimension = prefs.getWindowSize();
@@ -646,7 +648,7 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleZeroToInfinityIntervals();
 			}
 		};
-		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(),
+		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervals(),
 				showZeroToInfinityIntervalsAction);
 
 		showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element",
@@ -666,7 +668,7 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleTokenAge();
 			}
 		};
-		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, CreateGui.showTokenAge(), showTokenAgeAction);
+		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, showTokenAge(), showTokenAgeAction);
 
 		viewMenu.addSeparator();
 
@@ -919,10 +921,10 @@ public class GuiFrame extends JFrame implements Observer {
 		showEnabledTransitionsList(true);
 		showToolTips(true);
 		CreateGui.getCurrentTab().setResizeingDefault();
-		if(!CreateGui.showZeroToInfinityIntervals()){
+		if(!showZeroToInfinityIntervals()){
 			showZeroToInfinityIntervalsCheckBox.doClick();
 		}
-		if(!CreateGui.showTokenAge()){
+		if(!showTokenAge()){
 			showTokenAgeCheckBox.doClick();
 		}
 		//Delay-enabled Transitions
@@ -946,7 +948,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		prefs.setShowEnabledTrasitions(showEnabledTransitions);
 		prefs.setShowDelayEnabledTransitions(showDelayEnabledTransitions);
-		prefs.setShowTokenAge(CreateGui.showTokenAge());
+		prefs.setShowTokenAge(showTokenAge());
 		prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
 		prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
 		prefs.setDelayEnabledTransitionIsRandomTransition(DelayEnabledTransitionControl.isRandomTransition());
@@ -1425,14 +1427,14 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private void toggleTokenAge(){
-		CreateGui.toggleShowTokenAge();
-		Preferences.getInstance().setShowTokenAge(CreateGui.showTokenAge());
+		toggleShowTokenAge();
+		Preferences.getInstance().setShowTokenAge(showTokenAge());
 		appView.repaintAll();
 	}
 
 	private void toggleZeroToInfinityIntervals() {
-		CreateGui.toggleShowZeroToInfinityIntervals();
-		Preferences.getInstance().setShowZeroInfIntervals(CreateGui.showZeroToInfinityIntervals());
+		toggleShowZeroToInfinityIntervals();
+		Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals());
 		appView.repaintAll();
 	}
 
@@ -2667,6 +2669,22 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public boolean isShowingDelayEnabledTransitions() {
 		return showDelayEnabledTransitions;
+	}
+
+	public void toggleShowZeroToInfinityIntervals() {
+		showZeroToInfinityIntervals = !showZeroToInfinityIntervals;
+	}
+
+	public boolean showZeroToInfinityIntervals() {
+		return showZeroToInfinityIntervals;
+	}
+
+	public boolean showTokenAge(){
+		return showTokenAge;
+	}
+
+	public void toggleShowTokenAge(){
+		showTokenAge = !showTokenAge;
 	}
 
 }

@@ -32,9 +32,7 @@ public class CreateGui {
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	private static boolean usingGTKFileBrowser = true;
-	
-	private static boolean showZeroToInfinityIntervals = true;
-	private static boolean showTokenAge = true;
+
 
 	public static final String imgPath = "resources/Images/";
 	public static String userPath; //Used for latest open dialog path
@@ -190,7 +188,7 @@ public class CreateGui {
 	public static File getFile() {
 		return getFile(appTab.getSelectedIndex());
 	}
-	
+
 	public static File getFile(int index) {
 		TabContent tab = tabs.get(index);
 		return tab.getFile();
@@ -243,21 +241,7 @@ public class CreateGui {
 		return usingGTKFileBrowser;
 	}
 	
-	public static void toggleShowZeroToInfinityIntervals() {
-		showZeroToInfinityIntervals = !showZeroToInfinityIntervals;
-	}
-	
-	public static boolean showZeroToInfinityIntervals() {
-		return showZeroToInfinityIntervals;
-	}
 
-	public static boolean showTokenAge(){
-		return showTokenAge;
-	}
-
-	public static void toggleShowTokenAge(){
-		showTokenAge = !showTokenAge;
-	}
 
 
 	//XXX Two Methodes to access same data (created after auto encapsulate)

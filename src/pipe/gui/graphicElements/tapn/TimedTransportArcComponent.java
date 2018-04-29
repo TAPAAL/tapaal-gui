@@ -85,7 +85,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		if (isInPreSet && underlyingTransportArc != null) {
-			if (CreateGui.showZeroToInfinityIntervals()){
+			if (CreateGui.getApp().showZeroToInfinityIntervals()){
 				label.setText(underlyingTransportArc.interval().toString(
 						displayConstantNames)
 						+ " : " + getGroup());
@@ -227,7 +227,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
         public String getGuardAsString(boolean showZeroToInfinityIntervals) {
-                if (!showZeroToInfinityIntervals && !CreateGui.showZeroToInfinityIntervals() && underlyingTransportArc.interval().toString().equals("[0,inf)")) {
+                if (!showZeroToInfinityIntervals && !CreateGui.getApp().showZeroToInfinityIntervals() && underlyingTransportArc.interval().toString().equals("[0,inf)")) {
                         return "";
                 } 
                 return underlyingTransportArc.interval().toString();

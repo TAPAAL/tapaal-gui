@@ -185,7 +185,7 @@ public class TimedPlaceComponent extends Place {
 
         // Decide whether or not to draw tokens as dots
         boolean drawDots = false;
-        if(!CreateGui.showTokenAge()) {
+        if(!CreateGui.getApp().showTokenAge()) {
             // only draw dots if there're 1-5 tokens.
             drawDots = (marking > 0 && marking < 6);
 
