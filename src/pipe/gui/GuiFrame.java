@@ -1849,7 +1849,7 @@ public class GuiFrame extends JFrame implements Observer {
 				hideComponentWindow();
 			}
 
-			CreateGui.switchToEditorComponents();
+			CreateGui.getCurrentTab().switchToEditorComponents();
 			showComponents(showComponents);
 			showQueries(showQueries);
 			showConstants(showConstants);
@@ -1861,7 +1861,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(true);
 			break;
 		case animation:
-			TabContent tab = (TabContent) appTab.getSelectedComponent();
+			TabContent tab = CreateGui.getCurrentTab();
 			CreateGui.getAnimator().setTabContent(tab);
 			tab.switchToAnimationComponents(showEnabledTransitions);
 			showComponents(showComponents);

@@ -235,24 +235,10 @@ public class CreateGui {
 	}
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
-	public static void switchToAnimationComponents() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.switchToAnimationComponents(true);
-	}
-
-	public static void switchToEditorComponents() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.switchToEditorComponents();
-	}
 
 	public static AnimationHistoryComponent getAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getUntimedAnimationHistory();
-	}
-
-	public static void addAbstractAnimationPane() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.addAbstractAnimationPane();
 	}
 
 	public static AnimationController getAnimationController() {
@@ -313,12 +299,6 @@ public class CreateGui {
 		showTokenAge = !showTokenAge;
 	}
 
-	public static void verifyQuery() {
-		TabContent tab = getCurrentTab();
-		if (tab.isQueryPossible()) {
-			getCurrentTab().verifySelectedQuery();
-		}
-	}
 
 	//XXX Two Methodes to access same data (created after auto encapsulate)
 	public static GuiFrame getApp() { // returns a reference to the application
