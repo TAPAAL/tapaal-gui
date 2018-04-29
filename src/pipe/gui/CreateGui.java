@@ -320,7 +320,7 @@ public class CreateGui {
 		}
 	}
 
-	//XXX Two Methodes to access same data (comes after auto encapsulate)
+	//XXX Two Methodes to access same data (created after auto encapsulate)
 	public static GuiFrame getApp() { // returns a reference to the application
 		return getAppGui();
 	}
