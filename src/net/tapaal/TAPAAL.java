@@ -53,8 +53,13 @@ public class TAPAAL {
 		CreateGui.init();
 
 		// Enable debug
-		if (commandline.hasOption("debug") || TAPAAL.VERSION == "DEV") {
+		if (commandline.hasOption("debug")) {
 			Logger.enableLogging(true);
+		}
+
+		if (TAPAAL.VERSION == "DEV"){
+			Logger.enableLogging(true);
+			Logger.log("Debug logging is enabled by default in DEV branch");
 		}
 
 		// Open files
