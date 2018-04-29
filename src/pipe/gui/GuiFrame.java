@@ -106,8 +106,11 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	private String frameTitle;
 	private DrawingSurfaceImpl appView;
-	private Pipe.ElementType mode, prev_mode; 
+	private Pipe.ElementType mode, prev_mode;
+	private GUIMode guiMode = GUIMode.noNet;
+
 	private int newNameCounter = 1;
+
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
@@ -178,9 +181,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private GuiAction selectAllAction;
 
-	private JMenuItem statistics;
-	private JMenuItem verification;
-
 	public GuiAction startAction;
 	public GuiAction stepforwardAction;
 	public GuiAction stepbackwardAction;
@@ -203,7 +203,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showDelayEnabledTransitions = true;
 	private boolean showToolTips = true;
 
-	private GUIMode guiMode = GUIMode.noNet;
+
 	private JMenu importMenu, exportMenu, zoomMenu;
 
 
@@ -834,22 +834,20 @@ public class GuiFrame extends JFrame implements Observer {
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-		verification = new JMenuItem(verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
+		verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				CreateGui.getCurrentTab().verifySelectedQuery();
 			}
-		});
-		verification.setMnemonic('m');
+		};
+		toolsMenu.add(verifyAction).setMnemonic('m');
 
-		toolsMenu.add(verification);	
-		statistics = new JMenuItem(netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
+		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				StatisticsPanel.showStatisticsPanel();
 			}
-		});
-		statistics.setMnemonic('i');
-		toolsMenu.add(statistics);		
+		};
+		toolsMenu.add(netStatisticsAction).setMnemonic('i');
 
 
 		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
@@ -1339,7 +1337,7 @@ public class GuiFrame extends JFrame implements Observer {
 		startAction.setEnabled(enable);
 
 		// Tools
-		statistics.setEnabled(enable);
+		netStatisticsAction.setEnabled(enable);
 
 	}
 

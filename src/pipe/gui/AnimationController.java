@@ -163,9 +163,9 @@ public class AnimationController extends JPanel {
 			c.gridy = 0;
 			add(firemode, c);
 
-                        initDelayTimePanel(animationToolBar);
-                        
-                        initDelaySlider();
+			initDelayTimePanel(animationToolBar);
+
+			initDelaySlider();
 		}
                 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
