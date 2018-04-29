@@ -36,9 +36,46 @@ public class CreateGui {
 	private static boolean showZeroToInfinityIntervals = true;
 	private static boolean showTokenAge = true;
 
-	public static String imgPath, userPath; // useful for stuff
+	public static final String imgPath = "resources/Images/";
+	public static String userPath; //Used for latest open dialog path
+
 	
 	public static Integer MaximalNumberOfTokensAllowed = 999;
+
+	public static void init() {
+
+		// Null makes the open dialog open default folder, For Windwos, My Documents, For *nix  ~ , etc
+		userPath = null;
+
+		appGui = new GuiFrame(TAPAAL.getProgramName());
+
+		if (getAppGui().isMac()){
+			try {
+				SpecialMacHandler.postprocess();
+			} catch (NoClassDefFoundError e) {
+				//Failed loading special mac handler, ignore and run program without MacOS integration
+			}
+		}
+
+		Grid.enableGrid();
+
+		appTab = new JTabbedPane();
+		animator = new Animator();
+
+		getAppGui().setTab(); // sets Tab properties
+
+		getAppGui().getContentPane().add(appTab);
+
+		getAppGui().setVisible(true);
+		getAppGui().activateSelectAction();
+		Verifyta.trySetup();
+		VerifyTAPN.trySetup();
+		VerifyTAPNDiscreteVerification.trySetup();
+		VerifyPN.trySetup();
+
+		checkForUpdate(false);
+	}
+
 
 	public static void checkForUpdate(boolean forcecheck) {
 		final VersionChecker versionChecker = new VersionChecker();
@@ -104,41 +141,7 @@ public class CreateGui {
 	}
 	
 
-	public static void init() {
-		
-		imgPath = "resources/Images/";
 
-		// make the initial dir for browsing be My Documents (win), ~ (*nix), etc
-		userPath = null;
-
-		appGui = new GuiFrame(TAPAAL.getProgramName());
-		
-		if (getAppGui().isMac()){
-			try {
-				SpecialMacHandler.postprocess();
-			} catch (NoClassDefFoundError e) {
-				//Failed loading special mac handler, ignore and run program without MacOS integration
-			}	
-		}
-		
-		Grid.enableGrid();
-
-		appTab = new JTabbedPane();
-		animator = new Animator();
-
-		getAppGui().setTab(); // sets Tab properties
-
-		getAppGui().getContentPane().add(appTab);
-
-		getAppGui().setVisible(true);
-		getAppGui().activateSelectAction();
-		Verifyta.trySetup();
-		VerifyTAPN.trySetup();
-		VerifyTAPNDiscreteVerification.trySetup();
-		VerifyPN.trySetup();
-
-		checkForUpdate(false);
-	}
 
 
 
