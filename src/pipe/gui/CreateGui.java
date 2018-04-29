@@ -190,6 +190,11 @@ public class CreateGui {
 	public static File getFile() {
 		return getFile(appTab.getSelectedIndex());
 	}
+	
+	public static File getFile(int index) {
+		TabContent tab = tabs.get(index);
+		return tab.getFile();
+	}
 
 	public static void setFile(File modelfile, int fileNo) {
 		if (fileNo >= tabs.size()) {
@@ -228,11 +233,6 @@ public class CreateGui {
 
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
-	}
-
-	public static File getFile(int index) {
-		TabContent tab = tabs.get(index);
-		return tab.getFile();
 	}
 
 	public static void setUsingGTKFileBrowser(boolean useGTKFileBrowser) {
