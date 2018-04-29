@@ -221,18 +221,6 @@ public class CreateGui {
 		return animator;
 	}
 
-	/**
-	 * returns the current dataLayer object - used to get a reference to pass to
-	 * the modules
-	 */
-	public static DataLayer currentPNMLData() {
-		if (appTab.getSelectedIndex() < 0) {
-			return null;
-		}
-
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getModel();
-	}
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 
