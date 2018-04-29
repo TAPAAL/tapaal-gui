@@ -87,13 +87,13 @@ public class Animator {
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
 		tab.addAbstractAnimationPane();
-		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getCurrentTab().getUntimedAnimationHistory();
 
 		for(TAPNNetworkTraceStep step : trace){
 			untimedAnimationHistory.addHistoryItem(step.toString());
 		}
 
-		CreateGui.getAbstractAnimationPane().setSelectedIndex(0);
+		CreateGui.getCurrentTab().getUntimedAnimationHistory().setSelectedIndex(0);
 		setFiringmode("Random");
 
 		JOptionPane.showMessageDialog(CreateGui.getApp(),

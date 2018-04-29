@@ -224,10 +224,7 @@ public class CreateGui {
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 
-	public static AnimationHistoryComponent getAbstractAnimationPane() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getUntimedAnimationHistory();
-	}
+
 
 
 	public static void undoGetFreeSpace() {
