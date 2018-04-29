@@ -35,6 +35,7 @@ import javax.swing.event.ChangeListener;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.NameGenerator;
@@ -662,8 +663,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 
 		int newMarking = (Integer)markingSpinner.getValue();
-		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
-			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+		if (newMarking > Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED) {
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 

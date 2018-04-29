@@ -39,9 +39,6 @@ public class CreateGui {
 	public static final String imgPath = "resources/Images/";
 	public static String userPath; //Used for latest open dialog path
 
-	
-	public static Integer MaximalNumberOfTokensAllowed = 999;
-
 	public static void init() {
 
 		// Null makes the open dialog open default folder, For Windwos, My Documents, For *nix  ~ , etc
