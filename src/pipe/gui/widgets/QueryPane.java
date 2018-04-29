@@ -14,8 +14,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -23,12 +21,10 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -36,28 +32,20 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.undo.AddQueryCommand;
 import pipe.gui.undo.RemoveQueriesCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.SortQueriesCommand;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.StringComparator;
 
 public class QueryPane extends JPanel {
 	private static final long serialVersionUID = 4062539545170994654L;
@@ -504,8 +492,8 @@ public class QueryPane extends JPanel {
 		//Saves the net in a temporary file which is used in batchProcessing
 		//File is deleted on exit
 		try {
-			tempFile = File.createTempFile(CreateGui.appGui.getCurrentTabName(), ".xml");
-			CreateGui.appGui.saveNet(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
+			tempFile = File.createTempFile(CreateGui.getAppGui().getCurrentTabName(), ".xml");
+			CreateGui.getAppGui().saveNet(CreateGui.getTab().getSelectedIndex(), tempFile, selectedQueries);
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {

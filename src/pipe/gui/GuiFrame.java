@@ -38,7 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
@@ -1885,8 +1884,8 @@ public class GuiFrame extends JFrame implements Observer {
 		case noNet:
 			// Disable All Actions
 			statusBar.changeText(statusBar.textforNoNet);
-			if(CreateGui.appGui != null){
-				CreateGui.appGui.setFocusTraversalPolicy(null);
+			if(CreateGui.getAppGui() != null){
+				CreateGui.getAppGui().setFocusTraversalPolicy(null);
 			}
 			break;
 
@@ -2088,7 +2087,7 @@ public class GuiFrame extends JFrame implements Observer {
 						CreateGui.getCurrentTab().selectFirstActiveTemplate();
 					}
 					//Enable simulator focus traversal policy
-					CreateGui.appGui.setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+					CreateGui.getAppGui().setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 				} else {
 					JOptionPane.showMessageDialog(GuiFrame.this,
 							"You need at least one active template to enter simulation mode",
@@ -2104,7 +2103,7 @@ public class GuiFrame extends JFrame implements Observer {
 				setAnimationMode(!appView.isInAnimationMode());
 				CreateGui.getCurrentTab().restoreSelectedTemplate();
 				//Enable editor focus traversal policy
-				CreateGui.appGui.setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
+				CreateGui.getAppGui().setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 			}
 		} catch (Exception e) {
 			Logger.log(e);
@@ -2122,7 +2121,7 @@ public class GuiFrame extends JFrame implements Observer {
 			// This is a fix for bug #812694 where on mac some menues are gray after
 			// changing from simulation mode, when displaying a trace. Showing and
 			// hiding a menu seems to fix this problem
-			JDialog a = new JDialog(CreateGui.appGui, false);
+			JDialog a = new JDialog(CreateGui.getAppGui(), false);
 			a.setUndecorated(true);
 			a.setVisible(true);
 			a.dispose();

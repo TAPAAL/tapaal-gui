@@ -233,7 +233,7 @@ Printable, DrawingSurface {
 
 	public void update(Observable o, Object diffObj) {
 		if ((diffObj instanceof PetriNetObject) && (diffObj != null)) {
-			if (CreateGui.appGui.getMode() == ElementType.CREATING) {
+			if (CreateGui.getAppGui().getMode() == ElementType.CREATING) {
 
 				addNewPetriNetObject((PetriNetObject) diffObj);
 			}

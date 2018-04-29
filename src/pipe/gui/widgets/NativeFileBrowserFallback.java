@@ -11,11 +11,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import dk.aau.cs.gui.TabContent;
-
 import pipe.gui.CreateGui;
-import pipe.gui.ExtensionFilter;
-import pipe.gui.GuiFrame;
 
 public class NativeFileBrowserFallback extends FileBrowserImplementation {
 	private FileDialog fc;
@@ -23,7 +19,7 @@ public class NativeFileBrowserFallback extends FileBrowserImplementation {
 	private JFileChooser fileChooser;
 
 	public NativeFileBrowserFallback(String filetype, final String ext, String path) {
-		fc = new FileDialog(CreateGui.appGui, filetype);
+		fc = new FileDialog(CreateGui.getAppGui(), filetype);
 
 		if (filetype == null) {
 			filetype = "file";
@@ -106,7 +102,7 @@ public class NativeFileBrowserFallback extends FileBrowserImplementation {
 			File destination = new File(newName);
 
 			if(destination.exists()){
-				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, newName + "\nDo you want to overwrite this file?");
+				int overRide = JOptionPane.showConfirmDialog(CreateGui.getAppGui(), newName + "\nDo you want to overwrite this file?");
 				switch (overRide) {
 				case JOptionPane.NO_OPTION:
 					source.delete();

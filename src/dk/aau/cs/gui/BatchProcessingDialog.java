@@ -31,7 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -54,7 +53,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -62,7 +60,6 @@ import javax.swing.table.TableRowSorter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -75,11 +72,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.StringComparator;
-import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
@@ -1384,7 +1377,7 @@ public class BatchProcessingDialog extends JDialog {
 
 			public void fireFileChanged(FileChangedEvent e) {
 				if(!(isQueryListEmpty())) {
-					fileStatusLabel.setText(CreateGui.appGui.getCurrentTabName());
+					fileStatusLabel.setText(CreateGui.getAppGui().getCurrentTabName());
 				}
 				else
 					fileStatusLabel.setText(e.fileName());

@@ -29,23 +29,17 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
-import javax.swing.text.DocumentFilter.FilterBypass;
+
 import pipe.dataLayer.NetType;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
-import java.awt.BorderLayout;
+
 import java.awt.event.ActionListener;
-import java.util.Dictionary;
 import java.util.Hashtable;
 import javax.swing.JButton;
 import javax.swing.JSlider;
@@ -112,10 +106,10 @@ public class AnimationController extends JPanel {
 	GuiAction startAction, stepforwardAction, stepbackwardAction;
 
 	public AnimationController(NetType netType) {
-		startAction = CreateGui.appGui.startAction;
+		startAction = CreateGui.getAppGui().startAction;
 
-		stepbackwardAction = CreateGui.appGui.stepbackwardAction;
-		stepforwardAction = CreateGui.appGui.stepforwardAction;
+		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
+		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
 
 		stepbackwardAction.setEnabled(false);
 		stepforwardAction.setEnabled(false);
@@ -448,8 +442,8 @@ public class AnimationController extends JPanel {
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
 
-		CreateGui.appGui.setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
-		CreateGui.appGui.setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
+		CreateGui.getAppGui().setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
+		CreateGui.getAppGui().setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
 	}
 	
 	private void initializeDocumentFilterForDelayInput() {

@@ -1,16 +1,13 @@
 package pipe.gui;
 
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
@@ -29,7 +26,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 public class CreateGui {
 
-	public static GuiFrame appGui;
+	private static GuiFrame appGui;
 	private static Animator animator;
 	private static JTabbedPane appTab;
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
@@ -116,7 +113,7 @@ public class CreateGui {
 
 		appGui = new GuiFrame(TAPAAL.getProgramName());
 		
-		if (appGui.isMac()){ 
+		if (getAppGui().isMac()){
 			try {
 				SpecialMacHandler.postprocess();
 			} catch (NoClassDefFoundError e) {
@@ -129,12 +126,12 @@ public class CreateGui {
 		appTab = new JTabbedPane();
 		animator = new Animator();
 
-		appGui.setTab(); // sets Tab properties
+		getAppGui().setTab(); // sets Tab properties
 
-		appGui.getContentPane().add(appTab);
+		getAppGui().getContentPane().add(appTab);
 
-		appGui.setVisible(true);
-		appGui.activateSelectAction();
+		getAppGui().setVisible(true);
+		getAppGui().activateSelectAction();
 		Verifyta.trySetup();
 		VerifyTAPN.trySetup();
 		VerifyTAPNDiscreteVerification.trySetup();
@@ -143,9 +140,7 @@ public class CreateGui {
 		checkForUpdate(false);
 	}
 
-	public static GuiFrame getApp() { // returns a reference to the application
-		return appGui;
-	}
+
 
 	public static DataLayer getModel() {
 		return getModel(appTab.getSelectedIndex());
@@ -323,5 +318,12 @@ public class CreateGui {
 		if (tab.isQueryPossible()) {
 			getCurrentTab().verifySelectedQuery();
 		}
+	}
+
+	public static GuiFrame getApp() { // returns a reference to the application
+		return getAppGui();
+	}
+	public static GuiFrame getAppGui() {
+		return appGui;
 	}
 }

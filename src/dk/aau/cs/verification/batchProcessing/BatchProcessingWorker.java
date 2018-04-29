@@ -377,7 +377,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		BatchProcessingVerificationResult result;		
 		if(QueryPane.getTemporaryFile() != null && fileName.equals(QueryPane.getTemporaryFile().getName())) {
 			//removes numbers from tempFile so it looks good
-			result = new BatchProcessingVerificationResult(CreateGui.appGui.getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
+			result = new BatchProcessingVerificationResult(CreateGui.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
 		} else {
 			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
 		}

@@ -8,25 +8,17 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
@@ -36,7 +28,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
-import dk.aau.cs.verification.VerifyTAPN.TraceType;
+
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -46,7 +38,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -416,7 +407,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(CreateGui.appGui, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 

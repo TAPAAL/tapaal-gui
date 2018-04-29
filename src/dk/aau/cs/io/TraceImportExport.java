@@ -49,7 +49,7 @@ public class TraceImportExport {
 
             FileBrowser fb = new FileBrowser("Export Trace", "trc");
             // path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-            path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')));
+            path = fb.saveFile(CreateGui.getAppGui().getCurrentTabName().substring(0, CreateGui.getAppGui().getCurrentTabName().lastIndexOf('.')));
 
             FileOutputStream fs = new FileOutputStream(path);
             fs.write(os.toByteArray());

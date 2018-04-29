@@ -25,7 +25,6 @@ import javax.print.PrintException;
 import javax.print.SimpleDoc;
 import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -246,7 +245,7 @@ public class Export {
 				}
 				break;
 			case QUERY:
-				filename = new FileBrowser("Query XML file", "xml", filename).saveFile(CreateGui.appGui.getCurrentTabName().replaceAll(".xml", "-queries"));
+				filename = new FileBrowser("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".xml", "-queries"));
 				if (filename != null) {
 					toQueryXML(g, filename);
 				}
