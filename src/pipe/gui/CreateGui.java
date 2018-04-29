@@ -205,7 +205,7 @@ public class CreateGui {
 		tabs.remove(index);
 	}
 
-	public static JTabbedPane getTab() {
+	public static JTabbedPane getTabs() {
 		return appTab;
 	}
 
@@ -320,6 +320,7 @@ public class CreateGui {
 		}
 	}
 
+	//XXX Two Methodes to access same data (comes after auto encapsulate)
 	public static GuiFrame getApp() { // returns a reference to the application
 		return getAppGui();
 	}
