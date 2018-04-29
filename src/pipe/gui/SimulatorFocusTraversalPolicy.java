@@ -12,7 +12,7 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 		
 		Component comp = CreateGui.getApp();
 		if(aComponent instanceof GuiFrame){
-			comp = CreateGui.getAnimationController().TimeDelayField;
+			comp = CreateGui.getCurrentTab().getAnimationController().TimeDelayField;
 		}
 		
 		return comp;
@@ -23,7 +23,7 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 			Component aComponent) {
 		Component comp = CreateGui.getApp();
 		if(aComponent instanceof GuiFrame){
-			comp = CreateGui.getAnimationController().TimeDelayField;
+			comp = CreateGui.getCurrentTab().getAnimationController().TimeDelayField;
 		}
 		return comp;
 	}
@@ -40,7 +40,7 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 
 	@Override
 	public Component getLastComponent(Container aContainer) {
-		return CreateGui.getAnimationController().TimeDelayField;
+		return CreateGui.getCurrentTab().getAnimationController().TimeDelayField;
 	}
 
 }

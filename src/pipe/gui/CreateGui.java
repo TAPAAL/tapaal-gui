@@ -229,20 +229,6 @@ public class CreateGui {
 		return tab.getUntimedAnimationHistory();
 	}
 
-	public static AnimationController getAnimationController() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getAnimationController();
-	}
-		
-	public static TransitionFireingComponent getTransitionFireingComponent() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getTransitionFireingComponent();
-	}	
-
-	public static void removeAbstractAnimationPane() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.removeAbstractAnimationPane();
-	}
 
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);

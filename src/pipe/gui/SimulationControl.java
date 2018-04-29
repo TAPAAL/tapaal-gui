@@ -113,7 +113,7 @@ public class SimulationControl extends JPanel {
 		timer = new Timer(simulationSpeed.getValue()*20, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getTransitionFireingComponent().fireSelectedTransition();				
+				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
 			}
 		});
 		timer.setRepeats(true);
@@ -129,12 +129,12 @@ public class SimulationControl extends JPanel {
 	
 	public void start(){
 		timer.start();
-		CreateGui.getTransitionFireingComponent().updateFireButton();
+		CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
 	}
 	
 	public void stop(){
 		timer.stop();
-		CreateGui.getTransitionFireingComponent().updateFireButton();
+		CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
 	}
 	
 	public boolean isRunning(){

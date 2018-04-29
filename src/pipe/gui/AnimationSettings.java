@@ -31,7 +31,7 @@ public class AnimationSettings{
 				if(simControl.randomSimulation()){
 					delayEnabled.randomMode.setSelected(true);
 				}
-				CreateGui.getTransitionFireingComponent().updateFireButton();
+				CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
 			}
 		});
 		

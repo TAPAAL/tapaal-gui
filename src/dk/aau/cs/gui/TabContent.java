@@ -294,14 +294,14 @@ public class TabContent extends JSplitPane {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepBackwards();
 								anim.stepBack();
-								CreateGui.getAnimationController()
+								CreateGui.getCurrentTab().getAnimationController()
 								.setAnimationButtonsEnabled();
 							}
 						} else {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepForward();
 								anim.stepForward();
-								CreateGui.getAnimationController()
+								CreateGui.getCurrentTab().getAnimationController()
 								.setAnimationButtonsEnabled();
 							}
 						}

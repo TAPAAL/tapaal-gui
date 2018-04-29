@@ -712,7 +712,7 @@ public class GuiFrame extends JFrame implements Observer {
 				CreateGui.getCurrentTab().getAnimationHistory().stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				updateMouseOverInformation();
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 			}
 		});
 		animateMenu.add(
@@ -722,7 +722,7 @@ public class GuiFrame extends JFrame implements Observer {
 						CreateGui.getCurrentTab().getAnimationHistory().stepForward();
 						CreateGui.getAnimator().stepForward();
 						updateMouseOverInformation();
-						CreateGui.getAnimationController().setAnimationButtonsEnabled();
+						CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 					}
 				});
 
@@ -731,7 +731,7 @@ public class GuiFrame extends JFrame implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 				updateMouseOverInformation();
 			}
 		});
@@ -741,7 +741,7 @@ public class GuiFrame extends JFrame implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 				updateMouseOverInformation();
 			}
 		});
@@ -1237,17 +1237,17 @@ public class GuiFrame extends JFrame implements Observer {
 			// Remove constant highlight
 			CreateGui.getCurrentTab().removeConstantHighlights();
 
-			CreateGui.getAnimationController().requestFocusInWindow();
+			CreateGui.getCurrentTab().getAnimationController().requestFocusInWindow();
 
 			// Event repeater
-			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
-			CreateGui.getAnimationController().getActionMap().put("_right_hold", stepforwardAction);
-			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
-			CreateGui.getAnimationController().getActionMap().put("_left_hold", stepbackwardAction);
-			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
-			CreateGui.getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
-			CreateGui.getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
-			CreateGui.getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
+			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
+			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_right_hold", stepforwardAction);
+			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
+			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_left_hold", stepbackwardAction);
+			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
+			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
+			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
+			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
 			exportTraceAction.setEnabled(false);
@@ -1795,7 +1795,7 @@ public class GuiFrame extends JFrame implements Observer {
 			stepforwardAction.setEnabled(CreateGui.getCurrentTab().getAnimationHistory().isStepForwardAllowed());
 			stepbackwardAction.setEnabled(CreateGui.getCurrentTab().getAnimationHistory().isStepBackAllowed());
 
-			CreateGui.getAnimationController().setAnimationButtonsEnabled();
+			CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 
 		} else {
 			stepbackwardAction.setEnabled(false);
@@ -1879,7 +1879,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
-			CreateGui.getAnimationController().requestFocusInWindow();
+			CreateGui.getCurrentTab().getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
