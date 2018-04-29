@@ -249,11 +249,6 @@ public class CreateGui {
 		return tab.getAnimationHistory();
 	}
 
-	public static void updateConstantsList() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.updateConstantsList();
-	}
-
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
 	}

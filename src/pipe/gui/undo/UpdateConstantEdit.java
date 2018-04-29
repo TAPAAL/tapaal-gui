@@ -26,7 +26,7 @@ public class UpdateConstantEdit extends Command {
 		store.remove(oldConstant);
 		store.add(newConstant);
 		model.updateGuardsAndWeightsWithNewConstant(oldConstant.name(), newConstant);
-		CreateGui.updateConstantsList();
+		CreateGui.getCurrentTab().updateConstantsList();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class UpdateConstantEdit extends Command {
 		store.remove(newConstant);
 		store.add(oldConstant);
 		model.updateGuardsAndWeightsWithNewConstant(newConstant.name(), oldConstant);
-		CreateGui.updateConstantsList();
+		CreateGui.getCurrentTab().updateConstantsList();
 
 	}
 

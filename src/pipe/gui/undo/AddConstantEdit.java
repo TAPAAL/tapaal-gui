@@ -17,13 +17,13 @@ public class AddConstantEdit extends Command {
 	@Override
 	public void redo() {
 		store.add(constant);
-		CreateGui.updateConstantsList();
+		CreateGui.getCurrentTab().updateConstantsList();
 	}
 
 	@Override
 	public void undo() {
 		store.remove(constant);
-		CreateGui.updateConstantsList();
+		CreateGui.getCurrentTab().updateConstantsList();
 	}
 
 }
