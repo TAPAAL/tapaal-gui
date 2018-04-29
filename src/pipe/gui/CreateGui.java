@@ -41,7 +41,7 @@ public class CreateGui {
 
 	public static void init() {
 
-		// Null makes the open dialog open default folder, For Windwos, My Documents, For *nix  ~ , etc
+		// Null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
 		userPath = null;
 
 		appGui = new GuiFrame(TAPAAL.getProgramName());
