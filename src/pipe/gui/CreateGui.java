@@ -221,12 +221,6 @@ public class CreateGui {
 		return animator;
 	}
 
-
-	/** Creates a new animationHistory text area, and returns a reference to it */
-
-
-
-
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
 	}
