@@ -32,7 +32,6 @@ import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.AddTimedPlaceCommand;
 import pipe.gui.undo.AddTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -41,7 +40,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  * The petrinet is drawn onto this frame.
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
-Printable, DrawingSurface {
+Printable {
 	private static final long serialVersionUID = 4434596266503933386L;
 	private boolean netChanged = false;
 	private boolean animationmode = false;
