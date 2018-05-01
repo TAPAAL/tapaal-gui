@@ -1519,7 +1519,7 @@ public class GuiFrame extends JFrame implements Observer {
 			} else {
 				path = appTab.getTitleAt(index);
 			}
-			String filename = new FileBrowser(path).saveFile();
+			String filename = new FileBrowser("Timed-Arc Petri Net", "xml", path).saveFile();
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
@@ -2344,7 +2344,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open", "ctrl O") {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = new FileBrowser(CreateGui.userPath).openFiles();
+				File[] files = new FileBrowser("Timed-Arc Petri Net", "xml", CreateGui.userPath).openFiles();
 				for (File f : files) {
 					if (f.exists() && f.isFile() && f.canRead()) {
 						CreateGui.userPath = f.getParent();

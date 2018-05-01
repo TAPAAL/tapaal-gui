@@ -6,10 +6,6 @@ import pipe.gui.CreateGui;
 
 public class FileBrowser  {
 	private FileBrowserImplementation fb = null;
-
-	public FileBrowser(String path) {
-		this("Timed-Arc Petri Net", "xml", path); // default parameters
-	}
 	
 	public FileBrowser(String filetype, final String ext) {
 		this(filetype, ext, null);
@@ -24,10 +20,6 @@ public class FileBrowser  {
 			}
 		}
 		if(path != null) fb.lastPath = path;
-	}
-
-	public FileBrowser() {
-		this(null);
 	}
 
 	public File openFile() {
