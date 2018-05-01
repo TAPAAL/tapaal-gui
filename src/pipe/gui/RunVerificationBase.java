@@ -1,6 +1,5 @@
 package pipe.gui;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -8,9 +7,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
@@ -20,29 +17,21 @@ import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
-import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
-import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
@@ -99,7 +88,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if(options.useOverApproximation() &&
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
 				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
-			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+			VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 			if(!verifypn.supportsModel(transformedModel.value1(), options)){
 				// Skip over-approximation if model is not supported.
 				// Prevents verification from displaying error.

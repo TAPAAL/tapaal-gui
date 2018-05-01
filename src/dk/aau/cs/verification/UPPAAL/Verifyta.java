@@ -10,10 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
-import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
@@ -28,7 +26,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.ExecutabilityChecker;
-import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -36,7 +33,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -186,7 +182,7 @@ public class Verifyta implements ModelChecker {
 		if (verifyta != null && !verifyta.equals("")) {
 			if (new File(verifyta).exists()){
 				verifytapath = verifyta;
-				Verifyta v = new Verifyta(new FileFinderImpl(), new MessengerImpl());
+				Verifyta v = new Verifyta(new FileFinder(), new MessengerImpl());
 				if(v.isCorrectVersion()){
 					return true;
 				}else{
@@ -199,7 +195,7 @@ public class Verifyta implements ModelChecker {
 		verifyta = Preferences.getInstance().getVerifytaLocation();
 		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
-			Verifyta v = new Verifyta(new FileFinderImpl(), new MessengerImpl());
+			Verifyta v = new Verifyta(new FileFinder(), new MessengerImpl());
 			if(v.isCorrectVersion()){
 				return true;
 			}else{

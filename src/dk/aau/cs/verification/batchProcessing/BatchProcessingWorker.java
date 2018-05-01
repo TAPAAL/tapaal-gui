@@ -9,7 +9,7 @@ import javax.swing.SwingWorker;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
-import pipe.gui.FileFinderImpl;
+import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.Messenger;
@@ -465,25 +465,25 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private Verifyta getVerifyta() {
-		Verifyta verifyta = new Verifyta(new FileFinderImpl(), new MessengerImpl());
+		Verifyta verifyta = new Verifyta(new FileFinder(), new MessengerImpl());
 		verifyta.setup();
 		return verifyta;
 	}
 
 	private static VerifyTAPN getVerifyTAPN() {
-		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 		verifytapn.setup();
 		return verifytapn;
 	}
 	
 	private static VerifyPN getVerifyPN() {
-		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+		VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 		verifypn.setup();
 		return verifypn;
 	}
 	
 	private static VerifyTAPNDiscreteVerification getVerifyTAPNDiscreteVerification() {
-		VerifyTAPNDiscreteVerification verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+		VerifyTAPNDiscreteVerification verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
 		verifytapnDiscreteVerification.setup();
 		return verifytapnDiscreteVerification;
 	}
