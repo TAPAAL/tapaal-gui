@@ -4,7 +4,7 @@ import java.io.File;
 import pipe.gui.CreateGui;
 
 
-public class FileBrowser extends FileBrowserImplementation {
+public class FileBrowser  {
 	private FileBrowserImplementation fb = null;
 
 	public FileBrowser(String path) {
