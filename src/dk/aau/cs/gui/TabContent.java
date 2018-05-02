@@ -403,7 +403,6 @@ public class TabContent extends JSplitPane {
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-		animatorSplitPaneScroller.setPreferredSize(editorSplitPaneScroller.getSize());
 
 	}
 
