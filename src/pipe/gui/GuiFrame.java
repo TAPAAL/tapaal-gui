@@ -70,7 +70,7 @@ import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
@@ -1519,7 +1519,7 @@ public class GuiFrame extends JFrame implements Observer {
 			} else {
 				path = appTab.getTitleAt(index);
 			}
-			String filename = new FileBrowser("Timed-Arc Petri Net", "xml", path).saveFile();
+			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "xml", path).saveFile();
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
@@ -2344,7 +2344,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open", "ctrl O") {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = new FileBrowser("Timed-Arc Petri Net", "xml", CreateGui.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Timed-Arc Petri Net", "xml", CreateGui.userPath).openFiles();
 				for (File f : files) {
 					if (f.exists() && f.isFile() && f.canRead()) {
 						CreateGui.userPath = f.getParent();
@@ -2398,7 +2398,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = new FileBrowser("Import PNML", "pnml", CreateGui.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Import PNML", "pnml", CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
@@ -2411,7 +2411,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		importMenu.add(importSUMOAction = new GuiAction("SUMO queries (.txt)", "Import SUMO queries in a plain text format") {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = new FileBrowser("Import SUMO", "txt", CreateGui.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Import SUMO", "txt", CreateGui.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						CreateGui.userPath = f.getParent();
@@ -2424,7 +2424,7 @@ public class GuiFrame extends JFrame implements Observer {
 		importMenu.add(
 				importXMLAction = new GuiAction("XML queries (.xml)", "Import MCC queries in XML format", KeyStroke.getKeyStroke('R', shortcutkey)) {
 					public void actionPerformed(ActionEvent arg0) {
-						File[] files = new FileBrowser("Import XML queries", "xml", CreateGui.userPath).openFiles();
+						File[] files = FileBrowser.constructor("Import XML queries", "xml", CreateGui.userPath).openFiles();
 						for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								CreateGui.userPath = f.getParent();

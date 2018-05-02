@@ -46,7 +46,7 @@ import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**
  * Class for exporting things to other formats, as well as printing.
@@ -199,13 +199,13 @@ public class Export {
 		try {
 			switch (format) {
 			case PNG:
-				filename = new FileBrowser("PNG image", "png", filename).saveFile();
+				filename = FileBrowser.constructor("PNG image", "png", filename).saveFile();
 				if (filename != null) {
 					toPNG(g, filename);
 				}
 				break;
 			case POSTSCRIPT:
-				filename = new FileBrowser("PostScript file", "ps", filename)
+				filename = FileBrowser.constructor("PostScript file", "ps", filename)
 				.saveFile();
 				if (filename != null) {
 					toPostScript(g, filename);
@@ -231,21 +231,21 @@ public class Export {
 				if (figureOptions == possibilities[1])
 					tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
 
-				filename = new FileBrowser("TikZ figure", "tex", filename).saveFile();
+				filename = FileBrowser.constructor("TikZ figure", "tex", filename).saveFile();
 				if (filename != null) {
 					TikZExporter output = new TikZExporter(model, filename, tikZOption);
 					output.ExportToTikZ();
 				}
 				break;
 			case PNML:
-				filename = new FileBrowser("PNML file", "pnml", filename)
+				filename = FileBrowser.constructor("PNML file", "pnml", filename)
 				.saveFile();
 				if (filename != null) {
 					toPnml(g, filename);
 				}
 				break;
 			case QUERY:
-				filename = new FileBrowser("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".xml", "-queries"));
+				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".xml", "-queries"));
 				if (filename != null) {
 					toQueryXML(g, filename);
 				}

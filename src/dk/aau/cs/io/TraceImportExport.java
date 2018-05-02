@@ -13,7 +13,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.swing.JOptionPane;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -47,7 +47,7 @@ public class TraceImportExport {
         try {
             ByteArrayOutputStream os = prepareTraceStream();
 
-            FileBrowser fb = new FileBrowser("Export Trace", "trc");
+            FileBrowser fb = FileBrowser.constructor("Export Trace", "trc");
             // path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
             path = fb.saveFile(CreateGui.getAppGui().getCurrentTabName().substring(0, CreateGui.getAppGui().getCurrentTabName().lastIndexOf('.')));
 
@@ -157,7 +157,7 @@ public class TraceImportExport {
             }
         }
 
-        FileBrowser fb = new FileBrowser("Import Trace", "trc");
+        FileBrowser fb = FileBrowser.constructor ("Import Trace", "trc");
         File f = fb.openFile();
 
         if (f == null) {

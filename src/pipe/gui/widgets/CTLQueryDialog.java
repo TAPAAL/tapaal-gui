@@ -105,6 +105,7 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class CTLQueryDialog extends JPanel {
 
@@ -2400,7 +2401,7 @@ public class CTLQueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");

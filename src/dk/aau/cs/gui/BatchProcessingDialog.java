@@ -62,7 +62,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
@@ -505,7 +505,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets","xml", lastPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","xml", lastPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
@@ -1019,7 +1019,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			private void exportResults() {
-				String filename = new FileBrowser("CSV file", "csv", lastPath)
+				String filename = FileBrowser.constructor("CSV file", "csv", lastPath)
 						.saveFile("results");
 				if (filename != null) {
 					File exportFile = new File(filename);
