@@ -429,7 +429,6 @@ public class TabContent extends JSplitPane {
 
 		templateExplorer.switchToEditorMode();
 		this.setLeftComponent(editorSplitPaneScroller);
-		editorSplitPaneScroller.setPreferredSize(animatorSplitPaneScroller.getSize());
 		drawingSurface.repaintAll();
 	}
 
