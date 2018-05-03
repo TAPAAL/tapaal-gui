@@ -102,7 +102,7 @@ public class TabContent extends JSplitPane {
 			zoomLevels.put(net, new Zoomer());
 		}
 		
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
+		drawingSurface = new DrawingSurfaceImpl(new DataLayer());
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
