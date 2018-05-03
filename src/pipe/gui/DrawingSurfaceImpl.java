@@ -324,16 +324,6 @@ Printable {
 		}
 	}
 
-	public void setCursorType(String type) {
-		if (type.equals("arrow")) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		} else if (type.equals("crosshair")) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		} else if (type.equals("move")) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-		}
-	}
-
 	public SelectionManager getSelectionObject() {
 		return selection;
 	}

@@ -2244,11 +2244,11 @@ public class GuiFrame extends JFrame implements Observer {
 
 			if (typeID == ElementType.SELECT) {
 				appView.getSelectionObject().enableSelection();
-				appView.setCursorType("arrow");
+				appView.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			} else if (typeID == ElementType.DRAG) {
-				appView.setCursorType("move");
+				appView.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
-				appView.setCursorType("crosshair");
+				appView.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 			}
 		}
 		// }
