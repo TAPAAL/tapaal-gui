@@ -1,14 +1,19 @@
 package pipe.gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -23,21 +29,35 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.DOMException;
 import dk.aau.cs.gui.FileNameCellRenderer;
+import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
+import dk.aau.cs.gui.components.ExportBatchResultTableModel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.util.StringComparator;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
@@ -51,16 +71,21 @@ public class ExportBatchDialog extends JDialog {
 	private final static String TOOL_TIP_UniqueQueryNamesCheckbox = "Give queries unique names when exporting";
 	
 	private JPanel filesButtonsPanel;
+	private JPanel mainPanel;
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
 	private JButton removeFileButton;
 	private JButton exportFilesButton;
+	private JPanel chooserPanel;
+	private JTextField destinationPathField;
 	private JList fileList;
 	private DefaultListModel listModel;
 	private List<File> files = new ArrayList<File>();
-	private String lastPath;
+	private String lastExportPath;
+	private String lastSelectPath;
 	private JCheckBox uniqueQueryNames;
-
+	private File destinationFile;
+	private ExportBatchResultTableModel tableModel;
 
 	static ExportBatchDialog exportBatchDialog;
 	ModelLoader loader = new ModelLoader(new DrawingSurfaceImpl(new DataLayer()));
@@ -79,7 +104,153 @@ public class ExportBatchDialog extends JDialog {
 	
 	private ExportBatchDialog(Frame frame, String title, boolean modal) {
 		super(frame, title, modal);	
+		initComponents();
+	}
+	
+	private void initComponents() {
+		setLayout(new FlowLayout());
+		mainPanel = new JPanel(new GridBagLayout());
+		
 		initFileList();
+		initChooserPanel();
+		initProgressPanel();
+		
+		setContentPane(mainPanel);
+	}
+	
+	private void initProgressPanel() {
+		JPanel resultPanel = new JPanel();
+		resultPanel.setBorder(BorderFactory.createTitledBorder("Exported Files"));
+		
+		tableModel = new ExportBatchResultTableModel();
+		final JTable resultTable = new JTable(tableModel){
+			private static final long serialVersionUID = 8524549736351991872L;
+
+			public String getToolTipText(MouseEvent e) {
+				String tip= null;
+				java.awt.Point point = e.getPoint();
+				int rowIndex = rowAtPoint(point);
+				int colIndex = columnAtPoint(point);
+				
+				try {
+					tip = getValueAt(rowIndex, colIndex).toString();
+				}
+				catch (RuntimeException e1) {
+					tip = "";
+				}
+				return tip;
+			}
+		};
+		resultTable.getColumn("Status").setCellRenderer(new ExportResultTableCellRenderer(true));
+		
+		
+		// Enable sorting
+		Comparator<Object> comparator = new StringComparator();
+		
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(resultTable.getModel());
+		for(int i = 0; i < resultTable.getColumnCount(); i++){
+			sorter.setComparator(i, comparator);
+		}
+		resultTable.setRowSorter(sorter);
+		
+		JScrollPane scrollPane = new JScrollPane(resultTable);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.BOTH;
+		resultPanel.add(scrollPane, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.weightx = 0;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 10, 0);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		
+		mainPanel.add(resultPanel, gbc);
+	}
+	
+	private void initChooserPanel() {
+		chooserPanel = new JPanel(new GridBagLayout());
+		chooserPanel.setBorder(BorderFactory.createTitledBorder("Export to destination"));
+		
+		destinationPathField = new JTextField("", 23);
+		destinationPathField.setEditable(true);
+		destinationPathField.getDocument().addDocumentListener(new DocumentListener() {			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				textFieldChanged();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				textFieldChanged();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				textFieldChanged();				
+			}
+		});
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		chooserPanel.add(destinationPathField, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 10, 0, 0);
+		JButton destinationPathSelector = new JButton("Select Destination");
+		destinationPathSelector.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectDestinationPath();
+				destinationPathField.setText(destinationFile.getParent());
+				enableButtons();
+			}
+		});
+		chooserPanel.add(destinationPathSelector, gbc);
+		
+
+		uniqueQueryNames = new JCheckBox("Use unique query names", true);
+		uniqueQueryNames.setToolTipText(TOOL_TIP_UniqueQueryNamesCheckbox);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(10, 0, 0, 0);
+		chooserPanel.add(uniqueQueryNames, gbc);
+		
+		exportFilesButton = new JButton("Export All Nets and Queries");
+		exportFilesButton.setToolTipText(TOOL_TIP_ExportFilesButton);
+		exportFilesButton.setEnabled(false);
+		exportFilesButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tableModel.clear();
+				exportFiles();
+				enableButtons();
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(10, 10, 0, 0);
+
+		chooserPanel.add(exportFilesButton, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+		gbc.insets = new Insets(10, 0, 10, 0);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		
+		mainPanel.add(chooserPanel, gbc);
 	}
 	
 	private void initFileList() {
@@ -102,18 +273,9 @@ public class ExportBatchDialog extends JDialog {
 		fileList.setCellRenderer(new FileNameCellRenderer());
 		GridBagConstraints gbc = new GridBagConstraints();
 
-		uniqueQueryNames = new JCheckBox("Unique Query Names", true);
-		uniqueQueryNames.setToolTipText(TOOL_TIP_UniqueQueryNamesCheckbox);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		fileListPanel.add(uniqueQueryNames, gbc);
-
 		JScrollPane scrollpane = new JScrollPane(fileList);
 		scrollpane.setMinimumSize(new Dimension(175, 375));
-		scrollpane.setPreferredSize(new Dimension(175, 375));
+		scrollpane.setPreferredSize(new Dimension(250, 375));
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -178,21 +340,6 @@ public class ExportBatchDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		filesButtonsPanel.add(clearFilesButton, gbc);
 		
-		exportFilesButton = new JButton("Export All Nets and Queries");
-		exportFilesButton.setToolTipText(TOOL_TIP_ExportFilesButton);
-		exportFilesButton.setEnabled(false);
-		exportFilesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exportFiles();
-				enableButtons();
-			}
-		});
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		filesButtonsPanel.add(exportFilesButton, gbc);
-		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -207,18 +354,18 @@ public class ExportBatchDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		gbc.gridheight = 2;
-		gbc.insets = new Insets(10, 5, 0, 5);
+		gbc.insets = new Insets(10, 5, 10, 5);
 		
-		setContentPane(fileListPanel);
+		mainPanel.add(fileListPanel, gbc);
 	}
 
 	private void addFiles() {
-		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets","xml");
+		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets",".xml", lastSelectPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
 			for (File file : filesArray) {
-				lastPath = file.getParent();
+				lastSelectPath = file.getParent();
 				if (!files.contains(file)) {
 					files.add(file);
 					listModel.addElement(file);
@@ -247,13 +394,17 @@ public class ExportBatchDialog extends JDialog {
 		if (listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			removeFileButton.setEnabled(true);
-			exportFilesButton.setEnabled(true);
+
 
 		} else {
 			clearFilesButton.setEnabled(false);
 			removeFileButton.setEnabled(false);
-			exportFilesButton.setEnabled(false);
 		}
+		if(listModel.size() > 0 && destinationFile != null && new File(destinationPathField.getText()).exists()) {
+			exportFilesButton.setEnabled(true);
+		}
+		else
+			exportFilesButton.setEnabled(false);
 
 	}
 	private void clearFiles() {
@@ -261,23 +412,50 @@ public class ExportBatchDialog extends JDialog {
 		listModel.removeAllElements();
 	}
 	
-	private void exportFiles() {
-		File destinationFile = new File(new FileBrowser("Select an export folder", ".", lastPath).saveFile("Export"));
-		if(destinationFile != null) {
-	    	lastPath = destinationFile.getParent();
-	    	try {
-	    		for(File file : files) {
-			    	Path path = Paths.get(destinationFile.getParent() + "/" + file.getName().replaceAll(".xml", ""));
-	    			Files.createDirectories(path);
-	    			exportModel(file, path);
-	    		}
-		    	new MessengerImpl().displayInfoMessage("The selected nets were exported as PNML and XML query files in " + destinationFile.getParent() + ".");
-	    	}
-	    	catch(Exception e){
-				System.err.append("An error occurred while exporting the nets.");
-	    	}
+	private void selectDestinationPath() {
+		String chosenFile = new FileBrowser("Select an export folder", ".", lastExportPath).saveFile("Export");
+		if(chosenFile != null) {
+			destinationFile = new File(chosenFile);
+			lastSelectPath = chosenFile;
 		}
-    }	    
+		else return;
+	}
+	
+	private void exportFiles() {
+		if(destinationFile != null && destinationFile.exists()) {
+    		String destPath = destinationFile.isFile() ? destinationFile.getParent() : destinationFile.getAbsolutePath();
+			lastExportPath = destPath;
+    		for(File file : files) {
+    			try {
+		    		Path path = Paths.get(destPath + "/" + file.getName().replaceAll(".xml", ""));
+			    	if(!(Files.exists(path))) {
+		    			Files.createDirectories(path);
+		    			exportModel(file, path);
+		    			String[] resultSucces = {file.getName(), destPath, "Success"};
+		    			tableModel.addResult(resultSucces);
+			    	}
+			    	else {
+		    			String[] resultFolderExists = {file.getName(), destPath, "Folder already exists"};
+		    			tableModel.addResult(resultFolderExists);
+			    	}
+    			}
+    			catch(Exception e){
+        			String[] resultFail = {file.getName(), destPath, "Parse Error"};
+        			tableModel.addResult(resultFail);
+    	    	}
+	    	}	
+		}
+		else if(destinationFile == null) {
+			new MessengerImpl().displayErrorMessage("Please choose a folder for exporting");
+		}
+		else if(!(destinationFile.exists())) {
+			new MessengerImpl().displayErrorMessage("The chosen path does not exist");
+		}
+    }
+	public void textFieldChanged() {
+		destinationFile = new File(destinationPathField.getText());
+		enableButtons();
+	}
 	
 	private void exportModel(File file, Path path) throws Exception {
 			LoadedModel loadedModel = loader.load(file);
@@ -307,8 +485,64 @@ public class ExportBatchDialog extends JDialog {
 			pipe.dataLayer.TAPNQuery copy = query;
 			copy.setName((fileName.replaceAll(".xml", "") + "." + query.getName() + "-" + index).replaceAll(" ", "_"));
 			renamedQueries.add(copy);
+			index++;
 		}
 		return renamedQueries;
 		
 	}
+	private class ExportResultTableCellRenderer extends JLabel implements
+	TableCellRenderer {
+	Border unselectedBorder = null;
+	Border selectedBorder = null;
+	boolean isBordered = true;
+	
+	public ExportResultTableCellRenderer(boolean isBordered) {
+		this.isBordered = isBordered;
+	}
+	
+		public Component getTableCellRendererComponent(JTable table,
+				Object value, boolean isSelected, boolean hasFocus, int row,
+				int column) {
+			if (isBordered) {
+				if (isSelected) {
+					setBackground(table.getSelectionBackground());
+					setForeground(table.getSelectionForeground());
+		
+					if (selectedBorder == null) {
+						selectedBorder = BorderFactory.createMatteBorder(2, 5,
+								2, 5, table.getSelectionBackground());
+					}
+					setBorder(selectedBorder);
+				} else {
+					boolean isResultColumn = table.getColumnName(column)
+							.equals("Status");
+					if (value != null) {
+						if ((isResultColumn && value.toString().equals("Success")))
+							setBackground(new Color(91, 255, 91)); // light red
+						else if ((isResultColumn && (value.toString().equals("Parse Error")) || value.toString().equals("Folder already exists")))
+							setBackground(new Color(255, 91, 91)); // light  green
+						else
+							setBackground(table.getBackground());
+					} else {
+						setBackground(table.getBackground());
+					}
+					setForeground(table.getForeground());
+					if (unselectedBorder == null) {
+						unselectedBorder = BorderFactory.createMatteBorder(2,
+								5, 2, 5, table.getBackground());
+					}
+					setBorder(unselectedBorder);
+				}
+			}
+		
+			setEnabled(table.isEnabled());
+			setFont(table.getFont());
+			setOpaque(true);
+		
+		
+			return this;
+		}
+	}
 }
+
+
