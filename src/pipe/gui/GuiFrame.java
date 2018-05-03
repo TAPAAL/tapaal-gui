@@ -2251,7 +2251,6 @@ public class GuiFrame extends JFrame implements Observer {
 				appView.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 			}
 		}
-		// }
 
 	}
 
