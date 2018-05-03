@@ -382,7 +382,6 @@ public class ExportBatchDialog extends JDialog {
 			files.remove(file);
 			listModel.removeElement(file);
 		}
-
 		enableButtons();
 	}
 	
@@ -394,8 +393,6 @@ public class ExportBatchDialog extends JDialog {
 		if (listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			removeFileButton.setEnabled(true);
-
-
 		} else {
 			clearFilesButton.setEnabled(false);
 			removeFileButton.setEnabled(false);
@@ -492,6 +489,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 	private class ExportResultTableCellRenderer extends JLabel implements
 	TableCellRenderer {
+	private static final long serialVersionUID = -1054925029991763163L;
 	Border unselectedBorder = null;
 	Border selectedBorder = null;
 	boolean isBordered = true;
@@ -517,10 +515,12 @@ public class ExportBatchDialog extends JDialog {
 					boolean isResultColumn = table.getColumnName(column)
 							.equals("Status");
 					if (value != null) {
-						if ((isResultColumn && value.toString().equals("Success")))
+						if ((isResultColumn && value.toString().equals("Success"))) {
 							setBackground(new Color(91, 255, 91)); // light red
-						else if ((isResultColumn && (value.toString().equals("Parse Error")) || value.toString().equals("Folder already exists")))
+						}
+						else if ((isResultColumn && (value.toString().equals("Parse Error")) || value.toString().equals("Folder already exists"))) {
 							setBackground(new Color(255, 91, 91)); // light  green
+						}
 						else
 							setBackground(table.getBackground());
 					} else {
