@@ -46,7 +46,6 @@ Printable {
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
-	public PlaceTransitionObject createPTO;
 	
 	private static final int DRAWING_SURFACE_GROW = 100;
 
