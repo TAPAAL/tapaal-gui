@@ -33,27 +33,7 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 		Application app = Application.getApplication();
 		app.setAboutHandler(this);
 	    app.setQuitHandler(this);
-	   
-	    try {
-	    	Image appImage;
-			appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
-					CreateGui.imgPath + "icon.png"));
-			app.setDockIconImage(appImage);
-		} catch (MalformedURLException e) {
-			Logger.log("Error loading Image");
-		} catch (IOException e) {
-			Logger.log("Error loading Image");
-		}
-	    
-	    //Set specific settings
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
 
-        // Use native file chooser
-        System.setProperty("apple.awt.fileDialogForDirectories", "false");
-        
-        // Grow size of boxes to add room for the resizer
-        System.setProperty("apple.awt.showGrowBox", "true");
 	}
 	
 	public void handleAbout(AboutEvent arg0) {
