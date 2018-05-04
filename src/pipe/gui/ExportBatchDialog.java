@@ -1,5 +1,6 @@
 package pipe.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -8,7 +9,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -32,6 +33,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -39,7 +41,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -48,16 +49,13 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.DOMException;
 import dk.aau.cs.gui.FileNameCellRenderer;
-import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.ExportBatchResultTableModel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
@@ -86,6 +84,10 @@ public class ExportBatchDialog extends JDialog {
 	private JCheckBox uniqueQueryNames;
 	private File destinationFile;
 	private ExportBatchResultTableModel tableModel;
+	
+	private Thread progressBarThread;
+	private JProgressBar progressBar;
+	private JDialog progressBarContainer;
 
 	static ExportBatchDialog exportBatchDialog;
 	ModelLoader loader = new ModelLoader(new DrawingSurfaceImpl(new DataLayer()));
@@ -103,7 +105,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private ExportBatchDialog(Frame frame, String title, boolean modal) {
-		super(frame, title, modal);	
+		super(frame, title, modal);
 		initComponents();
 	}
 	
@@ -141,9 +143,9 @@ public class ExportBatchDialog extends JDialog {
 				return tip;
 			}
 		};
+		//for coloring cells
 		resultTable.getColumn("Status").setCellRenderer(new ExportResultTableCellRenderer(true));
-		
-		
+				
 		// Enable sorting
 		Comparator<Object> comparator = new StringComparator();
 		
@@ -154,16 +156,19 @@ public class ExportBatchDialog extends JDialog {
 		resultTable.setRowSorter(sorter);
 		
 		JScrollPane scrollPane = new JScrollPane(resultTable);
+		scrollPane.setPreferredSize(new Dimension(600, 400));
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		resultPanel.add(scrollPane);
+		
+		
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.BOTH;
-		resultPanel.add(scrollPane, gbc);
-		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.weightx = 0;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(0, 0, 10, 0);
+		gbc.insets = new Insets(0, 0, 10, 5);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		
 		mainPanel.add(resultPanel, gbc);
@@ -173,7 +178,7 @@ public class ExportBatchDialog extends JDialog {
 		chooserPanel = new JPanel(new GridBagLayout());
 		chooserPanel.setBorder(BorderFactory.createTitledBorder("Export to destination"));
 		
-		destinationPathField = new JTextField("", 23);
+		destinationPathField = new JTextField("", 30);
 		destinationPathField.setEditable(true);
 		destinationPathField.getDocument().addDocumentListener(new DocumentListener() {			
 			@Override
@@ -202,7 +207,7 @@ public class ExportBatchDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 10, 0, 0);
-		JButton destinationPathSelector = new JButton("Select Destination");
+		JButton destinationPathSelector = new JButton("Select destination folder");
 		destinationPathSelector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectDestinationPath();
@@ -230,6 +235,7 @@ public class ExportBatchDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				tableModel.clear();
 				exportFiles();
+				new MessengerImpl().displayInfoMessage("Process finished");
 				enableButtons();
 			}
 		});
@@ -246,7 +252,7 @@ public class ExportBatchDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
-		gbc.insets = new Insets(10, 0, 10, 0);
+		gbc.insets = new Insets(10, 0, 10, 5);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		
@@ -358,6 +364,26 @@ public class ExportBatchDialog extends JDialog {
 		
 		mainPanel.add(fileListPanel, gbc);
 	}
+	
+	private void initProgressBar() {
+		progressBarContainer = new JDialog(exportBatchDialog, "Exporting...", true);
+		progressBar = new JProgressBar(0, fileList.getModel().getSize());
+		
+		
+		progressBarContainer.add(BorderLayout.CENTER, progressBar);
+		progressBarContainer.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		progressBarContainer.setSize(400, 100);
+		progressBarContainer.setLocationRelativeTo(exportBatchDialog);
+		progressBarContainer.setVisible(false);
+		progressBar.setStringPainted(true);
+		progressBar.setString("Exported Nets: 0 of " + fileList.getModel().getSize());
+		
+		progressBarThread = new Thread(new Runnable() {
+			public void run() {
+				progressBarContainer.setVisible(true);
+			}
+		});
+	}
 
 	private void addFiles() {
 		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets",".xml", lastSelectPath);
@@ -413,33 +439,43 @@ public class ExportBatchDialog extends JDialog {
 		String chosenFile = new FileBrowser("Select an export folder", ".", lastExportPath).saveFile("Export");
 		if(chosenFile != null) {
 			destinationFile = new File(chosenFile);
-			lastSelectPath = chosenFile;
+			lastExportPath = chosenFile;
 		}
 		else return;
 	}
 	
 	private void exportFiles() {
+		//loading bar
+		initProgressBar();
+		
 		if(destinationFile != null && destinationFile.exists()) {
     		String destPath = destinationFile.isFile() ? destinationFile.getParent() : destinationFile.getAbsolutePath();
 			lastExportPath = destPath;
+			progressBarThread.start();
     		for(File file : files) {
     			try {
 		    		Path path = Paths.get(destPath + "/" + file.getName().replaceAll(".xml", ""));
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
 		    			exportModel(file, path);
-		    			String[] resultSucces = {file.getName(), destPath, "Success"};
-		    			tableModel.addResult(resultSucces);
+		    			tableModel.addResult(new String[]{file.getName(), destPath, "Succeeded"});
 			    	}
 			    	else {
-		    			String[] resultFolderExists = {file.getName(), destPath, "Folder already exists"};
-		    			tableModel.addResult(resultFolderExists);
+		    			tableModel.addResult(new String[]{file.getName(), destPath, "Failed as the subfolder already exists"});
 			    	}
     			}
     			catch(Exception e){
-        			String[] resultFail = {file.getName(), destPath, "Parse Error"};
-        			tableModel.addResult(resultFail);
+	    			tableModel.addResult(new String[]{file.getName(), destPath, "Failed due to net/query parsing error"});
     	    	}
+    			//For the loading bar
+    			progressBar.setString("Exported Nets: " + files.indexOf(file) + " of " + files.size());
+    			progressBar.setValue(files.indexOf(file));
+    			progressBar.paintImmediately(new Rectangle(0, 0, progressBar.getWidth(), progressBar.getHeight()));
+    			//reset loading bar when done
+    			if(progressBar.getValue() == files.size()-1) {
+    				progressBarContainer.setVisible(false);
+    				progressBar.setValue(1);
+    			}
 	    	}	
 		}
 		else if(destinationFile == null) {
@@ -501,6 +537,9 @@ public class ExportBatchDialog extends JDialog {
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
+			if(value != null) {
+				setText(value.toString());
+			}
 			if (isBordered) {
 				if (isSelected) {
 					setBackground(table.getSelectionBackground());
@@ -515,16 +554,14 @@ public class ExportBatchDialog extends JDialog {
 					boolean isResultColumn = table.getColumnName(column)
 							.equals("Status");
 					if (value != null) {
-						if ((isResultColumn && value.toString().equals("Success"))) {
+						if ((isResultColumn && value.toString().equals("Succeeded"))) {
 							setBackground(new Color(91, 255, 91)); // light red
 						}
-						else if ((isResultColumn && (value.toString().equals("Parse Error")) || value.toString().equals("Folder already exists"))) {
+						else if ((isResultColumn && (value.toString().equals("Failed due to net/query parsing error")) || value.toString().equals("Failed as the subfolder already exists"))) {
 							setBackground(new Color(255, 91, 91)); // light  green
 						}
 						else
 							setBackground(table.getBackground());
-					} else {
-						setBackground(table.getBackground());
 					}
 					setForeground(table.getForeground());
 					if (unselectedBorder == null) {
