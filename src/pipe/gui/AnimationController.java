@@ -64,7 +64,6 @@ public class AnimationController extends JPanel {
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
-
 	private GuiAction stepforwardAction, stepbackwardAction;
 
 	public AnimationController(NetType netType) {
@@ -131,168 +130,159 @@ public class AnimationController extends JPanel {
 		
 		initializeDocumentFilterForDelayInput();
 	}
-        
-         private void initDelaySlider() {
-                JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                JButton decrese = new JButton("-");
-                decrese.setPreferredSize(new Dimension(20, 30));
-                decrese.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                                setDelayModeScale(delayScale / 2);
-                                delaySlider.setValue(delaySlider.getValue() * 2);
-                        }
-                });
-                sliderPanel.add(decrese);
 
-                delaySlider = new JSlider(0, 160);
-                delaySlider.setSnapToTicks(false);
-                delaySlider.setMajorTickSpacing(10);
-                delaySlider.setMinorTickSpacing(0);
-                delaySlider.setPaintLabels(true);
-                delaySlider.setPaintTicks(true);
-                delaySlider.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                                TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-                                CreateGui.getAnimator().reportBlockingPlaces();
+	private void initDelaySlider() {
+		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JButton decrese = new JButton("-");
+		decrese.setPreferredSize(new Dimension(20, 30));
+		decrese.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDelayModeScale(delayScale / 2);
+				delaySlider.setValue(delaySlider.getValue() * 2);
+			}
+		});
+		sliderPanel.add(decrese);
 
-                        }
-                });
+		delaySlider = new JSlider(0, 160);
+		delaySlider.setSnapToTicks(false);
+		delaySlider.setMajorTickSpacing(10);
+		delaySlider.setMinorTickSpacing(0);
+		delaySlider.setPaintLabels(true);
+		delaySlider.setPaintTicks(true);
+		delaySlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
+				CreateGui.getAnimator().reportBlockingPlaces();
 
-                delaySlider.addKeyListener(new KeyListener() {
-                        public void keyPressed(KeyEvent e) {
-                                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                        addTimeDelayToHistory();
-                                }
-                        }
+			}
+		});
 
-                        public void keyReleased(KeyEvent e) {
-                                CreateGui.getAnimator().reportBlockingPlaces();
-                        }
+		delaySlider.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					addTimeDelayToHistory();
+				}
+			}
 
-                        public void keyTyped(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
+				CreateGui.getAnimator().reportBlockingPlaces();
+			}
 
-                        }
-                });
+			public void keyTyped(KeyEvent e) {
 
-                setDelayModeScale(16);
+			}
+		});
 
-                sliderPanel.add(delaySlider);
-                JButton increse = new JButton("+");
-                increse.setPreferredSize(new Dimension(20, 30));
-                increse.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                                setDelayModeScale(delayScale * 2);
-                                delaySlider.setValue(delaySlider.getValue() / 2);
-                        }
-                });
-                sliderPanel.add(increse);
+		setDelayModeScale(16);
 
-                GridBagConstraints c = new GridBagConstraints();
-                c.fill = GridBagConstraints.HORIZONTAL;
-                c.weightx = 0.5;
-                c.gridx = 0;
-                c.gridy = 1;
-                add(sliderPanel, c);
-        }
-        
-        private void setDelayModeScale(int scale){
-            if (scale == 0) return;
-            delayScale = scale;
-            Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
-            labels.put(0, new JLabel("0"));
-            labels.put(160, new JLabel(Integer.toString(delayScale)));
-            delaySlider.setLabelTable(labels);
-        }
-        
-        
-        private void initDelayTimePanel(JToolBar animationToolBar) {
-                JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		sliderPanel.add(delaySlider);
+		JButton increse = new JButton("+");
+		increse.setPreferredSize(new Dimension(20, 30));
+		increse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDelayModeScale(delayScale * 2);
+				delaySlider.setValue(delaySlider.getValue() / 2);
+			}
+		});
+		sliderPanel.add(increse);
 
-                okButton = new javax.swing.JButton();
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0.5;
+		c.gridx = 0;
+		c.gridy = 1;
+		add(sliderPanel, c);
+	}
 
-                okButton.setText("Time delay");
-                // okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-                okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-                // okButton.setPreferredSize(new java.awt.Dimension(75, 25));
-                okButton.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                // okButtonHandler(evt);
-                                addTimeDelayToHistory();
-                        }
-                });
+	private void setDelayModeScale(int scale) {
+		if (scale == 0) return;
+		delayScale = scale;
+		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
+		labels.put(0, new JLabel("0"));
+		labels.put(160, new JLabel(Integer.toString(delayScale)));
+		delaySlider.setLabelTable(labels);
+	}
 
-                //"Hack" to make sure the toolTip for this button is showed as long as possible
-                okButton.addMouseListener(new MouseAdapter() {
-                        final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
-                        final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
-                        final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
-                        final int dismissDelayMinutes = Integer.MAX_VALUE;
 
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                                ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
-                                ToolTipManager.sharedInstance().setInitialDelay(0);
-                                ToolTipManager.sharedInstance().setReshowDelay(0);
-                                ToolTipManager.sharedInstance().setEnabled(true);
-                        }
+	private void initDelayTimePanel(JToolBar animationToolBar) {
+		JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-                                ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
-                                ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
-                                ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
-                                ToolTipManager.sharedInstance().setEnabled(CreateGui.getApp().isShowingToolTips());
-                        }
-                });
+		okButton = new javax.swing.JButton();
 
-                TimeDelayField.addKeyListener(new KeyListener() {
-                        public void keyPressed(KeyEvent e) {
-                                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                        addTimeDelayToHistory();
-                                        TimeDelayField.getFocusCycleRootAncestor().requestFocus();	// Remove focus
-                                }
-                        }
+		okButton.setText("Time delay");
+		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
+		okButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				addTimeDelayToHistory();
+			}
+		});
 
-                        public void keyReleased(KeyEvent e) {
-                                CreateGui.getAnimator().reportBlockingPlaces();
-                        }
+		//"Hack" to make sure the toolTip for this button is showed as long as possible
+		okButton.addMouseListener(new MouseAdapter() {
+			final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
+			final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
+			final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
+			final int dismissDelayMinutes = Integer.MAX_VALUE;
 
-                        public void keyTyped(KeyEvent e) {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
+				ToolTipManager.sharedInstance().setInitialDelay(0);
+				ToolTipManager.sharedInstance().setReshowDelay(0);
+				ToolTipManager.sharedInstance().setEnabled(true);
+			}
 
-                        }
+			@Override
+			public void mouseExited(MouseEvent e) {
+				ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
+				ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
+				ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
+				ToolTipManager.sharedInstance().setEnabled(CreateGui.getApp().isShowingToolTips());
+			}
+		});
 
-                });
+		TimeDelayField.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					addTimeDelayToHistory();
+					TimeDelayField.getFocusCycleRootAncestor().requestFocus();    // Remove focus
+				}
+			}
 
-                // Disable shortcuts when focused
-                TimeDelayField.addFocusListener(new FocusListener() {
-                        public void focusLost(FocusEvent arg0) {
-                                CreateGui.getApp().setStepShotcutEnabled(true);
-                        }
+			public void keyReleased(KeyEvent e) {
+				CreateGui.getAnimator().reportBlockingPlaces();
+			}
 
-                        public void focusGained(FocusEvent arg0) {
-                                CreateGui.getApp().setStepShotcutEnabled(false);
-                        }
-                });
+			public void keyTyped(KeyEvent e) {
 
-                DecimalFormat df = new DecimalFormat();
-                df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-                df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+			}
 
-                TimeDelayField.setText(df.format(1f));
-                TimeDelayField.setColumns(6);
+		});
 
-                timedelayPanel.add(TimeDelayField);
-                timedelayPanel.add(okButton);
-			//CreateGui.getAnimator().reportBlockingPlaces();
+		// Disable shortcuts when focused
+		TimeDelayField.addFocusListener(new FocusListener() {
+			public void focusLost(FocusEvent arg0) {
+				CreateGui.getApp().setStepShotcutEnabled(true);
+			}
 
-			// c.fill = GridBagConstraints.HORIZONTAL;
-                // c.weightx = 0.5;
-                // c.gridx = 0;
-                // c.gridy = 3;
-                // add(timedelayPanel, c);
-                animationToolBar.add(timedelayPanel);
-        }
+			public void focusGained(FocusEvent arg0) {
+				CreateGui.getApp().setStepShotcutEnabled(false);
+			}
+		});
+
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+
+		TimeDelayField.setText(df.format(1f));
+		TimeDelayField.setColumns(6);
+
+		timedelayPanel.add(TimeDelayField);
+		timedelayPanel.add(okButton);
+
+		animationToolBar.add(timedelayPanel);
+	}
 
 	public void updateFiringModeComboBox() {
 		FiringMode currentFiringMode = CreateGui.getAnimator().getFiringmode();
