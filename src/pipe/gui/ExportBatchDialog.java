@@ -67,6 +67,11 @@ public class ExportBatchDialog extends JDialog {
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	private final static String TOOL_TIP_ExportFilesButton = "Press to export all nets in PNML and XML format";
 	private final static String TOOL_TIP_UniqueQueryNamesCheckbox = "Give queries unique names when exporting";
+	private final static String NAME_SuccesString = "Succeeded";
+	private final static String NAME_SuccesStringOrphanTransitionsRemoved = "Succeeded, orphan transitions removed";
+	private final static String NAME_FailStringFolderExists = "Failed as the subfolder already exists";
+	private final static String NAME_FailStringParseError = "Failed due to net/query parsing error";
+
 	
 	private JPanel filesButtonsPanel;
 	private JPanel mainPanel;
@@ -467,15 +472,15 @@ public class ExportBatchDialog extends JDialog {
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
 		    			exportModel(file, path);
-		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), destPath, "Succeeded"} 
-		    			: new String[]{file.getName(), destPath, "Succeeded, orphan transitions removed"});
+		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), destPath, NAME_SuccesString} 
+		    			: new String[]{file.getName(), destPath, NAME_SuccesStringOrphanTransitionsRemoved});
 			    	}
 			    	else {
-		    			tableModel.addResult(new String[]{file.getName(), destPath, "Failed as the subfolder already exists"});
+		    			tableModel.addResult(new String[]{file.getName(), destPath, NAME_FailStringFolderExists});
 			    	}
     			}
     			catch(Exception e){
-	    			tableModel.addResult(new String[]{file.getName(), destPath, "Failed due to net/query parsing error"});
+	    			tableModel.addResult(new String[]{file.getName(), destPath, NAME_FailStringParseError});
     	    	}
     			//For the loading bar
     			progressBar.setString("Exported Nets: " + files.indexOf(file) + " of " + files.size());
@@ -565,11 +570,11 @@ public class ExportBatchDialog extends JDialog {
 					boolean isResultColumn = table.getColumnName(column)
 							.equals("Status");
 					if (value != null) {
-						if ((isResultColumn && (value.toString().equals("Succeeded")) || value.toString().equals("Succeeded, orphan transitions removed"))) {
-							setBackground(new Color(91, 255, 91)); // light red
+						if ((isResultColumn && (value.toString().equals(NAME_SuccesString)) || value.toString().equals(NAME_SuccesStringOrphanTransitionsRemoved))) {
+							setBackground(new Color(91, 255, 91)); // light green
 						}
-						else if ((isResultColumn && (value.toString().equals("Failed due to net/query parsing error")) || value.toString().equals("Failed as the subfolder already exists"))) {
-							setBackground(new Color(255, 91, 91)); // light  green
+						else if ((isResultColumn && (value.toString().equals(NAME_FailStringParseError)) || value.toString().equals(NAME_FailStringFolderExists))) {
+							setBackground(new Color(255, 91, 91)); // light  red
 						}
 						else
 							setBackground(table.getBackground());
