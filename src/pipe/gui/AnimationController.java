@@ -68,7 +68,7 @@ public class AnimationController extends JPanel {
 
 	JTextField TimeDelayField = new JTextField();
 	JComboBox firermodebox = null;
-	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
 	public AnimationController(NetType netType) {
 
