@@ -64,8 +64,8 @@ public class AnimationController extends JPanel {
 	private javax.swing.JButton okButton;
         private JSlider delaySlider;
         private int delayScale = 10;
-	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
-	private String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded"; 
+	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
+	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
 	class ToggleButton extends JToggleButton implements PropertyChangeListener {
 
