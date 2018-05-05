@@ -88,9 +88,18 @@ public class ExportBatchDialog extends JDialog {
 	private Thread progressBarThread;
 	private JProgressBar progressBar;
 	private JDialog progressBarContainer;
+	static boolean noOrphanTransitions = false;
 
 	static ExportBatchDialog exportBatchDialog;
 	ModelLoader loader = new ModelLoader(new DrawingSurfaceImpl(new DataLayer()));
+	
+	public static boolean isDialogVisible() {
+		return exportBatchDialog.isVisible();
+	}
+	
+	public static void setNoOrphanTransitions(boolean value) {
+		noOrphanTransitions = value;
+	}
 	
 	public static void ShowExportBatchDialog(){
 		if(exportBatchDialog == null){
@@ -458,7 +467,8 @@ public class ExportBatchDialog extends JDialog {
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
 		    			exportModel(file, path);
-		    			tableModel.addResult(new String[]{file.getName(), destPath, "Succeeded"});
+		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), destPath, "Succeeded"} 
+		    			: new String[]{file.getName(), destPath, "Succeeded, orphan transitions removed"});
 			    	}
 			    	else {
 		    			tableModel.addResult(new String[]{file.getName(), destPath, "Failed as the subfolder already exists"});
@@ -471,6 +481,7 @@ public class ExportBatchDialog extends JDialog {
     			progressBar.setString("Exported Nets: " + files.indexOf(file) + " of " + files.size());
     			progressBar.setValue(files.indexOf(file));
     			progressBar.paintImmediately(new Rectangle(0, 0, progressBar.getWidth(), progressBar.getHeight()));
+    			noOrphanTransitions = false;
     			//reset loading bar when done
     			if(progressBar.getValue() == files.size()-1) {
     				progressBarContainer.setVisible(false);
@@ -554,7 +565,7 @@ public class ExportBatchDialog extends JDialog {
 					boolean isResultColumn = table.getColumnName(column)
 							.equals("Status");
 					if (value != null) {
-						if ((isResultColumn && value.toString().equals("Succeeded"))) {
+						if ((isResultColumn && (value.toString().equals("Succeeded")) || value.toString().equals("Succeeded, orphan transitions removed"))) {
 							setBackground(new Color(91, 255, 91)); // light red
 						}
 						else if ((isResultColumn && (value.toString().equals("Failed due to net/query parsing error")) || value.toString().equals("Failed as the subfolder already exists"))) {
