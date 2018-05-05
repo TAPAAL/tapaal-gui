@@ -64,38 +64,6 @@ public class AnimationController extends JPanel {
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
-	class ToggleButton extends JToggleButton implements PropertyChangeListener {
-
-		private static final long serialVersionUID = -6594894202788511816L;
-
-		public ToggleButton(Action a) {
-			super(a);
-			if (a.getValue(Action.SMALL_ICON) != null) {
-				// toggle buttons like to have images *and* text, nasty
-				setText(null);
-			}
-			a.addPropertyChangeListener(this);
-		}
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals("selected")) {
-				Boolean b = (Boolean) evt.getNewValue();
-				if (b != null) {
-					setSelected(b.booleanValue());
-				}
-			}
-		}
-
-	}
-
-	private void addButton(JToolBar toolBar, GuiAction action) {
-
-		if (action.getValue("selected") != null) {
-			toolBar.add(new ToggleButton(action));
-		} else {
-			toolBar.add(action);
-		}
-	}
 
 	private GuiAction stepforwardAction, stepbackwardAction;
 
@@ -126,8 +94,8 @@ public class AnimationController extends JPanel {
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
 		animationToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
-		addButton(animationToolBar, stepbackwardAction);
-		addButton(animationToolBar, stepforwardAction);
+		animationToolBar.add(stepbackwardAction);
+		animationToolBar.add(stepforwardAction);
 
 		animationToolBar.setVisible(true);
 
