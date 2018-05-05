@@ -66,6 +66,10 @@ public class AnimationController extends JPanel {
 
 	private GuiAction stepforwardAction, stepbackwardAction;
 
+	JTextField TimeDelayField = new JTextField();
+	JComboBox firermodebox = null;
+	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+
 	public AnimationController(NetType netType) {
 
 		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
@@ -402,7 +406,5 @@ public class AnimationController extends JPanel {
 		((AbstractDocument)doc).setDocumentFilter(new DecimalOnlyDocumentFilter(5));
 	}
 
-	JTextField TimeDelayField = new JTextField();
-	JComboBox firermodebox = null;
-	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+
 }
