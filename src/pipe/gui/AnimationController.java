@@ -371,13 +371,10 @@ public class AnimationController extends JPanel {
 																	// number
 																	// localised
 		// Try parse
-
 		BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
 				new MathContext(Pipe.AGE_PRECISION));
 
-		// BigDecimal timeDelayToSet = new
-		// BigDecimal(TimeDelayField.getText(), new
-		// MathContext(Pipe.AGE_PRECISION));
+
 		return timeDelayToSet;
 	}
 
