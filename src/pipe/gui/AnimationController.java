@@ -103,10 +103,9 @@ public class AnimationController extends JPanel {
 		}
 	}
 
-	GuiAction startAction, stepforwardAction, stepbackwardAction;
+	private GuiAction stepforwardAction, stepbackwardAction;
 
 	public AnimationController(NetType netType) {
-		startAction = CreateGui.getAppGui().startAction;
 
 		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
 		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
