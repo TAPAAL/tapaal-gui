@@ -315,7 +315,6 @@ public class GuiFrame extends JFrame implements Observer {
 					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					Logger.log("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
-					CreateGui.setUsingGTKFileBrowser(false);
 				}
 
 			}

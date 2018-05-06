@@ -30,9 +30,6 @@ public class CreateGui {
 	private static JTabbedPane appTab;
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
-	private static boolean usingGTKFileBrowser = true;
-
-
 	public static final String imgPath = "resources/Images/";
 	public static String userPath; //Used for latest open dialog path
 
@@ -235,17 +232,6 @@ public class CreateGui {
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
 	}
-
-	public static void setUsingGTKFileBrowser(boolean useGTKFileBrowser) {
-		usingGTKFileBrowser = useGTKFileBrowser;
-	}
-	
-	public static boolean usingGTKFileBrowser() {
-		return usingGTKFileBrowser;
-	}
-	
-
-
 
 	//XXX Two Methodes to access same data (created after auto encapsulate)
 	public static GuiFrame getApp() { // returns a reference to the application
