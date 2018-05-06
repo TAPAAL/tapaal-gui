@@ -281,18 +281,20 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			// Set the Look and Feel native for the system.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			if(UIManager.getLookAndFeel().getName().equals("Windows")){
-				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-					if ("Nimbus".equals(info.getName())) {
-						UIManager.setLookAndFeel(info.getClassName());
-						UIManager.getLookAndFeelDefaults().put("List[Selected].textBackground", new Color(57, 105, 138));
-						UIManager.getLookAndFeelDefaults().put("List[Selected].textForeground", new Color(255,255,255));
-						UIManager.getLookAndFeelDefaults().put("List.background", new Color(255,255,255));
 
-						break;
-					}
-				}
-			}
+			//XXX Bug made us select non-native L&F for Windows, bug seems to be no longer present.
+//			if(UIManager.getLookAndFeel().getName().equals("Windows")){
+//				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//					if ("Nimbus".equals(info.getName())) {
+//						UIManager.setLookAndFeel(info.getClassName());
+//						UIManager.getLookAndFeelDefaults().put("List[Selected].textBackground", new Color(57, 105, 138));
+//						UIManager.getLookAndFeelDefaults().put("List[Selected].textForeground", new Color(255,255,255));
+//						UIManager.getLookAndFeelDefaults().put("List.background", new Color(255,255,255));
+//
+//						break;
+//					}
+//				}
+//			}
 
 			// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
 			UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
