@@ -41,11 +41,7 @@ public class CreateGui {
 		appGui = new GuiFrame(TAPAAL.getProgramName());
 
 		if (getAppGui().isMac()){
-			try {
-				SpecialMacHandler.postprocess();
-			} catch (NoClassDefFoundError e) {
-				//Failed loading special mac handler, ignore and run program without MacOS integration
-			}
+			SpecialMacHandler.postprocess();
 		}
 
 		Grid.enableGrid();
