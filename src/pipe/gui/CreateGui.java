@@ -44,7 +44,7 @@ public class CreateGui {
 			SpecialMacHandler.postprocess();
 		}
 
-		Grid.enableGrid();
+
 
 		appTab = new JTabbedPane();
 

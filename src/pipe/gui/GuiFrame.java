@@ -251,6 +251,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		animator = new Animator();
+		Grid.enableGrid();
 
 		loadPrefrences();
 
