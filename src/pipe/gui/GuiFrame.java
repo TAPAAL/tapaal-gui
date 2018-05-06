@@ -1646,21 +1646,20 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (file != null) {
 			try {
-				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
-				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
+				ModelLoader loader = new ModelLoader(tab.drawingSurface());
 				LoadedModel loadedModel = loader.load(file);
 
-				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
-				currentTab.setQueries(loadedModel.queries());
-				currentTab.setConstants(loadedModel.network().constants());
-				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
+				tab.setNetwork(loadedModel.network(), loadedModel.templates());
+				tab.setQueries(loadedModel.queries());
+				tab.setConstants(loadedModel.network().constants());
+				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
-				currentTab.selectFirstElements();
+				tab.selectFirstElements();
 
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
@@ -1707,7 +1706,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (file != null) {
 			try {
-				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(ElementType.CREATING);
@@ -1715,19 +1713,19 @@ public class GuiFrame extends JFrame implements Observer {
 
 				LoadedModel loadedModel;
 				if(loadPNML){
-					PNMLoader loader = new PNMLoader(currentTab.drawingSurface());
+					PNMLoader loader = new PNMLoader(tab.drawingSurface());
 					loadedModel = loader.load(file);
 				} else {
-					ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
+					ModelLoader loader = new ModelLoader(tab.drawingSurface());
 					loadedModel = loader.load(file);
 				}
 
-				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
-				currentTab.setQueries(loadedModel.queries());
-				currentTab.setConstants(loadedModel.network().constants());
-				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
+				tab.setNetwork(loadedModel.network(), loadedModel.templates());
+				tab.setQueries(loadedModel.queries());
+				tab.setConstants(loadedModel.network().constants());
+				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
-				currentTab.selectFirstElements();
+				tab.selectFirstElements();
 
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
