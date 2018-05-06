@@ -197,6 +197,10 @@ public class CreateGui {
 		return tabs.size() - 1;
 	}
 
+	public static void undoGetFreeSpace() {
+		tabs.remove(tabs.size() - 1);
+	}
+
 	public static void removeTab(int index) {
 		tabs.remove(index);
 	}
@@ -221,11 +225,7 @@ public class CreateGui {
 	public static Animator getAnimator() {
 		return appGui.getAnimator();
 	}
-
-	public static void undoGetFreeSpace() {
-		tabs.remove(tabs.size() - 1);
-	}
-
+	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
 	public static GuiFrame getApp() { // returns a reference to the application
 		return getAppGui();
