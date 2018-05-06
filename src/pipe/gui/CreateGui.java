@@ -27,7 +27,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 public class CreateGui {
 
 	private static GuiFrame appGui;
-	private static Animator animator;
 	private static JTabbedPane appTab;
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
@@ -55,7 +54,6 @@ public class CreateGui {
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
-		animator = new Animator();
 
 		getAppGui().setTab(); // sets Tab properties
 
@@ -225,8 +223,13 @@ public class CreateGui {
 		return tabs.get(appTab.getSelectedIndex());
 	}
 
+	/**
+	 * @deprecated Use method getAnimator in GuiFrame
+	 * @return
+	 */
+	@Deprecated
 	public static Animator getAnimator() {
-		return animator;
+		return appGui.getAnimator();
 	}
 
 	public static void undoGetFreeSpace() {

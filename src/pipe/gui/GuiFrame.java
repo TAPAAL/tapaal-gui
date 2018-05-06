@@ -104,6 +104,12 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	private String frameTitle;
 	private DrawingSurfaceImpl appView;
+
+	public Animator getAnimator() {
+		return animator;
+	}
+
+	private Animator animator;
 	private Pipe.ElementType mode, prev_mode;
 	private GUIMode guiMode = GUIMode.noNet;
 
@@ -304,6 +310,8 @@ public class GuiFrame extends JFrame implements Observer {
 		this.setMinimumSize(new Dimension(825, 480));
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		animator = new Animator();
 
 		loadPrefrences();
 
