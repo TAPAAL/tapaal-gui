@@ -758,7 +758,7 @@ public class GuiFrame extends JFrame implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CreateGui.getCurrentTab().getAnimationHistory().stepBackwards();
-				CreateGui.getAnimator().stepBack();
+				getAnimator().stepBack();
 				updateMouseOverInformation();
 				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 			}
@@ -768,7 +768,7 @@ public class GuiFrame extends JFrame implements Observer {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						CreateGui.getCurrentTab().getAnimationHistory().stepForward();
-						CreateGui.getAnimator().stepForward();
+						getAnimator().stepForward();
 						updateMouseOverInformation();
 						CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 					}
@@ -778,7 +778,7 @@ public class GuiFrame extends JFrame implements Observer {
 				"Let time pass one time unit", "W") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
+				getAnimator().letTimePass(BigDecimal.ONE);
 				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 				updateMouseOverInformation();
 			}
@@ -1569,7 +1569,7 @@ public class GuiFrame extends JFrame implements Observer {
 			NetworkMarking currentMarking = null;
 			if(getGUIMode().equals(GUIMode.animation)){
 				currentMarking = currentTab.network().marking();
-				currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
+				currentTab.network().setMarking(getAnimator().getInitialMarking());
 			}
 
 			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
@@ -1893,7 +1893,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
-				CreateGui.getAnimator().restoreModel();
+				getAnimator().restoreModel();
 				hideComponentWindow();
 			}
 
@@ -1910,18 +1910,18 @@ public class GuiFrame extends JFrame implements Observer {
 			break;
 		case animation:
 			TabContent tab = CreateGui.getCurrentTab();
-			CreateGui.getAnimator().setTabContent(tab);
+			getAnimator().setTabContent(tab);
 			tab.switchToAnimationComponents(showEnabledTransitions);
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
 			tab.drawingSurface().changeAnimationMode(true);
 			tab.drawingSurface().repaintAll();
-			CreateGui.getAnimator().reset(false);
-			CreateGui.getAnimator().storeModel();
-			CreateGui.getAnimator().highlightEnabledTransitions();
-			CreateGui.getAnimator().reportBlockingPlaces();
-			CreateGui.getAnimator().setFiringmode("Random");
+			getAnimator().reset(false);
+			getAnimator().storeModel();
+			getAnimator().highlightEnabledTransitions();
+			getAnimator().reportBlockingPlaces();
+			getAnimator().setFiringmode("Random");
 
 			statusBar.changeText(statusBar.textforAnimation);
 			selectAction.setSelected(false);
