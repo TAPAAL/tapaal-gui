@@ -41,7 +41,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -242,67 +241,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		frameTitle = title;
 		setTitle(null);
-		try {
-			// Set the Look and Feel native for the system.
-			setLookAndFeel();
-			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
-                        UIManager.put("Slider.paintValue", false);
-
-			// 2010-05-07, Kenneth Yrke Joergensen:
-			// If the native look and feel is GTK replace the useless open
-			// dialog, with a java-reimplementation.
-
-			if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
-				try {
-					//Load class to see if its there
-					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
-				} catch (ClassNotFoundException exc){
-					Logger.log("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
-					CreateGui.setUsingGTKFileBrowser(false);
-				}
-
-			}
-
-
-		} catch (Exception exc) {
-			Logger.log("Error loading L&F: " + exc);
-		}
-
-		if (isMac()){ 
-
-			try{
-				new SpecialMacHandler();
-			} catch (NoClassDefFoundError e) {
-				//Failed loading special mac handler, ignore and run program without MacOS integration
-			}
-
-			//XXX Refactor to sperate function, only a test to see of this fixes issues for TAPAAL on Java9 bug #1764383
-			Application app = Application.getApplication();
-			try {
-				Image appImage;
-				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
-					CreateGui.imgPath + "icon.png"));
-				app.setDockIconImage(appImage);
-			} catch (MalformedURLException e) {
-				Logger.log("Error loading Image");
-			} catch (IOException e) {
-				Logger.log("Error loading Image");
-			}
-
-			//Set specific settings
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
-
-			// Use native file chooser
-			System.setProperty("apple.awt.fileDialogForDirectories", "false");
-
-			// Grow size of boxes to add room for the resizer
-			System.setProperty("apple.awt.showGrowBox", "true");
-
-		}
-
-		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
+		trySetLookAndFeel();
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setSize(screenSize.width * 80 / 100, screenSize.height * 80 / 100);
@@ -337,6 +276,91 @@ public class GuiFrame extends JFrame implements Observer {
 		setGUIMode(GUIMode.noNet);
 	}
 
+	private void trySetLookAndFeel() {
+		try {
+			// Set the Look and Feel native for the system.
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			if(UIManager.getLookAndFeel().getName().equals("Windows")){
+				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+					if ("Nimbus".equals(info.getName())) {
+						UIManager.setLookAndFeel(info.getClassName());
+						UIManager.getLookAndFeelDefaults().put("List[Selected].textBackground", new Color(57, 105, 138));
+						UIManager.getLookAndFeelDefaults().put("List[Selected].textForeground", new Color(255,255,255));
+						UIManager.getLookAndFeelDefaults().put("List.background", new Color(255,255,255));
+
+						break;
+					}
+				}
+			}
+
+			// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
+			UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
+					{
+					"SPACE", "pressed",
+					"released SPACE", "released",
+					"ENTER", "pressed",
+					"released ENTER", "released"
+					}));
+			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
+                        UIManager.put("Slider.paintValue", false);
+
+			// 2010-05-07, Kenneth Yrke Joergensen:
+			// If the native look and feel is GTK replace the useless open
+			// dialog, with a java-reimplementation.
+
+			if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
+				try {
+					//Load class to see if its there
+					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
+					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
+				} catch (ClassNotFoundException exc){
+					Logger.log("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
+					CreateGui.setUsingGTKFileBrowser(false);
+				}
+
+			}
+
+
+		} catch (Exception exc) {
+			Logger.log("Error loading L&F: " + exc);
+		}
+
+		if (isMac()){
+
+			try{
+				new SpecialMacHandler();
+			} catch (NoClassDefFoundError e) {
+				//Failed loading special mac handler, ignore and run program without MacOS integration
+			}
+
+			//XXX Refactor to sperate function, only a test to see of this fixes issues for TAPAAL on Java9 bug #1764383
+			Application app = Application.getApplication();
+			try {
+				Image appImage;
+				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
+					CreateGui.imgPath + "icon.png"));
+				app.setDockIconImage(appImage);
+			} catch (MalformedURLException e) {
+				Logger.log("Error loading Image");
+			} catch (IOException e) {
+				Logger.log("Error loading Image");
+			}
+
+			//Set specific settings
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
+
+			// Use native file chooser
+			System.setProperty("apple.awt.fileDialogForDirectories", "false");
+
+			// Grow size of boxes to add room for the resizer
+			System.setProperty("apple.awt.showGrowBox", "true");
+
+		}
+
+		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
+	}
+
 	private void loadPrefrences() {
 		Preferences prefs = Preferences.getInstance();
 
@@ -368,31 +392,6 @@ public class GuiFrame extends JFrame implements Observer {
 			this.setSize(dimension);
 		}
 
-	}
-
-	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		if(UIManager.getLookAndFeel().getName().equals("Windows")){
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					UIManager.getLookAndFeelDefaults().put("List[Selected].textBackground", new Color(57, 105, 138));
-					UIManager.getLookAndFeelDefaults().put("List[Selected].textForeground", new Color(255,255,255));
-					UIManager.getLookAndFeelDefaults().put("List.background", new Color(255,255,255));
-									
-					break;
-				}
-			}
-		}
-
-		// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
-		UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
-				{
-				"SPACE", "pressed",
-				"released SPACE", "released",
-				"ENTER", "pressed",
-				"released ENTER", "released"
-				}));
 	}
 
 	/**
