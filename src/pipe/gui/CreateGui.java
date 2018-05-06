@@ -44,16 +44,13 @@ public class CreateGui {
 			SpecialMacHandler.postprocess();
 		}
 
-
-
 		appTab = new JTabbedPane();
 
-		getAppGui().setTab(); // sets Tab properties
+		appGui.setTab(); // sets Tab properties
+		appGui.getContentPane().add(appTab);
 
-		getAppGui().getContentPane().add(appTab);
+		appGui.setVisible(true);
 
-		getAppGui().setVisible(true);
-		getAppGui().activateSelectAction();
 		Verifyta.trySetup();
 		VerifyTAPN.trySetup();
 		VerifyTAPNDiscreteVerification.trySetup();
