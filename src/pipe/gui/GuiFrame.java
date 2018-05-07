@@ -1623,7 +1623,7 @@ public class GuiFrame extends JFrame implements Observer {
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template);
 
-		tab.setCurrentTemplate(template);
+		//tab.setCurrentTemplate(template);
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
