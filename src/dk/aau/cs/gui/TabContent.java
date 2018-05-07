@@ -543,11 +543,24 @@ public class TabContent extends JSplitPane {
 		return count;
 	}
 
-	public void addTemplate(Template template) {
+	/*
+		XXX: 2018-05-07 kyrke, added a version of addTemplate that does not call templatExplorer.updatTemplateList
+		used in createNewTab (as updateTamplateList expects the current tab to be selected)
+		this needs to be refactored asap. but the is the only way I could get it to work for now.
+		The code is very unclean on what is a template, TimeArcPetriNetNetwork, seems to mix concerns about
+		gui/controller/model. Further refactoring is needed to clean up this mess.
+	 */
+	public void addTemplate(Template template, boolean updateTemplateExplorer) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
 		zoomLevels.put(template.model(), template.zoomer());
-		templateExplorer.updateTemplateList();
+		if (updateTemplateExplorer) {
+			templateExplorer.updateTemplateList();
+		}
+	}
+
+	public void addTemplate(Template template) {
+		addTemplate(template, true);
 	}
 
 	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {

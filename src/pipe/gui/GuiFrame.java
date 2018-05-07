@@ -1607,7 +1607,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void createNewTab(String name, NetType netType) {
 		int freeSpace = CreateGui.getFreeSpace(netType);
 
-		setObjects(freeSpace);
+		//setObjects(freeSpace);
 		//CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
@@ -1615,16 +1615,14 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
-		appTab.addTab(name, tab);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
-
 
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
-		tab.addTemplate(template);
+		tab.addTemplate(template, false);
 
 		//tab.setCurrentTemplate(template);
-
+		appTab.addTab(name, tab);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
 
