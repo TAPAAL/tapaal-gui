@@ -197,6 +197,10 @@ public class CreateGui {
 		return tabs.size() - 1;
 	}
 
+	public static void addTab (TabContent tab ) {
+		tabs.add(tab);
+	}
+
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
 	}
@@ -214,7 +218,7 @@ public class CreateGui {
 	}
 
 	public static TabContent getCurrentTab() {
-		return tabs.get(appTab.getSelectedIndex());
+		return getTab(appTab.getSelectedIndex());
 	}
 
 	/**
