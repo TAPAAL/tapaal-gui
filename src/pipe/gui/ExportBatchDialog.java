@@ -9,6 +9,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,13 +50,16 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.DOMException;
 import dk.aau.cs.gui.FileNameCellRenderer;
+import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.ExportBatchResultTableModel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
@@ -159,6 +163,7 @@ public class ExportBatchDialog extends JDialog {
 		};
 		//for coloring cells
 		resultTable.getColumn("Status").setCellRenderer(new ExportResultTableCellRenderer(true));
+		resultTable.getColumn("Destination").setCellRenderer(new ExportResultTableCellRenderer(true));
 				
 		// Enable sorting
 		Comparator<Object> comparator = new StringComparator();
@@ -260,7 +265,6 @@ public class ExportBatchDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				tableModel.clear();
 				exportFiles();
-				new MessengerImpl().displayInfoMessage("Process finished");
 				enableButtons();
 			}
 		});
@@ -478,20 +482,20 @@ public class ExportBatchDialog extends JDialog {
 			lastExportPath = destPath;
 			progressBarThread.start();
     		for(File file : files) {
+	    		Path path = Paths.get(destPath + "/" + file.getName().replaceAll(".xml", ""));
     			try {
-		    		Path path = Paths.get(destPath + "/" + file.getName().replaceAll(".xml", ""));
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
 		    			exportModel(file, path);
-		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), destPath, NAME_SuccesString} 
-		    			: new String[]{file.getName(), destPath, NAME_SuccesStringOrphanTransitionsRemoved});
+		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), path.toString(), NAME_SuccesString} 
+		    			: new String[]{file.getName(), path.toString(), NAME_SuccesStringOrphanTransitionsRemoved});
 			    	}
 			    	else {
-		    			tableModel.addResult(new String[]{file.getName(), destPath, NAME_FailStringFolderExists});
+		    			tableModel.addResult(new String[]{file.getName(), path.toString(), NAME_FailStringFolderExists});
 			    	}
     			}
     			catch(Exception e){
-	    			tableModel.addResult(new String[]{file.getName(), destPath, NAME_FailStringParseError});
+	    			tableModel.addResult(new String[]{file.getName(), path.toString() , NAME_FailStringParseError});
     	    	}
     			//For the loading bar
     			progressBar.setString("Exported Nets: " + files.indexOf(file) + " of " + files.size());
@@ -564,9 +568,6 @@ public class ExportBatchDialog extends JDialog {
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
-			if(value != null) {
-				setText(value.toString());
-			}
 			if (isBordered) {
 				if (isSelected) {
 					setBackground(table.getSelectionBackground());
@@ -602,9 +603,35 @@ public class ExportBatchDialog extends JDialog {
 			setEnabled(table.isEnabled());
 			setFont(table.getFont());
 			setOpaque(true);
-		
+			
+			if (value != null) {
+				if (table.getColumnName(column).equals(
+						"Destination")) {
+					setText(".../"+new File(value.toString()).getName());
+					Point mousePos = table.getMousePosition();
+					String[] result = null;
+					if (mousePos != null) {
+						result = ((ExportBatchResultTableModel) table
+								.getModel()).getResult(table
+								.rowAtPoint(mousePos));
+					}
+					setToolTipText(result != null ? generateDestinationTooltip(result) : value.toString());
+				} else {
+					setToolTipText(value.toString());
+					setText(value.toString());
+				}
+			} else {
+				setToolTipText("");
+				setText("");
+			}
 		
 			return this;
+		}
+		
+		private String generateDestinationTooltip(String[] result) {
+			String fullFilePath = result[1];
+			
+			return fullFilePath;
 		}
 	}
 }

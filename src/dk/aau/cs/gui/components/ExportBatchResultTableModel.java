@@ -3,6 +3,9 @@ package dk.aau.cs.gui.components;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
+import dk.aau.cs.util.Require;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
+
 
 public class ExportBatchResultTableModel extends AbstractTableModel {
  static final long serialVersionUID = 959574725280211159L;
@@ -47,6 +50,11 @@ public class ExportBatchResultTableModel extends AbstractTableModel {
 	public void clear() {
 		results.clear();
 		fireTableDataChanged();
+	}
+	public String[] getResult(int index) {
+		Require.that(index >= 0 && index < results.size(), "Index out of range");
+		
+		return results.get(index);
 	}
 
 }
