@@ -1417,6 +1417,12 @@ public class GuiFrame extends JFrame implements Observer {
 	//TODO: Refactor the setObject (bad name), inline in changeToTab/Close Tab and use changeToTab in newTab
 
 	private void changeToTab(int index) {
+
+		//If tab is changed by something else that by clicking a tab then change to the tab.
+		if (appTab.getSelectedIndex() != index) {
+			appTab.setSelectedIndex(index);
+		}
+
 		setObjects(index);
 		if (appView != null) {
 			appView.setVisible(true);
@@ -1611,7 +1617,7 @@ public class GuiFrame extends JFrame implements Observer {
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name, tab);
 		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
-		appTab.setSelectedIndex(freeSpace);
+
 
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
@@ -1623,7 +1629,7 @@ public class GuiFrame extends JFrame implements Observer {
 		appView.updatePreferredSize();
 
 		//setTitle(name);// Change the program caption
-		appTab.setTitleAt(freeSpace, name);
+		//appTab.setTitleAt(freeSpace, name);
 		//selectAction.actionPerformed(null);
 		changeToTab(freeSpace);
 	}
