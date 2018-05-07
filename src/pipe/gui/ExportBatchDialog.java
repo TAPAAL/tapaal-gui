@@ -163,6 +163,7 @@ public class ExportBatchDialog extends JDialog {
 		};
 		//for coloring cells
 		resultTable.getColumn("Status").setCellRenderer(new ExportResultTableCellRenderer(true));
+		//for tooltips
 		resultTable.getColumn("Destination").setCellRenderer(new ExportResultTableCellRenderer(true));
 				
 		// Enable sorting
@@ -398,7 +399,6 @@ public class ExportBatchDialog extends JDialog {
 		progressBarContainer = new JDialog(exportBatchDialog, "Exporting...", true);
 		progressBar = new JProgressBar(0, fileList.getModel().getSize());
 		
-		
 		progressBarContainer.add(BorderLayout.CENTER, progressBar);
 		progressBarContainer.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		progressBarContainer.setSize(400, 100);
@@ -406,6 +406,7 @@ public class ExportBatchDialog extends JDialog {
 		progressBarContainer.setVisible(false);
 		progressBar.setStringPainted(true);
 		progressBar.setString("Exported Nets: 0 of " + fileList.getModel().getSize());
+		progressBar.setValue(0);
 		
 		progressBarThread = new Thread(new Runnable() {
 			public void run() {
@@ -505,7 +506,7 @@ public class ExportBatchDialog extends JDialog {
     			//reset loading bar when done
     			if(progressBar.getValue() == files.size()-1) {
     				progressBarContainer.setVisible(false);
-    				progressBar.setValue(1);
+    				progressBar.setValue(0);
     			}
 	    	}	
 		}
@@ -585,8 +586,11 @@ public class ExportBatchDialog extends JDialog {
 						if ((isResultColumn && (value.toString().equals(NAME_SuccesString)) || value.toString().equals(NAME_SuccesStringOrphanTransitionsRemoved))) {
 							setBackground(new Color(91, 255, 91)); // light green
 						}
-						else if ((isResultColumn && (value.toString().equals(NAME_FailStringParseError)) || value.toString().equals(NAME_FailStringFolderExists))) {
+						else if (isResultColumn && value.toString().equals(NAME_FailStringParseError)) {
 							setBackground(new Color(255, 91, 91)); // light  red
+						}
+						else if (isResultColumn && value.toString().equals(NAME_FailStringFolderExists)) {
+							setBackground(new Color(255, 255, 120)); // light yellow
 						}
 						else
 							setBackground(table.getBackground());
