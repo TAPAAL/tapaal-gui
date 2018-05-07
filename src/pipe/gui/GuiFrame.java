@@ -1602,7 +1602,7 @@ public class GuiFrame extends JFrame implements Observer {
 		int freeSpace = CreateGui.getFreeSpace(netType);
 
 		setObjects(freeSpace);
-		CreateGui.getModel(freeSpace).setNetType(netType);
+		//CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
@@ -1622,9 +1622,10 @@ public class GuiFrame extends JFrame implements Observer {
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
 
-		setTitle(name);// Change the program caption
+		//setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
-		selectAction.actionPerformed(null);
+		//selectAction.actionPerformed(null);
+		changeToTab(freeSpace);
 	}
 
 
