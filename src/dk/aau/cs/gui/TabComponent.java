@@ -125,7 +125,7 @@ public class TabComponent extends JPanel {
 						
 						//Update DrawingSurfaceImpl manually. Bug #1543124
 						CreateGui.getApp().setObjects(pane.getSelectedIndex());
-						
+
 						CreateGui.getApp().activateSelectAction();
 					}
 				}

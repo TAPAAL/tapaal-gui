@@ -1404,23 +1404,7 @@ public class GuiFrame extends JFrame implements Observer {
 			public void stateChanged(ChangeEvent e) {
 
 				int index = appTab.getSelectedIndex();
-				setObjects(index);
-				if (appView != null) {
-					appView.setVisible(true);
-					appView.repaint();
-					updateZoomCombo();
-
-					setTitle(appTab.getTitleAt(index));
-					setGUIMode(GUIMode.draw);
-
-					// TODO: change this code... it's ugly :)
-					if (getMode() == ElementType.SELECT) {
-						activateSelectAction();
-					}
-
-				} else {
-					setTitle(null);
-				}
+				changeToTab(index);
 
 			}
 
@@ -1429,6 +1413,25 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
+	private void changeToTab(int index) {
+		setObjects(index);
+		if (appView != null) {
+			appView.setVisible(true);
+			appView.repaint();
+			updateZoomCombo();
+
+			setTitle(appTab.getTitleAt(index));
+			setGUIMode(GUIMode.draw);
+
+			// TODO: change this code... it's ugly :)
+			if (getMode() == ElementType.SELECT) {
+				activateSelectAction();
+			}
+
+		} else {
+			setTitle(null);
+		}
+	}
 
 
 	// HAK Method called by netModel object when it changes
