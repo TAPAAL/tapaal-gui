@@ -1622,7 +1622,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		//tab.setCurrentTemplate(template);
 		appTab.addTab(name, tab);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
+		appTab.setTabComponentAt(appTab.getTabCount()-1, new TabComponent(appTab));
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
 
