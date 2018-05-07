@@ -1413,6 +1413,9 @@ public class GuiFrame extends JFrame implements Observer {
 
 	}
 
+	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
+	//TODO: Refactor the setObject (bad name), inline in changeToTab/Close Tab and use changeToTab in newTab
+
 	private void changeToTab(int index) {
 		setObjects(index);
 		if (appView != null) {
