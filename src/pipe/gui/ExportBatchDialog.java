@@ -135,7 +135,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private void initProgressPanel() {
-		JPanel resultPanel = new JPanel();
+		JPanel resultPanel = new JPanel(new GridBagLayout());
 		resultPanel.setBorder(BorderFactory.createTitledBorder("Exported Files"));
 		
 		tableModel = new ExportBatchResultTableModel();
@@ -170,17 +170,25 @@ public class ExportBatchDialog extends JDialog {
 		resultTable.setRowSorter(sorter);
 		
 		JScrollPane scrollPane = new JScrollPane(resultTable);
-		scrollPane.setPreferredSize(new Dimension(600, 400));
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		resultPanel.add(scrollPane);
-		
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		resultPanel.add(scrollPane, gbc);
+		
+		
+		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.weightx = 0;
-		gbc.weighty = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(0, 0, 10, 5);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -213,6 +221,9 @@ public class ExportBatchDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.WEST;
 		chooserPanel.add(destinationPathField, gbc);
 		
@@ -299,7 +310,7 @@ public class ExportBatchDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridwidth = 3;
 		gbc.weightx = 1.0;
