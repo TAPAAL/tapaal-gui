@@ -33,11 +33,6 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final Pattern ruleCApplicationPattern = Pattern.compile("\\s*Applications of rule C:\\s*(\\d+)\\s*");
 	private static final Pattern ruleDApplicationPattern = Pattern.compile("\\s*Applications of rule D:\\s*(\\d+)\\s*");
 	private static final Pattern ruleEApplicationPattern = Pattern.compile("\\s*Applications of rule E:\\s*(\\d+)\\s*");
-	private static final Pattern ruleFApplicationPattern = Pattern.compile("\\s*Applications of rule F:\\s*(\\d+)\\s*");
-	private static final Pattern ruleGApplicationPattern = Pattern.compile("\\s*Applications of rule G:\\s*(\\d+)\\s*");
-	private static final Pattern ruleHApplicationPattern = Pattern.compile("\\s*Applications of rule H:\\s*(\\d+)\\s*");
-	private static final Pattern ruleIApplicationPattern = Pattern.compile("\\s*Applications of rule I:\\s*(\\d+)\\s*");
-
 	
 	
 	public VerifyPNOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
@@ -55,12 +50,6 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 		int ruleC = 0;
 		int ruleD = 0;
 		int ruleE = 0;
-		int ruleF = 0;
-		int ruleG = 0;
-		int ruleH = 0;
-		int ruleI = 0;
-
-		
 		boolean reductionUsed = false;
 		boolean result = false;
 		boolean foundResult = false;
@@ -149,29 +138,12 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 					if(matcher.find()){
 						ruleE = Integer.valueOf(matcher.group(1));
 					}
-					
-					matcher = ruleFApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleF = Integer.valueOf(matcher.group(1));
-					}
-					matcher = ruleGApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleG = Integer.valueOf(matcher.group(1));
-					}
-					matcher = ruleHApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleH = Integer.valueOf(matcher.group(1));
-					}
-					matcher = ruleIApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleI = Integer.valueOf(matcher.group(1));
-					}
 				}
 			}
 			
 			if(!foundResult) return null;
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH, ruleI) : null;
+			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD, ruleE) : null;
 			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
 			return value; 
 		} catch (Exception e) {
