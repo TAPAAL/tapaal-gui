@@ -102,9 +102,17 @@ public class Export {
 	            
 	            while(queryIterator.hasNext()){
 	                TAPNQuery clonedQuery = queryIterator.next().copy();
-	                clonedQuery.getProperty().accept(new RenameAllPlacesVisitor(mapping), null);
-	                clonedQuery.getProperty().accept(new RenameAllTransitionsVisitor(mapping), null);
-	                XMLVisitor.buildXMLQuery(clonedQuery.getProperty(), clonedQuery.getName());
+
+                            // Attempt to parse and possibly transform the string query using the manual edit parser
+                            TCTLAbstractProperty newProperty;
+                            try {
+                                newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
+                            } catch (Throwable ex) {
+                                newProperty = clonedQuery == null ? new TCTLPathPlaceHolder() : clonedQuery.getProperty();
+                            }
+                            newProperty.accept(new RenameAllPlacesVisitor(mapping), null);
+                            newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
+                            XMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
 	            }
 	            queryStream.print(XMLVisitor.getFormatted());
 				
