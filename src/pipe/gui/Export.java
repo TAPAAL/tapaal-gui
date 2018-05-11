@@ -6,6 +6,9 @@
  */
 package pipe.gui;
 
+import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
