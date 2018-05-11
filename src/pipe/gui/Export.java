@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -42,6 +43,7 @@ import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
@@ -88,17 +90,21 @@ public class Export {
 		}
 	}
 	
-	private static void toQueryXML(DrawingSurfaceImpl g, String filename){
+	private static void toQueryXML(String filename){
+		toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries());
+		
+	}
+	
+	public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries){
 		try{
-			TabContent currentTab = CreateGui.getCurrentTab();
-                        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
-                        NameMapping mapping = composer.transformModel(currentTab.network()).value2();
-                        Iterator<TAPNQuery> queryIterator = currentTab.queries().iterator();
-                        PrintStream queryStream = new PrintStream(filename);
-			CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-                        
-                        while(queryIterator.hasNext()){
-                            TAPNQuery clonedQuery = queryIterator.next().copy();
+	            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
+	            NameMapping mapping = composer.transformModel(network).value2();
+	            Iterator<TAPNQuery> queryIterator = queries.iterator();
+	            PrintStream queryStream = new PrintStream(filename);
+	            CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+	            
+	            while(queryIterator.hasNext()){
+	                TAPNQuery clonedQuery = queryIterator.next().copy();
 
                             // Attempt to parse and possibly transform the string query using the manual edit parser
                             TCTLAbstractProperty newProperty;
@@ -110,10 +116,10 @@ public class Export {
                             newProperty.accept(new RenameAllPlacesVisitor(mapping), null);
                             newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
                             XMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
-                        }
-                        queryStream.print(XMLVisitor.getFormatted());
-			
-			queryStream.close();
+	            }
+	            queryStream.print(XMLVisitor.getFormatted());
+				
+				queryStream.close();
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the queries to XML.");
 		}
@@ -259,7 +265,7 @@ public class Export {
 			case QUERY:
 				filename = new FileBrowser("Query XML file", "xml", filename).saveFile(CreateGui.appGui.getCurrentTabName().replaceAll(".xml", "-queries"));
 				if (filename != null) {
-					toQueryXML(g, filename);
+					toQueryXML(filename);
 				}
 				break;
 			}

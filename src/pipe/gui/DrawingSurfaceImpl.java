@@ -73,10 +73,7 @@ Printable, DrawingSurface {
 	private MouseHandler mouseHandler;
 	private NameGenerator nameGenerator = new NameGenerator();
 
-	private TabContent tabContent;
-
-	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent parent) {
-		this.tabContent = parent;
+	public DrawingSurfaceImpl(DataLayer dataLayer) {
 		guiModel = dataLayer;
 		setLayout(null);
 		setOpaque(true);
@@ -94,10 +91,6 @@ Printable, DrawingSurface {
 
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
-	}
-
-	public TabContent parent(){
-		return tabContent;
 	}
 
 	public NameGenerator getNameGenerator() {

@@ -196,8 +196,7 @@ public class CreateGui {
 		while (tab.drawingSurface() == null) {
 
 			try {
-				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel(),
-						tab));
+				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
