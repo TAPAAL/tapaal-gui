@@ -431,7 +431,7 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(exportMenu, exportToXMLAction = new FileAction("XML Queries",
 				"Export the queries to XML format", "ctrl H"));
 		exportToXMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('H', shortcutkey));
-		addMenuItem(exportMenu, exportBatchAction = new FileAction("Batch Export to PNML and query XML", "Export multiple queries in XML and PNML format", "ctrl K"));
+		addMenuItem(exportMenu, exportBatchAction = new FileAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", "ctrl K"));
 		exportBatchAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('K', shortcutkey));
 		
 		fileMenu.add(exportMenu);
