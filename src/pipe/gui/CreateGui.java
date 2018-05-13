@@ -174,15 +174,6 @@ public class CreateGui {
 		return getDrawingSurface(appTab.getSelectedIndex());
 	}
 
-	public static File getFile() {
-		return getFile(appTab.getSelectedIndex());
-	}
-
-	public static File getFile(int index) {
-		TabContent tab = tabs.get(index);
-		return tab.getFile();
-	}
-
 	public static int getFreeSpace(NetType netType) {
 		tabs.add(new TabContent(netType));
 		return tabs.size() - 1;

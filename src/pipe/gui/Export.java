@@ -164,8 +164,8 @@ public class Export {
 		}
 
 		String filename = null;
-		if (CreateGui.getFile() != null) {
-			filename = CreateGui.getFile().getAbsolutePath();
+		if (CreateGui.getCurrentTab().getFile() != null) {
+			filename = CreateGui.getCurrentTab().getFile().getAbsolutePath();
 			// change file extension
 			int dotpos = filename.lastIndexOf('.');
 			if (dotpos > filename.lastIndexOf(System.getProperty("file.separator"))) {
