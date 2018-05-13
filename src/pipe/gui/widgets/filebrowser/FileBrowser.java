@@ -1,6 +1,8 @@
 package pipe.gui.widgets.filebrowser;
 
 import java.io.File;
+
+import dk.aau.cs.util.JavaUtil;
 import pipe.gui.CreateGui;
 
 
@@ -13,7 +15,7 @@ public abstract class FileBrowser  {
 
 	public static FileBrowser constructor(String filetype, final String ext, String path) {
 
-		if(CreateGui.getAppGui().getJRE() >= 7){
+		if(JavaUtil.getJREMajorVersion() >= 7){
 			FileBrowser newObject = new NativeFileBrowser(filetype, ext, path);
 			if(path != null) {
 				newObject.lastPath = path;

@@ -216,25 +216,6 @@ public class GuiFrame extends JFrame implements Observer {
 		return Platform.isMac();
 	}
 
-	//XXX - guess this will break on java 10?
-	public int getJRE(){
-		String version = System.getProperty("java.version");
-		String[] versionSplit = version.split("\\.");
-
-		try {
-			if (Integer.parseInt(versionSplit[0]) >= 9) {
-				//Version format (9.X.Y)
-				return Integer.parseInt(versionSplit[0]);
-			} else {
-				//Before java 9 version in format (1.X.Y)
-				return Integer.parseInt(versionSplit[1]);
-			}
-		} catch (NumberFormatException e) {
-			Logger.log("Error parsing java version, failing silent (0): " + e.getMessage());
-			return 0; // Unknown version
-		}
-	}	
-
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
 		// name to be appended to basic window title
