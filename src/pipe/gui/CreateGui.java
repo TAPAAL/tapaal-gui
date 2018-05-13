@@ -3,7 +3,6 @@ package pipe.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -18,7 +17,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -47,7 +45,7 @@ public class CreateGui {
 
 		appTab = new JTabbedPane();
 
-		appGui.setTab(); // sets Tab properties
+		appGui.setChangeListenerOnTab(); // sets Tab properties
 		appGui.getContentPane().add(appTab);
 
 		appGui.setVisible(true);

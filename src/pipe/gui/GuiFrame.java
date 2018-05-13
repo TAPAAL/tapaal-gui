@@ -1371,7 +1371,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
-	public void setTab() {
+	public void setChangeListenerOnTab() {
 		appTab = CreateGui.getTabs();
 		appTab.addChangeListener(new ChangeListener() {
 
