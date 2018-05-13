@@ -377,7 +377,7 @@ public class TAPNComposer implements ITAPNComposer {
 				} else {
 					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
 				}
-				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeight());
+				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -435,7 +435,7 @@ public class TAPNComposer implements ITAPNComposer {
 				String destinationTemplate = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 
-				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeight());
+				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -504,7 +504,7 @@ public class TAPNComposer implements ITAPNComposer {
 				} else {
 					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
 				}
-				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeight());
+				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
@@ -628,7 +628,7 @@ public class TAPNComposer implements ITAPNComposer {
 				} else {
 					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
 				}
-				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeight());
+				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				// Gui work
