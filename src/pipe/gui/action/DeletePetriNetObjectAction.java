@@ -8,10 +8,8 @@ package pipe.gui.action;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.management.Query;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
@@ -24,7 +22,6 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.TimedPlace;
 
 public class DeletePetriNetObjectAction extends AbstractAction {
 
@@ -37,7 +34,7 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 
 	public void actionPerformed(ActionEvent e) {
 		// check if queries need to be removed
-		ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
+		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getSelectionObject().getSelection();
 		Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTabs().getSelectedComponent()).queries();
 		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
@@ -79,19 +76,19 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 				: JOptionPane.YES_OPTION;
 
 		if (choice == JOptionPane.YES_OPTION) {
-			CreateGui.getView().getUndoManager().newEdit(); // new "transaction""
+			CreateGui.getDrawingSurface().getUndoManager().newEdit(); // new "transaction""
 			if (queriesAffected) {
 				TabContent currentTab = ((TabContent) CreateGui.getTabs().getSelectedComponent());
 				for (TAPNQuery q : queriesToDelete) {
 					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
 					cmd.redo();
-					CreateGui.getView().getUndoManager().addEdit(cmd);
+					CreateGui.getDrawingSurface().getUndoManager().addEdit(cmd);
 				}
 			}
 			
-			CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());
-			CreateGui.getView().getSelectionObject().deleteSelection();
-			CreateGui.getView().repaint();
+			CreateGui.getDrawingSurface().getUndoManager().deleteSelection(CreateGui.getDrawingSurface().getSelectionObject().getSelection());
+			CreateGui.getDrawingSurface().getSelectionObject().deleteSelection();
+			CreateGui.getDrawingSurface().repaint();
 			CreateGui.getCurrentTab().network().buildConstraints();
 		}
 	}

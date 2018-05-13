@@ -181,11 +181,11 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	// 
 	@Override
 	public void addedToGui() {
-		if (CreateGui.getView() != null) {
+		if (CreateGui.getDrawingSurface() != null) {
 			markedAsDeleted = false;
 			deleted = false;
 			updateBounds();
-			// CreateGui.getView().setNetChanged(true);
+			// CreateGui.getDrawingSurface().setNetChanged(true);
 		}
 	}
 

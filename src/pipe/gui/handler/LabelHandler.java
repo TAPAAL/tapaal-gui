@@ -39,7 +39,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// 
-		if (!SwingUtilities.isLeftMouseButton(e) || CreateGui.getView().isInAnimationMode()) {
+		if (!SwingUtilities.isLeftMouseButton(e) || CreateGui.getDrawingSurface().isInAnimationMode()) {
 			return;
 		}
 

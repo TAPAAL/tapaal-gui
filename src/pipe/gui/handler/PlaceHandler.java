@@ -23,8 +23,6 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -78,7 +76,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {
-				UndoManager undoManager = CreateGui.getView().getUndoManager();
+				UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
 
 				switch (CreateGui.getApp().getMode()) {
 				case ADDTOKEN:
@@ -119,7 +117,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof TimedPlaceComponent) && !isDragging) {// &&
-				if (CreateGui.getView().isInAnimationMode()) {
+				if (CreateGui.getDrawingSurface().isInAnimationMode()) {
 					((TimedPlaceComponent) myObject).showAgeOfTokens(true);
 				}
 			}
@@ -133,7 +131,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if ((myObject instanceof TimedPlaceComponent)) {// &&
-			if (CreateGui.getView().isInAnimationMode()) {
+			if (CreateGui.getDrawingSurface().isInAnimationMode()) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 			}
 		}

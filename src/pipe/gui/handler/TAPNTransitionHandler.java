@@ -38,7 +38,7 @@ public class TAPNTransitionHandler extends TransitionHandler {
 		} else {
 			rotation = e.getWheelRotation() * 45;
 		}
-		CreateGui.getView().getUndoManager().addNewEdit(
+		CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 				((Transition) myObject).rotate(rotation));
 	}
 

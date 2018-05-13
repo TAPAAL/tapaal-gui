@@ -44,7 +44,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -2367,7 +2366,7 @@ public class CTLQueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getView().setNetChanged(true);
+						CreateGui.getDrawingSurface().setNetChanged(true);
 						exit();
 					}
 				}
@@ -2377,7 +2376,7 @@ public class CTLQueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved and verified, the net is marked as modified
-						CreateGui.getView().setNetChanged(true);
+						CreateGui.getDrawingSurface().setNetChanged(true);
 						exit();
 						TAPNQuery query = getQuery();
 

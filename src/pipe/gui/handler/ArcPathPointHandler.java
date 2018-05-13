@@ -85,7 +85,7 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (e.isShiftDown()) {
-			CreateGui.getView().getUndoManager().addNewEdit(
+			CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 					((ArcPathPoint) myObject).togglePointType());
 		}
 	}

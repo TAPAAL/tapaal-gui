@@ -40,7 +40,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -425,7 +424,7 @@ public class GuiFrame extends JFrame implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// check if queries need to be removed
-				ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
+				ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getSelectionObject().getSelection();
 				Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
 				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
@@ -498,7 +497,7 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components", "ctrl A") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getView().getSelectionObject().selectAll();
+				CreateGui.getDrawingSurface().getSelectionObject().selectAll();
 			}
 		});
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
@@ -1385,7 +1384,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 		});
-		appView = CreateGui.getView();
+		appView = CreateGui.getDrawingSurface();
 
 	}
 
@@ -1880,7 +1879,7 @@ public class GuiFrame extends JFrame implements Observer {
 		case draw:
 			// Enable all draw actions
 			startAction.setSelected(false);
-			CreateGui.getView().changeAnimationMode(false);
+			CreateGui.getDrawingSurface().changeAnimationMode(false);
 
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
@@ -1894,7 +1893,7 @@ public class GuiFrame extends JFrame implements Observer {
 			showConstants(showConstants);
 			showToolTips(showToolTips);
 
-			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
+			CreateGui.getDrawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
 			activateSelectAction();
 			selectAction.setSelected(true);
@@ -1938,7 +1937,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private void hideComponentWindow(){
-		ArrayList<PetriNetObject> selection = CreateGui.getView().getPNObjects();
+		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getPNObjects();
 
 		for (PetriNetObject pn : selection) {
 			if (pn instanceof TimedPlaceComponent) {
