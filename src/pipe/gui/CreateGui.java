@@ -142,7 +142,11 @@ public class CreateGui {
 		return tab.getModel();
 	}
 
+	//XXX two methods returns the same value, needs refacotring
 	public static DrawingSurfaceImpl getDrawingSurface() {
+		return getDrawingSurface(appTab.getSelectedIndex());
+	}
+	public static DrawingSurfaceImpl getView() {
 		return getDrawingSurface(appTab.getSelectedIndex());
 	}
 
@@ -170,9 +174,6 @@ public class CreateGui {
 		return tab.drawingSurface();
 	}
 
-	public static DrawingSurfaceImpl getView() {
-		return getDrawingSurface(appTab.getSelectedIndex());
-	}
 
 	public static int getFreeSpace(NetType netType) {
 		tabs.add(new TabContent(netType));
