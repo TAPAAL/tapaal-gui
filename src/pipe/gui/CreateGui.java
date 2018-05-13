@@ -178,10 +178,6 @@ public class CreateGui {
 		tabs.add(tab);
 	}
 
-	public static void undoGetFreeSpace() {
-		tabs.remove(tabs.size() - 1);
-	}
-
 	public static void removeTab(int index) {
 		tabs.remove(index);
 	}

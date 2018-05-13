@@ -1767,10 +1767,9 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private void undoAddTab(int currentlySelected) {
-		CreateGui.undoGetFreeSpace();
+		CreateGui.removeTab(appTab.getSelectedIndex() -1);
 		appTab.removeTabAt(appTab.getTabCount() - 1);
 		appTab.setSelectedIndex(currentlySelected);
-
 	}
 
 	/**
