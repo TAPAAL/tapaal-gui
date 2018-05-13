@@ -1504,7 +1504,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private boolean saveOperation(int index, boolean forceSaveAs) {
-		File modelFile = CreateGui.getFile(index);
+		File modelFile = CreateGui.getTab(index).getFile();
 		boolean result;
 		if (!forceSaveAs && modelFile != null) { // ordinary save
 			saveNet(index, modelFile);
