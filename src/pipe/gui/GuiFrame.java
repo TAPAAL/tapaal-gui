@@ -1536,7 +1536,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
 
-			CreateGui.setFile(outFile, index);
+			CreateGui.getCurrentTab().setFile(outFile);
 
 			CreateGui.getDrawingSurface(index).setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
@@ -1657,7 +1657,7 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.getApp().restoreMode();
 				}
 
-				CreateGui.setFile(null, freeSpace);
+				tab.setFile(null);
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
@@ -1724,7 +1724,7 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 
 				if(!loadPNML){
-					CreateGui.setFile(file, freeSpace);
+					tab.setFile(file);
 				}
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);

@@ -183,16 +183,6 @@ public class CreateGui {
 		return tab.getFile();
 	}
 
-	public static void setFile(File modelfile, int fileNo) {
-		if (fileNo >= tabs.size()) {
-			return;
-		}
-
-		TabContent tab = (tabs.get(fileNo));
-		tab.setFile(modelfile);
-
-	}
-
 	public static int getFreeSpace(NetType netType) {
 		tabs.add(new TabContent(netType));
 		return tabs.size() - 1;
