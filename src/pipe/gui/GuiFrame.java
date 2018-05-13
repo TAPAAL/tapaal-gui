@@ -468,7 +468,7 @@ public class GuiFrame extends JFrame implements Observer {
 						if (choice == JOptionPane.YES_OPTION) {
 							appView.getUndoManager().newEdit(); // new "transaction""
 							if (queriesAffected) {
-								TabContent currentTab = ((TabContent) CreateGui.getTabs().getSelectedComponent());
+								TabContent currentTab = CreateGui.getCurrentTab();
 								for (TAPNQuery q : queriesToDelete) {
 									Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
 									cmd.redo();

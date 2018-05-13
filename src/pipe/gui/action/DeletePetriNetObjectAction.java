@@ -35,7 +35,7 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 		// check if queries need to be removed
 		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getSelectionObject().getSelection();
-		Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTabs().getSelectedComponent()).queries();
+		Iterable<TAPNQuery> queries =  CreateGui.getCurrentTab().queries();
 		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
 		boolean queriesAffected = false;
@@ -78,7 +78,7 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 		if (choice == JOptionPane.YES_OPTION) {
 			CreateGui.getDrawingSurface().getUndoManager().newEdit(); // new "transaction""
 			if (queriesAffected) {
-				TabContent currentTab = ((TabContent) CreateGui.getTabs().getSelectedComponent());
+				TabContent currentTab = CreateGui.getCurrentTab();
 				for (TAPNQuery q : queriesToDelete) {
 					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
 					cmd.redo();
