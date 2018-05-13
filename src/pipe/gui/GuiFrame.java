@@ -1372,7 +1372,6 @@ public class GuiFrame extends JFrame implements Observer {
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
 	public void setTab() {
-
 		appTab = CreateGui.getTabs();
 		appTab.addChangeListener(new ChangeListener() {
 
@@ -1384,8 +1383,6 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 		});
-		appView = CreateGui.getDrawingSurface();
-
 	}
 
 	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
