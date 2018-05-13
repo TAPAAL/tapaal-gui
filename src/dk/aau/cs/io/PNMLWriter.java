@@ -236,7 +236,7 @@ public class PNMLWriter implements NetWriter {
 			arcElement.appendChild(inscription);
 			Element text = document.createElement("text");
 			inscription.appendChild(text);
-			text.setTextContent(((TimedOutputArcComponent)arc).getWeight().nameForSaving(true)+"");
+			text.setTextContent(((TimedOutputArcComponent)arc).getWeight().nameForSaving(false)+"");
 		} 
 		
 		if(arc instanceof TimedInhibitorArcComponent){
