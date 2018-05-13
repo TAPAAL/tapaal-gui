@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
+import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;
 import pipe.dataLayer.DataLayer;
@@ -40,7 +41,7 @@ public class CreateGui {
 
 		appGui = new GuiFrame(TAPAAL.getProgramName());
 
-		if (getAppGui().isMac()){
+		if (Platform.isMac()){
 			SpecialMacHandler.postprocess();
 		}
 

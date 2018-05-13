@@ -211,11 +211,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private JMenu importMenu, exportMenu, zoomMenu;
 
-
-	public boolean isMac(){
-		return Platform.isMac();
-	}
-
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
 		// name to be appended to basic window title
@@ -308,7 +303,7 @@ public class GuiFrame extends JFrame implements Observer {
 			Logger.log("Error loading L&F: " + exc);
 		}
 
-		if (isMac()){
+		if (Platform.isMac()){
 
 			try{
 				new SpecialMacHandler();
