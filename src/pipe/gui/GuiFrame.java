@@ -1369,6 +1369,14 @@ public class GuiFrame extends JFrame implements Observer {
 		appView = CreateGui.getDrawingSurface(index);
 	}
 
+	private void undoAddTab(int currentlySelected) {
+		CreateGui.removeTab(appTab.getSelectedIndex() );
+		appTab.removeTabAt(appTab.getSelectedIndex());
+		appTab.setSelectedIndex(currentlySelected);
+		//Update DrawingSurfaceImpl manually. Bug #1543124
+		setObjects(appTab.getSelectedIndex());
+	}
+
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
 	public void setChangeListenerOnTab() {
@@ -1766,11 +1774,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setGUIMode(GuiFrame.GUIMode.draw);
 	}
 
-	private void undoAddTab(int currentlySelected) {
-		CreateGui.removeTab(appTab.getSelectedIndex() -1);
-		appTab.removeTabAt(appTab.getTabCount() - 1);
-		appTab.setSelectedIndex(currentlySelected);
-	}
+
 
 	/**
 	 * If current net has modifications, asks if you want to save and does it if
