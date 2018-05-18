@@ -413,7 +413,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets", ".xml", lastSelectPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets", "xml", lastSelectPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
