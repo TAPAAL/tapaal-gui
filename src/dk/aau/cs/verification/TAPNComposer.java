@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 
 import pipe.dataLayer.DataLayer;
+import pipe.gui.ExportBatchDialog;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.ArcPathPoint;
@@ -18,6 +19,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.gui.components.ExportBatchResultTableModel;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -314,10 +316,13 @@ public class TAPNComposer implements ITAPNComposer {
 							mapping.addMapping(tapn.name(), timedTransition.name(), uniqueTransitionName);
 						}
 					}else{
-						if(!hasShownMessage){
+						if(!hasShownMessage && !(ExportBatchDialog.isDialogVisible())){
 							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model."
 									+ System.getProperty("line.separator") + "They will be removed before the verification.");
 							hasShownMessage = true;
+						}
+						else if(ExportBatchDialog.isDialogVisible()) {
+							ExportBatchDialog.setNoOrphanTransitions(true);
 						}
 					}
 				}
@@ -372,7 +377,7 @@ public class TAPNComposer implements ITAPNComposer {
 				} else {
 					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
 				}
-				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeight());
+				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -430,7 +435,7 @@ public class TAPNComposer implements ITAPNComposer {
 				String destinationTemplate = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 
-				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeight());
+				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -499,7 +504,7 @@ public class TAPNComposer implements ITAPNComposer {
 				} else {
 					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
 				}
-				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeight());
+				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
@@ -623,7 +628,7 @@ public class TAPNComposer implements ITAPNComposer {
 				} else {
 					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
 				}
-				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeight());
+				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
 				// Gui work

@@ -165,6 +165,7 @@ public class CreateGui {
 //				e.printStackTrace();
 //			}
 //		}
+
 		return tab.drawingSurface();
 	}
 

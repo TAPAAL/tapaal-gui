@@ -136,6 +136,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private GuiAction exportToXMLAction;
 	private GuiAction exportTraceAction;
 	private GuiAction importTraceAction;
+	private GuiAction exportBatchAction;
 
 	private GuiAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
@@ -159,6 +160,10 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction selectAction;
 	private TypeAction deleteTokenAction;
 	private TypeAction timedPlaceAction;
+
+	private JMenuItem statistics;
+	private JMenuItem verification;
+
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
 
@@ -392,6 +397,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private JMenu buildMenuEdit(int shortcutkey) {
+
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
@@ -1304,6 +1310,7 @@ public class GuiFrame extends JFrame implements Observer {
 			stripTimeDialogAction.setEnabled(false);
 
 			enableAllActions(false);
+
 			break;
 		}
 
@@ -1322,8 +1329,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		saveAction.setEnabled(enable);
 		saveAsAction.setEnabled(enable);
-
-		exportMenu.setEnabled(enable);
+		
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
@@ -2530,7 +2536,17 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 			fileMenu.add(exampleMenu);
 			fileMenu.addSeparator();
+
 		}
+
+
+
+		fileMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", "ctrl K") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ExportBatchDialog.ShowExportBatchDialog();
+			}
+		});
 
 		fileMenu.add(exitAction = new GuiAction("Exit", "Close the program", KeyStroke.getKeyStroke('Q', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
