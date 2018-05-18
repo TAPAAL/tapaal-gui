@@ -2532,7 +2532,7 @@ public class GuiFrame extends JFrame implements Observer {
 					GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filename);
-							createNewTabFromFile(file, filename);
+							createNewTabFromFile(file, netname);
 						}
 					};
 					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
