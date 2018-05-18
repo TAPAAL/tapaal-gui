@@ -2495,6 +2495,13 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 
+		exportMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", "ctrl K") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ExportBatchDialog.ShowExportBatchDialog();
+			}
+		});
+
 
 		fileMenu.add(exportMenu);
 
@@ -2541,12 +2548,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 
-		fileMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", "ctrl K") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ExportBatchDialog.ShowExportBatchDialog();
-			}
-		});
+
 
 		fileMenu.add(exitAction = new GuiAction("Exit", "Close the program", KeyStroke.getKeyStroke('Q', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
