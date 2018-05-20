@@ -2740,4 +2740,6 @@ public class GuiFrame extends JFrame implements Observer {
 		showTokenAge = !showTokenAge;
 	}
 
+	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
+
 }
