@@ -114,6 +114,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private int newNameCounter = 1;
 
 	private JTabbedPane appTab;
+
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
 	private JToolBar drawingToolBar;
@@ -229,6 +230,13 @@ public class GuiFrame extends JFrame implements Observer {
 		this.setMinimumSize(new Dimension(825, 480));
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		//XXX: Moved appTab from creategui needs further refacotring
+		//kyrke 2018-05-20
+		appTab = new JTabbedPane();
+		getContentPane().add(appTab);
+		setChangeListenerOnTab(); // sets Tab properties
+
 
 		animator = new Animator();
 		Grid.enableGrid();
@@ -1386,7 +1394,7 @@ public class GuiFrame extends JFrame implements Observer {
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
 	public void setChangeListenerOnTab() {
-		appTab = CreateGui.getTabs();
+
 		appTab.addChangeListener(new ChangeListener() {
 
 			public void stateChanged(ChangeEvent e) {

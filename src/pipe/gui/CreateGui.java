@@ -26,7 +26,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 public class CreateGui {
 
 	private static GuiFrame appGui;
-	private static JTabbedPane appTab;
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	public static final String imgPath = "resources/Images/";
@@ -43,10 +42,6 @@ public class CreateGui {
 			SpecialMacHandler.postprocess();
 		}
 
-		appTab = new JTabbedPane();
-
-		appGui.setChangeListenerOnTab(); // sets Tab properties
-		appGui.getContentPane().add(appTab);
 
 		appGui.setVisible(true);
 
@@ -128,7 +123,7 @@ public class CreateGui {
 
 
 	public static DataLayer getModel() {
-		return getModel(appTab.getSelectedIndex());
+		return getModel(appGui.getSelectedTabIndex());
 	}
 
 	public static DataLayer getModel(int index) {
@@ -141,7 +136,7 @@ public class CreateGui {
 	}
 
 	public static DrawingSurfaceImpl getDrawingSurface() {
-		return getDrawingSurface(appTab.getSelectedIndex());
+		return getDrawingSurface(appGui.getSelectedTabIndex());
 	}
 
 	public static DrawingSurfaceImpl getDrawingSurface(int index) {
@@ -183,16 +178,12 @@ public class CreateGui {
 		tabs.remove(index);
 	}
 
-	public static JTabbedPane getTabs() {
-		return appTab;
-	}
-
 	public static TabContent getTab(int index) {
 		return tabs.get(index);
 	}
 
 	public static TabContent getCurrentTab() {
-		return getTab(appTab.getSelectedIndex());
+		return getTab(appGui.getSelectedTabIndex());
 	}
 
 	/**
