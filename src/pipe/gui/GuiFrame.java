@@ -1816,7 +1816,6 @@ public class GuiFrame extends JFrame implements Observer {
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public void createNewTabFromFile(File file) {
-
 		try {
 			InputStream stream = new FileInputStream(file);
 			TabContent tab = createNewTabFromFile(stream, file.getName());
@@ -1827,8 +1826,6 @@ public class GuiFrame extends JFrame implements Observer {
 					"Error loading file: " + file.getName(),
 					JOptionPane.ERROR_MESSAGE);
 		}
-
-
 	}
 
 	private void duplicateTab(TabContent tabToDuplicate) {
