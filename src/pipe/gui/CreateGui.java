@@ -36,7 +36,7 @@ public class CreateGui {
 
 	public static void init() {
 		appGui = new GuiFrame(TAPAAL.getProgramName());
-		
+
 		if (Platform.isMac()){
 			SpecialMacHandler.postprocess();
 		}

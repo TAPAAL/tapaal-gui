@@ -2419,14 +2419,8 @@ public class GuiFrame extends JFrame implements Observer {
 		fileMenu.add(closeAction = new GuiAction("Close", "Close the current tab", "ctrl W") {
 			public void actionPerformed(ActionEvent arg0) {
 
-				if ((appTab.getTabCount() > 0) && checkForSave()) {
-					// Set GUI mode to noNet
-					setGUIMode(GUIMode.noNet);
-
-					int index = appTab.getSelectedIndex();
-					appTab.remove(index);
-					CreateGui.removeTab(index);
-				}
+				int index = appTab.getSelectedIndex();
+				closeTab(index);
 
 			}
 
@@ -2800,5 +2794,24 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
+
+
+	//If needed, add boolean forceClose, where net is not checkedForSave and just closed
+	public void closeTab(int index) {
+
+		if(appTab.getTabCount() > 0 && CreateGui.getApp().checkForSave(index)){
+			if(appTab.getTabCount() == 1) { CreateGui.getApp().setGUIMode(GUIMode.noNet); }
+
+			//Close the gui part first, else we get an error bug #826578
+			appTab.removeTabAt(index);
+			CreateGui.removeTab(index);
+
+			//Update DrawingSurfaceImpl manually. Bug #1543124
+			CreateGui.getApp().setObjects(appTab.getSelectedIndex());
+
+			CreateGui.getApp().activateSelectAction();
+		}
+
+	}
 
 }
