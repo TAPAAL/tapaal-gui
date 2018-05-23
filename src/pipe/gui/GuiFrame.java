@@ -2797,6 +2797,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	//If needed, add boolean forceClose, where net is not checkedForSave and just closed
+	//XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
 	public void closeTab(int index) {
 
 		if(appTab.getTabCount() > 0 && CreateGui.getApp().checkForSave(index)){
