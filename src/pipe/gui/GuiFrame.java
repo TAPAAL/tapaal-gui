@@ -1434,6 +1434,7 @@ public class GuiFrame extends JFrame implements Observer {
 		appView = CreateGui.getDrawingSurface(index);
 	}
 
+	//XXX 2018-05-23 kyrke, implementation close to closeTab, needs refactoring
 	private void undoAddTab(int currentlySelected) {
 		CreateGui.removeTab(appTab.getSelectedIndex() );
 		appTab.removeTabAt(appTab.getSelectedIndex());
