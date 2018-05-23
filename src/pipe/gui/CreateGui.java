@@ -36,7 +36,7 @@ public class CreateGui {
 
 	public static void init() {
 		appGui = new GuiFrame(TAPAAL.getProgramName());
-
+		
 		if (Platform.isMac()){
 			SpecialMacHandler.postprocess();
 		}
@@ -44,14 +44,6 @@ public class CreateGui {
 		appGui.setVisible(true);
 		appGui.checkForUpdate(false);
 	}
-
-
-
-	
-
-
-
-
 
 	public static DataLayer getModel() {
 		return getModel(appGui.getSelectedTabIndex());
