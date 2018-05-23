@@ -1674,8 +1674,9 @@ public class GuiFrame extends JFrame implements Observer {
 		appTab.addTab(name, tab);
 		int newTabIndex = appTab.getTabCount()-1;
 		appTab.setTabComponentAt(newTabIndex, new TabComponent(appTab));
-		appView.setNetChanged(false); // Status is unchanged
-		appView.updatePreferredSize();
+
+		//appView.setNetChanged(false); // Status is unchanged
+		//appView.updatePreferredSize();
 
 		//setTitle(name);// Change the program caption
 		//appTab.setTitleAt(freeSpace, name);
@@ -1693,7 +1694,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
-
 
 		if (namePrefix == null || namePrefix.equals("")) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
@@ -1837,7 +1837,7 @@ public class GuiFrame extends JFrame implements Observer {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
-				
+
 				ModelLoader loader = new ModelLoader(tab.drawingSurface());
                 LoadedModel loadedModel = loader.load(file);
 
