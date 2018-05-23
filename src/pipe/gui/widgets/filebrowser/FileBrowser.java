@@ -7,7 +7,11 @@ import pipe.gui.CreateGui;
 
 
 public abstract class FileBrowser  {
-	String lastPath = null;
+    //Used for latest open dialog path
+    //Default value null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
+	//XXX 2018-05-23 moved from CreateGUI, refactor with regards to usage with lastPath local var in this class
+    public static String userPath = null;
+    String lastPath = null;
 
 	public static FileBrowser constructor(String filetype, final String ext) {
 		return constructor(filetype, ext, null);

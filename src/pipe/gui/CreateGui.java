@@ -30,10 +30,6 @@ public class CreateGui {
 	
 	public static final String imgPath = "resources/Images/";
 
-	//Used for latest open dialog path
-	//Default value null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
-	public static String userPath = null;
-
 	public static void init() {
 		appGui = new GuiFrame(TAPAAL.getProgramName());
 

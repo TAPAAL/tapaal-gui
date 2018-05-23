@@ -2407,10 +2407,10 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open", "ctrl O") {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Timed-Arc Petri Net", "xml", CreateGui.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Timed-Arc Petri Net", "xml", FileBrowser.userPath).openFiles();
 				for (File f : files) {
 					if (f.exists() && f.isFile() && f.canRead()) {
-						CreateGui.userPath = f.getParent();
+						FileBrowser.userPath = f.getParent();
 						createNewTabFromFile(f, false);
 					}
 				}
@@ -2455,10 +2455,10 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Import PNML", "pnml", CreateGui.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
-						CreateGui.userPath = f.getParent();
+						FileBrowser.userPath = f.getParent();
 						createNewTabFromFile(f, true);
 					}
 				}
@@ -2468,10 +2468,10 @@ public class GuiFrame extends JFrame implements Observer {
 
 		importMenu.add(importSUMOAction = new GuiAction("SUMO queries (.txt)", "Import SUMO queries in a plain text format") {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Import SUMO", "txt", CreateGui.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
-						CreateGui.userPath = f.getParent();
+						FileBrowser.userPath = f.getParent();
 						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());
 					}
 				}
@@ -2481,10 +2481,10 @@ public class GuiFrame extends JFrame implements Observer {
 		importMenu.add(
 				importXMLAction = new GuiAction("XML queries (.xml)", "Import MCC queries in XML format", KeyStroke.getKeyStroke('R', shortcutkey)) {
 					public void actionPerformed(ActionEvent arg0) {
-						File[] files = FileBrowser.constructor("Import XML queries", "xml", CreateGui.userPath).openFiles();
+						File[] files = FileBrowser.constructor("Import XML queries", "xml", FileBrowser.userPath).openFiles();
 						for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
-								CreateGui.userPath = f.getParent();
+								FileBrowser.userPath = f.getParent();
 								XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());
 							}
 						}
