@@ -29,24 +29,19 @@ public class CreateGui {
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	public static final String imgPath = "resources/Images/";
-	public static String userPath; //Used for latest open dialog path
+
+	//Used for latest open dialog path
+	//Default value null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
+	public static String userPath = null;
 
 	public static void init() {
-
-		// Null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
-		userPath = null;
-
 		appGui = new GuiFrame(TAPAAL.getProgramName());
 
 		if (Platform.isMac()){
 			SpecialMacHandler.postprocess();
 		}
 
-
 		appGui.setVisible(true);
-
-
-
 		appGui.checkForUpdate(false);
 	}
 
