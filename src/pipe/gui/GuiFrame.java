@@ -1819,7 +1819,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			InputStream stream = new FileInputStream(file);
 			TabContent tab = createNewTabFromFile(stream, file.getName());
-			tab.setFile(file);
+			if (tab != null) tab.setFile(file);
 		}catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(GuiFrame.this,
 					"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString(),
