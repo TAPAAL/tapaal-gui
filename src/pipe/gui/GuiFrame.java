@@ -1745,10 +1745,11 @@ public class GuiFrame extends JFrame implements Observer {
 		selectAction.actionPerformed(null);
 	}
 
+
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
-	public void createNewTabFromFile(File file, boolean loadPNML) {
+	public void createNewTabFromPNMLFile(File file) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name;
 
@@ -1774,13 +1775,10 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 
 				LoadedModel loadedModel;
-				if(loadPNML){
-					PNMLoader loader = new PNMLoader(tab.drawingSurface());
-					loadedModel = loader.load(file);
-				} else {
-					ModelLoader loader = new ModelLoader(tab.drawingSurface());
-					loadedModel = loader.load(file);
-				}
+
+				PNMLoader loader = new PNMLoader(tab.drawingSurface());
+				loadedModel = loader.load(file);
+
 
 				tab.setNetwork(loadedModel.network(), loadedModel.templates());
 				tab.setQueries(loadedModel.queries());
@@ -1793,9 +1791,71 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.getApp().restoreMode();
 				}
 
-				if(!loadPNML){
-					tab.setFile(file);
+			} catch (Exception e) {
+				undoAddTab(currentlySelected);
+				JOptionPane.showMessageDialog(GuiFrame.this,
+						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
+						"Error loading file: " + name,
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+
+		appView.setNetChanged(false); // Status is unchanged
+		appView.updatePreferredSize();
+		name = name.replace(".pnml",".xml"); // rename .pnml input file to .xml
+		setTitle(name);// Change the program caption
+		appTab.setTitleAt(freeSpace, name);
+		selectAction.actionPerformed(null);
+	}
+
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 */
+	public void createNewTabFromFile(File file) {
+		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
+		String name;
+
+		setObjects(freeSpace);
+		int currentlySelected = appTab.getSelectedIndex();
+
+		if (file == null) {
+			name = "New Petri net " + (newNameCounter++) + ".xml";
+		} else {
+			name = file.getName();
+		}
+
+		TabContent tab = CreateGui.getTab(freeSpace);
+		appTab.addTab(name, null, tab, null);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
+		appTab.setSelectedIndex(freeSpace);
+
+		if (file != null) {
+			try {
+				if (CreateGui.getApp() != null) {
+					// Notifies used to indicate new instances.
+					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
+
+				LoadedModel loadedModel;
+
+				ModelLoader loader = new ModelLoader(tab.drawingSurface());
+				loadedModel = loader.load(file);
+
+				tab.setNetwork(loadedModel.network(), loadedModel.templates());
+				tab.setQueries(loadedModel.queries());
+				tab.setConstants(loadedModel.network().constants());
+				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
+
+				tab.selectFirstElements();
+
+				if (CreateGui.getApp() != null) {
+					CreateGui.getApp().restoreMode();
+				}
+
+				tab.setFile(file);
+
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
@@ -2411,7 +2471,7 @@ public class GuiFrame extends JFrame implements Observer {
 				for (File f : files) {
 					if (f.exists() && f.isFile() && f.canRead()) {
 						FileBrowser.userPath = f.getParent();
-						createNewTabFromFile(f, false);
+						createNewTabFromFile(f);
 					}
 				}
 			}
@@ -2459,7 +2519,7 @@ public class GuiFrame extends JFrame implements Observer {
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						FileBrowser.userPath = f.getParent();
-						createNewTabFromFile(f, true);
+						createNewTabFromPNMLFile(f);
 					}
 				}
 			}
