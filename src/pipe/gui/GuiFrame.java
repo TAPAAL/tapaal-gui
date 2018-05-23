@@ -1691,17 +1691,17 @@ public class GuiFrame extends JFrame implements Observer {
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
-	public void createNewTabFromFile(InputStream file, String namePrefix) {
+	public TabContent createNewTabFromFile(InputStream file, String name) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
-		String name;
+
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
-		if (namePrefix == null || namePrefix.equals("")) {
+		if (name == null || name.equals("")) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
-		} else {
-			name = namePrefix + ".xml";
+		} else if (!name.toLowerCase().endsWith(".xml")){
+			name = name + ".xml";
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
@@ -1709,42 +1709,43 @@ public class GuiFrame extends JFrame implements Observer {
 		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
 		appTab.setSelectedIndex(freeSpace);
 
-		if (file != null) {
-			try {
-				if (CreateGui.getApp() != null) {
-					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(ElementType.CREATING);
-				}
 
-				ModelLoader loader = new ModelLoader(tab.drawingSurface());
-				LoadedModel loadedModel = loader.load(file);
-
-				tab.setNetwork(loadedModel.network(), loadedModel.templates());
-				tab.setQueries(loadedModel.queries());
-				tab.setConstants(loadedModel.network().constants());
-				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
-
-				tab.selectFirstElements();
-
-				if (CreateGui.getApp() != null) {
-					CreateGui.getApp().restoreMode();
-				}
-
-				tab.setFile(null);
-			} catch (Exception e) {
-				undoAddTab(currentlySelected);
-				JOptionPane.showMessageDialog(GuiFrame.this,
-						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(), 
-						"Error loading file: " + name, 
-						JOptionPane.ERROR_MESSAGE);
-				return;
+		try {
+			if (CreateGui.getApp() != null) {
+				// Notifies used to indicate new instances.
+				CreateGui.getApp().setMode(ElementType.CREATING);
 			}
+
+			ModelLoader loader = new ModelLoader(tab.drawingSurface());
+			LoadedModel loadedModel = loader.load(file);
+
+			tab.setNetwork(loadedModel.network(), loadedModel.templates());
+			tab.setQueries(loadedModel.queries());
+			tab.setConstants(loadedModel.network().constants());
+			tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
+
+			tab.selectFirstElements();
+
+			if (CreateGui.getApp() != null) {
+				CreateGui.getApp().restoreMode();
+			}
+
+			tab.setFile(null);
+		} catch (Exception e) {
+			undoAddTab(currentlySelected);
+			JOptionPane.showMessageDialog(GuiFrame.this,
+					"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
+					"Error loading file: " + name,
+					JOptionPane.ERROR_MESSAGE);
+			return null;
 		}
+
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		setTitle(name);// Change the program caption
 		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
 		selectAction.actionPerformed(null);
+		return tab;
 	}
 
 
@@ -1815,60 +1816,19 @@ public class GuiFrame extends JFrame implements Observer {
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public void createNewTabFromFile(File file) {
-		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
-		String name;
 
-		setObjects(freeSpace);
-		int currentlySelected = appTab.getSelectedIndex();
-
-		if (file == null) {
-			name = "New Petri net " + (newNameCounter++) + ".xml";
-		} else {
-			name = file.getName();
+		try {
+			InputStream stream = new FileInputStream(file);
+			TabContent tab = createNewTabFromFile(stream, file.getName());
+			tab.setFile(file);
+		}catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(GuiFrame.this,
+					"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString(),
+					"Error loading file: " + file.getName(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 
-		TabContent tab = CreateGui.getTab(freeSpace);
-		appTab.addTab(name, null, tab, null);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
-		appTab.setSelectedIndex(freeSpace);
 
-		if (file != null) {
-			try {
-				if (CreateGui.getApp() != null) {
-					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(ElementType.CREATING);
-				}
-
-				ModelLoader loader = new ModelLoader(tab.drawingSurface());
-                LoadedModel loadedModel = loader.load(file);
-
-				tab.setNetwork(loadedModel.network(), loadedModel.templates());
-				tab.setQueries(loadedModel.queries());
-				tab.setConstants(loadedModel.network().constants());
-				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
-
-				tab.selectFirstElements();
-
-				if (CreateGui.getApp() != null) {
-					CreateGui.getApp().restoreMode();
-				}
-
-				tab.setFile(file);
-
-			} catch (Exception e) {
-				undoAddTab(currentlySelected);
-				JOptionPane.showMessageDialog(GuiFrame.this,
-						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(), 
-						"Error loading file: " + name, 
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-		}
-
-		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-		setTitle(name);// Change the program caption
-		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
-		selectAction.actionPerformed(null);
 	}
 
 	private void duplicateTab(TabContent tabToDuplicate) {
