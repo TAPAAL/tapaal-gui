@@ -1652,7 +1652,14 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public void createNewTab(String name, NetType netType){
-		createNewTab(name, new TabContent(NetType.TAPN));
+		TabContent tab = new TabContent(NetType.TAPN);
+
+		//Set Default Template
+		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
+		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
+		tab.addTemplate(template, false);
+
+		createNewTab(name, tab);
 	}
 
 	public void createNewTab(String name, TabContent tab) {
@@ -1664,11 +1671,7 @@ public class GuiFrame extends JFrame implements Observer {
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
 		}
-
-		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
-		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
-		tab.addTemplate(template, false);
-
+		
 		//tab.setCurrentTemplate(template);
 		CreateGui.addTab(tab);
 		appTab.addTab(name, tab);
