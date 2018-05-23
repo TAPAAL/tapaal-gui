@@ -2863,9 +2863,9 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.removeTab(index);
 
 			//Update DrawingSurfaceImpl manually. Bug #1543124
-			CreateGui.getApp().setObjects(appTab.getSelectedIndex());
+			setObjects(appTab.getSelectedIndex());
 
-			CreateGui.getApp().activateSelectAction();
+			activateSelectAction();
 		}
 
 	}
