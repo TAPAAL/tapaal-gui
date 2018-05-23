@@ -24,6 +24,7 @@ import javax.swing.event.ChangeListener;
 import com.apple.eawt.Application;
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 
@@ -241,6 +242,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
+
+		//XXX 2018-05-23 kyrke: Moved from CreatGUI (static), needs further refactoring to seperate conserns
+		Verifyta.trySetup();
+		VerifyTAPN.trySetup();
+		VerifyTAPNDiscreteVerification.trySetup();
+		VerifyPN.trySetup();
+
 	}
 
 	private void trySetLookAndFeel() {

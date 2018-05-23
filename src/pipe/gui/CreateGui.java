@@ -45,10 +45,7 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 
-		Verifyta.trySetup();
-		VerifyTAPN.trySetup();
-		VerifyTAPNDiscreteVerification.trySetup();
-		VerifyPN.trySetup();
+
 
 		appGui.checkForUpdate(false);
 	}
