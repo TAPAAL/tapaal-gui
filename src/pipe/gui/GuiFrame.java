@@ -1837,11 +1837,9 @@ public class GuiFrame extends JFrame implements Observer {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
-
-				LoadedModel loadedModel;
-
+				
 				ModelLoader loader = new ModelLoader(tab.drawingSurface());
-				loadedModel = loader.load(file);
+                LoadedModel loadedModel = loader.load(file);
 
 				tab.setNetwork(loadedModel.network(), loadedModel.templates());
 				tab.setQueries(loadedModel.queries());
