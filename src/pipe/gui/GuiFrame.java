@@ -1738,7 +1738,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		}
 
-		appView.updatePreferredSize();
+		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
@@ -1800,7 +1800,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		}
 
-		appView.updatePreferredSize();
+		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".xml"); // rename .pnml input file to .xml
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
@@ -1861,8 +1861,8 @@ public class GuiFrame extends JFrame implements Observer {
 				return;
 			}
 		}
-		
-		appView.updatePreferredSize();
+
+		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
