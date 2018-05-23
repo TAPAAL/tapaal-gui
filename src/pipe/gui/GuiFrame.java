@@ -1651,7 +1651,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
-	public void createNewTab(String name, NetType netType){
+	public void createNewEmptyTab(String name, NetType netType){
 		TabContent tab = new TabContent(NetType.TAPN);
 
 		//Set Default Template
