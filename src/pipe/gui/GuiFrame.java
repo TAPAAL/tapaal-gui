@@ -17,29 +17,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -382,6 +360,71 @@ public class GuiFrame extends JFrame implements Observer {
 			this.setSize(dimension);
 		}
 
+	}
+
+	//XXX 2018-05-23 kyrke, moved from CreateGui, static method
+	//Needs further refactoring to seperate conserns
+	public void checkForUpdate(boolean forcecheck) {
+		final VersionChecker versionChecker = new VersionChecker();
+		if (versionChecker.checkForNewVersion(forcecheck))  {
+			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
+			message.append("\n\nCurrent version: ");
+			message.append(TAPAAL.VERSION);
+			message.append("\nNew version: ");
+			message.append(versionChecker.getNewVersionNumber());
+			String changelog = versionChecker.getChangelog();
+			if (!changelog.equals("")){
+				message.append('\n');
+				message.append('\n');
+				message.append("Changelog:");
+				message.append('\n');
+				message.append(changelog);
+			}
+			JOptionPane optionPane = new JOptionPane();
+			optionPane.setMessage(message.toString());
+			optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+			JButton updateButton, laterButton, ignoreButton;
+			updateButton = new JButton("Update now");
+			updateButton.setMnemonic(KeyEvent.VK_C);
+			optionPane.add(updateButton);
+			laterButton = new JButton("Update later");
+			laterButton.setMnemonic(KeyEvent.VK_C);
+			optionPane.add(laterButton);
+			ignoreButton = new JButton("Ignore this update");
+			laterButton.setMnemonic(KeyEvent.VK_C);
+			optionPane.add(ignoreButton);
+
+			optionPane.setOptions(new Object[] {updateButton, laterButton, ignoreButton});
+
+
+			final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
+			laterButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Preferences.getInstance().setLatestVersion(null);
+					dialog.setVisible(false);
+					dialog.dispose ();
+				}
+			});
+			updateButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Preferences.getInstance().setLatestVersion(null);
+					dialog.setVisible(false);
+					dialog.dispose();
+					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
+				}
+			});
+			ignoreButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
+					dialog.setVisible(false);
+					dialog.dispose ();
+				}
+			});
+
+			updateButton.requestFocusInWindow();
+			dialog.getRootPane().setDefaultButton(updateButton);
+			dialog.setVisible(true);
+		}
 	}
 
 	/**
@@ -831,7 +874,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		helpMenu.add(checkUpdate = new GuiAction("Check for updates", "Check if there is a new version of TAPAAL") {
 			public void actionPerformed(ActionEvent arg0) {
-				pipe.gui.CreateGui.checkForUpdate(true);
+				checkForUpdate(true);
 			}
 		});
 

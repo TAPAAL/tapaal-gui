@@ -50,72 +50,11 @@ public class CreateGui {
 		VerifyTAPNDiscreteVerification.trySetup();
 		VerifyPN.trySetup();
 
-		checkForUpdate(false);
+		appGui.checkForUpdate(false);
 	}
 
 
-	public static void checkForUpdate(boolean forcecheck) {
-		final VersionChecker versionChecker = new VersionChecker();
-		if (versionChecker.checkForNewVersion(forcecheck))  {
-			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
-			message.append("\n\nCurrent version: ");
-			message.append(TAPAAL.VERSION);
-			message.append("\nNew version: ");
-			message.append(versionChecker.getNewVersionNumber());
-			String changelog = versionChecker.getChangelog();
-			if (!changelog.equals("")){
-				message.append('\n');
-				message.append('\n');
-				message.append("Changelog:");
-				message.append('\n');
-				message.append(changelog);
-			}
-			JOptionPane optionPane = new JOptionPane();
-		    optionPane.setMessage(message.toString());
-		    optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
-		    JButton updateButton, laterButton, ignoreButton;
-		    updateButton = new JButton("Update now");
-		    updateButton.setMnemonic(KeyEvent.VK_C);
-			optionPane.add(updateButton);
-            laterButton = new JButton("Update later"); 
-            laterButton.setMnemonic(KeyEvent.VK_C);
-            optionPane.add(laterButton);
-            ignoreButton = new JButton("Ignore this update"); 
-            laterButton.setMnemonic(KeyEvent.VK_C);
-            optionPane.add(ignoreButton);
-            
-		    optionPane.setOptions(new Object[] {updateButton, laterButton, ignoreButton});
-		   
-		  
-		    final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
-		    laterButton.addActionListener(new ActionListener() {
-    			public void actionPerformed(ActionEvent e) {
-    				Preferences.getInstance().setLatestVersion(null);
-    				dialog.setVisible(false);
-    				dialog.dispose ();
-    			}
-    		});
-		    updateButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Preferences.getInstance().setLatestVersion(null);
-					dialog.setVisible(false);
-					dialog.dispose();
-					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
-				}
-			});
-		    ignoreButton.addActionListener(new ActionListener() {
-    			public void actionPerformed(ActionEvent e) {
-    				Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
-    				dialog.setVisible(false);
-    				dialog.dispose ();
-    			}
-    		});
-		    
-		    updateButton.requestFocusInWindow();	
-		    dialog.getRootPane().setDefaultButton(updateButton);
-		    dialog.setVisible(true);
-		}
-	}
+
 	
 
 
