@@ -1,26 +1,12 @@
 package pipe.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
-import net.tapaal.Preferences;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.verification.UPPAAL.Verifyta;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
 public class CreateGui {
