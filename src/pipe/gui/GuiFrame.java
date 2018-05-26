@@ -131,7 +131,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private GuiAction incSpacingAction;
 	private GuiAction decSpacingAction;
-	private GuiAction deleteAction;
+	public GuiAction deleteAction;
 
 	private TypeAction annotationAction;
 	private TypeAction inhibarcAction;
