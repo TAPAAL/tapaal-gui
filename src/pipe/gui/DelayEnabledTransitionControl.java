@@ -33,10 +33,10 @@ public class DelayEnabledTransitionControl extends JPanel{
 	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
 	private static boolean defaultIsRandomTrasition;
 	
-	JLabel precitionLabel;
-	JSlider delayEnabledPrecision;
-	JLabel delayModeLabel;
-	JComboBox delayMode;
+	private JLabel precitionLabel;
+	private JSlider delayEnabledPrecision;
+	private JLabel delayModeLabel;
+	private JComboBox delayMode;
 	JCheckBox randomMode;
 	
 	private DelayEnabledTransitionControl() {
@@ -45,12 +45,12 @@ public class DelayEnabledTransitionControl extends JPanel{
 		//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
 		delayEnabledPrecision = new JSlider(JSlider.HORIZONTAL, 0, 5, 4);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(0), new JLabel("0.00001"));
-		labelTable.put(new Integer(1), new JLabel("0.0001"));
-		labelTable.put(new Integer(2), new JLabel("0.001"));
-		labelTable.put(new Integer(3), new JLabel("0.01"));
-		labelTable.put(new Integer(4), new JLabel("0.1"));
-		labelTable.put(new Integer(5), new JLabel("1"));
+		labelTable.put(0, new JLabel("0.00001"));
+		labelTable.put(1, new JLabel("0.0001"));
+		labelTable.put(2, new JLabel("0.001"));
+		labelTable.put(3, new JLabel("0.01"));
+		labelTable.put(4, new JLabel("0.1"));
+		labelTable.put(5, new JLabel("1"));
 		
 		delayEnabledPrecision.setLabelTable(labelTable);
 		delayEnabledPrecision.setSnapToTicks(true);
