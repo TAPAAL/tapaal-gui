@@ -476,14 +476,14 @@ public class TemplateExplorer extends JPanel {
 	}
 	
 	private EscapableDialog dialog;
-	JPanel container;
-	JTextField nameTextField;
-	Dimension size;
-	JLabel nameLabel;
-	JPanel buttonContainer;
-	JButton okButton;
-	JButton cancelButton;
-	JPanel nameContainer;
+	private JPanel container;
+	private JTextField nameTextField;
+	private Dimension size;
+	private JLabel nameLabel;
+	private JPanel buttonContainer;
+	private JButton okButton;
+	private JButton cancelButton;
+	private JPanel nameContainer;
 	
 	private void onOKRenameTemplate() {		
 		Template template = selectedModel();			
