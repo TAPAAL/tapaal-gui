@@ -928,7 +928,7 @@ public class TemplateExplorer extends JPanel {
 				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				//The change was ok, record it to undo/redo history
-				undoManager.addNewEdit(new ToggleTemplateActivationCommand(parent.templateExplorer, item, newValue));
+				undoManager.addNewEdit(new ToggleTemplateActivationCommand(parent.getTemplateExplorer(), item, newValue));
 			}
 
 

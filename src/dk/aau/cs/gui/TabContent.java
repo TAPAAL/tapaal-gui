@@ -50,25 +50,25 @@ import dk.aau.cs.util.Require;
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
 
-	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
-	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	protected HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
-	protected JScrollPane drawingSurfaceScroller;
-	protected JScrollPane editorSplitPaneScroller;
-	protected JScrollPane animatorSplitPaneScroller;
-	protected DrawingSurfaceImpl drawingSurface;
-	protected File appFile;
+	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
+	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	private JScrollPane drawingSurfaceScroller;
+	private JScrollPane editorSplitPaneScroller;
+	private JScrollPane animatorSplitPaneScroller;
+	private DrawingSurfaceImpl drawingSurface;
+	private File appFile;
 	private JPanel drawingSurfaceDummy;
 	
 	// Normal mode
-	BugHandledJXMultisplitPane editorSplitPane;
-	static Split editorModelroot = null;
-	static Split simulatorModelRoot = null;
+	private BugHandledJXMultisplitPane editorSplitPane;
+	private static Split editorModelroot = null;
+	private static Split simulatorModelRoot = null;
 
-	QueryPane queries;
-	ConstantsPane constantsPanel;
-	TemplateExplorer templateExplorer;
-	SharedPlacesAndTransitionsPanel sharedPTPanel;
+	private QueryPane queries;
+	private ConstantsPane constantsPanel;
+	private TemplateExplorer templateExplorer;
+	private SharedPlacesAndTransitionsPanel sharedPTPanel;
 
 	private static final String constantsName = "constants";
 	private static final String queriesName = "queries";
@@ -76,20 +76,20 @@ public class TabContent extends JSplitPane {
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	protected AnimationHistoryComponent animBox;
-	protected AnimationController animControlerBox;
-	protected JScrollPane animationHistoryScrollPane;
-	protected JScrollPane animationControllerScrollPane;
-	protected AnimationHistoryComponent abstractAnimationPane = null;
-	protected JPanel animationControlsPanel;
-	protected TransitionFireingComponent transitionFireing;
+	private AnimationHistoryComponent animBox;
+	private AnimationController animControlerBox;
+	private JScrollPane animationHistoryScrollPane;
+	private JScrollPane animationControllerScrollPane;
+	private AnimationHistoryComponent abstractAnimationPane = null;
+	private JPanel animationControlsPanel;
+	private TransitionFireingComponent transitionFireing;
 
 	private static final String transitionFireingName = "enabledTransitions";
 	private static final String animControlName = "animControl";
 
-	protected JSplitPane animationHistorySplitter;
+	private JSplitPane animationHistorySplitter;
 
-	protected BugHandledJXMultisplitPane animatorSplitPane;
+	private BugHandledJXMultisplitPane animatorSplitPane;
 
 	private Integer selectedTemplate = 0;
 	private Boolean selectedTemplateWasActive = false;
