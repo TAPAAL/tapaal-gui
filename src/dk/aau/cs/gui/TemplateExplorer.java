@@ -126,7 +126,7 @@ public class TemplateExplorer extends JPanel {
 	}
 	
 	public Integer indexOfSelectedTemplate() {
-		return new Integer(templateList.getSelectedIndex());
+		return templateList.getSelectedIndex();
 	}
 	
 	public void restoreSelectedTemplate(Integer value) {
