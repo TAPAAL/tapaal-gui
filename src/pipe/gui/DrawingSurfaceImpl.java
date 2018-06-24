@@ -82,7 +82,7 @@ Printable {
 		mouseHandler = new MouseHandler(this, dataLayer);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
-		//addMouseWheelListener(mouseHandler);
+		addMouseWheelListener(mouseHandler);
 
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
@@ -781,14 +781,15 @@ Printable {
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
-			if (!e.isControlDown()) {
-				return;
-			} else {
+			if (e.isControlDown()) {
 				if (e.getWheelRotation() > 0) {
 					view.zoomIn();
 				} else {
 					view.zoomOut();
 				}
+			} else {
+				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
+				getParent().dispatchEvent(e);
 			}
 		}
 	}
