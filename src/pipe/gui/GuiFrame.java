@@ -559,7 +559,7 @@ public class GuiFrame extends JFrame implements Observer {
 		editMenu.addSeparator();
 
 
-		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components", "ctrl A") {
+		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components",  KeyStroke.getKeyStroke('A', shortcutkey )) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CreateGui.getDrawingSurface().getSelectionObject().selectAll();
@@ -2412,14 +2412,14 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic('F');
 
-		createAction = new GuiAction("New", "Create a new Petri net", "ctrl N") {
+		createAction = new GuiAction("New", "Create a new Petri net",  KeyStroke.getKeyStroke('N', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				showNewPNDialog();
 			}
 		};
 		fileMenu.add(createAction);
 
-		fileMenu.add(openAction = new GuiAction("Open", "Open", "ctrl O") {
+		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				File[] files = FileBrowser.constructor("Timed-Arc Petri Net", "xml", FileBrowser.userPath).openFiles();
 				for (File f : files) {
@@ -2431,7 +2431,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 
-		fileMenu.add(closeAction = new GuiAction("Close", "Close the current tab", "ctrl W") {
+		fileMenu.add(closeAction = new GuiAction("Close", "Close the current tab",  KeyStroke.getKeyStroke('W', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 
 				int index = appTab.getSelectedIndex();
@@ -2443,7 +2443,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.addSeparator();
 
-		fileMenu.add(saveAction = new GuiAction("Save", "Save", "ctrl S") {
+		fileMenu.add(saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				 if (canNetBeSavedAndShowMessage()) {
                      saveOperation(false); 
@@ -2563,7 +2563,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 
-		exportMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", "ctrl K") {
+		exportMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information",  KeyStroke.getKeyStroke('K', shortcutkey )) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ExportBatchDialog.ShowExportBatchDialog();
