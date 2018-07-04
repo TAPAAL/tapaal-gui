@@ -2595,11 +2595,11 @@ public class GuiFrame extends JFrame implements Observer {
 			for (String filename : nets) {
 				if (filename.toLowerCase().endsWith(".xml")) {
 					
-					String netname = filename.replace(".xml", "");
-					
+					final String netname = filename.replace(".xml", "");
+					final String filenameFinal = filename;
 					GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
 						public void actionPerformed(ActionEvent arg0) {
-							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filename);
+							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
 							createNewTabFromFile(file, netname);
 						}
 					};
