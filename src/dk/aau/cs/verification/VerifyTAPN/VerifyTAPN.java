@@ -15,7 +15,6 @@ import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
@@ -38,7 +37,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -215,7 +213,7 @@ public class VerifyTAPN implements ModelChecker {
 		if (verifytapn != null && !verifytapn.isEmpty()) {
 			if (new File(verifytapn).exists()){
 				verifytapnpath = verifytapn;
-				VerifyTAPN v = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+				VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 				if(v.isCorrectVersion()){
 					return true;
 				}else{
@@ -242,7 +240,7 @@ public class VerifyTAPN implements ModelChecker {
 			if (verifytapnfile.exists()){
 
 				verifytapnpath = verifytapnfile.getAbsolutePath();
-				VerifyTAPN v = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+				VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 				if(v.isCorrectVersion()){
 					return true;
 				}else{

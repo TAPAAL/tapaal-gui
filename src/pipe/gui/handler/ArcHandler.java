@@ -58,7 +58,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 			if (e.getClickCount() == 2) {
 				Arc arc = (Arc) myObject;
 				if (e.isControlDown()) {
-					CreateGui.getView().getUndoManager().addNewEdit(
+					CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 							arc.getArcPath().insertPoint(
 									new Point2D.Float(arc.getX() + e.getX(),
 											arc.getY() + e.getY()),

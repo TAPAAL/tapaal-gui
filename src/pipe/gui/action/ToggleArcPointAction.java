@@ -29,7 +29,7 @@ public class ToggleArcPointAction extends javax.swing.AbstractAction {
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getView().getUndoManager().addNewEdit(
+		CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 				arcPathPoint.togglePointType());
 	}
 

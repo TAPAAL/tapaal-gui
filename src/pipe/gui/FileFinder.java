@@ -1,7 +1,16 @@
 package pipe.gui;
 
+import pipe.gui.widgets.filebrowser.FileBrowser;
+
 import java.io.File;
 
-public interface FileFinder {
-	File ShowFileBrowserDialog(String description, String extension, String path);
+
+public class FileFinder {
+
+	public File ShowFileBrowserDialog(String description, String extension, String path) {
+		if (path==null || path=="") { path= System.getProperty("user.home"); }
+		FileBrowser fileBrowser = FileBrowser.constructor(description, extension, path);
+		return fileBrowser.openFile();
+	}
+
 }

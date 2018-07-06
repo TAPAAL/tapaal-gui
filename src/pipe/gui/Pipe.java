@@ -3,12 +3,6 @@ package pipe.gui;
 import java.awt.Color;
 
 public class Pipe {
-   
-	// Filesystem Definitions
-	public static final String PROPERTY_FILE_EXTENSION = ".properties";
-	public static final String PROPERTY_FILE_DESC = "PIPE Properties file";
-	public static final String CLASS_FILE_EXTENSION = ".class";
-	public static final String CLASS_FILE_DESC = "Java Class File";
 
 	//Enum for all actions and types of elements
 	public static enum ElementType {
@@ -16,16 +10,10 @@ public class Pipe {
 		//TAPN Elements
 		TAPNPLACE, TAPNTRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
 		//Others (might refactore)
-		ADDTOKEN, DELTOKEN, SELECT, DELETE, DRAW, GRID, DRAG, CREATING,
+		ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG, CREATING,
 		//Fast modes
-		FAST_TRANSITION, FAST_PLACE, 
-		//Others (refactore?)
-		STOP, STEPBACKWARD, STEPFORWARD, FIRE, START, RANDOM, ANIMATE, TIMEPASS, VERIFY, DELAYFIRE,
-		//Components
-		PREVCOMPONENT, NEXTCOMPONENT
+		FAST_TRANSITION, FAST_PLACE
 	}
-
-	public static final ElementType DEFAULT_ELEMENT_TYPE = ElementType.SELECT;
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;
 	public static final int DASHED_PADDING = 8;
@@ -49,14 +37,12 @@ public class Pipe {
 	public static final int PLACE_TRANSITION_PROXIMITY_RADIUS = 25;
 
 	// Object layer positions for GuiView:
-	public static final int WHITE_LAYER_OFFSET = 80;
 	public static final int ARC_POINT_LAYER_OFFSET = 50;
 	public static final int ARC_LAYER_OFFSET = 20;
 	public static final int PLACE_TRANSITION_LAYER_OFFSET = 30;
 	public static final int NOTE_LAYER_OFFSET = 10;
 	public static final int SELECTION_LAYER_OFFSET = 90;
 	public static final int LOWEST_LAYER_OFFSET = 0;
-	
 
 	// For AnnotationNote appearance:
 	public static final int RESERVED_BORDER = 12;
@@ -64,8 +50,7 @@ public class Pipe {
 	public static final int ANNOTATION_MIN_WIDTH = 40;
 	public static final Color NOTE_DISABLED_COLOUR = Color.BLACK;
 	public static final Color NOTE_EDITING_COLOUR = Color.BLACK;
-	public static final Color RESIZE_POINT_DOWN_COLOUR = new Color(220, 220,
-			255);
+	public static final Color RESIZE_POINT_DOWN_COLOUR = new Color(220, 220, 255);
 	public static final String ANNOTATION_DEFAULT_FONT = "Helvetica";
 	public static final int ANNOTATION_DEFAULT_FONT_SIZE = 12;
 
@@ -79,8 +64,6 @@ public class Pipe {
 
 	public static int DEFAULT_BUFFER_CAPACITY = 50;
 
-	public static boolean JOIN_ARCS = false;
-
 	public static final int ZOOM_DELTA = 10;
 	public static final int ZOOM_MAX = 300;
 	public static final int ZOOM_MIN = 40;
@@ -93,8 +76,6 @@ public class Pipe {
 	public static Color QUERY_NOT_SATISFIED_COLOR = new Color(204, 0, 0);
 	public static Color QUERY_INCONCLUSIVE_COLOR = new Color(255, 153, 0);
 
-	public static final int MAX_NODES = 20000;
-
 	public static final int verifytaMinRev = 5648;
 	public static final String verifytapnMinRev = "1.3.0";
 	public static final String verifydtapnMinRev = "3.3.0";
@@ -102,4 +83,5 @@ public class Pipe {
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
+	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 999;
 }

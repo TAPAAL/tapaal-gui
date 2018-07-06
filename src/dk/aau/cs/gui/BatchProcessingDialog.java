@@ -31,7 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -54,7 +53,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -62,10 +60,9 @@ import javax.swing.table.TableRowSorter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
@@ -75,11 +72,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.StringComparator;
-import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
@@ -512,7 +505,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets","xml", lastPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","xml", lastPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
@@ -1026,7 +1019,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			private void exportResults() {
-				String filename = new FileBrowser("CSV file", "csv", lastPath)
+				String filename = FileBrowser.constructor("CSV file", "csv", lastPath)
 						.saveFile("results");
 				if (filename != null) {
 					File exportFile = new File(filename);
@@ -1384,7 +1377,7 @@ public class BatchProcessingDialog extends JDialog {
 
 			public void fireFileChanged(FileChangedEvent e) {
 				if(!(isQueryListEmpty())) {
-					fileStatusLabel.setText(CreateGui.appGui.getCurrentTabName());
+					fileStatusLabel.setText(CreateGui.getAppGui().getCurrentTabName());
 				}
 				else
 					fileStatusLabel.setText(e.fileName());

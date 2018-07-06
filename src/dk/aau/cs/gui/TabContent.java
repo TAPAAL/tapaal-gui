@@ -50,25 +50,25 @@ import dk.aau.cs.util.Require;
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
 
-	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
-	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	protected HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
-	protected JScrollPane drawingSurfaceScroller;
-	protected JScrollPane editorSplitPaneScroller;
-	protected JScrollPane animatorSplitPaneScroller;
-	protected DrawingSurfaceImpl drawingSurface;
-	protected File appFile;
+	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
+	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	private JScrollPane drawingSurfaceScroller;
+	private JScrollPane editorSplitPaneScroller;
+	private JScrollPane animatorSplitPaneScroller;
+	private DrawingSurfaceImpl drawingSurface;
+	private File appFile;
 	private JPanel drawingSurfaceDummy;
 	
 	// Normal mode
-	BugHandledJXMultisplitPane editorSplitPane;
-	static Split editorModelroot = null;
-	static Split simulatorModelRoot = null;
+	private BugHandledJXMultisplitPane editorSplitPane;
+	private static Split editorModelroot = null;
+	private static Split simulatorModelRoot = null;
 
-	QueryPane queries;
-	ConstantsPane constantsPanel;
-	TemplateExplorer templateExplorer;
-	SharedPlacesAndTransitionsPanel sharedPTPanel;
+	private QueryPane queries;
+	private ConstantsPane constantsPanel;
+	private TemplateExplorer templateExplorer;
+	private SharedPlacesAndTransitionsPanel sharedPTPanel;
 
 	private static final String constantsName = "constants";
 	private static final String queriesName = "queries";
@@ -76,28 +76,25 @@ public class TabContent extends JSplitPane {
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	protected AnimationHistoryComponent animBox;
-	protected AnimationController animControlerBox;
-	protected JScrollPane animationHistoryScrollPane;
-	protected JScrollPane animationControllerScrollPane;
-	protected AnimationHistoryComponent abstractAnimationPane = null;
-	protected JPanel animationControlsPanel;
-	protected TransitionFireingComponent transitionFireing;
+	private AnimationHistoryComponent animBox;
+	private AnimationController animControlerBox;
+	private JScrollPane animationHistoryScrollPane;
+	private JScrollPane animationControllerScrollPane;
+	private AnimationHistoryComponent abstractAnimationPane = null;
+	private JPanel animationControlsPanel;
+	private TransitionFireingComponent transitionFireing;
 
 	private static final String transitionFireingName = "enabledTransitions";
 	private static final String animControlName = "animControl";
 
-	protected JSplitPane animationHistorySplitter;
+	private JSplitPane animationHistorySplitter;
 
-	protected BugHandledJXMultisplitPane animatorSplitPane;
+	private BugHandledJXMultisplitPane animatorSplitPane;
 
 	private Integer selectedTemplate = 0;
 	private Boolean selectedTemplateWasActive = false;
 	
 	private WorkflowDialog workflowDialog = null;
-	
-	//Some nets are so big we can't draw them 
-	private boolean showDrawingSurface;
 
 	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
@@ -139,7 +136,6 @@ public class TabContent extends JSplitPane {
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
 		this.setDividerSize(8);	
-
 	}
 	
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -298,14 +294,14 @@ public class TabContent extends JSplitPane {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepBackwards();
 								anim.stepBack();
-								CreateGui.getAnimationController()
+								CreateGui.getCurrentTab().getAnimationController()
 								.setAnimationButtonsEnabled();
 							}
 						} else {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepForward();
 								anim.stepForward();
-								CreateGui.getAnimationController()
+								CreateGui.getCurrentTab().getAnimationController()
 								.setAnimationButtonsEnabled();
 							}
 						}
@@ -325,8 +321,6 @@ public class TabContent extends JSplitPane {
 		//Add 10 pixel to the minimumsize of the scrollpane
 		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
 	}
-	
-	private final static String delayEnabledTransitionControlName = "delayEnabledTransitionControl";
 
 	private void createAnimatorSplitPane(NetType netType) {
 		if (animBox == null)
@@ -399,8 +393,7 @@ public class TabContent extends JSplitPane {
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
 		// Inserts dummy to avoid nullpointerexceptions from the displaynode
-		// method
-		// A component can only be on one splitpane at the time
+		// method. A component can only be on one splitpane at the time
 		dummy = new JButton("EditorDummy");
 		dummy.setMinimumSize(templateExplorer.getMinimumSize());
 		dummy.setPreferredSize(templateExplorer.getPreferredSize());
@@ -410,7 +403,6 @@ public class TabContent extends JSplitPane {
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-		animatorSplitPaneScroller.setPreferredSize(editorSplitPaneScroller.getSize());
 
 	}
 
@@ -427,8 +419,7 @@ public class TabContent extends JSplitPane {
 		if (animatorSplitPane != null) {
 
 			// Inserts dummy to avoid nullpointerexceptions from the displaynode
-			// method
-			// A component can only be on one splitpane at the time
+			// method. A component can only be on one splitpane at the time
 			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
@@ -437,7 +428,6 @@ public class TabContent extends JSplitPane {
 
 		templateExplorer.switchToEditorMode();
 		this.setLeftComponent(editorSplitPaneScroller);
-		editorSplitPaneScroller.setPreferredSize(animatorSplitPaneScroller.getSize());
 		drawingSurface.repaintAll();
 	}
 
@@ -494,7 +484,6 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 		animatorSplitPane.validate();
-
 	}
 
 	private void createAnimationController(NetType netType) {
@@ -554,11 +543,24 @@ public class TabContent extends JSplitPane {
 		return count;
 	}
 
-	public void addTemplate(Template template) {
+	/*
+		XXX: 2018-05-07 kyrke, added a version of addTemplate that does not call templatExplorer.updatTemplateList
+		used in createNewTab (as updateTamplateList expects the current tab to be selected)
+		this needs to be refactored asap. but the is the only way I could get it to work for now.
+		The code is very unclean on what is a template, TimeArcPetriNetNetwork, seems to mix concerns about
+		gui/controller/model. Further refactoring is needed to clean up this mess.
+	 */
+	public void addTemplate(Template template, boolean updateTemplateExplorer) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
 		zoomLevels.put(template.model(), template.zoomer());
-		templateExplorer.updateTemplateList();
+		if (updateTemplateExplorer) {
+			templateExplorer.updateTemplateList();
+		}
+	}
+
+	public void addTemplate(Template template) {
+		addTemplate(template, true);
 	}
 
 	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {
@@ -599,7 +601,6 @@ public class TabContent extends JSplitPane {
 
 	public void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
-		// constantsPanel.showConstants();
 	}
 
 	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
@@ -703,7 +704,6 @@ public class TabContent extends JSplitPane {
 		templateExplorer.selectFirst();
 		queries.selectFirst();
 		constantsPanel.selectFirst();
-		
 	}	
 	
 	public boolean isQueryPossible() {

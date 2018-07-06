@@ -17,15 +17,12 @@ import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -40,7 +37,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -227,7 +223,7 @@ public class VerifyPN implements ModelChecker{
 			if (verifypn != null && !verifypn.isEmpty()) {
 				if (new File(verifypn).exists()){
 					verifypnpath = verifypn;
-					VerifyPN v = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
 					if(v.isCorrectVersion()){
 						return true;
 					}else{
@@ -254,7 +250,7 @@ public class VerifyPN implements ModelChecker{
 				if (verifypnfile.exists()){
 
 					verifypnpath = verifypnfile.getAbsolutePath();
-					VerifyPN v = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
 					if(v.isCorrectVersion()){
 						return true;
 					}else{

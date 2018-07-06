@@ -105,7 +105,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			frame.createNewTab(name, type);
+			frame.createNewEmptyTab(name, type);
 		} catch (Exception e) {
 			JOptionPane
 					.showMessageDialog(

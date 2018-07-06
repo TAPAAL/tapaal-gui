@@ -32,7 +32,6 @@ import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.AddTimedPlaceCommand;
 import pipe.gui.undo.AddTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -41,15 +40,14 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  * The petrinet is drawn onto this frame.
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
-Printable, DrawingSurface {
+Printable {
 	private static final long serialVersionUID = 4434596266503933386L;
 	private boolean netChanged = false;
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
-	public PlaceTransitionObject createPTO;
 	
-	protected static final int DRAWING_SURFACE_GROW = 100;
+	private static final int DRAWING_SURFACE_GROW = 100;
 
 	private AnimationHandler animationHandler = new AnimationHandler();
 
@@ -58,9 +56,6 @@ Printable, DrawingSurface {
 	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
-
-	// flag used in fast mode to know if a new PetriNetObject has been created
-	public boolean newPNO = false;
 
 	// flag used in paintComponents() to know if a call to zoom() has been done
 	private boolean doSetViewPosition = true;
@@ -87,7 +82,7 @@ Printable, DrawingSurface {
 		mouseHandler = new MouseHandler(this, dataLayer);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
-		//addMouseWheelListener(mouseHandler);
+		addMouseWheelListener(mouseHandler);
 
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
@@ -129,9 +124,9 @@ Printable, DrawingSurface {
 			add(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == ElementType.SELECT)
+		if(CreateGui.getApp().getMode() == ElementType.SELECT) {
 			this.selection.enableSelection();
-
+		}
 
 	}
 
@@ -229,7 +224,7 @@ Printable, DrawingSurface {
 
 	public void update(Observable o, Object diffObj) {
 		if ((diffObj instanceof PetriNetObject) && (diffObj != null)) {
-			if (CreateGui.appGui.getMode() == ElementType.CREATING) {
+			if (CreateGui.getAppGui().getMode() == ElementType.CREATING) {
 
 				addNewPetriNetObject((PetriNetObject) diffObj);
 			}
@@ -321,16 +316,6 @@ Printable, DrawingSurface {
 		}
 	}
 
-	public void setCursorType(String type) {
-		if (type.equals("arrow")) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		} else if (type.equals("crosshair")) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		} else if (type.equals("move")) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-		}
-	}
-
 	public SelectionManager getSelectionObject() {
 		return selection;
 	}
@@ -355,7 +340,7 @@ Printable, DrawingSurface {
 		}
 	}
 
-	public void calculateNewBoundsForScrollPane(Rectangle rect) {
+	private void calculateNewBoundsForScrollPane(Rectangle rect) {
 		boolean changed = false;
 		Dimension current = getPreferredSize();
 		
@@ -455,6 +440,13 @@ Printable, DrawingSurface {
 		double midpointY = Zoomer.getUnzoomedValue(viewport.getViewPosition().y
 				+ (viewport.getHeight() * 0.5), zoom);
 		return (new java.awt.Point((int) midpointX, (int) midpointY));
+	}
+
+	void zoomToMidPoint() {
+
+		Point midpoint = midpoint(zoomControl.getPercent());
+		zoomTo(midpoint);
+
 	}
 
 	public void zoomIn() {
@@ -612,7 +604,7 @@ Printable, DrawingSurface {
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(ElementType.FAST_TRANSITION);
+						app.setMode(ElementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -629,7 +621,7 @@ Printable, DrawingSurface {
 						app.setMode(ElementType.TAPNARC);
 						getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto2).mouseReleased(e);
-						app.setFastMode(ElementType.FAST_TRANSITION);
+						app.setMode(ElementType.FAST_TRANSITION);
 						// enter fast mode
 						pnObject.dispatchEvent(e);
 					}
@@ -637,12 +629,12 @@ Printable, DrawingSurface {
 
 				case IMMTRANS:
 				case TIMEDTRANS:
-					boolean timed = (mode == ElementType.TIMEDTRANS ? true : false);
+					boolean timed = (mode == ElementType.TIMEDTRANS);
 					pto = newTransition(e.getPoint(), timed);
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(ElementType.FAST_PLACE);
+						app.setMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -659,7 +651,7 @@ Printable, DrawingSurface {
 						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
 						// enter fast mode
-						app.setFastMode(ElementType.FAST_PLACE);
+						app.setMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -714,7 +706,7 @@ Printable, DrawingSurface {
 						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
 						// enter fast mode
-						app.setFastMode(ElementType.FAST_PLACE);
+						app.setMode(ElementType.FAST_PLACE);
 					} else{
 						app.endFastMode();
 					}
@@ -733,7 +725,7 @@ Printable, DrawingSurface {
 						getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
 						getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
 						// enter fast mode
-						app.setFastMode(ElementType.FAST_TRANSITION);
+						app.setMode(ElementType.FAST_TRANSITION);
 					} else{
 						app.endFastMode();
 					}
@@ -789,14 +781,15 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
-			if (!e.isControlDown()) {
-				return;
-			} else {
+			if (e.isControlDown()) {
 				if (e.getWheelRotation() > 0) {
 					view.zoomIn();
 				} else {
 					view.zoomOut();
 				}
+			} else {
+				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
+				getParent().dispatchEvent(e);
 			}
 		}
 	}

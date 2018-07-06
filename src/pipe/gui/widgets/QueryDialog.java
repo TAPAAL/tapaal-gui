@@ -12,8 +12,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -74,8 +72,6 @@ import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
-import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
 import pipe.gui.Zoomer;
@@ -99,15 +95,12 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
@@ -123,9 +116,9 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
-import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {
 
@@ -2644,7 +2637,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getView().setNetChanged(true);
+						CreateGui.getDrawingSurface().setNetChanged(true);
 						exit();
 					}
 				}
@@ -2654,7 +2647,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved and verified, the net is marked as modified
-						CreateGui.getView().setNetChanged(true);
+						CreateGui.getDrawingSurface().setNetChanged(true);
 						exit();
 						TAPNQuery query = getQuery();
 
@@ -2678,7 +2671,7 @@ public class QueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");

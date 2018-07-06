@@ -29,25 +29,25 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
 public class Verifier {
 	private static Verifyta getVerifyta() {
-		Verifyta verifyta = new Verifyta(new FileFinderImpl(), new MessengerImpl());
+		Verifyta verifyta = new Verifyta(new FileFinder(), new MessengerImpl());
 		verifyta.setup();
 		return verifyta;
 	}
 	
 	private static VerifyTAPN getVerifyTAPN() {
-		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 		verifytapn.setup();
 		return verifytapn;
 	}
 
 	private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
-		VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+		VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
 		verifydtapn.setup();
 		return verifydtapn;
 	}
 
 	private static VerifyPN getVerifyPN() {
-		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+		VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 		verifypn.setup();
 		return verifypn;
 	}

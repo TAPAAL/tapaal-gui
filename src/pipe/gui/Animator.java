@@ -80,20 +80,20 @@ public class Animator {
 		currentAction = -1;
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
-		CreateGui.getAnimationHistory().setSelectedIndex(0);
-		CreateGui.getAnimationController().setAnimationButtonsEnabled();
+		CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(0);
+		CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
 		tab.addAbstractAnimationPane();
-		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getCurrentTab().getUntimedAnimationHistory();
 
 		for(TAPNNetworkTraceStep step : trace){
 			untimedAnimationHistory.addHistoryItem(step.toString());
 		}
 
-		CreateGui.getAbstractAnimationPane().setSelectedIndex(0);
+		CreateGui.getCurrentTab().getUntimedAnimationHistory().setSelectedIndex(0);
 		setFiringmode("Random");
 
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -113,7 +113,7 @@ public class Animator {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-			CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+			CreateGui.getCurrentTab().getAnimationHistory().setLastShown(getTrace().getTraceType());
 		}
 	}
 
@@ -169,7 +169,7 @@ public class Animator {
 	}
 
 	public void updateFireableTransitions(){
-		TransitionFireingComponent transFireComponent = CreateGui.getTransitionFireingComponent();
+		TransitionFireingComponent transFireComponent = CreateGui.getCurrentTab().getTransitionFireingComponent();
 		transFireComponent.startReInit();
 		isUrgentTransitionEnabled = false;
 		
@@ -267,7 +267,7 @@ public class Animator {
 
 	public void stepForward() {
 		if(currentAction == actionHistory.size()-1 && trace != null){
-			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
+			int selectedIndex = CreateGui.getCurrentTab().getAnimationHistory().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
 
@@ -278,7 +278,7 @@ public class Animator {
 				addToTimedTrace(getTrace().getLoopSteps());
 			}
 
-			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+			CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(selectedIndex);
 			currentAction = action;
 			currentMarkingIndex = markingIndex;
 		}
@@ -436,9 +436,9 @@ public class Animator {
 	public void reportBlockingPlaces(){
 
 		try{
-			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
+			BigDecimal delay = CreateGui.getCurrentTab().getAnimationController().getCurrentDelay();
 		if(isUrgentTransitionEnabled && delay.compareTo(new BigDecimal(0))>0){
-			CreateGui.getAnimationController().getOkButton().setEnabled(false);
+			CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
 			for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
@@ -451,17 +451,17 @@ public class Animator {
 				}
 			}
 			sb.append("</html>");
-			CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
+			CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText(sb.toString());
 			return;
 		}
 			if(delay.compareTo(new BigDecimal(0))<0){
-				CreateGui.getAnimationController().getOkButton().setEnabled(false);
-				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
+				CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
+				CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
 			} else {
 				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
 				if(blockingPlaces.size() == 0){
-					CreateGui.getAnimationController().getOkButton().setEnabled(true);
-					CreateGui.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
+					CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(true);
+					CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText("Press to add the delay");
 				} else {
 					StringBuilder sb = new StringBuilder();
 					sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
@@ -470,15 +470,15 @@ public class Animator {
 					}
 					//JOptionPane.showMessageDialog(null, sb.toString());
 					sb.append("</html>");
-					CreateGui.getAnimationController().getOkButton().setEnabled(false);
-					CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
+					CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
+					CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText(sb.toString());
 				}
 			}
 		} catch (NumberFormatException e) {
 			// Do nothing, invalud number
 		} catch (ParseException e) {
-			CreateGui.getAnimationController().getOkButton().setEnabled(false);
-			CreateGui.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
+			CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
+			CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
 		}
 	}
 
@@ -514,7 +514,7 @@ public class Animator {
 			removeStoredActions(currentAction + 1);
 
 		tab.network().setMarking(marking);
-		CreateGui.getAnimationHistory().addHistoryItem(action.toString());
+		CreateGui.getCurrentTab().getAnimationHistory().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
 		currentAction++;
@@ -540,8 +540,8 @@ public class Animator {
 			.println("Illegal firing mode mode: " + t + " not found.");
 		}
 
-		CreateGui.getAnimationController().updateFiringModeComboBox();
-		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
+		CreateGui.getCurrentTab().getAnimationController().updateFiringModeComboBox();
+		CreateGui.getCurrentTab().getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
 	enum FillListStatus{
@@ -644,7 +644,7 @@ public class Animator {
 			if(answer != JOptionPane.OK_OPTION) return false;
 		}
 		if(isDisplayingUntimedTrace){
-			CreateGui.removeAbstractAnimationPane();
+			CreateGui.getCurrentTab().removeAbstractAnimationPane();
 		}
 		isDisplayingUntimedTrace = false;
 		trace = null;
@@ -661,7 +661,7 @@ public class Animator {
 			answer = removeSetTrace(true);
 		}
 		if(answer){
-			CreateGui.getAnimationHistory().clearStepsForward();
+			CreateGui.getCurrentTab().getAnimationHistory().clearStepsForward();
 		}
 		return answer;
 	}

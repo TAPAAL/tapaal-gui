@@ -213,7 +213,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		point = new Point2D.Double(x + myPath.getBounds().getX()
 				- COMPONENT_DRAW_OFFSET - zoomGrow, y
 				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
-		if (!CreateGui.getView().isInAnimationMode()) {
+		if (!CreateGui.getDrawingSurface().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
 				myPath.showPoints();
@@ -371,7 +371,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			DrawingSurfaceImpl aView = CreateGui.getView();
+			DrawingSurfaceImpl aView = CreateGui.getDrawingSurface();
 			if (aView.createArc == arcBeingDraw) {
 				aView.createArc = null;
 				delete();

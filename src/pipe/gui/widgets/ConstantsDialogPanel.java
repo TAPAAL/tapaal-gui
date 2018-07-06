@@ -295,7 +295,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					nameTextField.requestFocusInWindow();
 					return;
 				} else
-					CreateGui.getView().getUndoManager().addNewEdit(edit);
+					CreateGui.getDrawingSurface().getUndoManager().addNewEdit(edit);
 				exit();
 			}
 			model.buildConstraints();

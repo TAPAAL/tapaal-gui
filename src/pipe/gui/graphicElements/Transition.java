@@ -233,7 +233,7 @@ public class Transition extends PlaceTransitionObject {
 		double unZoomedY = (y - COMPONENT_DRAW_OFFSET)
 				/ (zoomPercentage / 100.0);
 
-		someArc = CreateGui.getView().createArc;
+		someArc = CreateGui.getDrawingSurface().createArc;
 		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
 			if ((proximityTransition.contains((int) unZoomedX, (int) unZoomedY) || transition
 					.contains((int) unZoomedX, (int) unZoomedY))

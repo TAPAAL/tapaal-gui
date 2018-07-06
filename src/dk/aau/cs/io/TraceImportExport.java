@@ -13,7 +13,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.swing.JOptionPane;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -47,9 +47,9 @@ public class TraceImportExport {
         try {
             ByteArrayOutputStream os = prepareTraceStream();
 
-            FileBrowser fb = new FileBrowser("Export Trace", "trc");
+            FileBrowser fb = FileBrowser.constructor("Export Trace", "trc");
             // path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-            path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')));
+            path = fb.saveFile(CreateGui.getAppGui().getCurrentTabName().substring(0, CreateGui.getAppGui().getCurrentTabName().lastIndexOf('.')));
 
             FileOutputStream fs = new FileOutputStream(path);
             fs.write(os.toByteArray());
@@ -148,7 +148,7 @@ public class TraceImportExport {
     }
 
     public static void importTrace() {
-        if (pipe.gui.CreateGui.getAnimationHistory().getListModel().size() > 1) {
+        if (pipe.gui.CreateGui.getCurrentTab().getAnimationHistory().getListModel().size() > 1) {
             int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
                     "You are about to import a trace. This removes the current trace.",
                     "Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -157,7 +157,7 @@ public class TraceImportExport {
             }
         }
 
-        FileBrowser fb = new FileBrowser("Import Trace", "trc");
+        FileBrowser fb = FileBrowser.constructor ("Import Trace", "trc");
         File f = fb.openFile();
 
         if (f == null) {

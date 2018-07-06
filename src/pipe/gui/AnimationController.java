@@ -29,24 +29,17 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
-import javax.swing.text.DocumentFilter.FilterBypass;
+
 import pipe.dataLayer.NetType;
-import pipe.gui.GuiFrame.AnimateAction;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
-import java.awt.BorderLayout;
+
 import java.awt.event.ActionListener;
-import java.util.Dictionary;
 import java.util.Hashtable;
 import javax.swing.JButton;
 import javax.swing.JSlider;
@@ -64,71 +57,26 @@ import javax.swing.event.ChangeListener;
 
 public class AnimationController extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
-        private JSlider delaySlider;
-        private int delayScale = 10;
-	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
-	private String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded"; 
+	private JSlider delaySlider;
+	private int delayScale = 10;
+	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
+	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
-	class ToggleButton extends JToggleButton implements PropertyChangeListener {
+	private GuiAction stepforwardAction, stepbackwardAction;
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -6594894202788511816L;
-
-		public ToggleButton(Action a) {
-			super(a);
-			if (a.getValue(Action.SMALL_ICON) != null) {
-				// toggle buttons like to have images *and* text, nasty
-				setText(null);
-			}
-			a.addPropertyChangeListener(this);
-		}
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals("selected")) {
-				Boolean b = (Boolean) evt.getNewValue();
-				if (b != null) {
-					setSelected(b.booleanValue());
-				}
-			}
-		}
-
-	}
-
-	private void addButton(JToolBar toolBar, GuiAction action) {
-
-		if (action.getValue("selected") != null) {
-			toolBar.add(new ToggleButton(action));
-		} else {
-			toolBar.add(action);
-		}
-	}
-
-	AnimateAction startAction, stepforwardAction, stepbackwardAction,
-			randomAction, randomAnimateAction, timeAction;
+	JTextField TimeDelayField = new JTextField();
+	JComboBox firermodebox = null;
+	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
 	public AnimationController(NetType netType) {
-		startAction = CreateGui.appGui.startAction;
 
-		stepbackwardAction = CreateGui.appGui.stepbackwardAction;
-		stepforwardAction = CreateGui.appGui.stepforwardAction;
+		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
+		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
 
 		stepbackwardAction.setEnabled(false);
 		stepforwardAction.setEnabled(false);
-
-		// timeAction = new AnimateAction("Time", Pipe.TIMEPASS,
-		// "Let Time pass", "_");
-
-		//randomAction = new AnimateAction("Random", ElementType.RANDOM,
-		//		"Randomly fire a transition", "typed 5");
-		//randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
-		//		"Randomly fire a number of transitions", "typed 7", true);
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -149,8 +97,8 @@ public class AnimationController extends JPanel {
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
 		animationToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
-		addButton(animationToolBar, stepbackwardAction);
-		addButton(animationToolBar, stepforwardAction);
+		animationToolBar.add(stepbackwardAction);
+		animationToolBar.add(stepforwardAction);
 
 		animationToolBar.setVisible(true);
 
@@ -173,9 +121,9 @@ public class AnimationController extends JPanel {
 			c.gridy = 0;
 			add(firemode, c);
 
-                        initDelayTimePanel(animationToolBar);
-                        
-                        initDelaySlider();
+			initDelayTimePanel(animationToolBar);
+
+			initDelaySlider();
 		}
                 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
@@ -186,168 +134,159 @@ public class AnimationController extends JPanel {
 		
 		initializeDocumentFilterForDelayInput();
 	}
-        
-         private void initDelaySlider() {
-                JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                JButton decrese = new JButton("-");
-                decrese.setPreferredSize(new Dimension(20, 30));
-                decrese.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                                setDelayModeScale(delayScale / 2);
-                                delaySlider.setValue(delaySlider.getValue() * 2);
-                        }
-                });
-                sliderPanel.add(decrese);
 
-                delaySlider = new JSlider(0, 160);
-                delaySlider.setSnapToTicks(false);
-                delaySlider.setMajorTickSpacing(10);
-                delaySlider.setMinorTickSpacing(0);
-                delaySlider.setPaintLabels(true);
-                delaySlider.setPaintTicks(true);
-                delaySlider.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                                TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-                                CreateGui.getAnimator().reportBlockingPlaces();
+	private void initDelaySlider() {
+		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JButton decrese = new JButton("-");
+		decrese.setPreferredSize(new Dimension(20, 30));
+		decrese.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDelayModeScale(delayScale / 2);
+				delaySlider.setValue(delaySlider.getValue() * 2);
+			}
+		});
+		sliderPanel.add(decrese);
 
-                        }
-                });
+		delaySlider = new JSlider(0, 160);
+		delaySlider.setSnapToTicks(false);
+		delaySlider.setMajorTickSpacing(10);
+		delaySlider.setMinorTickSpacing(0);
+		delaySlider.setPaintLabels(true);
+		delaySlider.setPaintTicks(true);
+		delaySlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
+				CreateGui.getAnimator().reportBlockingPlaces();
 
-                delaySlider.addKeyListener(new KeyListener() {
-                        public void keyPressed(KeyEvent e) {
-                                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                        addTimeDelayToHistory();
-                                }
-                        }
+			}
+		});
 
-                        public void keyReleased(KeyEvent e) {
-                                CreateGui.getAnimator().reportBlockingPlaces();
-                        }
+		delaySlider.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					addTimeDelayToHistory();
+				}
+			}
 
-                        public void keyTyped(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
+				CreateGui.getAnimator().reportBlockingPlaces();
+			}
 
-                        }
-                });
+			public void keyTyped(KeyEvent e) {
 
-                setDelayModeScale(16);
+			}
+		});
 
-                sliderPanel.add(delaySlider);
-                JButton increse = new JButton("+");
-                increse.setPreferredSize(new Dimension(20, 30));
-                increse.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                                setDelayModeScale(delayScale * 2);
-                                delaySlider.setValue(delaySlider.getValue() / 2);
-                        }
-                });
-                sliderPanel.add(increse);
+		setDelayModeScale(16);
 
-                GridBagConstraints c = new GridBagConstraints();
-                c.fill = GridBagConstraints.HORIZONTAL;
-                c.weightx = 0.5;
-                c.gridx = 0;
-                c.gridy = 1;
-                add(sliderPanel, c);
-        }
-        
-        private void setDelayModeScale(int scale){
-            if (scale == 0) return;
-            delayScale = scale;
-            Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
-            labels.put(0, new JLabel("0"));
-            labels.put(160, new JLabel(Integer.toString(delayScale)));
-            delaySlider.setLabelTable(labels);
-        }
-        
-        
-        private void initDelayTimePanel(JToolBar animationToolBar) {
-                JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		sliderPanel.add(delaySlider);
+		JButton increse = new JButton("+");
+		increse.setPreferredSize(new Dimension(20, 30));
+		increse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDelayModeScale(delayScale * 2);
+				delaySlider.setValue(delaySlider.getValue() / 2);
+			}
+		});
+		sliderPanel.add(increse);
 
-                okButton = new javax.swing.JButton();
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0.5;
+		c.gridx = 0;
+		c.gridy = 1;
+		add(sliderPanel, c);
+	}
 
-                okButton.setText("Time delay");
-                // okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-                okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-                // okButton.setPreferredSize(new java.awt.Dimension(75, 25));
-                okButton.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                // okButtonHandler(evt);
-                                addTimeDelayToHistory();
-                        }
-                });
+	private void setDelayModeScale(int scale) {
+		if (scale == 0) return;
+		delayScale = scale;
+		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
+		labels.put(0, new JLabel("0"));
+		labels.put(160, new JLabel(Integer.toString(delayScale)));
+		delaySlider.setLabelTable(labels);
+	}
 
-                //"Hack" to make sure the toolTip for this button is showed as long as possible
-                okButton.addMouseListener(new MouseAdapter() {
-                        final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
-                        final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
-                        final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
-                        final int dismissDelayMinutes = Integer.MAX_VALUE;
 
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                                ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
-                                ToolTipManager.sharedInstance().setInitialDelay(0);
-                                ToolTipManager.sharedInstance().setReshowDelay(0);
-                                ToolTipManager.sharedInstance().setEnabled(true);
-                        }
+	private void initDelayTimePanel(JToolBar animationToolBar) {
+		JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-                                ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
-                                ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
-                                ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
-                                ToolTipManager.sharedInstance().setEnabled(CreateGui.getApp().isShowingToolTips());
-                        }
-                });
+		okButton = new javax.swing.JButton();
 
-                TimeDelayField.addKeyListener(new KeyListener() {
-                        public void keyPressed(KeyEvent e) {
-                                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                        addTimeDelayToHistory();
-                                        TimeDelayField.getFocusCycleRootAncestor().requestFocus();	// Remove focus
-                                }
-                        }
+		okButton.setText("Time delay");
+		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
+		okButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				addTimeDelayToHistory();
+			}
+		});
 
-                        public void keyReleased(KeyEvent e) {
-                                CreateGui.getAnimator().reportBlockingPlaces();
-                        }
+		//"Hack" to make sure the toolTip for this button is showed as long as possible
+		okButton.addMouseListener(new MouseAdapter() {
+			final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
+			final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
+			final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
+			final int dismissDelayMinutes = Integer.MAX_VALUE;
 
-                        public void keyTyped(KeyEvent e) {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
+				ToolTipManager.sharedInstance().setInitialDelay(0);
+				ToolTipManager.sharedInstance().setReshowDelay(0);
+				ToolTipManager.sharedInstance().setEnabled(true);
+			}
 
-                        }
+			@Override
+			public void mouseExited(MouseEvent e) {
+				ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
+				ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
+				ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
+				ToolTipManager.sharedInstance().setEnabled(CreateGui.getApp().isShowingToolTips());
+			}
+		});
 
-                });
+		TimeDelayField.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					addTimeDelayToHistory();
+					TimeDelayField.getFocusCycleRootAncestor().requestFocus();    // Remove focus
+				}
+			}
 
-                // Disable shortcuts when focused
-                TimeDelayField.addFocusListener(new FocusListener() {
-                        public void focusLost(FocusEvent arg0) {
-                                CreateGui.getApp().setStepShotcutEnabled(true);
-                        }
+			public void keyReleased(KeyEvent e) {
+				CreateGui.getAnimator().reportBlockingPlaces();
+			}
 
-                        public void focusGained(FocusEvent arg0) {
-                                CreateGui.getApp().setStepShotcutEnabled(false);
-                        }
-                });
+			public void keyTyped(KeyEvent e) {
 
-                DecimalFormat df = new DecimalFormat();
-                df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-                df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+			}
 
-                TimeDelayField.setText(df.format(1f));
-                TimeDelayField.setColumns(6);
+		});
 
-                timedelayPanel.add(TimeDelayField);
-                timedelayPanel.add(okButton);
-			//CreateGui.getAnimator().reportBlockingPlaces();
+		// Disable shortcuts when focused
+		TimeDelayField.addFocusListener(new FocusListener() {
+			public void focusLost(FocusEvent arg0) {
+				CreateGui.getApp().setStepShotcutEnabled(true);
+			}
 
-			// c.fill = GridBagConstraints.HORIZONTAL;
-                // c.weightx = 0.5;
-                // c.gridx = 0;
-                // c.gridy = 3;
-                // add(timedelayPanel, c);
-                animationToolBar.add(timedelayPanel);
-        }
+			public void focusGained(FocusEvent arg0) {
+				CreateGui.getApp().setStepShotcutEnabled(false);
+			}
+		});
+
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+
+		TimeDelayField.setText(df.format(1f));
+		TimeDelayField.setColumns(6);
+
+		timedelayPanel.add(TimeDelayField);
+		timedelayPanel.add(okButton);
+
+		animationToolBar.add(timedelayPanel);
+	}
 
 	public void updateFiringModeComboBox() {
 		FiringMode currentFiringMode = CreateGui.getAnimator().getFiringmode();
@@ -364,7 +303,7 @@ public class AnimationController extends JPanel {
 	}
 
 	private void addTimeDelayToHistory() {
-		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animBox = CreateGui.getCurrentTab().getAnimationHistory();
 		try {
 
 			// Hack to allow usage of localised numbes
@@ -432,13 +371,10 @@ public class AnimationController extends JPanel {
 																	// number
 																	// localised
 		// Try parse
-
 		BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
 				new MathContext(Pipe.AGE_PRECISION));
 
-		// BigDecimal timeDelayToSet = new
-		// BigDecimal(TimeDelayField.getText(), new
-		// MathContext(Pipe.AGE_PRECISION));
+
 		return timeDelayToSet;
 	}
 
@@ -453,13 +389,13 @@ public class AnimationController extends JPanel {
 	}
 
 	public void setAnimationButtonsEnabled() {
-		AnimationHistoryComponent animationHistory = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animationHistory = CreateGui.getCurrentTab().getAnimationHistory();
 
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
 
-		CreateGui.appGui.setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
-		CreateGui.appGui.setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
+		CreateGui.getAppGui().setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
+		CreateGui.getAppGui().setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
 	}
 	
 	private void initializeDocumentFilterForDelayInput() {
@@ -467,7 +403,5 @@ public class AnimationController extends JPanel {
 		((AbstractDocument)doc).setDocumentFilter(new DecimalOnlyDocumentFilter(5));
 	}
 
-	JTextField TimeDelayField = new JTextField();
-	JComboBox firermodebox = null;
-	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+
 }

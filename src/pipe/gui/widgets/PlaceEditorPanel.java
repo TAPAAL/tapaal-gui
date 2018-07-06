@@ -1,7 +1,6 @@
 package pipe.gui.widgets;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,12 +13,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.swing.AbstractListModel;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -34,14 +30,9 @@ import javax.swing.event.ChangeListener;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.SharedPlaceNamePanel;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
-import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
@@ -662,8 +653,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 
 		int newMarking = (Integer)markingSpinner.getValue();
-		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
-			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+		if (newMarking > Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED) {
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 

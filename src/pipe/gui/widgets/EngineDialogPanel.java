@@ -5,13 +5,10 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,7 +22,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
-import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 
 public class EngineDialogPanel {	
@@ -78,11 +74,11 @@ public class EngineDialogPanel {
 	}	
 
 	private void selectTapnEngine() {
-		FileFinder fileFinder = new FileFinderImpl();
+		FileFinder fileFinder = new FileFinder();
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapnpath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "", (new VerifyTAPN(new FileFinderImpl(), new MessengerImpl())).getPath());
+			File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "", (new VerifyTAPN(new FileFinder(), new MessengerImpl())).getPath());
 			if(file != null){
 				if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
@@ -106,11 +102,11 @@ public class EngineDialogPanel {
 	}
 
 	private void selectdTapnEngine() {
-		FileFinder fileFinder = new FileFinderImpl();
+		FileFinder fileFinder = new FileFinder();
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapnpath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "", (new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl())).getPath());
+			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "", (new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl())).getPath());
 			if(file != null){
 				if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
@@ -134,7 +130,7 @@ public class EngineDialogPanel {
 	}
 
 	private void selectVerifytaEngine() {
-		FileFinder fileFinder = new FileFinderImpl();
+		FileFinder fileFinder = new FileFinder();
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapath = null;
 		try {
@@ -166,11 +162,11 @@ public class EngineDialogPanel {
 	}
 
 	private void selectVerifypnEngine() {
-		FileFinder fileFinder = new FileFinderImpl();
+		FileFinder fileFinder = new FileFinder();
 		MessengerImpl messenger = new MessengerImpl();
 		String verifypnpath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifypn", "",(new VerifyPN(new FileFinderImpl(), new MessengerImpl())).getPath());
+			File file = fileFinder.ShowFileBrowserDialog("Verifypn", "",(new VerifyPN(new FileFinder(), new MessengerImpl())).getPath());
 			if(file != null){
 				if(file.getName().matches("^verifypn.*(?:\\.exe)?$")){
 					verifypnpath = file.getAbsolutePath();
@@ -234,7 +230,7 @@ public class EngineDialogPanel {
 		} else {
 			verifytaversion = verifyta.getVersion();
 		}
-		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 		String verifytapnPath = verifyTAPN.getPath();
 		String verifytapnversion = "";
 
@@ -245,7 +241,7 @@ public class EngineDialogPanel {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
 
-		VerifyTAPNDiscreteVerification verifydTAPN = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+		VerifyTAPNDiscreteVerification verifydTAPN = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
 		String verifydtapnPath = verifydTAPN.getPath();
 		String verifydtapnversion = "";
 
@@ -256,7 +252,7 @@ public class EngineDialogPanel {
 			verifydtapnversion = verifydTAPN.getVersion();
 		}
 		
-		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+		VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 		String verifypnpath = verifypn.getPath();
 		String verifypnversion = "";
 

@@ -18,13 +18,13 @@ public class RemoveConstantEdit extends Command {
 	@Override
 	public void redo() {
 		store.remove(constant);
-		CreateGui.updateConstantsList();
+		CreateGui.getCurrentTab().updateConstantsList();
 	}
 
 	@Override
 	public void undo() {
 		store.add(constant);
-		CreateGui.updateConstantsList();
+		CreateGui.getCurrentTab().updateConstantsList();
 	}
 
 }

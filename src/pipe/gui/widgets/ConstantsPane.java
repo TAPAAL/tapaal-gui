@@ -1,48 +1,33 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
@@ -51,11 +36,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.GuiFrame;
-import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortConstantsCommand;
 import dk.aau.cs.model.tapn.Constant;
@@ -170,7 +151,7 @@ public class ConstantsPane extends JPanel {
 							if (!(c.lowerBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()-1));
-								CreateGui.getView().getUndoManager().addNewEdit(edit);
+								CreateGui.getDrawingSurface().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						}
@@ -178,7 +159,7 @@ public class ConstantsPane extends JPanel {
 							if (!(c.upperBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()+1));
-								CreateGui.getView().getUndoManager().addNewEdit(edit);
+								CreateGui.getDrawingSurface().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						} 

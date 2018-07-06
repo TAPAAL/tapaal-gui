@@ -15,7 +15,6 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.GuiFrame.GUIMode;
 
-import pipe.gui.action.DeletePetriNetObjectAction;
 import pipe.gui.graphicElements.PetriNetObject;
 
 /**
@@ -52,8 +51,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 */
 	public JPopupMenu getPopup(MouseEvent e) {
 		JPopupMenu popup = new JPopupMenu();
-		JMenuItem menuItem = new JMenuItem(new DeletePetriNetObjectAction(
-				myObject));
+		JMenuItem menuItem = new JMenuItem(CreateGui.getApp().deleteAction);
 		menuItem.setText("Delete");
 		popup.add(menuItem);
 		return popup;
@@ -112,7 +110,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
-				CreateGui.getView().getUndoManager().translateSelection(
+				CreateGui.getDrawingSurface().getUndoManager().translateSelection(
 						((DrawingSurfaceImpl) contentPane).getSelectionObject()
 								.getSelection(), totalX, totalY);
 				totalX = 0;

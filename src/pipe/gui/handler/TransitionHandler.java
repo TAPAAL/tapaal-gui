@@ -12,7 +12,6 @@ import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
@@ -51,7 +50,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		} else {
 			rotation = e.getWheelRotation() * 45;
 		}
-		CreateGui.getView().getUndoManager().addNewEdit(
+		CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 				((Transition) myObject).rotate(rotation));
 
 	}
@@ -123,7 +122,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof TimedTransitionComponent) && !isDragging) {// &&
-				if (CreateGui.getView().isInAnimationMode()) {
+				if (CreateGui.getDrawingSurface().isInAnimationMode()) {
 					((TimedTransitionComponent) myObject).showDInterval(true);
 				}
 			}
@@ -137,7 +136,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if ((myObject instanceof TimedTransitionComponent)) {// &&
-			if (CreateGui.getView().isInAnimationMode()) {
+			if (CreateGui.getDrawingSurface().isInAnimationMode()) {
 				((TimedTransitionComponent) myObject).showDInterval(false);
 			}
 		}
@@ -146,7 +145,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mouseEngfstered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof pipe.gui.graphicElements.tapn.TimedTransitionComponent) && !isDragging) {// &&
-				if (CreateGui.getView().isInAnimationMode()) {
+				if (CreateGui.getDrawingSurface().isInAnimationMode()) {
 					((TimedTransitionComponent) myObject).updateToolTip(true);
 				} else {
 					((TimedTransitionComponent) myObject).updateToolTip(false);

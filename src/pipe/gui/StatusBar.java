@@ -13,37 +13,34 @@ public class StatusBar extends JPanel {
 	 */
 	private static final long serialVersionUID = -8253246293753481390L;
 	/* Provides the appropriate text for the mode that the user is in */
-	public String textforNoNet = "Open a net to start editing";
+	public static final String textforNoNet = "Open a net to start editing";
 
-	public String textforDrawing = "Drawing Mode: Click on a button to start adding components to the "
+	public static final String textforDrawing = "Drawing Mode: Click on a button to start adding components to the "
 			+ "Editor";
-	public String textforPlace = "Place Mode: Right click on a place to see menu options "
+	public static final String textforPlace = "Place Mode: Right click on a place to see menu options "
 			+ "";
-	public String textforTAPNPlace = "Place Mode: Right click on a place to see menu options "
+	public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options "
 			+ "";
-	public String textforTrans = "Transition Mode: Right click on a transition to see menu "
+	public static final String textforTrans = "Transition Mode: Right click on a transition to see menu "
 			+ "options [Mouse wheel -> rotate]";
-	public String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu "
+	public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu "
 			+ "options [Mouse wheel -> rotate]";
-	public String textforAddtoken = "Add Token Mode: Click on a place to add a token";
-	public String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
-	public String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to "
+	public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
+	public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
+	public static final String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to "
 			+ "fire it";
-	public String textforArc = "Arc Mode: Right click on an arc to see menu options "
+	public static final String textforArc = "Arc Mode: Right click on an arc to see menu options "
 			+ "";
-	public String textforTransportArc = "Transport Arc Mode: Right click on an arc to see menu options "
+	public static final String textforTransportArc = "Transport Arc Mode: Right click on an arc to see menu options "
 			+ "";
-	public String textforInhibArc = "Inhibitor Mode: Right click on an arc to see menu options "
+	public static final String textforInhibArc = "Inhibitor Mode: Right click on an arc to see menu options "
 			+ "";
-	public String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
-	public String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; "
+	public static final String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
+	public static final String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; "
 			+ "double click to edit";
 
-	public String textforDrag = "Drag Mode";
+	public static final String textforDrag = "Drag Mode";
 
-	public String textforMarking = "Add a marking parameter";
-
-	public String textforRate = "Add a rate parameter";
 
 	private JLabel label;
 

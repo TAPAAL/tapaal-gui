@@ -126,7 +126,7 @@ public class TemplateExplorer extends JPanel {
 	}
 	
 	public Integer indexOfSelectedTemplate() {
-		return new Integer(templateList.getSelectedIndex());
+		return templateList.getSelectedIndex();
 	}
 	
 	public void restoreSelectedTemplate(Integer value) {
@@ -476,14 +476,14 @@ public class TemplateExplorer extends JPanel {
 	}
 	
 	private EscapableDialog dialog;
-	JPanel container;
-	JTextField nameTextField;
-	Dimension size;
-	JLabel nameLabel;
-	JPanel buttonContainer;
-	JButton okButton;
-	JButton cancelButton;
-	JPanel nameContainer;
+	private JPanel container;
+	private JTextField nameTextField;
+	private Dimension size;
+	private JLabel nameLabel;
+	private JPanel buttonContainer;
+	private JButton okButton;
+	private JButton cancelButton;
+	private JPanel nameContainer;
 	
 	private void onOKRenameTemplate() {		
 		Template template = selectedModel();			
@@ -928,7 +928,7 @@ public class TemplateExplorer extends JPanel {
 				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				//The change was ok, record it to undo/redo history
-				undoManager.addNewEdit(new ToggleTemplateActivationCommand(parent.templateExplorer, item, newValue));
+				undoManager.addNewEdit(new ToggleTemplateActivationCommand(parent.getTemplateExplorer(), item, newValue));
 			}
 
 

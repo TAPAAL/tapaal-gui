@@ -45,7 +45,7 @@ public class TAPAAL {
 		try {
 			commandline = parser.parse(options, args);
 		} catch (ParseException exp) {
-			System.err.println("There where an error parsing the specifyed arguments");
+			System.err.println("There where an error parsing the specified arguments");
 			System.err.println("Unexpected exception:" + exp.getMessage());
 		}
 
@@ -57,6 +57,11 @@ public class TAPAAL {
 			Logger.enableLogging(true);
 		}
 
+		if (TAPAAL.VERSION == "DEV"){
+			Logger.enableLogging(true);
+			Logger.log("Debug logging is enabled by default in DEV branch");
+		}
+
 		// Open files
 		String[] files = commandline.getArgs();
 		for (String f : files) {
@@ -64,7 +69,7 @@ public class TAPAAL {
 
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
-					CreateGui.appGui.createNewTabFromFile(file, false);
+					CreateGui.getAppGui().createNewTabFromFile(file);
 				} else if (file.exists()) {
 					System.err.println("Can not read file " + file.toString());
 				}

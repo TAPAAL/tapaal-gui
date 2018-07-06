@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.widgets.filebrowser;
 
 import java.awt.FileDialog;
 import java.io.File;
@@ -7,24 +7,23 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import dk.aau.cs.gui.TabContent;
-
 import pipe.gui.CreateGui;
-import pipe.gui.ExtensionFilter;
-import pipe.gui.GuiFrame;
 
-public class NativeFileBrowser extends FileBrowserImplementation {
+class NativeFileBrowserFallback extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
-	
-	public NativeFileBrowser(String filetype, final String ext, String path) {
-		fc = new FileDialog(CreateGui.appGui, filetype);
+	private JFileChooser fileChooser;
+
+	/**
+		This show native open/save dialogs for all type of dialogs except multifile open,
+	 	Java before 7, have problems with multiselect for native dialogs.
+	 */
+	NativeFileBrowserFallback(String filetype, final String ext, String path) {
+		fc = new FileDialog(CreateGui.getAppGui(), filetype);
 
 		if (filetype == null) {
 			filetype = "file";
@@ -34,6 +33,10 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 		this.ext = ext;
 		fc.setDirectory(path);
 
+		/* Setup JFileChooser for multi file selection */
+		fileChooser = new JFileChooser();
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
 		// Setup filter if extension specified
 		if(!ext.equals("")){
 			fc.setFilenameFilter(new FilenameFilter() {
@@ -42,13 +45,19 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 					return name.endsWith( ext );
 				}
 			});
+
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					filetype, new String[] { ext });
+			fileChooser.setFileFilter(filter);
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setFileFilter(filter);
+			fileChooser.setMultiSelectionEnabled(true);
 		}
 	}
 
 	public File openFile() {
 		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMode(FileDialog.LOAD);
-		fc.setMultipleMode(false);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
@@ -56,40 +65,35 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
 		return file;
 	}
-	
+
 	public File[] openFiles() {
-		fc.setFile(ext.equals("")? "":"*."+ext);
-		fc.setMultipleMode(true);
-		fc.setMode(FileDialog.LOAD);
-		fc.setVisible(true);
-		File[] selectedFiles = fc.getFiles();
-		String selectedDir = fc.getDirectory();
-		lastPath = selectedDir;
-		return selectedFiles;
+		if (lastPath != null) {
+			File path = new File(lastPath);
+			if (path.exists()) {
+				fileChooser.setCurrentDirectory(path);
+			}
+		}
+		File[] filesArray = new File[0];
+		int result = fileChooser.showOpenDialog(null);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			filesArray = fileChooser.getSelectedFiles();
+		}
+		return filesArray;
 	}
-	
+
+
 	public String saveFile(String suggestedName) {
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
 
-		// user canceled
-		if (fc.getFile() == null) {
-			return null;
-		}
-
-		// Fixes bug:1648076 for OS X 
-		if(fc.getDirectory().endsWith(suggestedName+"."+ext+"/")){
-			fc.setDirectory(fc.getDirectory().replaceAll(suggestedName+"."+ext+"/", ""));
-		}
-
 		String file = fc.getFile() == null? null: fc.getDirectory() + fc.getFile();
 		lastPath = fc.getDirectory();
-		
+
 		if(file == null){
 			return file;
 		}
-		
+
 		// Windows does not enforce file ending on save
 		else if (!file.endsWith("."+ext)) {
 			File source = new File(file);
@@ -102,7 +106,7 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 			File destination = new File(newName);
 
 			if(destination.exists()){
-				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, newName + "\nDo you want to overwrite this file?");
+				int overRide = JOptionPane.showConfirmDialog(CreateGui.getAppGui(), newName + "\nDo you want to overwrite this file?");
 				switch (overRide) {
 				case JOptionPane.NO_OPTION:
 					source.delete();
@@ -114,7 +118,7 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 					return null;
 				}
 			}
-			
+
 			source.renameTo(destination);
 			source.delete();
 			try {
@@ -123,8 +127,6 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 				return null;
 			}
 		}
-
 		return file;
 	}
-
 }

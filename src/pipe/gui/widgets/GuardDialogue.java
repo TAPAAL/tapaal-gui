@@ -22,7 +22,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,7 +36,6 @@ import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -129,7 +127,7 @@ public class GuardDialogue extends JPanel /*
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				TimedOutputArcComponent arc = (TimedOutputArcComponent) objectToBeEdited;
-				UndoManager undoManager = CreateGui.getView().getUndoManager();
+				UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
 				undoManager.newEdit();
 
 				dk.aau.cs.model.tapn.TimeInterval guard  = null;

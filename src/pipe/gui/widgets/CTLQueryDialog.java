@@ -44,7 +44,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -105,6 +104,7 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class CTLQueryDialog extends JPanel {
 
@@ -2366,7 +2366,7 @@ public class CTLQueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getView().setNetChanged(true);
+						CreateGui.getDrawingSurface().setNetChanged(true);
 						exit();
 					}
 				}
@@ -2376,7 +2376,7 @@ public class CTLQueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved and verified, the net is marked as modified
-						CreateGui.getView().setNetChanged(true);
+						CreateGui.getDrawingSurface().setNetChanged(true);
 						exit();
 						TAPNQuery query = getQuery();
 
@@ -2400,7 +2400,7 @@ public class CTLQueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");

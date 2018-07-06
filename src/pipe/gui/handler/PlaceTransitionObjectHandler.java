@@ -63,10 +63,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	}
 
 	private void createArc(Arc newArc, PlaceTransitionObject currentObject) {
-		newArc.setZoom(CreateGui.getView().getZoom());
+		newArc.setZoom(CreateGui.getDrawingSurface().getZoom());
 		contentPane.add(newArc);
 		currentObject.addConnectFrom(newArc);
-		CreateGui.getView().createArc = newArc;
+		CreateGui.getDrawingSurface().createArc = newArc;
 		// addPetriNetObject a handler for shift & esc actions drawing arc
 		// this is removed when the arc is finished drawing:
 		newArc.requestFocusInWindow();
@@ -77,7 +77,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	// Disable key bindings that are only available when drawing arcs.
 	private void freeArc(Arc newArc){
 		newArc.disableDrawingKeyBindings();
-		CreateGui.getView().createArc = null;
+		CreateGui.getDrawingSurface().createArc = null;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
-		if (CreateGui.getView().createArc == null) {
+		if (CreateGui.getDrawingSurface().createArc == null) {
 			switch (CreateGui.getApp().getMode()) {
 			case TAPNARC:{
 
@@ -128,7 +128,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 
-		DrawingSurfaceImpl view = CreateGui.getView();
+		DrawingSurfaceImpl view = CreateGui.getDrawingSurface();
 		UndoManager undoManager = view.getUndoManager();
 		GuiFrame app = CreateGui.getApp();
 

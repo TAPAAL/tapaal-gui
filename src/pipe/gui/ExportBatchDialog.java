@@ -50,17 +50,14 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.DOMException;
 import dk.aau.cs.gui.FileNameCellRenderer;
-import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.ExportBatchResultTableModel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
 
@@ -416,7 +413,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets",".xml", lastSelectPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets", "xml", lastSelectPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
@@ -466,7 +463,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private void selectDestinationPath() {
-		String chosenFile = new FileBrowser("Select an export folder", ".", lastExportPath).saveFile("Export");
+		String chosenFile = FileBrowser.constructor("Select an export folder", ".", lastExportPath).saveFile("Export");
 		if(chosenFile != null) {
 			destinationFile = new File(chosenFile);
 			lastExportPath = chosenFile;

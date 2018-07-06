@@ -26,7 +26,7 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		timedPlace = timedPlaceComponent.underlyingPlace();
 		
 		// queries this place is an inclusion place in 
-		Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTab().getSelectedComponent()).queries();
+		Iterable<TAPNQuery> queries = CreateGui.getCurrentTab().queries();
 		
 		for (TAPNQuery q : queries) {
 			if(q.inclusionPlaces().inclusionPlaces().contains(timedPlace)){

@@ -72,14 +72,6 @@ public class DataLayer extends Observable implements Cloneable {
 	 * Create empty Petri-Net object
 	 */
 	public DataLayer() {
-		initializeMatrices();
-	}
-
-	/**
-	 * Initialize Arrays
-	 */
-	private void initializeMatrices() {
-
 		placesArray = new ArrayList<Place>();
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
@@ -91,6 +83,7 @@ public class DataLayer extends Observable implements Cloneable {
 		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>>();
 		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>>();
 	}
+
 
 	/**
 	 * Add placeInput to the back of the Place ArrayList All observers are

@@ -153,7 +153,7 @@ public class AnnotationNote extends Note {
 		String newText = note.getText();
 		if (oldText != null && !newText.equals(oldText)) {
 			// Text has been changed
-			CreateGui.getView().getUndoManager().addNewEdit(
+			CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 					new AnnotationTextEdit(this, oldText, newText));
 			updateBounds();
 		}
@@ -292,7 +292,7 @@ public class AnnotationNote extends Note {
 			if ((typeMask & RIGHT) == RIGHT) {
 				myNote.adjustRight(Zoomer.getUnzoomedValue(x, zoom));
 			}
-			CreateGui.getView().setNetChanged(true);
+			CreateGui.getDrawingSurface().setNetChanged(true);
 		}
 
 		public void myPaintComponent(Graphics g) {

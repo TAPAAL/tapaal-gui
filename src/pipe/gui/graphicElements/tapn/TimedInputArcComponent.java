@@ -62,7 +62,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
         public String getGuardAsString(boolean showZeroToInfinityIntervals) {
-                if (!showZeroToInfinityIntervals && !CreateGui.showZeroToInfinityIntervals() && inputArc.interval().toString().equals("[0,inf)")) {
+                if (!showZeroToInfinityIntervals && !CreateGui.getApp().showZeroToInfinityIntervals() && inputArc.interval().toString().equals("[0,inf)")) {
                         return "";
                 } 
                 return inputArc.interval().toString();
@@ -102,7 +102,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 			if (inputArc == null)
 				label.setText("");
 			else {
-				if (!CreateGui.showZeroToInfinityIntervals()) {
+				if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
 					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
 						label.setText("");
 					}

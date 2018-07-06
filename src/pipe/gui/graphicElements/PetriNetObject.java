@@ -48,9 +48,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	protected int zoom = Pipe.ZOOM_DEFAULT;
 	private DataLayer guiModel;
 
-	public PetriNetObject() {
-	}
-
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
 	}
@@ -94,10 +91,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	}
 
 	public void select() {
-		if (selectable && !selected) {
-			selected = true;
-			repaint();
-		}
+		select(true);
 	}
 
 	public void select(boolean shouldRepaint) {

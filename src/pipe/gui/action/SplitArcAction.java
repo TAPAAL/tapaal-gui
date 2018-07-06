@@ -31,7 +31,7 @@ public class SplitArcAction extends javax.swing.AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		CreateGui.getView().getUndoManager().addNewEdit(
+		CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
 				selected.getArcPath().insertPoint(mouseposition, false));
 		// selected.split(mouseposition));
 	}
