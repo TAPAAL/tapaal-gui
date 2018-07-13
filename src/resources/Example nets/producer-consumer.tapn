@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+<net active="true" id="ProducerConsumer" type="P/T net">
+<labels border="true" height="110" positionX="517" positionY="164" width="184">By firing the transition Transport the produced items are moved to the place Ready. Transport arcs are used for this purpose so that the age of each item is preserved.</labels>
+<labels border="true" height="80" positionX="844" positionY="83" width="169">Consumer is consuming (with certain time restrictions) items that have not yet reached the age of 3.</labels>
+<labels border="true" height="59" positionX="460" positionY="464" width="169">Items that reach the age of 3 have to be Collected into the Garbage place.</labels>
+<labels border="true" height="80" positionX="156" positionY="74" width="184">Producer is producing items with certain time restrictions
+and these items wait in place In_transit for Transport.</labels>
+<place id="Ready_to_produce" initialMarking="1" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="Ready_to_produce" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="195.0"/>
+<place id="Recover" initialMarking="0" invariant="&lt;= 5" markingOffsetX="0.0" markingOffsetY="0.0" name="Recover" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="435.0"/>
+<place id="In_transit" initialMarking="0" invariant="&lt;= 3" markingOffsetX="0.0" markingOffsetY="0.0" name="In_transit" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="450.0" positionY="315.0"/>
+<place id="Ready_to_consume" initialMarking="1" invariant="&lt;= 7" markingOffsetX="0.0" markingOffsetY="0.0" name="Ready_to_consume" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="900.0" positionY="195.0"/>
+<place id="Get_ready" initialMarking="0" invariant="&lt;= 6" markingOffsetX="0.0" markingOffsetY="0.0" name="Get_ready" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="900.0" positionY="435.0"/>
+<place id="Ready" initialMarking="0" invariant="&lt;= 3" markingOffsetX="0.0" markingOffsetY="0.0" name="Ready" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="690.0" positionY="315.0"/>
+<place id="Garbage" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Garbage" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="690.0" positionY="555.0"/>
+<transition angle="0" id="Produce" infiniteServer="false" name="Produce" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="300.0" positionY="315.0" priority="0" urgent="false"/>
+<transition angle="0" id="Recovering" infiniteServer="false" name="Recovering" nameOffsetX="-5.0" nameOffsetY="34.0" positionX="120.0" positionY="315.0" priority="0" urgent="false"/>
+<transition angle="0" id="Consume" infiniteServer="false" name="Consume" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="810.0" positionY="315.0" priority="0" urgent="false"/>
+<transition angle="0" id="Done" infiniteServer="false" name="Done" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="990.0" positionY="315.0" priority="0" urgent="false"/>
+<transition angle="0" id="Transport" infiniteServer="false" name="Transport" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="570.0" positionY="315.0" priority="0" urgent="false"/>
+<transition angle="0" id="Collect" infiniteServer="false" name="Collect" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="690.0" positionY="435.0" priority="0" urgent="false"/>
+<arc id="Ready_to_produce to Produce" inscription="[0,2]" source="Ready_to_produce" target="Produce" type="timed" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="230" yCoord="219"/>
+<arcpath arcPointType="false" id="1" xCoord="307" yCoord="322"/>
+</arc>
+<arc id="Recover to Recovering" inscription="[3,5]" source="Recover" target="Recovering" type="timed" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="213" yCoord="434"/>
+<arcpath arcPointType="false" id="1" xCoord="136" yCoord="332"/>
+</arc>
+<arc id="Ready_to_consume to Consume" inscription="[4,7]" source="Ready_to_consume" target="Consume" type="timed" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="903" yCoord="219"/>
+<arcpath arcPointType="false" id="1" xCoord="827" yCoord="322"/>
+</arc>
+<arc id="Get_ready to Done" inscription="[3,6]" source="Get_ready" target="Done" type="timed" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="920" yCoord="434"/>
+<arcpath arcPointType="false" id="1" xCoord="996" yCoord="332"/>
+</arc>
+<arc id="Ready to Consume" inscription="[0,3]" source="Ready" target="Consume" type="timed" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="716" yCoord="327"/>
+<arcpath arcPointType="false" id="1" xCoord="816" yCoord="327"/>
+</arc>
+<arc id="Ready to Collect" inscription="[3,inf)" source="Ready" target="Collect" type="timed" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="702" yCoord="341"/>
+<arcpath arcPointType="false" id="1" xCoord="702" yCoord="432"/>
+</arc>
+<arc id="Produce to Recover" inscription="1" source="Produce" target="Recover" type="normal" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="306" yCoord="332"/>
+<arcpath arcPointType="false" id="1" xCoord="230" yCoord="434"/>
+</arc>
+<arc id="Produce to In_transit" inscription="1" source="Produce" target="In_transit" type="normal" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="316" yCoord="327"/>
+<arcpath arcPointType="false" id="1" xCoord="447" yCoord="327"/>
+</arc>
+<arc id="Recovering to Ready_to_produce" inscription="1" source="Recovering" target="Ready_to_produce" type="normal" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="137" yCoord="322"/>
+<arcpath arcPointType="false" id="1" xCoord="213" yCoord="219"/>
+</arc>
+<arc id="Consume to Get_ready" inscription="1" source="Consume" target="Get_ready" type="normal" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="826" yCoord="332"/>
+<arcpath arcPointType="false" id="1" xCoord="903" yCoord="434"/>
+</arc>
+<arc id="Done to Ready_to_consume" inscription="1" source="Done" target="Ready_to_consume" type="normal" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="997" yCoord="322"/>
+<arcpath arcPointType="false" id="1" xCoord="920" yCoord="219"/>
+</arc>
+<arc id="In_transit to Transport" inscription="[1,3]:1" source="In_transit" target="Transport" type="transport" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="476" yCoord="327"/>
+<arcpath arcPointType="false" id="1" xCoord="576" yCoord="327"/>
+</arc>
+<arc id="Transport to Ready" inscription="[1,3]:1" source="Transport" target="Ready" type="transport" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="586" yCoord="327"/>
+<arcpath arcPointType="false" id="1" xCoord="687" yCoord="327"/>
+</arc>
+<arc id="Collect to Garbage" inscription="1" source="Collect" target="Garbage" type="normal" weight="1">
+<arcpath arcPointType="false" id="0" xCoord="702" yCoord="462"/>
+<arcpath arcPointType="false" id="1" xCoord="702" yCoord="552"/>
+</arc>
+</net>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Three in Garbage" overApproximation="true" pTrie="true" query="EF ProducerConsumer.Garbage = 3" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Avoid Garbage" overApproximation="false" pTrie="true" query="EG ProducerConsumer.Garbage = 0" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="true" traceOption="SOME"/>
+<k-bound bound="3"/>
+</pnml>
