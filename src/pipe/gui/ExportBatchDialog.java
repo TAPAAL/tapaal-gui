@@ -413,7 +413,7 @@ public class ExportBatchDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets", "xml", lastSelectPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","tapn", "xml", lastSelectPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
@@ -480,7 +480,7 @@ public class ExportBatchDialog extends JDialog {
 			lastExportPath = destPath;
 			progressBarThread.start();
     		for(File file : files) {
-	    		Path path = Paths.get(destPath + "/" + file.getName().replaceAll(".xml", ""));
+	    		Path path = Paths.get(destPath + "/" + file.getName().replaceAll(".xml", "").replaceAll(".tapn", ""));
     			try {
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
@@ -545,7 +545,7 @@ public class ExportBatchDialog extends JDialog {
 		
 		for(pipe.dataLayer.TAPNQuery query : queries) {
 			pipe.dataLayer.TAPNQuery copy = query;
-			copy.setName((fileName.replaceAll(".xml", "") + "." + query.getName() + "-" + index).replaceAll(" ", "_"));
+			copy.setName((fileName.replaceAll(".xml", "") + "." + query.getName() + "-" + index).replaceAll(" ", "_").replaceAll(".tapn", ""));
 			renamedQueries.add(copy);
 			index++;
 		}

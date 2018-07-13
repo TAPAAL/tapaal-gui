@@ -17,12 +17,16 @@ class NativeFileBrowserFallback extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
 	private JFileChooser fileChooser;
+	private String optionalExt;
 
 	/**
 		This show native open/save dialogs for all type of dialogs except multifile open,
 	 	Java before 7, have problems with multiselect for native dialogs.
 	 */
 	NativeFileBrowserFallback(String filetype, final String ext, String path) {
+		this(filetype, ext, "", path);
+	}
+	NativeFileBrowserFallback(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
 
 		if (filetype == null) {
@@ -31,23 +35,37 @@ class NativeFileBrowserFallback extends FileBrowser {
 		if(path == null) path = lastPath;
 
 		this.ext = ext;
+		this.optionalExt = optionalExt;
 		fc.setDirectory(path);
 
 		/* Setup JFileChooser for multi file selection */
 		fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		FileNameExtensionFilter filter;
 
 		// Setup filter if extension specified
 		if(!ext.equals("")){
-			fc.setFilenameFilter(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith( ext );
-				}
-			});
+			if(!optionalExt.equals("")) {
+				fc.setFilenameFilter(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith( ext ) || name.endsWith(optionalExt);
+					}
+				});
+				filter = new FileNameExtensionFilter(
+						filetype, new String[] { ext, optionalExt });
+			}else {
+				fc.setFilenameFilter(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith( ext );
+					}
+				});
+				filter = new FileNameExtensionFilter(
+						filetype, new String[] { ext });
+			}
 
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-					filetype, new String[] { ext });
+			
 			fileChooser.setFileFilter(filter);
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setFileFilter(filter);

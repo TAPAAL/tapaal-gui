@@ -14,8 +14,13 @@ import pipe.gui.CreateGui;
 class NativeFileBrowser extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
+	private String optionalExt;
 	
 	NativeFileBrowser(String filetype, final String ext, String path) {
+		this(filetype, ext, "", path);
+	}
+	
+	NativeFileBrowser(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
 
 		if (filetype == null) {
@@ -24,18 +29,30 @@ class NativeFileBrowser extends FileBrowser {
 		if(path == null) path = lastPath;
 
 		this.ext = ext;
+		this.optionalExt = optionalExt;
 		fc.setDirectory(path);
 
 		// Setup filter if extension specified
 		if(!ext.equals("")){
-			fc.setFilenameFilter(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith( ext );
-				}
-			});
+			if(!optionalExt.equals("")) {
+				fc.setFilenameFilter(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith( ext ) || name.endsWith(optionalExt);
+					}
+				});
+			}
+			else {
+				fc.setFilenameFilter(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith( ext );
+					}
+				});
+			}
 		}
 	}
+	
 
 	public File openFile() {
 		fc.setFile(ext.equals("")? "":"*."+ext);
