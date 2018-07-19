@@ -136,6 +136,8 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_Random = "Random search";
 	private static final String name_KeepQueryOption = "Do not override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
+	private static final String name_SOUNDNESS = "Soundness";
+	private static final String name_STRONGSOUNDNESS = "Strong Soundness";
 	private static final String name_EXISTDEADLOCK = "Existence of a deadlock";
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
@@ -192,6 +194,11 @@ public class BatchProcessingDialog extends JDialog {
 	//Tool tips for results panel
 	private final static String TOOL_TIP_ExportButton = "Press to export batch results into a CVS file";
 	private final static String TOOL_TIP_CloseButton = "Press to close the batch processing dialog";
+	
+	private final static String NOT_SATISFIED_STRING_STRONG_SOUNDNESS = "Net is not sound and can therefore not be checked for strong soundness";
+	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
+	private final static String SATISFIED_STRING = "Satisfied";
+
 	
 	private static String lastPath = null;
 	
@@ -574,7 +581,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(queryLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption,
-				name_SEARCHWHOLESTATESPACE, name_EXISTDEADLOCK};
+				name_SEARCHWHOLESTATESPACE, name_EXISTDEADLOCK, name_SOUNDNESS, name_STRONGSOUNDNESS};
 		queryPropertyOption = new JComboBox(options);
 		queryPropertyOption.setToolTipText(TOOL_TIP_Query_Property_Option);
 		
@@ -948,9 +955,13 @@ public class BatchProcessingDialog extends JDialog {
 		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
 		if (propertyOptionString.equals(name_SEARCHWHOLESTATESPACE))
 			return QueryPropertyOption.SearchWholeStateSpace;
-                else if (propertyOptionString.equals(name_EXISTDEADLOCK))
-                        return QueryPropertyOption.ExistDeadlock;
-                else
+        else if (propertyOptionString.equals(name_EXISTDEADLOCK))
+                return QueryPropertyOption.ExistDeadlock;
+        else if (propertyOptionString.equals(name_STRONGSOUNDNESS))
+        	return QueryPropertyOption.StrongSoundness;
+        else if (propertyOptionString.equals(name_SOUNDNESS))
+        	return QueryPropertyOption.Soundness;
+        else
 			return QueryPropertyOption.KeepQueryOption;
 	}
 	
@@ -1504,15 +1515,15 @@ public class BatchProcessingDialog extends JDialog {
 							"Query");
 					if (value != null) {
 						if ((isResultColumn && value.toString().equals(
-								"Satisfied"))
+								SATISFIED_STRING))
 								|| (isQueryColumn && value.toString().equals(
 										"TRUE")))
-							setBackground(new Color(91, 255, 91)); // light red
-						else if ((isResultColumn && value.toString().equals(
-								"Not Satisfied"))
+							setBackground(new Color(91, 255, 91)); // light green
+						else if ((isResultColumn && (value.toString().equals(
+								NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS)))
 								|| (isQueryColumn && value.toString().equals(
 										"FALSE")))
-							setBackground(new Color(255, 91, 91)); // light  green
+							setBackground(new Color(255, 91, 91)); // light  red
 						else if (isResultColumn && value.toString().equals(
 								"Inconclusive"))
 							setBackground(new Color(255, 255, 120)); // light yellow

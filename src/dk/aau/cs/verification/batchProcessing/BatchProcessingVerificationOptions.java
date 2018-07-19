@@ -9,7 +9,7 @@ import dk.aau.cs.util.Require;
 public class BatchProcessingVerificationOptions {
 	
 	public enum QueryPropertyOption {
-		KeepQueryOption, SearchWholeStateSpace, ExistDeadlock
+		KeepQueryOption, SearchWholeStateSpace, ExistDeadlock, Soundness, StrongSoundness
 	};
 	
 	public enum SymmetryOption {

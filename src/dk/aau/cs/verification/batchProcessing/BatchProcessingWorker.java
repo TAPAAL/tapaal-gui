@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -15,7 +16,11 @@ import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -24,6 +29,7 @@ import dk.aau.cs.approximation.ApproximationWorker;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
+import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -57,6 +63,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.StubbornReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
@@ -71,6 +78,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private boolean oomCurrentVerification = false;
 	private int verificationTasksCompleted;
 	private LoadedBatchProcessingModel model;
+	private boolean isSoundnessCheck;
 	
 	
 	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
@@ -234,64 +242,137 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
-		if(queryToVerify.isActive()) { 
-			VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
+		if(queryToVerify.isActive()) {
+
+			if(isSoundnessCheck) {
+				processSoundnessCheck(file, composedModel, queryToVerify);
+			}
+			if(!isSoundnessCheck) { 
+				VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
 			
-			if(verificationResult != null)
-				processVerificationResult(file, queryToVerify, verificationResult);
+				if(verificationResult != null)
+					processVerificationResult(file, queryToVerify, verificationResult);
+			}
 		}
 		else
 			publishResult(file.getName(), queryToVerify, "Skipped - query is disabled because it contains propositions involving places from a deactivated component", 0, new NullStats());
+		
 		fireVerificationTaskComplete();
+	}
+	private void processSoundnessCheck(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception{
+		VerificationResult<TimedArcPetriNetTrace> verificationResult;
+		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_SOUNDNESS) {
+			try {
+				verificationResult = verifyQuery(file, composedModel, queryToVerify);
+				if(verificationResult != null)
+					processVerificationResult(file, queryToVerify, verificationResult);
+			} catch (Exception e) {
+				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Open the net and press CTRL + F for more information.", 0, new NullStats());
+			}
+		}
+		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
+			//Test for Soundness before Strong Soundness
+			pipe.dataLayer.TAPNQuery queryToCheckIfSound = new pipe.dataLayer.TAPNQuery(
+					"Workflow soundness checking", queryToVerify.getCapacity(),
+					new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
+					SearchOption.DEFAULT,
+					ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+					false, true, false, null, ExtrapolationOption.AUTOMATIC,
+					WorkflowMode.WORKFLOW_SOUNDNESS);
+			try {
+				VerificationResult<TimedArcPetriNetTrace> resultOfSoundCheck = verifyQuery(file, composedModel, queryToCheckIfSound);
+				//Strong Soundness check
+				if(resultOfSoundCheck.isQuerySatisfied()) {
+					long m = resultOfSoundCheck.stats().exploredStates();
+					long B = 0;
+					for (TimedPlace p : composedModel.value1().places()) {
+						if (p.invariant().upperBound().equals(Bound.Infinity)) {
+							continue;
+						}
+						B = Math.max(B, p.invariant().upperBound().value());
+					}
+					long c  = m*B+1;
+					queryToVerify.setStrongSoundnessBound(c);
+					verificationResult = verifyQuery(file, composedModel, queryToVerify);
+					if(verificationResult != null)
+						processVerificationResult(file, queryToVerify, verificationResult);
+				} else
+					publishResult(file.getName(), queryToVerify, "Net is not sound and can therefore not be checked for strong soundness", 0, new NullStats());
+				
+			} catch (Exception e) {
+				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Open the net and press CTRL + F for more information.", 0, new NullStats());
+			}
+		}
 	}
 
 	private pipe.dataLayer.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
 		if(batchProcessingVerificationOptions != null) {
-			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
-			ReductionOption option = query.getReductionOption();
-                        TCTLAbstractProperty property;
-                        String name;
-                        if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.ExistDeadlock) {
-                            property = generateExistDeadlock(model);
-                            name = "Existence of a deadlock";
-                        } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace) {
-                            property = generateSearchWholeStateSpaceProperty(model);
-                            name = "Search whole state space";
-                        } else {
-                            property = query.getProperty();
-                            name = query.getName();
-                        }
-			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
-			boolean stubbornReduction = batchProcessingVerificationOptions.stubbornReductionOption() == StubbornReductionOption.KeepQueryOption ? query.isStubbornReductionEnabled() : getStubbornReductionFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
-			boolean overApproximation = query.isOverApproximationEnabled();
-			boolean underApproximation = query.isUnderApproximationEnabled();
-			int approximationDenominator = query.approximationDenominator();
-			if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.None) {
-				overApproximation = false;
-				underApproximation = false;
-			} else if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.OverApproximation) {
-				overApproximation = true;
-				underApproximation = false;
-			} else if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.UnderApproximation) {
-				overApproximation = false;
-				underApproximation = true;
-			}
-			if (batchProcessingVerificationOptions.approximationDenominator() != 0) {
-				approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
-			}
-			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
-			
-			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
-				changedQuery.setActive(query.isActive());
-
-			changedQuery.setCategory(query.getCategory());
-			changedQuery.setAlgorithmOption(query.getAlgorithmOption());
-			changedQuery.setUseSiphontrap(query.isSiphontrapEnabled());
-			changedQuery.setUseQueryReduction(query.isQueryReductionEnabled());
-			changedQuery.setUseStubbornReduction(stubbornReduction);
-			return changedQuery;
+			if(!(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness || batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness)) {
+				SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
+				ReductionOption option = query.getReductionOption();
+	            TCTLAbstractProperty property;
+	            String name;
+	            if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.ExistDeadlock) {
+	                property = generateExistDeadlock(model);
+	                name = "Existence of a deadlock";
+	            } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace) {
+	                property = generateSearchWholeStateSpaceProperty(model);
+	                name = "Search whole state space";
+	            } else {
+	                property = query.getProperty();
+	                name = query.getName();
+	            }
+				boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
+				boolean stubbornReduction = batchProcessingVerificationOptions.stubbornReductionOption() == StubbornReductionOption.KeepQueryOption ? query.isStubbornReductionEnabled() : getStubbornReductionFromBatchProcessingOptions();
+				boolean overApproximation = query.isOverApproximationEnabled();
+				boolean underApproximation = query.isUnderApproximationEnabled();
+				int approximationDenominator = query.approximationDenominator();
+				if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.None) {
+					overApproximation = false;
+					underApproximation = false;
+				} else if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.OverApproximation) {
+					overApproximation = true;
+					underApproximation = false;
+				} else if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.UnderApproximation) {
+					overApproximation = false;
+					underApproximation = true;
+				}
+				if (batchProcessingVerificationOptions.approximationDenominator() != 0) {
+					approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
+				}
+				
+				pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
+				
+				if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
+					changedQuery.setActive(query.isActive());
+	
+				changedQuery.setCategory(query.getCategory());
+				changedQuery.setAlgorithmOption(query.getAlgorithmOption());
+				changedQuery.setUseSiphontrap(query.isSiphontrapEnabled());
+				changedQuery.setUseQueryReduction(query.isQueryReductionEnabled());
+				changedQuery.setUseStubbornReduction(stubbornReduction);
+				return changedQuery;
+			} else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness) {
+				isSoundnessCheck = true;
+				return new pipe.dataLayer.TAPNQuery(
+					"Workflow soundness checking", capacity,
+							new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
+							SearchOption.DEFAULT,
+							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+							false, true, false, null, ExtrapolationOption.AUTOMATIC,
+							WorkflowMode.WORKFLOW_SOUNDNESS);
+        	
+	        } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness) {
+	        	isSoundnessCheck = true;
+	        	return new pipe.dataLayer.TAPNQuery(
+						"Workflow soundness checking", capacity,
+								new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
+								SearchOption.DEFAULT,
+								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+								false, true, false, null, ExtrapolationOption.AUTOMATIC,
+								WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+	        }
 		}
 		
 		return query;
@@ -325,7 +406,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		try {
 			verificationResult = verify(composedModel, query);
 		} catch(UnsupportedModelException e) {
-			publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats());
+			if(isSoundnessCheck)
+				publishResult(file.getName(), query, "Skipped - model not supported by the verification method. Open the net and press CTRL + F for more information.", 0, new NullStats());
+			else
+				publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats());
 			return null;
 		} catch(UnsupportedQueryException e) {
 			if(e.getMessage().toLowerCase().contains("discrete inclusion"))
@@ -333,7 +417,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			else
 				publishResult(file.getName(), query, "Skipped - query not supported by the verification method", 0, new NullStats());
 			return null;
-		}
+		} 
 		return verificationResult;
 	}
 
@@ -427,10 +511,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return new TCTLAGNode(new TCTLTrueNode());
 	}
         
-        private TCTLAbstractProperty generateExistDeadlock(TimedArcPetriNet model) throws Exception {
+	private TCTLAbstractProperty generateExistDeadlock(TimedArcPetriNet model) throws Exception {
 		return new TCTLEFNode(new TCTLDeadlockNode()); 
 	}
-
+	
 	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return getVerifyTAPN();
