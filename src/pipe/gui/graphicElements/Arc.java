@@ -117,6 +117,11 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public String getName() {
 		return getId();
 	}
+	
+	@Override 
+	public NameLabel getNameLabel() {
+		return label;
+	}
 
 	/**
 	 * Get source returns null if value not yet entered

@@ -18,15 +18,6 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 Cloneable {
 
 	private static final long serialVersionUID = -6629006415467929184L;
-	/** X-axis Position on screen */
-	protected double positionX;
-	/** Y-axis Position on screen */
-	protected double positionY;
-
-	/** X-axis Position on screen */
-	protected double nameOffsetX;
-	/** Y-axis Position on screen */
-	protected double nameOffsetY;
 
 	protected double componentWidth;
 	protected double componentHeight;
@@ -130,26 +121,6 @@ Cloneable {
 		// sets the text within the label
 		// System.out.println("setting name to: " + nameInput);
 		pnName.setName(nameInput);
-	}
-
-	/**
-	 * Set X-axis offset for name position
-	 * 
-	 * @param nameOffsetXInput
-	 *            Double value for name X-axis offset
-	 */
-	public void setNameOffsetX(double nameOffsetXInput) {
-		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
-	}
-
-	/**
-	 * Set Y-axis offset for name position
-	 * 
-	 * @param nameOffsetYInput
-	 *            Double value for name Y-axis offset
-	 */
-	public void setNameOffsetY(double nameOffsetYInput) {
-		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
 	}
 
 	/**
@@ -361,13 +332,6 @@ Cloneable {
 				+ getHeight() / 2.0);
 	}
 
-	protected void updateLabelLocation() {
-		pnName.setPosition(
-				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
-		);
-	}
-
 	@Override
 	public void delete() {
 		if (getParent() != null) {
@@ -411,6 +375,7 @@ Cloneable {
 	}
 
 	// TODO: Find a better name for this
+	@Override
 	public void updateOnMoveOrZoom() {
 		updateBounds();
 		updateConnected();

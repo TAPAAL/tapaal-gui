@@ -930,6 +930,10 @@ public class TapnLegacyXmlLoader {
 					newObject.addMouseListener(new AnimationHandler());
 
 				} else if (newObject instanceof Arc) {
+					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
+					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TimedTransportArcComponent) {
