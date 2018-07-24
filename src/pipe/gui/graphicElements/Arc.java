@@ -92,8 +92,12 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	public void setLabelPosition() {
-		label.setPosition((int) (myPath.midPoint.x)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y));
+		label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
+				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY));
+	}
+	@Override
+	public void updateLabelLocation() {
+		setLabelPosition();
 	}
 
 	/**
@@ -158,7 +162,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public double getStartPositionY() {
 		return myPath.getPoint(0).getY();
 	}
-
 	/**
 	 * Updates the start position of the arc, resets the arrowhead and updates
 	 * the bounds

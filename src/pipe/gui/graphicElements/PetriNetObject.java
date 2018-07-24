@@ -78,6 +78,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
 		);
 	}
+	
 	public void updateOnMoveOrZoom() {
 		updateLabelLocation();
 	}

@@ -9,7 +9,6 @@ import javax.swing.SwingUtilities;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.NameLabel;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {

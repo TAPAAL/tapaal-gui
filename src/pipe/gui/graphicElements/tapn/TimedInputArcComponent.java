@@ -160,8 +160,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	@Override
 	public void setLabelPosition() {
-		label.setPosition((int) (myPath.midPoint.x)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y)
+		label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
+				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)
 				- ((zoom / 55) * (zoom / 55)));
 	}
 
