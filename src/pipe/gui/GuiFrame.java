@@ -1364,6 +1364,8 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			prevcomponentAction.setEnabled(false);
+			nextcomponentAction.setEnabled(false);
 
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
@@ -1405,6 +1407,9 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomOutAction.setEnabled(enable);
 		zoomComboBox.setEnabled(enable);
 		zoomMenu.setEnabled(enable);
+		
+		decSpacingAction.setEnabled(enable);
+		incSpacingAction.setEnabled(enable);
 
 		toggleGrid.setEnabled(enable);
 
