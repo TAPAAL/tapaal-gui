@@ -1576,13 +1576,13 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getTab(index).getFile();
 		boolean result;
-		if (!forceSaveAs && modelFile != null) { // ordinary save
+		if (!forceSaveAs && modelFile != null && !(modelFile.getName().endsWith(".xml"))) { // ordinary save
 			saveNet(index, modelFile);
 			result = true;
 		} else { // save as
 			String path;
 			if (modelFile != null) {
-				path = modelFile.toString();
+				path = modelFile.getParent();
 			} else {
 				path = appTab.getTitleAt(index);
 			}
@@ -1604,11 +1604,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			if(outFile.getAbsolutePath().endsWith(".xml")) {
-				File xmlCopy = outFile;
-				outFile = new File(xmlCopy.getAbsolutePath().replaceAll(".xml", ".tapn"));
-				xmlCopy.delete();
-			}
 			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
 
 			CreateGui.getCurrentTab().setFile(outFile);
@@ -1698,6 +1693,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	public TabContent createNewTabFromFile(InputStream file, String name) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
+		boolean showFileEndingChangedMessage = false;
 
 
 		setObjects(freeSpace);
@@ -1708,6 +1704,7 @@ public class GuiFrame extends JFrame implements Observer {
 		} else if (!name.toLowerCase().endsWith(".tapn")){
 			if(name.endsWith(".xml")){
 				name = name.replaceAll(".xml", ".tapn");
+				showFileEndingChangedMessage = true;
 			}else
 				name = name + ".tapn";
 		}
@@ -1753,6 +1750,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
 		selectAction.actionPerformed(null);
+		showFileEndingChangedMessage(showFileEndingChangedMessage);
 		return tab;
 	}
 
@@ -2431,7 +2429,6 @@ public class GuiFrame extends JFrame implements Observer {
 			public void actionPerformed(ActionEvent arg0) {
 				File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
 				for (File f : files) {
-					System.out.println(f.exists() + "\n" + f.isFile() + "\n" + f.canRead());
 					if (f.exists() && f.isFile() && f.canRead()) {
 						FileBrowser.userPath = f.getParent();
 						createNewTabFromFile(f);
@@ -2818,6 +2815,12 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
+	public void showFileEndingChangedMessage(boolean showMessage) {
+		if(showMessage) {
+			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+		}
+	}
 
 
 	//If needed, add boolean forceClose, where net is not checkedForSave and just closed

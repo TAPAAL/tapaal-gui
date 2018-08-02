@@ -14,8 +14,6 @@ import pipe.gui.CreateGui;
 class NativeFileBrowser extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
-	private String optionalExt;
-	
 	NativeFileBrowser(String filetype, final String ext, String path) {
 		this(filetype, ext, "", path);
 	}
@@ -29,7 +27,6 @@ class NativeFileBrowser extends FileBrowser {
 		if(path == null) path = lastPath;
 
 		this.ext = ext;
-		this.optionalExt = optionalExt;
 		fc.setDirectory(path);
 
 		// Setup filter if extension specified

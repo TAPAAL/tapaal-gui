@@ -17,8 +17,6 @@ class NativeFileBrowserFallback extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
 	private JFileChooser fileChooser;
-	private String optionalExt;
-
 	/**
 		This show native open/save dialogs for all type of dialogs except multifile open,
 	 	Java before 7, have problems with multiselect for native dialogs.
@@ -35,7 +33,6 @@ class NativeFileBrowserFallback extends FileBrowser {
 		if(path == null) path = lastPath;
 
 		this.ext = ext;
-		this.optionalExt = optionalExt;
 		fc.setDirectory(path);
 
 		/* Setup JFileChooser for multi file selection */
