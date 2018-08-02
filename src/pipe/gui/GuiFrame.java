@@ -1711,10 +1711,6 @@ public class GuiFrame extends JFrame  {
 
 
 		try {
-			if (CreateGui.getApp() != null) {
-				// Notifies used to indicate new instances.
-				CreateGui.getApp().setMode(ElementType.CREATING);
-			}
 
 			ModelLoader loader = new ModelLoader(tab.drawingSurface());
 			LoadedModel loadedModel = loader.load(file);
@@ -1772,10 +1768,6 @@ public class GuiFrame extends JFrame  {
 
 		if (file != null) {
 			try {
-				if (CreateGui.getApp() != null) {
-					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(ElementType.CREATING);
-				}
 
 				LoadedModel loadedModel;
 
