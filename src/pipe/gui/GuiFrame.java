@@ -72,7 +72,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
-public class GuiFrame extends JFrame implements Observer {
+public class GuiFrame extends JFrame  {
 
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
@@ -1494,12 +1494,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 
-	// HAK Method called by netModel object when it changes
-	public void update(Observable o, Object obj) {
-		if ((mode != ElementType.CREATING) && (!appView.isInAnimationMode())) {
-			appView.setNetChanged(true);
-		}
-	}
+
 
 	private void showQueries(boolean enable){
 		showQueries = enable;
