@@ -47,8 +47,8 @@ public class VersionChecker {
 					}
 					return result;
 				}
-				else if (forcecheck)
-				{JOptionPane.showMessageDialog(null, "It is impossible to establish a connection to the server. Try again later.", "No Update for " + TAPAAL.getProgramName(),
+				else if (forcecheck){
+					JOptionPane.showMessageDialog(null, "It is impossible to establish a connection to the server. Try again later.", "No Update for " + TAPAAL.getProgramName(),
 							JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());	
 				}
 			}
