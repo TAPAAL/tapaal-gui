@@ -46,11 +46,6 @@ public class DataLayer extends Observable implements Cloneable {
 	 */
 	private ArrayList<? extends PetriNetObject> changeArrayList = null;
 
-	/** Used to determine whether the matrixes have been modified */
-	static boolean initialMarkingVectorChanged = true;
-
-	static boolean currentMarkingVectorChanged = true;
-
 	/**
 	 * Hashtable which maps PlaceTransitionObjects to their list of connected
 	 * arcs
