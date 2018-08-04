@@ -813,32 +813,6 @@ public class DataLayer extends Observable implements Cloneable {
 		return null;
 	}
 
-	public boolean hasTAPNInhibitorArcs() { // TODO: Fix this to make it faster
-		for (Arc arc : arcsArray) {
-			if (arc instanceof TimedInhibitorArcComponent) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean hasTransportArcs() {
-		for(Arc arc : arcsArray) {
-			if(arc instanceof TimedTransportArcComponent) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean hasInvariants() {
-		for(Place p : placesArray) {
-			if(!((TimedPlaceComponent)p).underlyingPlace().invariant().equals(TimeInvariant.LESS_THAN_INFINITY))
-				return true;
-		}
-		return false;
-	}
-
 	public NetType netType() {
 		return type;
 	}
