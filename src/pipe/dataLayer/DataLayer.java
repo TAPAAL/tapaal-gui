@@ -338,7 +338,7 @@ public class DataLayer extends Observable implements Cloneable {
 	/**
 	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
 	 * 
-	 * @param arcInput
+	 * @param inhibitorArcInput
 	 *            New Arc
 	 */
 	private void addInhibitorArcToInhibitorsMap(TimedInhibitorArcComponent inhibitorArcInput) {
@@ -732,8 +732,8 @@ public class DataLayer extends Observable implements Cloneable {
 
 	/**
 	 * Return the Place called placeName from the Petri-Net
-	 * 
-	 * @param placeId
+	 *
+	 * @param placeID
 	 *            ID of Place object to return
 	 * @return The first Place object found with id equal to placeId
 	 */
