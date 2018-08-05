@@ -68,7 +68,6 @@ public class DataLayer extends Observable implements Cloneable {
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
 
-		// tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList<AnnotationNote>();
 
 		// may as well do the hashtable here as well
@@ -230,7 +229,6 @@ public class DataLayer extends Observable implements Cloneable {
 
 			setChanged();
 
-			// notifyObservers(arcInput.getBounds());
 			notifyObservers(arcInput);
 		}
 	}
@@ -286,7 +284,6 @@ public class DataLayer extends Observable implements Cloneable {
 
 			setChanged();
 
-			// notifyObservers(arcInput.getBounds());
 			notifyObservers(inhibitorArcInput);
 		}
 	}
@@ -299,20 +296,15 @@ public class DataLayer extends Observable implements Cloneable {
 	 *            New Arc
 	 * */
 	private void addArcToArcsMap(TimedOutputArcComponent arcInput) {
-		// now we want to add the arc to the list of arcs for it's source and
-		// target
+		// now we want to add the arc to the list of arcs for it's source and target
 		PlaceTransitionObject source = arcInput.getSource();
 		PlaceTransitionObject target = arcInput.getTarget();
 		ArrayList<TimedOutputArcComponent> newList = null;
 
 		if (source != null) {
-			// Pete: Place/Transitions now always moveable
-			// source.setMovable(false);
 			if (arcsMap.get(source) != null) {
-				// System.out.println("adding arc to existing list");
 				arcsMap.get(source).add(arcInput);
 			} else {
-				// System.out.println("creating new arc list");
 				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(source, newList);
@@ -320,19 +312,14 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 
 		if (target != null) {
-			// Pete: Place/Transitions now always moveable
-			// target.setMovable(false);
 			if (arcsMap.get(target) != null) {
-				// System.out.println("adding arc to existing list2");
 				arcsMap.get(target).add(arcInput);
 			} else {
-				// System.out.println("creating new arc list2");
 				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(target, newList);
 			}
 		}
-		// System.out.println("arcsMap size: " + arcsMap.size());
 	}
 
 	/**
@@ -342,9 +329,7 @@ public class DataLayer extends Observable implements Cloneable {
 	 *            New Arc
 	 */
 	private void addInhibitorArcToInhibitorsMap(TimedInhibitorArcComponent inhibitorArcInput) {
-		// now we want to add the inhibitor arc to the list of inhibitor arcs
-		// for
-		// it's source and target
+		// now we want to add the inhibitor arc to the list of inhibitor arcs for it's source and target
 		PlaceTransitionObject source = inhibitorArcInput.getSource();
 		PlaceTransitionObject target = inhibitorArcInput.getTarget();
 		ArrayList<TimedInhibitorArcComponent> newList = null;
@@ -368,7 +353,6 @@ public class DataLayer extends Observable implements Cloneable {
 				tapnInhibitorsMap.put(target, newList);
 			}
 		}
-		// System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
 	}
 
 
@@ -416,13 +400,10 @@ public class DataLayer extends Observable implements Cloneable {
 				if (pnObject instanceof PlaceTransitionObject) {
 					if (arcsMap.get(pnObject) != null) {
 
-						// get the list of attached arcs for the object we are
-						// removing
+						// get the list of attached arcs for the object we are removing
 						attachedArcs = arcsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
+						// iterate over all the attached arcs, removing them all in inverse order!
 						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
 							try {
 								((Arc) attachedArcs.get(i)).delete();
@@ -438,13 +419,10 @@ public class DataLayer extends Observable implements Cloneable {
 
 					if (tapnInhibitorsMap.get(pnObject) != null) {
 
-						// get the list of attached arcs for the object we are
-						// removing
+						// get the list of attached arcs for the object we are removing
 						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
+						// iterate over all the attached arcs, removing them all in inverse order!
 						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
 							((Arc) attachedArcs.get(i)).delete();
 						}
