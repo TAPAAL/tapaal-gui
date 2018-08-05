@@ -146,7 +146,6 @@ public class Animator {
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
 			if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
-				current.notifyObservers();
 				tempTransition.repaint();
 			}
 		}
@@ -162,7 +161,6 @@ public class Animator {
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
 			if (!(tempTransition.isEnabled(true)) || !tempTransition.isDelayEnabledTransition(true) || (tempTransition.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
-				current.notifyObservers();
 				tempTransition.repaint();
 			}
 		}
@@ -209,7 +207,6 @@ public class Animator {
 				Transition tempTransition = transitionIterator.next();
 				tempTransition.setEnabledFalse();
 				tempTransition.setDelayEnabledTransitionFalse();
-				activeGuiModel().notifyObservers();
 				tempTransition.repaint();
 			}
 		}

@@ -23,7 +23,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 
 
-public class DataLayer extends Observable implements Cloneable {
+public class DataLayer implements Cloneable {
 
 	/** PNML File Name */
 	public String pnmlName = null;
@@ -87,8 +87,6 @@ public class DataLayer extends Observable implements Cloneable {
 		Require.that(placeInput != null, "input place was null");
 
 		placesArray.add(placeInput);
-		setChanged();
-		notifyObservers(placeInput);
 	}
 
 	/**
@@ -100,8 +98,6 @@ public class DataLayer extends Observable implements Cloneable {
 	 */
 	public void addAnnotation(AnnotationNote labelInput) {
 		labelsArray.add(labelInput);
-		setChanged();
-		notifyObservers(labelInput);
 	}
 
 	/**
@@ -115,8 +111,6 @@ public class DataLayer extends Observable implements Cloneable {
 		Require.that(transitionInput != null, "input transition was null");
 		
 		transitionsArray.add(transitionInput);
-		setChanged();
-		notifyObservers(transitionInput);
 	}
 
 	/**
@@ -227,17 +221,12 @@ public class DataLayer extends Observable implements Cloneable {
 			arcsArray.add(arcInput);
 			addArcToArcsMap(arcInput);
 
-			setChanged();
-
-			notifyObservers(arcInput);
 		}
 	}
 
 	public void addTransportArc(TimedTransportArcComponent transportArc) {
 		arcsArray.add(transportArc);
 		addArcToArcsMap(transportArc);
-		setChanged();
-		notifyObservers();
 	}
 
 	public void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
@@ -282,9 +271,6 @@ public class DataLayer extends Observable implements Cloneable {
 			arcsArray.add(inhibitorArcInput);
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
 
-			setChanged();
-
-			notifyObservers(inhibitorArcInput);
 		}
 	}
 
@@ -505,12 +491,6 @@ public class DataLayer extends Observable implements Cloneable {
 					}
 				} 
 
-				if (didSomething) {
-					setChanged();
-
-					// notifyObservers(pnObject.getBounds());
-					notifyObservers(pnObject);
-				}
 			}
 		} catch (NullPointerException npe) {
 			System.out.println("NullPointerException [debug]\n"
