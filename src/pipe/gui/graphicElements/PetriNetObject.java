@@ -101,6 +101,23 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	public void setNameOffsetY(double nameOffsetYInput) {
 		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
 	}
+	/**
+	 * Get X-axis offset for ...
+	 * 
+	 * @return Double value for X-axis offset of ...
+	 */
+	public Double getNameOffsetXObject() {
+		return nameOffsetX;
+	}
+
+	/**
+	 * Moved to PetriNetObject Get Y-axis offset for ...
+	 * 
+	 * @return Double value for Y-axis offset of ...
+	 */
+	public Double getNameOffsetYObject() {
+		return nameOffsetY;
+	}
 
 	/**
 	 * Get id returns null if value not yet entered

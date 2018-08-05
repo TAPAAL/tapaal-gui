@@ -182,24 +182,6 @@ Cloneable {
 	}
 
 	/**
-	 * Get X-axis offset for ...
-	 * 
-	 * @return Double value for X-axis offset of ...
-	 */
-	public Double getNameOffsetXObject() {
-		return nameOffsetX;
-	}
-
-	/**
-	 * Moved to PlaceTransitionObject Get Y-axis offset for ...
-	 * 
-	 * @return Double value for Y-axis offset of ...
-	 */
-	public Double getNameOffsetYObject() {
-		return nameOffsetY;
-	}
-
-	/**
 	 * Get X-axis position, returns null if value not yet entered
 	 * 
 	 * @return Double value for X-axis position
