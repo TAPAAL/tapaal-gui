@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
@@ -93,8 +94,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	public void setLabelPosition() {
-		label.setPosition((int) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom)), 
-						  (int) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom)));
+		label.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
 	}
 	@Override
 	public void updateLabelLocation() {
