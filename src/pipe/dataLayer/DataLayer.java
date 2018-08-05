@@ -689,25 +689,6 @@ public class DataLayer extends Observable implements Cloneable {
 		return returnTransition;
 	}
 
-	public Transition getTransitionByNameIgnoreGiven(Transition ignore,
-			String transitionName) {
-		Transition returnTransition = null;
-
-		if (transitionsArray != null) {
-			if (transitionName != null) {
-				for (int i = 0; i < transitionsArray.size(); i++) {
-					if (!transitionsArray.get(i).equals(ignore)) {
-						if (transitionName.equalsIgnoreCase((transitionsArray
-								.get(i)).getName())) {
-							returnTransition = transitionsArray.get(i);
-						}
-					}
-				}
-			}
-		}
-		return returnTransition;
-	}
-
 	/**
 	 * Return the Place called placeName from the Petri-Net
 	 *
@@ -746,24 +727,6 @@ public class DataLayer extends Observable implements Cloneable {
 					if (placeName.equalsIgnoreCase((placesArray.get(i))
 							.getName())) {
 						returnPlace = placesArray.get(i);
-					}
-				}
-			}
-		}
-		return returnPlace;
-	}
-
-	public Place getPlaceByNameIgnoreGiven(Place ignore, String placeName) {
-		Place returnPlace = null;
-
-		if (placesArray != null) {
-			if (placeName != null) {
-				for (int i = 0; i < placesArray.size(); i++) {
-					if (!placesArray.get(i).equals(ignore)) {
-						if (placeName.equalsIgnoreCase((placesArray.get(i))
-								.getName())) {
-							returnPlace = placesArray.get(i);
-						}
 					}
 				}
 			}
