@@ -9,6 +9,7 @@ import javax.swing.*;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
+import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
@@ -92,8 +93,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	public void setLabelPosition() {
-		label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY));
+		label.setPosition((int) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom)), 
+						  (int) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom)));
 	}
 	@Override
 	public void updateLabelLocation() {
@@ -322,6 +323,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void zoomUpdate(int percent) {
 		zoom = percent;
 		this.updateArcPosition();
+		this.updateOnMoveOrZoom();
 		label.zoomUpdate(percent);
 		label.updateSize();
 	}
