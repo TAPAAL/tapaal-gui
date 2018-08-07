@@ -121,6 +121,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	@Override
 	protected Void doInBackground() throws Exception {
+		isSoundnessCheck = false;
 		for(File file : files){
 
 			fireFileChanged(file.getName());
@@ -267,13 +268,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				if(verificationResult != null)
 					processVerificationResult(file, queryToVerify, verificationResult);
 			} catch (Exception e) {
-				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Open the net and press CTRL + F for more information.", 0, new NullStats());
+				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", 0, new NullStats());
 			}
 		}
 		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
 			//Test for Soundness before Strong Soundness
 			pipe.dataLayer.TAPNQuery queryToCheckIfSound = new pipe.dataLayer.TAPNQuery(
-					"Workflow soundness checking", queryToVerify.getCapacity(),
+					"Workflow soundness check", queryToVerify.getCapacity(),
 					new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 					SearchOption.DEFAULT,
 					ReductionOption.VerifyTAPNdiscreteVerification, true, true,
@@ -297,10 +298,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					if(verificationResult != null)
 						processVerificationResult(file, queryToVerify, verificationResult);
 				} else
-					publishResult(file.getName(), queryToVerify, "Net is not sound and can therefore not be checked for strong soundness", 0, new NullStats());
+					publishResult(file.getName(), queryToVerify, "Not Strongly Sound", 0, new NullStats());
 				
 			} catch (Exception e) {
-				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Open the net and press CTRL + F for more information.", 0, new NullStats());
+				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", 0, new NullStats());
 			}
 		}
 	}
@@ -355,8 +356,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				return changedQuery;
 			} else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness) {
 				isSoundnessCheck = true;
-				return new pipe.dataLayer.TAPNQuery(
-					"Workflow soundness checking", capacity,
+				query = new pipe.dataLayer.TAPNQuery(
+					"Workflow soundness check", capacity,
 							new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 							SearchOption.DEFAULT,
 							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
@@ -365,8 +366,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         	
 	        } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness) {
 	        	isSoundnessCheck = true;
-	        	return new pipe.dataLayer.TAPNQuery(
-						"Workflow soundness checking", capacity,
+	        	query = new pipe.dataLayer.TAPNQuery(
+						"Workflow soundness check", capacity,
 								new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
 								SearchOption.DEFAULT,
 								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
@@ -407,7 +408,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			verificationResult = verify(composedModel, query);
 		} catch(UnsupportedModelException e) {
 			if(isSoundnessCheck)
-				publishResult(file.getName(), query, "Skipped - model not supported by the verification method. Open the net and press CTRL + F for more information.", 0, new NullStats());
+				publishResult(file.getName(), query, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", 0, new NullStats());
 			else
 				publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats());
 			return null;
@@ -440,6 +441,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			else
 			{
 				queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
+				if(isSoundnessCheck && !verificationResult.isQuerySatisfied())
+					queryResult = "Not Sound";
 			}
 			if (query.discreteInclusion() && !verificationResult.isBounded() && 
 					((query.queryType().equals(QueryType.EF) && !verificationResult.getQueryResult().isQuerySatisfied())
@@ -452,6 +455,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					queryResult = "Inconclusive";
 				}
 			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime(), verificationResult.stats());
+		} else if(isSoundnessCheck && verificationResult.error()) {
+			publishResult(file.getName(), query, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", verificationResult.verificationTime(), new NullStats());
 		} else {
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), new NullStats());
 		}		

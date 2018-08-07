@@ -195,7 +195,8 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_ExportButton = "Press to export batch results into a CVS file";
 	private final static String TOOL_TIP_CloseButton = "Press to close the batch processing dialog";
 	
-	private final static String NOT_SATISFIED_STRING_STRONG_SOUNDNESS = "Net is not sound and can therefore not be checked for strong soundness";
+	private final static String NOT_SATISFIED_STRING_STRONG_SOUNDNESS = "Not Strongly Sound";
+	private final static String NOT_SATISFIED_STRING_SOUNDNESS = "Not Sound";
 	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
 	private final static String SATISFIED_STRING = "Satisfied";
 
@@ -1520,7 +1521,7 @@ public class BatchProcessingDialog extends JDialog {
 										"TRUE")))
 							setBackground(new Color(91, 255, 91)); // light green
 						else if ((isResultColumn && (value.toString().equals(
-								NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS)))
+								NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) || value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS)))
 								|| (isQueryColumn && value.toString().equals(
 										"FALSE")))
 							setBackground(new Color(255, 91, 91)); // light  red
