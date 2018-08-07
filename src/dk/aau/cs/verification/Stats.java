@@ -46,7 +46,7 @@ public class Stats {
 		this.explored = explored;
 		this.stored = stored;	
 		this.transitionStats = transitionStats;
-                this.placeBoundStats = placeBoundStats;
+        this.placeBoundStats = placeBoundStats;
 		this.minExecutionTime = minExecutionTime;
 		this.maxExecutionTime = maxExecutionTime;
 		this.coveredMarking = coveredMarking;
@@ -137,6 +137,12 @@ public class Stats {
     }
     public long getExploredConfigurations() {
         return exploredConfigurations;
+    }
+    
+    public void addStats(Stats stats) {
+    	explored += stats.exploredStates();
+    	discovered += stats.discoveredStates();
+    	stored += stats.storedStates();
     }
 
 	public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){

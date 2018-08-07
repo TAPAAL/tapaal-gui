@@ -280,6 +280,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 					false, true, false, null, ExtrapolationOption.AUTOMATIC,
 					WorkflowMode.WORKFLOW_SOUNDNESS);
+			long time = 0;
+			Stats stats = new NullStats();
 			try {
 				VerificationResult<TimedArcPetriNetTrace> resultOfSoundCheck = verifyQuery(file, composedModel, queryToCheckIfSound);
 				//Strong Soundness check
@@ -295,13 +297,22 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					long c  = m*B+1;
 					queryToVerify.setStrongSoundnessBound(c);
 					verificationResult = verifyQuery(file, composedModel, queryToVerify);
+					
+					//add stats from regular soundness check
+					verificationResult.stats().addStats(resultOfSoundCheck.stats());
+					verificationResult.addTime(resultOfSoundCheck.verificationTime());
+					time = verificationResult.verificationTime() + resultOfSoundCheck.verificationTime();
+					stats = verificationResult.stats();
+					
+
 					if(verificationResult != null)
 						processVerificationResult(file, queryToVerify, verificationResult);
 				} else
-					publishResult(file.getName(), queryToVerify, "Not Strongly Sound", 0, new NullStats());
+					publishResult(file.getName(), queryToVerify, "Not Strongly Sound", resultOfSoundCheck.verificationTime(), resultOfSoundCheck.stats());
+					System.out.println(resultOfSoundCheck.stats());
 				
 			} catch (Exception e) {
-				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", 0, new NullStats());
+				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", time, stats);
 			}
 		}
 	}
