@@ -8,18 +8,18 @@ import javax.swing.SwingUtilities;
 
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.NameLabel;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.PetriNetObject;
 
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
 
-	private PlaceTransitionObject obj;
+	private PetriNetObject obj;
 
 	private NameLabel nl;
 
 	protected Point dragInit = new Point();
 
-	public LabelHandler(NameLabel _nl, PlaceTransitionObject _obj) {
+	public LabelHandler(NameLabel _nl, PetriNetObject _obj) {
 		obj = _obj;
 		nl = _nl;
 	}

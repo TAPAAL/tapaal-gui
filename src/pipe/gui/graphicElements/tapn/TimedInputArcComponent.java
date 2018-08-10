@@ -9,7 +9,9 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
+import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -160,9 +162,11 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	@Override
 	public void setLabelPosition() {
-		label.setPosition((int) (myPath.midPoint.x)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y)
-				- ((zoom / 55) * (zoom / 55)));
+		/*label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
+				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)
+				- ((zoom / 55) * (zoom / 55)));*/
+		label.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
 	}
 
 	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {
