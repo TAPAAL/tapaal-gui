@@ -649,6 +649,17 @@ public class TapnLegacyXmlLoader {
 		String targetInput = inputArcElement.getAttribute("target");
 		boolean taggedArc = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(inputArcElement, "tagged");
 		String inscriptionTempStorage = getChildNodesContentOfValueChildNodeAsString(inputArcElement, "inscription");
+		double nameOffsetXInput;
+		double nameOffsetYInput;
+		
+		//This check is done, as arcs in nets saved before this change do not have a nameOffset
+		if(inputArcElement.getAttribute("nameOffsetX") != "" && inputArcElement.getAttribute("nameOffsetY") != "") {
+			nameOffsetXInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
+			nameOffsetYInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
+		} else {
+			nameOffsetXInput = 0;
+			nameOffsetYInput = 0;
+		}
 
 		PlaceTransitionObject sourceIn = guiModel.getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = guiModel.getPlaceTransitionObject(targetInput);
@@ -694,6 +705,8 @@ public class TapnLegacyXmlLoader {
 			}
 
 		}
+		tempArc.setNameOffsetX(nameOffsetXInput);
+		tempArc.setNameOffsetY(nameOffsetYInput);
 
 		parseArcPathAsOldFormat(inputArcElement, tempArc);
 	}
@@ -930,6 +943,10 @@ public class TapnLegacyXmlLoader {
 					newObject.addMouseListener(new AnimationHandler());
 
 				} else if (newObject instanceof Arc) {
+					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
+					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TimedTransportArcComponent) {

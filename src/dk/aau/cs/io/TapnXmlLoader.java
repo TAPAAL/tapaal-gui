@@ -479,6 +479,17 @@ public class TapnXmlLoader {
 		boolean taggedArc = arc.getAttribute("tagged").equals("true") ? true : false;
 		String inscriptionTempStorage = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
+		double nameOffsetXInput;
+		double nameOffsetYInput;
+		
+		//This check is done, as arcs in nets saved before this change do not have a nameOffset
+		if(arc.getAttribute("nameOffsetX") != "" && arc.getAttribute("nameOffsetY") != "") {
+			nameOffsetXInput = Double.parseDouble(arc.getAttribute("nameOffsetX"));
+			nameOffsetYInput = Double.parseDouble(arc.getAttribute("nameOffsetY"));
+		} else {
+			nameOffsetXInput = 0;
+			nameOffsetYInput = 0;
+		}
 		
 		sourceInput = idResolver.get(template.model().name(), sourceInput);
 		targetInput = idResolver.get(template.model().name(), targetInput);
@@ -525,6 +536,8 @@ public class TapnXmlLoader {
 			}
 
 		}
+		tempArc.setNameOffsetX(nameOffsetXInput);
+		tempArc.setNameOffsetY(nameOffsetYInput);
 
 		parseArcPath(arc, tempArc);
 	}
@@ -778,6 +791,10 @@ public class TapnXmlLoader {
 					newObject.addMouseListener(new AnimationHandler());
 
 				} else if (newObject instanceof Arc) {
+					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
+					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TimedTransportArcComponent) {

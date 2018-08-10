@@ -18,15 +18,6 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 Cloneable {
 
 	private static final long serialVersionUID = -6629006415467929184L;
-	/** X-axis Position on screen */
-	protected double positionX;
-	/** Y-axis Position on screen */
-	protected double positionY;
-
-	/** X-axis Position on screen */
-	protected double nameOffsetX;
-	/** Y-axis Position on screen */
-	protected double nameOffsetY;
 
 	protected double componentWidth;
 	protected double componentHeight;
@@ -133,26 +124,6 @@ Cloneable {
 	}
 
 	/**
-	 * Set X-axis offset for name position
-	 * 
-	 * @param nameOffsetXInput
-	 *            Double value for name X-axis offset
-	 */
-	public void setNameOffsetX(double nameOffsetXInput) {
-		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
-	}
-
-	/**
-	 * Set Y-axis offset for name position
-	 * 
-	 * @param nameOffsetYInput
-	 *            Double value for name Y-axis offset
-	 */
-	public void setNameOffsetY(double nameOffsetYInput) {
-		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
-	}
-
-	/**
 	 * Get X-axis position
 	 * 
 	 * @return Double value for X-axis position
@@ -207,24 +178,6 @@ Cloneable {
 	}
 
 	public double getNameOffsetY() {
-		return nameOffsetY;
-	}
-
-	/**
-	 * Get X-axis offset for ...
-	 * 
-	 * @return Double value for X-axis offset of ...
-	 */
-	public Double getNameOffsetXObject() {
-		return nameOffsetX;
-	}
-
-	/**
-	 * Moved to PlaceTransitionObject Get Y-axis offset for ...
-	 * 
-	 * @return Double value for Y-axis offset of ...
-	 */
-	public Double getNameOffsetYObject() {
 		return nameOffsetY;
 	}
 
@@ -361,13 +314,6 @@ Cloneable {
 				+ getHeight() / 2.0);
 	}
 
-	protected void updateLabelLocation() {
-		pnName.setPosition(
-				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
-		);
-	}
-
 	@Override
 	public void delete() {
 		if (getParent() != null) {
@@ -411,6 +357,7 @@ Cloneable {
 	}
 
 	// TODO: Find a better name for this
+	@Override
 	public void updateOnMoveOrZoom() {
 		updateBounds();
 		updateConnected();

@@ -12,9 +12,11 @@ import javax.swing.JComponent;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
+import pipe.gui.Zoomer;
 
 /**
  * Petri-Net Object Class 
@@ -26,6 +28,15 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	private static final long serialVersionUID = 2693171860021066729L;
 
 	protected static final int COMPONENT_DRAW_OFFSET= 5;
+	/** X-axis Position on screen */
+	protected double positionX;
+	/** Y-axis Position on screen */
+	protected double positionY;
+
+	/** X-axis Position on screen */
+	protected double nameOffsetX;
+	/** Y-axis Position on screen */
+	protected double nameOffsetY;
 	
 	
 	protected String id = null;
@@ -59,6 +70,53 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	public void setId(String idInput) {
 		id = idInput;
 		setName(idInput);
+	}
+	
+	protected void updateLabelLocation() {
+		this.getNameLabel().setPosition(
+				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
+		);
+	}
+	
+	public void updateOnMoveOrZoom() {
+		updateLabelLocation();
+	}
+	/**
+	 * Set X-axis offset for name position
+	 * 
+	 * @param nameOffsetXInput
+	 *            Double value for name X-axis offset
+	 */
+	public void setNameOffsetX(double nameOffsetXInput) {
+		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
+	}
+
+	/**
+	 * Set Y-axis offset for name position
+	 * 
+	 * @param nameOffsetYInput
+	 *            Double value for name Y-axis offset
+	 */
+	public void setNameOffsetY(double nameOffsetYInput) {
+		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
+	}
+	/**
+	 * Get X-axis offset for ...
+	 * 
+	 * @return Double value for X-axis offset of ...
+	 */
+	public Double getNameOffsetXObject() {
+		return nameOffsetX;
+	}
+
+	/**
+	 * Moved to PetriNetObject Get Y-axis offset for ...
+	 * 
+	 * @return Double value for Y-axis offset of ...
+	 */
+	public Double getNameOffsetYObject() {
+		return nameOffsetY;
 	}
 
 	/**

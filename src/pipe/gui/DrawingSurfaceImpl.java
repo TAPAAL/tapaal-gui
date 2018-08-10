@@ -184,6 +184,10 @@ Printable {
 					add(newObject);
 				} else if (newObject instanceof Arc) {
 					add(newObject);
+					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
+					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TimedTransportArcComponent) {

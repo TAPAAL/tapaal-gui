@@ -441,6 +441,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		arcElement.setAttribute("id", (inputArc.getId() != null ? inputArc.getId() : "error"));
 		arcElement.setAttribute("source", (inputArc.getSource().getId() != null ? inputArc.getSource().getId() : ""));
 		arcElement.setAttribute("target", (inputArc.getTarget().getId() != null ? inputArc.getTarget().getId() : ""));
+		arcElement.setAttribute("nameOffsetX", (inputArc.getNameOffsetXObject() != null ? String.valueOf(inputArc.getNameOffsetXObject()) : ""));
+		arcElement.setAttribute("nameOffsetY", (inputArc.getNameOffsetYObject() != null ? String.valueOf(inputArc.getNameOffsetYObject()) : ""));
 		
 		if (inputArc instanceof TimedOutputArcComponent) {
 			if (inputArc instanceof TimedInputArcComponent) {
