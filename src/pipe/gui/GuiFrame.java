@@ -1773,7 +1773,7 @@ public class GuiFrame extends JFrame implements Observer {
 		if (file == null) {
 			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		} else {
-			name = file.getName();
+			name = file.getName().replaceAll(".pnml", ".tapn");
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);

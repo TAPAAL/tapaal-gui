@@ -47,8 +47,6 @@ public abstract class FileBrowser  {
 	public String saveFile(){
 		if(CreateGui.getAppGui().getCurrentTabName().endsWith(".tapn"))
 			return saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".tapn", ""));
-		else if(CreateGui.getAppGui().getCurrentTabName().endsWith(".pnml"))
-			return saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".pnml", ""));
 		else
 			return saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".xml", ""));
 	}
