@@ -1581,17 +1581,17 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getTab(index).getFile();
 		boolean result;
-		if (!forceSaveAs && modelFile != null) { // ordinary save
+		if (!forceSaveAs && modelFile != null && !(modelFile.getName().endsWith(".xml"))) { // ordinary save
 			saveNet(index, modelFile);
 			result = true;
 		} else { // save as
 			String path;
 			if (modelFile != null) {
-				path = modelFile.toString();
+				path = modelFile.getParent();
 			} else {
 				path = appTab.getTitleAt(index);
 			}
-			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "xml", path).saveFile();
+			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile();
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
@@ -1674,7 +1674,7 @@ public class GuiFrame extends JFrame implements Observer {
 		//CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (newNameCounter++) + ".xml";
+			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		}
 		
 		//tab.setCurrentTemplate(template);
@@ -1698,15 +1698,20 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	public TabContent createNewTabFromFile(InputStream file, String name) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
+		boolean showFileEndingChangedMessage = false;
 
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
 		if (name == null || name.equals("")) {
-			name = "New Petri net " + (newNameCounter++) + ".xml";
-		} else if (!name.toLowerCase().endsWith(".xml")){
-			name = name + ".xml";
+			name = "New Petri net " + (newNameCounter++) + ".tapn";
+		} else if (!name.toLowerCase().endsWith(".tapn")){
+			if(name.endsWith(".xml")){
+				name = name.replaceAll(".xml", ".tapn");
+				showFileEndingChangedMessage = true;
+			}else
+				name = name + ".tapn";
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
@@ -1750,6 +1755,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
 		selectAction.actionPerformed(null);
+		showFileEndingChangedMessage(showFileEndingChangedMessage);
 		return tab;
 	}
 
@@ -1765,9 +1771,9 @@ public class GuiFrame extends JFrame implements Observer {
 		int currentlySelected = appTab.getSelectedIndex();
 
 		if (file == null) {
-			name = "New Petri net " + (newNameCounter++) + ".xml";
+			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		} else {
-			name = file.getName();
+			name = file.getName().replaceAll(".pnml", ".tapn");
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
@@ -1810,7 +1816,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-		name = name.replace(".pnml",".xml"); // rename .pnml input file to .xml
+		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
 		setTitle(name);// Change the program caption
 		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
 		selectAction.actionPerformed(null);
@@ -1846,7 +1852,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 			String composedName = appTab.getTitleAt(index);
-			composedName = composedName.replace(".xml", "");
+			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
 			CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
@@ -2426,7 +2432,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Timed-Arc Petri Net", "xml", FileBrowser.userPath).openFiles();
+				File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
 				for (File f : files) {
 					if (f.exists() && f.isFile() && f.canRead()) {
 						FileBrowser.userPath = f.getParent();
@@ -2598,9 +2604,9 @@ public class GuiFrame extends JFrame implements Observer {
 			exampleMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Example.png")));
 			
 			for (String filename : nets) {
-				if (filename.toLowerCase().endsWith(".xml")) {
+				if (filename.toLowerCase().endsWith(".tapn")) {
 					
-					final String netname = filename.replace(".xml", "");
+					final String netname = filename.replace(".tapn", "");
 					final String filenameFinal = filename;
 					GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
 						public void actionPerformed(ActionEvent arg0) {
@@ -2688,10 +2694,10 @@ public class GuiFrame extends JFrame implements Observer {
 
 					int toReturn = one.compareTo(two);
 					// Special hack to get intro-example first
-					if (one.equals("intro-example.xml")) {
+					if (one.equals("intro-example.tapn")) {
 						toReturn = -1;
 					}
-					if (two.equals("intro-example.xml")) {
+					if (two.equals("intro-example.tapn")) {
 						toReturn = 1;
 					}
 					return toReturn;
@@ -2814,6 +2820,12 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
+	public void showFileEndingChangedMessage(boolean showMessage) {
+		if(showMessage) {
+			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+		}
+	}
 
 
 	//If needed, add boolean forceClose, where net is not checkedForSave and just closed
