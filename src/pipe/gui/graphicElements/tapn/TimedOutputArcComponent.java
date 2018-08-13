@@ -217,8 +217,10 @@ public class TimedOutputArcComponent extends Arc {
 
 		if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
 		g2.setStroke(new BasicStroke(0.01f * zoom));
@@ -235,8 +237,10 @@ public class TimedOutputArcComponent extends Arc {
 
 		if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
 		g2.setStroke(new BasicStroke(0.8f));
