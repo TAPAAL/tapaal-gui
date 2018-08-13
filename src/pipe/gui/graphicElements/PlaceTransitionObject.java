@@ -344,6 +344,7 @@ Cloneable {
 				}
 			}
 			repaint();
+			pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		}
 	}
 
