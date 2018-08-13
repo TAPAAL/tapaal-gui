@@ -39,8 +39,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 /**
  * The petrinet is drawn onto this frame.
  */
-public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
-Printable {
+public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	private static final long serialVersionUID = 4434596266503933386L;
 	private boolean netChanged = false;
 	private boolean animationmode = false;
@@ -224,16 +223,6 @@ Printable {
 		}
 		validate();
 		repaint();
-	}
-
-	public void update(Observable o, Object diffObj) {
-		if ((diffObj instanceof PetriNetObject) && (diffObj != null)) {
-			if (CreateGui.getAppGui().getMode() == ElementType.CREATING) {
-
-				addNewPetriNetObject((PetriNetObject) diffObj);
-			}
-			repaint();
-		}
 	}
 
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
