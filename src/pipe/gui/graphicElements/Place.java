@@ -108,8 +108,10 @@ public class Place extends PlaceTransitionObject {
 
 		if (selected && !ignoreSelection) {
 			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
+			pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
+			pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 		g2.fill(placeEllipse);
 
