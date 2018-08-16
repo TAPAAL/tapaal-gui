@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'net.tapaal'
+version '3.4-SNAPSHOT'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+repositories {
+    mavenCentral()
+}
+
+//Set the soruce and resource dir
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/']
+            exclude("resources/")
+        }
+        resources {
+            //Resources should be in folder called resources, so only add the resources folder
+            //adding srv/resources will places content of the folder in root of jar file
+            srcDirs = ['src/']
+            include("resources/")
+        }
+        //test {
+        //    srcDirs = ['tests']
+        //}
+    }
+}
+
+mainClassName = 'TAPAAL'
+
+jar {
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+
+    //Sets the main call for the Jar, you can double click to run the jar file
+    manifest {
+        attributes 'Main-Class': 'TAPAAL'
+    }
+    //The following lines makes libs a part of the build jar file (standalone jar)
+    //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+dependencies {
+    //compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    //compile group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.3'
+    //compile group: 'net.java.dev.jna', name: 'jna', version: '4.5.1'
+    //compile group: 'com.apple', name: 'AppleJavaExtensions', version: '1.4' // Not working
+
+    //Add jars from libs dir
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

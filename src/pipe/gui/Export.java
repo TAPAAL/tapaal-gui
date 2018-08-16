@@ -262,7 +262,7 @@ public class Export {
 				}
 				break;
 			case QUERY:
-				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".xml", "-queries"));
+				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".tapn", "-queries"));
 				if (filename != null) {
 					toQueryXML(filename);
 				}

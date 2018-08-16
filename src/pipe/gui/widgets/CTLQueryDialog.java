@@ -314,7 +314,6 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
 	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
-	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 	
 	//Tool tips for approximation panel
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
@@ -1106,7 +1105,8 @@ public class CTLQueryDialog extends JPanel {
 		Point location = guiDialog.getLocation();
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
-		saveUppaalXMLButton.setVisible(advancedView);
+		if(getReductionOption() != ReductionOption.VerifyPN)
+			saveUppaalXMLButton.setVisible(advancedView);
 		openComposedNetButton.setVisible(advancedView);
 		
 		if(advancedView){
@@ -2317,10 +2317,10 @@ public class CTLQueryDialog extends JPanel {
 
 	private void refreshExportButtonText() {
 		ReductionOption reduction = getReductionOption();
-		if (reduction == null) {saveUppaalXMLButton.setEnabled(false);}
+		if (reduction == null || reduction == ReductionOption.VerifyPN) {saveUppaalXMLButton.setEnabled(false);}
 		else {
-			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
-			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
+			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			saveUppaalXMLButton.setEnabled(true);
 		}
 	}
@@ -2477,7 +2477,7 @@ public class CTLQueryDialog extends JPanel {
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
-						composedName = composedName.replace(".xml", "");
+						composedName = composedName.replace(".tapn", "");
 						CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
 					} catch (Exception e1) {

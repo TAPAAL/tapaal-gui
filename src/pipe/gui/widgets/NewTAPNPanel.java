@@ -93,8 +93,8 @@ public class NewTAPNPanel extends JPanel {
 	}
 
 	protected void createNewTAPNBasedOnSelection(String name, NetType type) {
-		if (!name.endsWith(".xml")) {
-			name = name + ".xml";
+		if (!name.endsWith(".tapn")) {
+			name = name + ".tapn";
 		}
 
 		if (name.isEmpty()) {

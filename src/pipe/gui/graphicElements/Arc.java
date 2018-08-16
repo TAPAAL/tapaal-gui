@@ -8,7 +8,9 @@ import javax.swing.*;
 
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
+import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
@@ -92,8 +94,12 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	public void setLabelPosition() {
-		label.setPosition((int) (myPath.midPoint.x)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y));
+		label.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
+	}
+	@Override
+	public void updateLabelLocation() {
+		setLabelPosition();
 	}
 
 	/**
@@ -116,6 +122,11 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	@Override
 	public String getName() {
 		return getId();
+	}
+	
+	@Override 
+	public NameLabel getNameLabel() {
+		return label;
 	}
 
 	/**
@@ -153,7 +164,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public double getStartPositionY() {
 		return myPath.getPoint(0).getY();
 	}
-
 	/**
 	 * Updates the start position of the arc, resets the arrowhead and updates
 	 * the bounds
@@ -314,6 +324,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void zoomUpdate(int percent) {
 		zoom = percent;
 		this.updateArcPosition();
+		this.updateOnMoveOrZoom();
 		label.zoomUpdate(percent);
 		label.updateSize();
 	}
