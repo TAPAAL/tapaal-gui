@@ -516,7 +516,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","xml", lastPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","tapn", "xml", lastPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
