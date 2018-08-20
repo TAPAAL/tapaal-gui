@@ -79,6 +79,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private int verificationTasksCompleted;
 	private LoadedBatchProcessingModel model;
 	private boolean isSoundnessCheck;
+	private boolean isModelCheckOnly;
+	private ArrayList<File> filesProcessed;
 	
 	
 	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
@@ -122,6 +124,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected Void doInBackground() throws Exception {
 		isSoundnessCheck = false;
+		filesProcessed = new ArrayList<File>();
 		for(File file : files){
 
 			fireFileChanged(file.getName());
@@ -132,9 +135,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                     if(exiting()) {
                         return null;
                     }			
+                    if(isModelCheckOnly && filesProcessed.contains(file)) {
+                    	continue;
+                    }
                     Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
                                         
-					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
+					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query, file);
 					
 					if (batchProcessingVerificationOptions.isReductionOptionUserdefined()){
 						processQueryForUserdefinedReductions(file, composedModel, queryToVerify);
@@ -312,12 +318,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					System.out.println(resultOfSoundCheck.stats());
 				
 			} catch (Exception e) {
-				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", time, stats);
+				publishResult(file.getName(), queryToVerify, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", time, stats);
 			}
 		}
 	}
 
-	private pipe.dataLayer.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
+	private pipe.dataLayer.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query, File fileToBeChecked) throws Exception {
 		if(batchProcessingVerificationOptions != null) {
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			if(!(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness || batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness)) {
@@ -326,11 +332,15 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	            TCTLAbstractProperty property;
 	            String name;
 	            if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.ExistDeadlock) {
-	                property = generateExistDeadlock(model);
-	                name = "Existence of a deadlock";
+					property = generateExistDeadlock(model);
+					name = "Existence of a deadlock";
+					filesProcessed.add(fileToBeChecked);
+					isModelCheckOnly = true;
 	            } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace) {
-	                property = generateSearchWholeStateSpaceProperty(model);
+	            	property = generateSearchWholeStateSpaceProperty(model);
 	                name = "Search whole state space";
+	                filesProcessed.add(fileToBeChecked);
+	                isModelCheckOnly = true;
 	            } else {
 	                property = query.getProperty();
 	                name = query.getName();
@@ -374,6 +384,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
 							WorkflowMode.WORKFLOW_SOUNDNESS);
+				filesProcessed.add(fileToBeChecked);
+				isModelCheckOnly = true;
         	
 	        } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness) {
 	        	isSoundnessCheck = true;
@@ -384,7 +396,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 								false, true, false, null, ExtrapolationOption.AUTOMATIC,
 								WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
-	        }
+				filesProcessed.add(fileToBeChecked);
+				isModelCheckOnly = true;
+			}
 		}
 		
 		return query;
@@ -419,7 +433,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			verificationResult = verify(composedModel, query);
 		} catch(UnsupportedModelException e) {
 			if(isSoundnessCheck)
-				publishResult(file.getName(), query, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", 0, new NullStats());
+				publishResult(file.getName(), query, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", 0, new NullStats());
 			else
 				publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats());
 			return null;
@@ -454,6 +468,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
 				if(isSoundnessCheck && !verificationResult.isQuerySatisfied())
 					queryResult = "Not Sound";
+				if(isSoundnessCheck && verificationResult.isQuerySatisfied()) {
+					if(query.getWorkflowMode() == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS)
+						queryResult = "Strongly Sound";
+					else
+						queryResult = "Sound";
+				}
 			}
 			if (query.discreteInclusion() && !verificationResult.isBounded() && 
 					((query.queryType().equals(QueryType.EF) && !verificationResult.getQueryResult().isQuerySatisfied())
@@ -467,7 +487,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				}
 			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime(), verificationResult.stats());
 		} else if(isSoundnessCheck && verificationResult.error()) {
-			publishResult(file.getName(), query, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", verificationResult.verificationTime(), new NullStats());
+			publishResult(file.getName(), query, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", verificationResult.verificationTime(), new NullStats());
 		} else {
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), new NullStats());
 		}		

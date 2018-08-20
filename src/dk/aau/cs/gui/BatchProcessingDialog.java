@@ -199,6 +199,9 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String NOT_SATISFIED_STRING_SOUNDNESS = "Not Sound";
 	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
 	private final static String SATISFIED_STRING = "Satisfied";
+	private final static String SATISFIED_SOUNDNESS_STRING = "Sound";
+	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
+
 
 	
 	private static String lastPath = null;
@@ -513,7 +516,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","tapn","xml", lastPath);
+		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","xml", lastPath);
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
@@ -1516,12 +1519,14 @@ public class BatchProcessingDialog extends JDialog {
 							"Query");
 					if (value != null) {
 						if ((isResultColumn && value.toString().equals(
-								SATISFIED_STRING))
+								SATISFIED_STRING) || 
+								value.toString().equals(SATISFIED_SOUNDNESS_STRING) || value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING))
 								|| (isQueryColumn && value.toString().equals(
 										"TRUE")))
 							setBackground(new Color(91, 255, 91)); // light green
 						else if ((isResultColumn && (value.toString().equals(
-								NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) || value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS)))
+								NOT_SATISFIED_STRING) || 
+								value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) || value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS)))
 								|| (isQueryColumn && value.toString().equals(
 										"FALSE")))
 							setBackground(new Color(255, 91, 91)); // light  red
