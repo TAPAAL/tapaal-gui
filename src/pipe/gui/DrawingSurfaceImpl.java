@@ -184,14 +184,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						}
 					} else {
 						/* EOC */
-						ArcHandler arcHandler = new ArcHandler(this,(Arc) newObject);
+						ArcHandler arcHandler = new ArcHandler((Arc) newObject);
 						newObject.addMouseListener(arcHandler);
 						//newObject.addMouseWheelListener(arcHandler);
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
 					add(newObject);
-					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(this, (AnnotationNote) newObject);
+					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((AnnotationNote) newObject);
 					newObject.addMouseListener(noteHandler);
 					newObject.addMouseMotionListener(noteHandler);
 					((Note) newObject).getNote().addMouseListener(noteHandler);

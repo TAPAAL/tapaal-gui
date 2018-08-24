@@ -586,13 +586,13 @@ public class PNMLoader {
 						}
 					} else {
 						/* EOC */
-						ArcHandler arcHandler = new ArcHandler(drawingSurface,(Arc) newObject);
+						ArcHandler arcHandler = new ArcHandler((Arc) newObject);
 						newObject.addMouseListener(arcHandler);
 						//newObject.addMouseWheelListener(arcHandler);
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
-					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(drawingSurface, (AnnotationNote) newObject);
+					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((AnnotationNote) newObject);
 					newObject.addMouseListener(noteHandler);
 					newObject.addMouseMotionListener(noteHandler);
 					((Note) newObject).getNote().addMouseListener(noteHandler);

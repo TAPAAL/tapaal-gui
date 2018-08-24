@@ -266,7 +266,7 @@ public class TimedOutputArcComponent extends Arc {
 		newCopyArc.getSource().addConnectFrom(newCopyArc);
 		newCopyArc.getTarget().addConnectTo(newCopyArc);
 				
-		ArcHandler arcHandler = new ArcHandler((DrawingSurfaceImpl)getParent(), newCopyArc);
+		ArcHandler arcHandler = new ArcHandler(newCopyArc);
 		newCopyArc.addMouseListener(arcHandler);
 		//arc.addMouseWheelListener(arcHandler);
 		newCopyArc.addMouseMotionListener(arcHandler);

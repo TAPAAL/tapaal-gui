@@ -24,7 +24,7 @@ import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
  */
 public class ArcHandler extends PetriNetObjectHandler {
 
-	public ArcHandler(Container contentpane, Arc obj) {
+	public ArcHandler(Arc obj) {
 		super(obj);
 		enablePopup = true;
 	}
