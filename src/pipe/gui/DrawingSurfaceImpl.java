@@ -146,7 +146,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 						PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
 						newObject.addMouseListener(placeHandler);
-						//newObject.addMouseWheelListener(placeHandler);
+						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 						add(newObject);
 
@@ -174,19 +174,19 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						if (newObject instanceof TimedTransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
-							//newObject.addMouseWheelListener(transportArcHandler);
+							newObject.addMouseWheelListener(transportArcHandler);
 							newObject.addMouseMotionListener(transportArcHandler);
 						} else {
 							TimedArcHandler timedArcHandler = new TimedArcHandler(this, (Arc) newObject);
 							newObject.addMouseListener(timedArcHandler);
-							//newObject.addMouseWheelListener(timedArcHandler);
+							newObject.addMouseWheelListener(timedArcHandler);
 							newObject.addMouseMotionListener(timedArcHandler);
 						}
 					} else {
 						/* EOC */
 						ArcHandler arcHandler = new ArcHandler((Arc) newObject);
 						newObject.addMouseListener(arcHandler);
-						//newObject.addMouseWheelListener(arcHandler);
+						newObject.addMouseWheelListener(arcHandler);
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
