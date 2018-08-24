@@ -149,10 +149,13 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			return;
 		}
 
-		if (e.getWheelRotation() < 0) {
-			((TimedPlaceComponent)myObject).addTokens(1);
-		} else {
-			((TimedPlaceComponent)myObject).removeTokens(1);
-		}
+		if (myObject instanceof TimedPlaceComponent) {
+            TimedPlaceComponent p = (TimedPlaceComponent) myObject;
+		    if (e.getWheelRotation() < 0) {
+                p.addTokens(1);
+            } else {
+                p.removeTokens(1);
+            }
+        }
 	}
 }
