@@ -906,7 +906,7 @@ public class TapnLegacyXmlLoader {
 						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
 						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
-						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject, guiModel, tapn);
+						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -926,7 +926,7 @@ public class TapnLegacyXmlLoader {
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(drawingSurface, (Transition) newObject, guiModel, tapn);
+						transitionHandler = new TAPNTransitionHandler(drawingSurface, (Transition) newObject);
 					} else {
 						transitionHandler = new TransitionHandler(drawingSurface, (Transition) newObject);
 					}

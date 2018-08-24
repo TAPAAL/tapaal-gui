@@ -45,13 +45,6 @@ import dk.aau.cs.util.RequireException;
 public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	private static final String ERROR_MSG_TWO_ARCS = "We do not allow two arcs from a place to a transition or a transition to a place.";
 
-	public PlaceTransitionObjectHandler(Container contentpane,
-			PlaceTransitionObject obj, DataLayer guiModel,
-			TimedArcPetriNet model) {
-		this(contentpane, obj);
-
-	}
-
 	// constructor passing in all required objects
 	public PlaceTransitionObjectHandler(Container contentpane,
 			PlaceTransitionObject obj) {

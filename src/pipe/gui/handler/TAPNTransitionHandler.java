@@ -19,9 +19,8 @@ public class TAPNTransitionHandler extends TransitionHandler {
 
 	}
 
-	public TAPNTransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl,
-			Transition newObject, DataLayer guiModel, TimedArcPetriNet model) {
-		super(drawingSurfaceImpl, newObject, guiModel, model);
+	public TAPNTransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl, Transition newObject) {
+		super(drawingSurfaceImpl, newObject);
 	}
 
 	// overwrite to remove shift behaviour

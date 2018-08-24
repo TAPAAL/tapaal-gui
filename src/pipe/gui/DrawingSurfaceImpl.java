@@ -141,7 +141,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
 						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
-						PlaceHandler placeHandler = new PlaceHandler(this,(Place) newObject, this.guiModel, this.model);
+						PlaceHandler placeHandler = new PlaceHandler(this,(Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -164,7 +164,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(this,	(Transition) newObject, guiModel, model);
+						transitionHandler = new TAPNTransitionHandler(this,	(Transition) newObject);
 					} else {
 						transitionHandler = new TransitionHandler(this,	(Transition) newObject);
 					}

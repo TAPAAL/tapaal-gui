@@ -81,7 +81,7 @@ public class TimedPlaceComponent extends Place {
 		return new TimedPlaceListener() {
 			public void nameChanged(TimedPlaceEvent e) {
 				TimedPlace place = e.source();
-				TimedPlaceComponent.super.setName(place.name());				
+				TimedPlaceComponent.super.setName(place.name());
 			}
 			
 			public void invariantChanged(TimedPlaceEvent e) { 
@@ -456,7 +456,7 @@ public class TimedPlaceComponent extends Place {
 		placeComponent.getNameLabel().addMouseMotionListener(labelHandler);
 		placeComponent.getNameLabel().addMouseWheelListener(labelHandler);
 
-		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent, guiModel, tapn);
+		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent);
 		placeComponent.addMouseListener(placeHandler);
 		placeComponent.addMouseWheelListener(placeHandler);
 		placeComponent.addMouseMotionListener(placeHandler);

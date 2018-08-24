@@ -33,9 +33,8 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		super(contentpane, obj);
 	}
 
-	public PlaceHandler(DrawingSurfaceImpl drawingSurfaceImpl, Place newObject,
-			DataLayer guiModel, TimedArcPetriNet model) {
-		super(drawingSurfaceImpl, newObject, guiModel, model);
+	public PlaceHandler(DrawingSurfaceImpl drawingSurfaceImpl, Place newObject) {
+		super(drawingSurfaceImpl, newObject);
 	}
 
 	/**

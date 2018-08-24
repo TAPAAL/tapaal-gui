@@ -31,9 +31,8 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		super(contentpane, obj);
 	}
 
-	public TransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl,
-			Transition newObject, DataLayer guiModel, TimedArcPetriNet model) {
-		super(drawingSurfaceImpl, newObject, guiModel, model);
+	public TransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl, Transition newObject) {
+		super(drawingSurfaceImpl, newObject);
 	}
 
 	@Override
