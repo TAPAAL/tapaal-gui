@@ -901,21 +901,11 @@ public class TapnLegacyXmlLoader {
 					// XXX - kyrke
 					if (newObject instanceof TimedPlaceComponent) {
 
-						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
 						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 					} else {
-
-						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						//((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
 						newObject.addMouseListener(placeHandler);
@@ -931,11 +921,6 @@ public class TapnLegacyXmlLoader {
 						transitionHandler = new TransitionHandler(drawingSurface, (Transition) newObject);
 					}
 
-					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(), (Transition) newObject);
-					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
 					newObject.addMouseListener(transitionHandler);
 					newObject.addMouseMotionListener(transitionHandler);
 					newObject.addMouseWheelListener(transitionHandler);
@@ -943,10 +928,7 @@ public class TapnLegacyXmlLoader {
 					newObject.addMouseListener(new AnimationHandler());
 
 				} else if (newObject instanceof Arc) {
-					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
-					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
-					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TimedTransportArcComponent) {

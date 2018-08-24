@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
 
 /**
  * Petri-Net Place or Transition SuperClass
@@ -86,6 +87,10 @@ Cloneable {
 
 		// sets up Namelabel for each PN object
 		pnName = new NameLabel(zoom);
+		LabelHandler labelHandler = new LabelHandler(pnName, this);
+		getNameLabel().addMouseListener(labelHandler);
+		getNameLabel().addMouseMotionListener(labelHandler);
+		getNameLabel().addMouseWheelListener(labelHandler);
 	}
 
 	/**
