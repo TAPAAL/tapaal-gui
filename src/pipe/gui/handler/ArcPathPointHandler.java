@@ -20,7 +20,7 @@ import pipe.gui.graphicElements.ArcPathPoint;
 public class ArcPathPointHandler extends PetriNetObjectHandler {
 
 	public ArcPathPointHandler(Container contentpane, ArcPathPoint obj) {
-		super(contentpane, obj);
+		super(obj);
 		enablePopup = true;
 	}
 

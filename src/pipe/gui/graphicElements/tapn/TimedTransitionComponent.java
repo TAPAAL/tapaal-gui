@@ -213,7 +213,7 @@ public class TimedTransitionComponent extends Transition {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
-		TransitionHandler transitionHandler = new TAPNTransitionHandler((DrawingSurfaceImpl)getParent(), transitionComponent);
+		TransitionHandler transitionHandler = new TAPNTransitionHandler(transitionComponent);
 		transitionComponent.addMouseListener(transitionHandler);
 		transitionComponent.addMouseMotionListener(transitionHandler);
 		transitionComponent.addMouseWheelListener(transitionHandler);

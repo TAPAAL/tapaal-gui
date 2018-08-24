@@ -451,7 +451,7 @@ public class TimedPlaceComponent extends Place {
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, place.name(), nameOffsetX, nameOffsetY, 0, markingOffsetX, markingOffsetY, capacity);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
-		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent);
+		PlaceHandler placeHandler = new PlaceHandler(placeComponent);
 		placeComponent.addMouseListener(placeHandler);
 		placeComponent.addMouseWheelListener(placeHandler);
 		placeComponent.addMouseMotionListener(placeHandler);

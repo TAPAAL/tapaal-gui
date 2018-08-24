@@ -46,15 +46,15 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	private static final String ERROR_MSG_TWO_ARCS = "We do not allow two arcs from a place to a transition or a transition to a place.";
 
 	// constructor passing in all required objects
-	public PlaceTransitionObjectHandler(Container contentpane,
-			PlaceTransitionObject obj) {
-		super(contentpane, obj);
+	public PlaceTransitionObjectHandler(PlaceTransitionObject obj) {
+		super(obj);
 		enablePopup = true;
 	}
 
 	private void createArc(Arc newArc, PlaceTransitionObject currentObject) {
 		newArc.setZoom(CreateGui.getDrawingSurface().getZoom());
-		contentPane.add(newArc);
+		//Need to be casted to cointainer, as we only add it to the canvas but not the model
+		((Container)CreateGui.getDrawingSurface()).add(newArc);
 		currentObject.addConnectFrom(newArc);
 		CreateGui.getDrawingSurface().createArc = newArc;
 		// addPetriNetObject a handler for shift & esc actions drawing arc
@@ -173,7 +173,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					createTAPNInhibitorArc.getTransition().updateConnected();
 
 					// Evil hack to prevent the arc being added to GuiView twice
-					contentPane.remove(createTAPNInhibitorArc);
+					//Need to be casted to cointainer, as we only add it to the canvas but not the model
+					((Container)CreateGui.getDrawingSurface()).remove(createTAPNInhibitorArc);
 
 					view.getGuiModel().addArc(createTAPNInhibitorArc);
 
@@ -275,9 +276,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						currentObject.addConnectTo(transportArcToCreate);
 
-						// Evil hack to prevent the arc being added to GuiView
-						// twice
-						contentPane.remove(transportArcToCreate);
+						// Evil hack to prevent the arc being added to GuiView twice
+						//Need to be casted to cointainer, as we only add it to the canvas but not the model
+						((Container)CreateGui.getDrawingSurface()).remove(transportArcToCreate);
 
 						view.getGuiModel().addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
@@ -327,9 +328,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							break;
 						}
 
-						// Evil hack to prevent the arc being added to GuiView
-						// twice
-						contentPane.remove(arc2);
+						// Evil hack to prevent the arc being added to GuiView twice
+						//Need to be casted to cointainer, as we only add it to the canvas but not the model
+						((Container)CreateGui.getDrawingSurface()).remove(arc2);
 
 						view.getGuiModel().addArc(arc2);
 						view.addNewPetriNetObject(arc2);
@@ -393,9 +394,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						}
 						currentObject.addConnectTo(timedArcToCreate);
 
-						// Evil hack to prevent the arc being added to GuiView
-						// twice
-						contentPane.remove(timedArcToCreate);
+						// Evil hack to prevent the arc being added to GuiView twice
+						//Need to be casted to cointainer, as we only add it to the canvas but not the model
+						((Container)CreateGui.getDrawingSurface()).remove(timedArcToCreate);
 
 						view.getGuiModel().addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
@@ -438,9 +439,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						currentObject.addConnectTo(timedArcToCreate);
 						timedArcToCreate.getTransition().updateConnected();
 
-						// Evil hack to prevent the arc being added to GuiView
-						// twice
-						contentPane.remove(timedArcToCreate);
+						// Evil hack to prevent the arc being added to GuiView twice
+						//Need to be casted to cointainer, as we only add it to the canvas but not the model
+						((Container)CreateGui.getDrawingSurface()).remove(timedArcToCreate);
 						view.getGuiModel().addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 

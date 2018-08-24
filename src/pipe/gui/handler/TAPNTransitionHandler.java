@@ -14,14 +14,10 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class TAPNTransitionHandler extends TransitionHandler {
 
-	public TAPNTransitionHandler(Container contentpane, Transition obj) {
-		super(contentpane, obj);
-
+	public TAPNTransitionHandler(Transition obj) {
+		super(obj);
 	}
 
-	public TAPNTransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl, Transition newObject) {
-		super(drawingSurfaceImpl, newObject);
-	}
 
 	// overwrite to remove shift behaviour
 	@Override

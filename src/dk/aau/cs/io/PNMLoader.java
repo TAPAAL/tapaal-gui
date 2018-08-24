@@ -542,14 +542,14 @@ public class PNMLoader {
 					if (newObject instanceof TimedPlaceComponent) {
 
 
-						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
+						PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 					} else {
 
 
-						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
+						PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						//newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -558,9 +558,9 @@ public class PNMLoader {
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(drawingSurface, (Transition) newObject);
+						transitionHandler = new TAPNTransitionHandler((Transition) newObject);
 					} else {
-						transitionHandler = new TransitionHandler(drawingSurface, (Transition) newObject);
+						transitionHandler = new TransitionHandler((Transition) newObject);
 					}
 
 

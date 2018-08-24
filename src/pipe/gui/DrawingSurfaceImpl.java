@@ -136,7 +136,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					// XXX - kyrke
 					if (newObject instanceof TimedPlaceComponent) {
 
-						PlaceHandler placeHandler = new PlaceHandler(this,(Place) newObject);
+						PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -144,7 +144,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 					} else {
 
-						PlaceHandler placeHandler = new PlaceHandler(this, (Place) newObject);
+						PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						//newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -154,9 +154,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(this,	(Transition) newObject);
+						transitionHandler = new TAPNTransitionHandler((Transition) newObject);
 					} else {
-						transitionHandler = new TransitionHandler(this,	(Transition) newObject);
+						transitionHandler = new TransitionHandler((Transition) newObject);
 					}
 
 					newObject.addMouseListener(transitionHandler);

@@ -248,6 +248,10 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		return zoom;
 	}
 
+	public DrawingSurfaceImpl getParent() {
+		return (DrawingSurfaceImpl) super.getParent();
+	}
+
 	@Override
 	public PetriNetObject clone() {
 		try {

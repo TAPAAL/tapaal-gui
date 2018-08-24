@@ -8,7 +8,7 @@ import pipe.gui.graphicElements.Note;
 public class NoteHandler extends PetriNetObjectHandler {
 
 	public NoteHandler(Container contentpane, Note note) {
-		super(contentpane, note);
+		super(note);
 		enablePopup = true;
 	}
 

@@ -29,8 +29,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  */
 public class PlaceHandler extends PlaceTransitionObjectHandler {
 
-	public PlaceHandler(Container contentpane, Place obj) {
-		super(contentpane, obj);
+	public PlaceHandler(Place obj) {
+		super(obj);
 	}
 
 	/**

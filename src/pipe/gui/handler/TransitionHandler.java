@@ -27,8 +27,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		java.awt.event.MouseWheelListener {
 
-	public TransitionHandler(Container contentpane, Transition obj) {
-		super(contentpane, obj);
+	public TransitionHandler(Transition obj) {
+		super(obj);
 	}
 
 	@Override
