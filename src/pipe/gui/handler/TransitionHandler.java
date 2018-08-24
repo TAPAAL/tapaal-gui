@@ -31,10 +31,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		super(contentpane, obj);
 	}
 
-	public TransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl, Transition newObject) {
-		super(drawingSurfaceImpl, newObject);
-	}
-
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		
