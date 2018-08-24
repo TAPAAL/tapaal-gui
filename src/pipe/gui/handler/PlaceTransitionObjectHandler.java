@@ -44,15 +44,12 @@ import dk.aau.cs.util.RequireException;
 
 public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	private static final String ERROR_MSG_TWO_ARCS = "We do not allow two arcs from a place to a transition or a transition to a place.";
-	private DataLayer guiModel;
-	private TimedArcPetriNet model;
 
 	public PlaceTransitionObjectHandler(Container contentpane,
 			PlaceTransitionObject obj, DataLayer guiModel,
 			TimedArcPetriNet model) {
 		this(contentpane, obj);
-		this.guiModel = guiModel;
-		this.model = model;
+
 	}
 
 	// constructor passing in all required objects
@@ -163,7 +160,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								((TimedTransitionComponent) createTAPNInhibitorArc
 										.getTarget()).underlyingTransition(),
 								TimeInterval.ZERO_INF);
-						model.add(tia);
+						view.getModel().add(tia);
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
 						createTAPNInhibitorArc.updateLabel(true);
 					} catch (RequireException ex) {
@@ -185,12 +182,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					// Evil hack to prevent the arc being added to GuiView twice
 					contentPane.remove(createTAPNInhibitorArc);
 
-					guiModel.addArc(createTAPNInhibitorArc);
+					view.getGuiModel().addArc(createTAPNInhibitorArc);
 
 					view.addNewPetriNetObject(createTAPNInhibitorArc);
 
-					undoManager.addNewEdit(new AddTimedInhibitorArcCommand(
-							createTAPNInhibitorArc, model, guiModel, view));
+					undoManager.addNewEdit(
+							new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, view.getModel(), view.getGuiModel(), view)
+					);
 
 					freeArc(createTAPNInhibitorArc);
 				}
@@ -288,7 +286,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// twice
 						contentPane.remove(transportArcToCreate);
 
-						guiModel.addArc((TimedOutputArcComponent) transportArcToCreate);
+						view.getGuiModel().addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
 
 						freeArc(transportArcToCreate);
@@ -318,7 +316,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									((TimedTransitionComponent) arc2.getSource()).underlyingTransition(),
 									((TimedPlaceComponent) arc2.getTarget()).underlyingPlace(),
 									TimeInterval.ZERO_INF);
-							model.add(ta);
+							view.getModel().add(ta);
 							((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 							arc1.setUnderlyingArc(ta);
 							arc1.updateLabel(true);
@@ -340,7 +338,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// twice
 						contentPane.remove(arc2);
 
-						guiModel.addArc(arc2);
+						view.getGuiModel().addArc(arc2);
 						view.addNewPetriNetObject(arc2);
 						
 						currentObject.addConnectTo(arc2);
@@ -351,8 +349,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								new AddTransportArcCommand(
 										arc2,
 										arc2.underlyingTransportArc(), 
-										model, 
-										guiModel, 
+										view.getModel(),
+										view.getGuiModel(),
 										view));
 
 						freeArc(transportArcToCreate);
@@ -380,14 +378,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						TimedOutputArcComponent outputArc = (TimedOutputArcComponent) timedArcToCreate;
 						
 						try {
-							if(hasArcFromTransitionToPlace(model,((TimedTransitionComponent) outputArc.getSource()), ((TimedPlaceComponent) outputArc.getTarget()))){
+							if(hasArcFromTransitionToPlace(view.getModel(),((TimedTransitionComponent) outputArc.getSource()), ((TimedPlaceComponent) outputArc.getTarget()))){
 								throw new RequireException(ERROR_MSG_TWO_ARCS);
 							}
 							
 							dk.aau.cs.model.tapn.TimedOutputArc timedOutputArc = new TimedOutputArc(
 									((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(),
 									((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace());
-							model.add(timedOutputArc);
+							view.getModel().add(timedOutputArc);
 							outputArc.setUnderlyingArc(timedOutputArc);
 							outputArc.updateLabel(true);
 						} catch (RequireException ex) {
@@ -406,14 +404,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// twice
 						contentPane.remove(timedArcToCreate);
 
-						guiModel.addArc((TimedOutputArcComponent) timedArcToCreate);
+						view.getGuiModel().addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 						
 						undoManager.newEdit(); // new "transaction""
 						
 						undoManager.addEdit(new AddTimedOutputArcCommand(
 								(TimedOutputArcComponent) timedArcToCreate,
-								model, guiModel, view));
+								view.getModel(), view.getGuiModel(), view));
 
 						// else source is a place (not transition)
 					} else {
@@ -421,7 +419,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// Set underlying TimedInputArc
 						TimedInputArcComponent timedArc = (TimedInputArcComponent) timedArcToCreate;
 						try {
-							if(hasArcFromPlaceToTransition(model,((TimedPlaceComponent) timedArc.getSource()), ((TimedTransitionComponent) timedArc.getTarget()))){
+							if(hasArcFromPlaceToTransition(view.getModel(),((TimedPlaceComponent) timedArc.getSource()), ((TimedTransitionComponent) timedArc.getTarget()))){
 								throw new RequireException("Cannot have two arcs between the same place and transition");
 							}
 							
@@ -429,7 +427,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(),
 									((TimedTransitionComponent) timedArc.getTarget()).underlyingTransition(),
 									TimeInterval.ZERO_INF);
-							model.add(tia);
+							view.getModel().add(tia);
 							timedArc.setUnderlyingArc(tia);
 							timedArc.updateLabel(true);
 						} catch (RequireException ex) {
@@ -450,15 +448,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// Evil hack to prevent the arc being added to GuiView
 						// twice
 						contentPane.remove(timedArcToCreate);
-						guiModel
-								.addArc((TimedOutputArcComponent) timedArcToCreate);
+						view.getGuiModel().addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 
 						undoManager.newEdit(); // new "transaction""
 
 						undoManager.addEdit(new AddTimedInputArcCommand(
 								(TimedInputArcComponent) timedArcToCreate,
-								model, guiModel, view));
+								view.getModel(), view.getGuiModel(), view));
 
 					}
 
