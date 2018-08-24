@@ -33,10 +33,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		super(contentpane, obj);
 	}
 
-	public PlaceHandler(DrawingSurfaceImpl drawingSurfaceImpl, Place newObject) {
-		super(drawingSurfaceImpl, newObject);
-	}
-
 	/**
 	 * Creates the popup menu that the user will see when they right click on a
 	 * component
