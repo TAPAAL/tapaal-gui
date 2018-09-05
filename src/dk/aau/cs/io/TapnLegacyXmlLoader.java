@@ -641,7 +641,7 @@ public class TapnLegacyXmlLoader {
 				marking.add(new TimedToken(p, new BigDecimal(0.0)));
 			}
 		}
-	}
+//	}
 
 	private void parseAndAddArcAsOldFormat(Element inputArcElement) throws FormatException {
 		String idInput = inputArcElement.getAttribute("id");
