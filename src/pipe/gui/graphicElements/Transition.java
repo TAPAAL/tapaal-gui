@@ -27,7 +27,7 @@ import dk.aau.cs.model.tapn.TimeInterval;
 /**
  * Petri-Net Transition Class for Drawing Transitions
  */
-public class Transition extends PlaceTransitionObject {
+public abstract class Transition extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = 942116302162925121L;
 	

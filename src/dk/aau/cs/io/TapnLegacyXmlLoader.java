@@ -618,13 +618,13 @@ public class TapnLegacyXmlLoader {
 
 		Place place = null;
 
-		if (invariant == null || invariant.equals("")) {
-			place = new Place(positionXInput, positionYInput, idInput,
-					nameInput, nameOffsetXInput, nameOffsetYInput,
-					initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, capacityInput);
-
-		} else {
+//		if (invariant == null || invariant.equals("")) {
+//			place = new Place(positionXInput, positionYInput, idInput,
+//					nameInput, nameOffsetXInput, nameOffsetYInput,
+//					initialMarkingInput, markingOffsetXInput,
+//					markingOffsetYInput, capacityInput);
+//
+//		} else {
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
 					idInput, nameInput, nameOffsetXInput, nameOffsetYInput,
 					initialMarkingInput, markingOffsetXInput,

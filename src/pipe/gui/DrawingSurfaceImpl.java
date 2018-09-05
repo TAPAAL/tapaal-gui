@@ -513,14 +513,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return p;
 		}
 
-		private PlaceTransitionObject newPlace(Point p) {
-			p = adjustPoint(p, view.getZoom());
-
-			pnObject = new Place(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y));
-			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
-			return (PlaceTransitionObject) pnObject;
-		}
+//		private PlaceTransitionObject newPlace(Point p) {
+//			p = adjustPoint(p, view.getZoom());
+//
+//			pnObject = new Place(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y));
+//			guiModel.addPetriNetObject(pnObject);
+//			view.addNewPetriNetObject(pnObject);
+//			return (PlaceTransitionObject) pnObject;
+//		}
 
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPoint(p, view.getZoom());
@@ -533,7 +533,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return (PlaceTransitionObject) pnObject;
 		}
 
-		private PlaceTransitionObject newTransition(Point p, boolean timed) {
+/*		private PlaceTransitionObject newTransition(Point p, boolean timed) {
 			p = adjustPoint(p, view.getZoom());
 
 			pnObject = new Transition(Grid.getModifiedX(p.x), Grid
@@ -542,7 +542,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
-		}
+		}*/
 
 		private PlaceTransitionObject newTAPNTransition(Point p, boolean timed) {
 			p = adjustPoint(p, view.getZoom());
@@ -573,16 +573,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
 				Pipe.ElementType mode = app.getMode();
+				PlaceTransitionObject pto;
 				switch (mode) {
-				case PLACE:
-					PlaceTransitionObject pto = newPlace(e.getPoint());
-					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, guiModel));
-					if (e.isControlDown()) {
-						app.setMode(ElementType.FAST_TRANSITION);
-						pnObject.dispatchEvent(e);
-					}
-					break;
+//				case PLACE:
+//					PlaceTransitionObject pto = newPlace(e.getPoint());
+//					getUndoManager().addNewEdit(
+//							new AddPetriNetObjectEdit(pto, view, guiModel));
+//					if (e.isControlDown()) {
+//						app.setMode(ElementType.FAST_TRANSITION);
+//						pnObject.dispatchEvent(e);
+//					}
+//					break;
 
 				case TAPNPLACE:
 					// create place
@@ -602,17 +603,16 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					}
 					break;
 
-				case IMMTRANS:
-				case TIMEDTRANS:
-					boolean timed = (mode == ElementType.TIMEDTRANS);
-					pto = newTransition(e.getPoint(), timed);
-					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, guiModel));
-					if (e.isControlDown()) {
-						app.setMode(ElementType.FAST_PLACE);
-						pnObject.dispatchEvent(e);
-					}
-					break;
+//				case IMMTRANS:
+//				case TIMEDTRANS:
+//					boolean timed = (mode == ElementType.TIMEDTRANS);
+//					pto = newTransition(e.getPoint(), timed);
+//					getUndoManager().addNewEdit(new AddPetriNetObjectEdit(pto, view, guiModel));
+//					if (e.isControlDown()) {
+//						app.setMode(ElementType.FAST_PLACE);
+//						pnObject.dispatchEvent(e);
+//					}
+//					break;
 				case TAPNTRANS:
 					// create transition
 					pto = newTAPNTransition(e.getPoint());

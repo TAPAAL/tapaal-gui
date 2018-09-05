@@ -15,7 +15,7 @@ import pipe.gui.Zoomer;
 /**
   * Class for drawing a Place
  */
-public class Place extends PlaceTransitionObject {
+public abstract class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
 
@@ -68,34 +68,34 @@ public class Place extends PlaceTransitionObject {
 	}
 
 
-	public Place paste(double x, double y, boolean fromAnotherView) {
-		this.incrementCopyNumber();
-		Place copy = new Place(Grid.getModifiedX(x + this.getX()+ Pipe.PLACE_TRANSITION_HEIGHT / 2), 
-				Grid.getModifiedY(y	+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()	+ ")");
-		this.newCopy(copy);
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.capacity = capacity;
-		copy.attributesVisible = attributesVisible;
-		copy.markingOffsetX = markingOffsetX;
-		copy.markingOffsetY = markingOffsetY;
-		copy.update(true);
-		return copy;
-	}
-
-	public Place copy() {
-		Place copy = new Place(Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
-		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.capacity = capacity;
-		copy.attributesVisible = attributesVisible;
-		copy.markingOffsetX = markingOffsetX;
-		copy.markingOffsetY = markingOffsetY;
-		copy.setOriginal(this);
-		return copy;
-	}
+//	public Place paste(double x, double y, boolean fromAnotherView) {
+//		this.incrementCopyNumber();
+//		Place copy = new Place(Grid.getModifiedX(x + this.getX()+ Pipe.PLACE_TRANSITION_HEIGHT / 2),
+//				Grid.getModifiedY(y	+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
+//		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()	+ ")");
+//		this.newCopy(copy);
+//		copy.nameOffsetX = nameOffsetX;
+//		copy.nameOffsetY = nameOffsetY;
+//		copy.capacity = capacity;
+//		copy.attributesVisible = attributesVisible;
+//		copy.markingOffsetX = markingOffsetX;
+//		copy.markingOffsetY = markingOffsetY;
+//		copy.update(true);
+//		return copy;
+//	}
+//
+//	public Place copy() {
+//		Place copy = new Place(Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
+//		copy.pnName.setName(this.getName());
+//		copy.nameOffsetX = nameOffsetX;
+//		copy.nameOffsetY = nameOffsetY;
+//		copy.capacity = capacity;
+//		copy.attributesVisible = attributesVisible;
+//		copy.markingOffsetX = markingOffsetX;
+//		copy.markingOffsetY = markingOffsetY;
+//		copy.setOriginal(this);
+//		return copy;
+//	}
 
 	@Override
 	public void paintComponent(Graphics g) {

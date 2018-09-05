@@ -103,21 +103,21 @@ public class TimedPlaceComponent extends Place {
 
 	}
 
-	@Override
-	public TimedPlaceComponent copy() {
-		TimedPlaceComponent copy = new TimedPlaceComponent(Zoomer
-				.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(
-						this.getY(), zoom), place);
-		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.capacity = capacity;
-		copy.attributesVisible = attributesVisible;
-		copy.markingOffsetX = markingOffsetX;
-		copy.markingOffsetY = markingOffsetY;
-		copy.setOriginal(this);
-		return copy;
-	}
+//	@Override
+//	public TimedPlaceComponent copy() {
+//		TimedPlaceComponent copy = new TimedPlaceComponent(Zoomer
+//				.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(
+//						this.getY(), zoom), place);
+//		copy.pnName.setName(this.getName());
+//		copy.nameOffsetX = nameOffsetX;
+//		copy.nameOffsetY = nameOffsetY;
+//		copy.capacity = capacity;
+//		copy.attributesVisible = attributesVisible;
+//		copy.markingOffsetX = markingOffsetX;
+//		copy.markingOffsetY = markingOffsetY;
+//		copy.setOriginal(this);
+//		return copy;
+//	}
 
 
 	public String getInvariantAsString() {
