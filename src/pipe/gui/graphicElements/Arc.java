@@ -240,11 +240,9 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		deleted = false;
 		markedAsDeleted = false;
 
-		if (getParent() instanceof DrawingSurfaceImpl) {
-			myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
-		} else {
-			myPath.addPointsToGui((JLayeredPane) getParent());
-		}
+
+		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
+
 		updateArcPosition();
 		if (getParent() != null && label.getParent() == null) {
 			getParent().add(label);
