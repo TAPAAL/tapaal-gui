@@ -51,6 +51,10 @@ public class TimedTransitionComponent extends Transition {
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 		attributesVisible = true;
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
 	}
 
 	public TimedTransitionComponent(double positionXInput,
@@ -63,6 +67,18 @@ public class TimedTransitionComponent extends Transition {
 				angleInput, priority);
 		listener = timedTransitionListener();
 		attributesVisible = true;
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
+	}
+
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new TAPNTransitionHandler(this);
+		addMouseListener(new AnimationHandler());
 	}
 
 	private TimedTransitionListener timedTransitionListener(){
@@ -212,14 +228,7 @@ public class TimedTransitionComponent extends Transition {
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
-
-		TransitionHandler transitionHandler = new TAPNTransitionHandler(transitionComponent);
-		transitionComponent.addMouseListener(transitionHandler);
-		transitionComponent.addMouseMotionListener(transitionHandler);
-		transitionComponent.addMouseWheelListener(transitionHandler);
-
-		transitionComponent.addMouseListener(new AnimationHandler());
-
+		
 		transitionComponent.setGuiModel(guiModel);
 
 		return transitionComponent;
