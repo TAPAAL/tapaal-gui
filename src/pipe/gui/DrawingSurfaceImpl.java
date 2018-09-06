@@ -129,7 +129,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	}
 
-	public void addNewPetriNetObject(PetriNetObject newObject) {
+
+	//XXX: KYRKE 2018-09-06: Code moved here, as duplicated several places in net loaders, tmp solution, untill
+	//XXX handlers are handled better.
+	public static void addPNListeners(PetriNetObject newObject, DrawingSurfaceImpl drawingSurface, DataLayer guiModel) {
+
 		if (newObject != null) {
 			if (newObject.getMouseListeners().length == 0) {
 				if (newObject instanceof Place) {
@@ -140,7 +144,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
-						add(newObject);
+						drawingSurface.add(newObject);
 
 					} else {
 
@@ -148,7 +152,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
-						add(newObject);
+						drawingSurface.add(newObject);
 
 					}
 				} else if (newObject instanceof Transition) {
@@ -163,21 +167,21 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					newObject.addMouseMotionListener(transitionHandler);
 					newObject.addMouseWheelListener(transitionHandler);
 
-					newObject.addMouseListener(animationHandler);
+					newObject.addMouseListener(new AnimationHandler());
 
-					add(newObject);
+					drawingSurface.add(newObject);
 				} else if (newObject instanceof Arc) {
-					add(newObject);
+					drawingSurface.add(newObject);
 
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TimedTransportArcComponent) {
-							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc) newObject);
+							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
 							newObject.addMouseWheelListener(transportArcHandler);
 							newObject.addMouseMotionListener(transportArcHandler);
 						} else {
-							TimedArcHandler timedArcHandler = new TimedArcHandler(this, (Arc) newObject);
+							TimedArcHandler timedArcHandler = new TimedArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(timedArcHandler);
 							newObject.addMouseWheelListener(timedArcHandler);
 							newObject.addMouseMotionListener(timedArcHandler);
@@ -190,7 +194,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
-					add(newObject);
+					drawingSurface.add(newObject);
 					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((AnnotationNote) newObject);
 					newObject.addMouseListener(noteHandler);
 					newObject.addMouseMotionListener(noteHandler);
@@ -198,11 +202,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 
-				newObject.zoomUpdate(getZoom());
-				
+				newObject.zoomUpdate(drawingSurface.getZoom());
+
 			}
 			newObject.setGuiModel(guiModel);
 		}
+
+
+	}
+
+	public void addNewPetriNetObject(PetriNetObject newObject) {
+		addPNListeners(newObject, this, guiModel);
 		validate();
 		repaint();
 	}
