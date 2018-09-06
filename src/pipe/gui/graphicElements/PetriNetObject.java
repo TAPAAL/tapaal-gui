@@ -4,8 +4,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.EventListener;
 
 import javax.swing.JComponent;
@@ -17,6 +16,7 @@ import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.PetriNetObjectHandler;
 
 /**
  * Petri-Net Object Class 
@@ -58,6 +58,78 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	// Integer value which represents a zoom percentage
 	protected int zoom = Pipe.ZOOM_DEFAULT;
 	private DataLayer guiModel;
+
+	public PetriNetObjectHandler getMouseHandler() {
+		return mouseHandler;
+	}
+
+	protected PetriNetObjectHandler mouseHandler;
+
+	PetriNetObject() {
+
+		addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseClicked(e);
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mousePressed(e);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseReleased(e);
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseEntered(e);
+				}
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseExited(e);
+				}
+			}
+		});
+
+		addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseWheelMoved(e);
+				}
+			}
+		});
+
+		addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseDragged(e);
+				}
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseMoved(e);
+				}
+			}
+		});
+
+	}
 
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;

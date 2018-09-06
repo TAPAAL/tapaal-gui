@@ -617,19 +617,22 @@ public class ArcPath implements Shape, Cloneable {
 			if (editWindow.getIndexOf(pathPoint) < 0) {
 				editWindow.add(pathPoint);
 
-				pointHandler = new ArcPathPointHandler(editWindow, pathPoint);
+				//XXX KYRKE 2018-09-06 TEMP solution while moving handlers
+				if (pathPoint.getMouseHandler() == null) {
+					pointHandler = new ArcPathPointHandler(editWindow, pathPoint);
 
-				if (pathPoint.getMouseListeners().length == 0) {
-					pathPoint.addMouseListener(pointHandler);
+					//if (pathPoint.getMouseListeners().length == 0) {
+						pathPoint.addMouseListener(pointHandler);
+					//}
+
+					//if (pathPoint.getMouseMotionListeners().length == 0) {
+						pathPoint.addMouseMotionListener(pointHandler);
+					//}
+
+//					if (pathPoint.getMouseWheelListeners().length == 0) {
+//						pathPoint.addMouseWheelListener(pointHandler);
+//					}
 				}
-
-				if (pathPoint.getMouseMotionListeners().length == 0) {
-					pathPoint.addMouseMotionListener(pointHandler);
-				}
-
-//				if (pathPoint.getMouseWheelListeners().length == 0) {
-//					pathPoint.addMouseWheelListener(pointHandler);
-//				}
 				pathPoint.updatePointLocation();
 			}
 		}
