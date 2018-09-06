@@ -41,14 +41,7 @@ public class AnnotationNote extends Note {
 		this.isNew = isNew;
 	}
 
-	public AnnotationNote(String id, String text, int x, int y, boolean isNew) {
-		super(id, text, x, y);
-		this.isNew = isNew;
-		setDragPoints();
-	}
-
-	public AnnotationNote(String text, int x, int y, int w, int h,
-			boolean border, boolean isNew) {
+	public AnnotationNote(String text, int x, int y, int w, int h, boolean border, boolean isNew) {
 		super(text, x, y, w, h, border);
 		this.isNew = isNew;
 		setDragPoints();
