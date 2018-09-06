@@ -61,6 +61,10 @@ public class TimedPlaceComponent extends Place {
 
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
 	}
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
@@ -75,6 +79,16 @@ public class TimedPlaceComponent extends Place {
 		listener = timedPlaceListener();
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
+	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new PlaceHandler(this);
 	}
 
 	private TimedPlaceListener timedPlaceListener() {
@@ -450,11 +464,6 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, place.name(), nameOffsetX, nameOffsetY, 0, markingOffsetX, markingOffsetY, capacity);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
-
-		PlaceHandler placeHandler = new PlaceHandler(placeComponent);
-		placeComponent.addMouseListener(placeHandler);
-		placeComponent.addMouseWheelListener(placeHandler);
-		placeComponent.addMouseMotionListener(placeHandler);
 
 		placeComponent.setGuiModel(guiModel);
 
