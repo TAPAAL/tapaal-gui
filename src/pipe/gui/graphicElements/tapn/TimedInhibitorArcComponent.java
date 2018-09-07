@@ -29,14 +29,29 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc, guard);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
 		super(source);
+
+		//XXX: se note in funcation
+		addMouseHandler();
+	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new TimedArcHandler(this);
 	}
 
 	public void setUnderlyingArc(TimedInhibitorArc arc) {
@@ -162,11 +177,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		arc.getTarget().addConnectTo(arc);
 		
 		arc.setUnderlyingArc(tapn.getInhibitorArcFromPlaceAndTransition(tapn.getPlaceByName(inhibitorArc.source().name()), tapn.getTransitionByName(inhibitorArc.destination().name())));
-		
-		TimedArcHandler timedArcHandler = new TimedArcHandler(arc);
-		arc.addMouseListener(timedArcHandler);
-	//	arc.addMouseWheelListener(timedArcHandler);
-		arc.addMouseMotionListener(timedArcHandler);
 		
 		arc.setGuiModel(guiModel);
 		
