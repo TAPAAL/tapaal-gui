@@ -25,11 +25,8 @@ import javax.swing.JTextArea;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Place;
-import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.PlaceHandler;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.widgets.EscapableDialog;

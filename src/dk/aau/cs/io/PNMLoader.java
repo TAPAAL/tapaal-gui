@@ -44,29 +44,14 @@ import pipe.dataLayer.Template;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Note;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.handler.AnimationHandler;
-import pipe.gui.handler.AnnotationNoteHandler;
-import pipe.gui.handler.ArcHandler;
-import pipe.gui.handler.LabelHandler;
-import pipe.gui.handler.PlaceHandler;
-import pipe.gui.handler.TAPNTransitionHandler;
-import pipe.gui.handler.TimedArcHandler;
-import pipe.gui.handler.TransitionHandler;
-import pipe.gui.handler.TransportArcHandler;
 
 public class PNMLoader {
 	
