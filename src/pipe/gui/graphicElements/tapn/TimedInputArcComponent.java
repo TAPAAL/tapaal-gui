@@ -39,7 +39,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		addMouseHandler();
 
 	}
-	
+
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
 		init();

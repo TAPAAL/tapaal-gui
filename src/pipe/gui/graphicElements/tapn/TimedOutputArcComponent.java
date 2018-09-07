@@ -78,6 +78,9 @@ public class TimedOutputArcComponent extends Arc {
 		super(startPositionXInput, startPositionYInput, endPositionXInput,
 				endPositionYInput, sourceInput, targetInput, weightInput,
 				idInput);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
 	/**
@@ -85,6 +88,9 @@ public class TimedOutputArcComponent extends Arc {
 	 */
 	public TimedOutputArcComponent(PlaceTransitionObject newSource) {
 		super(newSource);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
@@ -99,6 +105,15 @@ public class TimedOutputArcComponent extends Arc {
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
+
+		//XXX: se note in funcation
+		addMouseHandler();
+	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new ArcHandler(this);
 	}
 
 	public TimedOutputArcComponent paste(double despX, double despY,
@@ -265,11 +280,6 @@ public class TimedOutputArcComponent extends Arc {
 		
 		newCopyArc.getSource().addConnectFrom(newCopyArc);
 		newCopyArc.getTarget().addConnectTo(newCopyArc);
-				
-		ArcHandler arcHandler = new ArcHandler(newCopyArc);
-		newCopyArc.addMouseListener(arcHandler);
-		//arc.addMouseWheelListener(arcHandler);
-		newCopyArc.addMouseMotionListener(arcHandler);
 		
 		newCopyArc.setGuiModel(guiModel);
 		
