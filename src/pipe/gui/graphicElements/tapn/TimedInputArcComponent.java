@@ -188,7 +188,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		arc.getSource().addConnectFrom(arc);
 		arc.getTarget().addConnectTo(arc);
 		
-		TimedArcHandler timedArcHandler = new TimedArcHandler((DrawingSurfaceImpl)getParent(), arc);
+		TimedArcHandler timedArcHandler = new TimedArcHandler(arc);
 		arc.addMouseListener(timedArcHandler);
 		//arc.addMouseWheelListener(timedArcHandler);
 		arc.addMouseMotionListener(timedArcHandler);

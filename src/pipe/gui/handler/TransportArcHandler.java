@@ -17,8 +17,8 @@ import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TransportArcHandler extends TimedArcHandler {
 
-	public TransportArcHandler(Container contentpane, Arc obj) {
-		super(contentpane, obj);
+	public TransportArcHandler(Arc obj) {
+		super(obj);
 		enablePopup = true;
 	}
 

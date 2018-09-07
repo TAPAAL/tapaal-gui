@@ -163,7 +163,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		
 		arc.setUnderlyingArc(tapn.getInhibitorArcFromPlaceAndTransition(tapn.getPlaceByName(inhibitorArc.source().name()), tapn.getTransitionByName(inhibitorArc.destination().name())));
 		
-		TimedArcHandler timedArcHandler = new TimedArcHandler((DrawingSurfaceImpl)getParent(), arc);
+		TimedArcHandler timedArcHandler = new TimedArcHandler(arc);
 		arc.addMouseListener(timedArcHandler);
 	//	arc.addMouseWheelListener(timedArcHandler);
 		arc.addMouseMotionListener(timedArcHandler);

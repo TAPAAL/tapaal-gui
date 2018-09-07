@@ -182,12 +182,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						/* CB - Joakim Byg add timed arcs */
 						if (newObject instanceof TimedInputArcComponent) {
 							if (newObject instanceof TimedTransportArcComponent) {
-								TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
+								TransportArcHandler transportArcHandler = new TransportArcHandler((Arc) newObject);
 								newObject.addMouseListener(transportArcHandler);
 								newObject.addMouseWheelListener(transportArcHandler);
 								newObject.addMouseMotionListener(transportArcHandler);
 							} else {
-								TimedArcHandler timedArcHandler = new TimedArcHandler(drawingSurface, (Arc) newObject);
+								TimedArcHandler timedArcHandler = new TimedArcHandler((Arc) newObject);
 								newObject.addMouseListener(timedArcHandler);
 								newObject.addMouseWheelListener(timedArcHandler);
 								newObject.addMouseMotionListener(timedArcHandler);
