@@ -130,15 +130,17 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			fireFileChanged(file.getName());
 			LoadedBatchProcessingModel model = loadModel(file);
 			this.model = model;
-			if(model != null) {			
+			if(model != null) {	
+                Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
                     if(exiting()) {
                         return null;
-                    }			
+                    }
+                    //For "Search whole state space", "Existence of deadlock", "Soundness" and "Strong Soundness" 
+                    //the file should only be checked once instead of checking every query
                     if(isModelCheckOnly && filesProcessed.contains(file)) {
                     	continue;
                     }
-                    Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
                                         
 					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query, file);
 					
@@ -147,7 +149,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					} else {
 						processQuery(file, composedModel, queryToVerify);
 					}
-					
+				}
+				if(model.queries().isEmpty() && batchProcessingVerificationOptions.queryPropertyOption() != QueryPropertyOption.KeepQueryOption) {
+					pipe.dataLayer.TAPNQuery queryToVerify = createQueryFromQueryPropertyOption(composedModel.value1(), batchProcessingVerificationOptions.queryPropertyOption(), file);
+					processQuery(file, composedModel, queryToVerify);
 				}
 			}
 		}
@@ -402,6 +407,53 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 		
 		return query;
+	}
+	
+	private pipe.dataLayer.TAPNQuery createQueryFromQueryPropertyOption(TimedArcPetriNet model, QueryPropertyOption option, File fileToBeChecked) throws Exception {
+		int capacity = batchProcessingVerificationOptions.capacity();
+		if(option == QueryPropertyOption.ExistDeadlock) {
+			filesProcessed.add(fileToBeChecked);
+			return new pipe.dataLayer.TAPNQuery(
+					"Existence of a deadlock", capacity,
+							generateExistDeadlock(model), TraceOption.NONE,
+							SearchOption.DEFAULT,
+							ReductionOption.VerifyPN, true, true,
+							false, true, false, null, ExtrapolationOption.AUTOMATIC,
+							WorkflowMode.WORKFLOW_SOUNDNESS);
+		}
+		if(option == QueryPropertyOption.SearchWholeStateSpace) {
+			filesProcessed.add(fileToBeChecked);
+			return new pipe.dataLayer.TAPNQuery(
+					"Search whole state space", capacity,
+							generateSearchWholeStateSpaceProperty(model), TraceOption.NONE,
+							SearchOption.DEFAULT,
+							ReductionOption.VerifyPN, true, true,
+							false, true, false, null, ExtrapolationOption.AUTOMATIC,
+							WorkflowMode.WORKFLOW_SOUNDNESS);
+		}
+		if (option == QueryPropertyOption.Soundness) {
+			isSoundnessCheck = true;
+			filesProcessed.add(fileToBeChecked);
+			return new pipe.dataLayer.TAPNQuery(
+				"Workflow soundness check", capacity,
+						new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
+						SearchOption.DEFAULT,
+						ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+						false, true, false, null, ExtrapolationOption.AUTOMATIC,
+						WorkflowMode.WORKFLOW_SOUNDNESS);
+		}
+		if(option == QueryPropertyOption.StrongSoundness) {
+			isSoundnessCheck = true;
+			filesProcessed.add(fileToBeChecked);
+        	return new pipe.dataLayer.TAPNQuery(
+					"Workflow soundness check", capacity,
+							new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
+							SearchOption.DEFAULT,
+							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+							false, true, false, null, ExtrapolationOption.AUTOMATIC,
+							WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+		}
+		return null;
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
