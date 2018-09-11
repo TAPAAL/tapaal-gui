@@ -614,8 +614,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					if (e.isControlDown()) {
 						// connect arc
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto2).mouseReleased(e);
+						pto2.getMouseHandler().mousePressed(e);
+						pto2.getMouseHandler().mouseReleased(e);
 						app.setMode(ElementType.FAST_TRANSITION);
 						// enter fast mode
 						pnObject.dispatchEvent(e);
@@ -642,8 +642,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					if (e.isControlDown()) {
 						// connect arc
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						pto.getMouseHandler().mousePressed(e);
+						pto.getMouseHandler().mouseReleased(e);
 						// enter fast mode
 						app.setMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
@@ -691,14 +691,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) pto, model, guiModel, view));
 					app.setMode(ElementType.TAPNARC);
-					getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+					pto.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
 						// connect arc
 						pnObject.dispatchEvent(e);
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						pto.getMouseHandler().mousePressed(e);
+						pto.getMouseHandler().mouseReleased(e);
 						// enter fast mode
 						app.setMode(ElementType.FAST_PLACE);
 					} else{
@@ -710,14 +710,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					PlaceTransitionObject pto3 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) pto3, model, guiModel, view));
 					app.setMode(ElementType.TAPNARC);
-					getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+					pto3.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
 						// connect arc
 						pnObject.dispatchEvent(e);
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+						pto3.getMouseHandler().mousePressed(e);
+						pto3.getMouseHandler().mouseReleased(e);
 						// enter fast mode
 						app.setMode(ElementType.FAST_TRANSITION);
 					} else{
@@ -732,14 +732,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				dragStart = new Point(start);
 			}
 			updatePreferredSize();
-		}
-
-		private MouseListener getPlaceTransitionObjectHandlerOf(PlaceTransitionObject obj){
-			for (MouseListener listener : obj.getMouseListeners()) {
-				if (listener instanceof PlaceTransitionObjectHandler)
-					return listener;
-			}
-			return null;
 		}
 
 		private void addPoint(final Arc createArc, final MouseEvent e) {
