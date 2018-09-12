@@ -411,13 +411,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	private pipe.dataLayer.TAPNQuery createQueryFromQueryPropertyOption(TimedArcPetriNet model, QueryPropertyOption option, File fileToBeChecked) throws Exception {
 		int capacity = batchProcessingVerificationOptions.capacity();
+		ReductionOption reductionOption = model.isUntimed() ? ReductionOption.VerifyPN : ReductionOption.VerifyTAPN;
 		if(option == QueryPropertyOption.ExistDeadlock) {
 			filesProcessed.add(fileToBeChecked);
 			return new pipe.dataLayer.TAPNQuery(
 					"Existence of a deadlock", capacity,
 							generateExistDeadlock(model), TraceOption.NONE,
 							SearchOption.DEFAULT,
-							ReductionOption.VerifyPN, true, true,
+							reductionOption, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
 							WorkflowMode.WORKFLOW_SOUNDNESS);
 		}
@@ -427,7 +428,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					"Search whole state space", capacity,
 							generateSearchWholeStateSpaceProperty(model), TraceOption.NONE,
 							SearchOption.DEFAULT,
-							ReductionOption.VerifyPN, true, true,
+							reductionOption, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
 							WorkflowMode.WORKFLOW_SOUNDNESS);
 		}
