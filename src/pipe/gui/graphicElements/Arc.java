@@ -11,6 +11,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
@@ -53,10 +54,11 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
+
+		//XXX see comment in function
+		setLableHandler();
 	}
-	
-	abstract public void setWeight(Weight weight);
-	abstract public Weight getWeight();
+
 
 	/**
 	 * Create Petri-Net Arc object
@@ -67,11 +69,34 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		myPath.addPoint();
 		myPath.addPoint();
 		myPath.createPath();
+
+		//XXX see comment in function
+		setLableHandler();
 	}
 
 	public Arc() {
 		super();
+
+		label = new NameLabel(zoom);
+		//XXX see comment in function
+		setLableHandler();
 	}
+
+
+	private void setLableHandler() {
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		LabelHandler labelHandler = new LabelHandler(this.getNameLabel(), this);
+
+		getNameLabel().addMouseListener(labelHandler);
+		getNameLabel().addMouseMotionListener(labelHandler);
+		getNameLabel().addMouseWheelListener(labelHandler);
+
+	}
+
+	abstract public void setWeight(Weight weight);
+	abstract public Weight getWeight();
 
 	/**
 	 * Set source

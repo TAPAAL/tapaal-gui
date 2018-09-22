@@ -95,7 +95,7 @@ public class TimedOutputArcComponent extends Arc {
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
 		zoom = arc.zoom;
-		label = new NameLabel(zoom);
+
 		myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
 			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i),zoom);
