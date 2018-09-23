@@ -48,8 +48,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	
 	private static final int DRAWING_SURFACE_GROW = 100;
 
-	private AnimationHandler animationHandler = new AnimationHandler();
-
 	private SelectionManager selection;
 	private UndoManager undoManager;
 	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
