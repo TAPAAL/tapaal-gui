@@ -91,17 +91,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 		g2d.draw(selectionRectangle);
 	}
 
-	public void deleteSelection() {
-		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
-		for (int i = 0; i < pnObjects.size(); i++) {
-			if (pnObjects.get(i).isSelected()) {
-				pnObjects.get(i).delete();
-			}
-		}
-		drawingSurface.updatePreferredSize();
-	}
-
 	public void clearSelection() {
 		// Get all the objects in the current window
 		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();

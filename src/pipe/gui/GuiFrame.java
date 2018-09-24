@@ -542,7 +542,6 @@ public class GuiFrame extends JFrame  {
 							}
 
 							appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-							appView.getSelectionObject().deleteSelection();
 							appView.repaint();
 							CreateGui.getCurrentTab().network().buildConstraints();
 						}
