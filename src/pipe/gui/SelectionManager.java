@@ -28,9 +28,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 		java.awt.event.MouseListener, java.awt.event.MouseWheelListener,
 		java.awt.event.MouseMotionListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 9057152447545103393L;
 	private Point startPoint;
 	private Rectangle selectionRectangle = new Rectangle(-1, -1);
@@ -174,19 +171,13 @@ public class SelectionManager extends javax.swing.JComponent implements
 		return selection;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
 	public void mousePressed(MouseEvent e) {
 		CreateGui.getCurrentTab().removeConstantHighlights();
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
 			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
 			startPoint = e.getPoint();
-			selectionRectangle.setRect(startPoint.getX(), startPoint.getY(), 0,
-					0);
+			selectionRectangle.setRect(startPoint.getX(), startPoint.getY(), 0, 0);
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
 			repaint();
@@ -195,12 +186,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
 	public void mouseReleased(MouseEvent e) {
 		if (isSelecting) {
 			// Select anything that intersects with the rectangle.
@@ -212,13 +197,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent
-	 * )
-	 */
 	public void mouseDragged(MouseEvent e) {
 		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
 		
@@ -255,12 +233,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 	public void mouseExited(MouseEvent e) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-	 */
 	public void mouseMoved(MouseEvent e) {
 	}
 
@@ -270,34 +242,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 			pnObject.select(false);
 		}
 		drawingSurface.repaint();
-	}
-
-	public int getSelectionCount() {
-		Component[] netObj = drawingSurface.getComponents();
-		int selectionCount = 0;
-		// Get all the objects in the current window
-		for (int i = 0; i < netObj.length; i++) {
-			// Handle Arcs and Arc Points
-			if ((netObj[i] instanceof Arc)
-					&& ((PetriNetObject) netObj[i]).isSelectable()) {
-				Arc thisArc = (Arc) netObj[i];
-				ArcPath thisArcPath = thisArc.getArcPath();
-				for (int j = 1; j < thisArcPath.getEndIndex(); j++) {
-					if (thisArcPath.isPointSelected(j)) {
-						selectionCount++;
-					}
-				}
-			}
-
-			// Handle PlaceTransition Objects
-			if ((netObj[i] instanceof PlaceTransitionObject)
-					&& ((PetriNetObject) netObj[i]).isSelectable()) {
-				if (((PlaceTransitionObject) netObj[i]).isSelected()) {
-					selectionCount++;
-				}
-			}
-		}
-		return selectionCount;
 	}
 
 }
