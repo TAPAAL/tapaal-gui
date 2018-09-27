@@ -95,16 +95,23 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	public void actionPerformed(ActionEvent arg0) {
 		messageShown = false;
 		if(list.getSelectedValuesList() != null){
-			ArrayList<String> affectedComponents = new ArrayList<String>(); 
+			ArrayList<String> affectedComponents = new ArrayList<String>();
 			if(sharedPlacesAndTransitionsPanel.isDisplayingTransitions()){
 				for(Object transition : list.getSelectedValuesList()) {
 					for(TimedTransition t : ((SharedTransition)transition).transitions()){
-						affectedComponents.add(t.model().name());
+						if(!(affectedComponents.contains(t.model().name())))
+							affectedComponents.add(t.model().name());
 					}
 				}
 			} else {
+				ArrayList<String> affectedComponentsWithDupes = new ArrayList<String>();
 				for(Object place : list.getSelectedValuesList()) {
-					affectedComponents.addAll(((SharedPlace)place).getComponentsUsingThisPlace());
+					affectedComponentsWithDupes.addAll(((SharedPlace)place).getComponentsUsingThisPlace());
+				}
+				for(String component : affectedComponentsWithDupes) {
+					if(!(affectedComponents.contains(component))) {
+						affectedComponents.add(component);
+					}
 				}
 			}
 			
@@ -115,26 +122,26 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 				
 			if(result.choice == JOptionPane.OK_OPTION){
 				undoManager.newEdit();
+				Collection<TAPNQuery> affectedQueries = new ArrayList<TAPNQuery>();
+				
 				if(sharedPlacesAndTransitionsPanel.isDisplayingTransitions()){
+					affectedQueries = findAffectedTransitionQueries(list.getSelectedValuesList());
 					for(Object transition : list.getSelectedValuesList()) {
-						deleteSharedTransition(result.deleteFromTemplates, (SharedTransition) transition);
+						deleteSharedTransition(result.deleteFromTemplates, (SharedTransition) transition, affectedQueries);
 					}
 						
 				}else{
+					affectedQueries = findAffectedPlaceQueries(list.getSelectedValuesList());
 					for(Object place : list.getSelectedValuesList()) {
-						deleteSharedPlace(result.deleteFromTemplates, (SharedPlace) place);
+						deleteSharedPlace(result.deleteFromTemplates, (SharedPlace) place, affectedQueries);
 					}
 				}
 			}
 		}
 	}
 
-	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove) {
+	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove, Collection<TAPNQuery> affectedQueries) {
 		SharedPlace sharedPlace = placeToRemove;
-		Collection<TAPNQuery> affectedQueries = new ArrayList<TAPNQuery>();
-		if(!messageShown) {
-			affectedQueries = findAffectedPlaceQueries(list.getSelectedValuesList());
-		}
 		if(affectedQueries.size() > 0 && messageShown == false){
 			messageShown = true;
 			StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
@@ -253,12 +260,8 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		undoManager.addEdit(cmd);
 	}
 	
-	private void deleteSharedTransition(boolean deleteFromTemplates, SharedTransition transitionToBeRemoved) {
+	private void deleteSharedTransition(boolean deleteFromTemplates, SharedTransition transitionToBeRemoved, Collection<TAPNQuery> affectedQueries) {
 		SharedTransition sharedTransition = transitionToBeRemoved;
-		Collection<TAPNQuery> affectedQueries = new ArrayList<TAPNQuery>();
-		if(!messageShown) {
-			affectedQueries = findAffectedTransitionQueries(list.getSelectedValuesList());
-		}
 		if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
 	        StringBuffer buffer = new StringBuffer("The following queries contains the shared transition and will also be deleted:");
