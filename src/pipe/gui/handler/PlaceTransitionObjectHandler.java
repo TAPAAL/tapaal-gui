@@ -105,8 +105,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				boolean isInPreSet = false;
 				if (currentObject instanceof Place) {
 					isInPreSet = true;
-					Arc arc = new TimedTransportArcComponent(currentObject, 1,
-							isInPreSet);
+					Arc arc = new TimedTransportArcComponent(currentObject, 1, isInPreSet);
 					createArc(arc, currentObject);
 				}
 				break;
