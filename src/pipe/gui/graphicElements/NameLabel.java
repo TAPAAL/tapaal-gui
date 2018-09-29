@@ -28,10 +28,6 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 	private Font font = new Font(Pipe.LABEL_FONT, Font.BOLD,
 			Pipe.LABEL_DEFAULT_FONT_SIZE);
 
-	public NameLabel() {
-		this("");
-	}
-
 	public NameLabel(int zoom) {
 		this("");
 		setFont(getFont().deriveFont(Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE, zoom)));
