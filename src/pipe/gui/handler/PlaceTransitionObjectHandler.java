@@ -204,8 +204,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 					// Check if arc has leagal target
 					PlaceTransitionObject target = transportArcToCreate.getTarget();
-					if (!(target instanceof Transition && target != null)) {
-						System.err.println("Error creating transport arc, invalid target");
+					if (!(target instanceof Transition)) {
 						transportArcToCreate.delete();
 						break;
 					}
