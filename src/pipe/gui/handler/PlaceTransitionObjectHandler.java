@@ -191,167 +191,165 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			Arc transportArcToCreate = view.createArc;
 
-				if (currentObject != transportArcToCreate.getSource()) {
+			if (currentObject != transportArcToCreate.getSource()) {
 
-					transportArcToCreate.setSelectable(true);
+				transportArcToCreate.setSelectable(true);
 
-					// This is the first step
-					if (transportArcToCreate.getSource() instanceof Place) {
+				// This is the first step
+				if (transportArcToCreate.getSource() instanceof Place) {
 
-						// mikaelhm - Dont allow a transport arc from place to
-						// transition if there is another arc.
-						boolean existsArc = false;
+					// mikaelhm - Dont allow a transport arc from place to
+					// transition if there is another arc.
+					boolean existsArc = false;
 
-						// Check if arc has leagal target
-						PlaceTransitionObject target = transportArcToCreate
-								.getTarget();
-						if (!(target instanceof Transition && target != null)) {
-							System.err.println("Error creating transport arc, invalid target");
-							transportArcToCreate.delete();
-							break;
-						}
-
-						Iterator<Arc> arcsFrom = transportArcToCreate
-								.getSource().getConnectFromIterator();
-						// search for pre-existent arcs from transportArcToCreate's source to
-						// transportArcToCreate's target
-						while (arcsFrom.hasNext()) {
-							Arc someArc = (arcsFrom.next());
-							if (someArc == transportArcToCreate) {
-								break;
-							} else if (someArc.getSource() == transportArcToCreate.getSource() && someArc.getTarget() == currentObject) {
-								existsArc = true;
-
-								if (someArc instanceof TimedInhibitorArcComponent) {
-									// user has drawn a transport arc where there is
-									// a TAPNInhibitorArc arc already - This does not make sense.
-									cleanupArc(transportArcToCreate, view);
-									System.out.println(ERROR_MSG_TWO_ARCS);
-									JOptionPane.showMessageDialog(
-													CreateGui.getApp(),
-													ERROR_MSG_TWO_ARCS,
-													"Error",
-													JOptionPane.ERROR_MESSAGE);
-
-								} else if (someArc instanceof TimedTransportArcComponent) {
-									// user has drawn a transport arc where there is
-									// a transport arc already - We do not allow that.
-									cleanupArc(transportArcToCreate, view);
-									System.out.println(ERROR_MSG_TWO_ARCS);
-									JOptionPane.showMessageDialog(CreateGui
-											.getApp(), ERROR_MSG_TWO_ARCS,
-											"Error", JOptionPane.ERROR_MESSAGE);
-
-								} else if (someArc instanceof TimedOutputArcComponent) {
-									// user has drawn a transport arc where there is
-									// a normal arc already - We do not allow that.
-									cleanupArc(transportArcToCreate, view);
-									System.out.println(ERROR_MSG_TWO_ARCS);
-									JOptionPane.showMessageDialog(CreateGui
-											.getApp(), ERROR_MSG_TWO_ARCS,
-											"Error", JOptionPane.ERROR_MESSAGE);
-
-								}
-								break;
-							}
-						}
-						if (existsArc) {
-							transportArcToCreate.delete();
-							break;
-						}
-
-						int groupMaxCounter = 0;
-
-						for (Object pt : transportArcToCreate.getTarget()
-								.getPostset()) {
-							if (pt instanceof TimedTransportArcComponent) {
-								if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
-									groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
-								}
-							}
-						}
-
-						((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
-
-						currentObject.addConnectTo(transportArcToCreate);
-
-						// Evil hack to prevent the arc being added to GuiView twice
-						//Need to be casted to cointainer, as we only add it to the canvas but not the model
-						((Container)CreateGui.getDrawingSurface()).remove(transportArcToCreate);
-
-						view.getGuiModel().addArc((TimedOutputArcComponent) transportArcToCreate);
-						view.addNewPetriNetObject(transportArcToCreate);
-
-						freeArc(transportArcToCreate);
-						
-						// Create the next arc
-						TimedTransportArcComponent arc2 = new TimedTransportArcComponent(currentObject, groupMaxCounter + 1, false);
-						
-						//Update the partners for the arcs
-						TimedTransportArcComponent arc1 = ((TimedTransportArcComponent) transportArcToCreate);
-						
-						arc2.setConnectedTo(arc1);
-						arc1.setConnectedTo(arc2);
-										
-						//Draw part 2 of the transport arc
-						createArc(arc2, currentObject);
-						
-
-					} else if (transportArcToCreate.getSource() instanceof Transition) {
-						
-						TimedTransportArcComponent arc2 = (TimedTransportArcComponent) transportArcToCreate;
-						TimedTransportArcComponent arc1 = arc2.getConnectedTo();
-						
-						dk.aau.cs.model.tapn.TransportArc ta;
-						try {
-							ta = new dk.aau.cs.model.tapn.TransportArc(
-									((TimedPlaceComponent) arc1.getSource()).underlyingPlace(),
-									((TimedTransitionComponent) arc2.getSource()).underlyingTransition(),
-									((TimedPlaceComponent) arc2.getTarget()).underlyingPlace(),
-									TimeInterval.ZERO_INF);
-							view.getModel().add(ta);
-							((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
-							arc1.setUnderlyingArc(ta);
-							arc1.updateLabel(true);
-							((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
-						} catch (RequireException ex) {
-							cleanupArc(arc1, view);
-							cleanupArc(arc2, view);
-							JOptionPane.showMessageDialog(
-											CreateGui.getApp(),
-											"There was an error drawing the arc. Possible problems:\n"
-													+ " - There is already an arc between the source place and transition\n"
-													+ " - There is already an arc between the transtion and the target place\n"
-													+ " - You are attempting to draw an arc between a shared transition and a shared place",
-											"Error", JOptionPane.ERROR_MESSAGE);
-							break;
-						}
-
-						// Evil hack to prevent the arc being added to GuiView twice
-						//Need to be casted to cointainer, as we only add it to the canvas but not the model
-						((Container)CreateGui.getDrawingSurface()).remove(arc2);
-
-						view.getGuiModel().addArc(arc2);
-						view.addNewPetriNetObject(arc2);
-						
-						currentObject.addConnectTo(arc2);
-						
-						undoManager.newEdit();
-
-						undoManager.addEdit(
-								new AddTransportArcCommand(
-										arc2,
-										arc2.underlyingTransportArc(), 
-										view.getModel(),
-										view.getGuiModel(),
-										view));
-
-						freeArc(transportArcToCreate);
-
-						arc2.setGroupNr(arc1.getGroupNr());
+					// Check if arc has leagal target
+					PlaceTransitionObject target = transportArcToCreate.getTarget();
+					if (!(target instanceof Transition && target != null)) {
+						System.err.println("Error creating transport arc, invalid target");
+						transportArcToCreate.delete();
+						break;
 					}
 
+					Iterator<Arc> arcsFrom = transportArcToCreate.getSource().getConnectFromIterator();
+					// search for pre-existent arcs from transportArcToCreate's source to
+					// transportArcToCreate's target
+					while (arcsFrom.hasNext()) {
+						Arc someArc = (arcsFrom.next());
+						if (someArc == transportArcToCreate) {
+							break;
+						} else if (someArc.getSource() == transportArcToCreate.getSource() && someArc.getTarget() == currentObject) {
+							existsArc = true;
+
+							if (someArc instanceof TimedInhibitorArcComponent) {
+								// user has drawn a transport arc where there is
+								// a TAPNInhibitorArc arc already - This does not make sense.
+								cleanupArc(transportArcToCreate, view);
+								System.out.println(ERROR_MSG_TWO_ARCS);
+								JOptionPane.showMessageDialog(
+										CreateGui.getApp(),
+										ERROR_MSG_TWO_ARCS,
+										"Error",
+										JOptionPane.ERROR_MESSAGE);
+
+							} else if (someArc instanceof TimedTransportArcComponent) {
+								// user has drawn a transport arc where there is
+								// a transport arc already - We do not allow that.
+								cleanupArc(transportArcToCreate, view);
+								System.out.println(ERROR_MSG_TWO_ARCS);
+								JOptionPane.showMessageDialog(CreateGui
+												.getApp(), ERROR_MSG_TWO_ARCS,
+										"Error", JOptionPane.ERROR_MESSAGE);
+
+							} else if (someArc instanceof TimedOutputArcComponent) {
+								// user has drawn a transport arc where there is
+								// a normal arc already - We do not allow that.
+								cleanupArc(transportArcToCreate, view);
+								System.out.println(ERROR_MSG_TWO_ARCS);
+								JOptionPane.showMessageDialog(CreateGui
+												.getApp(), ERROR_MSG_TWO_ARCS,
+										"Error", JOptionPane.ERROR_MESSAGE);
+
+							}
+							break;
+						}
+					}
+					if (existsArc) {
+						transportArcToCreate.delete();
+						break;
+					}
+
+					int groupMaxCounter = 0;
+
+					for (Object pt : transportArcToCreate.getTarget()
+							.getPostset()) {
+						if (pt instanceof TimedTransportArcComponent) {
+							if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
+								groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
+							}
+						}
+					}
+
+					((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
+
+					currentObject.addConnectTo(transportArcToCreate);
+
+					// Evil hack to prevent the arc being added to GuiView twice
+					//Need to be casted to cointainer, as we only add it to the canvas but not the model
+					((Container) CreateGui.getDrawingSurface()).remove(transportArcToCreate);
+
+					view.getGuiModel().addArc((TimedOutputArcComponent) transportArcToCreate);
+					view.addNewPetriNetObject(transportArcToCreate);
+
+					freeArc(transportArcToCreate);
+
+					// Create the next arc
+					TimedTransportArcComponent arc2 = new TimedTransportArcComponent(currentObject, groupMaxCounter + 1, false);
+
+					//Update the partners for the arcs
+					TimedTransportArcComponent arc1 = ((TimedTransportArcComponent) transportArcToCreate);
+
+					arc2.setConnectedTo(arc1);
+					arc1.setConnectedTo(arc2);
+
+					//Draw part 2 of the transport arc
+					createArc(arc2, currentObject);
+
+
+				} else if (transportArcToCreate.getSource() instanceof Transition) {
+
+					TimedTransportArcComponent arc2 = (TimedTransportArcComponent) transportArcToCreate;
+					TimedTransportArcComponent arc1 = arc2.getConnectedTo();
+
+					dk.aau.cs.model.tapn.TransportArc ta;
+					try {
+						ta = new dk.aau.cs.model.tapn.TransportArc(
+								((TimedPlaceComponent) arc1.getSource()).underlyingPlace(),
+								((TimedTransitionComponent) arc2.getSource()).underlyingTransition(),
+								((TimedPlaceComponent) arc2.getTarget()).underlyingPlace(),
+								TimeInterval.ZERO_INF);
+						view.getModel().add(ta);
+						((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
+						arc1.setUnderlyingArc(ta);
+						arc1.updateLabel(true);
+						((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
+					} catch (RequireException ex) {
+						cleanupArc(arc1, view);
+						cleanupArc(arc2, view);
+						JOptionPane.showMessageDialog(
+								CreateGui.getApp(),
+								"There was an error drawing the arc. Possible problems:\n"
+										+ " - There is already an arc between the source place and transition\n"
+										+ " - There is already an arc between the transtion and the target place\n"
+										+ " - You are attempting to draw an arc between a shared transition and a shared place",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						break;
+					}
+
+					// Evil hack to prevent the arc being added to GuiView twice
+					//Need to be casted to cointainer, as we only add it to the canvas but not the model
+					((Container) CreateGui.getDrawingSurface()).remove(arc2);
+
+					view.getGuiModel().addArc(arc2);
+					view.addNewPetriNetObject(arc2);
+
+					currentObject.addConnectTo(arc2);
+
+					undoManager.newEdit();
+
+					undoManager.addEdit(
+							new AddTransportArcCommand(
+									arc2,
+									arc2.underlyingTransportArc(),
+									view.getModel(),
+									view.getGuiModel(),
+									view));
+
+					freeArc(transportArcToCreate);
+
+					arc2.setGroupNr(arc1.getGroupNr());
 				}
+
+			}
 
 
 			break;
