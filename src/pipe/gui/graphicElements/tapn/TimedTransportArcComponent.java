@@ -27,8 +27,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private TimedTransportArcComponent connectedTo = null;
 	private TransportArc underlyingTransportArc;
 
-	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr,
-			boolean isInPreSet) {
+	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
 		setHead();
@@ -40,8 +39,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		addMouseHandler();
 	}
 
-	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group,
-			boolean isInPreSet) {
+	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
 		super(timedArc, "");
 		this.isInPreSet = isInPreSet;
 		setHead();
