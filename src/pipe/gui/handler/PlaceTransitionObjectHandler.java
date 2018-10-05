@@ -220,37 +220,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						} else if (someArc.getSource() == transportArcToCreate.getSource() && someArc.getTarget() == currentObject) {
 							existsArc = true;
 
-							if (someArc instanceof TimedInhibitorArcComponent) {
-								// user has drawn a transport arc where there is
-								// a TAPNInhibitorArc arc already - This does not make sense.
-								cleanupArc(transportArcToCreate, view);
-								System.out.println(ERROR_MSG_TWO_ARCS);
-								JOptionPane.showMessageDialog(
-										CreateGui.getApp(),
-										ERROR_MSG_TWO_ARCS,
-										"Error",
-										JOptionPane.ERROR_MESSAGE);
-
-							} else if (someArc instanceof TimedTransportArcComponent) {
-								// user has drawn a transport arc where there is
-								// a transport arc already - We do not allow that.
-								cleanupArc(transportArcToCreate, view);
-								System.out.println(ERROR_MSG_TWO_ARCS);
-								JOptionPane.showMessageDialog(CreateGui
-												.getApp(), ERROR_MSG_TWO_ARCS,
-										"Error", JOptionPane.ERROR_MESSAGE);
-
-							} else if (someArc instanceof TimedOutputArcComponent) {
-								// user has drawn a transport arc where there is
-								// a normal arc already - We do not allow that.
-								cleanupArc(transportArcToCreate, view);
-								System.out.println(ERROR_MSG_TWO_ARCS);
-								JOptionPane.showMessageDialog(CreateGui
-												.getApp(), ERROR_MSG_TWO_ARCS,
-										"Error", JOptionPane.ERROR_MESSAGE);
-
-							}
-							break;
+							// There already is a arc between this place and transition
+							cleanupArc(transportArcToCreate, view);
+							JOptionPane.showMessageDialog(
+									CreateGui.getApp(),
+									ERROR_MSG_TWO_ARCS,
+									"Error",
+									JOptionPane.ERROR_MESSAGE);
 						}
 					}
 					if (existsArc) {
