@@ -236,8 +236,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 					int groupMaxCounter = 0;
 
-					for (Object pt : transportArcToCreate.getTarget()
-							.getPostset()) {
+					for (Object pt : transportArcToCreate.getTarget().getPostset()) {
 						if (pt instanceof TimedTransportArcComponent) {
 							if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
 								groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
