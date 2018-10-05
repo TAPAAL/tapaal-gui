@@ -124,20 +124,20 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		super.mouseReleased(e);
 
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
-		
-		if (view.createArc == null){
+
+		Arc createArc = view.createArc;
+		if (createArc == null){
 			//If we have no arc, we have nothing to do
 			return;
 		}
 
 		//Check if the mouse was moved since key down event, and we are looking at the target
 		//Break the drawing if this is the case
-		Arc createArc = view.createArc; 
-		if (createArc != null && currentObject != createArc.getSource()){
-		if (createArc.getTarget() == null) {
-			cleanupArc(createArc, view);
-			return;
-		}
+		if (currentObject != createArc.getSource()){
+			if (createArc.getTarget() == null) {
+				cleanupArc(createArc, view);
+				return;
+			}
 		}
 		
 		switch (app.getMode()) {
