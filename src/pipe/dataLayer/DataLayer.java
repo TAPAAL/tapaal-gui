@@ -46,11 +46,6 @@ public class DataLayer implements Cloneable {
 	 */
 	private ArrayList<? extends PetriNetObject> changeArrayList = null;
 
-	/** Used to determine whether the matrixes have been modified */
-	static boolean initialMarkingVectorChanged = true;
-
-	static boolean currentMarkingVectorChanged = true;
-
 	/**
 	 * Hashtable which maps PlaceTransitionObjects to their list of connected
 	 * arcs
@@ -65,9 +60,6 @@ public class DataLayer implements Cloneable {
 
 	private NetType type = NetType.TAPN;
 
-	//Is the net too big to be drawn
-	private boolean isDrawable= true;
-	
 	/**
 	 * Create empty Petri-Net object
 	 */
@@ -76,7 +68,6 @@ public class DataLayer implements Cloneable {
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
 
-		// tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList<AnnotationNote>();
 
 		// may as well do the hashtable here as well
@@ -291,20 +282,15 @@ public class DataLayer implements Cloneable {
 	 *            New Arc
 	 * */
 	private void addArcToArcsMap(TimedOutputArcComponent arcInput) {
-		// now we want to add the arc to the list of arcs for it's source and
-		// target
+		// now we want to add the arc to the list of arcs for it's source and target
 		PlaceTransitionObject source = arcInput.getSource();
 		PlaceTransitionObject target = arcInput.getTarget();
 		ArrayList<TimedOutputArcComponent> newList = null;
 
 		if (source != null) {
-			// Pete: Place/Transitions now always moveable
-			// source.setMovable(false);
 			if (arcsMap.get(source) != null) {
-				// System.out.println("adding arc to existing list");
 				arcsMap.get(source).add(arcInput);
 			} else {
-				// System.out.println("creating new arc list");
 				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(source, newList);
@@ -312,31 +298,24 @@ public class DataLayer implements Cloneable {
 		}
 
 		if (target != null) {
-			// Pete: Place/Transitions now always moveable
-			// target.setMovable(false);
 			if (arcsMap.get(target) != null) {
-				// System.out.println("adding arc to existing list2");
 				arcsMap.get(target).add(arcInput);
 			} else {
-				// System.out.println("creating new arc list2");
 				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(target, newList);
 			}
 		}
-		// System.out.println("arcsMap size: " + arcsMap.size());
 	}
 
 	/**
 	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
 	 * 
-	 * @param arcInput
+	 * @param inhibitorArcInput
 	 *            New Arc
 	 */
 	private void addInhibitorArcToInhibitorsMap(TimedInhibitorArcComponent inhibitorArcInput) {
-		// now we want to add the inhibitor arc to the list of inhibitor arcs
-		// for
-		// it's source and target
+		// now we want to add the inhibitor arc to the list of inhibitor arcs for it's source and target
 		PlaceTransitionObject source = inhibitorArcInput.getSource();
 		PlaceTransitionObject target = inhibitorArcInput.getTarget();
 		ArrayList<TimedInhibitorArcComponent> newList = null;
@@ -360,7 +339,6 @@ public class DataLayer implements Cloneable {
 				tapnInhibitorsMap.put(target, newList);
 			}
 		}
-		// System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
 	}
 
 
@@ -408,13 +386,10 @@ public class DataLayer implements Cloneable {
 				if (pnObject instanceof PlaceTransitionObject) {
 					if (arcsMap.get(pnObject) != null) {
 
-						// get the list of attached arcs for the object we are
-						// removing
+						// get the list of attached arcs for the object we are removing
 						attachedArcs = arcsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
+						// iterate over all the attached arcs, removing them all in inverse order!
 						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
 							try {
 								((Arc) attachedArcs.get(i)).delete();
@@ -430,13 +405,10 @@ public class DataLayer implements Cloneable {
 
 					if (tapnInhibitorsMap.get(pnObject) != null) {
 
-						// get the list of attached arcs for the object we are
-						// removing
+						// get the list of attached arcs for the object we are removing
 						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
+						// iterate over all the attached arcs, removing them all in inverse order!
 						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
 							((Arc) attachedArcs.get(i)).delete();
 						}
@@ -697,29 +669,10 @@ public class DataLayer implements Cloneable {
 		return returnTransition;
 	}
 
-	public Transition getTransitionByNameIgnoreGiven(Transition ignore,
-			String transitionName) {
-		Transition returnTransition = null;
-
-		if (transitionsArray != null) {
-			if (transitionName != null) {
-				for (int i = 0; i < transitionsArray.size(); i++) {
-					if (!transitionsArray.get(i).equals(ignore)) {
-						if (transitionName.equalsIgnoreCase((transitionsArray
-								.get(i)).getName())) {
-							returnTransition = transitionsArray.get(i);
-						}
-					}
-				}
-			}
-		}
-		return returnTransition;
-	}
-
 	/**
 	 * Return the Place called placeName from the Petri-Net
-	 * 
-	 * @param placeId
+	 *
+	 * @param placeID
 	 *            ID of Place object to return
 	 * @return The first Place object found with id equal to placeId
 	 */
@@ -761,24 +714,6 @@ public class DataLayer implements Cloneable {
 		return returnPlace;
 	}
 
-	public Place getPlaceByNameIgnoreGiven(Place ignore, String placeName) {
-		Place returnPlace = null;
-
-		if (placesArray != null) {
-			if (placeName != null) {
-				for (int i = 0; i < placesArray.size(); i++) {
-					if (!placesArray.get(i).equals(ignore)) {
-						if (placeName.equalsIgnoreCase((placesArray.get(i))
-								.getName())) {
-							returnPlace = placesArray.get(i);
-						}
-					}
-				}
-			}
-		}
-		return returnPlace;
-	}
-
 	/**
 	 * Return the PlaceTransitionObject called ptoName from the Petri-Net
 	 * 
@@ -797,32 +732,6 @@ public class DataLayer implements Cloneable {
 		}
 
 		return null;
-	}
-
-	public boolean hasTAPNInhibitorArcs() { // TODO: Fix this to make it faster
-		for (Arc arc : arcsArray) {
-			if (arc instanceof TimedInhibitorArcComponent) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean hasTransportArcs() {
-		for(Arc arc : arcsArray) {
-			if(arc instanceof TimedTransportArcComponent) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean hasInvariants() {
-		for(Place p : placesArray) {
-			if(!((TimedPlaceComponent)p).underlyingPlace().invariant().equals(TimeInvariant.LESS_THAN_INFINITY))
-				return true;
-		}
-		return false;
 	}
 
 	public NetType netType() {
@@ -921,14 +830,6 @@ public class DataLayer implements Cloneable {
 			
 		
 		return guiModel;
-	}
-
-	public void setDrawable(boolean isDrawable) {
-		this.isDrawable = isDrawable;
-	}
-	
-	public boolean getDrawable(){
-		return isDrawable;
 	}
 	
 }
