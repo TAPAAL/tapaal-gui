@@ -562,7 +562,7 @@ public class TapnLegacyXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput);
 
 		TimedTransitionComponent transition = new TimedTransitionComponent(
-				positionXInput, positionYInput, idInput, nameInput,
+				positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput, timedTransition,
 				infiniteServer, angle, priority);
 		transition.setUnderlyingTransition(t);
@@ -613,7 +613,7 @@ public class TapnLegacyXmlLoader {
 //
 //		} else {
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
-					idInput, nameInput, nameOffsetXInput, nameOffsetYInput,
+					idInput, nameOffsetXInput, nameOffsetYInput,
 					initialMarkingInput, markingOffsetXInput,
 					markingOffsetYInput, capacityInput);
 

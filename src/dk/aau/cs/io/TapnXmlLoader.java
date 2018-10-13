@@ -394,7 +394,7 @@ public class TapnXmlLoader {
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
-				positionXInput, positionYInput, idInput, nameInput,
+				positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput, true,
 				infiniteServer, angle, priority);
 		transitionComponent.setUnderlyingTransition(t);
@@ -451,7 +451,7 @@ public class TapnXmlLoader {
 			}
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput, nameOffsetYInput, initialMarkingInput, markingOffsetXInput, markingOffsetYInput, 0);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, initialMarkingInput, markingOffsetXInput, markingOffsetYInput, 0);
 		placeComponent.setUnderlyingPlace(p);
 		
 		if (!displayName){

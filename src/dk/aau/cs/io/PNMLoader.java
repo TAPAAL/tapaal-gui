@@ -201,7 +201,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, id, name.point.getX(), name.point.getY(),
+			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.point.getX(), name.point.getY(),
 				marking.marking, marking.point.x, marking.point.y, 0);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
@@ -247,7 +247,7 @@ public class PNMLoader {
 		if(isNetDrawable()){
 			TimedTransitionComponent transitionComponent = 
 				//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-				new TimedTransitionComponent(position.getX(), position.getY(), id, id, name.point.getX(), name.point.getY(), 
+				new TimedTransitionComponent(position.getX(), position.getY(), id, name.point.getX(), name.point.getY(),
 						true, false, 0, 0);
 			transitionComponent.setUnderlyingTransition(transition);
 			template.guiModel().addPetriNetObject(transitionComponent);

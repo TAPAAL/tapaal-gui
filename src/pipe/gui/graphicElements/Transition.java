@@ -56,11 +56,10 @@ public abstract class Transition extends PlaceTransitionObject {
 	 * Create Petri-Net Transition object
 	 */
 	public Transition(double positionXInput, double positionYInput,
-			String idInput, String nameInput, double nameOffsetXInput,
+			String idInput, double nameOffsetXInput,
 			double nameOffsetYInput,
 			boolean infServer, int angleInput, int priority) {
-		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput);
+		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; // sets width
 		componentHeight = TRANSITION_HEIGHT;// sets height
 		constructTransition();

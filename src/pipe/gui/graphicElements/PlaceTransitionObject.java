@@ -49,15 +49,13 @@ Cloneable {
 	 *            Y-axis Position
 	 * @param idInput
 	 *            Place id
-	 * @param nameInput
-	 *            Name
 	 * @param nameOffsetXInput
 	 *            Name X-axis Position
 	 * @param nameOffsetYInput
 	 *            Name Y-axis Position
 	 */
 	public PlaceTransitionObject(double positionXInput, double positionYInput,
-			String idInput, String nameInput, double nameOffsetXInput,
+			String idInput, double nameOffsetXInput,
 			double nameOffsetYInput) {
 		this(positionXInput, positionYInput);
 		id = idInput;

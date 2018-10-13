@@ -58,11 +58,11 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent(double positionXInput,
-			double positionYInput, String idInput, String nameInput,
+			double positionYInput, String idInput,
 			double nameOffsetXInput, double nameOffsetYInput,
 			boolean timedTransition, boolean infServer, int angleInput,
 			int priority) {
-		super(positionXInput, positionYInput, idInput, nameInput,
+		super(positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
 		listener = timedTransitionListener();
@@ -226,7 +226,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 		
 		transitionComponent.setGuiModel(guiModel);
