@@ -184,21 +184,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		connectedTo = a;
 	}
 
-
-
-	/*
-	 * public TransportArc getBuddy() { TransportArc toReturn = null; if
-	 * (isInPreSet){ HashMap<TransportArc, TransportArc> transportArcMap =
-	 * (HashMap<TransportArc, TransportArc>) ((HashMap)
-	 * CreateGui.getModel().getTransportArcMap() ). get( this.getTarget() );
-	 * 
-	 * toReturn = transportArcMap.get(this); }else { HashMap<TransportArc,
-	 * TransportArc> transportArcMap = (HashMap<TransportArc, TransportArc>)
-	 * ((HashMap) CreateGui.getModel().getTransportArcMap() ). get(
-	 * this.getSource() ); for ( TransportArc ta : transportArcMap.keySet() ){
-	 * if (transportArcMap.get(ta) == this){ toReturn = ta; } } } return
-	 * toReturn; }
-	 */
 	public boolean isInPreSet() {
 		return isInPreSet;
 	}
