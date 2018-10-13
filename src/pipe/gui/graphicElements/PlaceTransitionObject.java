@@ -25,7 +25,6 @@ Cloneable {
 
 	private LinkedList<Arc> connectTo = new LinkedList<Arc>();
 	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
-	protected static Arc someArc;
 
 	private PlaceTransitionObject lastCopy = null;
 	private PlaceTransitionObject original = null;
@@ -282,6 +281,7 @@ Cloneable {
 	public void updateConnected() {
 		Iterator<Arc> arcsFrom = connectFrom.iterator();
 
+		Arc someArc;
 		while (arcsFrom.hasNext()) {
 			someArc = (arcsFrom.next());
 			updateEndPoint(someArc);
