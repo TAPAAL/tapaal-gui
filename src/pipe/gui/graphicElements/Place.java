@@ -215,11 +215,6 @@ public abstract class Place extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void showEditor() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
 			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
