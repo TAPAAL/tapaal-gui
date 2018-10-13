@@ -415,11 +415,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void showEditor() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		pnName.setText(getText());
 		pnName.zoomUpdate(zoom);
