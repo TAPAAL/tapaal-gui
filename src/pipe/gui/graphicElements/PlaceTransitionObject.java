@@ -28,12 +28,9 @@ Cloneable {
 
 	protected boolean attributesVisible = false;
 
-	// The "real" x coordinate of this place or transition in the net.
+	// The "real" x/y coordinate of this place or transition in the net.
 	// i.e. the x position at 100% zoom.
 	private double locationX;
-
-	// The "real" y coordinate of this place or transition in the net.
-	// i.e. the y position at 100% zoom.
 	private double locationY;
 
 	/**
