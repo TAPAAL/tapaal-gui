@@ -116,58 +116,6 @@ public class TimedOutputArcComponent extends Arc {
 		mouseHandler = new ArcHandler(this);
 	}
 
-	public TimedOutputArcComponent paste(double despX, double despY,
-			boolean toAnotherView) {
-		PlaceTransitionObject source = this.getSource().getLastCopy();
-		PlaceTransitionObject target = this.getTarget().getLastCopy();
-
-		if (source == null && target == null) {
-			// don't paste an arc with neither source nor target
-			return null;
-		}
-
-		if (source == null) {
-			if (toAnotherView) {
-				// if the source belongs to another Petri Net, the arc can't be
-				// pasted
-				return null;
-			} else {
-				source = this.getSource();
-			}
-		}
-
-		if (target == null) {
-			if (toAnotherView) {
-				// if the target belongs to another Petri Net, the arc can't be
-				// pasted
-				return null;
-			} else {
-				target = this.getTarget();
-			}
-		}
-
-		TimedOutputArcComponent copy = new TimedOutputArcComponent(0, 0, // startPoint
-				0, 0, // endPoint
-				source, target, 1, source.getId() + " to "
-						+ target.getId(), false);
-
-		copy.myPath.delete();
-		for (int i = 0; i <= myPath.getEndIndex(); i++) {
-			copy.myPath.addPoint(myPath.getPoint(i).getX() + despX,
-					myPath.getPoint(i).getY() + despY, myPath
-							.getPointType(i));
-			copy.myPath.selectPoint(i);
-		}
-
-		source.addConnectFrom(copy);
-		target.addConnectTo(copy);
-
-		return copy;
-	}
-
-	public TimedOutputArcComponent copy() {
-		return new TimedOutputArcComponent(this);
-	}
 
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 

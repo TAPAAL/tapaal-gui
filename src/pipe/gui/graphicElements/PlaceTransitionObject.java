@@ -26,8 +26,6 @@ Cloneable {
 	private LinkedList<Arc> connectTo = new LinkedList<Arc>();
 	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
 
-	private PlaceTransitionObject lastCopy = null;
-
 	protected boolean attributesVisible = false;
 
 	// The "real" x coordinate of this place or transition in the net.
@@ -389,10 +387,6 @@ Cloneable {
 	}
 
 	public abstract void updateEndPoint(Arc arc);
-
-	public PlaceTransitionObject getLastCopy() {
-		return lastCopy;
-	}
 
 	public abstract void showEditor();
 

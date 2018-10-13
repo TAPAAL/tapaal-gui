@@ -165,20 +165,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	@Override
-	public TimedInputArcComponent copy() {
-		return new TimedInputArcComponent(new TimedOutputArcComponent(this), timeInterval);
-	}
-
-	@Override
-	public TimedInputArcComponent paste(double despX, double despY,	boolean toAnotherView) {
-		TimedOutputArcComponent copy = new TimedOutputArcComponent(this);
-		copy.setSource(this.getSource());
-		copy.setTarget(this.getTarget());
-		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), timeInterval);
-		return timedCopy;
-	}
-
-	@Override
 	public void setLabelPosition() {
 		/*label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
 				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)

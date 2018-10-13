@@ -149,12 +149,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public TimedTransportArcComponent copy() {
-
-		return null;
-	}
-
-	@Override
 	public void delete() {
 		if (underlyingTransportArc != null) {
 			underlyingTransportArc.delete();
@@ -190,12 +184,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		connectedTo = a;
 	}
 
-	@Override
-	public TimedTransportArcComponent paste(double despX, double despY,
-			boolean toAnotherView) {
 
-		return null;
-	}
 
 	/*
 	 * public TransportArc getBuddy() { TransportArc toReturn = null; if
