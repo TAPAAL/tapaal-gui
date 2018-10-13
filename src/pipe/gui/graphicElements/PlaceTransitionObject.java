@@ -28,7 +28,6 @@ Cloneable {
 
 	private PlaceTransitionObject lastCopy = null;
 	private PlaceTransitionObject original = null;
-	private int copyNumber = 0;
 
 	protected boolean attributesVisible = false;
 
@@ -391,20 +390,6 @@ Cloneable {
 	}
 
 	public abstract void updateEndPoint(Arc arc);
-
-	public int getCopyNumber() {
-		if (original != null) {
-			return original.copyNumber;
-		} else {
-			return 0;
-		}
-	}
-
-	public void incrementCopyNumber() {
-		if (original != null) {
-			original.copyNumber++;
-		}
-	}
 
 	public void newCopy(PlaceTransitionObject ptObject) {
 		if (original != null) {
