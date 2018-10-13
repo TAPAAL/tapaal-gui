@@ -27,7 +27,6 @@ Cloneable {
 	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
 
 	private PlaceTransitionObject lastCopy = null;
-	private PlaceTransitionObject original = null;
 
 	protected boolean attributesVisible = false;
 
@@ -391,26 +390,8 @@ Cloneable {
 
 	public abstract void updateEndPoint(Arc arc);
 
-	public void newCopy(PlaceTransitionObject ptObject) {
-		if (original != null) {
-			original.lastCopy = ptObject;
-		}
-	}
-
 	public PlaceTransitionObject getLastCopy() {
 		return lastCopy;
-	}
-
-	public void resetLastCopy() {
-		lastCopy = null;
-	}
-
-	public void setOriginal(PlaceTransitionObject ptObject) {
-		original = ptObject;
-	}
-
-	public PlaceTransitionObject getOriginal() {
-		return original;
 	}
 
 	public abstract void showEditor();
