@@ -29,7 +29,7 @@ import dk.aau.cs.gui.undo.Command;
  * 
  * @author Pere Bonet: modified the weight label placement
  */
-public class ArcPath implements Shape, Cloneable {
+public class ArcPath implements Shape {
 
 	private GeneralPath path = new GeneralPath();
 	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();

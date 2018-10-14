@@ -104,15 +104,6 @@ public class TimedPlaceComponent extends Place {
 			}
 		};
 	}
-	
-	@Override
-	public TimedPlaceComponent clone() {
-		TimedPlaceComponent toReturn = (TimedPlaceComponent) super.clone();
-
-		toReturn.setInvariant(this.getInvariant());
-		return toReturn;
-
-	}
 
 	public String getInvariantAsString() {
 		return getInvariant().toString();

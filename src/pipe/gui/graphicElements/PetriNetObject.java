@@ -22,8 +22,7 @@ import pipe.gui.handler.PetriNetObjectHandler;
  * Petri-Net Object Class 
  * Implements things in common between all types of objects
  */
-public abstract class PetriNetObject extends JComponent implements Zoomable,
-		Cloneable, Translatable {
+public abstract class PetriNetObject extends JComponent implements Zoomable, Translatable {
 
 	private static final long serialVersionUID = 2693171860021066729L;
 
@@ -318,28 +317,5 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		return (DrawingSurfaceImpl) super.getParent();
 	}
 
-	@Override
-	public PetriNetObject clone() {
-		try {
-			PetriNetObject pnObjectCopy = (PetriNetObject) super.clone();
-
-			// Remove all mouse listeners on the new object
-			EventListener[] mouseListeners = pnObjectCopy
-					.getListeners(MouseListener.class);
-			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy.removeMouseListener((MouseListener) mouseListeners[i]);
-			}
-
-			mouseListeners = pnObjectCopy.getListeners(MouseMotionListener.class);
-
-			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
-			}
-
-			return pnObjectCopy;
-		} catch (CloneNotSupportedException e) {
-			throw new Error(e);
-		}
-	}
 
 }

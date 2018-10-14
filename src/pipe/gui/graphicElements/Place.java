@@ -196,18 +196,5 @@ public abstract class Place extends PlaceTransitionObject {
 		repaint();
 	}
 
-	@Override
-	public Place clone() {
 
-		Place toReturn = (Place) super.clone();
-
-		toReturn.markingOffsetX = markingOffsetX;
-		toReturn.markingOffsetY = markingOffsetY;
-		toReturn.componentWidth = componentWidth;
-		toReturn.componentHeight = componentHeight;
-		toReturn.setCentre((int) positionX, (int) positionY);
-
-		return toReturn;
-
-	}
 }

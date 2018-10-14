@@ -16,7 +16,7 @@ import pipe.gui.Zoomer;
  * @version 1.0
  * @author Camilla Clifford
  */
-public class NameLabel extends JTextArea implements Cloneable, Translatable,
+public class NameLabel extends JTextArea implements Translatable,
 		Zoomable {
 
 	private static final long serialVersionUID = 5167510420195429773L;
@@ -106,16 +106,6 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 	public void zoomUpdate(int value) {
 		setFont(getFont().deriveFont(Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
 		updateSize();
-	}
-
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	public void displayName(boolean display){

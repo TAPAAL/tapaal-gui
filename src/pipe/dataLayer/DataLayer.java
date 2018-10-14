@@ -23,7 +23,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 
 
-public class DataLayer implements Cloneable {
+public class DataLayer {
 
 	/** PNML File Name */
 	public String pnmlName = null;

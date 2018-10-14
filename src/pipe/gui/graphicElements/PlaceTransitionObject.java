@@ -15,8 +15,7 @@ import pipe.gui.handler.LabelHandler;
  * Petri-Net Place or Transition SuperClass
  * 
  */
-public abstract class PlaceTransitionObject extends PetriNetObject implements
-Cloneable {
+public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	private static final long serialVersionUID = -6629006415467929184L;
 
@@ -406,16 +405,4 @@ Cloneable {
 		update(true);
 	}
 
-	// XXX - kyrke now also clones arcs
-	// Clone object and deep copy the pnNames
-	@Override
-	public PlaceTransitionObject clone() {
-		PlaceTransitionObject toReturn = (PlaceTransitionObject) super.clone();
-		toReturn.pnName = (NameLabel) pnName.clone();
-
-		toReturn.connectFrom = connectFrom;
-		toReturn.connectTo = connectTo;
-
-		return toReturn;
-	}
 }

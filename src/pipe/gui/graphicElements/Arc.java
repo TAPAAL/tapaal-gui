@@ -19,7 +19,7 @@ import dk.aau.cs.model.tapn.Weight;
 /**
    Implementation of Element for drawing an arc
  */
-public abstract class Arc extends PetriNetObject implements Cloneable {
+public abstract class Arc extends PetriNetObject {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 
@@ -364,13 +364,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		}
 	}
 
-	/**
-	 * Method to clone an Arc object
-	 */
-	@Override
-	public PetriNetObject clone() {
-		return super.clone();
-	}
 
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,

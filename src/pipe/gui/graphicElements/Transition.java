@@ -475,24 +475,6 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 	}
-
-	 @Override
-	 public Transition clone() {
-		 Transition toReturn=null;
-		 toReturn = (Transition)super.clone();
-
-		 toReturn.positionX = positionX;
-
-		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
-		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-		 toReturn.constructTransition();
-		 toReturn.angle = 0;
-		 toReturn.setCentre((int)positionX, (int)positionY);
-		 toReturn.rotate(getAngle());
-		 toReturn.updateBounds();
-
-		 return toReturn;
-	 }
 	 
 	 public void blink(){
 		 if(blinkTimer == null) { initBlinkTimer(); }
