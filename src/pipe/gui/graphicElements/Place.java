@@ -28,19 +28,19 @@ public abstract class Place extends PlaceTransitionObject {
 	// Value of the capacity restriction; 0 means no capacity restriction 
 	protected Integer capacity = 0;
 
-	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
+	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
-	public static int tWidth = 5;
-	public static int tHeight = 5;
+	protected static int tWidth = 5;
+	protected static int tHeight = 5;
 
 	// Token dot position offsets
-	public static int tLeftX = 7;
-	public static int tRightX = 19;
-	public static int tTopY = 7;
-	public static int tBotY = 19;
-	public static int tMiddleX = 13;
-	public static int tMiddleY = 13;
+	protected static int tLeftX = 7;
+	protected static int tRightX = 19;
+	protected static int tTopY = 7;
+	protected static int tBotY = 19;
+	protected static int tMiddleX = 13;
+	protected static int tMiddleY = 13;
 
 	// Ellipse2D.Double place
 	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
