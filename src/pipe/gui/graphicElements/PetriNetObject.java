@@ -53,7 +53,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	protected Rectangle bounds = new Rectangle();
 
 	protected boolean deleted = false;
-	protected boolean markedAsDeleted = false;
 
 	// Integer value which represents a zoom percentage
 	protected int zoom = Pipe.ZOOM_DEFAULT;
@@ -296,11 +295,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 
 	public boolean isDeleted() {
-		return deleted || markedAsDeleted;
-	}
-
-	public void markAsDeleted() {
-		markedAsDeleted = true;
+		return deleted;
 	}
 
 	public void select(Rectangle selectionRectangle) {

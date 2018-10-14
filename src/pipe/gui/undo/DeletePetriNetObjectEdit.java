@@ -25,8 +25,6 @@ public class DeletePetriNetObjectEdit extends Command {
 		pnObject = _pnObject;
 		view = _view;
 		model = _model;
-
-		pnObject.markAsDeleted();
 	}
 
 	/** */

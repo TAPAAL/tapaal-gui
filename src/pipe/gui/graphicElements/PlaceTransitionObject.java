@@ -346,7 +346,6 @@ Cloneable {
 	@Override
 	public void addedToGui() {
 		deleted = false;
-		markedAsDeleted = false;
 		addLabelToContainer();
 		update(true);
 		updateOnMoveOrZoom();

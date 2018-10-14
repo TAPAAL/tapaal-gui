@@ -263,8 +263,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void addedToGui() {
 		// called by GuiView / State viewer when adding component.
 		deleted = false;
-		markedAsDeleted = false;
-
 
 		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
 
