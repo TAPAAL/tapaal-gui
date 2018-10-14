@@ -45,7 +45,6 @@ public class ArcPathPoint extends PetriNetObject {
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
-		copyPasteable = false; // we can't copy & paste indivial arc points!
 		zoom = Pipe.ZOOM_DEFAULT;
 
 		//XXX: see note in function
