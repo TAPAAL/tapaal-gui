@@ -36,15 +36,15 @@ public abstract class Transition extends PlaceTransitionObject {
 	private Shape proximityTransition;
 
 	// Transition Size
-	public static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
-	public static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
+	protected static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
+	protected static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
 	
 	protected int angle;
 	
 	// Animation Suff
 	protected boolean enabled = false;
-	public boolean delayEnabled = false;
-	public boolean highlighted = false;
+	protected boolean delayEnabled = false;
+	protected boolean highlighted = false;
 	private Timer blinkTimer;
 	private int blinkCount;
 
