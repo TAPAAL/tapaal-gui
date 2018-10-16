@@ -614,8 +614,8 @@ public class TapnLegacyXmlLoader {
 //		} else {
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
 					idInput, nameOffsetXInput, nameOffsetYInput,
-					initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, capacityInput);
+					markingOffsetXInput,
+					markingOffsetYInput);
 
 			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);

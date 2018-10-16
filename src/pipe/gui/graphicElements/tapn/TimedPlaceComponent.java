@@ -66,13 +66,12 @@ public class TimedPlaceComponent extends Place {
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
 			String idInput, Double nameOffsetXInput,
-			Double nameOffsetYInput, int initialMarkingInput,
-			double markingOffsetXInput, double markingOffsetYInput,
-			int capacityInput) {
+			Double nameOffsetYInput,
+			double markingOffsetXInput, double markingOffsetYInput) {
 
 		super(positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput, initialMarkingInput,
-				markingOffsetXInput, markingOffsetYInput, capacityInput);
+				nameOffsetXInput, nameOffsetYInput,
+				markingOffsetXInput, markingOffsetYInput);
 		listener = timedPlaceListener();
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
@@ -433,7 +432,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, 0, markingOffsetX, markingOffsetY, capacity);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, markingOffsetX, markingOffsetY);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		placeComponent.setGuiModel(guiModel);

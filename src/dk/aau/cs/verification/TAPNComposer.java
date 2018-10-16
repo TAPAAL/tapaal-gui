@@ -187,10 +187,8 @@ public class TAPNComposer implements ITAPNComposer {
 						oldPlace.getId(),
 						oldPlace.getNameOffsetX(),
 						oldPlace.getNameOffsetY(),
-						0,
 						oldPlace.getMarkingOffsetXObject().doubleValue(),
-						oldPlace.getMarkingOffsetYObject().doubleValue(),
-						0
+						oldPlace.getMarkingOffsetYObject().doubleValue()
 						);
 					newPlace.setGuiModel(guiModel);
 					newPlace.setUnderlyingPlace(constructedPlace);
@@ -239,10 +237,8 @@ public class TAPNComposer implements ITAPNComposer {
 								oldPlace.getId(),
 								oldPlace.getNameOffsetX(),
 								oldPlace.getNameOffsetY(),
-								0,
 								oldPlace.getMarkingOffsetXObject().doubleValue(),
-								oldPlace.getMarkingOffsetYObject().doubleValue(),
-								0
+								oldPlace.getMarkingOffsetYObject().doubleValue()
 								);
 						newPlace.setGuiModel(guiModel);
 						newPlace.setUnderlyingPlace(place);

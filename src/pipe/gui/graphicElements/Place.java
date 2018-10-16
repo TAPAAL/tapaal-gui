@@ -48,8 +48,8 @@ public abstract class Place extends PlaceTransitionObject {
 
 	public Place(double positionXInput, double positionYInput, String idInput,
 			Double nameOffsetXInput, Double nameOffsetYInput,
-			int initialMarkingInput, double markingOffsetXInput,
-			double markingOffsetYInput, int capacityInput) {
+			double markingOffsetXInput,
+			double markingOffsetYInput) {
 		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 		markingOffsetX = new Double(markingOffsetXInput);
 		markingOffsetY = new Double(markingOffsetYInput);

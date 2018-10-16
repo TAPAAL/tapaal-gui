@@ -451,7 +451,7 @@ public class TapnXmlLoader {
 			}
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, initialMarkingInput, markingOffsetXInput, markingOffsetYInput, 0);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, markingOffsetXInput, markingOffsetYInput);
 		placeComponent.setUnderlyingPlace(p);
 		
 		if (!displayName){

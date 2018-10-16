@@ -202,7 +202,7 @@ public class PNMLoader {
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
 			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.point.getX(), name.point.getY(),
-				marking.marking, marking.point.x, marking.point.y, 0);
+				marking.point.x, marking.point.y);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
 			addListeners(placeComponent, template);
