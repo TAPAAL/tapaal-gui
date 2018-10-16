@@ -19,12 +19,6 @@ public abstract class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
 
-	// Initial Marking X-axis Offset 
-	protected Double markingOffsetX = 0d;
-
-	// Initial Marking Y-axis Offset 
-	protected Double markingOffsetY = 0d;
-
 	// Value of the capacity restriction; 0 means no capacity restriction 
 	protected Integer capacity = 0;
 
@@ -47,12 +41,8 @@ public abstract class Place extends PlaceTransitionObject {
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
 	public Place(double positionXInput, double positionYInput, String idInput,
-			Double nameOffsetXInput, Double nameOffsetYInput,
-			double markingOffsetXInput,
-			double markingOffsetYInput) {
+			Double nameOffsetXInput, Double nameOffsetYInput) {
 		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
-		markingOffsetX = new Double(markingOffsetXInput);
-		markingOffsetY = new Double(markingOffsetYInput);
 		componentWidth = DIAMETER;
 		componentHeight = DIAMETER;
 		setCentre((int) positionX, (int) positionY);
@@ -92,24 +82,6 @@ public abstract class Place extends PlaceTransitionObject {
 		g2.draw(placeEllipse);
 
 		g2.setStroke(new BasicStroke(1.0f));
-	}
-
-	/**
-	 * Get X-axis offset for initial marking
-	 * 
-	 * @return Double value for X-axis offset of initial marking
-	 */
-	public Double getMarkingOffsetXObject() {
-		return markingOffsetX;
-	}
-
-	/**
-	 * Get Y-axis offset for initial marking
-	 * 
-	 * @return Double value for X-axis offset of initial marking
-	 */
-	public Double getMarkingOffsetYObject() {
-		return markingOffsetY;
 	}
 
 	/**
