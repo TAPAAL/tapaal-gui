@@ -120,7 +120,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	}
 
 	public void addNewPetriNetObject(PetriNetObject newObject) {
-		setLayer(newObject, DEFAULT_LAYER.intValue() + newObject.getLayerOffset());
+		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		super.add(newObject);
 
 		newObject.addedToGui();
