@@ -211,7 +211,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 				}
 
-				newObject.setGuiModel(guiModel);
 			//}
 		}
 

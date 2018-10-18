@@ -190,7 +190,6 @@ public class TAPNComposer implements ITAPNComposer {
 						oldPlace.getMarkingOffsetXObject().doubleValue(),
 						oldPlace.getMarkingOffsetYObject().doubleValue()
 						);
-					newPlace.setGuiModel(guiModel);
 					newPlace.setUnderlyingPlace(constructedPlace);
 					newPlace.setName(uniquePlaceName);
 					guiModel.addPetriNetObject(newPlace);
@@ -240,7 +239,6 @@ public class TAPNComposer implements ITAPNComposer {
 								oldPlace.getMarkingOffsetXObject().doubleValue(),
 								oldPlace.getMarkingOffsetYObject().doubleValue()
 								);
-						newPlace.setGuiModel(guiModel);
 						newPlace.setUnderlyingPlace(place);
 						newPlace.setName(uniquePlaceName);
 						guiModel.addPetriNetObject(newPlace);
@@ -295,7 +293,6 @@ public class TAPNComposer implements ITAPNComposer {
 									false,
 									oldTransition.getAngle(),
 									0);
-							newTransition.setGuiModel(guiModel);
 							newTransition.setUnderlyingTransition(transition);
 							newTransition.setName(uniqueTransitionName);
 							guiModel.addPetriNetObject(newTransition);
@@ -398,7 +395,6 @@ public class TAPNComposer implements ITAPNComposer {
 					// Set arcPath, guiModel and connectors
 					((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
-					newArc.setGuiModel(guiModel);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
 					guiSource.addConnectFrom(newArc);
@@ -456,7 +452,6 @@ public class TAPNComposer implements ITAPNComposer {
 					// Set arcPath, guiModel and connectors
 					newArc.setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
-					newArc.setGuiModel(guiModel);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
 					guiSource.addConnectTo(newArc);
@@ -529,7 +524,6 @@ public class TAPNComposer implements ITAPNComposer {
 								
 					newInArc.setUnderlyingArc(addedArc);
 					newInArc.setArcPath(newArcPathIn);
-					newInArc.setGuiModel(guiModel);
 					newInArc.updateArcPosition();
 					guiModel.addPetriNetObject(newInArc);
 					
@@ -576,7 +570,6 @@ public class TAPNComposer implements ITAPNComposer {
 				
 					newOutArc.setUnderlyingArc(addedArc);
 					newOutArc.setArcPath(newArcPathOut);
-					newOutArc.setGuiModel(guiModel);
 					newOutArc.updateArcPosition();
 					guiModel.addPetriNetObject(newOutArc);
 					
@@ -647,7 +640,6 @@ public class TAPNComposer implements ITAPNComposer {
 					
 					((TimedInhibitorArcComponent) newArc).setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
-					newArc.setGuiModel(guiModel);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
 					guiSource.addConnectTo(newArc);

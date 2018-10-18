@@ -373,6 +373,9 @@ public class DataLayer {
 	 *            The PetriNetObject to be added.
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
+
+		pnObject.setGuiModel(this);
+
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
 				addArc((TimedInhibitorArcComponent) pnObject);
@@ -398,6 +401,10 @@ public class DataLayer {
 	 *            The PetriNetObject to be removed.
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject) {
+
+		//XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
+		//pnObject.setGuiModel(null);
+
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;
 
@@ -915,7 +922,6 @@ public class DataLayer {
 		
 		for(AnnotationNote note : labelsArray) {
 			AnnotationNote annotation = note.copy();
-			annotation.setGuiModel(guiModel);
 			guiModel.addPetriNetObject(annotation);
 		}
 			
