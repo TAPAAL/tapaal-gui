@@ -9,6 +9,7 @@ import java.util.EventListener;
 
 import javax.swing.JComponent;
 
+import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -130,10 +131,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
-	}
-
-	public DataLayer getGuiModel() {
-		return guiModel;
 	}
 
 	public void setId(String idInput) {
