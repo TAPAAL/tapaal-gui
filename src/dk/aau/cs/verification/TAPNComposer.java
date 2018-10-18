@@ -193,7 +193,7 @@ public class TAPNComposer implements ITAPNComposer {
 					newPlace.setGuiModel(guiModel);
 					newPlace.setUnderlyingPlace(constructedPlace);
 					newPlace.setName(uniquePlaceName);
-					guiModel.addPlace(newPlace);
+					guiModel.addPetriNetObject(newPlace);
 				}
 			}
 		}
@@ -243,7 +243,7 @@ public class TAPNComposer implements ITAPNComposer {
 						newPlace.setGuiModel(guiModel);
 						newPlace.setUnderlyingPlace(place);
 						newPlace.setName(uniquePlaceName);
-						guiModel.addPlace(newPlace);
+						guiModel.addPetriNetObject(newPlace);
 					}
 				}
 			}
@@ -298,7 +298,7 @@ public class TAPNComposer implements ITAPNComposer {
 							newTransition.setGuiModel(guiModel);
 							newTransition.setUnderlyingTransition(transition);
 							newTransition.setName(uniqueTransitionName);
-							guiModel.addTransition(newTransition);
+							guiModel.addPetriNetObject(newTransition);
 						}
 						
 						if(timedTransition.isShared()){
@@ -458,7 +458,7 @@ public class TAPNComposer implements ITAPNComposer {
 					newArc.setArcPath(newArcPath);
 					newArc.setGuiModel(guiModel);
 					newArc.updateArcPosition();
-					guiModel.addArc(newArc);
+					guiModel.addPetriNetObject(newArc);
 					guiSource.addConnectTo(newArc);
 					guiTarget.addConnectFrom(newArc);
 				}
@@ -531,7 +531,7 @@ public class TAPNComposer implements ITAPNComposer {
 					newInArc.setArcPath(newArcPathIn);
 					newInArc.setGuiModel(guiModel);
 					newInArc.updateArcPosition();
-					guiModel.addArc(newInArc);
+					guiModel.addPetriNetObject(newInArc);
 					
 					guiSourceIn.addConnectTo(newInArc);
 					guiTargetIn.addConnectFrom(newInArc);
@@ -578,7 +578,7 @@ public class TAPNComposer implements ITAPNComposer {
 					newOutArc.setArcPath(newArcPathOut);
 					newOutArc.setGuiModel(guiModel);
 					newOutArc.updateArcPosition();
-					guiModel.addArc(newOutArc);
+					guiModel.addPetriNetObject(newOutArc);
 					
 					// Add connection references to the two transport arcs
 					newInArc.setConnectedTo(newOutArc);

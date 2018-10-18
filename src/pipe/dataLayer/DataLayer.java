@@ -92,7 +92,7 @@ public class DataLayer {
 	 * @param placeInput
 	 *            Place Object to add
 	 */
-	public void addPlace(Place placeInput) {
+	private void addPlace(Place placeInput) {
 		Require.that(placeInput != null, "input place was null");
 
 		placesArray.add(placeInput);
@@ -105,7 +105,7 @@ public class DataLayer {
 	 * @param labelInput
 	 *            AnnotationNote Object to add
 	 */
-	public void addAnnotation(AnnotationNote labelInput) {
+	private void addAnnotation(AnnotationNote labelInput) {
 		labelsArray.add(labelInput);
 	}
 
@@ -116,7 +116,7 @@ public class DataLayer {
 	 * @param transitionInput
 	 *            Transition Object to add
 	 */
-	public void addTransition(Transition transitionInput) {
+	private void addTransition(Transition transitionInput) {
 		Require.that(transitionInput != null, "input transition was null");
 		
 		transitionsArray.add(transitionInput);
@@ -129,7 +129,7 @@ public class DataLayer {
 	 * @param arcInput
 	 *            Arc Object to add
 	 */
-	public void addArc(TimedOutputArcComponent arcInput) {
+	private void addArc(TimedOutputArcComponent arcInput) {
 		boolean unique = true;
 
 		// Check if the arcs have a valid source and target
@@ -233,12 +233,12 @@ public class DataLayer {
 		}
 	}
 
-	public void addTransportArc(TimedTransportArcComponent transportArc) {
+	private void addTransportArc(TimedTransportArcComponent transportArc) {
 		arcsArray.add(transportArc);
 		addArcToArcsMap(transportArc);
 	}
 
-	public void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
+	private void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
 		boolean unique = true;
 
 		if (inhibitorArcInput != null) {
