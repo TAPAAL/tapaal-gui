@@ -884,7 +884,7 @@ public class DataLayer {
 		
 		for(Place p : placesArray) {
 			if(p instanceof TimedPlaceComponent) {
-				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn, guiModel);
+				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn);
 				oldToNewMapping.put(p, place);
 				guiModel.addPetriNetObject(place);
 			}
@@ -892,7 +892,7 @@ public class DataLayer {
 		
 		for(Transition t : transitionsArray) {
 			if(t instanceof TimedTransitionComponent) {
-				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn, guiModel);
+				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn);
 				oldToNewMapping.put(t, trans);
 				guiModel.addPetriNetObject(trans);
 			}
@@ -900,19 +900,19 @@ public class DataLayer {
 		
 		for(Arc arc : arcsArray) {
 			if(arc instanceof TimedTransportArcComponent) {
-				TimedTransportArcComponent transArc = ((TimedTransportArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedTransportArcComponent transArc = ((TimedTransportArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(transArc);
 			}
 			else if(arc instanceof TimedInhibitorArcComponent) {
-				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);				
+				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(inhibArc);
 			}
 			else if(arc instanceof TimedInputArcComponent) {
-				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(inputArc);
 			}
 			else if(arc instanceof TimedOutputArcComponent) {
-				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(outputArc);
 			}
 			else {
