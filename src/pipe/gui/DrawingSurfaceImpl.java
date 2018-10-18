@@ -119,8 +119,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	}
 
-
-	//XXX: KYRKE 2018-10-18, we need to refactor the "add" function, can be confused with JLayeredPane.add()
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		setLayer(newObject, DEFAULT_LAYER.intValue() + newObject.getLayerOffset());
 		super.add(newObject);
