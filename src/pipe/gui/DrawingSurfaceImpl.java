@@ -2,14 +2,11 @@ package pipe.gui;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.JLayeredPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -21,19 +18,14 @@ import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Note;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.handler.*;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.AddTimedPlaceCommand;
 import pipe.gui.undo.AddTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
@@ -118,7 +110,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		setPreferredSize(new Dimension(0,0));
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			pnObject.zoomUpdate(zoomer.getPercent());
-			add(pnObject);
+			addNewPetriNetObject(pnObject);
 		}
 
 		if(CreateGui.getApp().getMode() == ElementType.SELECT) {
@@ -130,9 +122,20 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	//XXX: KYRKE 2018-10-18, we need to refactor the "add" function, can be confused with JLayeredPane.add()
 	public void addNewPetriNetObject(PetriNetObject newObject) {
-		add(newObject);
-		validate();
-		repaint();
+		setLayer(newObject, DEFAULT_LAYER.intValue() + newObject.getLayerOffset());
+		super.add(newObject);
+
+		newObject.addedToGui();
+		petriNetObjects.add(newObject);
+
+		calculateNewBoundsForScrollPane(newObject.getBounds());
+		if(newObject.getNameLabel() != null){
+			calculateNewBoundsForScrollPane(newObject.getNameLabel().getBounds());
+		}
+
+		//Does not seem to be needed
+		//validate();
+		//repaint();
 	}
 
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
@@ -229,18 +232,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	public Zoomer getZoomController() {
 		return zoomControl;
-	}
-
-	public void add(PetriNetObject pnObject) {
-		setLayer(pnObject, DEFAULT_LAYER.intValue() + pnObject.getLayerOffset());
-		super.add(pnObject);
-		pnObject.addedToGui();
-		petriNetObjects.add(pnObject);
-
-		calculateNewBoundsForScrollPane(pnObject.getBounds());
-		if(pnObject.getNameLabel() != null){
-			calculateNewBoundsForScrollPane(pnObject.getNameLabel().getBounds());
-		}
 	}
 
 	private void calculateNewBoundsForScrollPane(Rectangle rect) {

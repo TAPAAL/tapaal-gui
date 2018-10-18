@@ -386,8 +386,8 @@ public class DataLayer {
 			} else if (pnObject instanceof Transition) {
 				addTransition((Transition) pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
-				addAnnotation((AnnotationNote)pnObject);				
-			} 
+				addAnnotation((AnnotationNote)pnObject);
+			}
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
@@ -900,7 +900,7 @@ public class DataLayer {
 		
 		for(Arc arc : arcsArray) {
 			if(arc instanceof TimedTransportArcComponent) {
-				TimedTransportArcComponent transArc = ((TimedTransportArcComponent)arc).copy(tapn, oldToNewMapping);
+				Arc transArc = ((TimedTransportArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(transArc);
 			}
 			else if(arc instanceof TimedInhibitorArcComponent) {
