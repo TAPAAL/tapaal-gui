@@ -1717,7 +1717,7 @@ public class GuiFrame extends JFrame  {
 
 		try {
 
-			ModelLoader loader = new ModelLoader(tab.drawingSurface());
+			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
 			tab.setNetwork(loadedModel.network(), loadedModel.templates());
@@ -1777,7 +1777,7 @@ public class GuiFrame extends JFrame  {
 
 				LoadedModel loadedModel;
 
-				PNMLoader loader = new PNMLoader(tab.drawingSurface());
+				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
 

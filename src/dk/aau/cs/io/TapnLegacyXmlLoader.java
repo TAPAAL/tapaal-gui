@@ -80,19 +80,17 @@ public class TapnLegacyXmlLoader {
 	private DataLayer guiModel;
 	private ArrayList<TAPNQuery> queries;
 	private ConstantStore constants;
-	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 
-	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
+	public TapnLegacyXmlLoader() {
 		presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 		postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 		queries = new ArrayList<TAPNQuery>();
 		constants = new ConstantStore();
-		drawingSurface = drawingSurfaceImpl;
 	}
 	
 	public LoadedModel load(InputStream file) throws FormatException {

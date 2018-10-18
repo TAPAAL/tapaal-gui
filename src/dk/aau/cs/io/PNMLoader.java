@@ -57,7 +57,6 @@ public class PNMLoader {
 	
 	enum GraphicsType { Position, Offset }
 
-	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private IdResolver idResolver = new IdResolver();
 	private HashSet<String> arcs = new HashSet<String>();
@@ -68,8 +67,7 @@ public class PNMLoader {
 	private int netSize = 0;
 	private int maxNetSize = 4000;
 	
-	public PNMLoader(DrawingSurfaceImpl drawingSurface) {
-		this.drawingSurface = drawingSurface;
+	public PNMLoader() {
 	}
 	
 	public LoadedModel load(File file) throws FormatException{

@@ -68,14 +68,12 @@ public class TapnXmlLoader {
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
-	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 	private IdResolver idResolver = new IdResolver();
 
-	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
-		this.drawingSurface = drawingSurface;
+	public TapnXmlLoader() {
 	}
 
 	public LoadedModel load(InputStream file) throws FormatException {
