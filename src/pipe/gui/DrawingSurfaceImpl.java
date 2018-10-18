@@ -128,97 +128,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	}
 
 
-	//XXX: KYRKE 2018-09-06: Code moved here, as duplicated several places in net loaders, tmp solution, untill
-	//XXX handlers are handled better.
-	public static void addPNListeners(PetriNetObject newObject, DrawingSurfaceImpl drawingSurface, DataLayer guiModel) {
-
-		if (newObject != null) {
-
-			//XXX 2018-09-06 temp solution while we are moving creation of handlers to the objects
-			if(newObject.getMouseHandler() != null) {
-				drawingSurface.add(newObject);
-			}else {
-				throw new RuntimeException("This code should never be called");
-
-//				//if (newObject.getMouseListeners().length == 0) {
-//					if (newObject instanceof Place) {
-//						// XXX - kyrke
-//						if (newObject instanceof TimedPlaceComponent) {
-//
-//							PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
-//							newObject.addMouseListener(placeHandler);
-//							newObject.addMouseWheelListener(placeHandler);
-//							newObject.addMouseMotionListener(placeHandler);
-//							drawingSurface.add(newObject);
-//
-//						} else {
-//
-//							PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
-//							newObject.addMouseListener(placeHandler);
-//							newObject.addMouseWheelListener(placeHandler);
-//							newObject.addMouseMotionListener(placeHandler);
-//							drawingSurface.add(newObject);
-//
-//						}
-//					} else if (newObject instanceof Transition) {
-//						TransitionHandler transitionHandler;
-//						if (newObject instanceof TimedTransitionComponent) {
-//							transitionHandler = new TAPNTransitionHandler((Transition) newObject);
-//						} else {
-//							transitionHandler = new TransitionHandler((Transition) newObject);
-//						}
-//
-//						newObject.addMouseListener(transitionHandler);
-//						newObject.addMouseMotionListener(transitionHandler);
-//						newObject.addMouseWheelListener(transitionHandler);
-//
-//						newObject.addMouseListener(new AnimationHandler());
-//
-//						drawingSurface.add(newObject);
-//					} else if (newObject instanceof Arc) {
-//						drawingSurface.add(newObject);
-//
-//						/* CB - Joakim Byg add timed arcs */
-//						if (newObject instanceof TimedInputArcComponent) {
-//							if (newObject instanceof TimedTransportArcComponent) {
-//								TransportArcHandler transportArcHandler = new TransportArcHandler((Arc) newObject);
-//								newObject.addMouseListener(transportArcHandler);
-//								newObject.addMouseWheelListener(transportArcHandler);
-//								newObject.addMouseMotionListener(transportArcHandler);
-//							} else {
-//								TimedArcHandler timedArcHandler = new TimedArcHandler((Arc) newObject);
-//								newObject.addMouseListener(timedArcHandler);
-//								newObject.addMouseWheelListener(timedArcHandler);
-//								newObject.addMouseMotionListener(timedArcHandler);
-//							}
-//						} else {
-//							/* EOC */
-//							ArcHandler arcHandler = new ArcHandler((Arc) newObject);
-//							newObject.addMouseListener(arcHandler);
-//							newObject.addMouseWheelListener(arcHandler);
-//							newObject.addMouseMotionListener(arcHandler);
-//						}
-//					} else if (newObject instanceof AnnotationNote) {
-//						drawingSurface.add(newObject);
-//						AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((AnnotationNote) newObject);
-//						newObject.addMouseListener(noteHandler);
-//						newObject.addMouseMotionListener(noteHandler);
-//						((Note) newObject).getNote().addMouseListener(noteHandler);
-//						((Note) newObject).getNote().addMouseMotionListener(noteHandler);
-//					}
-//
-//					newObject.zoomUpdate(drawingSurface.getZoom());
-
-				}
-
-			//}
-		}
-
-
-	}
-
+	//XXX: KYRKE 2018-10-18, we need to refactor the "add" function, can be confused with JLayeredPane.add()
 	public void addNewPetriNetObject(PetriNetObject newObject) {
-		addPNListeners(newObject, this, guiModel);
+		add(newObject);
 		validate();
 		repaint();
 	}

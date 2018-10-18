@@ -205,7 +205,6 @@ public class PNMLoader {
 				marking.point.x, marking.point.y);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
-			addListeners(placeComponent, template);
 		}
 		
 		idResolver.add(tapn.name(), id, id);
@@ -251,7 +250,6 @@ public class PNMLoader {
 						true, false, 0, 0);
 			transitionComponent.setUnderlyingTransition(transition);
 			template.guiModel().addPetriNetObject(transitionComponent);
-			addListeners(transitionComponent, template);
 		}
 		idResolver.add(tapn.name(), id, id);
 	}
@@ -441,7 +439,6 @@ public class PNMLoader {
 			arc.setUnderlyingArc(inputArc);
 
 			template.guiModel().addPetriNetObject(arc);
-			addListeners(arc, template);
 
 			source.addConnectFrom(arc);
 			target.addConnectTo(arc);
@@ -474,7 +471,6 @@ public class PNMLoader {
 			arc.setUnderlyingArc(outputArc);
 
 			template.guiModel().addPetriNetObject(arc);
-			addListeners(arc, template);
 
 			source.addConnectFrom(arc);
 			target.addConnectTo(arc);
@@ -497,7 +493,6 @@ public class PNMLoader {
 
 		tempArc.setUnderlyingArc(inhibArc);
 		template.guiModel().addPetriNetObject(tempArc);
-		addListeners(tempArc, template);
 		template.model().add(inhibArc);
 
 		source.addConnectFrom(tempArc);
@@ -518,8 +513,5 @@ public class PNMLoader {
 		}
 		return null;
 	}
-	
-	private void addListeners(PetriNetObject newObject, Template template) {
-		drawingSurface.addPNListeners(newObject, drawingSurface, template.guiModel());
-	}
+
 }

@@ -275,15 +275,12 @@ public class TapnXmlLoader {
 		if ("labels".equals(element.getNodeName())) {
 			AnnotationNote note = parseAnnotation(element);
 			template.guiModel().addPetriNetObject(note);
-			addListeners(note, template);
 		} else if ("place".equals(element.getNodeName())) {
 			TimedPlaceComponent place = parsePlace(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(place);
-			addListeners(place, template);
 		} else if ("transition".equals(element.getNodeName())) {
 			TimedTransitionComponent transition = parseTransition(element, network, template.model());
 			template.guiModel().addPetriNetObject(transition);
-			addListeners(transition, template);
 		} else if ("arc".equals(element.getNodeName())) {
 			parseAndAddArc(element, template, constants);
 		}
@@ -550,7 +547,6 @@ public class TapnXmlLoader {
 		}
 
 		template.guiModel().addPetriNetObject(tempArc);
-		addListeners(tempArc, template);
 		template.model().add(outputArc);
 
 		sourceIn.addConnectFrom(tempArc);
@@ -596,9 +592,7 @@ public class TapnXmlLoader {
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
 				template.guiModel().addPetriNetObject(tempArc);
-				addListeners(tempArc, template);
 				template.guiModel().addPetriNetObject(postsetTransportArc);
-				addListeners(postsetTransportArc, template);
 				template.model().add(transArc);
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
@@ -623,9 +617,7 @@ public class TapnXmlLoader {
 				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
 				template.guiModel().addPetriNetObject(presetTransportArc);
-				addListeners(presetTransportArc, template);
 				template.guiModel().addPetriNetObject(tempArc);
-				addListeners(tempArc, template);
 				template.model().add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
@@ -659,7 +651,6 @@ public class TapnXmlLoader {
 		}
 
 		template.guiModel().addPetriNetObject(tempArc);
-		addListeners(tempArc, template);
 		template.model().add(inputArc);
 
 		sourceIn.addConnectFrom(tempArc);
@@ -689,7 +680,6 @@ public class TapnXmlLoader {
 
 		tempArc.setUnderlyingArc(inhibArc);
 		template.guiModel().addPetriNetObject(tempArc);
-		addListeners(tempArc, template);
 		template.model().add(inhibArc);
 
 		sourceIn.addConnectFrom(tempArc);
@@ -731,7 +721,4 @@ public class TapnXmlLoader {
 		return new Constant(name, value);
 	}
 
-	private void addListeners(PetriNetObject newObject, Template template) {
-		drawingSurface.addPNListeners(newObject, drawingSurface, template.guiModel());
-	}
 }
