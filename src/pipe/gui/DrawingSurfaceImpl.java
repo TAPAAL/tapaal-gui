@@ -98,12 +98,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		this.guiModel = guiModel;
 		this.model = model;
 		this.zoomControl = zoomer;
-		CreateGui.getApp().updateZoomCombo();
+		app.updateZoomCombo();
 
 		if (animationmode) {
-			CreateGui.getAnimator().highlightEnabledTransitions();
-			CreateGui.getAnimator().unhighlightDisabledTransitions();
-			CreateGui.getAnimator().reportBlockingPlaces();
+			app.getAnimator().highlightEnabledTransitions();
+			app.getAnimator().unhighlightDisabledTransitions();
+			app.getAnimator().reportBlockingPlaces();
 		}
 
 		this.removeAll();
@@ -113,7 +113,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			addNewPetriNetObject(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == ElementType.SELECT) {
+		if(app.getMode() == ElementType.SELECT) {
 			this.selection.enableSelection();
 		}
 
