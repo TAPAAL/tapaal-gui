@@ -56,20 +56,6 @@ public class CreateGui {
 
 		TabContent tab = (tabs.get(index));
 
-		//XXX: 2018-04-26//kyrke The following code should never be called, a TAB always has a driwingSurface,
-		// if not seems wired to just create it.
-		// Code left in place for history, in case we someday experience problems with this.
-		// If no problems have been observed for some time, please remove the code and comment.
-//		while (tab.drawingSurface() == null) {
-//
-//			try {
-//				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel(),
-//						tab));
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-
 		return tab.drawingSurface();
 	}
 
