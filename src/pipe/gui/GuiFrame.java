@@ -932,7 +932,7 @@ public class GuiFrame extends JFrame  {
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StatisticsPanel.showStatisticsPanel();
+				StatisticsPanel.showStatisticsPanel(appView.getModel().getStatistics());
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
