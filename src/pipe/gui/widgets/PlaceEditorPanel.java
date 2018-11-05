@@ -707,7 +707,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists in this or another component, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}	
 			}
