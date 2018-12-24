@@ -49,7 +49,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
 	protected boolean copyPasteable = true; // True if object can be cloned.
-	protected static boolean ignoreSelection = false;
 	protected Rectangle bounds = new Rectangle();
 
 	protected boolean deleted = false;
@@ -174,10 +173,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 	public void setSelectable(boolean allow) {
 		selectable = allow;
-	}
-
-	public static void ignoreSelection(boolean ignore) {
-		ignoreSelection = ignore;
 	}
 
 	public boolean isDraggable() {

@@ -2193,7 +2193,6 @@ public class GuiFrame extends JFrame  {
 						CreateGui.getCurrentTab().setSelectedTemplateWasActive();
 					}
 					restoreMode();
-					PetriNetObject.ignoreSelection(true);
 					setAnimationMode(!appView.isInAnimationMode());
 					if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {
 						CreateGui.getCurrentTab().restoreSelectedTemplate();
@@ -2214,7 +2213,6 @@ public class GuiFrame extends JFrame  {
 				stepbackwardAction.setEnabled(false);
 			} else {
 				//setMode(ElementType.START);
-				PetriNetObject.ignoreSelection(false);
 				appView.getSelectionObject().clearSelection();
 				setAnimationMode(!appView.isInAnimationMode());
 				CreateGui.getCurrentTab().restoreSelectedTemplate();

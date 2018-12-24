@@ -122,7 +122,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
 				- myPath.getBounds().getY());
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
@@ -143,7 +143,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		g2.setStroke(new BasicStroke(0.8f));
 		g2.fillOval(-4, -8, 8, 8);
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);

@@ -215,7 +215,7 @@ public class TimedOutputArcComponent extends Arc {
 
 		AffineTransform reset = g2.getTransform();
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -235,7 +235,7 @@ public class TimedOutputArcComponent extends Arc {
 		g2.transform(Zoomer.getTransform(zoom));
 		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {

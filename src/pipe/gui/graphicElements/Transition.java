@@ -96,7 +96,7 @@ public class Transition extends PlaceTransitionObject {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
 			pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -108,7 +108,7 @@ public class Transition extends PlaceTransitionObject {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
 		} else if (delayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
 			g2.setPaint(Pipe.YELLOW_TRANSITION_COLOR);
-		} else if (selected && !ignoreSelection) {
+		} else if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
