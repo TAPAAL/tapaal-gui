@@ -23,7 +23,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 
-	protected Polygon head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
+	protected Shape head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
 			0, -10, -7, -10 }, 4);
 
 	protected NameLabel label;
@@ -265,7 +265,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		}
 
 		g2.setStroke(new BasicStroke(0.8f));
-		g2.fillPolygon(head);
+		g2.fill(head);
 
 		g2.transform(reset);
 	}
