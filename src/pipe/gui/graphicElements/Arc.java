@@ -236,6 +236,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 
 		AffineTransform reset = g2.getTransform();
 
+		//Draw Path
 		if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
@@ -247,9 +248,12 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		g2.setStroke(new BasicStroke(0.01f * zoom));
 		g2.draw(myPath);
 
+		//Draw Arrow-head
+		//Jump to arc end
 		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
 				.getPoint(myPath.getEndIndex()).getY());
 
+		//Rotate to match arrowhead to arc angle
 		g2.rotate(myPath.getEndAngle() + Math.PI);
 		g2.setColor(java.awt.Color.WHITE);
 
