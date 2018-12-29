@@ -1,7 +1,8 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import javax.swing.*;
@@ -21,6 +22,9 @@ import dk.aau.cs.model.tapn.Weight;
 public abstract class Arc extends PetriNetObject implements Cloneable {
 
 	private static final long serialVersionUID = 6527845538091358791L;
+
+	protected Polygon head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
+			0, -10, -7, -10 }, 4);
 
 	protected NameLabel label;
 
@@ -216,6 +220,54 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	
 	public void setArcPath(ArcPath newPath) {
 		myPath = newPath;
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
+
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+
+		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getY());
+
+		AffineTransform reset = g2.getTransform();
+
+		if (selected && !ignoreSelection) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.01f * zoom));
+		g2.draw(myPath);
+
+		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
+				.getPoint(myPath.getEndIndex()).getY());
+
+		g2.rotate(myPath.getEndAngle() + Math.PI);
+		g2.setColor(java.awt.Color.WHITE);
+
+		g2.transform(Zoomer.getTransform(zoom));
+		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+
+		if (selected && !ignoreSelection) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.8f));
+		g2.fillPolygon(head);
+
+		g2.transform(reset);
 	}
 
 	@Override
