@@ -25,6 +25,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 
 	protected Shape head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
 			0, -10, -7, -10 }, 4);
+	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 
 	protected NameLabel label;
 
@@ -269,7 +270,19 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		}
 
 		g2.setStroke(new BasicStroke(0.8f));
-		g2.fill(head);
+
+		if (fillHead) {
+			g2.fill(head);
+		} else {
+			Paint p = g2.getPaint();
+
+			//Fill first to get thick edge
+			g2.setColor(java.awt.Color.WHITE); // XXX: should be GB color of canvas / drawingsurface
+			g2.fill(head);
+
+			g2.setPaint(p);
+			g2.draw(head);
+		}
 
 		g2.transform(reset);
 	}
