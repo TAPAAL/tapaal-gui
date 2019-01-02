@@ -121,6 +121,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
+		newObject.zoomUpdate(zoomControl.getPercent());
 		super.add(newObject);
 
 		newObject.addedToGui();
