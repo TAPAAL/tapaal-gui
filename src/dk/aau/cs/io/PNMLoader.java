@@ -171,8 +171,6 @@ public class PNMLoader {
 			node = node.getNextSibling();
 		}
 		
-		template.guiModel().setDrawable(isNetDrawable());
-		
 		node = first;
 		//We parse the places and transitions first
 		while(node != null){
