@@ -3,19 +3,15 @@ package dk.aau.cs.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
-
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
 import dk.aau.cs.TCTL.visitors.ContainsSharedTransitionVisitor;
@@ -34,7 +30,6 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-import jdk.nashorn.internal.runtime.linker.LinkerCallSite;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
