@@ -166,7 +166,7 @@ public class QueryPane extends JPanel {
 	
 	public void updateQueryButtons() {
 		TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
-		if (queryList.getSelectedIndex() == -1 || query.isActive()) {
+		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
 			editQueryButton.setEnabled(false);
 			verifyButton.setEnabled(false);
 			removeQueryButton.setEnabled(false);
