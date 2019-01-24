@@ -1458,9 +1458,11 @@ public class BatchProcessingDialog extends JDialog {
 		if (listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
+			removeFileButton.setEnabled(true);
 		} else {
 			clearFilesButton.setEnabled(false);
 			startButton.setEnabled(false);
+			removeFileButton.setEnabled(false);
 		}
 
 		if (tableModel.getRowCount() > 0)
