@@ -295,7 +295,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					false, true, false, null, ExtrapolationOption.AUTOMATIC,
 					WorkflowMode.WORKFLOW_SOUNDNESS);
 			long time = 0;
-			Stats stats = new NullStats();
 			try {
 				final VerificationResult<TimedArcPetriNetTrace> resultOfSoundCheck = verifyQuery(file, composedModel, queryToCheckIfSound);
 				//Strong Soundness check
@@ -328,10 +327,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 				} else
 					publishResult(file.getName(), queryToVerify, "Not Strongly Sound", resultOfSoundCheck.verificationTime(), resultOfSoundCheck.stats());
-					System.out.println(resultOfSoundCheck.stats());
 				
 			} catch (Exception e) {
-				publishResult(file.getName(), queryToVerify, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", time, stats);
+				publishResult(file.getName(), queryToVerify, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", time, new NullStats());
 			}
 		}
 	}
