@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
-
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
+import pipe.gui.Verifier;
 import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -35,12 +35,14 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
+import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
@@ -53,6 +55,7 @@ import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
@@ -271,7 +274,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		fireVerificationTaskComplete();
 	}
-	private void processSoundnessCheck(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception{
+	private void processSoundnessCheck(final File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, final pipe.dataLayer.TAPNQuery queryToVerify) throws Exception{
 		VerificationResult<TimedArcPetriNetTrace> verificationResult;
 		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_SOUNDNESS) {
 			try {
@@ -294,7 +297,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			long time = 0;
 			Stats stats = new NullStats();
 			try {
-				VerificationResult<TimedArcPetriNetTrace> resultOfSoundCheck = verifyQuery(file, composedModel, queryToCheckIfSound);
+				final VerificationResult<TimedArcPetriNetTrace> resultOfSoundCheck = verifyQuery(file, composedModel, queryToCheckIfSound);
 				//Strong Soundness check
 				if(resultOfSoundCheck.isQuerySatisfied()) {
 					long m = resultOfSoundCheck.stats().exploredStates();
@@ -307,17 +310,22 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					}
 					long c  = m*B+1;
 					queryToVerify.setStrongSoundnessBound(c);
-					verificationResult = verifyQuery(file, composedModel, queryToVerify);
-					
-					//add stats from regular soundness check
-					verificationResult.stats().addStats(resultOfSoundCheck.stats());
-					verificationResult.addTime(resultOfSoundCheck.verificationTime());
-					time = verificationResult.verificationTime() + resultOfSoundCheck.verificationTime();
-					stats = verificationResult.stats();
-					
+					Verifier.runVerifyTAPNVerification(model.network(), queryToVerify, new VerificationCallback() {
+						
+						@Override
+						public void run() {							
+						}
+						
+						@Override
+						public void run(VerificationResult<TAPNNetworkTrace> result) {
+							TraceType traceType = ((TimedTAPNNetworkTrace) result.getTrace()).getTraceType();
+							if(traceType == TraceType.EG_DELAY_FOREVER || traceType == TraceType.EG_LOOP) {
+								publishResult(file.getName(), queryToVerify, "Not Strongly Sound", result.verificationTime(), result.stats());
+							} else
+								publishResult(file.getName(), queryToVerify, "Strongly Sound", result.verificationTime(), result.stats());
+						}
+					});
 
-					if(verificationResult != null)
-						processVerificationResult(file, queryToVerify, verificationResult);
 				} else
 					publishResult(file.getName(), queryToVerify, "Not Strongly Sound", resultOfSoundCheck.verificationTime(), resultOfSoundCheck.stats());
 					System.out.println(resultOfSoundCheck.stats());
