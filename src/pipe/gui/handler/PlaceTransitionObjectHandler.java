@@ -66,6 +66,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	// Disable key bindings that are only available when drawing arcs.
 	private void freeArc(Arc newArc){
+		newArc.sealArc();
 		newArc.disableDrawingKeyBindings();
 		CreateGui.getDrawingSurface().createArc = null;
 	}

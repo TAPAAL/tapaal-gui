@@ -587,6 +587,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		private void addPoint(final Arc createArc, final MouseEvent e) {
 			int x = Grid.getModifiedX(e.getX());
 			int y = Grid.getModifiedY(e.getY());
+
 			boolean shiftDown = e.isShiftDown();
 			createArc.setEndPoint(x, y, shiftDown);
 			createArc.getArcPath().addPoint(x, y, shiftDown);

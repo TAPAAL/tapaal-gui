@@ -34,6 +34,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);
+		isPrototype = true;
 
 		//XXX: se note in funcation
 		addMouseHandler();
