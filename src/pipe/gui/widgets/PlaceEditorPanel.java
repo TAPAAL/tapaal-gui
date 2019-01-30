@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
 
@@ -28,15 +29,19 @@ import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
 import dk.aau.cs.gui.undo.MakePlaceNewSharedCommand;
+import dk.aau.cs.gui.undo.MakePlaceNewSharedMultiCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
@@ -47,6 +52,7 @@ import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
@@ -701,14 +707,21 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			context.nameGenerator().updateIndices(context.activeModel(), newName);
 		
 			if(makeNewShared){
-				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent());
+				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent(), false);
 				context.undoManager().addEdit(command);
 				try{
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
+					int dialogResult = JOptionPane.showConfirmDialog(this, "A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\n Would you like to make the other places of the same name shared too?", "Error", JOptionPane.YES_NO_OPTION);
+					if(dialogResult == JOptionPane.YES_OPTION) {
+						Command cmd = new MakePlaceNewSharedMultiCommand(context, newName, place);	
+						context.undoManager().addEdit(cmd);
+						cmd.redo();
+					} else {
+						return false;
+					}
+					//JOptionPane.showMessageDialog(this, "A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 				}	
 			}
 		}

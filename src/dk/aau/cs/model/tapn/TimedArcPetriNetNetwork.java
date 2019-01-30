@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import pipe.gui.MessengerImpl;
+import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
@@ -70,12 +71,18 @@ public class TimedArcPetriNetNetwork {
 	}
 	
 	public void add(SharedPlace sharedPlace) {
+		add(sharedPlace, false);
+	}
+	
+	public void add(SharedPlace sharedPlace, boolean multiremove) {
 		Require.that(sharedPlace != null, "sharedPlace must not be null");
-		Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
-		
+		if(multiremove == false) {
+			Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
+		}
 		sharedPlace.setNetwork(this);
 		sharedPlace.setCurrentMarking(currentMarking);
-		sharedPlaces.add(sharedPlace);		
+		if(!(sharedPlaces.contains(sharedPlace)))
+			sharedPlaces.add(sharedPlace);
 	}
 
 	public boolean isNameUsedForShared(String name){

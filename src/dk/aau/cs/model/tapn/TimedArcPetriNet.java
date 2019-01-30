@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import pipe.gui.undo.AddArcPathPointEdit;
-
+import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
@@ -49,12 +49,17 @@ public class TimedArcPetriNet {
 	}
 
 	public void add(TimedPlace place) {
+		add(place, false);
+		System.out.println(Thread.currentThread().getStackTrace()[2].getLineNumber() + ";" + Thread.currentThread().getStackTrace()[2].getFileName());
+	}
+	public void add(TimedPlace place, boolean multiRemove) {
 		Require.that(place != null, "Argument must be a non-null place");
-		Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name already exists in the petri net.");
-
+		if(!multiRemove)
+			Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name already exists in the petri net.");
 		if(!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
+		System.out.println("Add " + place.isShared());
 	}
 
 	public void add(TimedTransition transition) {
@@ -127,6 +132,8 @@ public class TimedArcPetriNet {
 			currentMarking.removePlaceFromMarking(place);
 			((LocalTimedPlace)place).setModel(null);
 		}
+		System.out.println("Remove " + place.isShared());
+
 	}
 
 	public void remove(TimedTransition transition) { // TODO: These methods must clean up arcs also

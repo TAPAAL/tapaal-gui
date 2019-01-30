@@ -30,8 +30,9 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final TabContent currentTab;
 	private SharedPlacesAndTransitionsPanel sharedPanel;
 	private SharedPlace sharedPlace;
+	private boolean multiRemove;
 	
-	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab){
+	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multiRemove){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(newSharedName != null, "newSharedName cannot be null");
 		Require.that(place != null, "timedPlace cannot be null");
@@ -45,6 +46,7 @@ public class MakePlaceNewSharedCommand extends Command {
 		this.sharedPlace = null;
 		this.currentTab = currentTab;
 		this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
+		this.multiRemove = multiRemove;
 		oldTokens = place.tokens();
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
@@ -57,9 +59,9 @@ public class MakePlaceNewSharedCommand extends Command {
 			sharedPlace = new SharedPlace(newSharedName);
 		}
 		
-		sharedPanel.addSharedPlace(sharedPlace);		
+		sharedPanel.addSharedPlace(sharedPlace, multiRemove);
 		updateArcs(place, sharedPlace);
-		tapn.add(sharedPlace);
+		tapn.add(sharedPlace, multiRemove);
 		placeComponent.setUnderlyingPlace(sharedPlace);
 		
 		updateQueries(place, sharedPlace);
@@ -72,7 +74,7 @@ public class MakePlaceNewSharedCommand extends Command {
 		}
 		updateArcs(sharedPlace, place);
 		tapn.remove(sharedPlace);
-		tapn.add(place);
+		tapn.add(place, multiRemove);
 		place.addTokens(oldTokens);
 		placeComponent.setUnderlyingPlace(place);
 		

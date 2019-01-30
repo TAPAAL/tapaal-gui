@@ -429,7 +429,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 	
 	public void addSharedPlace(SharedPlace place){
-		sharedPlacesListModel.addElement(place);
+		addSharedPlace(place, false);
+	}
+	public void addSharedPlace(SharedPlace place, boolean multiAdd){
+		sharedPlacesListModel.addElement(place, multiAdd);
 	}
 	
 	public void removeSharedTransition(SharedTransition transition){
@@ -491,7 +494,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		}
 
 		public void addElement(SharedPlace place){
-			network.add(place);
+			addElement(place, false);
+		}
+		public void addElement(SharedPlace place, boolean multiAdd){
+			network.add(place, multiAdd);
 			fireIntervalAdded(this, network.numberOfSharedPlaces()-1, network.numberOfSharedPlaces());
 		}
 
