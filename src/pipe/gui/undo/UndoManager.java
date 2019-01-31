@@ -111,6 +111,7 @@ public class UndoManager {
 			// The currentEdit to undo (reverse order)
 			ArrayList<Command> currentEdit = edits.get(indexOfNextAdd);
 			for (int i = currentEdit.size() - 1; i >= 0; i--) {
+				System.out.println(currentEdit.get(i));
 				currentEdit.get(i).undo();
 			}
 

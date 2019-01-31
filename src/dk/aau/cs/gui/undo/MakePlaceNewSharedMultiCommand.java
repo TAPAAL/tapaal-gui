@@ -49,6 +49,7 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 		private Context context;
 		private Place place;
 		private Command command;
+		private List<Command> commands = new ArrayList<Command>();
 
 
 		
@@ -77,7 +78,8 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 				TimedPlaceComponent component = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
 				command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
 				command.redo();
-				undoManager.addNewEdit(command);
+				commands.add(command);
+				//undoManager.addNewEdit(command);
 			}
 			/*for(TimedArcPetriNet tapn : tapns) {
 				for(Place placeComponent : guiModels.get(tapn).getPlaces()) {
@@ -102,10 +104,12 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 
 		@Override
 		public void undo() {	
-			for(Template template : context.tabContent().allTemplates()) {
-				System.out.println("Hej " + template.toString());
+			for(Command command : commands)
 				command.undo();
-			}
+			/*for(Template template : context.tabContent().allTemplates()) {
+				System.out.println("Hej " + template.toString());
+				undoManager.undo();
+			}*/
 			/*Hashtable<LocalTimedPlace, String> createdPlaces = new Hashtable<LocalTimedPlace, String>();
 			for(Template template : currentTab.allTemplates()) {
 				TimedPlace place = template.model().getPlaceByName(newSharedName);
