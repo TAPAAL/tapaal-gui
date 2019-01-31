@@ -76,9 +76,11 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 		public void redo() {
 			for(Template template : context.tabContent().allTemplates()) {
 				TimedPlaceComponent component = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
-				command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
-				command.redo();
-				commands.add(command);
+				if(component != null) {
+					command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
+					command.redo();
+					commands.add(command);
+				}
 				//undoManager.addNewEdit(command);
 			}
 			/*for(TimedArcPetriNet tapn : tapns) {
@@ -160,58 +162,6 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 					}
 				}
 			}*/
-		}
-
-		private void updateArcs(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn) {
-			for(TimedInputArc arc : tapn.inputArcs()){
-				if(arc.source().equals(toReplace)){
-					arc.setSource(replacement);
-				}
-			}
-			
-			for(TimedInhibitorArc arc : tapn.inhibitorArcs()){
-				if(arc.source().equals(toReplace)){
-					arc.setSource(replacement);
-				}
-			}
-			
-			for(TransportArc arc : tapn.transportArcs()){
-				if(arc.source().equals(toReplace)){
-					arc.setSource(replacement);
-				}
-				
-				if(arc.destination().equals(toReplace)){
-					arc.setDestination(replacement);
-				}
-			}
-			
-			for(TimedOutputArc arc : tapn.outputArcs()){
-				if(arc.destination().equals(toReplace)){
-					arc.setDestination(replacement);
-				}
-			}
-		}
-		
-		private void updateQueries(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn) {
-			MakePlaceSharedVisitor visitor = new MakePlaceSharedVisitor((toReplace.isShared() ? "" : tapn.name()), toReplace.name(), (replacement.isShared() ? "" : tapn.name()), replacement.name());
-			for(TAPNQuery query : currentTab.queries()) {
-				TAPNQuery oldCopy = query.copy();
-				BooleanResult isQueryAffected = new BooleanResult(false);
-				query.getProperty().accept(visitor, isQueryAffected);
-				
-				if(isQueryAffected.result())
-					newQueryToOldQueryMapping.put(query, oldCopy);
-					
-			}
-		}
-			
-		private void undoQueryChanges(SharedPlace toReplace, TimedPlace replacement) {
-			for(TAPNQuery query : currentTab.queries()) {
-				if(newQueryToOldQueryMapping.containsKey(query))
-					query.set(newQueryToOldQueryMapping.get(query));
-			}
-			
-			newQueryToOldQueryMapping.clear();
 		}
 	}
 

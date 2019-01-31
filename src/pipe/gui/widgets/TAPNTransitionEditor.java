@@ -21,7 +21,9 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.MakePlaceNewSharedMultiCommand;
 import dk.aau.cs.gui.undo.MakeTransitionNewSharedCommand;
+import dk.aau.cs.gui.undo.MakeTransitionNewSharedMultiCommand;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.ToggleTransitionUrgent;
@@ -388,6 +390,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 
 	private boolean okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
+		System.out.println("Hej");
 		
 		// Check urgent constrain
 		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
@@ -402,9 +405,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			transition.underlyingTransition().unshare();
 		}
 		
-		if(sharedCheckBox.isSelected()){	
+		if(sharedCheckBox.isSelected() && !(transition.underlyingTransition().isShared())){	
+			System.out.println(transition.underlyingTransition().isShared() + " " + sharedCheckBox.isSelected());
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
-                        Command command = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
+            Command command = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
 			context.undoManager().addEdit(command);
 			try{
 				command.redo();
@@ -438,14 +442,20 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 			
 			if(makeNewShared){
-				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent());
+				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent(), false);
 				context.undoManager().addEdit(command);
 				try{
 					command.redo();
 				}catch(RequireException e){
+					System.out.println(makeSharedButton.isEnabled() + " " + sharedCheckBox.isSelected());
 					context.undoManager().undo();
-					JOptionPane.showMessageDialog(this,"A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
+					int dialogResult = JOptionPane.showConfirmDialog(this, "A transition or place with the specified name already exists, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\n Would you like to make the other transitions of the same name shared too?", "Error", JOptionPane.YES_NO_OPTION);
+					if(dialogResult == JOptionPane.YES_OPTION) {
+						Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);	
+						cmd.redo();
+						context.undoManager().addNewEdit(cmd);
+					} else
+						return false;
 				}
 				transition.setUrgent(urgentCheckBox.isSelected());
 			}  
