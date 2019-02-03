@@ -59,7 +59,6 @@ public class TimedArcPetriNet {
 		if(!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
-		System.out.println("Add " + place.isShared());
 	}
 
 	public void add(TimedTransition transition) {

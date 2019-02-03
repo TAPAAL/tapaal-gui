@@ -113,6 +113,25 @@ public class TimedArcPetriNetNetwork {
 		}
 		return false;
 	}
+	
+	public boolean isNameUsedForPlacesOnly(String name) {
+		for(TimedArcPetriNet net : tapns){
+			for(TimedTransition transition : net.transitions()) {
+				if(name.equalsIgnoreCase(transition.name()))
+					return false;
+			}
+		}
+		return true;
+	}
+	public boolean isNameUsedForTransitionsOnly(String name) {
+		for(TimedArcPetriNet net : tapns){
+			for(TimedPlace place : net.places()) {
+				if(name.equalsIgnoreCase(place.name()))
+					return false;
+			}
+		}
+		return true;
+	}
 		
 	public boolean isNameUsed(String name) {
 		return isNameUsedForShared(name) || isNameUsedInTemplates(name);
