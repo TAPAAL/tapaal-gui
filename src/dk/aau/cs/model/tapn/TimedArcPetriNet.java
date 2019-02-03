@@ -50,7 +50,6 @@ public class TimedArcPetriNet {
 
 	public void add(TimedPlace place) {
 		add(place, false);
-		System.out.println(Thread.currentThread().getStackTrace()[2].getLineNumber() + ";" + Thread.currentThread().getStackTrace()[2].getFileName());
 	}
 	public void add(TimedPlace place, boolean multiRemove) {
 		Require.that(place != null, "Argument must be a non-null place");
@@ -131,8 +130,6 @@ public class TimedArcPetriNet {
 			currentMarking.removePlaceFromMarking(place);
 			((LocalTimedPlace)place).setModel(null);
 		}
-		System.out.println("Remove " + place.isShared());
-
 	}
 
 	public void remove(TimedTransition transition) { // TODO: These methods must clean up arcs also

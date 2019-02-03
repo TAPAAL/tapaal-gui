@@ -464,7 +464,6 @@ public class GuiFrame extends JFrame  {
 				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(CreateGui.getApp().isEditionAllowed());
 				if (CreateGui.getApp().isEditionAllowed()) {
 					appView.getUndoManager().undo();
 					CreateGui.getCurrentTab().network().buildConstraints();
