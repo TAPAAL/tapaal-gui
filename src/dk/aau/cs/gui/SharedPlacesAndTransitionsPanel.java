@@ -144,22 +144,26 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 						renameButton.setEnabled(false);
 					}else{
 						removeButton.setEnabled(true);
-						renameButton.setEnabled(true);
+						if(list.getSelectedIndices().length == 1) {
+							renameButton.setEnabled(true);
+						}
+						else
+							renameButton.setEnabled(false);
 					}
 					
 					int index = list.getSelectedIndex();
-					if(index > 0)
+					if(index > 0 && list.getSelectedIndices().length == 1)
 						moveUpButton.setEnabled(true);
 					else
 						moveUpButton.setEnabled(false);
 								
 					if(isDisplayingTransitions()) {
-						if(index < sharedTransitionsListModel.getSize() - 1)
+						if(index < sharedTransitionsListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
 							moveDownButton.setEnabled(true);
 						else
 							moveDownButton.setEnabled(false);
 					} else {
-						if(index < sharedPlacesListModel.getSize() - 1)
+						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
 							moveDownButton.setEnabled(true);
 						else
 							moveDownButton.setEnabled(false);
