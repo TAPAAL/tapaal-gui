@@ -105,6 +105,11 @@ public class ConstantsPane extends JPanel {
 						removeBtn.setEnabled(true);
 						editBtn.setEnabled(true);						
 					}
+					
+					if (constantsList.getModel().getSize() >= 2) {
+						sortButton.setEnabled(true);
+					} else
+						sortButton.setEnabled(false);
 
 					int index = constantsList.getSelectedIndex();
 					if(index > 0)
@@ -363,7 +368,7 @@ public class ConstantsPane extends JPanel {
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortConstants);
-		sortButton.setEnabled(true);
+		sortButton.setEnabled(false);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);

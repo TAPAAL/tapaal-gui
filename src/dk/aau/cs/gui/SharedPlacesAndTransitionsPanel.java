@@ -162,11 +162,21 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 							moveDownButton.setEnabled(true);
 						else
 							moveDownButton.setEnabled(false);
+						
+						if (sharedTransitionsListModel.getSize() >=2) {
+							sortButton.setEnabled(true);
+						} else
+							sortButton.setEnabled(false);
 					} else {
 						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
 							moveDownButton.setEnabled(true);
 						else
 							moveDownButton.setEnabled(false);
+						
+						if (sharedPlacesListModel.getSize() >=2) {
+							sortButton.setEnabled(true);
+						} else
+							sortButton.setEnabled(false);
 					}
 				}
 			}
@@ -242,7 +252,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortPlaces);
-		sortButton.setEnabled(true);
+		sortButton.setEnabled(false);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isDisplayingTransitions()){
@@ -298,6 +308,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				} else {
 					moveDownButton.setEnabled(false);
 					moveUpButton.setEnabled(false);
+					sortButton.setEnabled(false);
 				}
 				if (list.getModel().getSize() <= 0){
 					renameButton.setEnabled(false);
@@ -506,6 +517,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			if(numElements <= 1) {
 				moveDownButton.setEnabled(false);
 				moveUpButton.setEnabled(false);
+				sortButton.setEnabled(false);
 			}
 			if (numElements <= 0) {
 				removeButton.setEnabled(false);
@@ -585,6 +597,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			if(numElements <= 1) {
 				moveDownButton.setEnabled(false);
 				moveUpButton.setEnabled(false);
+				sortButton.setEnabled(false);
 			}
 			if (numElements <= 0) {
 				removeButton.setEnabled(false);
