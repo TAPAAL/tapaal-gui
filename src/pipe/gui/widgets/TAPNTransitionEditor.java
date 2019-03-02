@@ -456,9 +456,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 							cmd.redo();
 							context.undoManager().addEdit(cmd);
 						}
-					} else
+					} else {
 						JOptionPane.showMessageDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.OK_OPTION);
 						return false;
+					}
 				}
 				transition.setUrgent(urgentCheckBox.isSelected());
 			}  
