@@ -450,7 +450,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					context.undoManager().undo();
 					//This is checked as a transition cannot be shared if there exists a place with the same name
 					if(transition.underlyingTransition().model().parentNetwork().isNameUsedForTransitionsOnly(newName)) {
-						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\n Would you like to make the other transitions of the same name shared too?", "Error", JOptionPane.YES_NO_OPTION);
+						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\n Do you want to share this transition name also in all other components?", "Error", JOptionPane.YES_NO_OPTION);
 						if(dialogResult == JOptionPane.YES_OPTION) {
 							Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);	
 							cmd.redo();
