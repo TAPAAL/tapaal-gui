@@ -1056,8 +1056,6 @@ public class WorkflowDialog extends JDialog {
                 
 				long c  = m*B+1;
 
-
-
 				/* Call engine */
 
 				final TAPNQuery q;

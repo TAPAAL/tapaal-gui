@@ -194,6 +194,10 @@ public class VerificationResult<TTrace> {
 	public boolean isOverApproximationResult(){
 		return isOverApproximationResult;
 	}
+	
+	public void addTime(long timeToAdd) {
+		verificationTime += timeToAdd;
+	}
 
 	public String getCTLStatsAsString(){
 		StringBuffer buffer = new StringBuffer();
