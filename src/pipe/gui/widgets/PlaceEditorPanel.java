@@ -720,6 +720,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 							Command cmd = new MakePlaceNewSharedMultiCommand(context, newName, place);	
 							cmd.redo();
 							context.undoManager().addNewEdit(cmd);
+						} else {
+							return false;
 						}
 					} else {
 						JOptionPane.showMessageDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.OK_OPTION);
