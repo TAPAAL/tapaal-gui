@@ -715,8 +715,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					context.undoManager().undo();
 					//This is checked as a place cannot be shared if there exists a transition with the same name
 					if(context.activeModel().parentNetwork().isNameUsedForPlacesOnly(newName)) {
-						int dialogResult = JOptionPane.showConfirmDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\n Do you want to share this place name also in all other components?", "Error", JOptionPane.YES_NO_OPTION);
-						if(dialogResult == JOptionPane.YES_OPTION) {
+						int dialogResult = JOptionPane.showConfirmDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis place name will be changed into shared one also in all other components.", "Error", JOptionPane.OK_CANCEL_OPTION);
+						if(dialogResult == JOptionPane.OK_OPTION) {
 							Command cmd = new MakePlaceNewSharedMultiCommand(context, newName, place);	
 							cmd.redo();
 							context.undoManager().addNewEdit(cmd);
