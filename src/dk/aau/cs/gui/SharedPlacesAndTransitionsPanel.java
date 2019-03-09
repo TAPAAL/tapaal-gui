@@ -444,7 +444,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 	
 	public void addSharedPlace(SharedPlace place){
-		sharedPlacesListModel.addElement(place);
+		addSharedPlace(place, false);
+	}
+	public void addSharedPlace(SharedPlace place, boolean multiAdd){
+		sharedPlacesListModel.addElement(place, multiAdd);
 	}
 	
 	public void removeSharedTransition(SharedTransition transition){
@@ -452,9 +455,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			sharedTransitionsListModel.removeElement(transition);
 		}
 	}
-	
 	public void addSharedTransition(SharedTransition transition){
-		sharedTransitionsListModel.addElement(transition);
+		addSharedTransition(transition, false);
+	}
+	public void addSharedTransition(SharedTransition transition, boolean multiAdd){
+		sharedTransitionsListModel.addElement(transition, multiAdd);
 	}
 
 	public class SharedPlacesListModel extends AbstractListModel {
@@ -506,7 +511,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		}
 
 		public void addElement(SharedPlace place){
-			network.add(place);
+			addElement(place, false);
+		}
+		public void addElement(SharedPlace place, boolean multiAdd){
+			network.add(place, multiAdd);
 			fireIntervalAdded(this, network.numberOfSharedPlaces()-1, network.numberOfSharedPlaces());
 		}
 
@@ -584,9 +592,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public int getSize() {
 			return network.numberOfSharedTransitions();
 		}
-
 		public void addElement(SharedTransition transition){
-			network.add(transition);
+			addElement(transition, false);
+		}
+
+		public void addElement(SharedTransition transition, boolean multiAdd){
+			network.add(transition, multiAdd);
 			fireIntervalAdded(this, network.numberOfSharedTransitions()-1, network.numberOfSharedTransitions());
 		}
 

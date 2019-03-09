@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import pipe.gui.MessengerImpl;
+import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
@@ -60,22 +61,35 @@ public class TimedArcPetriNetNetwork {
 		currentMarking.addMarking(tapn, marking);
 		tapn.setMarking(currentMarking);
 	}
-	
 	public void add(SharedTransition sharedTransition){
+		add(sharedTransition, false);
+	}
+
+	
+	public void add(SharedTransition sharedTransition, boolean multiAdd){
 		Require.that(sharedTransition != null, "sharedTransition must not be null");
-		Require.that(!isNameUsed(sharedTransition.name()), "There is already a transition or place with that name");
+		if(!multiAdd) {
+			Require.that(!isNameUsed(sharedTransition.name()), "There is already a transition or place with that name");
+		}
 		
 		sharedTransition.setNetwork(this);
-		sharedTransitions.add(sharedTransition);
+		if(!(sharedTransitions.contains(sharedTransition)))
+			sharedTransitions.add(sharedTransition);
 	}
 	
 	public void add(SharedPlace sharedPlace) {
+		add(sharedPlace, false);
+	}
+	
+	public void add(SharedPlace sharedPlace, boolean multiremove) {
 		Require.that(sharedPlace != null, "sharedPlace must not be null");
-		Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
-		
+		if(multiremove == false) {
+			Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
+		}
 		sharedPlace.setNetwork(this);
 		sharedPlace.setCurrentMarking(currentMarking);
-		sharedPlaces.add(sharedPlace);		
+		if(!(sharedPlaces.contains(sharedPlace)))
+			sharedPlaces.add(sharedPlace);
 	}
 
 	public boolean isNameUsedForShared(String name){
@@ -99,6 +113,25 @@ public class TimedArcPetriNetNetwork {
 			if(net.isNameUsed(name)) return true;
 		}
 		return false;
+	}
+	
+	public boolean isNameUsedForPlacesOnly(String name) {
+		for(TimedArcPetriNet net : tapns){
+			for(TimedTransition transition : net.transitions()) {
+				if(name.equalsIgnoreCase(transition.name()))
+					return false;
+			}
+		}
+		return true;
+	}
+	public boolean isNameUsedForTransitionsOnly(String name) {
+		for(TimedArcPetriNet net : tapns){
+			for(TimedPlace place : net.places()) {
+				if(name.equalsIgnoreCase(place.name()))
+					return false;
+			}
+		}
+		return true;
 	}
 		
 	public boolean isNameUsed(String name) {
