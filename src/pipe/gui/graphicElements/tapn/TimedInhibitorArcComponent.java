@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.util.Hashtable;
 
 import pipe.dataLayer.DataLayer;
@@ -29,16 +30,17 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
-
 		//XXX: se note in funcation
 		addMouseHandler();
+		setHead();
 	}
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc, guard);
-
 		//XXX: se note in funcation
 		addMouseHandler();
+		setHead();
+
 	}
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
@@ -46,6 +48,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 		//XXX: se note in funcation
 		addMouseHandler();
+		setHead();
 	}
 
 	private void addMouseHandler() {
@@ -61,6 +64,11 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	public TimedInhibitorArc underlyingTimedInhibitorArc() {
 		return inhibitorArc;
+	}
+
+	protected void setHead() {
+		head = new Ellipse2D.Double(-4, -8, 8, 8);
+		fillHead = false;
 	}
 
 	@Override
@@ -126,47 +134,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
-		// super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g;
 
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-
-		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
-				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
-				- myPath.getBounds().getY());
-
-		if (selected && !ignoreSelection) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-		}
-
-		g2.setStroke(new BasicStroke(0.01f * zoom));
-		g2.draw(myPath);
-
-		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
-				.getPoint(myPath.getEndIndex()).getY());
-
-		g2.rotate(myPath.getEndAngle() + Math.PI);
-		g2.setColor(java.awt.Color.WHITE);
-
-		AffineTransform reset = g2.getTransform();
-		g2.transform(Zoomer.getTransform(zoom));
-
-		g2.setStroke(new BasicStroke(0.8f));
-		g2.fillOval(-4, -8, 8, 8);
-
-		if (selected && !ignoreSelection) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-		}
-		g2.drawOval(-4, -8, 8, 8);
-
-		g2.setTransform(reset);
-	}
 	
 	public TimedInhibitorArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedInhibitorArcComponent arc = new TimedInhibitorArcComponent(this);
