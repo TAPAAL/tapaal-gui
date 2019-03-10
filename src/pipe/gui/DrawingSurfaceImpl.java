@@ -2,14 +2,11 @@ package pipe.gui;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.JLayeredPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -21,19 +18,14 @@ import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Note;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.handler.*;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.AddTimedPlaceCommand;
 import pipe.gui.undo.AddTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
@@ -106,122 +98,43 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		this.guiModel = guiModel;
 		this.model = model;
 		this.zoomControl = zoomer;
-		CreateGui.getApp().updateZoomCombo();
+		app.updateZoomCombo();
 
 		if (animationmode) {
-			CreateGui.getAnimator().highlightEnabledTransitions();
-			CreateGui.getAnimator().unhighlightDisabledTransitions();
-			CreateGui.getAnimator().reportBlockingPlaces();
+			app.getAnimator().highlightEnabledTransitions();
+			app.getAnimator().unhighlightDisabledTransitions();
+			app.getAnimator().reportBlockingPlaces();
 		}
 
 		this.removeAll();
 		setPreferredSize(new Dimension(0,0));
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			pnObject.zoomUpdate(zoomer.getPercent());
-			add(pnObject);
+			addNewPetriNetObject(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == ElementType.SELECT) {
+		if(app.getMode() == ElementType.SELECT) {
 			this.selection.enableSelection();
 		}
 
 	}
 
+	public void addNewPetriNetObject(PetriNetObject newObject) {
+		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
+		newObject.zoomUpdate(zoomControl.getPercent());
+		super.add(newObject);
 
-	//XXX: KYRKE 2018-09-06: Code moved here, as duplicated several places in net loaders, tmp solution, untill
-	//XXX handlers are handled better.
-	public static void addPNListeners(PetriNetObject newObject, DrawingSurfaceImpl drawingSurface, DataLayer guiModel) {
+		newObject.addedToGui();
+		petriNetObjects.add(newObject);
 
-		if (newObject != null) {
-
-			//XXX 2018-09-06 temp solution while we are moving creation of handlers to the objects
-			if(newObject.getMouseHandler() != null) {
-				drawingSurface.add(newObject);
-			}else {
-				throw new RuntimeException("This code should never be called");
-
-//				//if (newObject.getMouseListeners().length == 0) {
-//					if (newObject instanceof Place) {
-//						// XXX - kyrke
-//						if (newObject instanceof TimedPlaceComponent) {
-//
-//							PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
-//							newObject.addMouseListener(placeHandler);
-//							newObject.addMouseWheelListener(placeHandler);
-//							newObject.addMouseMotionListener(placeHandler);
-//							drawingSurface.add(newObject);
-//
-//						} else {
-//
-//							PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
-//							newObject.addMouseListener(placeHandler);
-//							newObject.addMouseWheelListener(placeHandler);
-//							newObject.addMouseMotionListener(placeHandler);
-//							drawingSurface.add(newObject);
-//
-//						}
-//					} else if (newObject instanceof Transition) {
-//						TransitionHandler transitionHandler;
-//						if (newObject instanceof TimedTransitionComponent) {
-//							transitionHandler = new TAPNTransitionHandler((Transition) newObject);
-//						} else {
-//							transitionHandler = new TransitionHandler((Transition) newObject);
-//						}
-//
-//						newObject.addMouseListener(transitionHandler);
-//						newObject.addMouseMotionListener(transitionHandler);
-//						newObject.addMouseWheelListener(transitionHandler);
-//
-//						newObject.addMouseListener(new AnimationHandler());
-//
-//						drawingSurface.add(newObject);
-//					} else if (newObject instanceof Arc) {
-//						drawingSurface.add(newObject);
-//
-//						/* CB - Joakim Byg add timed arcs */
-//						if (newObject instanceof TimedInputArcComponent) {
-//							if (newObject instanceof TimedTransportArcComponent) {
-//								TransportArcHandler transportArcHandler = new TransportArcHandler((Arc) newObject);
-//								newObject.addMouseListener(transportArcHandler);
-//								newObject.addMouseWheelListener(transportArcHandler);
-//								newObject.addMouseMotionListener(transportArcHandler);
-//							} else {
-//								TimedArcHandler timedArcHandler = new TimedArcHandler((Arc) newObject);
-//								newObject.addMouseListener(timedArcHandler);
-//								newObject.addMouseWheelListener(timedArcHandler);
-//								newObject.addMouseMotionListener(timedArcHandler);
-//							}
-//						} else {
-//							/* EOC */
-//							ArcHandler arcHandler = new ArcHandler((Arc) newObject);
-//							newObject.addMouseListener(arcHandler);
-//							newObject.addMouseWheelListener(arcHandler);
-//							newObject.addMouseMotionListener(arcHandler);
-//						}
-//					} else if (newObject instanceof AnnotationNote) {
-//						drawingSurface.add(newObject);
-//						AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((AnnotationNote) newObject);
-//						newObject.addMouseListener(noteHandler);
-//						newObject.addMouseMotionListener(noteHandler);
-//						((Note) newObject).getNote().addMouseListener(noteHandler);
-//						((Note) newObject).getNote().addMouseMotionListener(noteHandler);
-//					}
-//
-//					newObject.zoomUpdate(drawingSurface.getZoom());
-
-				}
-
-				newObject.setGuiModel(guiModel);
-			//}
+		calculateNewBoundsForScrollPane(newObject.getBounds());
+		if(newObject.getNameLabel() != null){
+			calculateNewBoundsForScrollPane(newObject.getNameLabel().getBounds());
 		}
 
-
-	}
-
-	public void addNewPetriNetObject(PetriNetObject newObject) {
-		addPNListeners(newObject, this, guiModel);
-		validate();
-		repaint();
+		//Does not seem to be needed
+		//validate();
+		//repaint();
 	}
 
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
@@ -320,18 +233,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		return zoomControl;
 	}
 
-	public void add(PetriNetObject pnObject) {
-		setLayer(pnObject, DEFAULT_LAYER.intValue() + pnObject.getLayerOffset());
-		super.add(pnObject);
-		pnObject.addedToGui();
-		petriNetObjects.add(pnObject);
-
-		calculateNewBoundsForScrollPane(pnObject.getBounds());
-		if(pnObject.getNameLabel() != null){
-			calculateNewBoundsForScrollPane(pnObject.getNameLabel().getBounds());
-		}
-	}
-
 	private void calculateNewBoundsForScrollPane(Rectangle rect) {
 		boolean changed = false;
 		Dimension current = getPreferredSize();
@@ -364,14 +265,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		super.removeAll();
 	}
 
-	public Point getPointer() {
-		return getMousePosition();
-	}
-
-	/*
-	 * Cb Joakim Byg - Animation not needed at the moment public
-	 * AnimationHandler getAnimationHandler() { return animationHandler; } EOC
-	 */
 
 	public boolean isInAnimationMode() {
 		return animationmode;
@@ -402,9 +295,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	@Override
 	public void remove(Component comp) {
 		petriNetObjects.remove(comp);
-		// if (result) {
-		// System.out.println("DEBUG: remove PNO from view");
-		// /}
+
 		super.remove(comp);
 	}
 
@@ -530,15 +421,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return p;
 		}
 
-//		private PlaceTransitionObject newPlace(Point p) {
-//			p = adjustPoint(p, view.getZoom());
-//
-//			pnObject = new Place(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y));
-//			guiModel.addPetriNetObject(pnObject);
-//			view.addNewPetriNetObject(pnObject);
-//			return (PlaceTransitionObject) pnObject;
-//		}
-
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPoint(p, view.getZoom());
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
@@ -549,17 +431,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
 		}
-
-/*		private PlaceTransitionObject newTransition(Point p, boolean timed) {
-			p = adjustPoint(p, view.getZoom());
-
-			pnObject = new Transition(Grid.getModifiedX(p.x), Grid
-					.getModifiedY(p.y));
-			
-			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
-			return (PlaceTransitionObject) pnObject;
-		}*/
 
 		private PlaceTransitionObject newTAPNTransition(Point p, boolean timed) {
 			p = adjustPoint(p, view.getZoom());
@@ -592,15 +463,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				Pipe.ElementType mode = app.getMode();
 				PlaceTransitionObject pto;
 				switch (mode) {
-//				case PLACE:
-//					PlaceTransitionObject pto = newPlace(e.getPoint());
-//					getUndoManager().addNewEdit(
-//							new AddPetriNetObjectEdit(pto, view, guiModel));
-//					if (e.isControlDown()) {
-//						app.setMode(ElementType.FAST_TRANSITION);
-//						pnObject.dispatchEvent(e);
-//					}
-//					break;
 
 				case TAPNPLACE:
 					// create place
@@ -620,16 +482,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					}
 					break;
 
-//				case IMMTRANS:
-//				case TIMEDTRANS:
-//					boolean timed = (mode == ElementType.TIMEDTRANS);
-//					pto = newTransition(e.getPoint(), timed);
-//					getUndoManager().addNewEdit(new AddPetriNetObjectEdit(pto, view, guiModel));
-//					if (e.isControlDown()) {
-//						app.setMode(ElementType.FAST_PLACE);
-//						pnObject.dispatchEvent(e);
-//					}
-//					break;
 				case TAPNTRANS:
 					// create transition
 					pto = newTAPNTransition(e.getPoint());
@@ -735,6 +587,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		private void addPoint(final Arc createArc, final MouseEvent e) {
 			int x = Grid.getModifiedX(e.getX());
 			int y = Grid.getModifiedY(e.getY());
+
 			boolean shiftDown = e.isShiftDown();
 			createArc.setEndPoint(x, y, shiftDown);
 			createArc.getArcPath().addPoint(x, y, shiftDown);

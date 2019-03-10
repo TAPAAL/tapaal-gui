@@ -54,6 +54,12 @@ public class TransportArcHandler extends TimedArcHandler {
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
+
+		if (((Arc) myObject).isPrototype()) {
+			dispatchToParentWithMouseLocationUpdated(e);
+			return;
+		}
+
 		if (CreateGui.getApp().isEditionAllowed()) {
 			Arc arc = (Arc) myObject;
 			if (e.getClickCount() == 2) {

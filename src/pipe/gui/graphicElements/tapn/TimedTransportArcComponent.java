@@ -34,6 +34,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);
+		isPrototype = true;
 
 		//XXX: se note in funcation
 		addMouseHandler();
@@ -247,7 +248,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 				underlyingTransportArc.interval(), oldWeight, weight);
 	}
 	
-	public TimedTransportArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TimedTransportArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedTransportArcComponent arc = new TimedTransportArcComponent(this, group, isInPreSet);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
@@ -258,8 +259,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		
 		arc.getSource().addConnectFrom(arc);
 		arc.getTarget().addConnectTo(arc);
-
-		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

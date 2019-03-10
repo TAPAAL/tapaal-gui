@@ -25,9 +25,6 @@ public abstract class Place extends PlaceTransitionObject {
 	// Initial Marking Y-axis Offset 
 	protected Double markingOffsetY = 0d;
 
-	// Value of the capacity restriction; 0 means no capacity restriction 
-	protected Integer capacity = 0;
-
 	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
@@ -187,7 +184,7 @@ public abstract class Place extends PlaceTransitionObject {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
-			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
+			pnName.setText("");
 		} else {
 			pnName.setText("");
 		}

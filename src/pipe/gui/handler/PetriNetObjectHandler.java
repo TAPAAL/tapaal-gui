@@ -1,7 +1,6 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
@@ -157,6 +156,13 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+	}
+
+	//Changes dispatches an event to the parent component, with the mouse location updated to the parent
+	//MouseLocation is relative to the component
+	public void dispatchToParentWithMouseLocationUpdated(MouseEvent e) {
+		e.translatePoint(myObject.getX(), myObject.getY());
+		myObject.getParent().dispatchEvent(e);
 	}
 
 }

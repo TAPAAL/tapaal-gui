@@ -182,7 +182,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedInputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TimedInputArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedInputArcComponent arc =  new TimedInputArcComponent(this);
 		
 		arc.setSource(oldToNewMapping.get(this.getSource()));
@@ -191,8 +191,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		
 		arc.getSource().addConnectFrom(arc);
 		arc.getTarget().addConnectTo(arc);
-		
-		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

@@ -54,6 +54,12 @@ public class ArcHandler extends PetriNetObjectHandler {
 	}
 	
 	public void mousePressed(MouseEvent e) {
+
+		if (((Arc) myObject).isPrototype()) {
+			dispatchToParentWithMouseLocationUpdated(e);
+			return;
+		}
+
 		if (CreateGui.getApp().isEditionAllowed()) {
 			if (e.getClickCount() == 2) {
 				Arc arc = (Arc) myObject;

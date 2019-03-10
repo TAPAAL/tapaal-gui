@@ -33,6 +33,19 @@ public abstract class Arc extends PetriNetObject {
 
 	protected ArcPath myPath = new ArcPath(this);
 
+	//Indicated wither the arc is being drawed (true), used to dispatch mouse events to parent
+	//Set to true, when using constructor for creating new arc when drawing
+	protected boolean isPrototype = false;
+
+	public boolean isPrototype() {
+		return isPrototype;
+	}
+
+	//Called to indicate arc is no longer a prototype
+	public void sealArc() {
+		isPrototype = false;
+	}
+
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
@@ -64,6 +77,7 @@ public abstract class Arc extends PetriNetObject {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
+		isPrototype = true;
 		label = new NameLabel(zoom);
 		source = newSource;
 		myPath.addPoint();

@@ -431,11 +431,9 @@ public class TimedPlaceComponent extends Place {
 		return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
 	}
 
-	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
+	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, markingOffsetX, markingOffsetY);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
-
-		placeComponent.setGuiModel(guiModel);
 
 		return placeComponent;
 	}

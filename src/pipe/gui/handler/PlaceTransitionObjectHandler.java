@@ -66,6 +66,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	// Disable key bindings that are only available when drawing arcs.
 	private void freeArc(Arc newArc){
+		newArc.sealArc();
 		newArc.disableDrawingKeyBindings();
 		CreateGui.getDrawingSurface().createArc = null;
 	}
@@ -175,7 +176,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					//Need to be casted to cointainer, as we only add it to the canvas but not the model
 					((Container)CreateGui.getDrawingSurface()).remove(createTAPNInhibitorArc);
 
-					view.getGuiModel().addArc(createTAPNInhibitorArc);
+					view.getGuiModel().addPetriNetObject(createTAPNInhibitorArc);
 
 					view.addNewPetriNetObject(createTAPNInhibitorArc);
 
@@ -251,7 +252,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					//Need to be casted to cointainer, as we only add it to the canvas but not the model
 					((Container) CreateGui.getDrawingSurface()).remove(transportArcToCreate);
 
-					view.getGuiModel().addArc((TimedOutputArcComponent) transportArcToCreate);
+					view.getGuiModel().addPetriNetObject((TimedOutputArcComponent) transportArcToCreate);
 					view.addNewPetriNetObject(transportArcToCreate);
 
 					freeArc(transportArcToCreate);
@@ -303,7 +304,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					//Need to be casted to cointainer, as we only add it to the canvas but not the model
 					((Container) CreateGui.getDrawingSurface()).remove(arc2);
 
-					view.getGuiModel().addArc(arc2);
+					view.getGuiModel().addPetriNetObject(arc2);
 					view.addNewPetriNetObject(arc2);
 
 					currentObject.addConnectTo(arc2);
@@ -369,7 +370,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						//Need to be casted to cointainer, as we only add it to the canvas but not the model
 						((Container)CreateGui.getDrawingSurface()).remove(timedArcToCreate);
 
-						view.getGuiModel().addArc((TimedOutputArcComponent) timedArcToCreate);
+						view.getGuiModel().addPetriNetObject((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 						
 						undoManager.newEdit(); // new "transaction""
@@ -413,7 +414,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// Evil hack to prevent the arc being added to GuiView twice
 						//Need to be casted to cointainer, as we only add it to the canvas but not the model
 						((Container)CreateGui.getDrawingSurface()).remove(timedArcToCreate);
-						view.getGuiModel().addArc((TimedOutputArcComponent) timedArcToCreate);
+						view.getGuiModel().addPetriNetObject((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 
 						undoManager.newEdit(); // new "transaction""

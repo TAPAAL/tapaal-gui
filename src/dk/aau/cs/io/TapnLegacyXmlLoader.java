@@ -80,19 +80,17 @@ public class TapnLegacyXmlLoader {
 	private DataLayer guiModel;
 	private ArrayList<TAPNQuery> queries;
 	private ConstantStore constants;
-	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 
-	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
+	public TapnLegacyXmlLoader() {
 		presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 		postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 		queries = new ArrayList<TAPNQuery>();
 		constants = new ConstantStore();
-		drawingSurface = drawingSurfaceImpl;
 	}
 	
 	public LoadedModel load(InputStream file) throws FormatException {
@@ -214,7 +212,6 @@ public class TapnLegacyXmlLoader {
 		}
 		
 		guiModel.addPetriNetObject(tempArc);
-		addListeners(tempArc);
 		tapn.add(outputArc);
 
 		sourceIn.addConnectFrom(tempArc);
@@ -260,9 +257,7 @@ public class TapnLegacyXmlLoader {
 				((TimedTransportArcComponent) tempArc).setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
 				guiModel.addPetriNetObject(tempArc);
-				addListeners(tempArc);
 				guiModel.addPetriNetObject(postsetTransportArc);
-				addListeners(postsetTransportArc);
 				tapn.add(transArc);
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
@@ -288,9 +283,7 @@ public class TapnLegacyXmlLoader {
 				((TimedTransportArcComponent) tempArc).setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
 				guiModel.addPetriNetObject(presetTransportArc);
-				addListeners(presetTransportArc);
 				guiModel.addPetriNetObject(tempArc);
-				addListeners(tempArc);
 				tapn.add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
@@ -324,7 +317,6 @@ public class TapnLegacyXmlLoader {
 		}
 		
 		guiModel.addPetriNetObject(tempArc);
-		addListeners(tempArc);
 		tapn.add(inputArc);
 
 		sourceIn.addConnectFrom(tempArc);
@@ -355,7 +347,6 @@ public class TapnLegacyXmlLoader {
 
 		((TimedInhibitorArcComponent) tempArc).setUnderlyingArc(inhibArc);
 		guiModel.addPetriNetObject(tempArc);
-		addListeners(tempArc);
 		tapn.add(inhibArc);
 
 		sourceIn.addConnectFrom(tempArc);
@@ -533,7 +524,6 @@ public class TapnLegacyXmlLoader {
 		AnnotationNote an = new AnnotationNote(text, positionXInput,
 				positionYInput, widthInput, heightInput, borderInput, false);
 		guiModel.addPetriNetObject(an);
-		addListeners(an);
 	}
 
 	private void parseAndAddTransitionAsOldFormat(Element element) throws FormatException {
@@ -567,7 +557,6 @@ public class TapnLegacyXmlLoader {
 				infiniteServer, angle, priority);
 		transition.setUnderlyingTransition(t);
 		guiModel.addPetriNetObject(transition);
-		addListeners(transition);
 		tapn.add(t);
 	}
 
@@ -622,7 +611,6 @@ public class TapnLegacyXmlLoader {
 			
 			((TimedPlaceComponent) place).setUnderlyingPlace(p);
 			guiModel.addPetriNetObject(place);
-			addListeners(place);
 
 			for (int i = 0; i < initialMarkingInput; i++) {
 				marking.add(new TimedToken(p, new BigDecimal(0.0)));
@@ -881,7 +869,4 @@ public class TapnLegacyXmlLoader {
 		return 0.0;
 	}
 
-	private void addListeners(PetriNetObject newObject) {
-		drawingSurface.addPNListeners(newObject, drawingSurface, guiModel);
-	}
 }

@@ -615,7 +615,7 @@ public class ArcPath implements Shape {
 			// we just want to add the new point.
 			// Nadeem 21/06/2005
 			if (editWindow.getIndexOf(pathPoint) < 0) {
-				editWindow.add(pathPoint);
+				editWindow.addNewPetriNetObject(pathPoint);
 				pathPoint.updatePointLocation();
 			}
 		}
