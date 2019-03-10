@@ -27,7 +27,7 @@ import dk.aau.cs.model.tapn.TimeInterval;
 /**
  * Petri-Net Transition Class for Drawing Transitions
  */
-public class Transition extends PlaceTransitionObject {
+public abstract class Transition extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = 942116302162925121L;
 	
@@ -36,15 +36,15 @@ public class Transition extends PlaceTransitionObject {
 	private Shape proximityTransition;
 
 	// Transition Size
-	public static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
-	public static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
+	protected static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
+	protected static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
 	
 	protected int angle;
 	
 	// Animation Suff
 	protected boolean enabled = false;
-	public boolean delayEnabled = false;
-	public boolean highlighted = false;
+	protected boolean delayEnabled = false;
+	protected boolean highlighted = false;
 	private Timer blinkTimer;
 	private int blinkCount;
 
@@ -56,11 +56,10 @@ public class Transition extends PlaceTransitionObject {
 	 * Create Petri-Net Transition object
 	 */
 	public Transition(double positionXInput, double positionYInput,
-			String idInput, String nameInput, double nameOffsetXInput,
+			String idInput, double nameOffsetXInput,
 			double nameOffsetYInput,
 			boolean infServer, int angleInput, int priority) {
-		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput);
+		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; // sets width
 		componentHeight = TRANSITION_HEIGHT;// sets height
 		constructTransition();
@@ -235,7 +234,7 @@ public class Transition extends PlaceTransitionObject {
 		double unZoomedY = (y - COMPONENT_DRAW_OFFSET)
 				/ (zoomPercentage / 100.0);
 
-		someArc = CreateGui.getDrawingSurface().createArc;
+		Arc someArc = CreateGui.getDrawingSurface().createArc;
 		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
 			if ((proximityTransition.contains((int) unZoomedX, (int) unZoomedY) || transition
 					.contains((int) unZoomedX, (int) unZoomedY))
@@ -416,11 +415,6 @@ public class Transition extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void showEditor() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		pnName.setText(getText());
 		pnName.zoomUpdate(zoom);
@@ -481,24 +475,6 @@ public class Transition extends PlaceTransitionObject {
 		}
 
 	}
-
-	 @Override
-	 public Transition clone() {
-		 Transition toReturn=null;
-		 toReturn = (Transition)super.clone();
-
-		 toReturn.positionX = positionX;
-
-		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
-		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-		 toReturn.constructTransition();
-		 toReturn.angle = 0;
-		 toReturn.setCentre((int)positionX, (int)positionY);
-		 toReturn.rotate(getAngle());
-		 toReturn.updateBounds();
-
-		 return toReturn;
-	 }
 	 
 	 public void blink(){
 		 if(blinkTimer == null) { initBlinkTimer(); }

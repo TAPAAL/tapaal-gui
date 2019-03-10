@@ -15,7 +15,7 @@ import pipe.gui.Zoomer;
 /**
   * Class for drawing a Place
  */
-public class Place extends PlaceTransitionObject {
+public abstract class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
 
@@ -28,30 +28,29 @@ public class Place extends PlaceTransitionObject {
 	// Value of the capacity restriction; 0 means no capacity restriction 
 	protected Integer capacity = 0;
 
-	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
+	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
-	public static int tWidth = 5;
-	public static int tHeight = 5;
+	protected static int tWidth = 5;
+	protected static int tHeight = 5;
 
 	// Token dot position offsets
-	public static int tLeftX = 7;
-	public static int tRightX = 19;
-	public static int tTopY = 7;
-	public static int tBotY = 19;
-	public static int tMiddleX = 13;
-	public static int tMiddleY = 13;
+	protected static int tLeftX = 7;
+	protected static int tRightX = 19;
+	protected static int tTopY = 7;
+	protected static int tBotY = 19;
+	protected static int tMiddleX = 13;
+	protected static int tMiddleY = 13;
 
 	// Ellipse2D.Double place
 	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
 	public Place(double positionXInput, double positionYInput, String idInput,
-			String nameInput, Double nameOffsetXInput, Double nameOffsetYInput,
-			int initialMarkingInput, double markingOffsetXInput,
-			double markingOffsetYInput, int capacityInput) {
-		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput);
+			Double nameOffsetXInput, Double nameOffsetYInput,
+			double markingOffsetXInput,
+			double markingOffsetYInput) {
+		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 		markingOffsetX = new Double(markingOffsetXInput);
 		markingOffsetY = new Double(markingOffsetYInput);
 		componentWidth = DIAMETER;
@@ -65,36 +64,6 @@ public class Place extends PlaceTransitionObject {
 		componentWidth = DIAMETER;
 		componentHeight = DIAMETER;
 		setCentre((int) positionX, (int) positionY);
-	}
-
-
-	public Place paste(double x, double y, boolean fromAnotherView) {
-		this.incrementCopyNumber();
-		Place copy = new Place(Grid.getModifiedX(x + this.getX()+ Pipe.PLACE_TRANSITION_HEIGHT / 2), 
-				Grid.getModifiedY(y	+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()	+ ")");
-		this.newCopy(copy);
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.capacity = capacity;
-		copy.attributesVisible = attributesVisible;
-		copy.markingOffsetX = markingOffsetX;
-		copy.markingOffsetY = markingOffsetY;
-		copy.update(true);
-		return copy;
-	}
-
-	public Place copy() {
-		Place copy = new Place(Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
-		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.capacity = capacity;
-		copy.attributesVisible = attributesVisible;
-		copy.markingOffsetX = markingOffsetX;
-		copy.markingOffsetY = markingOffsetY;
-		copy.setOriginal(this);
-		return copy;
 	}
 
 	@Override
@@ -155,7 +124,7 @@ public class Place extends PlaceTransitionObject {
 		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, zoom);
 		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, zoom);
 
-		someArc = CreateGui.getDrawingSurface().createArc;
+		Arc someArc = CreateGui.getDrawingSurface().createArc;
 		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
 			if ((proximityPlace.contains((int) unZoomedX, (int) unZoomedY) || placeEllipse
 					.contains((int) unZoomedX, (int) unZoomedY))
@@ -216,11 +185,6 @@ public class Place extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void showEditor() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
 			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
@@ -232,18 +196,5 @@ public class Place extends PlaceTransitionObject {
 		repaint();
 	}
 
-	@Override
-	public Place clone() {
 
-		Place toReturn = (Place) super.clone();
-
-		toReturn.markingOffsetX = markingOffsetX;
-		toReturn.markingOffsetY = markingOffsetY;
-		toReturn.componentWidth = componentWidth;
-		toReturn.componentHeight = componentHeight;
-		toReturn.setCentre((int) positionX, (int) positionY);
-
-		return toReturn;
-
-	}
 }

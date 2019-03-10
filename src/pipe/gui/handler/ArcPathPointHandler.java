@@ -5,7 +5,6 @@
  */
 package pipe.gui.handler;
 
-import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
@@ -19,8 +18,8 @@ import pipe.gui.graphicElements.ArcPathPoint;
 
 public class ArcPathPointHandler extends PetriNetObjectHandler {
 
-	public ArcPathPointHandler(Container contentpane, ArcPathPoint obj) {
-		super(contentpane, obj);
+	public ArcPathPointHandler(ArcPathPoint obj) {
+		super(obj);
 		enablePopup = true;
 	}
 

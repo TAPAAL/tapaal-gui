@@ -48,8 +48,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	
 	private static final int DRAWING_SURFACE_GROW = 100;
 
-	private AnimationHandler animationHandler = new AnimationHandler();
-
 	private SelectionManager selection;
 	private UndoManager undoManager;
 	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
@@ -129,98 +127,99 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	}
 
-	public void addNewPetriNetObject(PetriNetObject newObject) {
+
+	//XXX: KYRKE 2018-09-06: Code moved here, as duplicated several places in net loaders, tmp solution, untill
+	//XXX handlers are handled better.
+	public static void addPNListeners(PetriNetObject newObject, DrawingSurfaceImpl drawingSurface, DataLayer guiModel) {
+
 		if (newObject != null) {
-			if (newObject.getMouseListeners().length == 0) {
-				if (newObject instanceof Place) {
-					// XXX - kyrke
-					if (newObject instanceof TimedPlaceComponent) {
 
-						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+			//XXX 2018-09-06 temp solution while we are moving creation of handlers to the objects
+			if(newObject.getMouseHandler() != null) {
+				drawingSurface.add(newObject);
+			}else {
+				throw new RuntimeException("This code should never be called");
 
-						PlaceHandler placeHandler = new PlaceHandler(this,(Place) newObject, this.guiModel, this.model);
-						newObject.addMouseListener(placeHandler);
-						newObject.addMouseWheelListener(placeHandler);
-						newObject.addMouseMotionListener(placeHandler);
-						add(newObject);
+//				//if (newObject.getMouseListeners().length == 0) {
+//					if (newObject instanceof Place) {
+//						// XXX - kyrke
+//						if (newObject instanceof TimedPlaceComponent) {
+//
+//							PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
+//							newObject.addMouseListener(placeHandler);
+//							newObject.addMouseWheelListener(placeHandler);
+//							newObject.addMouseMotionListener(placeHandler);
+//							drawingSurface.add(newObject);
+//
+//						} else {
+//
+//							PlaceHandler placeHandler = new PlaceHandler((Place) newObject);
+//							newObject.addMouseListener(placeHandler);
+//							newObject.addMouseWheelListener(placeHandler);
+//							newObject.addMouseMotionListener(placeHandler);
+//							drawingSurface.add(newObject);
+//
+//						}
+//					} else if (newObject instanceof Transition) {
+//						TransitionHandler transitionHandler;
+//						if (newObject instanceof TimedTransitionComponent) {
+//							transitionHandler = new TAPNTransitionHandler((Transition) newObject);
+//						} else {
+//							transitionHandler = new TransitionHandler((Transition) newObject);
+//						}
+//
+//						newObject.addMouseListener(transitionHandler);
+//						newObject.addMouseMotionListener(transitionHandler);
+//						newObject.addMouseWheelListener(transitionHandler);
+//
+//						newObject.addMouseListener(new AnimationHandler());
+//
+//						drawingSurface.add(newObject);
+//					} else if (newObject instanceof Arc) {
+//						drawingSurface.add(newObject);
+//
+//						/* CB - Joakim Byg add timed arcs */
+//						if (newObject instanceof TimedInputArcComponent) {
+//							if (newObject instanceof TimedTransportArcComponent) {
+//								TransportArcHandler transportArcHandler = new TransportArcHandler((Arc) newObject);
+//								newObject.addMouseListener(transportArcHandler);
+//								newObject.addMouseWheelListener(transportArcHandler);
+//								newObject.addMouseMotionListener(transportArcHandler);
+//							} else {
+//								TimedArcHandler timedArcHandler = new TimedArcHandler((Arc) newObject);
+//								newObject.addMouseListener(timedArcHandler);
+//								newObject.addMouseWheelListener(timedArcHandler);
+//								newObject.addMouseMotionListener(timedArcHandler);
+//							}
+//						} else {
+//							/* EOC */
+//							ArcHandler arcHandler = new ArcHandler((Arc) newObject);
+//							newObject.addMouseListener(arcHandler);
+//							newObject.addMouseWheelListener(arcHandler);
+//							newObject.addMouseMotionListener(arcHandler);
+//						}
+//					} else if (newObject instanceof AnnotationNote) {
+//						drawingSurface.add(newObject);
+//						AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((AnnotationNote) newObject);
+//						newObject.addMouseListener(noteHandler);
+//						newObject.addMouseMotionListener(noteHandler);
+//						((Note) newObject).getNote().addMouseListener(noteHandler);
+//						((Note) newObject).getNote().addMouseMotionListener(noteHandler);
+//					}
+//
+//					newObject.zoomUpdate(drawingSurface.getZoom());
 
-					} else {
-
-						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						//((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
-						PlaceHandler placeHandler = new PlaceHandler(this, (Place) newObject);
-						newObject.addMouseListener(placeHandler);
-						//newObject.addMouseWheelListener(placeHandler);
-						newObject.addMouseMotionListener(placeHandler);
-						add(newObject);
-
-					}
-				} else if (newObject instanceof Transition) {
-					TransitionHandler transitionHandler;
-					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(this,	(Transition) newObject, guiModel, model);
-					} else {
-						transitionHandler = new TransitionHandler(this,	(Transition) newObject);
-					}
-
-					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(),(Transition) newObject);
-					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
-					newObject.addMouseListener(transitionHandler);
-					newObject.addMouseMotionListener(transitionHandler);
-					newObject.addMouseWheelListener(transitionHandler);
-
-					newObject.addMouseListener(animationHandler);
-
-					add(newObject);
-				} else if (newObject instanceof Arc) {
-					add(newObject);
-					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
-					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
-					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-					/* CB - Joakim Byg add timed arcs */
-					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TimedTransportArcComponent) {
-							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc) newObject);
-							newObject.addMouseListener(transportArcHandler);
-							//newObject.addMouseWheelListener(transportArcHandler);
-							newObject.addMouseMotionListener(transportArcHandler);
-						} else {
-							TimedArcHandler timedArcHandler = new TimedArcHandler(this, (Arc) newObject);
-							newObject.addMouseListener(timedArcHandler);
-							//newObject.addMouseWheelListener(timedArcHandler);
-							newObject.addMouseMotionListener(timedArcHandler);
-						}
-					} else {
-						/* EOC */
-						ArcHandler arcHandler = new ArcHandler(this,(Arc) newObject);
-						newObject.addMouseListener(arcHandler);
-						//newObject.addMouseWheelListener(arcHandler);
-						newObject.addMouseMotionListener(arcHandler);
-					}
-				} else if (newObject instanceof AnnotationNote) {
-					add(newObject);
-					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(this, (AnnotationNote) newObject);
-					newObject.addMouseListener(noteHandler);
-					newObject.addMouseMotionListener(noteHandler);
-					((Note) newObject).getNote().addMouseListener(noteHandler);
-					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 
-				newObject.zoomUpdate(getZoom());
-				
-			}
-			newObject.setGuiModel(guiModel);
+				newObject.setGuiModel(guiModel);
+			//}
 		}
+
+
+	}
+
+	public void addNewPetriNetObject(PetriNetObject newObject) {
+		addPNListeners(newObject, this, guiModel);
 		validate();
 		repaint();
 	}
@@ -531,14 +530,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return p;
 		}
 
-		private PlaceTransitionObject newPlace(Point p) {
-			p = adjustPoint(p, view.getZoom());
-
-			pnObject = new Place(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y));
-			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
-			return (PlaceTransitionObject) pnObject;
-		}
+//		private PlaceTransitionObject newPlace(Point p) {
+//			p = adjustPoint(p, view.getZoom());
+//
+//			pnObject = new Place(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y));
+//			guiModel.addPetriNetObject(pnObject);
+//			view.addNewPetriNetObject(pnObject);
+//			return (PlaceTransitionObject) pnObject;
+//		}
 
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPoint(p, view.getZoom());
@@ -551,7 +550,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return (PlaceTransitionObject) pnObject;
 		}
 
-		private PlaceTransitionObject newTransition(Point p, boolean timed) {
+/*		private PlaceTransitionObject newTransition(Point p, boolean timed) {
 			p = adjustPoint(p, view.getZoom());
 
 			pnObject = new Transition(Grid.getModifiedX(p.x), Grid
@@ -560,7 +559,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
-		}
+		}*/
 
 		private PlaceTransitionObject newTAPNTransition(Point p, boolean timed) {
 			p = adjustPoint(p, view.getZoom());
@@ -591,16 +590,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
 				Pipe.ElementType mode = app.getMode();
+				PlaceTransitionObject pto;
 				switch (mode) {
-				case PLACE:
-					PlaceTransitionObject pto = newPlace(e.getPoint());
-					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, guiModel));
-					if (e.isControlDown()) {
-						app.setMode(ElementType.FAST_TRANSITION);
-						pnObject.dispatchEvent(e);
-					}
-					break;
+//				case PLACE:
+//					PlaceTransitionObject pto = newPlace(e.getPoint());
+//					getUndoManager().addNewEdit(
+//							new AddPetriNetObjectEdit(pto, view, guiModel));
+//					if (e.isControlDown()) {
+//						app.setMode(ElementType.FAST_TRANSITION);
+//						pnObject.dispatchEvent(e);
+//					}
+//					break;
 
 				case TAPNPLACE:
 					// create place
@@ -612,25 +612,24 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					if (e.isControlDown()) {
 						// connect arc
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto2).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto2).mouseReleased(e);
+						pto2.getMouseHandler().mousePressed(e);
+						pto2.getMouseHandler().mouseReleased(e);
 						app.setMode(ElementType.FAST_TRANSITION);
 						// enter fast mode
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case IMMTRANS:
-				case TIMEDTRANS:
-					boolean timed = (mode == ElementType.TIMEDTRANS);
-					pto = newTransition(e.getPoint(), timed);
-					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, guiModel));
-					if (e.isControlDown()) {
-						app.setMode(ElementType.FAST_PLACE);
-						pnObject.dispatchEvent(e);
-					}
-					break;
+//				case IMMTRANS:
+//				case TIMEDTRANS:
+//					boolean timed = (mode == ElementType.TIMEDTRANS);
+//					pto = newTransition(e.getPoint(), timed);
+//					getUndoManager().addNewEdit(new AddPetriNetObjectEdit(pto, view, guiModel));
+//					if (e.isControlDown()) {
+//						app.setMode(ElementType.FAST_PLACE);
+//						pnObject.dispatchEvent(e);
+//					}
+//					break;
 				case TAPNTRANS:
 					// create transition
 					pto = newTAPNTransition(e.getPoint());
@@ -641,8 +640,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					if (e.isControlDown()) {
 						// connect arc
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						pto.getMouseHandler().mousePressed(e);
+						pto.getMouseHandler().mouseReleased(e);
 						// enter fast mode
 						app.setMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
@@ -690,14 +689,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) pto, model, guiModel, view));
 					app.setMode(ElementType.TAPNARC);
-					getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+					pto.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
 						// connect arc
 						pnObject.dispatchEvent(e);
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto).mouseReleased(e);
+						pto.getMouseHandler().mousePressed(e);
+						pto.getMouseHandler().mouseReleased(e);
 						// enter fast mode
 						app.setMode(ElementType.FAST_PLACE);
 					} else{
@@ -709,14 +708,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					PlaceTransitionObject pto3 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) pto3, model, guiModel, view));
 					app.setMode(ElementType.TAPNARC);
-					getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+					pto3.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
 						// connect arc
 						pnObject.dispatchEvent(e);
 						app.setMode(ElementType.TAPNARC);
-						getPlaceTransitionObjectHandlerOf(pto3).mousePressed(e);
-						getPlaceTransitionObjectHandlerOf(pto3).mouseReleased(e);
+						pto3.getMouseHandler().mousePressed(e);
+						pto3.getMouseHandler().mouseReleased(e);
 						// enter fast mode
 						app.setMode(ElementType.FAST_TRANSITION);
 					} else{
@@ -731,14 +730,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				dragStart = new Point(start);
 			}
 			updatePreferredSize();
-		}
-
-		private MouseListener getPlaceTransitionObjectHandlerOf(PlaceTransitionObject obj){
-			for (MouseListener listener : obj.getMouseListeners()) {
-				if (listener instanceof PlaceTransitionObjectHandler)
-					return listener;
-			}
-			return null;
 		}
 
 		private void addPoint(final Arc createArc, final MouseEvent e) {

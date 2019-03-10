@@ -11,6 +11,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
@@ -18,7 +19,7 @@ import dk.aau.cs.model.tapn.Weight;
 /**
    Implementation of Element for drawing an arc
  */
-public abstract class Arc extends PetriNetObject implements Cloneable {
+public abstract class Arc extends PetriNetObject {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 
@@ -53,10 +54,11 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
+
+		//XXX see comment in function
+		setLableHandler();
 	}
-	
-	abstract public void setWeight(Weight weight);
-	abstract public Weight getWeight();
+
 
 	/**
 	 * Create Petri-Net Arc object
@@ -67,11 +69,34 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		myPath.addPoint();
 		myPath.addPoint();
 		myPath.createPath();
+
+		//XXX see comment in function
+		setLableHandler();
 	}
 
 	public Arc() {
 		super();
+
+		label = new NameLabel(zoom);
+		//XXX see comment in function
+		setLableHandler();
 	}
+
+
+	private void setLableHandler() {
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		LabelHandler labelHandler = new LabelHandler(this.getNameLabel(), this);
+
+		getNameLabel().addMouseListener(labelHandler);
+		getNameLabel().addMouseMotionListener(labelHandler);
+		getNameLabel().addMouseWheelListener(labelHandler);
+
+	}
+
+	abstract public void setWeight(Weight weight);
+	abstract public Weight getWeight();
 
 	/**
 	 * Set source
@@ -238,13 +263,9 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void addedToGui() {
 		// called by GuiView / State viewer when adding component.
 		deleted = false;
-		markedAsDeleted = false;
 
-		if (getParent() instanceof DrawingSurfaceImpl) {
-			myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
-		} else {
-			myPath.addPointsToGui((JLayeredPane) getParent());
-		}
+		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
+
 		updateArcPosition();
 		if (getParent() != null && label.getParent() == null) {
 			getParent().add(label);
@@ -343,13 +364,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		}
 	}
 
-	/**
-	 * Method to clone an Arc object
-	 */
-	@Override
-	public PetriNetObject clone() {
-		return super.clone();
-	}
 
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,

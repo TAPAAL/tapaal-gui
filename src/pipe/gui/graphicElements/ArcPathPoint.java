@@ -17,6 +17,8 @@ import java.awt.geom.RectangularShape;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.ArcPathPointHandler;
+import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -43,14 +45,19 @@ public class ArcPathPoint extends PetriNetObject {
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
-		copyPasteable = false; // we can't copy & paste indivial arc points!
 		zoom = Pipe.ZOOM_DEFAULT;
+
+		//XXX: see note in function
+		addMouseHandler();
 	}
 
 	public ArcPathPoint(ArcPath a) {
 		this();
 		myArcPath = a;
 		setPointLocation(0, 0);
+
+		//XXX: see note in function
+		addMouseHandler();
 	}
 
 	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a) {
@@ -58,11 +65,23 @@ public class ArcPathPoint extends PetriNetObject {
 		myArcPath = a;
 		setPointLocation(x, y);
 		pointType = _pointType;
+
+		//XXX: see note in function
+		addMouseHandler();
 	}
 	
 	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a, int zoomLevel) {
 		this(x,y,_pointType,a);
 		zoom = zoomLevel;
+
+		//XXX: see note in function
+		addMouseHandler();
+	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new ArcPathPointHandler(this);
 	}
 
 	/**

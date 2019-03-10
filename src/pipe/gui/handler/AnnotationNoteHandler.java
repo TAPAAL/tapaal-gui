@@ -20,8 +20,8 @@ import pipe.gui.graphicElements.AnnotationNote;
 
 public class AnnotationNoteHandler extends NoteHandler {
 
-	public AnnotationNoteHandler(Container contentpane, AnnotationNote note) {
-		super(contentpane, note);
+	public AnnotationNoteHandler(AnnotationNote note) {
+		super(note);
 		enablePopup = true;
 	}
 

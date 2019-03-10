@@ -25,11 +25,8 @@ import javax.swing.JTextArea;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Place;
-import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.PlaceHandler;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.widgets.EscapableDialog;
@@ -61,27 +58,40 @@ public class TimedPlaceComponent extends Place {
 
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
 	}
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
-			String idInput, String nameInput, Double nameOffsetXInput,
-			Double nameOffsetYInput, int initialMarkingInput,
-			double markingOffsetXInput, double markingOffsetYInput,
-			int capacityInput) {
+			String idInput, Double nameOffsetXInput,
+			Double nameOffsetYInput,
+			double markingOffsetXInput, double markingOffsetYInput) {
 
-		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput, initialMarkingInput,
-				markingOffsetXInput, markingOffsetYInput, capacityInput);
+		super(positionXInput, positionYInput, idInput,
+				nameOffsetXInput, nameOffsetYInput,
+				markingOffsetXInput, markingOffsetYInput);
 		listener = timedPlaceListener();
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
+	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new PlaceHandler(this);
 	}
 
 	private TimedPlaceListener timedPlaceListener() {
 		return new TimedPlaceListener() {
 			public void nameChanged(TimedPlaceEvent e) {
 				TimedPlace place = e.source();
-				TimedPlaceComponent.super.setName(place.name());				
+				TimedPlaceComponent.super.setName(place.name());
 			}
 			
 			public void invariantChanged(TimedPlaceEvent e) { 
@@ -93,32 +103,6 @@ public class TimedPlaceComponent extends Place {
 			}
 		};
 	}
-	
-	@Override
-	public TimedPlaceComponent clone() {
-		TimedPlaceComponent toReturn = (TimedPlaceComponent) super.clone();
-
-		toReturn.setInvariant(this.getInvariant());
-		return toReturn;
-
-	}
-
-	@Override
-	public TimedPlaceComponent copy() {
-		TimedPlaceComponent copy = new TimedPlaceComponent(Zoomer
-				.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(
-						this.getY(), zoom), place);
-		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.capacity = capacity;
-		copy.attributesVisible = attributesVisible;
-		copy.markingOffsetX = markingOffsetX;
-		copy.markingOffsetY = markingOffsetY;
-		copy.setOriginal(this);
-		return copy;
-	}
-
 
 	public String getInvariantAsString() {
 		return getInvariant().toString();
@@ -448,18 +432,8 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, place.name(), nameOffsetX, nameOffsetY, 0, markingOffsetX, markingOffsetY, capacity);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, markingOffsetX, markingOffsetY);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
-
-		LabelHandler labelHandler = new LabelHandler(placeComponent.getNameLabel(), placeComponent);
-		placeComponent.getNameLabel().addMouseListener(labelHandler);
-		placeComponent.getNameLabel().addMouseMotionListener(labelHandler);
-		placeComponent.getNameLabel().addMouseWheelListener(labelHandler);
-
-		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent, guiModel, tapn);
-		placeComponent.addMouseListener(placeHandler);
-		placeComponent.addMouseWheelListener(placeHandler);
-		placeComponent.addMouseMotionListener(placeHandler);
 
 		placeComponent.setGuiModel(guiModel);
 

@@ -26,7 +26,6 @@ import pipe.gui.graphicElements.PetriNetObject;
 public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		implements java.awt.event.MouseWheelListener {
 
-	protected Container contentPane;
 	protected PetriNetObject myObject = null;
 
 	// justSelected: set to true on press, and false on release;
@@ -40,8 +39,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	private int totalY = 0;
 
 	// constructor passing in all required objects
-	public PetriNetObjectHandler(Container contentpane, PetriNetObject obj) {
-		contentPane = contentpane;
+	public PetriNetObjectHandler(PetriNetObject obj) {
 		myObject = obj;
 	}
 
@@ -76,8 +74,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
-					((DrawingSurfaceImpl) contentPane).getSelectionObject()
-							.clearSelection();
+					myObject.getParent().getSelectionObject().clearSelection();
 				}
 				myObject.select();
 				justSelected = true;
@@ -111,8 +108,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			if (isDragging) {
 				isDragging = false;
 				CreateGui.getDrawingSurface().getUndoManager().translateSelection(
-						((DrawingSurfaceImpl) contentPane).getSelectionObject()
-								.getSelection(), totalX, totalY);
+						myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
 				totalX = 0;
 				totalY = 0;
 			} else {
@@ -120,8 +116,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 					if (e.isShiftDown()) {
 						myObject.deselect();
 					} else {
-						((DrawingSurfaceImpl) contentPane).getSelectionObject()
-								.clearSelection();
+						myObject.getParent().getSelectionObject().clearSelection();
 						myObject.select();
 					}
 				}
@@ -152,8 +147,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			// Calculate translation in mouse
 			int transX = Grid.getModifiedX(e.getX() - dragInit.x);
 			int transY = Grid.getModifiedY(e.getY() - dragInit.y);
-			((DrawingSurfaceImpl) contentPane).getSelectionObject()
-					.translateSelection(transX, transY);
+			myObject.getParent().getSelectionObject().translateSelection(transX, transY);
 			
 			//Only register the actual distance and direction moved (in case of dragging past edge)
 			totalX += myObject.getX() - previousX;

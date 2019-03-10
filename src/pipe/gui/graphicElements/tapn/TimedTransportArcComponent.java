@@ -27,24 +27,34 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private TimedTransportArcComponent connectedTo = null;
 	private TransportArc underlyingTransportArc;
 
-	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr,
-			boolean isInPreSet) {
+	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
 		setHead();
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
-	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group,
-			boolean isInPreSet) {
+	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
 		super(timedArc, "");
 		this.isInPreSet = isInPreSet;
 		setHead();
 		this.setGroup(group);
 		// hack to reprint the label of the arc
 		updateLabel(true);
+
+		//XXX: se note in funcation
+		addMouseHandler();
+	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new TransportArcHandler(this);
 	}
 
 	public void setUnderlyingArc(TransportArc arc) {
@@ -139,12 +149,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public TimedTransportArcComponent copy() {
-
-		return null;
-	}
-
-	@Override
 	public void delete() {
 		if (underlyingTransportArc != null) {
 			underlyingTransportArc.delete();
@@ -180,26 +184,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		connectedTo = a;
 	}
 
-	@Override
-	public TimedTransportArcComponent paste(double despX, double despY,
-			boolean toAnotherView) {
-
-		return null;
-	}
-
-	/*
-	 * public TransportArc getBuddy() { TransportArc toReturn = null; if
-	 * (isInPreSet){ HashMap<TransportArc, TransportArc> transportArcMap =
-	 * (HashMap<TransportArc, TransportArc>) ((HashMap)
-	 * CreateGui.getModel().getTransportArcMap() ). get( this.getTarget() );
-	 * 
-	 * toReturn = transportArcMap.get(this); }else { HashMap<TransportArc,
-	 * TransportArc> transportArcMap = (HashMap<TransportArc, TransportArc>)
-	 * ((HashMap) CreateGui.getModel().getTransportArcMap() ). get(
-	 * this.getSource() ); for ( TransportArc ta : transportArcMap.keySet() ){
-	 * if (transportArcMap.get(ta) == this){ toReturn = ta; } } } return
-	 * toReturn; }
-	 */
 	public boolean isInPreSet() {
 		return isInPreSet;
 	}
@@ -274,12 +258,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		
 		arc.getSource().addConnectFrom(arc);
 		arc.getTarget().addConnectTo(arc);
-		
-		TransportArcHandler transportArcHandler = new TransportArcHandler((DrawingSurfaceImpl)getParent(), arc);
-		arc.addMouseListener(transportArcHandler);
-		//arc.addMouseWheelListener(transportArcHandler);
-		arc.addMouseMotionListener(transportArcHandler);
-		
+
 		arc.setGuiModel(guiModel);
 		
 		return arc;

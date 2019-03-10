@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.EventListener;
 
 import javax.swing.JComponent;
 
+import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -17,13 +17,13 @@ import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.PetriNetObjectHandler;
 
 /**
  * Petri-Net Object Class 
  * Implements things in common between all types of objects
  */
-public abstract class PetriNetObject extends JComponent implements Zoomable,
-		Cloneable, Translatable {
+public abstract class PetriNetObject extends JComponent implements Zoomable, Translatable {
 
 	private static final long serialVersionUID = 2693171860021066729L;
 
@@ -48,23 +48,89 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	protected boolean selected = false; // True if part of the current selection.
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
-	protected boolean copyPasteable = true; // True if object can be cloned.
 	protected static boolean ignoreSelection = false;
 	protected Rectangle bounds = new Rectangle();
 
 	protected boolean deleted = false;
-	protected boolean markedAsDeleted = false;
 
 	// Integer value which represents a zoom percentage
 	protected int zoom = Pipe.ZOOM_DEFAULT;
 	private DataLayer guiModel;
 
-	public void setGuiModel(DataLayer guiModel) {
-		this.guiModel = guiModel;
+	public PetriNetObjectHandler getMouseHandler() {
+		return mouseHandler;
 	}
 
-	public DataLayer getGuiModel() {
-		return guiModel;
+	protected PetriNetObjectHandler mouseHandler;
+
+	PetriNetObject() {
+
+		addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseClicked(e);
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mousePressed(e);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseReleased(e);
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseEntered(e);
+				}
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseExited(e);
+				}
+			}
+		});
+
+		addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseWheelMoved(e);
+				}
+			}
+		});
+
+		addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseDragged(e);
+				}
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				if (mouseHandler != null) {
+					mouseHandler.mouseMoved(e);
+				}
+			}
+		});
+
+	}
+
+	public void setGuiModel(DataLayer guiModel) {
+		this.guiModel = guiModel;
 	}
 
 	public void setId(String idInput) {
@@ -224,11 +290,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 
 	public boolean isDeleted() {
-		return deleted || markedAsDeleted;
-	}
-
-	public void markAsDeleted() {
-		markedAsDeleted = true;
+		return deleted;
 	}
 
 	public void select(Rectangle selectionRectangle) {
@@ -248,28 +310,9 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		return zoom;
 	}
 
-	@Override
-	public PetriNetObject clone() {
-		try {
-			PetriNetObject pnObjectCopy = (PetriNetObject) super.clone();
-
-			// Remove all mouse listeners on the new object
-			EventListener[] mouseListeners = pnObjectCopy
-					.getListeners(MouseListener.class);
-			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy.removeMouseListener((MouseListener) mouseListeners[i]);
-			}
-
-			mouseListeners = pnObjectCopy.getListeners(MouseMotionListener.class);
-
-			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
-			}
-
-			return pnObjectCopy;
-		} catch (CloneNotSupportedException e) {
-			throw new Error(e);
-		}
+	public DrawingSurfaceImpl getParent() {
+		return (DrawingSurfaceImpl) super.getParent();
 	}
+
 
 }

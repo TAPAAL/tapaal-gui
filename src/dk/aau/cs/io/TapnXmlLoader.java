@@ -29,26 +29,15 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Note;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.handler.AnimationHandler;
-import pipe.gui.handler.AnnotationNoteHandler;
-import pipe.gui.handler.ArcHandler;
-import pipe.gui.handler.LabelHandler;
-import pipe.gui.handler.PlaceHandler;
-import pipe.gui.handler.TAPNTransitionHandler;
-import pipe.gui.handler.TimedArcHandler;
-import pipe.gui.handler.TransitionHandler;
-import pipe.gui.handler.TransportArcHandler;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.tapn.Constant;
@@ -405,7 +394,7 @@ public class TapnXmlLoader {
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
-				positionXInput, positionYInput, idInput, nameInput,
+				positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput, true,
 				infiniteServer, angle, priority);
 		transitionComponent.setUnderlyingTransition(t);
@@ -462,7 +451,7 @@ public class TapnXmlLoader {
 			}
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput, nameOffsetYInput, initialMarkingInput, markingOffsetXInput, markingOffsetYInput, 0);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, markingOffsetXInput, markingOffsetYInput);
 		placeComponent.setUnderlyingPlace(p);
 		
 		if (!displayName){
@@ -743,90 +732,6 @@ public class TapnXmlLoader {
 	}
 
 	private void addListeners(PetriNetObject newObject, Template template) {
-		if (newObject != null) {
-			if (newObject.getMouseListeners().length == 0) {
-				if (newObject instanceof Place) {
-					// XXX - kyrke
-					if (newObject instanceof TimedPlaceComponent) {
-
-						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
-						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject, template.guiModel(), template.model());
-						newObject.addMouseListener(placeHandler);
-						newObject.addMouseWheelListener(placeHandler);
-						newObject.addMouseMotionListener(placeHandler);
-					} else {
-
-						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						//((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
-						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
-						newObject.addMouseListener(placeHandler);
-						//newObject.addMouseWheelListener(placeHandler);
-						newObject.addMouseMotionListener(placeHandler);
-
-					}
-				} else if (newObject instanceof Transition) {
-					TransitionHandler transitionHandler;
-					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(drawingSurface, (Transition) newObject, template.guiModel(), template.model());
-					} else {
-						transitionHandler = new TransitionHandler(drawingSurface, (Transition) newObject);
-					}
-
-					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(), (Transition) newObject);
-					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
-					newObject.addMouseListener(transitionHandler);
-					newObject.addMouseMotionListener(transitionHandler);
-					newObject.addMouseWheelListener(transitionHandler);
-
-					newObject.addMouseListener(new AnimationHandler());
-
-				} else if (newObject instanceof Arc) {
-					LabelHandler labelHandler = new LabelHandler(((Arc) newObject).getNameLabel(), (Arc) newObject);
-					((Arc) newObject).getNameLabel().addMouseListener(labelHandler);
-					((Arc) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Arc) newObject).getNameLabel().addMouseWheelListener(labelHandler);
-					/* CB - Joakim Byg add timed arcs */
-					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TimedTransportArcComponent) {
-							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
-							newObject.addMouseListener(transportArcHandler);
-							//newObject.addMouseWheelListener(transportArcHandler);
-							newObject.addMouseMotionListener(transportArcHandler);
-						} else {
-							TimedArcHandler timedArcHandler = new TimedArcHandler(drawingSurface, (Arc) newObject);
-							newObject.addMouseListener(timedArcHandler);
-							//newObject.addMouseWheelListener(timedArcHandler);
-							newObject.addMouseMotionListener(timedArcHandler);
-						}
-					} else {
-						/* EOC */
-						ArcHandler arcHandler = new ArcHandler(drawingSurface,(Arc) newObject);
-						newObject.addMouseListener(arcHandler);
-						//newObject.addMouseWheelListener(arcHandler);
-						newObject.addMouseMotionListener(arcHandler);
-					}
-				} else if (newObject instanceof AnnotationNote) {
-					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(drawingSurface, (AnnotationNote) newObject);
-					newObject.addMouseListener(noteHandler);
-					newObject.addMouseMotionListener(noteHandler);
-					((Note) newObject).getNote().addMouseListener(noteHandler);
-					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
-				}
-				
-				newObject.zoomUpdate(drawingSurface.getZoom());
-				
-			}
-			newObject.setGuiModel(template.guiModel());
-		}
+		drawingSurface.addPNListeners(newObject, drawingSurface, template.guiModel());
 	}
 }
