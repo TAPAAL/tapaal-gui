@@ -150,32 +150,32 @@ public class ArcPathPoint extends PetriNetObject {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (!ignoreSelection) {
-			Graphics2D g2 = (Graphics2D) g;
 
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
-					RenderingHints.VALUE_STROKE_NORMALIZE);
+		Graphics2D g2 = (Graphics2D) g;
 
-			if (pointType == CURVED) {
-				shape = new Ellipse2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
-			} else {
-				shape = new Rectangle2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
-			}
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+				RenderingHints.VALUE_STROKE_NORMALIZE);
 
-			if (selected) {
-				g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
-				g2.fill(shape);
-				g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-				g2.draw(shape);
-			} else {
-				g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
-				g2.fill(shape);
-				g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-				g2.draw(shape);
-			}
+		if (pointType == CURVED) {
+			shape = new Ellipse2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
+		} else {
+			shape = new Rectangle2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
 		}
+
+		if (selected) {
+			g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
+			g2.fill(shape);
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			g2.draw(shape);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
+			g2.fill(shape);
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			g2.draw(shape);
+		}
+
 	}
 
 	public int getIndex() {

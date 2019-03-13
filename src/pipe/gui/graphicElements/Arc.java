@@ -277,7 +277,7 @@ public abstract class Arc extends PetriNetObject {
 		AffineTransform reset = g2.getTransform();
 
 		//Draw Path
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -300,7 +300,7 @@ public abstract class Arc extends PetriNetObject {
 		g2.transform(Zoomer.getTransform(zoom));
 		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {

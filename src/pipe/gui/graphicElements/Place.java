@@ -72,7 +72,7 @@ public abstract class Place extends PlaceTransitionObject {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
 			pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -81,7 +81,7 @@ public abstract class Place extends PlaceTransitionObject {
 		}
 		g2.fill(placeEllipse);
 
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);

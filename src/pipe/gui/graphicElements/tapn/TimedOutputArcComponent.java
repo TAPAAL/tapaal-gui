@@ -161,8 +161,6 @@ public class TimedOutputArcComponent extends Arc {
 
 	}
 
-
-
 	public dk.aau.cs.model.tapn.TimedOutputArc underlyingArc() {
 		return outputArc;
 	}

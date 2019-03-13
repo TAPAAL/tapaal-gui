@@ -286,14 +286,12 @@ public class Export {
 		if (gridEnabled) {
 			Grid.enableGrid();
 		}
-		PetriNetObject.ignoreSelection(false);
 		g.repaint();
 	}
 
 	private static void setupViewForExport(DrawingSurfaceImpl g, boolean gridEnabled) {
 		// Stuff to make it export properly
 		g.updatePreferredSize();
-		PetriNetObject.ignoreSelection(true);
 		if (gridEnabled) {
 			Grid.disableGrid();
 		}

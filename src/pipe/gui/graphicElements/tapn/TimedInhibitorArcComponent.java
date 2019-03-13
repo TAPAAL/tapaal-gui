@@ -133,9 +133,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		return inhibitorArc.interval();
 	}
 
-	@Override
-
-	
 	public TimedInhibitorArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedInhibitorArcComponent arc = new TimedInhibitorArcComponent(this);
 		arc.setSource(oldToNewMapping.get(this.getSource()));

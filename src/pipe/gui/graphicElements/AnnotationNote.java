@@ -187,7 +187,7 @@ public class AnnotationNote extends Note {
 				RenderingHints.VALUE_STROKE_NORMALIZE);
 
 		g2.transform(Zoomer.getTransform(zoom));
-		if (selected && !ignoreSelection) {
+		if (selected) {
 			g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
 			g2.fill(noteRect);
 			if (drawBorder) {
@@ -312,7 +312,7 @@ public class AnnotationNote extends Note {
 		public void myPaintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setTransform(prova);
-			if (myNote.selected && !PetriNetObject.ignoreSelection) {
+			if (myNote.selected) {
 				g2.translate(this.getLocation().x, this.getLocation().y);
 				shape = new Rectangle(0, 0, 2 * SIZE, 2 * SIZE);
 				g2.fill(shape);
