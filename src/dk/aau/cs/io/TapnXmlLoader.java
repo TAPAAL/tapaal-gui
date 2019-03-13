@@ -408,8 +408,6 @@ public class TapnXmlLoader {
 		double nameOffsetXInput = Double.parseDouble(place.getAttribute("nameOffsetX"));
 		double nameOffsetYInput = Double.parseDouble(place.getAttribute("nameOffsetY"));
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
-		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
-		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
 		
@@ -446,7 +444,7 @@ public class TapnXmlLoader {
 			}
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, markingOffsetXInput, markingOffsetYInput);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 		placeComponent.setUnderlyingPlace(p);
 		
 		if (!displayName){

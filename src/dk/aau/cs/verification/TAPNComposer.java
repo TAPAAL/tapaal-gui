@@ -186,9 +186,7 @@ public class TAPNComposer implements ITAPNComposer {
 						oldPlace.getPositionY(),
 						oldPlace.getId(),
 						oldPlace.getNameOffsetX(),
-						oldPlace.getNameOffsetY(),
-						oldPlace.getMarkingOffsetXObject().doubleValue(),
-						oldPlace.getMarkingOffsetYObject().doubleValue()
+						oldPlace.getNameOffsetY()
 						);
 					newPlace.setUnderlyingPlace(constructedPlace);
 					newPlace.setName(uniquePlaceName);
@@ -235,10 +233,10 @@ public class TAPNComposer implements ITAPNComposer {
 								oldPlace.getPositionY() + offset.value2() * greatestHeight,
 								oldPlace.getId(),
 								oldPlace.getNameOffsetX(),
-								oldPlace.getNameOffsetY(),
-								oldPlace.getMarkingOffsetXObject().doubleValue(),
-								oldPlace.getMarkingOffsetYObject().doubleValue()
-								);
+								oldPlace.getNameOffsetY()
+						);
+						newPlace.setGuiModel(guiModel);
+
 						newPlace.setUnderlyingPlace(place);
 						newPlace.setName(uniquePlaceName);
 						guiModel.addPetriNetObject(newPlace);

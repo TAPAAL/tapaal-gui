@@ -568,9 +568,6 @@ public class TapnLegacyXmlLoader {
 		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
 		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
-		double markingOffsetXInput = getMarkingOffsetAttribute(element, "x");
-		double markingOffsetYInput = getMarkingOffsetAttribute(element, "y");
-		int capacityInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,	"capacity");
 		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
 
 		positionXInput = Grid.getModifiedX(positionXInput);
@@ -602,9 +599,7 @@ public class TapnLegacyXmlLoader {
 //
 //		} else {
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
-					idInput, nameOffsetXInput, nameOffsetYInput,
-					markingOffsetXInput,
-					markingOffsetYInput);
+					idInput, nameOffsetXInput, nameOffsetYInput);
 
 			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);

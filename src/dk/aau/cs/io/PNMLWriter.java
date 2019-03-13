@@ -179,10 +179,6 @@ public class PNMLWriter implements NetWriter {
 		placeElement.appendChild(name);
 		Element initialMarkingGraphics = document.createElement("graphics");
 		initialMarking.appendChild(initialMarkingGraphics);
-		Element initialMarkingOffset = document.createElement("offset");
-		initialMarkingGraphics.appendChild(initialMarkingOffset);
-		initialMarkingOffset.setAttribute("x", (inputPlace.getMarkingOffsetXObject() != null ? String.valueOf(Math.round(inputPlace.getMarkingOffsetXObject())) : ""));
-		initialMarkingOffset.setAttribute("y", (inputPlace.getMarkingOffsetYObject() != null ? String.valueOf(Math.round(inputPlace.getMarkingOffsetYObject())) : ""));
 		Element initialMarkingText = document.createElement("text");
 		initialMarking.appendChild(initialMarkingText);
 		initialMarkingText.setTextContent(((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
