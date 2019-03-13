@@ -1,7 +1,8 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
@@ -18,9 +20,13 @@ import dk.aau.cs.model.tapn.Weight;
 /**
    Implementation of Element for drawing an arc
  */
-public abstract class Arc extends PetriNetObject implements Cloneable {
+public abstract class Arc extends PetriNetObject {
 
 	private static final long serialVersionUID = 6527845538091358791L;
+
+	protected Shape head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
+			0, -10, -7, -10 }, 4);
+	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 
 	protected NameLabel label;
 
@@ -31,6 +37,19 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	private PlaceTransitionObject target = null;
 
 	protected ArcPath myPath = new ArcPath(this);
+
+	//Indicated wither the arc is being drawed (true), used to dispatch mouse events to parent
+	//Set to true, when using constructor for creating new arc when drawing
+	protected boolean isPrototype = false;
+
+	public boolean isPrototype() {
+		return isPrototype;
+	}
+
+	//Called to indicate arc is no longer a prototype
+	public void sealArc() {
+		isPrototype = false;
+	}
 
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
@@ -53,25 +72,50 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
+
+		//XXX see comment in function
+		setLableHandler();
 	}
-	
-	abstract public void setWeight(Weight weight);
-	abstract public Weight getWeight();
+
 
 	/**
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
+		isPrototype = true;
 		label = new NameLabel(zoom);
 		source = newSource;
 		myPath.addPoint();
 		myPath.addPoint();
 		myPath.createPath();
+
+		//XXX see comment in function
+		setLableHandler();
 	}
 
 	public Arc() {
 		super();
+
+		label = new NameLabel(zoom);
+		//XXX see comment in function
+		setLableHandler();
 	}
+
+
+	private void setLableHandler() {
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		LabelHandler labelHandler = new LabelHandler(this.getNameLabel(), this);
+
+		getNameLabel().addMouseListener(labelHandler);
+		getNameLabel().addMouseMotionListener(labelHandler);
+		getNameLabel().addMouseWheelListener(labelHandler);
+
+	}
+
+	abstract public void setWeight(Weight weight);
+	abstract public Weight getWeight();
 
 	/**
 	 * Set source
@@ -219,6 +263,70 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
+
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+
+		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getY());
+
+		AffineTransform reset = g2.getTransform();
+
+		//Draw Path
+		if (selected) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.01f * zoom));
+		g2.draw(myPath);
+
+		//Draw Arrow-head
+		//Jump to arc end
+		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
+				.getPoint(myPath.getEndIndex()).getY());
+
+		//Rotate to match arrowhead to arc angle
+		g2.rotate(myPath.getEndAngle() + Math.PI);
+		g2.setColor(java.awt.Color.WHITE);
+
+		g2.transform(Zoomer.getTransform(zoom));
+		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+
+		if (selected) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.8f));
+
+		if (fillHead) {
+			g2.fill(head);
+		} else {
+			Paint p = g2.getPaint();
+
+			//Fill first to get thick edge
+			g2.setColor(java.awt.Color.WHITE); // XXX: should be GB color of canvas / drawingsurface
+			g2.fill(head);
+
+			g2.setPaint(p);
+			g2.draw(head);
+		}
+
+		g2.transform(reset);
+	}
+
+	@Override
 	public boolean contains(int x, int y) {
 		point = new Point2D.Double(x + myPath.getBounds().getX()
 				- COMPONENT_DRAW_OFFSET - zoomGrow, y
@@ -238,13 +346,9 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void addedToGui() {
 		// called by GuiView / State viewer when adding component.
 		deleted = false;
-		markedAsDeleted = false;
 
-		if (getParent() instanceof DrawingSurfaceImpl) {
-			myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
-		} else {
-			myPath.addPointsToGui((JLayeredPane) getParent());
-		}
+		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
+
 		updateArcPosition();
 		if (getParent() != null && label.getParent() == null) {
 			getParent().add(label);
@@ -343,13 +447,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		}
 	}
 
-	/**
-	 * Method to clone an Arc object
-	 */
-	@Override
-	public PetriNetObject clone() {
-		return super.clone();
-	}
 
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,

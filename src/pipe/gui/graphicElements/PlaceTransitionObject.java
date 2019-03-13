@@ -9,13 +9,13 @@ import java.util.LinkedList;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
 
 /**
  * Petri-Net Place or Transition SuperClass
  * 
  */
-public abstract class PlaceTransitionObject extends PetriNetObject implements
-Cloneable {
+public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	private static final long serialVersionUID = -6629006415467929184L;
 
@@ -24,20 +24,12 @@ Cloneable {
 
 	private LinkedList<Arc> connectTo = new LinkedList<Arc>();
 	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
-	protected static Arc someArc;
-
-	private PlaceTransitionObject lastCopy = null;
-	private PlaceTransitionObject original = null;
-	private int copyNumber = 0;
 
 	protected boolean attributesVisible = false;
 
-	// The "real" x coordinate of this place or transition in the net.
+	// The "real" x/y coordinate of this place or transition in the net.
 	// i.e. the x position at 100% zoom.
 	private double locationX;
-
-	// The "real" y coordinate of this place or transition in the net.
-	// i.e. the y position at 100% zoom.
 	private double locationY;
 
 	/**
@@ -49,15 +41,13 @@ Cloneable {
 	 *            Y-axis Position
 	 * @param idInput
 	 *            Place id
-	 * @param nameInput
-	 *            Name
 	 * @param nameOffsetXInput
 	 *            Name X-axis Position
 	 * @param nameOffsetYInput
 	 *            Name Y-axis Position
 	 */
 	public PlaceTransitionObject(double positionXInput, double positionYInput,
-			String idInput, String nameInput, double nameOffsetXInput,
+			String idInput, double nameOffsetXInput,
 			double nameOffsetYInput) {
 		this(positionXInput, positionYInput);
 		id = idInput;
@@ -86,6 +76,10 @@ Cloneable {
 
 		// sets up Namelabel for each PN object
 		pnName = new NameLabel(zoom);
+		LabelHandler labelHandler = new LabelHandler(pnName, this);
+		getNameLabel().addMouseListener(labelHandler);
+		getNameLabel().addMouseMotionListener(labelHandler);
+		getNameLabel().addMouseWheelListener(labelHandler);
 	}
 
 	/**
@@ -204,9 +198,6 @@ Cloneable {
 	/**
 	 * Implemented in subclasses as involves some tailoring according to the
 	 * shape
-	 * 
-	 * @param e
-	 *            Mouse Event
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
@@ -277,6 +268,7 @@ Cloneable {
 	public void updateConnected() {
 		Iterator<Arc> arcsFrom = connectFrom.iterator();
 
+		Arc someArc;
 		while (arcsFrom.hasNext()) {
 			someArc = (arcsFrom.next());
 			updateEndPoint(someArc);
@@ -350,7 +342,6 @@ Cloneable {
 	@Override
 	public void addedToGui() {
 		deleted = false;
-		markedAsDeleted = false;
 		addLabelToContainer();
 		update(true);
 		updateOnMoveOrZoom();
@@ -389,42 +380,6 @@ Cloneable {
 
 	public abstract void updateEndPoint(Arc arc);
 
-	public int getCopyNumber() {
-		if (original != null) {
-			return original.copyNumber;
-		} else {
-			return 0;
-		}
-	}
-
-	public void incrementCopyNumber() {
-		if (original != null) {
-			original.copyNumber++;
-		}
-	}
-
-	public void newCopy(PlaceTransitionObject ptObject) {
-		if (original != null) {
-			original.lastCopy = ptObject;
-		}
-	}
-
-	public PlaceTransitionObject getLastCopy() {
-		return lastCopy;
-	}
-
-	public void resetLastCopy() {
-		lastCopy = null;
-	}
-
-	public void setOriginal(PlaceTransitionObject ptObject) {
-		original = ptObject;
-	}
-
-	public PlaceTransitionObject getOriginal() {
-		return original;
-	}
-
 	public abstract void showEditor();
 
 	public void setAttributesVisible(boolean flag) {
@@ -447,16 +402,4 @@ Cloneable {
 		update(true);
 	}
 
-	// XXX - kyrke now also clones arcs
-	// Clone object and deep copy the pnNames
-	@Override
-	public PlaceTransitionObject clone() {
-		PlaceTransitionObject toReturn = (PlaceTransitionObject) super.clone();
-		toReturn.pnName = (NameLabel) pnName.clone();
-
-		toReturn.connectFrom = connectFrom;
-		toReturn.connectTo = connectTo;
-
-		return toReturn;
-	}
 }

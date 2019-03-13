@@ -24,8 +24,8 @@ import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
  */
 public class ArcHandler extends PetriNetObjectHandler {
 
-	public ArcHandler(Container contentpane, Arc obj) {
-		super(contentpane, obj);
+	public ArcHandler(Arc obj) {
+		super(obj);
 		enablePopup = true;
 	}
 
@@ -54,6 +54,12 @@ public class ArcHandler extends PetriNetObjectHandler {
 	}
 	
 	public void mousePressed(MouseEvent e) {
+
+		if (((Arc) myObject).isPrototype()) {
+			dispatchToParentWithMouseLocationUpdated(e);
+			return;
+		}
+
 		if (CreateGui.getApp().isEditionAllowed()) {
 			if (e.getClickCount() == 2) {
 				Arc arc = (Arc) myObject;
@@ -86,7 +92,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 			// Calculate translation in mouse
 			int transX = (Grid.getModifiedX(e.getX() - dragInit.x));
 			int transY = (Grid.getModifiedY(e.getY() - dragInit.y));
-			((DrawingSurfaceImpl) contentPane).getSelectionObject()
+			myObject.getParent().getSelectionObject()
 					.translateSelection(transX, transY);
 			dragInit.translate(
 					-(currentObject.getLocation().x - oldLocation.x - transX),

@@ -97,7 +97,7 @@ public class ExportBatchDialog extends JDialog {
 	static boolean noOrphanTransitions = false;
 
 	static ExportBatchDialog exportBatchDialog;
-	ModelLoader loader = new ModelLoader(new DrawingSurfaceImpl(new DataLayer()));
+	ModelLoader loader = new ModelLoader();
 	
 	public static boolean isDialogVisible() {
 		return exportBatchDialog.isVisible();

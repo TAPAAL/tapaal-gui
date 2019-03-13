@@ -47,9 +47,6 @@ public class TimedOutputArcComponent extends Arc {
 	 */
 	private static final long serialVersionUID = 5588142404135607382L;
 
-	protected Polygon head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
-			0, -10, -7, -10 }, 4);
-
 	private dk.aau.cs.model.tapn.TimedOutputArc outputArc;
 
 	/**
@@ -78,6 +75,9 @@ public class TimedOutputArcComponent extends Arc {
 		super(startPositionXInput, startPositionYInput, endPositionXInput,
 				endPositionYInput, sourceInput, targetInput, weightInput,
 				idInput);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
 	/**
@@ -85,11 +85,14 @@ public class TimedOutputArcComponent extends Arc {
 	 */
 	public TimedOutputArcComponent(PlaceTransitionObject newSource) {
 		super(newSource);
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
 		zoom = arc.zoom;
-		label = new NameLabel(zoom);
+
 		myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
 			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i),zoom);
@@ -99,60 +102,17 @@ public class TimedOutputArcComponent extends Arc {
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
+
+		//XXX: se note in funcation
+		addMouseHandler();
 	}
 
-	public TimedOutputArcComponent paste(double despX, double despY,
-			boolean toAnotherView) {
-		PlaceTransitionObject source = this.getSource().getLastCopy();
-		PlaceTransitionObject target = this.getTarget().getLastCopy();
-
-		if (source == null && target == null) {
-			// don't paste an arc with neither source nor target
-			return null;
-		}
-
-		if (source == null) {
-			if (toAnotherView) {
-				// if the source belongs to another Petri Net, the arc can't be
-				// pasted
-				return null;
-			} else {
-				source = this.getSource();
-			}
-		}
-
-		if (target == null) {
-			if (toAnotherView) {
-				// if the target belongs to another Petri Net, the arc can't be
-				// pasted
-				return null;
-			} else {
-				target = this.getTarget();
-			}
-		}
-
-		TimedOutputArcComponent copy = new TimedOutputArcComponent(0, 0, // startPoint
-				0, 0, // endPoint
-				source, target, 1, source.getId() + " to "
-						+ target.getId(), false);
-
-		copy.myPath.delete();
-		for (int i = 0; i <= myPath.getEndIndex(); i++) {
-			copy.myPath.addPoint(myPath.getPoint(i).getX() + despX,
-					myPath.getPoint(i).getY() + despY, myPath
-							.getPointType(i));
-			copy.myPath.selectPoint(i);
-		}
-
-		source.addConnectFrom(copy);
-		target.addConnectTo(copy);
-
-		return copy;
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new ArcHandler(this);
 	}
 
-	public TimedOutputArcComponent copy() {
-		return new TimedOutputArcComponent(this);
-	}
 
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
@@ -201,54 +161,6 @@ public class TimedOutputArcComponent extends Arc {
 
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g;
-
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-
-		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
-				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
-				- myPath.getBounds().getY());
-
-		AffineTransform reset = g2.getTransform();
-
-		if (selected) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
-		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
-		}
-
-		g2.setStroke(new BasicStroke(0.01f * zoom));
-		g2.draw(myPath);
-
-		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
-				.getPoint(myPath.getEndIndex()).getY());
-
-		g2.rotate(myPath.getEndAngle() + Math.PI);
-		g2.setColor(java.awt.Color.WHITE);
-
-		g2.transform(Zoomer.getTransform(zoom));
-		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-
-		if (selected) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
-		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
-		}
-
-		g2.setStroke(new BasicStroke(0.8f));
-		g2.fillPolygon(head);
-
-		g2.transform(reset);
-	}
-
 	public dk.aau.cs.model.tapn.TimedOutputArc underlyingArc() {
 		return outputArc;
 	}
@@ -257,7 +169,7 @@ public class TimedOutputArcComponent extends Arc {
 		this.outputArc = outputArc;
 	}
 
-	public TimedOutputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TimedOutputArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedOutputArcComponent newCopyArc = new TimedOutputArcComponent(this);
 		newCopyArc.setSource(oldToNewMapping.get(this.getSource()));
 		newCopyArc.setTarget(oldToNewMapping.get(this.getTarget()));
@@ -265,13 +177,6 @@ public class TimedOutputArcComponent extends Arc {
 		
 		newCopyArc.getSource().addConnectFrom(newCopyArc);
 		newCopyArc.getTarget().addConnectTo(newCopyArc);
-				
-		ArcHandler arcHandler = new ArcHandler((DrawingSurfaceImpl)getParent(), newCopyArc);
-		newCopyArc.addMouseListener(arcHandler);
-		//arc.addMouseWheelListener(arcHandler);
-		newCopyArc.addMouseMotionListener(arcHandler);
-		
-		newCopyArc.setGuiModel(guiModel);
 		
 		return newCopyArc;
 	}

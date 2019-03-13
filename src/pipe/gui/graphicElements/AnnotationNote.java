@@ -39,20 +39,34 @@ public class AnnotationNote extends Note {
 		super(x, y);
 		setDragPoints();
 		this.isNew = isNew;
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
 	}
 
-	public AnnotationNote(String id, String text, int x, int y, boolean isNew) {
-		super(id, text, x, y);
-		this.isNew = isNew;
-		setDragPoints();
-	}
-
-	public AnnotationNote(String text, int x, int y, int w, int h,
-			boolean border, boolean isNew) {
+	public AnnotationNote(String text, int x, int y, int w, int h, boolean border, boolean isNew) {
 		super(text, x, y, w, h, border);
 		this.isNew = isNew;
 		setDragPoints();
+
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		addMouseHandler();
 	}
+
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+
+		AnnotationNoteHandler h = new AnnotationNoteHandler(this);
+		mouseHandler = h;
+
+		getNote().addMouseListener(h);
+		getNote().addMouseMotionListener(h);
+
+	}
+
 
 	private void setDragPoints() {
 		dragPoints[0] = new ResizePoint(this, ResizePoint.TOP
@@ -332,11 +346,6 @@ public class AnnotationNote extends Note {
 	
 	public AnnotationNote copy() {
 		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder(), isNew);
-		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
-		annotation.addMouseListener(noteHandler);
-		annotation.addMouseMotionListener(noteHandler);
-		annotation.getNote().addMouseListener(noteHandler);
-		annotation.getNote().addMouseMotionListener(noteHandler);
 		
 		return annotation;
 	}

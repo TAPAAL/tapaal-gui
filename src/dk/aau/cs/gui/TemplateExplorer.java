@@ -295,7 +295,7 @@ public class TemplateExplorer extends JPanel {
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortComponents);
-		sortButton.setEnabled(true);
+		sortButton.setEnabled(false);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);
@@ -988,6 +988,7 @@ public class TemplateExplorer extends JPanel {
 					copyButton.setEnabled(false);
 					moveUpButton.setEnabled(false);
 					moveDownButton.setEnabled(false);
+					sortButton.setEnabled(false);
 				} else {
 					if (buttonPanel != null) {
 						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1){
@@ -1001,6 +1002,10 @@ public class TemplateExplorer extends JPanel {
 						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
+						if(templateList.getModel().getSize() >= 2)
+							sortButton.setEnabled(true);
+						else
+							sortButton.setEnabled(false);
 						
 						if(index > 0)
 							moveUpButton.setEnabled(true);

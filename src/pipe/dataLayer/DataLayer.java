@@ -23,7 +23,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 
 
-public class DataLayer implements Cloneable {
+public class DataLayer {
 
 	/** PNML File Name */
 	public String pnmlName = null;
@@ -83,7 +83,7 @@ public class DataLayer implements Cloneable {
 	 * @param placeInput
 	 *            Place Object to add
 	 */
-	public void addPlace(Place placeInput) {
+	private void addPlace(Place placeInput) {
 		Require.that(placeInput != null, "input place was null");
 
 		placesArray.add(placeInput);
@@ -96,7 +96,7 @@ public class DataLayer implements Cloneable {
 	 * @param labelInput
 	 *            AnnotationNote Object to add
 	 */
-	public void addAnnotation(AnnotationNote labelInput) {
+	private void addAnnotation(AnnotationNote labelInput) {
 		labelsArray.add(labelInput);
 	}
 
@@ -107,7 +107,7 @@ public class DataLayer implements Cloneable {
 	 * @param transitionInput
 	 *            Transition Object to add
 	 */
-	public void addTransition(Transition transitionInput) {
+	private void addTransition(Transition transitionInput) {
 		Require.that(transitionInput != null, "input transition was null");
 		
 		transitionsArray.add(transitionInput);
@@ -120,7 +120,7 @@ public class DataLayer implements Cloneable {
 	 * @param arcInput
 	 *            Arc Object to add
 	 */
-	public void addArc(TimedOutputArcComponent arcInput) {
+	private void addArc(TimedOutputArcComponent arcInput) {
 		boolean unique = true;
 
 		// Check if the arcs have a valid source and target
@@ -224,12 +224,12 @@ public class DataLayer implements Cloneable {
 		}
 	}
 
-	public void addTransportArc(TimedTransportArcComponent transportArc) {
+	private void addTransportArc(TimedTransportArcComponent transportArc) {
 		arcsArray.add(transportArc);
 		addArcToArcsMap(transportArc);
 	}
 
-	public void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
+	private void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
 		boolean unique = true;
 
 		if (inhibitorArcInput != null) {
@@ -351,6 +351,9 @@ public class DataLayer implements Cloneable {
 	 *            The PetriNetObject to be added.
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
+
+		pnObject.setGuiModel(this);
+
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
 				addArc((TimedInhibitorArcComponent) pnObject);
@@ -361,8 +364,8 @@ public class DataLayer implements Cloneable {
 			} else if (pnObject instanceof Transition) {
 				addTransition((Transition) pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
-				addAnnotation((AnnotationNote)pnObject);				
-			} 
+				addAnnotation((AnnotationNote)pnObject);
+			}
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
@@ -376,6 +379,10 @@ public class DataLayer implements Cloneable {
 	 *            The PetriNetObject to be removed.
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject) {
+
+		//XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
+		//pnObject.setGuiModel(null);
+
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;
 
@@ -786,7 +793,7 @@ public class DataLayer implements Cloneable {
 		
 		for(Place p : placesArray) {
 			if(p instanceof TimedPlaceComponent) {
-				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn, guiModel);
+				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn);
 				oldToNewMapping.put(p, place);
 				guiModel.addPetriNetObject(place);
 			}
@@ -794,7 +801,7 @@ public class DataLayer implements Cloneable {
 		
 		for(Transition t : transitionsArray) {
 			if(t instanceof TimedTransitionComponent) {
-				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn, guiModel);
+				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn);
 				oldToNewMapping.put(t, trans);
 				guiModel.addPetriNetObject(trans);
 			}
@@ -802,19 +809,19 @@ public class DataLayer implements Cloneable {
 		
 		for(Arc arc : arcsArray) {
 			if(arc instanceof TimedTransportArcComponent) {
-				TimedTransportArcComponent transArc = ((TimedTransportArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				Arc transArc = ((TimedTransportArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(transArc);
 			}
 			else if(arc instanceof TimedInhibitorArcComponent) {
-				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);				
+				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(inhibArc);
 			}
 			else if(arc instanceof TimedInputArcComponent) {
-				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(inputArc);
 			}
 			else if(arc instanceof TimedOutputArcComponent) {
-				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(outputArc);
 			}
 			else {
@@ -824,7 +831,6 @@ public class DataLayer implements Cloneable {
 		
 		for(AnnotationNote note : labelsArray) {
 			AnnotationNote annotation = note.copy();
-			annotation.setGuiModel(guiModel);
 			guiModel.addPetriNetObject(annotation);
 		}
 			

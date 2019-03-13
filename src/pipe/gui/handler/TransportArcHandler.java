@@ -17,8 +17,8 @@ import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TransportArcHandler extends TimedArcHandler {
 
-	public TransportArcHandler(Container contentpane, Arc obj) {
-		super(contentpane, obj);
+	public TransportArcHandler(Arc obj) {
+		super(obj);
 		enablePopup = true;
 	}
 
@@ -54,6 +54,12 @@ public class TransportArcHandler extends TimedArcHandler {
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
+
+		if (((Arc) myObject).isPrototype()) {
+			dispatchToParentWithMouseLocationUpdated(e);
+			return;
+		}
+
 		if (CreateGui.getApp().isEditionAllowed()) {
 			Arc arc = (Arc) myObject;
 			if (e.getClickCount() == 2) {

@@ -71,7 +71,6 @@ public class TabTransformer {
                     // Set arcPath, guiModel and connectors
                     ((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
                     newArc.setArcPath(newArcPath);
-                    newArc.setGuiModel(guiModel);
                     newArc.updateArcPosition();
                     guiModel.addPetriNetObject(newArc);
                     guiSource.addConnectFrom(newArc);
@@ -110,7 +109,6 @@ public class TabTransformer {
                     // Set arcPath, guiModel and connectors
                     ((TimedOutputArcComponent) newArc).setUnderlyingArc(addedArc);
                     newArc.setArcPath(newArcPath);
-                    newArc.setGuiModel(guiModel);
                     newArc.updateArcPosition();
                     guiModel.addPetriNetObject(newArc);
                     guiSource.addConnectFrom(newArc);

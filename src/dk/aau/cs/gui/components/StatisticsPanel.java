@@ -41,15 +41,18 @@ public class StatisticsPanel extends JPanel{
 	String[] headLines = {"", "Shown component", "Active components", "All components"};
 	
 	private static JDialog dialog;
-	
-	private StatisticsPanel() {
+	private Object[][] contents;
+
+	private StatisticsPanel(Object[][] statistics) {
 		super(new GridBagLayout());
-		
+
+		this.contents = statistics;
+
 		init();
 	}
 	
-	public static void showStatisticsPanel(){
-		StatisticsPanel panel = new StatisticsPanel();
+	public static void showStatisticsPanel(Object[][] statistics){
+		StatisticsPanel panel = new StatisticsPanel(statistics);
 		
 		JOptionPane optionPane = new JOptionPane(panel, JOptionPane.INFORMATION_MESSAGE);
 		
@@ -60,7 +63,6 @@ public class StatisticsPanel extends JPanel{
 	}
 
 	private JPanel init() {
-		Object[][] contents = CreateGui.getDrawingSurface().getModel().getStatistics();
 		
 		addRow(headLines, 0, true);
 		
@@ -77,7 +79,7 @@ public class StatisticsPanel extends JPanel{
 		gbc.gridwidth = headLines.length;
 		JSeparator jSep;
 		gbc.insets = new Insets(topBottomMargin, 0, topBottomMargin, rightMargin);
-		for(int i = 3; i<contents.length*2-2; i += 2){
+		for(int i = 3; i< contents.length*2-2; i += 2){
 			jSep = new JSeparator();
 			jSep.setPreferredSize(new Dimension(1, 3));
 			gbc.gridy = i;
@@ -86,7 +88,7 @@ public class StatisticsPanel extends JPanel{
 		
 		//If any orphan transitions - add them
 		boolean orphanTransitions = false;
-		for(int i = 1; i<contents[contents.length-1].length; i++){
+		for(int i = 1; i< contents[contents.length-1].length; i++){
 			if(!contents[contents.length-1][i].toString().equals("0")){
 				orphanTransitions = true;
 			}

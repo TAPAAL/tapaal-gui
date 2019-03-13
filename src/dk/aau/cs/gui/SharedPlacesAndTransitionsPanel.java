@@ -144,25 +144,39 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 						renameButton.setEnabled(false);
 					}else{
 						removeButton.setEnabled(true);
-						renameButton.setEnabled(true);
+						if(list.getSelectedIndices().length == 1) {
+							renameButton.setEnabled(true);
+						}
+						else
+							renameButton.setEnabled(false);
 					}
 					
 					int index = list.getSelectedIndex();
-					if(index > 0)
+					if(index > 0 && list.getSelectedIndices().length == 1)
 						moveUpButton.setEnabled(true);
 					else
 						moveUpButton.setEnabled(false);
 								
 					if(isDisplayingTransitions()) {
-						if(index < sharedTransitionsListModel.getSize() - 1)
+						if(index < sharedTransitionsListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
 							moveDownButton.setEnabled(true);
 						else
 							moveDownButton.setEnabled(false);
+						
+						if (sharedTransitionsListModel.getSize() >=2) {
+							sortButton.setEnabled(true);
+						} else
+							sortButton.setEnabled(false);
 					} else {
-						if(index < sharedPlacesListModel.getSize() - 1)
+						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
 							moveDownButton.setEnabled(true);
 						else
 							moveDownButton.setEnabled(false);
+						
+						if (sharedPlacesListModel.getSize() >=2) {
+							sortButton.setEnabled(true);
+						} else
+							sortButton.setEnabled(false);
 					}
 				}
 			}
@@ -238,7 +252,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortPlaces);
-		sortButton.setEnabled(true);
+		sortButton.setEnabled(false);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isDisplayingTransitions()){
@@ -294,6 +308,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				} else {
 					moveDownButton.setEnabled(false);
 					moveUpButton.setEnabled(false);
+					sortButton.setEnabled(false);
 				}
 				if (list.getModel().getSize() <= 0){
 					renameButton.setEnabled(false);
@@ -429,7 +444,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 	
 	public void addSharedPlace(SharedPlace place){
-		sharedPlacesListModel.addElement(place);
+		addSharedPlace(place, false);
+	}
+	public void addSharedPlace(SharedPlace place, boolean multiAdd){
+		sharedPlacesListModel.addElement(place, multiAdd);
 	}
 	
 	public void removeSharedTransition(SharedTransition transition){
@@ -437,9 +455,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			sharedTransitionsListModel.removeElement(transition);
 		}
 	}
-	
 	public void addSharedTransition(SharedTransition transition){
-		sharedTransitionsListModel.addElement(transition);
+		addSharedTransition(transition, false);
+	}
+	public void addSharedTransition(SharedTransition transition, boolean multiAdd){
+		sharedTransitionsListModel.addElement(transition, multiAdd);
 	}
 
 	public class SharedPlacesListModel extends AbstractListModel {
@@ -491,7 +511,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		}
 
 		public void addElement(SharedPlace place){
-			network.add(place);
+			addElement(place, false);
+		}
+		public void addElement(SharedPlace place, boolean multiAdd){
+			network.add(place, multiAdd);
 			fireIntervalAdded(this, network.numberOfSharedPlaces()-1, network.numberOfSharedPlaces());
 		}
 
@@ -502,6 +525,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			if(numElements <= 1) {
 				moveDownButton.setEnabled(false);
 				moveUpButton.setEnabled(false);
+				sortButton.setEnabled(false);
 			}
 			if (numElements <= 0) {
 				removeButton.setEnabled(false);
@@ -568,9 +592,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public int getSize() {
 			return network.numberOfSharedTransitions();
 		}
-
 		public void addElement(SharedTransition transition){
-			network.add(transition);
+			addElement(transition, false);
+		}
+
+		public void addElement(SharedTransition transition, boolean multiAdd){
+			network.add(transition, multiAdd);
 			fireIntervalAdded(this, network.numberOfSharedTransitions()-1, network.numberOfSharedTransitions());
 		}
 
@@ -581,6 +608,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			if(numElements <= 1) {
 				moveDownButton.setEnabled(false);
 				moveUpButton.setEnabled(false);
+				sortButton.setEnabled(false);
 			}
 			if (numElements <= 0) {
 				removeButton.setEnabled(false);

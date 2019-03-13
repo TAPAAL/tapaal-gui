@@ -17,14 +17,16 @@ public class MakeTransitionNewSharedCommand extends Command {
 	private final String oldName;
 	private final TimedArcPetriNet tapn;
 	private SharedPlacesAndTransitionsPanel sharedPanel;
+	private boolean multiShare;
 	
-	public MakeTransitionNewSharedCommand(TimedArcPetriNet tapn, String newName, TimedTransition timedTransition, TabContent tabContent){
+	public MakeTransitionNewSharedCommand(TimedArcPetriNet tapn, String newName, TimedTransition timedTransition, TabContent tabContent, boolean multiShare){
 		this.sharedTransition = null;
 		this.tapn = tapn;
 		this.timedTransition = timedTransition;
 		this.newName = newName;
 		this.oldName = timedTransition.name();
 		this.sharedPanel = tabContent.getSharedPlacesAndTransitionsPanel();
+		this.multiShare = multiShare;
 	}
 	
 	@Override
@@ -33,7 +35,7 @@ public class MakeTransitionNewSharedCommand extends Command {
 		if(sharedTransition == null){
 			sharedTransition = new SharedTransition(newName);
 		}
-		sharedPanel.addSharedTransition(sharedTransition);			
+		sharedPanel.addSharedTransition(sharedTransition, multiShare);			
 		sharedTransition.makeShared(timedTransition);
 		
 		tapn.add(timedTransition);

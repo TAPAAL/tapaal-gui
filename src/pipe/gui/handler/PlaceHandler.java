@@ -29,13 +29,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  */
 public class PlaceHandler extends PlaceTransitionObjectHandler {
 
-	public PlaceHandler(Container contentpane, Place obj) {
-		super(contentpane, obj);
-	}
-
-	public PlaceHandler(DrawingSurfaceImpl drawingSurfaceImpl, Place newObject,
-			DataLayer guiModel, TimedArcPetriNet model) {
-		super(drawingSurfaceImpl, newObject, guiModel, model);
+	public PlaceHandler(Place obj) {
+		super(obj);
 	}
 
 	/**
@@ -154,10 +149,13 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			return;
 		}
 
-		if (e.getWheelRotation() < 0) {
-			((TimedPlaceComponent)myObject).addTokens(1);
-		} else {
-			((TimedPlaceComponent)myObject).removeTokens(1);
-		}
+		if (myObject instanceof TimedPlaceComponent) {
+            TimedPlaceComponent p = (TimedPlaceComponent) myObject;
+		    if (e.getWheelRotation() < 0) {
+                p.addTokens(1);
+            } else {
+                p.removeTokens(1);
+            }
+        }
 	}
 }

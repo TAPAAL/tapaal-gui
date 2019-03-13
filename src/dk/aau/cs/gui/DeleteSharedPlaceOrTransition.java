@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
-
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
 import dk.aau.cs.TCTL.visitors.ContainsSharedTransitionVisitor;
@@ -32,7 +30,6 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
@@ -64,6 +61,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	SharedPlacesListModel sharedPlacesListModel;
 	SharedTransitionsListModel sharedTransitionsListModel;
 	NameGenerator nameGenerator;
+	boolean messageShown;
 	
 	public DeleteSharedPlaceOrTransition(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, TabContent tab, 
 			SharedPlacesListModel sharedPlacesListModel, SharedTransitionsListModel sharedTransitionsListModel, NameGenerator nameGenerator) {
@@ -90,14 +88,26 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent arg0) {
-		if(list.getSelectedValue() != null){
-			ArrayList<String> affectedComponents = new ArrayList<String>(); 
+		messageShown = false;
+		if(list.getSelectedValuesList() != null){
+			ArrayList<String> affectedComponents = new ArrayList<String>();
 			if(sharedPlacesAndTransitionsPanel.isDisplayingTransitions()){
-				for(TimedTransition t : ((SharedTransition)list.getSelectedValue()).transitions()){
-					affectedComponents.add(t.model().name());
+				for(Object transition : list.getSelectedValuesList()) {
+					for(TimedTransition t : ((SharedTransition)transition).transitions()){
+						if(!(affectedComponents.contains(t.model().name())))
+							affectedComponents.add(t.model().name());
+					}
 				}
 			} else {
-				affectedComponents = ((SharedPlace)list.getSelectedValue()).getComponentsUsingThisPlace();
+				ArrayList<String> affectedComponentsWithDupes = new ArrayList<String>();
+				for(Object place : list.getSelectedValuesList()) {
+					affectedComponentsWithDupes.addAll(((SharedPlace)place).getComponentsUsingThisPlace());
+				}
+				for(String component : affectedComponentsWithDupes) {
+					if(!(affectedComponents.contains(component))) {
+						affectedComponents.add(component);
+					}
+				}
 			}
 			
 			DeleteSharedResult result = new DeleteSharedResult(JOptionPane.OK_OPTION, false);
@@ -107,19 +117,28 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 				
 			if(result.choice == JOptionPane.OK_OPTION){
 				undoManager.newEdit();
+				Collection<TAPNQuery> affectedQueries = new ArrayList<TAPNQuery>();
+				
 				if(sharedPlacesAndTransitionsPanel.isDisplayingTransitions()){
-					deleteSharedTransition(result.deleteFromTemplates);
+					affectedQueries = findAffectedTransitionQueries(list.getSelectedValuesList());
+					for(Object transition : list.getSelectedValuesList()) {
+						deleteSharedTransition(result.deleteFromTemplates, (SharedTransition) transition, affectedQueries);
+					}
+						
 				}else{
-					deleteSharedPlace(result.deleteFromTemplates);
+					affectedQueries = findAffectedPlaceQueries(list.getSelectedValuesList());
+					for(Object place : list.getSelectedValuesList()) {
+						deleteSharedPlace(result.deleteFromTemplates, (SharedPlace) place, affectedQueries);
+					}
 				}
 			}
 		}
 	}
 
-	private void deleteSharedPlace(boolean deleteFromTemplates) {
-		SharedPlace sharedPlace = (SharedPlace)list.getSelectedValue();
-		Collection<TAPNQuery> affectedQueries = findAffectedPlaceQueries(sharedPlace);
-		if(affectedQueries.size() > 0){
+	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove, Collection<TAPNQuery> affectedQueries) {
+		SharedPlace sharedPlace = placeToRemove;
+		if(affectedQueries.size() > 0 && messageShown == false){
+			messageShown = true;
 			StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append(System.getProperty("line.separator"));
@@ -184,33 +203,38 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}
 	}
 
-	private Collection<TAPNQuery> findAffectedPlaceQueries(SharedPlace sharedPlace) {
+	private Collection<TAPNQuery> findAffectedPlaceQueries(List<Object> sharedPlaces) {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
-		ContainsSharedPlaceVisitor visitor = new ContainsSharedPlaceVisitor(sharedPlace.name());
-
-		for(TAPNQuery query : tab.queries()){
-			BooleanResult result = new BooleanResult();
-			query.getProperty().accept(visitor, result);
-			if(result.result()){
-				queries.add(query);
+		for(Object sharedPlace : sharedPlaces) {
+			ContainsSharedPlaceVisitor visitor = new ContainsSharedPlaceVisitor(((SharedPlace)sharedPlace).name());
+	
+			for(TAPNQuery query : tab.queries()){
+				BooleanResult result = new BooleanResult();
+				query.getProperty().accept(visitor, result);
+				if(result.result() && !(queries.contains(query))){
+					queries.add(query);
+				}
 			}
 		}
 		return queries;
 	}
         
-        private Collection<TAPNQuery> findAffectedTransitionQueries(SharedTransition sharedTransition) {
+	private Collection<TAPNQuery> findAffectedTransitionQueries(List<Object> sharedTransitions) {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
-		ContainsSharedTransitionVisitor visitor = new ContainsSharedTransitionVisitor(sharedTransition.name());
-
-		for(TAPNQuery query : tab.queries()){
-			BooleanResult result = new BooleanResult();
-			query.getProperty().accept(visitor, result);
-			if(result.result()){
-				queries.add(query);
+		for(Object sharedTransition : sharedTransitions) {
+			ContainsSharedTransitionVisitor visitor = new ContainsSharedTransitionVisitor(((SharedTransition)sharedTransition).name());
+			
+			for(TAPNQuery query : tab.queries()){
+				BooleanResult result = new BooleanResult();
+				query.getProperty().accept(visitor, result);
+				if(result.result() && !(queries.contains(query))){
+					queries.add(query);
+				}
 			}
 		}
 		return queries;
 	}
+        
 
 	private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {
 		if(arc instanceof TimedInhibitorArcComponent){
@@ -231,26 +255,26 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		undoManager.addEdit(cmd);
 	}
 	
-	private void deleteSharedTransition(boolean deleteFromTemplates) {
-		SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
-                Collection<TAPNQuery> affectedQueries = findAffectedTransitionQueries(sharedTransition);
-		if(affectedQueries.size() > 0){
-                    StringBuffer buffer = new StringBuffer("The following queries contains the shared transition and will also be deleted:");
-                    buffer.append(System.getProperty("line.separator"));
-                    buffer.append(System.getProperty("line.separator"));
-
-                    for(TAPNQuery query : affectedQueries){
-                            buffer.append(query.getName());
-                            buffer.append(System.getProperty("line.separator"));
-                    }
-                    buffer.append(System.getProperty("line.separator"));
-                    buffer.append("Do you want to continue?");
-                    int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    if(choice == JOptionPane.NO_OPTION) return;
-
-                    Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
-                    cmd.redo();
-                    undoManager.addEdit(cmd);
+	private void deleteSharedTransition(boolean deleteFromTemplates, SharedTransition transitionToBeRemoved, Collection<TAPNQuery> affectedQueries) {
+		SharedTransition sharedTransition = transitionToBeRemoved;
+		if(affectedQueries.size() > 0 && !messageShown){
+			messageShown = true;
+	        StringBuffer buffer = new StringBuffer("The following queries contains the shared transition and will also be deleted:");
+	        buffer.append(System.getProperty("line.separator"));
+	        buffer.append(System.getProperty("line.separator"));
+	
+	        for(TAPNQuery query : affectedQueries){
+	                buffer.append(query.getName());
+	                buffer.append(System.getProperty("line.separator"));
+	        }
+	        buffer.append(System.getProperty("line.separator"));
+	        buffer.append("Do you want to continue?");
+	        int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+	        if(choice == JOptionPane.NO_OPTION) return;
+	
+	        Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
+	        cmd.redo();
+	        undoManager.addEdit(cmd);
 		}
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow

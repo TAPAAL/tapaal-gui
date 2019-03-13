@@ -34,6 +34,29 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	public TimedInputArcComponent(PlaceTransitionObject source) {
 		super(source);
 		init();
+
+		//XXX: se note in funcation
+		addMouseHandler();
+
+	}
+
+	public TimedInputArcComponent(TimedOutputArcComponent arc) {
+		super(arc);
+		init();
+
+		//XXX: se note in funcation
+		addMouseHandler();
+
+	}
+
+	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
+		super(arc);
+		timeInterval = guard;
+		updateLabel(true);
+
+		//XXX: se note in funcation
+		addMouseHandler();
+
 	}
 
 	private void init() {
@@ -41,15 +64,10 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedInputArcComponent(TimedOutputArcComponent arc) {
-		super(arc);
-		init();
-	}
-
-	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
-		super(arc);
-		timeInterval = guard;
-		updateLabel(true);
+	private void addMouseHandler() {
+		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+		mouseHandler = new TimedArcHandler(this);
 	}
 
 	@Override
@@ -147,20 +165,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	@Override
-	public TimedInputArcComponent copy() {
-		return new TimedInputArcComponent(new TimedOutputArcComponent(this), timeInterval);
-	}
-
-	@Override
-	public TimedInputArcComponent paste(double despX, double despY,	boolean toAnotherView) {
-		TimedOutputArcComponent copy = new TimedOutputArcComponent(this);
-		copy.setSource(this.getSource());
-		copy.setTarget(this.getTarget());
-		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), timeInterval);
-		return timedCopy;
-	}
-
-	@Override
 	public void setLabelPosition() {
 		/*label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
 				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)
@@ -178,7 +182,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedInputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TimedInputArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedInputArcComponent arc =  new TimedInputArcComponent(this);
 		
 		arc.setSource(oldToNewMapping.get(this.getSource()));
@@ -187,13 +191,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		
 		arc.getSource().addConnectFrom(arc);
 		arc.getTarget().addConnectTo(arc);
-		
-		TimedArcHandler timedArcHandler = new TimedArcHandler((DrawingSurfaceImpl)getParent(), arc);
-		arc.addMouseListener(timedArcHandler);
-		//arc.addMouseWheelListener(timedArcHandler);
-		arc.addMouseMotionListener(timedArcHandler);
-		
-		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

@@ -29,7 +29,7 @@ import dk.aau.cs.gui.undo.Command;
  * 
  * @author Pere Bonet: modified the weight label placement
  */
-public class ArcPath implements Shape, Cloneable {
+public class ArcPath implements Shape {
 
 	private GeneralPath path = new GeneralPath();
 	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
@@ -615,62 +615,13 @@ public class ArcPath implements Shape, Cloneable {
 			// we just want to add the new point.
 			// Nadeem 21/06/2005
 			if (editWindow.getIndexOf(pathPoint) < 0) {
-				editWindow.add(pathPoint);
-
-				pointHandler = new ArcPathPointHandler(editWindow, pathPoint);
-
-				if (pathPoint.getMouseListeners().length == 0) {
-					pathPoint.addMouseListener(pointHandler);
-				}
-
-				if (pathPoint.getMouseMotionListeners().length == 0) {
-					pathPoint.addMouseMotionListener(pointHandler);
-				}
-
-//				if (pathPoint.getMouseWheelListeners().length == 0) {
-//					pathPoint.addMouseWheelListener(pointHandler);
-//				}
+				editWindow.addNewPetriNetObject(pathPoint);
 				pathPoint.updatePointLocation();
 			}
 		}
 	}
 
-	public void addPointsToGui(JLayeredPane editWindow) {
-		ArcPathPoint pathPoint;
-		ArcPathPointHandler pointHandler;
 
-		(pathPoints.get(0)).setDraggable(false);
-		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
-
-		for (int i = 0; i < pathPoints.size(); i++) {
-			pathPoint = pathPoints.get(i);
-			pathPoint.setVisible(false);
-
-			// Check whether the point has already been added to the gui
-			// as addPointsToGui() may have been called after the user
-			// split an existing point. If this is the case, we don't want
-			// to add all the points again along with new action listeners,
-			// we just want to add the new point.
-			// Nadeem 21/06/2005
-			if (editWindow.getIndexOf(pathPoint) < 0) {
-				editWindow.add(pathPoint);
-				pointHandler = new ArcPathPointHandler(editWindow, pathPoint);
-
-				if (pathPoint.getMouseListeners().length == 0) {
-					pathPoint.addMouseListener(pointHandler);
-				}
-
-				if (pathPoint.getMouseMotionListeners().length == 0) {
-					pathPoint.addMouseMotionListener(pointHandler);
-				}
-
-//				if (pathPoint.getMouseWheelListeners().length == 0) {
-//					pathPoint.addMouseWheelListener(pointHandler);
-//				}
-				pathPoint.updatePointLocation();
-			}
-		}
-	}
 
 	public void delete() { // Michael: Tells the arc points to remove themselves
 		while (!pathPoints.isEmpty()) {
@@ -714,11 +665,9 @@ public class ArcPath implements Shape, Cloneable {
 	 */
 	public void insertPoint(int index, ArcPathPoint newpoint) {
 		pathPoints.add(index, newpoint);
-		if (myArc.getParent() instanceof DrawingSurfaceImpl) {
-			addPointsToGui((DrawingSurfaceImpl) myArc.getParent());
-		} else {
-			addPointsToGui((JLayeredPane) myArc.getParent());
-		}
+
+		addPointsToGui((DrawingSurfaceImpl) myArc.getParent());
+
 	}
 
 	/**
