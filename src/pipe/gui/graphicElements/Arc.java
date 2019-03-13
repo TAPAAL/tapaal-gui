@@ -1,7 +1,8 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import javax.swing.*;
@@ -23,6 +24,10 @@ public abstract class Arc extends PetriNetObject {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 
+	protected Shape head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
+			0, -10, -7, -10 }, 4);
+	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
+
 	protected NameLabel label;
 
 	private static Point2D.Double point;
@@ -32,6 +37,19 @@ public abstract class Arc extends PetriNetObject {
 	private PlaceTransitionObject target = null;
 
 	protected ArcPath myPath = new ArcPath(this);
+
+	//Indicated wither the arc is being drawed (true), used to dispatch mouse events to parent
+	//Set to true, when using constructor for creating new arc when drawing
+	protected boolean isPrototype = false;
+
+	public boolean isPrototype() {
+		return isPrototype;
+	}
+
+	//Called to indicate arc is no longer a prototype
+	public void sealArc() {
+		isPrototype = false;
+	}
 
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
@@ -64,6 +82,7 @@ public abstract class Arc extends PetriNetObject {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
+		isPrototype = true;
 		label = new NameLabel(zoom);
 		source = newSource;
 		myPath.addPoint();
@@ -241,6 +260,70 @@ public abstract class Arc extends PetriNetObject {
 	
 	public void setArcPath(ArcPath newPath) {
 		myPath = newPath;
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
+
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+
+		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getY());
+
+		AffineTransform reset = g2.getTransform();
+
+		//Draw Path
+		if (selected && !ignoreSelection) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.01f * zoom));
+		g2.draw(myPath);
+
+		//Draw Arrow-head
+		//Jump to arc end
+		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
+				.getPoint(myPath.getEndIndex()).getY());
+
+		//Rotate to match arrowhead to arc angle
+		g2.rotate(myPath.getEndAngle() + Math.PI);
+		g2.setColor(java.awt.Color.WHITE);
+
+		g2.transform(Zoomer.getTransform(zoom));
+		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+
+		if (selected && !ignoreSelection) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.8f));
+
+		if (fillHead) {
+			g2.fill(head);
+		} else {
+			Paint p = g2.getPaint();
+
+			//Fill first to get thick edge
+			g2.setColor(java.awt.Color.WHITE); // XXX: should be GB color of canvas / drawingsurface
+			g2.fill(head);
+
+			g2.setPaint(p);
+			g2.draw(head);
+		}
+
+		g2.transform(reset);
 	}
 
 	@Override

@@ -198,9 +198,6 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	/**
 	 * Implemented in subclasses as involves some tailoring according to the
 	 * shape
-	 * 
-	 * @param e
-	 *            Mouse Event
 	 */
 	@Override
 	public void paintComponent(Graphics g) {

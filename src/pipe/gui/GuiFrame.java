@@ -542,7 +542,6 @@ public class GuiFrame extends JFrame  {
 							}
 
 							appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-							appView.getSelectionObject().deleteSelection();
 							appView.repaint();
 							CreateGui.getCurrentTab().network().buildConstraints();
 						}
@@ -932,7 +931,7 @@ public class GuiFrame extends JFrame  {
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StatisticsPanel.showStatisticsPanel();
+				StatisticsPanel.showStatisticsPanel(appView.getModel().getStatistics());
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
@@ -1717,7 +1716,7 @@ public class GuiFrame extends JFrame  {
 
 		try {
 
-			ModelLoader loader = new ModelLoader(tab.drawingSurface());
+			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
 			tab.setNetwork(loadedModel.network(), loadedModel.templates());
@@ -1777,7 +1776,7 @@ public class GuiFrame extends JFrame  {
 
 				LoadedModel loadedModel;
 
-				PNMLoader loader = new PNMLoader(tab.drawingSurface());
+				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
 

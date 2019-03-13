@@ -271,15 +271,6 @@ public class ArcPathPoint extends PetriNetObject {
 		super.removeFromContainer();
 	}
 
-	public PetriNetObject paste(double despX, double despY,
-			boolean toAnotherView) {
-		return null;
-	}
-
-	public PetriNetObject copy() {
-		return null;
-	}
-
 	@Override
 	public int getLayerOffset() {
 		return Pipe.ARC_POINT_LAYER_OFFSET;

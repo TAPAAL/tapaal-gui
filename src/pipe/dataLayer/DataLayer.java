@@ -46,11 +46,6 @@ public class DataLayer {
 	 */
 	private ArrayList<? extends PetriNetObject> changeArrayList = null;
 
-	/** Used to determine whether the matrixes have been modified */
-	static boolean initialMarkingVectorChanged = true;
-
-	static boolean currentMarkingVectorChanged = true;
-
 	/**
 	 * Hashtable which maps PlaceTransitionObjects to their list of connected
 	 * arcs
@@ -65,9 +60,6 @@ public class DataLayer {
 
 	private NetType type = NetType.TAPN;
 
-	//Is the net too big to be drawn
-	private boolean isDrawable= true;
-	
 	/**
 	 * Create empty Petri-Net object
 	 */
@@ -76,7 +68,6 @@ public class DataLayer {
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
 
-		// tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList<AnnotationNote>();
 
 		// may as well do the hashtable here as well
@@ -92,7 +83,7 @@ public class DataLayer {
 	 * @param placeInput
 	 *            Place Object to add
 	 */
-	public void addPlace(Place placeInput) {
+	private void addPlace(Place placeInput) {
 		Require.that(placeInput != null, "input place was null");
 
 		placesArray.add(placeInput);
@@ -105,7 +96,7 @@ public class DataLayer {
 	 * @param labelInput
 	 *            AnnotationNote Object to add
 	 */
-	public void addAnnotation(AnnotationNote labelInput) {
+	private void addAnnotation(AnnotationNote labelInput) {
 		labelsArray.add(labelInput);
 	}
 
@@ -116,7 +107,7 @@ public class DataLayer {
 	 * @param transitionInput
 	 *            Transition Object to add
 	 */
-	public void addTransition(Transition transitionInput) {
+	private void addTransition(Transition transitionInput) {
 		Require.that(transitionInput != null, "input transition was null");
 		
 		transitionsArray.add(transitionInput);
@@ -129,7 +120,7 @@ public class DataLayer {
 	 * @param arcInput
 	 *            Arc Object to add
 	 */
-	public void addArc(TimedOutputArcComponent arcInput) {
+	private void addArc(TimedOutputArcComponent arcInput) {
 		boolean unique = true;
 
 		// Check if the arcs have a valid source and target
@@ -233,12 +224,12 @@ public class DataLayer {
 		}
 	}
 
-	public void addTransportArc(TimedTransportArcComponent transportArc) {
+	private void addTransportArc(TimedTransportArcComponent transportArc) {
 		arcsArray.add(transportArc);
 		addArcToArcsMap(transportArc);
 	}
 
-	public void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
+	private void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
 		boolean unique = true;
 
 		if (inhibitorArcInput != null) {
@@ -291,20 +282,15 @@ public class DataLayer {
 	 *            New Arc
 	 * */
 	private void addArcToArcsMap(TimedOutputArcComponent arcInput) {
-		// now we want to add the arc to the list of arcs for it's source and
-		// target
+		// now we want to add the arc to the list of arcs for it's source and target
 		PlaceTransitionObject source = arcInput.getSource();
 		PlaceTransitionObject target = arcInput.getTarget();
 		ArrayList<TimedOutputArcComponent> newList = null;
 
 		if (source != null) {
-			// Pete: Place/Transitions now always moveable
-			// source.setMovable(false);
 			if (arcsMap.get(source) != null) {
-				// System.out.println("adding arc to existing list");
 				arcsMap.get(source).add(arcInput);
 			} else {
-				// System.out.println("creating new arc list");
 				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(source, newList);
@@ -312,31 +298,24 @@ public class DataLayer {
 		}
 
 		if (target != null) {
-			// Pete: Place/Transitions now always moveable
-			// target.setMovable(false);
 			if (arcsMap.get(target) != null) {
-				// System.out.println("adding arc to existing list2");
 				arcsMap.get(target).add(arcInput);
 			} else {
-				// System.out.println("creating new arc list2");
 				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(target, newList);
 			}
 		}
-		// System.out.println("arcsMap size: " + arcsMap.size());
 	}
 
 	/**
 	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
 	 * 
-	 * @param arcInput
+	 * @param inhibitorArcInput
 	 *            New Arc
 	 */
 	private void addInhibitorArcToInhibitorsMap(TimedInhibitorArcComponent inhibitorArcInput) {
-		// now we want to add the inhibitor arc to the list of inhibitor arcs
-		// for
-		// it's source and target
+		// now we want to add the inhibitor arc to the list of inhibitor arcs for it's source and target
 		PlaceTransitionObject source = inhibitorArcInput.getSource();
 		PlaceTransitionObject target = inhibitorArcInput.getTarget();
 		ArrayList<TimedInhibitorArcComponent> newList = null;
@@ -360,7 +339,6 @@ public class DataLayer {
 				tapnInhibitorsMap.put(target, newList);
 			}
 		}
-		// System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
 	}
 
 
@@ -373,6 +351,9 @@ public class DataLayer {
 	 *            The PetriNetObject to be added.
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
+
+		pnObject.setGuiModel(this);
+
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
 				addArc((TimedInhibitorArcComponent) pnObject);
@@ -383,8 +364,8 @@ public class DataLayer {
 			} else if (pnObject instanceof Transition) {
 				addTransition((Transition) pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
-				addAnnotation((AnnotationNote)pnObject);				
-			} 
+				addAnnotation((AnnotationNote)pnObject);
+			}
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
@@ -398,6 +379,10 @@ public class DataLayer {
 	 *            The PetriNetObject to be removed.
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject) {
+
+		//XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
+		//pnObject.setGuiModel(null);
+
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;
 
@@ -408,13 +393,10 @@ public class DataLayer {
 				if (pnObject instanceof PlaceTransitionObject) {
 					if (arcsMap.get(pnObject) != null) {
 
-						// get the list of attached arcs for the object we are
-						// removing
+						// get the list of attached arcs for the object we are removing
 						attachedArcs = arcsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
+						// iterate over all the attached arcs, removing them all in inverse order!
 						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
 							try {
 								((Arc) attachedArcs.get(i)).delete();
@@ -430,13 +412,10 @@ public class DataLayer {
 
 					if (tapnInhibitorsMap.get(pnObject) != null) {
 
-						// get the list of attached arcs for the object we are
-						// removing
+						// get the list of attached arcs for the object we are removing
 						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
+						// iterate over all the attached arcs, removing them all in inverse order!
 						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
 							((Arc) attachedArcs.get(i)).delete();
 						}
@@ -697,29 +676,10 @@ public class DataLayer {
 		return returnTransition;
 	}
 
-	public Transition getTransitionByNameIgnoreGiven(Transition ignore,
-			String transitionName) {
-		Transition returnTransition = null;
-
-		if (transitionsArray != null) {
-			if (transitionName != null) {
-				for (int i = 0; i < transitionsArray.size(); i++) {
-					if (!transitionsArray.get(i).equals(ignore)) {
-						if (transitionName.equalsIgnoreCase((transitionsArray
-								.get(i)).getName())) {
-							returnTransition = transitionsArray.get(i);
-						}
-					}
-				}
-			}
-		}
-		return returnTransition;
-	}
-
 	/**
 	 * Return the Place called placeName from the Petri-Net
-	 * 
-	 * @param placeId
+	 *
+	 * @param placeID
 	 *            ID of Place object to return
 	 * @return The first Place object found with id equal to placeId
 	 */
@@ -761,24 +721,6 @@ public class DataLayer {
 		return returnPlace;
 	}
 
-	public Place getPlaceByNameIgnoreGiven(Place ignore, String placeName) {
-		Place returnPlace = null;
-
-		if (placesArray != null) {
-			if (placeName != null) {
-				for (int i = 0; i < placesArray.size(); i++) {
-					if (!placesArray.get(i).equals(ignore)) {
-						if (placeName.equalsIgnoreCase((placesArray.get(i))
-								.getName())) {
-							returnPlace = placesArray.get(i);
-						}
-					}
-				}
-			}
-		}
-		return returnPlace;
-	}
-
 	/**
 	 * Return the PlaceTransitionObject called ptoName from the Petri-Net
 	 * 
@@ -797,32 +739,6 @@ public class DataLayer {
 		}
 
 		return null;
-	}
-
-	public boolean hasTAPNInhibitorArcs() { // TODO: Fix this to make it faster
-		for (Arc arc : arcsArray) {
-			if (arc instanceof TimedInhibitorArcComponent) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean hasTransportArcs() {
-		for(Arc arc : arcsArray) {
-			if(arc instanceof TimedTransportArcComponent) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean hasInvariants() {
-		for(Place p : placesArray) {
-			if(!((TimedPlaceComponent)p).underlyingPlace().invariant().equals(TimeInvariant.LESS_THAN_INFINITY))
-				return true;
-		}
-		return false;
 	}
 
 	public NetType netType() {
@@ -877,7 +793,7 @@ public class DataLayer {
 		
 		for(Place p : placesArray) {
 			if(p instanceof TimedPlaceComponent) {
-				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn, guiModel);
+				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn);
 				oldToNewMapping.put(p, place);
 				guiModel.addPetriNetObject(place);
 			}
@@ -885,7 +801,7 @@ public class DataLayer {
 		
 		for(Transition t : transitionsArray) {
 			if(t instanceof TimedTransitionComponent) {
-				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn, guiModel);
+				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn);
 				oldToNewMapping.put(t, trans);
 				guiModel.addPetriNetObject(trans);
 			}
@@ -893,19 +809,19 @@ public class DataLayer {
 		
 		for(Arc arc : arcsArray) {
 			if(arc instanceof TimedTransportArcComponent) {
-				TimedTransportArcComponent transArc = ((TimedTransportArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				Arc transArc = ((TimedTransportArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(transArc);
 			}
 			else if(arc instanceof TimedInhibitorArcComponent) {
-				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);				
+				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(inhibArc);
 			}
 			else if(arc instanceof TimedInputArcComponent) {
-				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(inputArc);
 			}
 			else if(arc instanceof TimedOutputArcComponent) {
-				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, oldToNewMapping);
 				guiModel.addPetriNetObject(outputArc);
 			}
 			else {
@@ -915,20 +831,11 @@ public class DataLayer {
 		
 		for(AnnotationNote note : labelsArray) {
 			AnnotationNote annotation = note.copy();
-			annotation.setGuiModel(guiModel);
 			guiModel.addPetriNetObject(annotation);
 		}
 			
 		
 		return guiModel;
-	}
-
-	public void setDrawable(boolean isDrawable) {
-		this.isDrawable = isDrawable;
-	}
-	
-	public boolean getDrawable(){
-		return isDrawable;
 	}
 	
 }

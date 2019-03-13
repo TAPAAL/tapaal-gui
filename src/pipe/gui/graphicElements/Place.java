@@ -19,6 +19,7 @@ public abstract class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
 
+
 	// Value of the capacity restriction; 0 means no capacity restriction 
 	protected Integer capacity = 0;
 
@@ -159,7 +160,7 @@ public abstract class Place extends PlaceTransitionObject {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
-			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
+			pnName.setText("");
 		} else {
 			pnName.setText("");
 		}

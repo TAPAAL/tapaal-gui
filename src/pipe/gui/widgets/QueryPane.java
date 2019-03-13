@@ -170,11 +170,18 @@ public class QueryPane extends JPanel {
 			editQueryButton.setEnabled(false);
 			verifyButton.setEnabled(false);
 			removeQueryButton.setEnabled(false);
+			sortButton.setEnabled(false);
 		} else {
 			editQueryButton.setEnabled(true);
 			verifyButton.setEnabled(true);
 			removeQueryButton.setEnabled(true);
+			sortButton.setEnabled(true);
 		}
+		if(queryList.getModel().getSize() >= 2)
+			sortButton.setEnabled(true);
+		else
+			sortButton.setEnabled(false);
+		
 		int index = queryList.getSelectedIndex();
 		if(index > 0 && queryList.getSelectedIndices().length == 1)
 			moveUpButton.setEnabled(true);
@@ -248,7 +255,7 @@ public class QueryPane extends JPanel {
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortQueries);
-		sortButton.setEnabled(true);
+		sortButton.setEnabled(false);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Command c = new SortQueriesCommand(listModel);
@@ -344,6 +351,7 @@ public class QueryPane extends JPanel {
 					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
 					addQuery(q);
 				}
+				updateQueryButtons();
 			}
 		});
 

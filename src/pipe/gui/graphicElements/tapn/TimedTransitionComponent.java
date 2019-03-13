@@ -225,11 +225,9 @@ public class TimedTransitionComponent extends Transition {
 		return super.rotate(angleInc);
 	}
 
-	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
+	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
-		
-		transitionComponent.setGuiModel(guiModel);
 
 		return transitionComponent;
 	}
