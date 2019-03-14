@@ -241,7 +241,7 @@ public class Export {
 						null, possibilities, "Only the TikZ figure");
 				TikZExporter.TikZOutputOption tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if (figureOptions == null)
-					return;
+					break;
 
 				if (figureOptions == possibilities[0])
 					tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
