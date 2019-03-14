@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -63,7 +65,6 @@ public class TimedArcPetriNet {
 	public void add(TimedTransition transition) {
 		Require.that(transition != null, "Argument must be a non-null transition");
 		Require.that(!isNameUsed(transition.name()) || transition.isShared(), "A place or transition with the specified name already exists in the petri net.");
-
 		transition.setModel(this);
 		transitions.add(transition);
 	}
