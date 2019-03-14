@@ -624,6 +624,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				} else {
 					view.zoomOut();
 				}
+				CreateGui.getAppGui().updateZoomCombo();
 			} else {
 				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
 				getParent().dispatchEvent(e);
