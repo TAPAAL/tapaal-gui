@@ -20,14 +20,12 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import com.apple.eawt.Application;
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
-
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -2558,7 +2556,7 @@ public class GuiFrame extends JFrame  {
 			}
 		});
 
-		exportMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information",  KeyStroke.getKeyStroke('K', shortcutkey )) {
+		exportMenu.add(exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information",  KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ExportBatchDialog.ShowExportBatchDialog();
