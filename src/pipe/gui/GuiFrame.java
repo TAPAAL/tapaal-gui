@@ -2341,21 +2341,21 @@ public class GuiFrame extends JFrame  {
 		buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Graesboell, ");
 		buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
 		buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2018\n\n");
+		buffer.append("Aalborg University 2009-2019\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2018\n\n");
+		buffer.append("Aalborg University 2011-2019\n\n");
 		buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2018\n\n");
+                buffer.append("Aalborg University 2012-2019\n\n");
 		buffer.append("TAPAAL Untimed Engine (verifypn):\n");
                 buffer.append("Frederik Meyer Boenneland, Jakob Dyhr, Peter Fogh, ");
                 buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, ");
                 buffer.append("Tobias S. Jepsen, Mads Johannsen,\nIsabella Kaufmann, ");
                 buffer.append("Andreas H. Klostergaard, Soeren M. Nielsen,\nThomas S. Nielsen, Lars K. Oestergaard, ");
                 buffer.append("Samuel Pastva and Jiri Srba\n");
-                buffer.append("Aalborg University 2014-2018\n\n");
+                buffer.append("Aalborg University 2014-2019\n\n");
 
 
 		buffer.append("\n");
