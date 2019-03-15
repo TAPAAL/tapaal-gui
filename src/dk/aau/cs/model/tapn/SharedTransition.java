@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
+import pipe.dataLayer.Template;
+import pipe.gui.CreateGui;
 
 public class SharedTransition {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -151,5 +153,15 @@ public class SharedTransition {
 			if(transition.presetSize() > 0 || transition.postsetSize() > 0) return false;
 		}
 		return true;
+	}
+	public ArrayList<String> getComponentsUsingThisTransition(){
+		ArrayList<String> components = new ArrayList<String>();
+		for(Template t : CreateGui.getCurrentTab().allTemplates()){
+			TimedTransition tt = t.model().getTransitionByName(this.name);
+			if(tt != null){
+				components.add(t.model().name());
+			}
+		}
+		return components;
 	}
 }

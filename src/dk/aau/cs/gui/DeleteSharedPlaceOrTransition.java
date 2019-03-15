@@ -91,15 +91,17 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		messageShown = false;
 		if(list.getSelectedValuesList() != null){
 			ArrayList<String> affectedComponents = new ArrayList<String>();
+			ArrayList<String> affectedComponentsWithDupes = new ArrayList<String>();
 			if(sharedPlacesAndTransitionsPanel.isDisplayingTransitions()){
 				for(Object transition : list.getSelectedValuesList()) {
-					for(TimedTransition t : ((SharedTransition)transition).transitions()){
-						if(!(affectedComponents.contains(t.model().name())))
-							affectedComponents.add(t.model().name());
+					affectedComponentsWithDupes.addAll(((SharedTransition)transition).getComponentsUsingThisTransition());
+				}
+				for(String component : affectedComponentsWithDupes) {
+					if(!(affectedComponents.contains(component))) {
+						affectedComponents.add(component);
 					}
 				}
 			} else {
-				ArrayList<String> affectedComponentsWithDupes = new ArrayList<String>();
 				for(Object place : list.getSelectedValuesList()) {
 					affectedComponentsWithDupes.addAll(((SharedPlace)place).getComponentsUsingThisPlace());
 				}
@@ -296,17 +298,25 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			sharedTransitionsListModel.removeElement(sharedTransition);
 			undoManager.addEdit(new DeleteSharedTransitionCommand(sharedTransition, sharedTransitionsListModel));
 		}else{
-			Collection<TimedTransition> copy = sharedTransition.transitions();
-			for(TimedTransition transition : copy){
+			
+			ArrayList<TimedTransition> transitions = new ArrayList<TimedTransition> ();
+			for(Template template : tab.allTemplates()) {
+				TimedTransition timedTransition = template.model().getTransitionByName(sharedTransition.name());
+				if(timedTransition != null)
+					transitions.add(timedTransition);
+			}
+			for(TimedTransition transition : transitions){
 				transition.unshare();
 				undoManager.addEdit(new UnshareTransitionCommand(sharedTransition, transition));
 			}
 			sharedTransitionsListModel.removeElement(sharedTransition);
 			undoManager.addEdit(new DeleteSharedTransitionCommand(sharedTransition, sharedTransitionsListModel));
-			for(TimedTransition transition : copy){
+			for(TimedTransition transition : transitions){
 				String name = nameGenerator.getNewTransitionName(transition.model());
 				// We add this invisible transition renaming to avoid problems with undo
-				undoManager.addEdit(new RenameTimedTransitionCommand(tab, transition, name, transition.name())); 
+				Command renameCommand = new RenameTimedTransitionCommand(tab, transition, name, transition.name());
+				renameCommand.redo();
+				undoManager.addEdit(renameCommand); 
 			}
 		}
 	}
