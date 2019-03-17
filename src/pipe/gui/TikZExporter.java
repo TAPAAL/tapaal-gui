@@ -115,46 +115,48 @@ public class TikZExporter {
 			out.append(arc.getSource().getId());
 			out.append(") ");
 			out.append(arcPoints);
-			out.append("to[bend right=0] ");
-                        out.append(arcLabel);
-                        out.append(" (");
+			out.append("to[bend right=0]");
+			//out.append(arcLabel);
+			out.append(" (");
 			out.append(arc.getTarget().getId());
 			out.append(") {};\n");
+			out.append(arcLabel);
 		}
 		return out;
 	}
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel = "";
+		String arcLabelPositionString = "\\draw (" + RoundCoordinate(arc.getNameLabel().getXPosition())+ "," + (RoundCoordinate(arc.getNameLabel().getYPosition())*(-1)) + ") node {";
+
 		if (arc instanceof TimedInputArcComponent) {
-                        if (net.netType().equals(NetType.UNTIMED)) {
-                                if (arc.getWeight().value() > 1) {
-                                        arcLabel += "node[midway,auto] {$" + arc.getWeight().value() + "\\times$}\\ ";
-                                }
-                                return arcLabel;
-                        }    
+            if (net.netType().equals(NetType.UNTIMED)) {
+                if (arc.getWeight().value() > 1) {
+                        arcLabel += arcLabelPositionString + "$" + arc.getWeight().value() + "\\times$}\\;\n";
+                }
+                return arcLabel;
+            }    
 			if (!(arc.getSource() instanceof TimedTransitionComponent)) {
-				arcLabel = "node[midway,auto] {";
-                                if (arc.getWeight().value() > 1) {
-                                        arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
-                                }
+				arcLabel = arcLabelPositionString;
+                if (arc.getWeight().value() > 1) {
+                        arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
+                }
 				arcLabel += "$\\mathrm{" + replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsString(false)) + "}$";
 				if (arc instanceof TimedTransportArcComponent)
 					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
-				arcLabel += "}";
+				arcLabel += "};\n";
 			} else {
-				if (arc instanceof TimedTransportArcComponent)
-					arcLabel = "node[midway,auto] {";
-                                        if (arc.getWeight().value() > 1) {
-                                                arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
-                                        }
-					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "}";
+				arcLabel = arcLabelPositionString;
+                if (arc.getWeight().value() > 1) {
+                        arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
+                }
+				arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "};\n";
 			}
 		} else {
-                        if (arc.getWeight().value() > 1) {
-                                arcLabel += "node[midway,auto] { $" + arc.getWeight().value() + "\\times$\\ }";
-                        }
-                }
+            if (arc.getWeight().value() > 1) {
+                    arcLabel += arcLabelPositionString + "$" + arc.getWeight().value() + "\\times$\\ };\n";
+            }
+    	}
 		return arcLabel;
 	}
 
@@ -277,9 +279,11 @@ public class TikZExporter {
 
 		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=1, yscale=1]\n");
                 out.append("%% the figure can be scaled by changing xscale and yscale\n");
-                out.append("%% positions of labels that are currently fixed to label=135 degrees\n");
+                out.append("%% positions of place/transition labels that are currently fixed to label=135 degrees\n");
                 out.append("%% can be adjusted so that they do not cover arcs\n");
                 out.append("%% similarly the curving of arcs can be done by adjusting bend left/right=XX\n");
+                out.append("%% arc labels may be slightly skewed compared to the tapaal drawing due to rounding.\n");
+                out.append("%% This can be adjusted by tuning the coordinates of the label of the respective arc\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 
 		if (!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
