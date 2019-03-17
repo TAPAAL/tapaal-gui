@@ -4,10 +4,10 @@ plugins {
 }
 
 group 'net.tapaal'
-version '3.4-SNAPSHOT'
+version '4.0-SNAPSHOT'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -46,9 +46,9 @@ jar {
 }
 
 dependencies {
-    //compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
-    //compile group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.3'
-    //compile group: 'net.java.dev.jna', name: 'jna', version: '4.5.1'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.3'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '4.5.1'
     //compile group: 'com.apple', name: 'AppleJavaExtensions', version: '1.4' // Not working
 
     //Add jars from libs dir
