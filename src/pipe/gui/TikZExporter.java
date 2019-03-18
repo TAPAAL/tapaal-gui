@@ -170,11 +170,7 @@ public class TikZExporter {
 				angle = ",rotate=" + String.valueOf(trans.getAngle() + 90);
 
 			out.append("\\node[transition");
-			out.append(angle);
-			if (trans.getAttributesVisible()){
-				out.append(",label=135:");
-				out.append(exportMathName(trans.getName()));
-			}			
+			out.append(angle);		
 			out.append("] at (");
 			out.append(RoundCoordinate(trans.getPositionX()));
 			out.append(',');
@@ -191,13 +187,22 @@ public class TikZExporter {
 				out.append(".center) { };\n");
 			}
                         
-                        if(((TimedTransitionComponent)trans).underlyingTransition().isUrgent()){
+			if(((TimedTransitionComponent)trans).underlyingTransition().isUrgent()){
 				out.append("\\node[urgenttransition");
 				out.append(angle);
 				out.append("] at (");
 				out.append(trans.getId());
 				out.append(".center) { };\n");
 			}
+			if (trans.getAttributesVisible()){
+				out.append("%% label for transition " + trans.getName() + "\n");
+				out.append("\\draw (");
+				out.append(RoundCoordinate(trans.getNameLabel().getXPosition()) + "," + (RoundCoordinate(trans.getNameLabel().getYPosition()) * -1) + ")");
+				out.append(" node ");
+				out.append(" {");
+				out.append(exportMathName(trans.getName()));
+				out.append("};\n");
+			}	
 		}
 		return out;
 	}
@@ -230,7 +235,7 @@ public class TikZExporter {
 				out.append(" node[align=left] ");
 				out.append("{");
 				if(place.getAttributesVisible())
-					out.append("$\\mathrm{" + place.getName() + "}$");					
+					out.append(exportMathName(place.getName()));					
 				if(invariant != "") {
 					if((place.getAttributesVisible()))
 						out.append("\\\\");
@@ -307,7 +312,7 @@ public class TikZExporter {
 		out.append("\\tikzstyle{every token}=[fill=white,text=black]\n");
 		out.append("\\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]\n");
 		out.append("\\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]\n");
-                out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]");
+		out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]");
 		return out;
 	}
 
