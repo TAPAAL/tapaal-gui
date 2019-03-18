@@ -3,12 +3,13 @@ package pipe.gui.handler;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-
 import javax.swing.SwingUtilities;
-
+import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.NameLabel;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
@@ -31,6 +32,20 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if(obj instanceof Arc) {
+			if (((Arc) obj).isPrototype()) {
+				return;
+			}
+	
+			if (CreateGui.getApp().isEditionAllowed()) {
+				if (e.getClickCount() == 2) {
+					Arc arc = (Arc) obj;
+					if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+						((TimedOutputArcComponent) arc).showTimeIntervalEditor();
+					}
+				}
+			}
+		}
 		dragInit = e.getPoint(); //
 		// dragInit = e.getLocationOnScreen(); //causes exception in Windows!
 		dragInit = javax.swing.SwingUtilities.convertPoint(nl, dragInit, obj);
@@ -60,5 +75,4 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		obj.dispatchEvent(e);
 	}
-
 }
