@@ -120,6 +120,8 @@ public class TikZExporter {
 			out.append(" (");
 			out.append(arc.getTarget().getId());
 			out.append(") {};\n");
+			if(arcLabel != "")
+				out.append("%% Label for arc between " + arc.getSource().getName() + " and " + arc.getTarget().getName() + "\n");
 			out.append(arcLabel);
 		}
 		return out;
@@ -207,12 +209,6 @@ public class TikZExporter {
 			String tokensInPlace = getTokenListStringFor(place);
 
 			out.append("\\node[place");
-			if (place.getAttributesVisible()){
-				out.append(",label=135:");
-				out.append(exportMathName(place.getName()));
-			}	
-			out.append(',');
-			out.append(invariant);
 			out.append(tokensInPlace);
 			out.append("] at (");
 			out.append(RoundCoordinate(place.getPositionX()));
@@ -227,6 +223,23 @@ public class TikZExporter {
 				out.append(place.getId());
 				out.append(".center) { };\n");
 			}
+			if (place.getAttributesVisible() || invariant != ""){
+				out.append("%% label for place " + place.getName() + "\n");
+				out.append("\\draw (");
+				out.append(RoundCoordinate(place.getNameLabel().getXPosition()) + "," + (RoundCoordinate(place.getNameLabel().getYPosition()) * -1) + ")");
+				out.append(" node[align=left] ");
+				out.append("{");
+				if(place.getAttributesVisible())
+					out.append("$\\mathrm{" + place.getName() + "}$");					
+				if(invariant != "") {
+					if((place.getAttributesVisible()))
+						out.append("\\\\");
+					out.append(invariant);
+				}else {
+					out.append("};\n");
+				}
+					
+			}	
 		}
 
 		return out;
@@ -239,7 +252,7 @@ public class TikZExporter {
 		String tokensInPlace = "";
 		if (tokens.size() > 0) {
 			if (tokens.size() == 1 && !net.netType().equals(NetType.UNTIMED)) {
-				tokensInPlace = "structured tokens={" + tokens.get(0).age().setScale(1) + "},";
+				tokensInPlace = ", structured tokens={" + tokens.get(0).age().setScale(1) + "},";
 			} else {
 				tokensInPlace = exportMultipleTokens(tokens);
 			}
@@ -252,14 +265,14 @@ public class TikZExporter {
 		String invariant = "";
 
 		if (!((TimedPlaceComponent) place).getInvariantAsString().contains("inf"))
-			invariant = "label=315:inv: $\\mathrm{" + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + "}$,";
+			invariant = "$\\mathrm{" + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + "}$};\n";
 		return invariant;
 	}
 
 	private String exportMultipleTokens(List<TimedToken> tokens) {
 		StringBuffer out = new StringBuffer();
 
-		out.append("structured tokens={\\#");
+		out.append(", structured tokens={\\#");
 		out.append(String.valueOf(tokens.size()));
 		out.append("},");
 		if (!net.netType().equals(NetType.UNTIMED)) {
@@ -282,8 +295,8 @@ public class TikZExporter {
                 out.append("%% positions of place/transition labels that are currently fixed to label=135 degrees\n");
                 out.append("%% can be adjusted so that they do not cover arcs\n");
                 out.append("%% similarly the curving of arcs can be done by adjusting bend left/right=XX\n");
-                out.append("%% arc labels may be slightly skewed compared to the tapaal drawing due to rounding.\n");
-                out.append("%% This can be adjusted by tuning the coordinates of the label of the respective arc\n");
+                out.append("%% labels may be slightly skewed compared to the tapaal drawing due to rounding.\n");
+                out.append("%% This can be adjusted by tuning the coordinates of the label\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 
 		if (!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
