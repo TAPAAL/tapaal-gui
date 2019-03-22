@@ -35,11 +35,7 @@ public class QueryWrapper{
     }
 
     public boolean hasException(){
-        if(this.exception == null){
-            return false;
-        } else{
-            return true;
-        }
+        return this.exception != null;
     }
 
     public String getNameAndException(){

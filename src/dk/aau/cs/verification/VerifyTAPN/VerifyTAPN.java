@@ -373,11 +373,10 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
-		if(model.hasWeights() || 
-				model.hasUrgentTransitions()) {
+		if(model.hasWeights() || model.hasUrgentTransitions()) {
 			return false;
 		}
-		
+
 		return true;
 	}
 	

@@ -389,10 +389,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private boolean isQueryListEmpty() {
-		if(ListOfQueries.getModel().getSize() == 0)
-			return true;
-		else
-			return false;
+		return ListOfQueries.getModel().getSize() == 0;
 	}
 
 	private void initFileListPanel() {

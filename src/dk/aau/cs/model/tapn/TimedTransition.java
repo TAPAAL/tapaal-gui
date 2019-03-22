@@ -196,12 +196,7 @@ public class TimedTransition extends TAPNElement {
 	public boolean isDEnabled(){
 		TimeInterval dInterval = calculateDInterval();
 
-		if(dInterval != null){
-			return true;
-		}
-		else{
-			return false; 
-		}
+		return dInterval != null;
 	}
 
 	public TimeInterval calculateDInterval(){
