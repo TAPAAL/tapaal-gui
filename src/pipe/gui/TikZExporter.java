@@ -163,7 +163,7 @@ public class TikZExporter {
 		for (Transition trans : transitions) {
 			String angle = "";
 			if (trans.getAngle() != 0)
-				angle = ",rotate=" + String.valueOf(trans.getAngle() + 90);
+				angle = ",rotate=" + (trans.getAngle() + 90);
 
 			out.append("\\node[transition");
 			out.append(angle);
@@ -258,7 +258,7 @@ public class TikZExporter {
 		StringBuffer out = new StringBuffer();
 
 		out.append("structured tokens={\\#");
-		out.append(String.valueOf(tokens.size()));
+		out.append(tokens.size());
 		out.append("},");
 		if (!net.netType().equals(NetType.UNTIMED)) {
 			out.append("pin=above:{\\{");

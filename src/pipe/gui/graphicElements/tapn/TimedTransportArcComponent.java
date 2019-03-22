@@ -103,7 +103,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			else {
 				if (underlyingTransportArc.interval().toString(
 						displayConstantNames).equals("[0,inf)")) {
-					label.setText(" : " + String.valueOf(getGroup()));
+					label.setText(" : " + getGroup());
 				}
 				else {
 					label.setText(underlyingTransportArc.interval().toString(
@@ -136,7 +136,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			}
 			
 		} else if (!isInPreSet) {
-			label.setText(" : " + String.valueOf(getGroup()));
+			label.setText(" : " + getGroup());
 		} else {
 			label.setText("");
 		}

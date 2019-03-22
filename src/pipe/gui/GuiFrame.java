@@ -2115,7 +2115,7 @@ public class GuiFrame extends JFrame  {
 	public void updateZoomCombo() {
 		ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
 		zoomComboBox.removeActionListener(zoomComboListener);
-		zoomComboBox.setSelectedItem(String.valueOf(appView.getZoomController().getPercent()) + "%");
+		zoomComboBox.setSelectedItem(appView.getZoomController().getPercent() + "%");
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
 	
