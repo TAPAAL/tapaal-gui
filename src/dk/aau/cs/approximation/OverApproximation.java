@@ -227,7 +227,7 @@ public class OverApproximation implements ITAPNApproximation {
 			TCTLNotNode notNode = new TCTLNotNode(pBlock);
 			
 			if(((TCTLAGNode) topNode).getProperty() instanceof TCTLOrListNode){
-				((TCTLOrListNode) ((TCTLAGNode) topNode).getProperty()).addDisjunct(notNode);;
+				((TCTLOrListNode) ((TCTLAGNode) topNode).getProperty()).addDisjunct(notNode);
 			}
 			else{
 				TCTLOrListNode orList = new TCTLOrListNode((((TCTLAGNode) topNode).getProperty()), notNode);
@@ -250,7 +250,7 @@ public class OverApproximation implements ITAPNApproximation {
 			TCTLNotNode notNode = new TCTLNotNode(pBlock);
 			
 			if(((TCTLAFNode) topNode).getProperty() instanceof TCTLOrListNode){
-				((TCTLOrListNode) ((TCTLAFNode) topNode).getProperty()).addDisjunct(notNode);;
+				((TCTLOrListNode) ((TCTLAFNode) topNode).getProperty()).addDisjunct(notNode);
 			}
 			else{
 				TCTLOrListNode orList = new TCTLOrListNode((((TCTLAFNode) topNode).getProperty()), notNode);

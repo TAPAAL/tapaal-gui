@@ -99,7 +99,7 @@ public class TimeInvariant {
 		buffer.append(' ');
 		buffer.append(upper);
 		return buffer.toString();
-	};
+	}
 	
 	public String toString(boolean displayConstantNames) {
 		StringBuffer buffer = new StringBuffer();

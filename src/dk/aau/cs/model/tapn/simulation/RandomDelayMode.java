@@ -23,8 +23,8 @@ public class RandomDelayMode implements DelayMode{
 		return instance;
 	}
 	
-	private RandomDelayMode(){};
-	
+	private RandomDelayMode(){}
+
 	int numberOfDecimals = -1;
 
 	@Override

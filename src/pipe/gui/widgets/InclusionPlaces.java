@@ -6,8 +6,8 @@ import java.util.List;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class InclusionPlaces {
-	public enum InclusionPlacesOption { AllPlaces, UserSpecified };
-	
+	public enum InclusionPlacesOption { AllPlaces, UserSpecified }
+
 	private InclusionPlacesOption inclusionOption;
 	private List<TimedPlace> inclusionPlaces;
 	

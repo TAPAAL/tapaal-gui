@@ -42,8 +42,8 @@ public class ManualDelayMode implements DelayMode{
 		return instance;
 	}
 	
-	private ManualDelayMode(){};
-	
+	private ManualDelayMode(){}
+
 	TimeInterval dInterval; 
 	JButton okButton;
 	boolean okPressed = false;

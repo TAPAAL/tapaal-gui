@@ -13,19 +13,19 @@ public class TAPNQuery {
     
 	public enum TraceOption {
 		FASTEST, SOME, NONE
-	};
+	}
 
 	public enum SearchOption {
 		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT
-	};
+	}
 
 	public enum HashTableSize {
 		MB_4, MB_16, MB_64, MB_256, MB_512
-	};
+	}
 
 	public enum ExtrapolationOption {
 		AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP
-	};
+	}
 	
 	public enum WorkflowMode{
 		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS

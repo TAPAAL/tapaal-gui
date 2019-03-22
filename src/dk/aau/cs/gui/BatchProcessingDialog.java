@@ -1083,7 +1083,7 @@ public class BatchProcessingDialog extends JDialog {
 						Integer.MAX_VALUE); // disable tooltips disappearing
 				ToolTipManager.sharedInstance().setInitialDelay(200);
 				return new MultiLineAutoWrappingToolTip();
-			};
+			}
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
 		table.getColumnModel().getColumn(0).setMinWidth(70);

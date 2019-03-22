@@ -2798,7 +2798,7 @@ public class GuiFrame extends JFrame  {
 		showTokenAge = !showTokenAge;
 	}
 
-	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
+	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); }
 	public void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
 			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"

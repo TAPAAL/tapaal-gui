@@ -45,7 +45,7 @@ public class TimeInterval {
 		boolean equalBounds = !upperIsInfinity
 				&& IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) == 0;
 		boolean lowerIsNotInfinity = lower != Bound.Infinity;
-		boolean lowerSmallerThanUpper = IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) < 0;;
+		boolean lowerSmallerThanUpper = IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) < 0;
 
 		return lowerIsNotInfinity
 				&& ((upperIsInfinity && !isUpperIncluded)
