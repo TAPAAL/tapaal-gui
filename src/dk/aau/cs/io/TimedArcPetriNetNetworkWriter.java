@@ -333,21 +333,13 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			    .newDocumentBuilder()
 			    .parse(new ByteArrayInputStream(formulaString.getBytes()))
 			    .getDocumentElement().getElementsByTagName("formula").item(0);
-		} catch (SAXException e) {
-			System.out
-			.println(e.toString() + " thrown in savePNML() "
-					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
-		} catch (IOException e) {
-			System.out
-			.println(e.toString() + " thrown in savePNML() "
-					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
-		} catch (ParserConfigurationException e) {
+		} catch (SAXException | ParserConfigurationException | IOException e) {
 			System.out
 			.println(e.toString() + " thrown in savePNML() "
 					+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
 		}
-			
-		return null;
+
+        return null;
 	}
 
 	private String getInclusionPlacesString(TAPNQuery query) {

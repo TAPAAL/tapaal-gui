@@ -136,9 +136,7 @@ public class TAPAAL {
 			
 			return installdir;
 			
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
+		} catch (MalformedURLException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return null;

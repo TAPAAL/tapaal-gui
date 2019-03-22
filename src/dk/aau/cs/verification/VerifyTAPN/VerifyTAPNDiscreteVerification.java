@@ -96,10 +96,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 						result = readVersionNumberFrom(stream);
 					}
 					child.waitFor();
-				} catch (IOException e) {
-				} catch (InterruptedException e) {
+				} catch (IOException | InterruptedException e) {
 				}
-			}
+            }
 
 			return result;
 		}

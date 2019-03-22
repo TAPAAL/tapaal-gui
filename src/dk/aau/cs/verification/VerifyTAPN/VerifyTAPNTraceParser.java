@@ -49,7 +49,7 @@ public class VerifyTAPNTraceParser {
 			Node node = nodeList.item(i);
 			if(node instanceof Element){
 				Element element = (Element)node;
-				
+
 				if(element.getTagName().equals("transition")){
 					TimedTransitionStep step = parseTransitionStep(element);
 					trace.add(step);
@@ -116,11 +116,7 @@ public class VerifyTAPNTraceParser {
 				}
 			});
 			return builder.parse(new InputSource(reader));
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}

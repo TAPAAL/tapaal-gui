@@ -19,12 +19,10 @@ public class ResourceManager {
 	private static ImageIcon loadIcon(String name) {
 		try {
 			return new ImageIcon(ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name)).getScaledInstance(52, 52, Image.SCALE_SMOOTH));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch(IllegalArgumentException e){
+		} catch (IOException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
-		return null;
+        return null;
 	}
 	
 	public static ImageIcon satisfiedIcon(){

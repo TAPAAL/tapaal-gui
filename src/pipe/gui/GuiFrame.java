@@ -314,8 +314,6 @@ public class GuiFrame extends JFrame  {
 				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
 					CreateGui.imgPath + "icon.png"));
 				app.setDockIconImage(appImage);
-			} catch (MalformedURLException e) {
-				Logger.log("Error loading Image");
 			} catch (IOException e) {
 				Logger.log("Error loading Image");
 			}
