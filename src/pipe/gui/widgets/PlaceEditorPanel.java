@@ -601,7 +601,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		SharedPlace selected = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
 		setInvariantControlsBasedOn(selected);
-		if(((SharedPlace) selected).getComponentsUsingThisPlace().size() > 0){
+		if(selected.getComponentsUsingThisPlace().size() > 0){
 			setMarking(selected.numberOfTokens());
 		}
 	}

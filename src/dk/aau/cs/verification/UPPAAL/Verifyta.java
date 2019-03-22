@@ -282,7 +282,7 @@ public class Verifyta implements ModelChecker {
 				}
 		}
 		
-		if (((VerifytaOptions) options).traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry() == true) {
+		if (options.traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry() == true) {
 			return false;
 		}
 		
@@ -363,7 +363,7 @@ public class Verifyta implements ModelChecker {
 		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)), (VerifytaOptions) options);
 
 		if (trace == null) {
-			if (((VerifytaOptions) options).traceOption() != TraceOption.NONE) {
+			if (options.traceOption() != TraceOption.NONE) {
 				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
 				   (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied()))
 					return null;

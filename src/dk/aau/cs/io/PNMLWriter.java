@@ -227,12 +227,12 @@ public class PNMLWriter implements NetWriter {
 		arcElement.setAttribute("source", (arc.getSource().getId() != null ? arc.getSource().getId() : ""));
 		arcElement.setAttribute("target", (arc.getTarget().getId() != null ? arc.getTarget().getId() : ""));
 		
-		if (arc instanceof TimedOutputArcComponent && ((TimedOutputArcComponent)arc).getWeight().value() > 1 ) {
+		if (arc instanceof TimedOutputArcComponent && arc.getWeight().value() > 1 ) {
 			Element inscription = document.createElement("inscription");
 			arcElement.appendChild(inscription);
 			Element text = document.createElement("text");
 			inscription.appendChild(text);
-			text.setTextContent(((TimedOutputArcComponent)arc).getWeight().nameForSaving(false)+"");
+			text.setTextContent(arc.getWeight().nameForSaving(false)+"");
 		} 
 		
 		if(arc instanceof TimedInhibitorArcComponent){

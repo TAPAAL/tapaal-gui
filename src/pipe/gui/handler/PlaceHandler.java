@@ -93,8 +93,8 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
-					int x = Zoomer.getZoomedValue(((Place) myObject).getNameOffsetXObject().intValue(), myObject.getZoom());
-					int y = Zoomer.getZoomedValue(((Place) myObject).getNameOffsetYObject().intValue(), myObject.getZoom());
+					int x = Zoomer.getZoomedValue(myObject.getNameOffsetXObject().intValue(), myObject.getZoom());
+					int y = Zoomer.getZoomedValue(myObject.getNameOffsetYObject().intValue(), myObject.getZoom());
 					m.show(myObject, x, y);
 				}
 			}

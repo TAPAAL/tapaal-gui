@@ -84,7 +84,7 @@ public class EnabledTransitionsList extends JPanel{
 		//Trick to make the "splitter" appear
 		//transitions.addElement(new SplitterListItem());
 		//sort the transitions
-		Object[] temp = (Object[])transitions.toArray();
+		Object[] temp = transitions.toArray();
 		Arrays.sort(temp);
 		transitions.clear();
 		for(Object item : temp){

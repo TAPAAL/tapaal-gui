@@ -2491,16 +2491,16 @@ public class QueryDialog extends JPanel {
 		else if(reductionOption.getSelectedItem() == null){
 			symmetryReduction.setVisible(false);
 		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
+		else if(reductionOption.getSelectedItem().equals(name_DISCRETE) || reductionOption.getSelectedItem().equals(name_UNTIMED)) {
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(false);
 		}
-		else if((((String)reductionOption.getSelectedItem()).equals(name_COMBI) ||
-				((String)reductionOption.getSelectedItem()).equals(name_OPTIMIZEDSTANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_STANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCAST) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)) &&
+		else if((reductionOption.getSelectedItem().equals(name_COMBI) ||
+				reductionOption.getSelectedItem().equals(name_OPTIMIZEDSTANDARD) ||
+				reductionOption.getSelectedItem().equals(name_STANDARD) ||
+				reductionOption.getSelectedItem().equals(name_BROADCAST) ||
+				reductionOption.getSelectedItem().equals(name_BROADCASTDEG2)) &&
 				(!noApproximationEnable.isSelected() ||
 				someTraceRadioButton.isSelected()) 
 				){
@@ -2549,7 +2549,7 @@ public class QueryDialog extends JPanel {
 			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
 		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+		else if(reductionOption.getSelectedItem().equals(name_DISCRETE)) {
 			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
 			useStubbornReduction.setVisible(true);
@@ -2750,9 +2750,9 @@ public class QueryDialog extends JPanel {
 					else if (underApproximationEnable.isSelected())
 					{
 						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposer) composer).getGuiModel());
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), composer.getGuiModel());
 					}
-					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
+					templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();

@@ -138,8 +138,8 @@ public abstract class Arc extends PetriNetObject {
 	}
 
 	public void setLabelPosition() {
-		label.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
+		label.setPosition(Grid.getModifiedX((myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))),
+						  Grid.getModifiedY((myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
 	}
 	@Override
 	public void updateLabelLocation() {
@@ -347,7 +347,7 @@ public abstract class Arc extends PetriNetObject {
 		// called by GuiView / State viewer when adding component.
 		deleted = false;
 
-		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
+		myPath.addPointsToGui(getParent());
 
 		updateArcPosition();
 		if (getParent() != null && label.getParent() == null) {

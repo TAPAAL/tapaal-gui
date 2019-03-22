@@ -891,14 +891,14 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private SearchOption getSearchOption() {
-		if (((String) searchOption.getSelectedItem()).equals(name_DFS))
+		if (searchOption.getSelectedItem().equals(name_DFS))
 			return SearchOption.DFS;
-		else if (((String) searchOption.getSelectedItem()).equals(name_Random))
+		else if (searchOption.getSelectedItem().equals(name_Random))
 			return SearchOption.RANDOM;
-		else if (((String) searchOption.getSelectedItem())
+		else if (searchOption.getSelectedItem()
 				.equals(name_HEURISTIC))
 			return SearchOption.HEURISTIC;
-		else if (((String) searchOption.getSelectedItem()).equals(name_BFS))
+		else if (searchOption.getSelectedItem().equals(name_BFS))
 			return SearchOption.BFS;
 		else
 			return SearchOption.BatchProcessingKeepQueryOption;
@@ -1332,7 +1332,7 @@ public class BatchProcessingDialog extends JDialog {
 
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals("state")) {
-					if ((StateValue) evt.getNewValue() == StateValue.DONE) {
+					if (evt.getNewValue() == StateValue.DONE) {
 						enableButtons();
 						cancelButton.setEnabled(false);
 						skipFileButton.setEnabled(false);
@@ -1340,7 +1340,7 @@ public class BatchProcessingDialog extends JDialog {
 						timer.stop();
 						stopMemoryTimer();
 						timeoutTimer.stop();
-					} else if ((StateValue) evt.getNewValue() == StateValue.STARTED) {
+					} else if (evt.getNewValue() == StateValue.STARTED) {
 						disableButtonsDuringProcessing();
 						cancelButton.setEnabled(true);
 						skipFileButton.setEnabled(true);
