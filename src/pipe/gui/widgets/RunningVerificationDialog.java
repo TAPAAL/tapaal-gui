@@ -1,6 +1,3 @@
-/**
- * 
- */
 package pipe.gui.widgets;
 
 import java.awt.Container;

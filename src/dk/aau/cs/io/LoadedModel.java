@@ -1,6 +1,3 @@
-/**
- * 
- */
 package dk.aau.cs.io;
 
 import java.util.Collection;

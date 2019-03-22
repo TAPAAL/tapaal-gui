@@ -1,6 +1,3 @@
-/**
- * 
- */
 package pipe.gui;
 
 import java.awt.BorderLayout;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package dk.aau.cs.translations;
 
 public enum ReductionOption {
