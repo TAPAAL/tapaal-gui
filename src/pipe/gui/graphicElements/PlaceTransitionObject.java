@@ -274,9 +274,8 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 			someArc.updateArcPosition();
 		}
 
-		Iterator<Arc> arcsTo = connectTo.iterator();
-		while (arcsTo.hasNext()) {
-			someArc = (arcsTo.next());
+		for (Arc connectTo1 : connectTo) {
+			someArc = (connectTo1);
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
 		}

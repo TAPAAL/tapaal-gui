@@ -127,9 +127,8 @@ public abstract class Transition extends PlaceTransitionObject {
 				.toRadians(angleInc), componentWidth / 2, componentHeight / 2));
 		outlineTransition();
 
-		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
-		while (arcIterator.hasNext()) {
-			(arcIterator.next()).calcAngle();
+		for (ArcAngleCompare arcAngleCompare : arcAngleList) {
+			arcAngleCompare.calcAngle();
 		}
 		Collections.sort(arcAngleList);
 
@@ -270,9 +269,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	public void updateEndPoint(Arc arc) {
 		boolean match = false;
 
-		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
-		while (arcIterator.hasNext()) {
-			ArcAngleCompare thisArc = arcIterator.next();
+		for (ArcAngleCompare thisArc : arcAngleList) {
 			if (thisArc.arc == arc) {
 				thisArc.calcAngle();
 				match = true;

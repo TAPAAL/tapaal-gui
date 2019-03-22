@@ -1342,10 +1342,8 @@ public class WorkflowDialog extends JDialog {
 						NetworkMarking oldMarking = model.marking();
 						model.setMarking(final_marking);
 						outer: for( TimedArcPetriNet temp : model.activeTemplates()){
-							Iterator<TimedTransition> transitionIterator = temp.transitions().iterator();
-							while (transitionIterator.hasNext()) {
-								TimedTransition tempTransition = transitionIterator.next();
-								if (tempTransition.isDEnabled()){
+							for (TimedTransition tempTransition : temp.transitions()) {
+								if (tempTransition.isDEnabled()) {
 									output = RESULT_ERROR_NO_TRACE_TO_FINAL;
 									break outer;
 								}
