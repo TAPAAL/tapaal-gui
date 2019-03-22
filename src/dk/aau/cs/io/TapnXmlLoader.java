@@ -696,11 +696,11 @@ public class TapnXmlLoader {
 						// Wierd naming convention in pipe: this represents if
 						// the arc point is a curve point or not
 						String arcTempType = element.getAttribute("arcPointType");
-						float arcPointX = Float.valueOf(arcTempX).floatValue();
-						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						float arcPointX = Float.valueOf(arcTempX);
+						float arcPointY = Float.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType).booleanValue();
+						boolean arcPointType = Boolean.valueOf(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
 				}
