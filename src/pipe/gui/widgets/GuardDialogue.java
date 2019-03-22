@@ -689,12 +689,7 @@ public class GuardDialogue extends JPanel /*
 				List <Constant> constantList = new ArrayList<Constant>();
 				constantList.addAll(constants);
 
-				Collections.sort(constantList,new Comparator<Constant>() {
-					public int compare(Constant o1, Constant o2) {
-						return o1.name().compareToIgnoreCase(o2.name());
-					}
-				});
-
+				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
 				for (Constant c : constantList) {
 					if (c.value() >= value) {
@@ -724,11 +719,7 @@ public class GuardDialogue extends JPanel /*
 				List <Constant> constantList = new ArrayList<Constant>();
 				constantList.addAll(constants);
 				
-				Collections.sort(constantList,new Comparator<Constant>() {
-						public int compare(Constant o1, Constant o2) {
-						return o1.name().compareToIgnoreCase(o2.name());
-						}
-				});
+				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
 				
 				for (Constant c : constantList) {

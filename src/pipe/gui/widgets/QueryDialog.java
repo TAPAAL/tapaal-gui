@@ -1708,11 +1708,7 @@ public class QueryDialog extends JPanel {
 							}
 						}
 
-						Collections.sort(placeNames, new Comparator<String>() {
-							public int compare(String o1, String o2) {
-								return o1.compareToIgnoreCase(o2);
-							}
-						});
+						placeNames.sort(String::compareToIgnoreCase);
 						placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
 						currentlySelected = tapn;
@@ -1725,11 +1721,7 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 						placeNames.add(place.name());
 					}
-					Collections.sort(placeNames, new Comparator<String>() {
-						public int compare(String o1, String o2) {
-							return o1.compareToIgnoreCase(o2);
-						}
-					});
+					placeNames.sort(String::compareToIgnoreCase);
 					placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
 					currentlySelected = SHARED;

@@ -386,7 +386,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public TimedArcPetriNet[] sortTemplates() {
 		TimedArcPetriNet[] oldOrder = tapns.toArray(new TimedArcPetriNet[0]);
-		Collections.sort(tapns, new StringComparator());
+		tapns.sort(new StringComparator());
 		return oldOrder;
 	}
 	
@@ -415,7 +415,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public SharedPlace[] sortSharedPlaces() {
 		SharedPlace[] oldOrder = sharedPlaces.toArray(new SharedPlace[0]);
-		Collections.sort(sharedPlaces, new StringComparator());
+		sharedPlaces.sort(new StringComparator());
 		return oldOrder;
 	}
 	
@@ -432,7 +432,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public SharedTransition[] sortSharedTransitions() {
 		SharedTransition[] oldOrder = sharedTransitions.toArray(new SharedTransition[0]); 
-		Collections.sort(sharedTransitions, new StringComparator());
+		sharedTransitions.sort(new StringComparator());
 		return oldOrder;
 	}
 	

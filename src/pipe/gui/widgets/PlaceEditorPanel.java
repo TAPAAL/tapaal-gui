@@ -174,11 +174,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			sharedPlaces.add(place.underlyingPlace());
 		}
 
-		Collections.sort(sharedPlaces, new Comparator<TimedPlace>() {
-			public int compare(TimedPlace o1, TimedPlace o2) {
-				return o1.name().compareToIgnoreCase(o2.name());
-			}
-		});
+		sharedPlaces.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
 		if(place.underlyingPlace().isShared()) {
 

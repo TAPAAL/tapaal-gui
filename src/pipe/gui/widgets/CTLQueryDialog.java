@@ -1701,11 +1701,8 @@ public class CTLQueryDialog extends JPanel {
 								placeTransitionNames.add(transition.name());
 							}
 						}
-						Collections.sort(placeTransitionNames, new Comparator<String>() {
-							public int compare(String o1, String o2) {
-								return o1.compareToIgnoreCase(o2);
-							}
-						});
+						placeTransitionNames.sort(String::compareToIgnoreCase);
+
 						placesTransitionsBox.setModel(new DefaultComboBoxModel(placeTransitionNames));
 
 						currentlySelected = tapn;
@@ -1721,11 +1718,7 @@ public class CTLQueryDialog extends JPanel {
 					for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
 						placeTransitionNames.add(transition.name());
 					}
-					Collections.sort(placeTransitionNames, new Comparator<String>() {
-						public int compare(String o1, String o2) {
-							return o1.compareToIgnoreCase(o2);
-						}
-					});
+					placeTransitionNames.sort(String::compareToIgnoreCase);
 					placesTransitionsBox.setModel(new DefaultComboBoxModel(placeTransitionNames));
 
 					currentlySelected = SHARED;

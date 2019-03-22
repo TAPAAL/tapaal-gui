@@ -273,11 +273,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			sharedTransitions.add(transition.underlyingTransition().sharedTransition());
 		}
 		
-		Collections.sort(sharedTransitions, new Comparator<SharedTransition>() {
-			public int compare(SharedTransition o1, SharedTransition o2) {
-				return o1.name().compareToIgnoreCase(o2.name());
-			}
-		});
+		sharedTransitions.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 		
 		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
 				"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
