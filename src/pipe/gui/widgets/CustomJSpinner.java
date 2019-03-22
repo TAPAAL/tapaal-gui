@@ -35,8 +35,7 @@ public class CustomJSpinner extends JSpinner{
 		else {
 			val = (Integer) originalValue;
 		}
-		Integer returnValue = new Integer(val);
-		return returnValue;
+		return new Integer(val);
 	}
 	
 	public CustomJSpinner(Integer value, final Integer minimumValue, final Integer maximumValue) {

@@ -171,9 +171,8 @@ public class EnabledTransitionsList extends JPanel{
 			} else {
 				transitionName = getTemplate() + "." + transitionName;
 			}
-			String result = interval + transitionName;
 
-			return result;
+			return interval + transitionName;
 		}
 		
 		public String toString(){

@@ -337,9 +337,8 @@ public class VerifyPN implements ModelChecker{
 			if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 			
 			VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-			TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 
-			return trace;
+			return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 		}
 
 		private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {

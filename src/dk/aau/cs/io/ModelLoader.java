@@ -14,13 +14,11 @@ public class ModelLoader {
 	public LoadedModel load(File file) throws Exception{		
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader();
 		try{
-			LoadedModel loadedModel = newFormatLoader.load(file);
-			return loadedModel;
+			return newFormatLoader.load(file);
 		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
-				LoadedModel loadedModel = oldFormatLoader.load(file);
-				return loadedModel;
+				return oldFormatLoader.load(file);
 			} catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());
 			}
@@ -31,13 +29,11 @@ public class ModelLoader {
 	public LoadedModel load(InputStream file) throws Exception{
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader();
 		try{
-			LoadedModel loadedModel = newFormatLoader.load(file);
-			return loadedModel;
+			return newFormatLoader.load(file);
 		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
-				LoadedModel loadedModel = oldFormatLoader.load(file);
-				return loadedModel;
+				return oldFormatLoader.load(file);
 			} catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());
 			}

@@ -370,12 +370,8 @@ public class AnimationController extends JPanel {
 																	// the
 																	// number
 																	// localised
-		// Try parse
-		BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
-				new MathContext(Pipe.AGE_PRECISION));
 
-
-		return timeDelayToSet;
+		return new BigDecimal(parseTime.toString(),	new MathContext(Pipe.AGE_PRECISION));
 	}
 
 	private void setEnabledStepbackwardAction(boolean b) {

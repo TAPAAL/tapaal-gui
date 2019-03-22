@@ -369,8 +369,7 @@ public class VerifyTAPN implements ModelChecker {
 	
 	private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
 		VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, query);
-		Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
-		return result;
+		return outputParser.parseOutput(output);
 	}
 	
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {

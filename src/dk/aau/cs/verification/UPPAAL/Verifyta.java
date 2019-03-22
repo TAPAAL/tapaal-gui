@@ -353,8 +353,7 @@ public class Verifyta implements ModelChecker {
 
 	private QueryResult parseQueryResult(String output, TAPNQuery query) {
 		VerifytaOutputParser outputParser = new VerifytaOutputParser(query);
-		QueryResult queryResult = outputParser.parseOutput(output);
-		return queryResult;
+		return outputParser.parseOutput(output);
 	}
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query, QueryResult queryResult) {

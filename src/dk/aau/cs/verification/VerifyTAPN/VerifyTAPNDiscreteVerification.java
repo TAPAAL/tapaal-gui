@@ -390,8 +390,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query, TimedArcPetriNet model) {
 			VerifyDTAPNOutputParser outputParser = new VerifyDTAPNOutputParser(totalTokens, extraTokens, query);
-			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
-			return result;
+			return outputParser.parseOutput(output);
 		}
 		
 		
