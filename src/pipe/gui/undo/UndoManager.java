@@ -228,27 +228,6 @@ public class UndoManager {
 						((ArcPathPoint) pnObject).getIndex()));
 			}
 		}else{
-			//		} else if (pnObject instanceof PlaceTransitionObject) {
-			//			//
-			//			Iterator<Arc> arcsTo = ((PlaceTransitionObject) pnObject)
-			//			.getConnectToIterator();
-			//			while (arcsTo.hasNext()) {
-			//				Arc anArc = arcsTo.next();
-			//				if (!anArc.isDeleted()) {
-			//					addEdit(new DeletePetriNetObjectEdit(anArc, view, guiModel));
-			//				}
-			//			}
-			//			//
-			//			Iterator<Arc> arcsFrom = ((PlaceTransitionObject) pnObject)
-			//			.getConnectFromIterator();
-			//			while (arcsFrom.hasNext()) {
-			//				Arc anArc = arcsFrom.next();
-			//				if (!anArc.isDeleted()) {
-			//					addEdit(new DeletePetriNetObjectEdit(anArc, view, guiModel));
-			//				}
-			//			}
-			//		}
-
 			if (!pnObject.isDeleted()) {
 				Command cmd = null;
 				if(pnObject instanceof TimedPlaceComponent){
