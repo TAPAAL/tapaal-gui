@@ -656,12 +656,8 @@ public class ArcPath implements Shape {
 	}
 
 	/**
-	 * insertPoint() Inserts a new point into the Array List of path points at
+	 * Inserts a new point into the Array List of path points at
 	 * the specified index and shifts all the following points along
-	 * 
-	 * @param index
-	 * @param newpoint
-	 * @author Nadeem
 	 */
 	public void insertPoint(int index, ArcPathPoint newpoint) {
 		pathPoints.add(index, newpoint);
@@ -671,13 +667,11 @@ public class ArcPath implements Shape {
 	}
 
 	/**
-	 * splitSegment() Goes through neighbouring pairs of ArcPathPoints
+	 * Goes through neighbouring pairs of ArcPathPoints
 	 * determining the midpoint between them. Then calculates the distance from
 	 * midpoint to the point passed as an argument. The pair of ArcPathPoints
 	 * resulting in the shortest distance then have an extra point added between
 	 * them at the midpoint effectively splitting that segment into two.
-	 * 
-	 * @param mouseposition
 	 */
 	public ArcPathPoint splitSegment(Point2D.Float mouseposition) {
 		int wantedpoint = findPoint(mouseposition);
