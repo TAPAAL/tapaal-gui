@@ -524,17 +524,23 @@ public class Animator {
 	}
 
 	public void setFiringmode(String t) {
-		if (t.equals("Random")) {
-			firingmode = new RandomFiringMode();
-		} else if (t.equals("Youngest")) {
-			firingmode = new YoungestFiringMode();
-		} else if (t.equals("Oldest")) {
-			firingmode = new OldestFiringMode();
-		} else if (t.equals("Manual")) {
-			firingmode = null;
-		} else {
-			System.err
-			.println("Illegal firing mode mode: " + t + " not found.");
+		switch (t) {
+			case "Random":
+				firingmode = new RandomFiringMode();
+				break;
+			case "Youngest":
+				firingmode = new YoungestFiringMode();
+				break;
+			case "Oldest":
+				firingmode = new OldestFiringMode();
+				break;
+			case "Manual":
+				firingmode = null;
+				break;
+			default:
+				System.err
+						.println("Illegal firing mode mode: " + t + " not found.");
+				break;
 		}
 
 		CreateGui.getCurrentTab().getAnimationController().updateFiringModeComboBox();

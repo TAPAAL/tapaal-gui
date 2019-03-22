@@ -953,28 +953,31 @@ public class BatchProcessingDialog extends JDialog {
 
 	private QueryPropertyOption getQueryPropertyOption() {
 		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
-		if (propertyOptionString.equals(name_SEARCHWHOLESTATESPACE))
-			return QueryPropertyOption.SearchWholeStateSpace;
-        else if (propertyOptionString.equals(name_EXISTDEADLOCK))
-                return QueryPropertyOption.ExistDeadlock;
-        else if (propertyOptionString.equals(name_STRONGSOUNDNESS))
-        	return QueryPropertyOption.StrongSoundness;
-        else if (propertyOptionString.equals(name_SOUNDNESS))
-        	return QueryPropertyOption.Soundness;
-        else
-			return QueryPropertyOption.KeepQueryOption;
+		switch (propertyOptionString) {
+			case name_SEARCHWHOLESTATESPACE:
+				return QueryPropertyOption.SearchWholeStateSpace;
+			case name_EXISTDEADLOCK:
+				return QueryPropertyOption.ExistDeadlock;
+			case name_STRONGSOUNDNESS:
+				return QueryPropertyOption.StrongSoundness;
+			case name_SOUNDNESS:
+				return QueryPropertyOption.Soundness;
+			default:
+				return QueryPropertyOption.KeepQueryOption;
+		}
 	}
 	
 	private ApproximationMethodOption getApproximationMethodOption() {
 		String ApproximationMethodOptionString = (String) approximationMethodOption.getSelectedItem();
-		if(ApproximationMethodOptionString.equals(name_OVER_APPROXIMATION)) {
-			return ApproximationMethodOption.OverApproximation;
-		} else if (ApproximationMethodOptionString.equals(name_UNDER_APPROXIMATION)) {
-			return ApproximationMethodOption.UnderApproximation;
-		} else if (ApproximationMethodOptionString.equals(name_NONE_APPROXIMATION)) {
-			return ApproximationMethodOption.None;
-		} else {
-			return ApproximationMethodOption.KeepQueryOption;
+		switch (ApproximationMethodOptionString) {
+			case name_OVER_APPROXIMATION:
+				return ApproximationMethodOption.OverApproximation;
+			case name_UNDER_APPROXIMATION:
+				return ApproximationMethodOption.UnderApproximation;
+			case name_NONE_APPROXIMATION:
+				return ApproximationMethodOption.None;
+			default:
+				return ApproximationMethodOption.KeepQueryOption;
 		}
 	}
 	

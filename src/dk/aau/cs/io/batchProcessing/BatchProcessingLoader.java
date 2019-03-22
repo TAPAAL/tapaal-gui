@@ -383,14 +383,20 @@ public class BatchProcessingLoader {
 			weight = Weight.parseWeight(arc.getAttribute("weight"), constants);
 		}
 
-		if (type.equals("tapnInhibitor"))
-			parseAndAddTimedInhibitorArc(sourceId, targetId, inscription, tapn, constants, weight);
-		else if (type.equals("timed"))
+		switch (type) {
+			case "tapnInhibitor":
+				parseAndAddTimedInhibitorArc(sourceId, targetId, inscription, tapn, constants, weight);
+				break;
+			case "timed":
 				parseAndAddTimedInputArc(sourceId, targetId, inscription, tapn, constants, weight);
-		else if (type.equals("transport"))
-			parseAndAddTransportArc(sourceId, targetId, inscription, tapn, constants, weight);
-		else
-			parseAndAddTimedOutputArc(sourceId, targetId, inscription, tapn, weight);
+				break;
+			case "transport":
+				parseAndAddTransportArc(sourceId, targetId, inscription, tapn, constants, weight);
+				break;
+			default:
+				parseAndAddTimedOutputArc(sourceId, targetId, inscription, tapn, weight);
+				break;
+		}
 	}
 
 	private void parseAndAddTimedOutputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, Weight weight) throws FormatException {
