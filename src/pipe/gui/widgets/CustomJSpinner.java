@@ -106,10 +106,10 @@ public class CustomJSpinner extends JSpinner{
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
 					//if currentValue is less than minValue of larger than maxValue then make it min or max.
 					if ((Integer)((JSpinner)e.getSource()).getValue() < minimumValue) {
-						((JSpinner)e.getSource()).setValue(new Integer(minimumValue));
+						((JSpinner)e.getSource()).setValue(minimumValue);
 					}
 					else if ((Integer)((JSpinner)e.getSource()).getValue() > maximumValue) {
-						((JSpinner)e.getSource()).setValue(new Integer(maximumValue));
+						((JSpinner)e.getSource()).setValue(maximumValue);
 					}
 				}
 			});
