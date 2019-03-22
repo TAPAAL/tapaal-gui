@@ -282,7 +282,7 @@ public class Verifyta implements ModelChecker {
 				}
 		}
 		
-		if (options.traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry() == true) {
+		if (options.traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry()) {
 			return false;
 		}
 		

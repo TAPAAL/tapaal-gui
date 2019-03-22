@@ -139,7 +139,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove, Collection<TAPNQuery> affectedQueries) {
 		SharedPlace sharedPlace = placeToRemove;
-		if(affectedQueries.size() > 0 && messageShown == false){
+		if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
 			StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
 			buffer.append(System.getProperty("line.separator"));

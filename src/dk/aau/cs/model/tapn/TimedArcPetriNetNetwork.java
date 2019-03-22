@@ -77,7 +77,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public void add(SharedPlace sharedPlace, boolean multiremove) {
 		Require.that(sharedPlace != null, "sharedPlace must not be null");
-		if(multiremove == false) {
+		if(!multiremove) {
 			Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
 		}
 		sharedPlace.setNetwork(this);

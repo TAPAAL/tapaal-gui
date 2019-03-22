@@ -485,7 +485,7 @@ public class ExportBatchDialog extends JDialog {
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
 		    			exportModel(file, path);
-		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), path.toString(), NAME_SuccesString} 
+		    			tableModel.addResult(!noOrphanTransitions ? new String[]{file.getName(), path.toString(), NAME_SuccesString}
 		    			: new String[]{file.getName(), path.toString(), NAME_SuccesStringOrphanTransitionsRemoved});
 			    	}
 			    	else {
