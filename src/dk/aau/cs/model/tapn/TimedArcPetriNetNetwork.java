@@ -1,11 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.PlaceEditorPanel;
@@ -398,9 +394,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public void undoSort(TimedArcPetriNet[] tapns) {
 		this.tapns.clear();
-		for(TimedArcPetriNet t: tapns){
-			this.tapns.add(t);
-		}
+		this.tapns.addAll(Arrays.asList(tapns));
 	}
 
 	public void swapConstants(int currentIndex, int newIndex) {
@@ -429,9 +423,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public void undoSort(SharedPlace[] oldOrder) {
 		sharedPlaces.clear();
-		for(SharedPlace p : oldOrder){
-			sharedPlaces.add(p);
-		}
+		sharedPlaces.addAll(Arrays.asList(oldOrder));
 	}
 
 	public void swapSharedTransitions(int currentIndex, int newIndex) {
@@ -448,9 +440,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public void undoSort(SharedTransition[] oldOrder) {
 		sharedTransitions.clear();
-		for(SharedTransition p : oldOrder){
-			sharedTransitions.add(p);
-		}
+		sharedTransitions.addAll(Arrays.asList(oldOrder));
 	}	
 	
 	public boolean isUntimed(){
