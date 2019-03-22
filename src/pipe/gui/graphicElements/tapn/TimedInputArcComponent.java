@@ -1,22 +1,15 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.Container;
 import java.util.Hashtable;
 
-import javax.swing.BoxLayout;
-
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.GuardDialogue;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.ConstantWeight;

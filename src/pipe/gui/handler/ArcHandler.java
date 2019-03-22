@@ -1,6 +1,5 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -11,7 +10,6 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;

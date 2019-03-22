@@ -1,15 +1,12 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.ReductionStats;
 import dk.aau.cs.verification.Stats;
 
 public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{

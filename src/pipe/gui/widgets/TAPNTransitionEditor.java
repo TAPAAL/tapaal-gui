@@ -21,7 +21,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MakePlaceNewSharedMultiCommand;
 import dk.aau.cs.gui.undo.MakeTransitionNewSharedCommand;
 import dk.aau.cs.gui.undo.MakeTransitionNewSharedMultiCommand;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import dk.aau.cs.util.Require;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 
 public class ExportBatchResultTableModel extends AbstractTableModel {

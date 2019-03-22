@@ -1,14 +1,10 @@
 package dk.aau.cs.gui.undo;
 
-import javax.swing.JOptionPane;
-
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
-import dk.aau.cs.gui.SharedTransitionNamePanel;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.util.RequireException;
 
 public class MakeTransitionNewSharedCommand extends Command {
 	private SharedTransition sharedTransition;

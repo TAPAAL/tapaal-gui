@@ -1,7 +1,5 @@
 package dk.aau.cs.TCTL.visitors;
 
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {

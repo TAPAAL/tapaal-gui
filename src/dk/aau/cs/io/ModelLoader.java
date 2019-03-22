@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
-import pipe.gui.DrawingSurfaceImpl;
 
 public class ModelLoader {
 

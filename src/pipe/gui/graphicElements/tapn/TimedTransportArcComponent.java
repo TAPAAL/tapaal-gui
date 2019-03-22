@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;

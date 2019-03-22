@@ -8,7 +8,6 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 

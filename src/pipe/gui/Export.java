@@ -19,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -50,7 +49,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.GuiFrame.GUIMode;
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**

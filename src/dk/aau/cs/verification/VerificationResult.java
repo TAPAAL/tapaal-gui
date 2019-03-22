@@ -6,15 +6,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 
 public class VerificationResult<TTrace> {

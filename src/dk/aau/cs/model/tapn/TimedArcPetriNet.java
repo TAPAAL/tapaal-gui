@@ -2,13 +2,8 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
-import pipe.gui.undo.AddArcPathPointEdit;
-import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;

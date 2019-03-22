@@ -17,8 +17,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import dk.aau.cs.debug.Logger;
-
 public class XMLFormatter {
 	public String format(String unformattedXml) {
 		try{

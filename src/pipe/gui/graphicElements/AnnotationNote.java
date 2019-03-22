@@ -13,7 +13,6 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JDialog;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe;

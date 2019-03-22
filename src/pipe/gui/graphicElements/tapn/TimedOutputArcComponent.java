@@ -1,24 +1,13 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.BasicStroke;
 import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
-import pipe.gui.graphicElements.NameLabel;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.ArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;

@@ -1,6 +1,5 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -10,16 +9,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.Transition;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
  * Class used to implement methods corresponding to mouse events on transitions.

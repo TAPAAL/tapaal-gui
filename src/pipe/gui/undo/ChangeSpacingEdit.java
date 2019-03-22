@@ -1,7 +1,6 @@
 package pipe.gui.undo;
 
 import pipe.gui.CreateGui;
-import pipe.gui.action.GuiAction;
 import dk.aau.cs.gui.undo.Command;
 
 public class ChangeSpacingEdit extends Command {

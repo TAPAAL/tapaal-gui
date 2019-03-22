@@ -4,7 +4,6 @@
 package pipe.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -15,9 +14,7 @@ import java.util.ArrayList;
 
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
 
 
 /**

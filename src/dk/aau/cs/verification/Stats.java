@@ -3,16 +3,7 @@ package dk.aau.cs.verification;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import dk.aau.cs.model.tapn.LocalTimedMarking;
-import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Tuple;
 
 public class Stats {

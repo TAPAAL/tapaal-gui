@@ -2,12 +2,9 @@ package dk.aau.cs.TCTL.visitors;
 
 import java.util.Hashtable;
 
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 
 public class CombiTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "id_t";

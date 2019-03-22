@@ -3,9 +3,7 @@ package dk.aau.cs.verification.UPPAAL;
 
 import javax.swing.ImageIcon;
 
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.IconSelector;
-import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.VerificationResult;
 
 

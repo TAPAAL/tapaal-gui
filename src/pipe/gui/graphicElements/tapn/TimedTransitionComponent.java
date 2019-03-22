@@ -6,28 +6,21 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.handler.AnimationHandler;
-import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.TAPNTransitionHandler;
-import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 import dk.aau.cs.gui.Context;

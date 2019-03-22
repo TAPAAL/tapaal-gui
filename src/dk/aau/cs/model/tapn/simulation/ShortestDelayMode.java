@@ -3,7 +3,6 @@ package dk.aau.cs.model.tapn.simulation;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.model.tapn.TimeInterval;

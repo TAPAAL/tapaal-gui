@@ -3,7 +3,6 @@ package pipe.gui.widgets;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JPopupMenu;

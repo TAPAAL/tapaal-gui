@@ -3,21 +3,14 @@ package dk.aau.cs.util;
 import com.sun.jna.*;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
-import pipe.gui.CreateGui;
 
 public class MemoryMonitor {
 

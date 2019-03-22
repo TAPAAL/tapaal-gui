@@ -52,7 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.util.Require;
 
 /**

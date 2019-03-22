@@ -1,10 +1,8 @@
 package dk.aau.cs.model.tapn;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 import pipe.gui.MessengerImpl;
-import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;

@@ -4,32 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map.Entry;
-
-import javax.swing.undo.UndoManager;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
 
 public class MakePlaceNewSharedMultiCommand extends Command {

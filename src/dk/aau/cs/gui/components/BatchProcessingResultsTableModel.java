@@ -3,7 +3,6 @@ package dk.aau.cs.gui.components;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.Query;
 import javax.swing.table.AbstractTableModel;
 
 import dk.aau.cs.translations.ReductionOption;
