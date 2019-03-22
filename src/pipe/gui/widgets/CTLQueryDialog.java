@@ -1897,7 +1897,7 @@ public class CTLQueryDialog extends JPanel {
                     }
 		}
 		if (!transitionSelected){
-                    sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName)!= null ? true : false;			
+                    sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName) != null;
 		}
 		return transitionSelected || sharedTransitionSelected;
 	}

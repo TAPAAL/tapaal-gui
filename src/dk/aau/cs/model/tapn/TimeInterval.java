@@ -158,8 +158,8 @@ public class TimeInterval {
 			}
 		}
 
-		return new TimeInterval(leftBracket.equals("[") ? true : false,
-				lowerBound, upperBound, rightBracket.equals("]") ? true : false);
+		return new TimeInterval(leftBracket.equals("["),
+				lowerBound, upperBound, rightBracket.equals("]"));
 	}
 
 	public TimeInterval copy() {

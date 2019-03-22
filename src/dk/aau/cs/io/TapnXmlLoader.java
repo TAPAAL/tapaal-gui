@@ -359,7 +359,7 @@ public class TapnXmlLoader {
 		
 		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
 		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
-		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
+		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
 		int angle = Integer.parseInt(transition.getAttribute("angle"));
 		int priority = Integer.parseInt(transition.getAttribute("priority"));
 		boolean displayName = transition.getAttribute("displayName").equals("false") ? false : true;
