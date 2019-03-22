@@ -199,8 +199,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	
 	/**
 	 * Sets whether Transition is enabled
-	 * 
-	 * @return enabled if True
 	 */
 	@Override
 	public void setEnabled(boolean status) {

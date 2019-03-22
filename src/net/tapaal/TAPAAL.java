@@ -15,14 +15,13 @@ import org.apache.commons.cli.PosixParser;
 import pipe.gui.CreateGui;
 import dk.aau.cs.debug.Logger;
 
+/**
+ * Main class for lunching TAPAAL
+ *
+ * @author Kenneth Yrke Joergensen (kenneth@yrke.dk)
+ */
 public class TAPAAL {
-	
-	/**
-	 * Main class for lunching TAPAAL
-	 * 
-	 * @author Kenneth Yrke Joergensen (kenneth@yrke.dk)
-	 */
-	
+
 	public static final String TOOLNAME = "TAPAAL";
 	public static final String VERSION = "DEV"; 
 

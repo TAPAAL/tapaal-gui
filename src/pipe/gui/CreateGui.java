@@ -83,7 +83,6 @@ public class CreateGui {
 
 	/**
 	 * @deprecated Use method getAnimator in GuiFrame
-	 * @return
 	 */
 	@Deprecated
 	public static Animator getAnimator() {

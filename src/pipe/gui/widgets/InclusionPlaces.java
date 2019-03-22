@@ -34,8 +34,6 @@ public class InclusionPlaces {
 	
 	/**
 	 * Perform a deep copy of the object and return it
-	 * 
-	 * @return
 	 */
 	public InclusionPlaces copy() {
 		InclusionPlaces copy = new InclusionPlaces();

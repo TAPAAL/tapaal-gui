@@ -1375,10 +1375,7 @@ public class GuiFrame extends JFrame  {
 	}
 
 	/**
-	 * Helperfunction for disabeling/enabeling all actions when we are in noNet
-	 * GUImode
-	 * 
-	 * @return
+	 * Helperfunction for disabeling/enabeling all actions when we are in noNet GUImode
 	 */
 	private void enableAllActions(boolean enable) {
 
