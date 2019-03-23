@@ -52,7 +52,7 @@ public class QueryPane extends JPanel {
 	private JPanel queryCollectionPanel;
 	private JPanel buttonsPanel;
 	private DefaultListModel listModel;
-	private JList queryList;
+	private JList<TAPNQuery> queryList;
 	private List<TAPNQuery> selectedQueries;
 	private JScrollPane queryScroller;
 	private Messenger messenger =  new MessengerImpl();

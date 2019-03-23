@@ -216,8 +216,8 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
 	private JButton removeFileButton;
-	private JList fileList;
-	private DefaultListModel listModel;
+	private JList<File> fileList;
+	private DefaultListModel<File> listModel;
 
 	private JLabel statusLabel;
 	private JLabel fileStatusLabel;
@@ -229,23 +229,23 @@ public class BatchProcessingDialog extends JDialog {
 	private JLabel memory;
 	private long startTimeMs = 0;
 
-	private JComboBox searchOption;
+	private JComboBox<String> searchOption;
 	private JButton exportButton;
 	private JButton closeButton;
-	private JComboBox queryPropertyOption;
+	private JComboBox<String> queryPropertyOption;
 	private JPanel verificationOptionsPanel;
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
-	private JComboBox symmetryOption;
-	private JComboBox stubbornReductionOption;
+	private JComboBox<String> symmetryOption;
+	private JComboBox<String> stubbornReductionOption;
 	private JCheckBox noTimeoutCheckbox;
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
-	private JComboBox approximationMethodOption;
+	private JComboBox<String> approximationMethodOption;
 	private CustomJSpinner approximationDenominator;
 	private JCheckBox approximationDenominatorCheckbox;
-	private JList ListOfQueries;
+	private JList<TAPNQuery> ListOfQueries;
 	
 	private Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
 
@@ -323,7 +323,7 @@ public class BatchProcessingDialog extends JDialog {
 	BatchProcessing was called from QueryPane
 	(should maybe be boolean)
 	*/
-	public static void showBatchProcessingDialog(JList ListOfQueries){
+	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries){
 		if(ListOfQueries.getModel().getSize() != 0) {
 			batchProcessingDialog = null;
 		}
@@ -339,7 +339,7 @@ public class BatchProcessingDialog extends JDialog {
 		batchProcessingDialog.setVisible(true);
 	}
 
-	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList ListOfQueries) {
+	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList<TAPNQuery> ListOfQueries) {
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
