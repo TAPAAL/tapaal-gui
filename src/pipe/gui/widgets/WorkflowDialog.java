@@ -403,26 +403,14 @@ public class WorkflowDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.NONE;
 		JButton help_button = new JButton("Help");
-		help_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		help_button.addActionListener(e -> JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
 
 		panel.add(help_button, gbc);
 
 		gbc.gridx = 1;
 		gbc.anchor = GridBagConstraints.EAST;
 		JButton close_button = new JButton("Close");
-		close_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+		close_button.addActionListener(e -> setVisible(false));
 
 		panel.add(close_button, gbc);
 	}
@@ -552,13 +540,7 @@ public class WorkflowDialog extends JDialog {
 			soundnessResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			soundnessResultTraceButton.setVisible(false);
-			soundnessResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(soundnessResultTrace);
-				}
-			});
+			soundnessResultTraceButton.addActionListener(e -> switchToTrace(soundnessResultTrace));
 			resultPanel.add(soundnessResultTraceButton, gbc);
 
 			// Min 
@@ -578,13 +560,7 @@ public class WorkflowDialog extends JDialog {
 			minResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			minResultTraceButton.setVisible(false);
-			minResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(minResultTrace);
-				}
-			});
+			minResultTraceButton.addActionListener(e -> switchToTrace(minResultTrace));
 			resultPanel.add(minResultTraceButton, gbc);
 
 			// Strong soundness
@@ -622,13 +598,7 @@ public class WorkflowDialog extends JDialog {
 			strongSoundnessResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			strongSoundnessResultTraceButton.setVisible(false);
-			strongSoundnessResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(strongSoundnessResultTrace);
-				}
-			});
+			strongSoundnessResultTraceButton.addActionListener(e -> switchToTrace(strongSoundnessResultTrace));
 			resultPanel.add(strongSoundnessResultTraceButton, gbc);
 
 			// Max 
@@ -649,13 +619,7 @@ public class WorkflowDialog extends JDialog {
 			maxResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			maxResultTraceButton.setVisible(false);
-			maxResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(maxResultTrace);
-				}
-			});
+			maxResultTraceButton.addActionListener(e -> switchToTrace(maxResultTrace));
 			resultPanel.add(maxResultTraceButton, gbc);
 			
 			unusedTransitionsLabel = new JLabel();
@@ -697,14 +661,10 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 6;
 		panel.add(numberOfExtraTokensInNet, gbc);
 
-		numberOfExtraTokensInNet.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-				CreateGui.getCurrentTab().network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-				CreateGui.getDrawingSurface().setNetChanged(true);
-			}
+		numberOfExtraTokensInNet.addChangeListener(e -> {
+			model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+			CreateGui.getCurrentTab().network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+			CreateGui.getDrawingSurface().setNetChanged(true);
 		});
 
 		gbc.gridwidth = 1;
@@ -713,23 +673,11 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 2;
 		panel.add(checkBound, gbc);
 
-		checkBound.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkBound();
-			}
-		});
+		checkBound.addActionListener(e -> checkBound());
 
 		JButton checkIfSound = new JButton("Analyse the workflow");
 		getRootPane().setDefaultButton(checkIfSound);
-		checkIfSound.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkProperties();
-			}
-		});
+		checkIfSound.addActionListener(e -> checkProperties());
 		gbc.gridx = 2;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.EAST;

@@ -102,11 +102,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		nameTextField = new javax.swing.JTextField();	
 		nameTextField.setPreferredSize(size);
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameTextField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -178,17 +176,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		container.add(valueSpinner,gbc);
 		
 		//add action listeners for buttons
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				onOK();
-			}
-		});
+		okButton.addActionListener(e -> onOK());
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
 		//add button container
 		gbc = new GridBagConstraints();

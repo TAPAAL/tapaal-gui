@@ -119,11 +119,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				if(doOK()){
-					exit();
-				}
+		okButton.addActionListener(evt -> {
+			if(doOK()){
+				exit();
 			}
 		});
 		rootPane.setDefaultButton(okButton);
@@ -133,11 +131,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		cancelButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(evt -> exit());
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -221,18 +215,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Place"));
 
 		sharedCheckBox = new JCheckBox("Shared");
-		sharedCheckBox.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				JCheckBox box = (JCheckBox)arg0.getSource();
-				if(box.isSelected()){
-					switchToNameDropDown();
-					makeSharedButton.setEnabled(false);
-				}else{
-					switchToNameTextField();
-					nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getDrawingSurface().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
-					makeSharedButton.setEnabled(true);
-				}
-			}		
+		sharedCheckBox.addActionListener(arg0 -> {
+			JCheckBox box = (JCheckBox)arg0.getSource();
+			if(box.isSelected()){
+				switchToNameDropDown();
+				makeSharedButton.setEnabled(false);
+			}else{
+				switchToNameTextField();
+				nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getDrawingSurface().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
+				makeSharedButton.setEnabled(true);
+			}
 		});
 
 		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -248,19 +240,17 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		makeSharedButton.setMinimumSize(new java.awt.Dimension(110, 25));
 		makeSharedButton.setPreferredSize(new java.awt.Dimension(110, 25));
 		
-		makeSharedButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				makeNewShared = true;
-				if(doOK()){
-					setupInitialState();
-					makeSharedButton.setEnabled(false);
-					sharedCheckBox.setEnabled(true);
-					sharedCheckBox.setSelected(true);
-					switchToNameDropDown();
-					sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
-				}
-				makeNewShared = false;
+		makeSharedButton.addActionListener(evt -> {
+			makeNewShared = true;
+			if(doOK()){
+				setupInitialState();
+				makeSharedButton.setEnabled(false);
+				sharedCheckBox.setEnabled(true);
+				sharedCheckBox.setSelected(true);
+				switchToNameDropDown();
+				sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 			}
+			makeNewShared = false;
 		});
 		
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -285,14 +275,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
 
-		sharedPlacesComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				SharedPlace place = (SharedPlace)e.getItem();
-				if(place.getComponentsUsingThisPlace().size() > 0){
-					setMarking(place.numberOfTokens());
-				}
-				setInvariantControlsBasedOn(place);
+		sharedPlacesComboBox.addItemListener(e -> {
+			SharedPlace place = (SharedPlace)e.getItem();
+			if(place.getComponentsUsingThisPlace().size() > 0){
+				setMarking(place.numberOfTokens());
 			}
+			setInvariantControlsBasedOn(place);
 		});
 
 		markingLabel = new javax.swing.JLabel("Marking:");
@@ -355,18 +343,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invRelationConstant = new JComboBox(new String[] { "<=", "<" });
 		//invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 		invariantSpinner = new CustomJSpinner(0, okButton);
-		invariantSpinner.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if(!invariantInf.isSelected()){
-					if ((Integer) invariantSpinner.getValue() < 1) {
-						invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
-						invRelationNormal.setSelectedItem("<=");
-					} else if (invRelationNormal.getModel().getSize() == 1) {
-						invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
-					}
+		invariantSpinner.addChangeListener(e -> {
+			if(!invariantInf.isSelected()){
+				if ((Integer) invariantSpinner.getValue() < 1) {
+					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+					invRelationNormal.setSelectedItem("<=");
+				} else if (invRelationNormal.getModel().getSize() == 1) {
+					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
 				}
 			}
-
 		});
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -394,29 +379,25 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantGroup.add(invariantSpinner, gbc);
 
 		invariantInf = new JCheckBox("inf");
-		invariantInf.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				if(!isUrgencyOK()){
-					invariantInf.setSelected(true);
-					return;
-				}
-				if (!invariantInf.isSelected()) {
-					invRelationNormal.setEnabled(true);
-					invariantSpinner.setEnabled(true);
-					invRelationNormal.setSelectedItem("<=");
-					if ((Integer) invariantSpinner.getValue() < 1) {
-						invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
-					} else {
-						invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
-					}
+		invariantInf.addActionListener(arg0 -> {
+			if(!isUrgencyOK()){
+				invariantInf.setSelected(true);
+				return;
+			}
+			if (!invariantInf.isSelected()) {
+				invRelationNormal.setEnabled(true);
+				invariantSpinner.setEnabled(true);
+				invRelationNormal.setSelectedItem("<=");
+				if ((Integer) invariantSpinner.getValue() < 1) {
+					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
 				} else {
-					invRelationNormal.setEnabled(false);
-					invariantSpinner.setEnabled(false);
-					invRelationNormal.setSelectedItem("<");
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
 				}
-
+			} else {
+				invRelationNormal.setEnabled(false);
+				invariantSpinner.setEnabled(false);
+				invRelationNormal.setSelectedItem("<");
+				invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
 			}
 
 		});
@@ -435,11 +416,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invConstantsComboBox.setMaximumRowCount(20);
 		//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
 		invConstantsComboBox.setPreferredSize(new Dimension(230, 30));
-		invConstantsComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					setRelationModelForConstants();
-				}
+		invConstantsComboBox.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				setRelationModelForConstants();
 			}
 		});
 
@@ -450,19 +429,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantGroup.add(invConstantsComboBox, gbc);
 
 		normalInvRadioButton = new JRadioButton("Normal");
-		normalInvRadioButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				disableInvariantComponents();
-				enableNormalInvariantComponents();
-			}
+		normalInvRadioButton.addActionListener(e -> {
+			disableInvariantComponents();
+			enableNormalInvariantComponents();
 		});
 
 		constantInvRadioButton = new JRadioButton("Constant");
-		constantInvRadioButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				disableInvariantComponents();
-				enableConstantInvariantComponents();
-			}
+		constantInvRadioButton.addActionListener(e -> {
+			disableInvariantComponents();
+			enableConstantInvariantComponents();
 		});
 		if (constants.isEmpty()){
 			constantInvRadioButton.setEnabled(false);

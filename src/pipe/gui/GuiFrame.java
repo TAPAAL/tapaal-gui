@@ -402,27 +402,21 @@ public class GuiFrame extends JFrame  {
 
 
 			final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
-			laterButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Preferences.getInstance().setLatestVersion(null);
-					dialog.setVisible(false);
-					dialog.dispose ();
-				}
+			laterButton.addActionListener(e -> {
+				Preferences.getInstance().setLatestVersion(null);
+				dialog.setVisible(false);
+				dialog.dispose ();
 			});
-			updateButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Preferences.getInstance().setLatestVersion(null);
-					dialog.setVisible(false);
-					dialog.dispose();
-					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
-				}
+			updateButton.addActionListener(e -> {
+				Preferences.getInstance().setLatestVersion(null);
+				dialog.setVisible(false);
+				dialog.dispose();
+				GuiFrame.showInBrowser("http://www.tapaal.net/download");
 			});
-			ignoreButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
-					dialog.setVisible(false);
-					dialog.dispose ();
-				}
+			ignoreButton.addActionListener(e -> {
+				Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
+				dialog.setVisible(false);
+				dialog.dispose ();
 			});
 
 			updateButton.requestFocusInWindow();
@@ -976,17 +970,13 @@ public class GuiFrame extends JFrame  {
 		toolsMenu.add(engineSelection);
 
 		JMenuItem clearPreferences = new JMenuItem("Clear all preferences");
-		clearPreferences.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// Clear persistent storage
-				Preferences.getInstance().clear();
-				// Engines reset individually to remove preferences for already setup engines
-				Verifyta.reset();
-				VerifyTAPN.reset();
-				VerifyTAPNDiscreteVerification.reset();
-			}
+		clearPreferences.addActionListener(arg0 -> {
+			// Clear persistent storage
+			Preferences.getInstance().clear();
+			// Engines reset individually to remove preferences for already setup engines
+			Verifyta.reset();
+			VerifyTAPN.reset();
+			VerifyTAPNDiscreteVerification.reset();
 		});
 		toolsMenu.add(clearPreferences);
 
@@ -1444,14 +1434,10 @@ public class GuiFrame extends JFrame  {
 	// linked model and view
 	public void setChangeListenerOnTab() {
 
-		appTab.addChangeListener(new ChangeListener() {
+		appTab.addChangeListener(e -> {
 
-			public void stateChanged(ChangeEvent e) {
-
-				int index = appTab.getSelectedIndex();
-				changeToTab(index);
-
-			}
+			int index = appTab.getSelectedIndex();
+			changeToTab(index);
 
 		});
 	}
@@ -2666,19 +2652,17 @@ public class GuiFrame extends JFrame  {
 				jar.close();
 			}
 
-			Arrays.sort(nets, new Comparator<String>() {
-				public int compare(String one, String two) {
+			Arrays.sort(nets, (one, two) -> {
 
-					int toReturn = one.compareTo(two);
-					// Special hack to get intro-example first
-					if (one.equals("intro-example.tapn")) {
-						toReturn = -1;
-					}
-					if (two.equals("intro-example.tapn")) {
-						toReturn = 1;
-					}
-					return toReturn;
+				int toReturn = one.compareTo(two);
+				// Special hack to get intro-example first
+				if (one.equals("intro-example.tapn")) {
+					toReturn = -1;
 				}
+				if (two.equals("intro-example.tapn")) {
+					toReturn = 1;
+				}
+				return toReturn;
 			});
 		} catch (Exception e) {
 			Logger.log("Error getting example files:" + e);

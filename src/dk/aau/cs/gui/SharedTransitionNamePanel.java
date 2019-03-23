@@ -89,11 +89,9 @@ public class SharedTransitionNamePanel extends JPanel {
 		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(330, 25));
 		nameField.setPreferredSize(new Dimension(330, 25));
-		nameField.addActionListener(new ActionListener() {			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
 		gbc = new GridBagConstraints();
 		gbc.gridy = 1;
@@ -205,11 +203,7 @@ public class SharedTransitionNamePanel extends JPanel {
 		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
 		gbc.anchor = GridBagConstraints.EAST;	
 
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
 		buttonPanel.add(cancelButton,gbc);
 		buttonPanel.add(okButton,gbcOk);

@@ -74,11 +74,9 @@ public class AnimationSelectmodeDialog extends JPanel {
 		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cancelled = false;
-				exit();
-			}
+		okButton.addActionListener(evt -> {
+			cancelled = false;
+			exit();
 		});
 
 		updateOkButton();
@@ -99,12 +97,7 @@ public class AnimationSelectmodeDialog extends JPanel {
 
 	private JPanel createDropDownForArc(String placeName, List<TimedToken> elligibleTokens, int weight) {
 		ArcTokenSelector tokenSelector = new ArcTokenSelector(placeName, elligibleTokens, weight);
-		tokenSelector.addArcTokenSelectorListener(new ArcTokenSelectorListener() {
-
-			public void arcTokenSelectorActionPreformed(ArcTokenSelectorListenerEvent e) {
-				updateOkButton();
-			}
-		});
+		tokenSelector.addArcTokenSelectorListener(e -> updateOkButton());
 		
 		arcTokenSelectors.add(tokenSelector);
 		return tokenSelector;

@@ -101,15 +101,13 @@ public class CustomJSpinner extends JSpinner{
 				this.setValue(value);
 			}
 			//this changelistener is added to listen for changes on account of the up and down arrows. 
-			this.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					//if currentValue is less than minValue of larger than maxValue then make it min or max.
-					if ((Integer)((JSpinner)e.getSource()).getValue() < minimumValue) {
-						((JSpinner)e.getSource()).setValue(minimumValue);
-					}
-					else if ((Integer)((JSpinner)e.getSource()).getValue() > maximumValue) {
-						((JSpinner)e.getSource()).setValue(maximumValue);
-					}
+			this.addChangeListener(e -> {
+				//if currentValue is less than minValue of larger than maxValue then make it min or max.
+				if ((Integer)((JSpinner)e.getSource()).getValue() < minimumValue) {
+					((JSpinner)e.getSource()).setValue(minimumValue);
+				}
+				else if ((Integer)((JSpinner)e.getSource()).getValue() > maximumValue) {
+					((JSpinner)e.getSource()).setValue(maximumValue);
 				}
 			});
 			this.setPreferredSize(new Dimension(100, 25));
@@ -118,19 +116,17 @@ public class CustomJSpinner extends JSpinner{
 			
 			final JSpinner spinner = this;
 
-			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher(){
-				public boolean dispatchKeyEvent(KeyEvent ke){
-					if(ke.getID()==KeyEvent.KEY_PRESSED && ke.getKeyCode() == KeyEvent.VK_ENTER &&
-							KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == textField)
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(ke -> {
+				if(ke.getID()==KeyEvent.KEY_PRESSED && ke.getKeyCode() == KeyEvent.VK_ENTER &&
+						KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == textField)
+				{
+					try
 					{
-						try
-						{
-							spinner.commitEdit();
-							KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(spinner, ke);
-						}catch(Exception e){}
-					}
-					return false;
+						spinner.commitEdit();
+						KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(spinner, ke);
+					}catch(Exception e){}
 				}
+				return false;
 			});
 	}
 	
@@ -142,10 +138,9 @@ public class CustomJSpinner extends JSpinner{
 			JFormattedTextField textField = jsEditor.getTextField();
 			//this actionlistener makes the okButtons click event fire 			
 			//when enter is pressed in the JSpinner. 
-			textField.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					okButton.requestFocusInWindow();
-					okButton.doClick();			}
+			textField.addActionListener(e -> {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
 			});
 		}
 	}

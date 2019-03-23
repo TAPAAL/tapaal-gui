@@ -112,11 +112,9 @@ public class TabComponent extends JPanel {
 			setBorderPainted(false);
 			addMouseListener(buttonMouseListener);
 			setRolloverEnabled(true);
-			addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					int index = pane.indexOfTabComponent(TabComponent.this);
-					CreateGui.getApp().closeTab(index);
-				}
+			addActionListener(arg0 -> {
+				int index = pane.indexOfTabComponent(TabComponent.this);
+				CreateGui.getApp().closeTab(index);
 			});
 		}
 

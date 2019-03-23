@@ -247,11 +247,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JCheckBox approximationDenominatorCheckbox;
 	private JList ListOfQueries;
 	
-	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			timeoutCurrentVerificationTask();
-		}
-	});
+	private Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
 
 	private BatchProcessingResultsTableModel tableModel;
 
@@ -409,15 +405,12 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 
-		fileList.addListSelectionListener(new ListSelectionListener() {
-
-			public void valueChanged(ListSelectionEvent e) {
-				if (!(e.getValueIsAdjusting())) {
-					if (fileList.getSelectedIndex() == -1) {
-						removeFileButton.setEnabled(false);
-					} else {
-						removeFileButton.setEnabled(true);
-					}
+		fileList.addListSelectionListener(e -> {
+			if (!(e.getValueIsAdjusting())) {
+				if (fileList.getSelectedIndex() == -1) {
+					removeFileButton.setEnabled(false);
+				} else {
+					removeFileButton.setEnabled(true);
 				}
 			}
 		});
@@ -442,11 +435,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		addFilesButton = new JButton("Add models");
 		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
-		addFilesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				addFiles();
-			}
-		});
+		addFilesButton.addActionListener(arg0 -> addFiles());
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -459,12 +448,7 @@ public class BatchProcessingDialog extends JDialog {
 		removeFileButton = new JButton("Remove models");
 		removeFileButton.setToolTipText(TOOL_TIP_RemoveFilesButton);
 		removeFileButton.setEnabled(false);
-		removeFileButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				removeSelectedFiles();
-			}
-		});
+		removeFileButton.addActionListener(arg0 -> removeSelectedFiles());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -475,12 +459,9 @@ public class BatchProcessingDialog extends JDialog {
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setToolTipText(TOOL_TIP_ClearFilesButton);
 		clearFilesButton.setEnabled(false);
-		clearFilesButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				clearFiles();
-				enableButtons();
-			}
+		clearFilesButton.addActionListener(e -> {
+			clearFiles();
+			enableButtons();
 		});
 
 		gbc = new GridBagConstraints();

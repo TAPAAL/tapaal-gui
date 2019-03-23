@@ -1183,12 +1183,7 @@ public class QueryDialog extends JPanel {
 		});
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-		advancedButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				toggleAdvancedSimpleView(true);
-			}
-		});
+		advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
@@ -1322,12 +1317,7 @@ public class QueryDialog extends JPanel {
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
 		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
-		kbounded.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
-			}
-
-		});
+		kbounded.addActionListener(evt -> Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet));
 		boundednessCheckPanel.add(kbounded);
 
 		GridBagConstraints gridBagConstraints;
@@ -1491,52 +1481,40 @@ public class QueryDialog extends JPanel {
 		queryPanel.add(quantificationPanel, gbc);
 
 		// Add action listeners to the query options
-		existsBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		existsBox.addActionListener(e -> {
+			TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 
-		existsDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		existsDiamond.addActionListener(e -> {
+			TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 
-		forAllBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		forAllBox.addActionListener(e -> {
+			TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 
-		forAllDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		forAllDiamond.addActionListener(e -> {
+			TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 	}
 
@@ -1667,15 +1645,13 @@ public class QueryDialog extends JPanel {
 
 		});
 
-		negationButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(), property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		negationButton.addActionListener(e -> {
+			TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(), property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 	}
 
@@ -1870,28 +1846,22 @@ public class QueryDialog extends JPanel {
 			}
 		});
 
-		placesBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
+		placesBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
 		});
 
-		relationalOperatorBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
-
+		relationalOperatorBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
+
 		});
 
-		placeMarking.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
+		placeMarking.addChangeListener(arg0 -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
 		});
 
@@ -1945,12 +1915,7 @@ public class QueryDialog extends JPanel {
 		editingButtonPanel.add(editQueryButton, gbc);
 
 		// Add action Listeners
-		deleteButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				deleteSelection();
-			}
-		});
+		deleteButton.addActionListener(e -> deleteSelection());
 
 		resetButton.addActionListener(new ActionListener() {
 
@@ -2168,11 +2133,9 @@ public class QueryDialog extends JPanel {
 		
 		while(buttons.hasMoreElements()){
 			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					setEnabledReductionOptions();
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
+			button.addActionListener(e -> {
+				setEnabledReductionOptions();
+				setEnabledOptionsAccordingToCurrentReduction();
 			});
 		}
 
@@ -2233,12 +2196,7 @@ public class QueryDialog extends JPanel {
 		
 		while(buttons.hasMoreElements()){
 			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
-			});
+			button.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 		}
 		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -2279,11 +2237,7 @@ public class QueryDialog extends JPanel {
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
-		reductionOption.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setEnabledOptionsAccordingToCurrentReduction();
-			}
-		});
+		reductionOption.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -2344,11 +2298,7 @@ public class QueryDialog extends JPanel {
 		useTimeDarts = new JCheckBox("Use Time Darts");
 		useTimeDarts.setSelected(false);
 		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
-		useTimeDarts.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setEnabledOptionsAccordingToCurrentReduction();
-			}
-		});
+		useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
@@ -2649,12 +2599,7 @@ public class QueryDialog extends JPanel {
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 
 			saveUppaalXMLButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -2773,18 +2718,11 @@ public class QueryDialog extends JPanel {
 			saveButton = new JButton("export");
 			cancelButton = new JButton("Cancel");
 
-			saveButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					querySaved = true;
-					exit();
-				}
+			saveButton.addActionListener(evt -> {
+				querySaved = true;
+				exit();
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 		}
 
 		if (option == QueryDialogueOption.Save) {

@@ -105,12 +105,10 @@ public class QueryPane extends JPanel {
 		queryList = new NonsearchableJList(listModel);
 		queryList.setCellRenderer(new QueryCellRenderer());
 		queryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		queryList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (!(e.getValueIsAdjusting())) {
-					queryList.ensureIndexIsVisible(queryList.getSelectedIndex());
-					updateQueryButtons();
-				}
+		queryList.addListSelectionListener(e -> {
+			if (!(e.getValueIsAdjusting())) {
+				queryList.ensureIndexIsVisible(queryList.getSelectedIndex());
+				updateQueryButtons();
 			}
 		});
 		queryList.addMouseListener(new MouseAdapter() {
@@ -256,12 +254,10 @@ public class QueryPane extends JPanel {
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortQueries);
 		sortButton.setEnabled(false);
-		sortButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Command c = new SortQueriesCommand(listModel);
-				undoManager.addNewEdit(c);
-				c.redo();
-			}
+		sortButton.addActionListener(e -> {
+			Command c = new SortQueriesCommand(listModel);
+			undoManager.addNewEdit(c);
+			c.redo();
 		});
 
 		gbc = new GridBagConstraints();
@@ -278,13 +274,11 @@ public class QueryPane extends JPanel {
 		editQueryButton.setToolTipText(toolTipEditQuery);
 		Dimension dimension = new Dimension(82, 23);
 		editQueryButton.setPreferredSize(dimension);
-		editQueryButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(queryList.getSelectedIndices().length == 1)
-					showEditDialog();
-				else
-					messenger.displayErrorMessage("It is only possible to edit 1 query at a time. Only verification can be done with multiple queries.");
-			}
+		editQueryButton.addActionListener(e -> {
+			if(queryList.getSelectedIndices().length == 1)
+				showEditDialog();
+			else
+				messenger.displayErrorMessage("It is only possible to edit 1 query at a time. Only verification can be done with multiple queries.");
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -296,11 +290,7 @@ public class QueryPane extends JPanel {
 		verifyButton.setEnabled(false);
 		verifyButton.setToolTipText(toolTipVerifyQuery);
 		verifyButton.setPreferredSize(dimension);
-		verifyButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				verifyQuery();
-			}
-		});
+		verifyButton.addActionListener(e -> verifyQuery());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -311,11 +301,7 @@ public class QueryPane extends JPanel {
 		removeQueryButton.setEnabled(false);
 		removeQueryButton.setToolTipText(toolTipRemoveQuery);
 		removeQueryButton.setPreferredSize(dimension);
-		removeQueryButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				removeQueries();
-			}
-		});
+		removeQueryButton.addActionListener(e -> removeQueries());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;

@@ -26,13 +26,11 @@ public class AnimationSettings{
 		simControl = SimulationControl.getInstance();
 		simControl.showCheckbox(true);
 		
-		simControl.addRandomSimulationActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(simControl.randomSimulation()){
-					delayEnabled.randomMode.setSelected(true);
-				}
-				CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
+		simControl.addRandomSimulationActionListener(e -> {
+			if(simControl.randomSimulation()){
+				delayEnabled.randomMode.setSelected(true);
 			}
+			CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
 		});
 		
 		content.add(delayEnabled, BorderLayout.NORTH);

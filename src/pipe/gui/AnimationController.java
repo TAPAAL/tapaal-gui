@@ -83,12 +83,7 @@ public class AnimationController extends JPanel {
 		firermodebox = new NonsearchableJComboBox(FIRINGMODES);
 		updateFiringModeComboBox();
 
-		firermodebox.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				CreateGui.getAnimator().setFiringmode(
-						(String) firermodebox.getSelectedItem());
-			}
-		});
+		firermodebox.addActionListener(evt -> CreateGui.getAnimator().setFiringmode((String) firermodebox.getSelectedItem()));
 
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
@@ -135,11 +130,9 @@ public class AnimationController extends JPanel {
 		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
-		decrese.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDelayModeScale(delayScale / 2);
-				delaySlider.setValue(delaySlider.getValue() * 2);
-			}
+		decrese.addActionListener(e -> {
+			setDelayModeScale(delayScale / 2);
+			delaySlider.setValue(delaySlider.getValue() * 2);
 		});
 		sliderPanel.add(decrese);
 
@@ -149,13 +142,10 @@ public class AnimationController extends JPanel {
 		delaySlider.setMinorTickSpacing(0);
 		delaySlider.setPaintLabels(true);
 		delaySlider.setPaintTicks(true);
-		delaySlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-				CreateGui.getAnimator().reportBlockingPlaces();
+		delaySlider.addChangeListener(e -> {
+			TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
+			CreateGui.getAnimator().reportBlockingPlaces();
 
-			}
 		});
 
 		delaySlider.addKeyListener(new KeyListener() {
@@ -179,11 +169,9 @@ public class AnimationController extends JPanel {
 		sliderPanel.add(delaySlider);
 		JButton increse = new JButton("+");
 		increse.setPreferredSize(new Dimension(20, 30));
-		increse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDelayModeScale(delayScale * 2);
-				delaySlider.setValue(delaySlider.getValue() / 2);
-			}
+		increse.addActionListener(e -> {
+			setDelayModeScale(delayScale * 2);
+			delaySlider.setValue(delaySlider.getValue() / 2);
 		});
 		sliderPanel.add(increse);
 
@@ -212,11 +200,7 @@ public class AnimationController extends JPanel {
 
 		okButton.setText("Time delay");
 		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				addTimeDelayToHistory();
-			}
-		});
+		okButton.addActionListener(evt -> addTimeDelayToHistory());
 
 		//"Hack" to make sure the toolTip for this button is showed as long as possible
 		okButton.addMouseListener(new MouseAdapter() {

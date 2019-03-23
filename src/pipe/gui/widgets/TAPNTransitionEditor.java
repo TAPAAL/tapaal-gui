@@ -77,14 +77,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		
 		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
-		sharedTransitionsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
-					((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
-				}else{
-					urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
-				}
+		sharedTransitionsComboBox.addActionListener(e -> {
+			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
+				((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+			}else{
+				urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
 			}
 		});
 
@@ -101,11 +98,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					makeSharedButton.setEnabled(false);
 				}else{
 					switchToNameTextField();
-                                        nameTextField.setText(transition.underlyingTransition().isShared()? 
+                                        nameTextField.setText(transition.underlyingTransition().isShared()?
                                                 CreateGui.getDrawingSurface().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
 					makeSharedButton.setEnabled(true);
 				}
-			}		
+			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
@@ -169,13 +166,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
 		
-		urgentCheckBox.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!isUrgencyOK()){
-					urgentCheckBox.setSelected(false);
-				}
+		urgentCheckBox.addActionListener(e -> {
+			if(!isUrgencyOK()){
+				urgentCheckBox.setSelected(false);
 			}
 		});
 	
@@ -204,11 +197,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				if(okButtonHandler(evt)){
-					exit();
-				}
+		okButton.addActionListener(evt -> {
+			if(okButtonHandler(evt)){
+				exit();
 			}
 		});
 
@@ -357,12 +348,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		textField.setCaretPosition(0);
 	}
 
-	CaretListener caretListener = new javax.swing.event.CaretListener() {
-		public void caretUpdate(javax.swing.event.CaretEvent evt) {
-			JTextField textField = (JTextField) evt.getSource();
-			textField.setBackground(new Color(255, 255, 255));
-			// textField.removeChangeListener(this);
-		}
+	CaretListener caretListener = evt -> {
+		JTextField textField = (JTextField) evt.getSource();
+		textField.setBackground(new Color(255, 255, 255));
+		// textField.removeChangeListener(this);
 	};
 	
 	private boolean isUrgencyOK(){

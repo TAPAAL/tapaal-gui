@@ -175,12 +175,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		closeDialogButton = new JButton("Close");
-		closeDialogButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}
-		});
+		closeDialogButton.addActionListener(arg0 -> dialog.setVisible(false));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;

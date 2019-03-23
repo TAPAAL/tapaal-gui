@@ -478,16 +478,14 @@ public abstract class Transition extends PlaceTransitionObject {
 	 }
 	 
 	 private void initBlinkTimer(){
-		 blinkTimer = new Timer(150, new ActionListener() {			 
-		      public void actionPerformed(ActionEvent evt) {		    	  		    	  
-		    	  if(blinkCount <= 2 ){
-		    		  setVisible(!isVisible());
-		    		  blinkCount++;		    	  
-		    	  } else {
-		    		  setVisible(true); // Ensures that transition is always visible after last blink
-		    		  blinkTimer.stop();
-		    	  }
-		      }
+		 blinkTimer = new Timer(150, evt -> {
+			 if(blinkCount <= 2 ){
+				 setVisible(!isVisible());
+				 blinkCount++;
+			 } else {
+				 setVisible(true); // Ensures that transition is always visible after last blink
+				 blinkTimer.stop();
+			 }
 		 });
 	 }
 }

@@ -1013,12 +1013,7 @@ public class CTLQueryDialog extends JPanel {
 		
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-		advancedButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				toggleAdvancedSimpleView(true);
-			}
-		});
+		advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
@@ -1141,12 +1136,7 @@ public class CTLQueryDialog extends JPanel {
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
 		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
-		kbounded.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
-			}
-
-		});
+		kbounded.addActionListener(evt -> Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet));
 		boundednessCheckPanel.add(kbounded);
 
 		GridBagConstraints gridBagConstraints;
@@ -1828,50 +1818,38 @@ public class CTLQueryDialog extends JPanel {
 			}
 		});
 
-		truePredicateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLTrueNode property = new TCTLTrueNode();
-				addPropertyToQuery(property);
-			}
+		truePredicateButton.addActionListener(e -> {
+			TCTLTrueNode property = new TCTLTrueNode();
+			addPropertyToQuery(property);
 		});
 
-		falsePredicateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLFalseNode property = new TCTLFalseNode();
-				addPropertyToQuery(property);
-			}
+		falsePredicateButton.addActionListener(e -> {
+			TCTLFalseNode property = new TCTLFalseNode();
+			addPropertyToQuery(property);
 		});
 
-		deadLockPredicateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLDeadlockNode property = new TCTLDeadlockNode();
-				addPropertyToQuery(property);
-			}
+		deadLockPredicateButton.addActionListener(e -> {
+			TCTLDeadlockNode property = new TCTLDeadlockNode();
+			addPropertyToQuery(property);
 		});
 
-		placesTransitionsBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
-				setEnablednessOfOperatorAndMarkingBoxes();
+		placesTransitionsBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
+			setEnablednessOfOperatorAndMarkingBoxes();
 		});
 
-		relationalOperatorBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
-
+		relationalOperatorBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
+
 		});
 
-		placeMarking.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
+		placeMarking.addChangeListener(arg0 -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
 		});
 
@@ -1947,12 +1925,7 @@ public class CTLQueryDialog extends JPanel {
 		editingButtonPanel.add(editQueryButton, gbc);
 
 		// Add action Listeners
-		deleteButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				deleteSelection();
-			}
-		});
+		deleteButton.addActionListener(e -> deleteSelection());
 
 		resetButton.addActionListener(new ActionListener() {
 
@@ -2379,12 +2352,7 @@ public class CTLQueryDialog extends JPanel {
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 
 			saveUppaalXMLButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -2484,18 +2452,11 @@ public class CTLQueryDialog extends JPanel {
 			saveButton = new JButton("export");
 			cancelButton = new JButton("Cancel");
 
-			saveButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					querySaved = true;
-					exit();
-				}
+			saveButton.addActionListener(evt -> {
+				querySaved = true;
+				exit();
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 		}
 
 		if (option == QueryDialogueOption.Save) {

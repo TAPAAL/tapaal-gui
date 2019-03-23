@@ -42,21 +42,15 @@ public class TransitionFireingComponent extends JPanel {
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
-		settingsButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				AnimationSettings.showAnimationSettings();
-			}
-		});
+		settingsButton.addActionListener(e -> AnimationSettings.showAnimationSettings());
 
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
-		fireButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(SimulationControl.getInstance().randomSimulation() && CreateGui.getApp().isShowingDelayEnabledTransitions()){
-					SimulationControl.startSimulation();
-				} else {
-					fireSelectedTransition();
-				}
+		fireButton.addActionListener(e -> {
+			if(SimulationControl.getInstance().randomSimulation() && CreateGui.getApp().isShowingDelayEnabledTransitions()){
+				SimulationControl.startSimulation();
+			} else {
+				fireSelectedTransition();
 			}
 		});
 		fireButton.addKeyListener(new KeyAdapter() {			
