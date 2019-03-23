@@ -10,7 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-public class WidthAdjustingComboBox extends JComboBox{
+public class WidthAdjustingComboBox<E> extends JComboBox<E>{
 
 	private static final long serialVersionUID = 1L;
 	
