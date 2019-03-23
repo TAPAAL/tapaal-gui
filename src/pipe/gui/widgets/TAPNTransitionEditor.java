@@ -496,11 +496,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JTextField nameTextField;
 	private javax.swing.JButton okButton;
 	private javax.swing.JButton makeSharedButton;
-	private javax.swing.JComboBox rotationComboBox;
+	private javax.swing.JComboBox<String> rotationComboBox;
 	private javax.swing.JLabel rotationLabel;
 	private javax.swing.JPanel transitionEditorPanel;
 	private javax.swing.JCheckBox sharedCheckBox;
-	private javax.swing.JComboBox sharedTransitionsComboBox;
+	private javax.swing.JComboBox<SharedTransition> sharedTransitionsComboBox;
 	private javax.swing.JCheckBox urgentCheckBox;
 	private javax.swing.JCheckBox makeNewSharedCheckBox;
 	private Vector<SharedTransition> sharedTransitions;
