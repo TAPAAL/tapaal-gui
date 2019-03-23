@@ -180,7 +180,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 * @return Double value for X-axis position
 	 */
 	public Double getPositionXObject() {
-		return new Double(locationX);
+		return locationX;
 		// return new Double(positionX);
 	}
 
@@ -190,7 +190,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 * @return Double value for Y-axis position
 	 */
 	public Double getPositionYObject() {
-		return new Double(locationY);
+		return locationY;
 		// return new Double(positionY);
 	}
 
