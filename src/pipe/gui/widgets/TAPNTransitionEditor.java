@@ -216,11 +216,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		cancelButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cancelButtonHandler(evt);
-			}
-		});
+		cancelButton.addActionListener(this::cancelButtonHandler);
 		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;

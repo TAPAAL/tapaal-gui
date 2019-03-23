@@ -399,11 +399,7 @@ public class GuardDialogue extends JPanel /*
 	//	firstIntervalNumber.setMaximumSize(intervalBoxDims);
 	//	firstIntervalNumber.setMinimumSize(intervalBoxDims);
 		firstIntervalNumber.setPreferredSize(intervalBoxDims);
-		firstIntervalNumber.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent evt) {
-				firstSpinnerStateChanged(evt);
-			}
-		});
+		firstIntervalNumber.addChangeListener(this::firstSpinnerStateChanged);
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
@@ -419,11 +415,7 @@ public class GuardDialogue extends JPanel /*
 		secondIntervalNumber.setMaximumSize(intervalBoxDims);
 		secondIntervalNumber.setMinimumSize(intervalBoxDims);
 		secondIntervalNumber.setPreferredSize(intervalBoxDims);
-		secondIntervalNumber.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent evt) {
-				secondSpinnerStateChanged(evt);
-			}
-		});
+		secondIntervalNumber.addChangeListener(this::secondSpinnerStateChanged);
 
 		gridBagConstraints.gridx = 4;
 		gridBagConstraints.gridy = 1;
