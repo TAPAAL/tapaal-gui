@@ -346,10 +346,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantSpinner.addChangeListener(e -> {
 			if(!invariantInf.isSelected()){
 				if ((Integer) invariantSpinner.getValue() < 1) {
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
 					invRelationNormal.setSelectedItem("<=");
 				} else if (invRelationNormal.getModel().getSize() == 1) {
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
 				}
 			}
 		});
@@ -753,11 +753,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private javax.swing.JPanel basicPropertiesPanel;
 	private javax.swing.JPanel timeInvariantPanel;
 	private JPanel invariantGroup;
-	private JComboBox invRelationNormal;
-	private JComboBox invRelationConstant;
+	private JComboBox<String> invRelationNormal;
+	private JComboBox<String> invRelationConstant;
 	private JSpinner invariantSpinner;
 	private JCheckBox invariantInf;
-	private JComboBox invConstantsComboBox;
+	private JComboBox<String> invConstantsComboBox;
 	private JRadioButton normalInvRadioButton;
 	private JRadioButton constantInvRadioButton;
 }

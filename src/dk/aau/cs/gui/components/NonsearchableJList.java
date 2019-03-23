@@ -12,7 +12,7 @@ import javax.swing.ListModel;
 //As the javax.swing.plaf.basic.BasicListUI.Handler class is a private nested class, in the javax.swing.plaf.basic.BasicListUI class, 
 //it's not possible to use "instanceof" to do the test.
 //Therefore the toString of the keylistener is used.
-public class NonsearchableJList extends JList{
+public class NonsearchableJList<E> extends JList<E>{
 	private static final long serialVersionUID = 2706313217985326989L;
 
 	public NonsearchableJList() {
@@ -25,12 +25,12 @@ public class NonsearchableJList extends JList{
 		removeKeyListener();
 	}
 
-	public NonsearchableJList(Object[]  listData){
+	public NonsearchableJList(E[]  listData){
 		super (listData);
 		removeKeyListener();
 	}
 
-	public NonsearchableJList(Vector<?> listData){
+	public NonsearchableJList(Vector<E> listData){
 		super (listData);
 		removeKeyListener();
 	}
