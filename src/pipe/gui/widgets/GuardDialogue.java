@@ -70,8 +70,8 @@ public class GuardDialogue extends JPanel /*
 
 	private JCheckBox inf;
 
-	private JComboBox leftDelimiter;
-	private JComboBox rightDelimiter;
+	private JComboBox<String> leftDelimiter;
+	private JComboBox<String> rightDelimiter;
 
 	private JCheckBox leftUseConstant;
 	private WidthAdjustingComboBox leftConstantsComboBox;
@@ -583,16 +583,11 @@ public class GuardDialogue extends JPanel /*
 		int firstValue = getFirstValue();
 		int secondValue = getSecondValue();
 
-		DefaultComboBoxModel modelRightIncludedOnly = new DefaultComboBoxModel(
-				new String[] { "]" });
-		DefaultComboBoxModel modelLeftIncludedOnly = new DefaultComboBoxModel(
-				new String[] { "[" });
-		DefaultComboBoxModel modelRightBoth = new DefaultComboBoxModel(
-				new String[] { "]", ")" });
-		DefaultComboBoxModel modelLeftBoth = new DefaultComboBoxModel(
-				new String[] { "[", "(" });
-		DefaultComboBoxModel modelRightExcludedOnly = new DefaultComboBoxModel(
-				new String[] { ")" });
+		DefaultComboBoxModel<String>  modelRightIncludedOnly = new DefaultComboBoxModel<>(new String[] { "]" });
+		DefaultComboBoxModel<String>  modelLeftIncludedOnly = new DefaultComboBoxModel<>(new String[] { "[" });
+		DefaultComboBoxModel<String>  modelRightBoth = new DefaultComboBoxModel<>(new String[] { "]", ")" });
+		DefaultComboBoxModel<String>  modelLeftBoth = new DefaultComboBoxModel<>(new String[] { "[", "(" });
+		DefaultComboBoxModel<String> modelRightExcludedOnly = new DefaultComboBoxModel<>(new String[] { ")" });
 
 		if (firstValue > secondValue) {
 			secondIntervalNumber.setValue(firstValue);
