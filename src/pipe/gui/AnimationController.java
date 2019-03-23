@@ -63,7 +63,7 @@ public class AnimationController extends JPanel {
 	private GuiAction stepforwardAction, stepbackwardAction;
 
 	JTextField TimeDelayField = new JTextField();
-	JComboBox firermodebox = null;
+	JComboBox<String> firermodebox = null;
 	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
 	public AnimationController(NetType netType) {
@@ -80,7 +80,7 @@ public class AnimationController extends JPanel {
 		// Use the default FlowLayout.
 		// Create everything.
 
-		firermodebox = new NonsearchableJComboBox(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(evt -> CreateGui.getAnimator().setFiringmode((String) firermodebox.getSelectedItem()));

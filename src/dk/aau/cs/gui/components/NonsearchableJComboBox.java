@@ -12,7 +12,7 @@ import javax.swing.JComboBox;
 //As the javax.swing.plaf.basic.BasicComboBoxUI.Handler class is a private nested class, in the javax.swing.plaf.basic.BasicComboBoxUI class, 
 //it's not possible to use "instanceof" to do the test.
 //Therefore the toString of the keylistener is used.
-public class NonsearchableJComboBox extends JComboBox {
+public class NonsearchableJComboBox<E> extends JComboBox<E> {
 
 	private static final long serialVersionUID = -5796892375680580143L;
 
@@ -26,12 +26,12 @@ public class NonsearchableJComboBox extends JComboBox {
 		removeKeyListener();
 	}
 
-	public NonsearchableJComboBox(Object[] items) {
+	public NonsearchableJComboBox(E[] items) {
 		super(items);
 		removeKeyListener();
 	}
 
-	public NonsearchableJComboBox(Vector<?> items) {
+	public NonsearchableJComboBox(Vector<E> items) {
 		super(items);
 		removeKeyListener();
 	}
