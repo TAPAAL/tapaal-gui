@@ -110,7 +110,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public String getStringOfTokens() {
-		StringBuffer buffer = new StringBuffer("{");
+		StringBuilder buffer = new StringBuilder("{");
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));

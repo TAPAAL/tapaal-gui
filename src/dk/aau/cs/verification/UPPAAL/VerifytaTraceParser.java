@@ -22,7 +22,7 @@ public class VerifytaTraceParser {
 				String previous = "";
 				double delayValue = 0;
 				while (reader.ready()) {
-					StringBuffer buffer = new StringBuffer();
+					StringBuilder buffer = new StringBuilder();
 					while ((line = reader.readLine()) != null && !line.isEmpty()) {
 						buffer.append(line);
 						buffer.append('\n');
@@ -225,7 +225,7 @@ public class VerifytaTraceParser {
 				}
 			} else {
 				while (reader.ready()) {
-					StringBuffer buffer = new StringBuffer();
+					StringBuilder buffer = new StringBuilder();
 					while ((line = reader.readLine()) != null && !line.isEmpty()) {
 						buffer.append(line);
 						buffer.append('\n');

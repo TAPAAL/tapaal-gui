@@ -23,7 +23,7 @@ public class BoundednessAnalysisResult {
 		if(boundednessResult().equals(Boundedness.Bounded)){
 			return "";
 		}else{
-			StringBuffer buffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append(String.format("Only markings with at most %1$d tokens (%2$d extra tokens)", totalTokens, extraTokens));

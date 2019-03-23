@@ -65,7 +65,7 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		public String getStatsExplanation(){
-			StringBuffer buffer = new StringBuffer("<html>");
+			StringBuilder buffer = new StringBuilder("<html>");
 			if(ctlOutput){
 				buffer.append("The number of configurations, markings and hyper-edges explored during<br />" +
 						"the on-the-fly generation of the dependency graph for the given net and<br />" +
@@ -341,7 +341,7 @@ public class VerifyPN implements ModelChecker{
 		}
 
 		private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-			StringBuffer buffer = new StringBuffer(options.toString());
+			StringBuilder buffer = new StringBuilder(options.toString());
 			buffer.append(' ');
 			buffer.append(modelFile);
 			buffer.append(' ');
@@ -357,7 +357,7 @@ public class VerifyPN implements ModelChecker{
 			} catch (IOException e1) {
 				return "";
 			}
-			StringBuffer buffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
 			String line = null;
 			try {
 				while ((line = reader.readLine()) != null) {

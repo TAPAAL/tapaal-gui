@@ -75,7 +75,7 @@ public class ReductionStats {
 	
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();		
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("Removed places: ");
 		buffer.append(removedPlaces);
 		buffer.append(System.getProperty("line.separator"));

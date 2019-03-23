@@ -51,7 +51,7 @@ public class CustomJSpinner extends JSpinner{
 				@Override
 				public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {                 
 					String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-					StringBuffer newString = new StringBuffer(old);
+					StringBuilder newString = new StringBuilder(old);
 					newString.replace(offset, length+offset, "");
 					if (stringIsValidInteger(newString.toString())) {
 						super.remove(fb, offset, length);
@@ -61,7 +61,7 @@ public class CustomJSpinner extends JSpinner{
 				@Override
 				public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
 					String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-					StringBuffer newString = new StringBuffer(old);
+					StringBuilder newString = new StringBuilder(old);
 					newString.replace(offset, length+offset, text);            	 			
 					if (stringIsValidInteger(newString.toString())) {                	
 						super.replace(fb, offset, length, text, attrs);

@@ -113,7 +113,7 @@ public class RunVerification extends RunVerificationBase {
 	JDialog d;
 
 	private String toHTML(String string){
-		StringBuffer buffer = new StringBuffer("<html>");
+		StringBuilder buffer = new StringBuilder("<html>");
 		buffer.append(string.replace(System.getProperty("line.separator"), "<br/>"));
 		buffer.append("</html>");
 		return buffer.toString();

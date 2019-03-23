@@ -1211,7 +1211,7 @@ public class QueryDialog extends JPanel {
 
 			private String getHelpMessage(){
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
-				StringBuffer buffer = new StringBuffer();
+				StringBuilder buffer = new StringBuilder();
 				buffer.append("<html>");
 				buffer.append("<b>Boundedness Options</b><br/>");
 				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");

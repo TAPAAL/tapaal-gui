@@ -75,7 +75,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 
 		result.append("-k ");
 		result.append(extraTokens+tokensInModel);

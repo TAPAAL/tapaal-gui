@@ -48,7 +48,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	}
 
 	private String createAtomicPropositionSum(String place) {
-		StringBuffer sum = new StringBuffer("(");
+		StringBuilder sum = new StringBuilder("(");
 		for (int i = 0; i < totalTokens; i++) {
 			sum.append(String.format("%1$s%2$s.%3$s", TOKEN_TEMPLATE_NAME, i,
 					place));

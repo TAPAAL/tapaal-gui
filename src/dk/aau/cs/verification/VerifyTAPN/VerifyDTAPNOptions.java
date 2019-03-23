@@ -43,7 +43,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		
 		result.append(' ');
 		result.append("-m ");

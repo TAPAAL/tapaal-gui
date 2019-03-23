@@ -195,7 +195,7 @@ public class VerificationResult<TTrace> {
 	}
 
 	public String getCTLStatsAsString(){
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("Explored configurations: ");
 		buffer.append(stats.getConfigurations());
 		buffer.append(System.getProperty("line.separator"));

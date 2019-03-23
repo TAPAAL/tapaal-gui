@@ -67,7 +67,7 @@ public class WorkflowDialog extends JDialog {
 
 	private static String getHelpMessage(){ 
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("<html>");
 		buffer.append("<b>Workflow Net</b><br/>");
 		buffer.append("A workflow net must contain exactly one <em>input</em> place with no incoming arcs,\n");

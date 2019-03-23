@@ -255,7 +255,7 @@ public class TikZExporter {
 	}
 
 	private String exportMultipleTokens(List<TimedToken> tokens) {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 
 		out.append("structured tokens={\\#");
 		out.append(tokens.size());
@@ -299,7 +299,7 @@ public class TikZExporter {
 	}
 
 	private String exportMathName(String name) {
-		StringBuffer out = new StringBuffer("$\\mathrm{");
+		StringBuilder out = new StringBuilder("$\\mathrm{");
 		int subscripts = 0;
 		for (int i = 0; i < name.length() - 1; i++) {
 			char c = name.charAt(i);

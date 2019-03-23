@@ -141,7 +141,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		SharedPlace sharedPlace = placeToRemove;
 		if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
-			StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
+			StringBuilder buffer = new StringBuilder("The following queries contains the shared place and will also be deleted:");
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append(System.getProperty("line.separator"));
 			
@@ -261,7 +261,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		SharedTransition sharedTransition = transitionToBeRemoved;
 		if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
-	        StringBuffer buffer = new StringBuffer("The following queries contains the shared transition and will also be deleted:");
+	        StringBuilder buffer = new StringBuilder("The following queries contains the shared transition and will also be deleted:");
 	        buffer.append(System.getProperty("line.separator"));
 	        buffer.append(System.getProperty("line.separator"));
 	

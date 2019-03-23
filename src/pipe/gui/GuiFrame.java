@@ -371,7 +371,7 @@ public class GuiFrame extends JFrame  {
 	public void checkForUpdate(boolean forcecheck) {
 		final VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion(forcecheck))  {
-			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
+			StringBuilder message = new StringBuilder("There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
 			message.append(TAPAAL.VERSION);
 			message.append("\nNew version: ");
