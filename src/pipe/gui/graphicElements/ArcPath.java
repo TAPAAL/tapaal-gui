@@ -596,15 +596,12 @@ public class ArcPath implements Shape {
 	}
 
 	public void addPointsToGui(DrawingSurfaceImpl editWindow) {
-		ArcPathPoint pathPoint;
 		ArcPathPointHandler pointHandler;
 
 		(pathPoints.get(0)).setDraggable(false);
 		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
 
-		for (int i = 0; i < pathPoints.size(); i++) {
-
-			pathPoint = pathPoints.get(i);
+		for (ArcPathPoint pathPoint : pathPoints) {
 			pathPoint.setVisible(false);
 
 			// Check whether the point has already been added to the gui
