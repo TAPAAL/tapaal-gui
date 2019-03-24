@@ -32,7 +32,7 @@ public class ArcPath implements Shape {
 	private GeneralPath path = new GeneralPath();
 	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
 	private Arc myArc;
-	protected ArcPathPoint currentPoint;
+	private ArcPathPoint currentPoint;
 	private boolean pointLock = false;
 	private static Stroke proximityStroke = new BasicStroke(
 			Pipe.ARC_PATH_PROXIMITY_WIDTH);
@@ -400,8 +400,8 @@ public class ArcPath implements Shape {
 
 	public void showPoints() {
 		if (!pointLock) {
-			for (int i = 0; i < pathPoints.size(); i++) {
-				(pathPoints.get(i)).setVisible(true);
+			for (ArcPathPoint pathPoint : pathPoints) {
+				pathPoint.setVisible(true);
 			}
 		}
 	}
@@ -419,8 +419,8 @@ public class ArcPath implements Shape {
 
 	//
 	public void forceHidePoints() {
-		for (int i = 0; i < pathPoints.size(); i++) {
-			(pathPoints.get(i)).hidePoint();
+		for (ArcPathPoint pathPoint : pathPoints) {
+			pathPoint.hidePoint();
 		}
 	}
 
@@ -603,6 +603,7 @@ public class ArcPath implements Shape {
 		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
 
 		for (int i = 0; i < pathPoints.size(); i++) {
+
 			pathPoint = pathPoints.get(i);
 			pathPoint.setVisible(false);
 
