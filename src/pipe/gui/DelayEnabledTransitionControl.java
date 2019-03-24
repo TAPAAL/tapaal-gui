@@ -36,7 +36,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 	private JLabel precitionLabel;
 	private JSlider delayEnabledPrecision;
 	private JLabel delayModeLabel;
-	private JComboBox delayMode;
+	private JComboBox<DelayMode> delayMode;
 	JCheckBox randomMode;
 	
 	private DelayEnabledTransitionControl() {
