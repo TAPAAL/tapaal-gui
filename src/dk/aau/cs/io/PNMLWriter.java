@@ -129,22 +129,22 @@ public class PNMLWriter implements NetWriter {
 
 	private void appendPlaces(Document document, DataLayer guiModel, Element NET) {
 		Place[] places = guiModel.getPlaces();
-		for (int i = 0; i < places.length; i++) {
-			NET.appendChild(createPlaceElement((TimedPlaceComponent) places[i], guiModel, document));
+		for (Place place : places) {
+			NET.appendChild(createPlaceElement((TimedPlaceComponent) place, guiModel, document));
 		}
 	}
 
 	private void appendTransitions(Document document, DataLayer guiModel, Element NET) {
 		Transition[] transitions = guiModel.getTransitions();
-		for (int i = 0; i < transitions.length; i++) {
-			NET.appendChild(createTransitionElement((TimedTransitionComponent)transitions[i],	document));
+		for (Transition transition : transitions) {
+			NET.appendChild(createTransitionElement((TimedTransitionComponent) transition, document));
 		}
 	}
 	
 	private void appendArcs(Document document, DataLayer guiModel, Element NET) {
 		Arc[] arcs = guiModel.getArcs();
-		for (int i = 0; i < arcs.length; i++) {
-			NET.appendChild(createArcElement(arcs[i], guiModel, document));
+		for (Arc arc : arcs) {
+			NET.appendChild(createArcElement(arc, guiModel, document));
 		}
 	}
 

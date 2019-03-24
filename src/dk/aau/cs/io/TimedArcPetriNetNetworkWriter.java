@@ -211,22 +211,22 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 	private void appendAnnotationNotes(Document document, DataLayer guiModel, Element NET) {
 		AnnotationNote[] labels = guiModel.getLabels();
-		for (int i = 0; i < labels.length; i++) {
-			NET.appendChild(createAnnotationNoteElement(labels[i], document));
+		for (AnnotationNote label : labels) {
+			NET.appendChild(createAnnotationNoteElement(label, document));
 		}
 	}
 
 	private void appendPlaces(Document document, DataLayer guiModel, Element NET) {
 		Place[] places = guiModel.getPlaces();
-		for (int i = 0; i < places.length; i++) {
-			NET.appendChild(createPlaceElement((TimedPlaceComponent) places[i], guiModel, document));
+		for (Place place : places) {
+			NET.appendChild(createPlaceElement((TimedPlaceComponent) place, guiModel, document));
 		}
 	}
 
 	private void appendTransitions(Document document, DataLayer guiModel, Element NET) {
 		Transition[] transitions = guiModel.getTransitions();
-		for (int i = 0; i < transitions.length; i++) {
-			NET.appendChild(createTransitionElement((TimedTransitionComponent)transitions[i],	document));
+		for (Transition transition : transitions) {
+			NET.appendChild(createTransitionElement((TimedTransitionComponent) transition, document));
 		}
 	}
 	
