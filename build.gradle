@@ -26,9 +26,11 @@ sourceSets {
             srcDirs = ['src/']
             include("resources/")
         }
-        //test {
-        //    srcDirs = ['tests']
-        //}
+        test {
+            java {
+                srcDirs = ['tests/']
+            }
+        }
     }
 }
 
@@ -53,5 +55,17 @@ dependencies {
 
     //Add jars from libs dir
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    //Junit
+    testCompile(
+            'junit:junit:4.12',
+            'org.junit.jupiter:junit-jupiter-api:5.4.0'
+    )
+    testRuntime(
+            'org.junit.jupiter:junit-jupiter-engine:5.4.0',
+            'org.junit.vintage:junit-vintage-engine:5.4.0'
+    )
+}
+test {
+    useJUnitPlatform()
 }
