@@ -216,54 +216,57 @@ public class VerifyPN implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-			String verifypn = null;
+			try {
+				String verifypn = null;
 
-			//If env is set, it overwrites the value
-			verifypn = System.getenv("verifypn");
-			if (verifypn != null && !verifypn.isEmpty()) {
-				if (new File(verifypn).exists()){
+				//If env is set, it overwrites the value
+				verifypn = System.getenv("verifypn");
+				if (verifypn != null && !verifypn.isEmpty()) {
+					if (new File(verifypn).exists()){
+						verifypnpath = verifypn;
+						VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+						if(v.isCorrectVersion()){
+							return true;
+						}else{
+							verifypn = null;
+							verifypnpath = null;
+						}
+					}
+				}
+
+				//If pref is set
+				verifypn = Preferences.getInstance().getVerifypnLocation();
+				if (verifypn != null && !verifypn.isEmpty()) {
 					verifypnpath = verifypn;
-					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
-						return true;
-					}else{
-						verifypn = null;
-						verifypnpath = null;
+					return true;
+				}
+
+				//Search the installdir for verifytapn
+				File installdir = TAPAAL.getInstallDir();
+
+				String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
+				for (String s : paths) {
+					File verifypnfile = new File(installdir + s);
+
+					if (verifypnfile.exists()){
+
+						verifypnpath = verifypnfile.getAbsolutePath();
+						VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+						if(v.isCorrectVersion()){
+							return true;
+						}else{
+							verifypn = null;
+							verifypnpath = null;
+						}
+
 					}
 				}
+
+
+				return false;
+			} catch (Exception e) {
+				return false;
 			}
-
-			//If pref is set
-			verifypn = Preferences.getInstance().getVerifypnLocation();
-			if (verifypn != null && !verifypn.isEmpty()) {
-				verifypnpath = verifypn;
-				return true;
-			}
-
-			//Search the installdir for verifytapn
-			File installdir = TAPAAL.getInstallDir();
-
-			String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
-			for (String s : paths) {
-				File verifypnfile = new File(installdir + s);
-
-				if (verifypnfile.exists()){
-
-					verifypnpath = verifypnfile.getAbsolutePath();
-					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
-						return true;
-					}else{
-						verifypn = null;
-						verifypnpath = null;
-					}
-
-				}
-			}
-
-
-
-			return false;
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
