@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package net.tapaal.swinghelpers;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;

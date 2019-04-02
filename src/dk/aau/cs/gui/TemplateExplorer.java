@@ -48,7 +48,7 @@ import pipe.gui.undo.RenameTemplateCommand;
 import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.RequestFocusListener;
+import net.tapaal.swinghelpers.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
 import dk.aau.cs.gui.components.NonsearchableJList;

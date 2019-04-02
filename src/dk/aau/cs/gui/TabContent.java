@@ -37,7 +37,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.widgets.JSplitPaneFix;
+import net.tapaal.swinghelpers.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;

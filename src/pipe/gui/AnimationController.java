@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -31,16 +30,13 @@ import javax.swing.text.AbstractDocument;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.widgets.DecimalOnlyDocumentFilter;
+import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
-import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import javax.swing.JButton;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * Implementes af class handling drawing of animation functions

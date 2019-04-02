@@ -61,7 +61,7 @@ public class Animator {
 		markings = new ArrayList<NetworkMarking>();
 	}
 
-	public void setTabContent(TabContent tab) {
+	public void setTabContent(TabContent tab)  {
 		this.tab = tab;
 	}
 
