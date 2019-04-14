@@ -208,54 +208,57 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-			String verifydtapn = null;
+			try {
+				String verifydtapn = null;
 
-			//If env is set, it overwrites the value
-			verifydtapn = System.getenv("verifydtapn");
-			if (verifydtapn != null && !verifydtapn.isEmpty()) {
-				if (new File(verifydtapn).exists()){
+				//If env is set, it overwrites the value
+				verifydtapn = System.getenv("verifydtapn");
+				if (verifydtapn != null && !verifydtapn.isEmpty()) {
+					if (new File(verifydtapn).exists()){
+						verifydtapnpath = verifydtapn;
+						VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+						if(v.isCorrectVersion()){
+							return true;
+						}else{
+							verifydtapn = null;
+							verifydtapnpath = null;
+						}
+					}
+				}
+
+				//If pref is set
+				verifydtapn = Preferences.getInstance().getVerifydtapnLocation();
+				if (verifydtapn != null && !verifydtapn.isEmpty()) {
 					verifydtapnpath = verifydtapn;
-					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
-						return true;
-					}else{
-						verifydtapn = null;
-						verifydtapnpath = null;
+					return true;
+				}
+
+				//Search the installdir for verifytapn
+				File installdir = TAPAAL.getInstallDir();
+
+				String[] paths = {"/bin/verifydtapn", "/bin/verifydtapn64", "/bin/verifydtapn.exe", "/bin/verifydtapn64.exe"};
+				for (String s : paths) {
+					File verifydtapnfile = new File(installdir + s);
+
+					if (verifydtapnfile.exists()){
+
+						verifydtapnpath = verifydtapnfile.getAbsolutePath();
+						VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+						if(v.isCorrectVersion()){
+							return true;
+						}else{
+							verifydtapn = null;
+							verifydtapnpath = null;
+						}
+
 					}
 				}
+
+
+				return false;
+			} catch (Exception e) {
+				return false;
 			}
-
-			//If pref is set
-			verifydtapn = Preferences.getInstance().getVerifydtapnLocation();
-			if (verifydtapn != null && !verifydtapn.isEmpty()) {
-				verifydtapnpath = verifydtapn;
-				return true;
-			}
-
-			//Search the installdir for verifytapn
-			File installdir = TAPAAL.getInstallDir();
-
-			String[] paths = {"/bin/verifydtapn", "/bin/verifydtapn64", "/bin/verifydtapn.exe", "/bin/verifydtapn64.exe"};
-			for (String s : paths) {
-				File verifydtapnfile = new File(installdir + s);
-
-				if (verifydtapnfile.exists()){
-
-					verifydtapnpath = verifydtapnfile.getAbsolutePath();
-					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
-						return true;
-					}else{
-						verifydtapn = null;
-						verifydtapnpath = null;
-					}
-
-				}
-			}
-
-
-
-			return false;
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
