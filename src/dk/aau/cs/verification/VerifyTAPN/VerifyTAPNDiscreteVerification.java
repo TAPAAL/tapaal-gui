@@ -127,30 +127,35 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			if (isNotSetup()) {
 				return false;
 			}
-			
+
 			File file = new File(getPath());
-			if(!file.canExecute()){
+			if (!file.canExecute()) {
 				messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
 						+ "The verifydtapn path will be reset. Please try again, "
 						+ "to manually set the verifydtapn path.", "Verifydtapn Error");
 				resetVerifytapn();
 				return false;
 			}
-			
-			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifydtapnMinRev.split("\\.");
-			
-			for(int i = 0; i < targetversion.length; i++){
-				if(version.length < i+1)	version[i] = "0";
-				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-				if(diff > 0){
-					break;
-				}else if(diff < 0){
-					return false;
+
+			if (getVersion() != null) {
+
+				String[] version = getVersion().split("\\.");
+				String[] targetversion = Pipe.verifydtapnMinRev.split("\\.");
+
+				for (int i = 0; i < targetversion.length; i++) {
+					if (version.length < i + 1) version[i] = "0";
+					int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+					if (diff > 0) {
+						break;
+					} else if (diff < 0) {
+						return false;
+					}
 				}
+
+				return true;
+			} else {
+				return false;
 			}
-			
-			return true;
 		}
 
 		private void resetVerifytapn() {
@@ -208,7 +213,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-			try {
 				String verifydtapn = null;
 
 				//If env is set, it overwrites the value
@@ -230,7 +234,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				verifydtapn = Preferences.getInstance().getVerifydtapnLocation();
 				if (verifydtapn != null && !verifydtapn.isEmpty()) {
 					verifydtapnpath = verifydtapn;
-					return true;
+					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+					if(v.isCorrectVersion()){
+						return true;
+					}else{
+						verifydtapn = null;
+						verifydtapnpath = null;
+					}
 				}
 
 				//Search the installdir for verifytapn
@@ -256,9 +266,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 
 				return false;
-			} catch (Exception e) {
-				return false;
-			}
+
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	

@@ -135,30 +135,35 @@ public class VerifyPN implements ModelChecker{
 			if (isNotSetup()) {
 				return false;
 			}
-			
+
 			File file = new File(getPath());
-			if(!file.canExecute()){
+			if (!file.canExecute()) {
 				messenger.displayErrorMessage("The engine verifypn is not executable.\n"
 						+ "The verifypn path will be reset. Please try again, "
 						+ "to manually set the verifypn path.", "VerifyPN Error");
 				resetVerifypn();
 				return false;
 			}
-			
-			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifypnMinRev.split("\\.");
-			
-			for(int i = 0; i < targetversion.length; i++){
-				if(version.length < i+1)	version[i] = "0";
-				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-				if(diff > 0){
-					break;
-				}else if(diff < 0){
-					return false;
+
+			if (getVersion() != null) {
+
+				String[] version = getVersion().split("\\.");
+				String[] targetversion = Pipe.verifypnMinRev.split("\\.");
+
+				for (int i = 0; i < targetversion.length; i++) {
+					if (version.length < i + 1) version[i] = "0";
+					int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+					if (diff > 0) {
+						break;
+					} else if (diff < 0) {
+						return false;
+					}
 				}
+
+				return true;
+			} else {
+				return false;
 			}
-			
-			return true;
 		}
 
 		private void resetVerifypn() {
@@ -216,7 +221,6 @@ public class VerifyPN implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-			try {
 				String verifypn = null;
 
 				//If env is set, it overwrites the value
@@ -238,7 +242,13 @@ public class VerifyPN implements ModelChecker{
 				verifypn = Preferences.getInstance().getVerifypnLocation();
 				if (verifypn != null && !verifypn.isEmpty()) {
 					verifypnpath = verifypn;
-					return true;
+					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+					if(v.isCorrectVersion()){
+						return true;
+					}else{
+						verifypn = null;
+						verifypnpath = null;
+					}
 				}
 
 				//Search the installdir for verifytapn
@@ -264,9 +274,7 @@ public class VerifyPN implements ModelChecker{
 
 
 				return false;
-			} catch (Exception e) {
-				return false;
-			}
+
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	

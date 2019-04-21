@@ -135,21 +135,25 @@ public class VerifyTAPN implements ModelChecker {
 			resetVerifytapn();
 			return false;
 		}
-		
-		String[] version = getVersion().split("\\.");
-		String[] targetversion = Pipe.verifytapnMinRev.split("\\.");
-		
-		for(int i = 0; i < targetversion.length; i++){
-			if(version.length < i+1)	version[i] = "0";
-			int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-			if(diff > 0){
-				break;
-			}else if(diff < 0){
-				return false;
+
+		if (getVersion() != null) {
+			String[] version = getVersion().split("\\.");
+			String[] targetversion = Pipe.verifytapnMinRev.split("\\.");
+
+			for (int i = 0; i < targetversion.length; i++) {
+				if (version.length < i + 1) version[i] = "0";
+				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+				if (diff > 0) {
+					break;
+				} else if (diff < 0) {
+					return false;
+				}
 			}
+
+			return true;
+		} else {
+			return false;
 		}
-		
-		return true;
 	}
 
 	private void resetVerifytapn() {
@@ -206,7 +210,7 @@ public class VerifyTAPN implements ModelChecker {
 	
 	public static boolean trySetup() {
 
-		try {
+
 			String verifytapn = null;
 
 			//If env is set, it overwrites the value
@@ -228,7 +232,13 @@ public class VerifyTAPN implements ModelChecker {
 			verifytapn = Preferences.getInstance().getVerifytapnLocation();
 			if (verifytapn != null && !verifytapn.isEmpty()) {
 				verifytapnpath = verifytapn;
-				return true;
+				VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
+				if(v.isCorrectVersion()){
+					return true;
+				}else{
+					verifytapn = null;
+					verifytapnpath = null;
+				}
 			}
 
 			//Search the installdir for verifytapn
@@ -253,9 +263,7 @@ public class VerifyTAPN implements ModelChecker {
 			}
 
 			return false;
-		} catch (Exception e) {
-			return false;
-		}
+
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
