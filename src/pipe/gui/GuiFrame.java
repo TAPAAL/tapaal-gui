@@ -1583,7 +1583,7 @@ public class GuiFrame extends JFrame  {
 			} else {
 				path = appTab.getTitleAt(index);
 			}
-			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile();
+			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
