@@ -208,6 +208,7 @@ public class UndoManager {
 		if (arcBeingDrawn != null) {
 			if (arcBeingDrawn.getParent() != null) {
 				arcBeingDrawn.getParent().remove(arcBeingDrawn);
+				arcBeingDrawn.getSource().removeFromArc(arcBeingDrawn);
 			}
 			view.createArc = null;
 		}
