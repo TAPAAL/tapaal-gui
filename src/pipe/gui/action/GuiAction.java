@@ -101,7 +101,7 @@ public abstract class GuiAction extends AbstractAction {
 		Boolean b = (Boolean) getValue(SELECTED_KEY);
 
 		if (b != null) {
-			return b.booleanValue();
+			return b;
 		}
 		return false;
 	}

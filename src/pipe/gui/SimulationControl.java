@@ -57,11 +57,9 @@ public class SimulationControl extends JPanel {
 		simulationSpeed.setPaintTrack(false);
 		simulationSpeed.setPreferredSize(new Dimension(340, simulationSpeed.getPreferredSize().height));
 		
-		simulationSpeed.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if(timer != null){
-					setDelay((100 - simulationSpeed.getValue())*20);
-				}
+		simulationSpeed.addChangeListener(e -> {
+			if(timer != null){
+				setDelay((100 - simulationSpeed.getValue())*20);
 			}
 		});
 		
@@ -106,12 +104,7 @@ public class SimulationControl extends JPanel {
 	}
 	
 	private void initTimer(){
-		timer = new Timer(simulationSpeed.getValue()*20, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
-			}
-		});
+		timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
 		timer.setRepeats(true);
 	}
 
@@ -143,12 +136,7 @@ public class SimulationControl extends JPanel {
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		JButton stopSimulationButton = new JButton("Stop");
-		stopSimulationButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}
-		});
+		stopSimulationButton.addActionListener(arg0 -> dialog.setVisible(false));
 		
 		getInstance().showCheckbox(false);
 		GridBagConstraints gbc = new GridBagConstraints();

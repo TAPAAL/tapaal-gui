@@ -106,7 +106,7 @@ public class VersionChecker {
 			
 			in.readLine();
 			
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			String s;
 			
 		    while ((s = in.readLine()) != null) {

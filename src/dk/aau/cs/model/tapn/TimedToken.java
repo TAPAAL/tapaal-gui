@@ -44,7 +44,7 @@ public class TimedToken {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-		StringBuffer buffer = new StringBuffer("(");
+		StringBuilder buffer = new StringBuilder("(");
 		buffer.append(place.toString());
 		buffer.append(", ");
 		buffer.append(df.format(age));

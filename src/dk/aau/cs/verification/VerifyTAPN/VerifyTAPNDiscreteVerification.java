@@ -64,7 +64,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		public String getStatsExplanation(){
-			StringBuffer buffer = new StringBuffer("<html>");
+			StringBuilder buffer = new StringBuilder("<html>");
 			buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
 			buffer.append("time a successor is calculated, this number is incremented)<br/>");
 			buffer.append("<br/>");
@@ -96,10 +96,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 						result = readVersionNumberFrom(stream);
 					}
 					child.waitFor();
-				} catch (IOException e) {
-				} catch (InterruptedException e) {
+				} catch (IOException | InterruptedException e) {
 				}
-			}
+            }
 
 			return result;
 		}
@@ -367,7 +366,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-			StringBuffer buffer = new StringBuffer(options.toString());
+			StringBuilder buffer = new StringBuilder(options.toString());
 			buffer.append(' ');
 			buffer.append(modelFile);
                         VerifyDTAPNOptions opts = (VerifyDTAPNOptions)options;
@@ -386,7 +385,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			} catch (IOException e1) {
 				return "";
 			}
-			StringBuffer buffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
 			String line = null;
 			try {
 				while ((line = reader.readLine()) != null) {

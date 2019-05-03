@@ -175,11 +175,7 @@ public class RunningVerificationDialog extends JDialog {
 	}
 
 	public void setupListeners(final SwingWorker<?, ?> worker) {
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				worker.cancel(true);
-			}
-		});
+		okButton.addActionListener(evt -> worker.cancel(true));
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -188,19 +184,16 @@ public class RunningVerificationDialog extends JDialog {
 			}
 		});
 		
-		worker.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getPropertyName().equals("state")) {
-					StateValue stateValue = (StateValue) event.getNewValue();
-					if (stateValue.equals(StateValue.DONE)) {								
-						setVisible(false);
-						timer.stop();
-						stopMemoryTimer();
-						dispose();						
-					}
+		worker.addPropertyChangeListener(event -> {
+			if (event.getPropertyName().equals("state")) {
+				StateValue stateValue = (StateValue) event.getNewValue();
+				if (stateValue.equals(StateValue.DONE)) {
+					setVisible(false);
+					timer.stop();
+					stopMemoryTimer();
+					dispose();
 				}
 			}
-
 		});
 	}
 }

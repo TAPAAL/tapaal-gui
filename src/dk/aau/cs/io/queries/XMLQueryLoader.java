@@ -72,15 +72,7 @@ public class XMLQueryLoader extends QueryLoader{
             
         try{
             doc = db.parse(file);
-        } catch (SAXException e){
-            Logger.log(e);
-            createDialogBox(e.getMessage(), "Parse Exception");
-            return queries;
-        } catch (IOException e){
-            Logger.log(e);
-            createDialogBox(e.getMessage(), "Parse Exception");
-            return queries;
-        } catch (IllegalArgumentException e){
+        } catch (SAXException | IllegalArgumentException | IOException e){
             Logger.log(e);
             createDialogBox(e.getMessage(), "Parse Exception");
             return queries;

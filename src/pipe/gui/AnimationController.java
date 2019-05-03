@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -31,16 +30,13 @@ import javax.swing.text.AbstractDocument;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.widgets.DecimalOnlyDocumentFilter;
+import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
-import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import javax.swing.JButton;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * Implementes af class handling drawing of animation functions
@@ -63,7 +59,7 @@ public class AnimationController extends JPanel {
 	private GuiAction stepforwardAction, stepbackwardAction;
 
 	JTextField TimeDelayField = new JTextField();
-	JComboBox firermodebox = null;
+	JComboBox<String> firermodebox = null;
 	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
 	public AnimationController(NetType netType) {
@@ -80,15 +76,10 @@ public class AnimationController extends JPanel {
 		// Use the default FlowLayout.
 		// Create everything.
 
-		firermodebox = new NonsearchableJComboBox(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(FIRINGMODES);
 		updateFiringModeComboBox();
 
-		firermodebox.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				CreateGui.getAnimator().setFiringmode(
-						(String) firermodebox.getSelectedItem());
-			}
-		});
+		firermodebox.addActionListener(evt -> CreateGui.getAnimator().setFiringmode((String) firermodebox.getSelectedItem()));
 
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
@@ -135,11 +126,9 @@ public class AnimationController extends JPanel {
 		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
-		decrese.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDelayModeScale(delayScale / 2);
-				delaySlider.setValue(delaySlider.getValue() * 2);
-			}
+		decrese.addActionListener(e -> {
+			setDelayModeScale(delayScale / 2);
+			delaySlider.setValue(delaySlider.getValue() * 2);
 		});
 		sliderPanel.add(decrese);
 
@@ -149,13 +138,10 @@ public class AnimationController extends JPanel {
 		delaySlider.setMinorTickSpacing(0);
 		delaySlider.setPaintLabels(true);
 		delaySlider.setPaintTicks(true);
-		delaySlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-				CreateGui.getAnimator().reportBlockingPlaces();
+		delaySlider.addChangeListener(e -> {
+			TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
+			CreateGui.getAnimator().reportBlockingPlaces();
 
-			}
 		});
 
 		delaySlider.addKeyListener(new KeyListener() {
@@ -179,11 +165,9 @@ public class AnimationController extends JPanel {
 		sliderPanel.add(delaySlider);
 		JButton increse = new JButton("+");
 		increse.setPreferredSize(new Dimension(20, 30));
-		increse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDelayModeScale(delayScale * 2);
-				delaySlider.setValue(delaySlider.getValue() / 2);
-			}
+		increse.addActionListener(e -> {
+			setDelayModeScale(delayScale * 2);
+			delaySlider.setValue(delaySlider.getValue() / 2);
 		});
 		sliderPanel.add(increse);
 
@@ -212,11 +196,7 @@ public class AnimationController extends JPanel {
 
 		okButton.setText("Time delay");
 		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				addTimeDelayToHistory();
-			}
-		});
+		okButton.addActionListener(evt -> addTimeDelayToHistory());
 
 		//"Hack" to make sure the toolTip for this button is showed as long as possible
 		okButton.addMouseListener(new MouseAdapter() {

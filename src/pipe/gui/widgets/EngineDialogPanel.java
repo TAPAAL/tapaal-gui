@@ -5,8 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
@@ -20,6 +18,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
+import net.tapaal.swinghelpers.RequestFocusListener;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -324,16 +323,8 @@ public class EngineDialogPanel {
 		JButton tapaalResetButton = new JButton("Reset");
 		tapaalResetButton.setToolTipText(toolTipReset);
 		tapaalResetButton.setMnemonic(KeyEvent.VK_T);
-		tapaalSelectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectTapnEngine();
-			}
-		});
-		tapaalResetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				resetVerifytapnEngine();
-			}
-		});
+		tapaalSelectButton.addActionListener(e -> selectTapnEngine());
+		tapaalResetButton.addActionListener(e -> resetVerifytapnEngine());
 		JPanel tapaalButtonPanel = new JPanel();
 		tapaalButtonPanel.setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
@@ -409,16 +400,8 @@ public class EngineDialogPanel {
 		JButton ResetButton = new JButton("Reset");
 		ResetButton.setToolTipText(toolTipReset);
 		ResetButton.setMnemonic(KeyEvent.VK_T);
-		SelectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectdTapnEngine();
-			}
-		});
-		ResetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				resetVerifydtapnEngine();
-			}
-		});
+		SelectButton.addActionListener(e -> selectdTapnEngine());
+		ResetButton.addActionListener(e -> resetVerifydtapnEngine());
 		JPanel ButtonPanel = new JPanel();
 		ButtonPanel.setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
@@ -494,16 +477,8 @@ public class EngineDialogPanel {
 		JButton ResetButton = new JButton("Reset");
 		ResetButton.setToolTipText(toolTipReset);
 		ResetButton.setMnemonic(KeyEvent.VK_T);
-		SelectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectVerifypnEngine();
-			}
-		});
-		ResetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				resetVerifypnEngine();
-			}
-		});
+		SelectButton.addActionListener(e -> selectVerifypnEngine());
+		ResetButton.addActionListener(e -> resetVerifypnEngine());
 		JPanel ButtonPanel = new JPanel();
 		ButtonPanel.setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
@@ -583,16 +558,8 @@ public class EngineDialogPanel {
 		JButton uppaalResetButton = new JButton("Reset");
 		uppaalResetButton.setMnemonic(KeyEvent.VK_R);
 		uppaalResetButton.setToolTipText(toolTipReset);
-		uppaalSelectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectVerifytaEngine();
-			}
-		});
-		uppaalResetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				resetVerifytaEngine();
-			}
-		});
+		uppaalSelectButton.addActionListener(e -> selectVerifytaEngine());
+		uppaalResetButton.addActionListener(arg0 -> resetVerifytaEngine());
 		JPanel uppaalButtonPanel = new JPanel();
 		uppaalButtonPanel.setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
@@ -664,11 +631,7 @@ public class EngineDialogPanel {
 		closeButton = new JButton("Close");
 		closeButton.setMnemonic(KeyEvent.VK_C);
 		closeButton.addAncestorListener(new RequestFocusListener());
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		closeButton.addActionListener(e -> exit());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;		

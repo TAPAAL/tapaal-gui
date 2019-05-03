@@ -95,11 +95,7 @@ public class TapnXmlLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}
@@ -108,11 +104,7 @@ public class TapnXmlLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}
@@ -323,23 +315,23 @@ public class TapnXmlLoader {
 		String text = annotation.getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
+			positionXInput = Integer.valueOf(positionXTempStorage) + 1;
 		}
 
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage).intValue() + 1;
+			positionYInput = Integer.valueOf(positionYTempStorage) + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp).intValue() + 1;
+			widthInput = Integer.valueOf(widthTemp) + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp).intValue() + 1;
+			heightInput = Integer.valueOf(heightTemp) + 1;
 		}
 
 		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp).booleanValue();
+			borderInput = Boolean.valueOf(borderTemp);
 		} else {
 			borderInput = true;
 		}

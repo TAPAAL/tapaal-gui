@@ -75,7 +75,7 @@ public class VerificationResult<TTrace> {
 			Integer transitionFired = element.value2();
 			returnList.add(new Tuple<String, Integer>(transitionName, transitionFired));
 		}
-		Collections.sort(returnList,new transitionTupleComparator());
+		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
         
@@ -90,7 +90,7 @@ public class VerificationResult<TTrace> {
 			Integer placeBound = element.value2();
 			returnList.add(new Tuple<String, Integer>(placeName, placeBound));
 		}
-		Collections.sort(returnList,new transitionTupleComparator());
+		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
 	
@@ -195,7 +195,7 @@ public class VerificationResult<TTrace> {
 	}
 
 	public String getCTLStatsAsString(){
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("Explored configurations: ");
 		buffer.append(stats.getConfigurations());
 		buffer.append(System.getProperty("line.separator"));

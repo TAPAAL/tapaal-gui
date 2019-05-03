@@ -255,7 +255,7 @@ public class ConstantStore {
 	
 	public Constant[] sortConstants() {
 		Constant[] oldOrder = constants.toArray(new Constant[0]);
-		Collections.sort(constants, new StringComparator());
+		constants.sort(new StringComparator());
 		return oldOrder;
 	}
 	

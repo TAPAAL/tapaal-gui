@@ -6,8 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
@@ -17,6 +15,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
+import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
@@ -77,14 +76,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		
 		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
-		sharedTransitionsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
-					((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
-				}else{
-					urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
-				}
+		sharedTransitionsComboBox.addActionListener(e -> {
+			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
+				((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+			}else{
+				urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
 			}
 		});
 
@@ -101,11 +97,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 					makeSharedButton.setEnabled(false);
 				}else{
 					switchToNameTextField();
-                                        nameTextField.setText(transition.underlyingTransition().isShared()? 
+                                        nameTextField.setText(transition.underlyingTransition().isShared()?
                                                 CreateGui.getDrawingSurface().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
 					makeSharedButton.setEnabled(true);
 				}
-			}		
+			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
@@ -169,13 +165,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
 		
-		urgentCheckBox.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!isUrgencyOK()){
-					urgentCheckBox.setSelected(false);
-				}
+		urgentCheckBox.addActionListener(e -> {
+			if(!isUrgencyOK()){
+				urgentCheckBox.setSelected(false);
 			}
 		});
 	
@@ -204,11 +196,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				if(okButtonHandler(evt)){
-					exit();
-				}
+		okButton.addActionListener(evt -> {
+			if(okButtonHandler(evt)){
+				exit();
 			}
 		});
 
@@ -216,11 +206,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		cancelButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cancelButtonHandler(evt);
-			}
-		});
+		cancelButton.addActionListener(this::cancelButtonHandler);
 		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -273,11 +259,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			sharedTransitions.add(transition.underlyingTransition().sharedTransition());
 		}
 		
-		Collections.sort(sharedTransitions, new Comparator<SharedTransition>() {
-			public int compare(SharedTransition o1, SharedTransition o2) {
-				return o1.name().compareToIgnoreCase(o2.name());
-			}
-		});
+		sharedTransitions.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 		
 		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
 				"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
@@ -365,12 +347,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		textField.setCaretPosition(0);
 	}
 
-	CaretListener caretListener = new javax.swing.event.CaretListener() {
-		public void caretUpdate(javax.swing.event.CaretEvent evt) {
-			JTextField textField = (JTextField) evt.getSource();
-			textField.setBackground(new Color(255, 255, 255));
-			// textField.removeChangeListener(this);
-		}
+	CaretListener caretListener = evt -> {
+		JTextField textField = (JTextField) evt.getSource();
+		textField.setBackground(new Color(255, 255, 255));
+		// textField.removeChangeListener(this);
 	};
 	
 	private boolean isUrgencyOK(){
@@ -515,11 +495,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JTextField nameTextField;
 	private javax.swing.JButton okButton;
 	private javax.swing.JButton makeSharedButton;
-	private javax.swing.JComboBox rotationComboBox;
+	private javax.swing.JComboBox<String> rotationComboBox;
 	private javax.swing.JLabel rotationLabel;
 	private javax.swing.JPanel transitionEditorPanel;
 	private javax.swing.JCheckBox sharedCheckBox;
-	private javax.swing.JComboBox sharedTransitionsComboBox;
+	private javax.swing.JComboBox<SharedTransition> sharedTransitionsComboBox;
 	private javax.swing.JCheckBox urgentCheckBox;
 	private javax.swing.JCheckBox makeNewSharedCheckBox;
 	private Vector<SharedTransition> sharedTransitions;

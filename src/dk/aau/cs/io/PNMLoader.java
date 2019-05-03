@@ -87,11 +87,7 @@ public class PNMLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}
@@ -323,8 +319,8 @@ public class PNMLoader {
 						String arcTempX = position.getAttribute("x");
 						String arcTempY = position.getAttribute("y");
 
-						float arcPointX = Float.valueOf(arcTempX).floatValue();
-						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						float arcPointX = Float.valueOf(arcTempX);
+						float arcPointY = Float.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						
@@ -365,8 +361,8 @@ public class PNMLoader {
 		String x = offset.getAttribute("x");
 		String y = offset.getAttribute("y");
 		
-                int xd = Math.round(Float.valueOf(x).floatValue());
-                int yd = Math.round(Float.valueOf(y).floatValue());
+                int xd = Math.round(Float.valueOf(x));
+                int yd = Math.round(Float.valueOf(y));
                
 		return new Point(xd, yd);
 	}

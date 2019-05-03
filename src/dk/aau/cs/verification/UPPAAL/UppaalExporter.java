@@ -50,9 +50,7 @@ public class UppaalExporter {
 			Tuple<dk.aau.cs.model.NTA.NTA, dk.aau.cs.model.NTA.UPPAALQuery> translatedModel = translator.translate(model, query);
 			translatedModel.value1().outputToUPPAALXML(new PrintStream(modelFile));
 			translatedModel.value2().output(new PrintStream(queryFile));
-		} catch(UnsupportedModelException e) {
-			throw e;
-		} catch(UnsupportedQueryException e) {
+		} catch(UnsupportedModelException | UnsupportedQueryException e) {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();

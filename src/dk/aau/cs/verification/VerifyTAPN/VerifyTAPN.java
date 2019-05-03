@@ -63,7 +63,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	public String getStatsExplanation(){
-		StringBuffer buffer = new StringBuffer("<html>");
+		StringBuilder buffer = new StringBuilder("<html>");
 		buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
 		buffer.append("time a successor is calculated, this number is incremented)<br/>");
 		buffer.append("<br/>");
@@ -95,8 +95,7 @@ public class VerifyTAPN implements ModelChecker {
 					result = readVersionNumberFrom(stream);
 				}
 				child.waitFor();
-			} catch (IOException e) {
-			} catch (InterruptedException e) {
+			} catch (IOException | InterruptedException e) {
 			}
 		}
 
@@ -348,7 +347,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-		StringBuffer buffer = new StringBuffer(options.toString());
+		StringBuilder buffer = new StringBuilder(options.toString());
 		buffer.append(' ');
 		buffer.append(modelFile);
 		buffer.append(' ');
@@ -364,7 +363,7 @@ public class VerifyTAPN implements ModelChecker {
 		} catch (IOException e1) {
 			return "";
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		String line = null;
 		try {
 			while ((line = reader.readLine()) != null) {

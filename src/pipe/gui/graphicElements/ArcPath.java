@@ -32,7 +32,6 @@ public class ArcPath implements Shape {
 	private GeneralPath path = new GeneralPath();
 	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
 	private Arc myArc;
-	protected ArcPathPoint currentPoint;
 	private boolean pointLock = false;
 	private static Stroke proximityStroke = new BasicStroke(
 			Pipe.ARC_PATH_PROXIMITY_WIDTH);
@@ -58,6 +57,7 @@ public class ArcPath implements Shape {
 	}
 
 	public void createPath() {
+		ArcPathPoint currentPoint;
 		setControlPoints();
 
 		path = new GeneralPath();
@@ -400,18 +400,17 @@ public class ArcPath implements Shape {
 
 	public void showPoints() {
 		if (!pointLock) {
-			for (int i = 0; i < pathPoints.size(); i++) {
-				(pathPoints.get(i)).setVisible(true);
+			for (ArcPathPoint pathPoint : pathPoints) {
+				pathPoint.setVisible(true);
 			}
 		}
 	}
 
 	public void hidePoints() {
 		if (!pointLock) {
-			for (int i = 0; i < pathPoints.size(); i++) {
-				currentPoint = (pathPoints.get(i));
-				if (!currentPoint.isSelected()) {
-					currentPoint.setVisible(false);
+			for (ArcPathPoint pathPoint : pathPoints) {
+				if (!pathPoint.isSelected()) {
+					pathPoint.setVisible(false);
 				}
 			}
 		}
@@ -419,8 +418,8 @@ public class ArcPath implements Shape {
 
 	//
 	public void forceHidePoints() {
-		for (int i = 0; i < pathPoints.size(); i++) {
-			(pathPoints.get(i)).hidePoint();
+		for (ArcPathPoint pathPoint : pathPoints) {
+			pathPoint.hidePoint();
 		}
 	}
 
@@ -596,14 +595,12 @@ public class ArcPath implements Shape {
 	}
 
 	public void addPointsToGui(DrawingSurfaceImpl editWindow) {
-		ArcPathPoint pathPoint;
 		ArcPathPointHandler pointHandler;
 
 		(pathPoints.get(0)).setDraggable(false);
 		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
 
-		for (int i = 0; i < pathPoints.size(); i++) {
-			pathPoint = pathPoints.get(i);
+		for (ArcPathPoint pathPoint : pathPoints) {
 			pathPoint.setVisible(false);
 
 			// Check whether the point has already been added to the gui

@@ -39,11 +39,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		JPopupMenu popup = super.getPopup(e);
 
 		JMenuItem menuItem = new JMenuItem("Edit Place");
-		menuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				((Place) myObject).showEditor();
-			}
-		});
+		menuItem.addActionListener(e1 -> ((Place) myObject).showEditor());
 		popup.insert(menuItem, index++);
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Place) myObject));

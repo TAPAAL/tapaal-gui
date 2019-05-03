@@ -45,7 +45,7 @@ public class VerifytaOptions implements VerificationOptions {
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 
 		if (untimedTrace) {
 			result.append("-Y ");

@@ -69,10 +69,8 @@ public class UndoManager {
 			checkMode();
 
 			// The currentEdit to redo
-			Iterator<Command> currentEdit = edits.get(indexOfNextAdd)
-			.iterator();
-			while (currentEdit.hasNext()) {
-				currentEdit.next().redo();
+			for (Command command : edits.get(indexOfNextAdd)) {
+				command.redo();
 			}
 			indexOfNextAdd = (indexOfNextAdd + 1) % UNDO_BUFFER_CAPACITY;
 			sizeOfBuffer++;
@@ -185,10 +183,8 @@ public class UndoManager {
 	public void translateSelection(ArrayList<PetriNetObject> objects,
 			int transX, int transY) {
 		newEdit(); // new "transaction""
-		Iterator<PetriNetObject> iterator = objects.iterator();
-		while (iterator.hasNext()) {
-			addEdit(new TranslatePetriNetObjectEdit(iterator.next(), transX,
-					transY));
+		for (PetriNetObject pnobject : objects) {
+			addEdit(new TranslatePetriNetObjectEdit(pnobject, transX, transY));
 		}
 	}
 

@@ -37,7 +37,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.widgets.JSplitPaneFix;
+import net.tapaal.swinghelpers.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
@@ -76,11 +76,11 @@ public class TabContent extends JSplitPane {
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryComponent animBox;
+	private AnimationHistoryComponent<String> animBox;
 	private AnimationController animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent abstractAnimationPane = null;
+	private AnimationHistoryComponent<String> abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
 
@@ -431,7 +431,7 @@ public class TabContent extends JSplitPane {
 		drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent getUntimedAnimationHistory() {
+	public AnimationHistoryComponent<String> getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -494,7 +494,7 @@ public class TabContent extends JSplitPane {
 		animControlerBox.requestFocus(true);
 	}
 
-	public AnimationHistoryComponent getAnimationHistory() {
+	public AnimationHistoryComponent<String> getAnimationHistory() {
 		return animBox;
 	}
 

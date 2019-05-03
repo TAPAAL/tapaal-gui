@@ -33,11 +33,7 @@ public class TransportArcHandler extends TimedArcHandler {
 			// Only show properties if its the first arc
 			if (tarc.getSource() instanceof Place) {
 				menuItem = new JMenuItem("Properties");
-				menuItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						tarc.showTimeIntervalEditor();
-					}
-				});
+				menuItem.addActionListener(e1 -> tarc.showTimeIntervalEditor());
 				popup.insert(menuItem, popupIndex++);
 			}
 			

@@ -174,11 +174,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		Component[] components = getComponents();
 		Dimension d = new Dimension(0, 0);
-		for (int i = 0; i < components.length; i++) {
-			if (components[i].getClass() == SelectionManager.class) {
+		for (Component component : components) {
+			if (component.getClass() == SelectionManager.class) {
 				continue; // SelectionObject not included
 			}
-			Rectangle r = components[i].getBounds();
+			Rectangle r = component.getBounds();
 			int x = r.x + r.width + DRAWING_SURFACE_GROW;
 			int y = r.y + r.height + DRAWING_SURFACE_GROW;
 			if (x > d.width) {
@@ -201,12 +201,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		Rectangle rect = new Rectangle(0, 0, -1, -1);
 
 		Component[] components = getComponents();
-		for (int i = 0; i < components.length; i++) {
-			if (components[i].getClass() == SelectionManager.class) {
+		for (Component component : components) {
+			if (component.getClass() == SelectionManager.class) {
 				continue; // SelectionObject not included
 			}
 
-			rect.add(components[i].getBounds());
+			rect.add(component.getBounds());
 		}
 
 		return rect;
@@ -356,9 +356,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		Component[] children = getComponents();
 
 		//Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
-		for (int i = 0; i < children.length; i++) {
-			if (children[i] instanceof Zoomable) {
-				((Zoomable) children[i]).zoomUpdate(zoomPercent);
+		for (Component child : children) {
+			if (child instanceof Zoomable) {
+				((Zoomable) child).zoomUpdate(zoomPercent);
 			}
 		}
 		

@@ -195,18 +195,16 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
-		moveUpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = list.getSelectedIndex();
-				
-				if(index > 0) {
-					if(isDisplayingTransitions())
-						sharedTransitionsListModel.swap(index, index-1);
-					else
-						sharedPlacesListModel.swap(index, index-1);
-					list.setSelectedIndex(index-1);
-					list.ensureIndexIsVisible(index-1);
-				}
+		moveUpButton.addActionListener(e -> {
+			int index = list.getSelectedIndex();
+
+			if(index > 0) {
+				if(isDisplayingTransitions())
+					sharedTransitionsListModel.swap(index, index-1);
+				else
+					sharedPlacesListModel.swap(index, index-1);
+				list.setSelectedIndex(index-1);
+				list.ensureIndexIsVisible(index-1);
 			}
 		});
 		
@@ -219,23 +217,21 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
-		moveDownButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = list.getSelectedIndex();
-				
-				if(isDisplayingTransitions()) {
-					if(index < sharedTransitionsListModel.getSize() - 1) {
-						sharedTransitionsListModel.swap(index, index+1);
-						list.setSelectedIndex(index+1);
-						list.ensureIndexIsVisible(index+1);
-						
-					}
-				} else {
-					if(index < sharedPlacesListModel.getSize() - 1) {
-						sharedPlacesListModel.swap(index, index+1);
-						list.setSelectedIndex(index+1);
-						list.ensureIndexIsVisible(index+1);
-					}
+		moveDownButton.addActionListener(e -> {
+			int index = list.getSelectedIndex();
+
+			if(isDisplayingTransitions()) {
+				if(index < sharedTransitionsListModel.getSize() - 1) {
+					sharedTransitionsListModel.swap(index, index+1);
+					list.setSelectedIndex(index+1);
+					list.ensureIndexIsVisible(index+1);
+
+				}
+			} else {
+				if(index < sharedPlacesListModel.getSize() - 1) {
+					sharedPlacesListModel.swap(index, index+1);
+					list.setSelectedIndex(index+1);
+					list.ensureIndexIsVisible(index+1);
 				}
 			}
 		});
@@ -250,17 +246,15 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortPlaces);
 		sortButton.setEnabled(false);
-		sortButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(isDisplayingTransitions()){
-					Command c = new SortSharedTransitionsCommand(sharedTransitionsListModel);
-					undoManager.addNewEdit(c);
-					c.redo();
-				} else {
-					Command c = new SortSharedPlacesCommand(sharedPlacesListModel);
-					undoManager.addNewEdit(c);
-					c.redo();
-				}
+		sortButton.addActionListener(e -> {
+			if(isDisplayingTransitions()){
+				Command c = new SortSharedTransitionsCommand(sharedTransitionsListModel);
+				undoManager.addNewEdit(c);
+				c.redo();
+			} else {
+				Command c = new SortSharedPlacesCommand(sharedPlacesListModel);
+				undoManager.addNewEdit(c);
+				c.redo();
 			}
 		});
 		sortButton.addMouseListener(new MouseAdapter() {
@@ -283,35 +277,33 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
 		placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
-		placesTransitionsComboBox.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox)e.getSource();
-				String selectedItem = (String)source.getSelectedItem();
-				if(selectedItem.equals(PLACES)){
-					list.setModel(sharedPlacesListModel);
-					renameButton.setToolTipText(toolTipRenamePlace);
-					addButton.setToolTipText(toolTipNewPlace);
-					removeButton.setToolTipText(toolTipRemovePlace);
-				}else if(selectedItem.equals(TRANSITIONS)){
-					list.setModel(sharedTransitionsListModel);
-					renameButton.setToolTipText(toolTipRenameTransition);
-					addButton.setToolTipText(toolTipNewTransition);
-					removeButton.setToolTipText(toolTipRemoveTransition);
-				}
-				
-				if(list.getModel().getSize() > 0) {
-					list.setSelectedIndex(0);
-					list.ensureIndexIsVisible(0);
-				} else {
-					moveDownButton.setEnabled(false);
-					moveUpButton.setEnabled(false);
-					sortButton.setEnabled(false);
-				}
-				if (list.getModel().getSize() <= 0){
-					renameButton.setEnabled(false);
-					removeButton.setEnabled(false);
-				}
-			}		
+		placesTransitionsComboBox.addActionListener(e -> {
+			JComboBox source = (JComboBox)e.getSource();
+			String selectedItem = (String)source.getSelectedItem();
+			if(selectedItem.equals(PLACES)){
+				list.setModel(sharedPlacesListModel);
+				renameButton.setToolTipText(toolTipRenamePlace);
+				addButton.setToolTipText(toolTipNewPlace);
+				removeButton.setToolTipText(toolTipRemovePlace);
+			}else if(selectedItem.equals(TRANSITIONS)){
+				list.setModel(sharedTransitionsListModel);
+				renameButton.setToolTipText(toolTipRenameTransition);
+				addButton.setToolTipText(toolTipNewTransition);
+				removeButton.setToolTipText(toolTipRemoveTransition);
+			}
+
+			if(list.getModel().getSize() > 0) {
+				list.setSelectedIndex(0);
+				list.ensureIndexIsVisible(0);
+			} else {
+				moveDownButton.setEnabled(false);
+				moveUpButton.setEnabled(false);
+				sortButton.setEnabled(false);
+			}
+			if (list.getModel().getSize() <= 0){
+				renameButton.setEnabled(false);
+				removeButton.setEnabled(false);
+			}
 		});
 		placesTransitionsComboBox.setSelectedIndex(0); // Sets up the proper list model
 		
@@ -340,14 +332,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		else {
 			renameButton.setToolTipText(toolTipRenamePlace);
 		}
-		renameButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				if(isDisplayingTransitions()){
-					showSharedTransitionNameDialog((SharedTransition)list.getSelectedValue());
-				}else{
-					showSharedPlaceNameDialog((SharedPlace)list.getSelectedValue());
-				}
-			}		
+		renameButton.addActionListener(arg0 -> {
+			if(isDisplayingTransitions()){
+				showSharedTransitionNameDialog((SharedTransition)list.getSelectedValue());
+			}else{
+				showSharedPlaceNameDialog((SharedPlace)list.getSelectedValue());
+			}
 		});
 		removeButton.setEnabled(false);
 		if (isDisplayingTransitions()){
@@ -364,14 +354,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		else {
 			addButton.setToolTipText(toolTipNewPlace);
 		}
-		addButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				if(isDisplayingTransitions()){
-					showSharedTransitionNameDialog(null);
-				}else{
-					showSharedPlaceNameDialog(null);
-				}
-			}		
+		addButton.addActionListener(arg0 -> {
+			if(isDisplayingTransitions()){
+				showSharedTransitionNameDialog(null);
+			}else{
+				showSharedPlaceNameDialog(null);
+			}
 		});
 
 		buttonPanel.add(renameButton);

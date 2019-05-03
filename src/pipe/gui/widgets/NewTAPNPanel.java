@@ -66,19 +66,11 @@ public class NewTAPNPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				createNewTAPNBasedOnSelection(nameTextBox.getText(), NetType.TAPN);
-			}
-		});
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), NetType.TAPN));
 
 		rootPane.setDefaultButton(okButton);
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;

@@ -639,10 +639,9 @@ public class DataLayer {
 
 		if (transitionsArray != null) {
 			if (transitionID != null) {
-				for (int i = 0; i < transitionsArray.size(); i++) {
-					if (transitionID.equalsIgnoreCase((transitionsArray.get(i))
-							.getId())) {
-						returnTransition = transitionsArray.get(i);
+				for (Transition transition : transitionsArray) {
+					if (transitionID.equalsIgnoreCase(transition.getId())) {
+						returnTransition = transition;
 					}
 				}
 			}
@@ -663,10 +662,9 @@ public class DataLayer {
 
 		if (transitionsArray != null) {
 			if (transitionName != null) {
-				for (int i = 0; i < transitionsArray.size(); i++) {
-					if (transitionName.equalsIgnoreCase((transitionsArray
-							.get(i)).getName())) {
-						returnTransition = transitionsArray.get(i);
+				for (Transition transition : transitionsArray) {
+					if (transitionName.equalsIgnoreCase(transition.getName())) {
+						returnTransition = transition;
 					}
 				}
 			}
@@ -686,9 +684,9 @@ public class DataLayer {
 
 		if (placesArray != null) {
 			if (placeID != null) {
-				for (int i = 0; i < placesArray.size(); i++) {
-					if (placeID.equalsIgnoreCase((placesArray.get(i)).getId())) {
-						returnPlace = placesArray.get(i);
+				for (Place place : placesArray) {
+					if (placeID.equalsIgnoreCase(place.getId())) {
+						returnPlace = place;
 					}
 				}
 			}
@@ -708,10 +706,9 @@ public class DataLayer {
 
 		if (placesArray != null) {
 			if (placeName != null) {
-				for (int i = 0; i < placesArray.size(); i++) {
-					if (placeName.equalsIgnoreCase((placesArray.get(i))
-							.getName())) {
-						returnPlace = placesArray.get(i);
+				for (Place place : placesArray) {
+					if (placeName.equalsIgnoreCase(place.getName())) {
+						returnPlace = place;
 					}
 				}
 			}

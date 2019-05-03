@@ -94,7 +94,7 @@ public class TimeInvariant {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(isUpperIncluded ? "<=" : "<");
 		buffer.append(' ');
 		buffer.append(upper);
@@ -102,7 +102,7 @@ public class TimeInvariant {
 	}
 	
 	public String toString(boolean displayConstantNames) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(isUpperIncluded ? "<=" : "<");
 		buffer.append(' ');
 		buffer.append((displayConstantNames || upper instanceof InfBound) ? upper	: upper.value());

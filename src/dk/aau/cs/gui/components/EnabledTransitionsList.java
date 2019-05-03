@@ -39,14 +39,14 @@ public class EnabledTransitionsList extends JPanel{
 		initPanel();
 	}
 
-	DefaultListModel transitions;
-	JList transitionsList;
+	DefaultListModel<TransitionListItem> transitions;
+	JList<TransitionListItem> transitionsList;
 	JScrollPane scrollPane;
 	TransitionListItem lastSelected;
 
 	public void initPanel(){
-		transitions = new DefaultListModel();
-		transitionsList = new JList(transitions);
+		transitions = new DefaultListModel<>();
+		transitionsList = new JList<>(transitions);
 		transitionsList.setCellRenderer(new EnabledTransitionListCellRenderer());
 
 		transitionsList.addMouseListener(new MouseAdapter() {
@@ -58,7 +58,7 @@ public class EnabledTransitionsList extends JPanel{
 				}
 				
 				if(e.getClickCount() == 1){
-					TransitionListItem highlightedItem = (TransitionListItem)transitionsList.getSelectedValue();
+					TransitionListItem highlightedItem = transitionsList.getSelectedValue();
 					if(highlightedItem != null){
 						highlightedItem.getTransition().blink();
 					}
@@ -72,7 +72,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 	
 	public void startReInit(){
-		lastSelected = (TransitionListItem)transitionsList.getSelectedValue();
+		lastSelected = transitionsList.getSelectedValue();
 		transitions.clear();
 	}
 
@@ -88,7 +88,7 @@ public class EnabledTransitionsList extends JPanel{
 		Arrays.sort(temp);
 		transitions.clear();
 		for(Object item : temp){
-			transitions.addElement(item);
+			transitions.addElement((TransitionListItem)item);
 		}
 
 		if(transitions.contains(lastSelected)){

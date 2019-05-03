@@ -36,7 +36,7 @@ public class ArcTokenSelector extends JPanel{
 		for(TimedToken token : elligibleTokens){
 			JCheckBox checkBox = new JCheckBox(token.toString());
 			checkBox.addItemListener(new ItemListener() {
-				
+
 				public void itemStateChanged(ItemEvent arg0) {
 					if(((JCheckBox)arg0.getSource()).isSelected()){
 						missingToSelect--;

@@ -6,15 +6,16 @@ import javax.swing.JList;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.dataLayer.Template;
 
 public class SortTemplatesCommand extends Command{
 	TimedArcPetriNet[] oldOrder;
 	TabContent tabContent; 
 	TemplateExplorer templateExplorer;
-	JList templateList;
-	DefaultListModel listModel;
+	JList<Template> templateList;
+	DefaultListModel<Template> listModel;
 	
-	public SortTemplatesCommand(TabContent tabContent, TemplateExplorer templateExplorer, JList templateList, DefaultListModel listModel) {
+	public SortTemplatesCommand(TabContent tabContent, TemplateExplorer templateExplorer, JList<Template> templateList, DefaultListModel<Template> listModel) {
 		this.templateList = templateList;
 		this.tabContent = tabContent;
 		this.templateExplorer = templateExplorer;
@@ -23,7 +24,7 @@ public class SortTemplatesCommand extends Command{
 	
 	@Override
 	public void undo() {
-		Object selectedValue = templateList.getSelectedValue();
+		Template selectedValue = templateList.getSelectedValue();
 		tabContent.undoSort(oldOrder);
 		templateExplorer.updateTemplateList();
 		templateList.setSelectedValue(selectedValue, true);
@@ -31,7 +32,7 @@ public class SortTemplatesCommand extends Command{
 
 	@Override
 	public void redo() {
-		Object selectedValue = templateList.getSelectedValue();
+		Template selectedValue = templateList.getSelectedValue();
 		oldOrder = tabContent.sortTemplates();
 		templateExplorer.updateTemplateList();
 		templateList.setSelectedValue(selectedValue, true);

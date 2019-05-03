@@ -8,12 +8,9 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,8 +26,8 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
+import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -70,8 +67,8 @@ public class GuardDialogue extends JPanel /*
 
 	private JCheckBox inf;
 
-	private JComboBox leftDelimiter;
-	private JComboBox rightDelimiter;
+	private JComboBox<String> leftDelimiter;
+	private JComboBox<String> rightDelimiter;
 
 	private JCheckBox leftUseConstant;
 	private WidthAdjustingComboBox leftConstantsComboBox;
@@ -159,7 +156,7 @@ public class GuardDialogue extends JPanel /*
 							.getSelectedItem().toString();
 					weight = new ConstantWeight(CreateGui.getCurrentTab().network().getConstant(constantName));
 				} else {
-					weight = new IntWeight(((Integer)weightNumber.getValue()).intValue());
+					weight = new IntWeight((Integer) weightNumber.getValue());
 				}
 				
 				return weight;
@@ -205,11 +202,7 @@ public class GuardDialogue extends JPanel /*
 				}
 			}
 		});
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(evt -> exit());
 
 	
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -249,13 +242,9 @@ public class GuardDialogue extends JPanel /*
 
 		weightNumber = new JSpinner();
 		weightNumber.setPreferredSize(intervalBoxDims);
-		weightNumber.addChangeListener(new ChangeListener() {
-			
-			
-			public void stateChanged(ChangeEvent e) {
-				if((Integer) weightNumber.getValue() < 1){
-					weightNumber.setValue(1);
-				}
+		weightNumber.addChangeListener(e -> {
+			if((Integer) weightNumber.getValue() < 1){
+				weightNumber.setValue(1);
 			}
 		});
 		
@@ -297,12 +286,10 @@ public class GuardDialogue extends JPanel /*
 		boolean enableConstantsCheckBoxes = !filteredConstants.isEmpty();
 		weightUseConstant = new JCheckBox("Use Constant");
 		weightUseConstant.setEnabled(enableConstantsCheckBoxes);
-		weightUseConstant.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				weightConstantsComboBox.setVisible(weightUseConstant.isSelected());
-				weightNumber.setVisible(!weightUseConstant.isSelected());
-				repackIfWindow();
-			}
+		weightUseConstant.addActionListener(e -> {
+			weightConstantsComboBox.setVisible(weightUseConstant.isSelected());
+			weightNumber.setVisible(!weightUseConstant.isSelected());
+			repackIfWindow();
 		});
 
 		gridBagConstraints = new GridBagConstraints();
@@ -364,17 +351,15 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(rightDelimiter, gridBagConstraints);
 
 		inf = new JCheckBox("inf", true);
-		inf.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				if (inf.isSelected()) {
-					secondIntervalNumber.setEnabled(false);
-					rightDelimiter.setEnabled(false);
-				} else {
-					secondIntervalNumber.setEnabled(true);
-					rightDelimiter.setEnabled(true);
-				}
-				setDelimiterModels();
+		inf.addActionListener(evt -> {
+			if (inf.isSelected()) {
+				secondIntervalNumber.setEnabled(false);
+				rightDelimiter.setEnabled(false);
+			} else {
+				secondIntervalNumber.setEnabled(true);
+				rightDelimiter.setEnabled(true);
 			}
+			setDelimiterModels();
 		});
 		gridBagConstraints.gridx = 6;
 		gridBagConstraints.gridy = 1;
@@ -399,11 +384,7 @@ public class GuardDialogue extends JPanel /*
 	//	firstIntervalNumber.setMaximumSize(intervalBoxDims);
 	//	firstIntervalNumber.setMinimumSize(intervalBoxDims);
 		firstIntervalNumber.setPreferredSize(intervalBoxDims);
-		firstIntervalNumber.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent evt) {
-				firstSpinnerStateChanged(evt);
-			}
-		});
+		firstIntervalNumber.addChangeListener(this::firstSpinnerStateChanged);
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
@@ -419,11 +400,7 @@ public class GuardDialogue extends JPanel /*
 		secondIntervalNumber.setMaximumSize(intervalBoxDims);
 		secondIntervalNumber.setMinimumSize(intervalBoxDims);
 		secondIntervalNumber.setPreferredSize(intervalBoxDims);
-		secondIntervalNumber.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent evt) {
-				secondSpinnerStateChanged(evt);
-			}
-		});
+		secondIntervalNumber.addChangeListener(this::secondSpinnerStateChanged);
 
 		gridBagConstraints.gridx = 4;
 		gridBagConstraints.gridy = 1;
@@ -438,12 +415,10 @@ public class GuardDialogue extends JPanel /*
 		boolean enableConstantsCheckBoxes = !constants.isEmpty();
 		leftUseConstant = new JCheckBox("Use Constant                    ");
 		leftUseConstant.setEnabled(enableConstantsCheckBoxes);
-		leftUseConstant.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updateLeftComponents();
-				updateRightConstantComboBox();
-				setDelimiterModels();
-			}
+		leftUseConstant.addActionListener(e -> {
+			updateLeftComponents();
+			updateRightConstantComboBox();
+			setDelimiterModels();
 		});
 
 		gridBagConstraints = new GridBagConstraints();
@@ -460,12 +435,10 @@ public class GuardDialogue extends JPanel /*
 	//	leftConstantsComboBox.setMaximumSize(intervalBoxDims);
 	//  leftConstantsComboBox.setMinimumSize(intervalBoxDims);
 		leftConstantsComboBox.setPreferredSize(intervalBoxDims);
-		leftConstantsComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					updateRightConstantComboBox();
-					setDelimiterModels();
-				}
+		leftConstantsComboBox.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				updateRightConstantComboBox();
+				setDelimiterModels();
 			}
 		});
 
@@ -476,12 +449,10 @@ public class GuardDialogue extends JPanel /*
 
 		rightUseConstant = new JCheckBox("Use Constant                    ");
 		rightUseConstant.setEnabled(enableConstantsCheckBoxes);
-		rightUseConstant.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updateRightComponents();
-				updateRightConstantComboBox();
-				setDelimiterModels();
-			}
+		rightUseConstant.addActionListener(e -> {
+			updateRightComponents();
+			updateRightConstantComboBox();
+			setDelimiterModels();
 		});
 
 		gridBagConstraints = new GridBagConstraints();
@@ -497,11 +468,9 @@ public class GuardDialogue extends JPanel /*
 	//	rightConstantsComboBox.setMinimumSize(intervalBoxDims);
 		rightConstantsComboBox.setPreferredSize(intervalBoxDims);
 		gridBagConstraints = new GridBagConstraints();
-		rightConstantsComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					setDelimiterModels();
-				}
+		rightConstantsComboBox.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				setDelimiterModels();
 			}
 		});
 
@@ -611,16 +580,11 @@ public class GuardDialogue extends JPanel /*
 		int firstValue = getFirstValue();
 		int secondValue = getSecondValue();
 
-		DefaultComboBoxModel modelRightIncludedOnly = new DefaultComboBoxModel(
-				new String[] { "]" });
-		DefaultComboBoxModel modelLeftIncludedOnly = new DefaultComboBoxModel(
-				new String[] { "[" });
-		DefaultComboBoxModel modelRightBoth = new DefaultComboBoxModel(
-				new String[] { "]", ")" });
-		DefaultComboBoxModel modelLeftBoth = new DefaultComboBoxModel(
-				new String[] { "[", "(" });
-		DefaultComboBoxModel modelRightExcludedOnly = new DefaultComboBoxModel(
-				new String[] { ")" });
+		DefaultComboBoxModel<String>  modelRightIncludedOnly = new DefaultComboBoxModel<>(new String[] { "]" });
+		DefaultComboBoxModel<String>  modelLeftIncludedOnly = new DefaultComboBoxModel<>(new String[] { "[" });
+		DefaultComboBoxModel<String>  modelRightBoth = new DefaultComboBoxModel<>(new String[] { "]", ")" });
+		DefaultComboBoxModel<String>  modelLeftBoth = new DefaultComboBoxModel<>(new String[] { "[", "(" });
+		DefaultComboBoxModel<String> modelRightExcludedOnly = new DefaultComboBoxModel<>(new String[] { ")" });
 
 		if (firstValue > secondValue) {
 			secondIntervalNumber.setValue(firstValue);
@@ -689,12 +653,7 @@ public class GuardDialogue extends JPanel /*
 				List <Constant> constantList = new ArrayList<Constant>();
 				constantList.addAll(constants);
 
-				Collections.sort(constantList,new Comparator<Constant>() {
-					public int compare(Constant o1, Constant o2) {
-						return o1.name().compareToIgnoreCase(o2.name());
-					}
-				});
-
+				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
 				for (Constant c : constantList) {
 					if (c.value() >= value) {
@@ -724,11 +683,7 @@ public class GuardDialogue extends JPanel /*
 				List <Constant> constantList = new ArrayList<Constant>();
 				constantList.addAll(constants);
 				
-				Collections.sort(constantList,new Comparator<Constant>() {
-						public int compare(Constant o1, Constant o2) {
-						return o1.name().compareToIgnoreCase(o2.name());
-						}
-				});
+				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
 				
 				for (Constant c : constantList) {

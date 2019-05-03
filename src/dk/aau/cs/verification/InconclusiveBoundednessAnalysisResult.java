@@ -15,7 +15,7 @@ public class InconclusiveBoundednessAnalysisResult extends
 	
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(System.getProperty("line.separator"));
 		buffer.append(System.getProperty("line.separator"));
 		buffer.append("The answer is conclusive only if the net is bounded");

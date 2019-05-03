@@ -48,7 +48,7 @@ import pipe.gui.undo.RenameTemplateCommand;
 import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.RequestFocusListener;
+import net.tapaal.swinghelpers.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
 import dk.aau.cs.gui.components.NonsearchableJList;
@@ -68,8 +68,8 @@ public class TemplateExplorer extends JPanel {
 	// Template explorer panel items
 	private JPanel templatePanel;
 	private JScrollPane scrollpane;
-	private JList templateList;
-	private DefaultListModel listModel;
+	private JList<Template> templateList;
+	private DefaultListModel<Template> listModel;
 
 	// Template button panel items
 	private JPanel buttonPanel;
@@ -246,7 +246,7 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index > 0) {
 					parent.swapTemplates(index, index-1);
-					Object o = listModel.getElementAt(index);
+					Template o = listModel.getElementAt(index);
                     listModel.setElementAt(listModel.getElementAt(index-1), index);
                     listModel.setElementAt(o, index-1);
                     templateList.ensureIndexIsVisible(index+1);
@@ -270,7 +270,7 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index < parent.network().allTemplates().size() - 1) {
 					parent.swapTemplates(index, index+1);
-					Object o = listModel.getElementAt(index);
+					Template o = listModel.getElementAt(index);
                     listModel.setElementAt(listModel.getElementAt(index+1), index);
                     listModel.setElementAt(o, index+1);
                     templateList.ensureIndexIsVisible(index+1);
@@ -289,12 +289,10 @@ public class TemplateExplorer extends JPanel {
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(false);
-		sortButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);
-				undoManager.addNewEdit(command);
-				command.redo();
-			}
+		sortButton.addActionListener(e -> {
+			Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);
+			undoManager.addNewEdit(command);
+			command.redo();
 		});
 		
 		gbc = new GridBagConstraints();
@@ -314,11 +312,7 @@ public class TemplateExplorer extends JPanel {
 		newTemplateButton.setPreferredSize(dimension);
 		newTemplateButton.setToolTipText(toolTipNewComponent);
 
-		newTemplateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				ShowNewTemplateDialog("");
-			}
-		});
+		newTemplateButton.addActionListener(arg0 -> ShowNewTemplateDialog(""));
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -675,12 +669,9 @@ public class TemplateExplorer extends JPanel {
 		nameTextField.setPreferredSize(size);
 		nameTextField.setText(oldname);
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {			
-			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameTextField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -730,18 +721,9 @@ public class TemplateExplorer extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonContainer.add(cancelButton,gbc);		
 		
-		okButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				onOKRenameTemplate();
-			}
-		});
+		okButton.addActionListener(e -> onOKRenameTemplate());
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
 		gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 8, 5, 8);

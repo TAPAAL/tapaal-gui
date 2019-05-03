@@ -101,11 +101,9 @@ public class ManualDelayMode implements DelayMode{
 
 			spinner = new JSpinner(model);
 			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner);
-			editor.getTextField().addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					okButton.requestFocus();
-					okButton.doClick();
-				}
+			editor.getTextField().addActionListener(arg0 -> {
+				okButton.requestFocus();
+				okButton.doClick();
 			});
 
 			editor.getTextField().setFormatterFactory(new AbstractFormatterFactory() {
@@ -153,24 +151,18 @@ public class ManualDelayMode implements DelayMode{
 			okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 			okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 			dialog.getRootPane().setDefaultButton(okButton);
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					okPressed = true;
-					dialog.setVisible(false);
-				}
+			okButton.addActionListener(arg0 -> {
+				okPressed = true;
+				dialog.setVisible(false);
 			});
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 			cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 			cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
-			cancelButton.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					okPressed = false;
-					dialog.setVisible(false);
-					
-				}
+			cancelButton.addActionListener(e -> {
+				okPressed = false;
+				dialog.setVisible(false);
+
 			});
 			
 			buttonPanel.add(cancelButton);

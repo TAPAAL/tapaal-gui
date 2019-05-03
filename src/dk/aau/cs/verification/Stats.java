@@ -142,7 +142,7 @@ public class Stats {
 	
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("Discovered markings: ");
 		buffer.append(discovered);
 		buffer.append(System.getProperty("line.separator"));

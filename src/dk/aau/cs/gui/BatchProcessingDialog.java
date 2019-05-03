@@ -48,8 +48,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
@@ -59,7 +57,7 @@ import javax.swing.table.TableRowSorter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
-import pipe.gui.widgets.CustomJSpinner;
+import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 import pipe.gui.widgets.QueryPane;
@@ -216,8 +214,8 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
 	private JButton removeFileButton;
-	private JList fileList;
-	private DefaultListModel listModel;
+	private JList<File> fileList;
+	private DefaultListModel<File> listModel;
 
 	private JLabel statusLabel;
 	private JLabel fileStatusLabel;
@@ -229,29 +227,25 @@ public class BatchProcessingDialog extends JDialog {
 	private JLabel memory;
 	private long startTimeMs = 0;
 
-	private JComboBox searchOption;
+	private JComboBox<String> searchOption;
 	private JButton exportButton;
 	private JButton closeButton;
-	private JComboBox queryPropertyOption;
+	private JComboBox<String> queryPropertyOption;
 	private JPanel verificationOptionsPanel;
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
-	private JComboBox symmetryOption;
-	private JComboBox stubbornReductionOption;
+	private JComboBox<String> symmetryOption;
+	private JComboBox<String> stubbornReductionOption;
 	private JCheckBox noTimeoutCheckbox;
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
-	private JComboBox approximationMethodOption;
+	private JComboBox<String> approximationMethodOption;
 	private CustomJSpinner approximationDenominator;
 	private JCheckBox approximationDenominatorCheckbox;
-	private JList ListOfQueries;
+	private JList<TAPNQuery> ListOfQueries;
 	
-	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			timeoutCurrentVerificationTask();
-		}
-	});
+	private Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
 
 	private BatchProcessingResultsTableModel tableModel;
 
@@ -327,7 +321,7 @@ public class BatchProcessingDialog extends JDialog {
 	BatchProcessing was called from QueryPane
 	(should maybe be boolean)
 	*/
-	public static void showBatchProcessingDialog(JList ListOfQueries){
+	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries){
 		if(ListOfQueries.getModel().getSize() != 0) {
 			batchProcessingDialog = null;
 		}
@@ -343,7 +337,7 @@ public class BatchProcessingDialog extends JDialog {
 		batchProcessingDialog.setVisible(true);
 	}
 
-	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList ListOfQueries) {
+	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList<TAPNQuery> ListOfQueries) {
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
@@ -409,15 +403,12 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 
-		fileList.addListSelectionListener(new ListSelectionListener() {
-
-			public void valueChanged(ListSelectionEvent e) {
-				if (!(e.getValueIsAdjusting())) {
-					if (fileList.getSelectedIndex() == -1) {
-						removeFileButton.setEnabled(false);
-					} else {
-						removeFileButton.setEnabled(true);
-					}
+		fileList.addListSelectionListener(e -> {
+			if (!(e.getValueIsAdjusting())) {
+				if (fileList.getSelectedIndex() == -1) {
+					removeFileButton.setEnabled(false);
+				} else {
+					removeFileButton.setEnabled(true);
 				}
 			}
 		});
@@ -442,11 +433,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		addFilesButton = new JButton("Add models");
 		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
-		addFilesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				addFiles();
-			}
-		});
+		addFilesButton.addActionListener(arg0 -> addFiles());
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -459,12 +446,7 @@ public class BatchProcessingDialog extends JDialog {
 		removeFileButton = new JButton("Remove models");
 		removeFileButton.setToolTipText(TOOL_TIP_RemoveFilesButton);
 		removeFileButton.setEnabled(false);
-		removeFileButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				removeSelectedFiles();
-			}
-		});
+		removeFileButton.addActionListener(arg0 -> removeSelectedFiles());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -475,12 +457,9 @@ public class BatchProcessingDialog extends JDialog {
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setToolTipText(TOOL_TIP_ClearFilesButton);
 		clearFilesButton.setEnabled(false);
-		clearFilesButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				clearFiles();
-				enableButtons();
-			}
+		clearFilesButton.addActionListener(e -> {
+			clearFiles();
+			enableButtons();
 		});
 
 		gbc = new GridBagConstraints();
@@ -953,28 +932,31 @@ public class BatchProcessingDialog extends JDialog {
 
 	private QueryPropertyOption getQueryPropertyOption() {
 		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
-		if (propertyOptionString.equals(name_SEARCHWHOLESTATESPACE))
-			return QueryPropertyOption.SearchWholeStateSpace;
-        else if (propertyOptionString.equals(name_EXISTDEADLOCK))
-                return QueryPropertyOption.ExistDeadlock;
-        else if (propertyOptionString.equals(name_STRONGSOUNDNESS))
-        	return QueryPropertyOption.StrongSoundness;
-        else if (propertyOptionString.equals(name_SOUNDNESS))
-        	return QueryPropertyOption.Soundness;
-        else
-			return QueryPropertyOption.KeepQueryOption;
+		switch (propertyOptionString) {
+			case name_SEARCHWHOLESTATESPACE:
+				return QueryPropertyOption.SearchWholeStateSpace;
+			case name_EXISTDEADLOCK:
+				return QueryPropertyOption.ExistDeadlock;
+			case name_STRONGSOUNDNESS:
+				return QueryPropertyOption.StrongSoundness;
+			case name_SOUNDNESS:
+				return QueryPropertyOption.Soundness;
+			default:
+				return QueryPropertyOption.KeepQueryOption;
+		}
 	}
 	
 	private ApproximationMethodOption getApproximationMethodOption() {
 		String ApproximationMethodOptionString = (String) approximationMethodOption.getSelectedItem();
-		if(ApproximationMethodOptionString.equals(name_OVER_APPROXIMATION)) {
-			return ApproximationMethodOption.OverApproximation;
-		} else if (ApproximationMethodOptionString.equals(name_UNDER_APPROXIMATION)) {
-			return ApproximationMethodOption.UnderApproximation;
-		} else if (ApproximationMethodOptionString.equals(name_NONE_APPROXIMATION)) {
-			return ApproximationMethodOption.None;
-		} else {
-			return ApproximationMethodOption.KeepQueryOption;
+		switch (ApproximationMethodOptionString) {
+			case name_OVER_APPROXIMATION:
+				return ApproximationMethodOption.OverApproximation;
+			case name_UNDER_APPROXIMATION:
+				return ApproximationMethodOption.UnderApproximation;
+			case name_NONE_APPROXIMATION:
+				return ApproximationMethodOption.None;
+			default:
+				return ApproximationMethodOption.KeepQueryOption;
 		}
 	}
 	
