@@ -135,30 +135,35 @@ public class VerifyPN implements ModelChecker{
 			if (isNotSetup()) {
 				return false;
 			}
-			
+
 			File file = new File(getPath());
-			if(!file.canExecute()){
+			if (!file.canExecute()) {
 				messenger.displayErrorMessage("The engine verifypn is not executable.\n"
 						+ "The verifypn path will be reset. Please try again, "
 						+ "to manually set the verifypn path.", "VerifyPN Error");
 				resetVerifypn();
 				return false;
 			}
-			
-			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifypnMinRev.split("\\.");
-			
-			for(int i = 0; i < targetversion.length; i++){
-				if(version.length < i+1)	version[i] = "0";
-				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-				if(diff > 0){
-					break;
-				}else if(diff < 0){
-					return false;
+
+			if (getVersion() != null) {
+
+				String[] version = getVersion().split("\\.");
+				String[] targetversion = Pipe.verifypnMinRev.split("\\.");
+
+				for (int i = 0; i < targetversion.length; i++) {
+					if (version.length < i + 1) version[i] = "0";
+					int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+					if (diff > 0) {
+						break;
+					} else if (diff < 0) {
+						return false;
+					}
 				}
+
+				return true;
+			} else {
+				return false;
 			}
-			
-			return true;
 		}
 
 		private void resetVerifypn() {
@@ -216,12 +221,26 @@ public class VerifyPN implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-			String verifypn = null;
+				String verifypn = null;
 
-			//If env is set, it overwrites the value
-			verifypn = System.getenv("verifypn");
-			if (verifypn != null && !verifypn.isEmpty()) {
-				if (new File(verifypn).exists()){
+				//If env is set, it overwrites the value
+				verifypn = System.getenv("verifypn");
+				if (verifypn != null && !verifypn.isEmpty()) {
+					if (new File(verifypn).exists()){
+						verifypnpath = verifypn;
+						VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+						if(v.isCorrectVersion()){
+							return true;
+						}else{
+							verifypn = null;
+							verifypnpath = null;
+						}
+					}
+				}
+
+				//If pref is set
+				verifypn = Preferences.getInstance().getVerifypnLocation();
+				if (verifypn != null && !verifypn.isEmpty()) {
 					verifypnpath = verifypn;
 					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
 					if(v.isCorrectVersion()){
@@ -231,39 +250,31 @@ public class VerifyPN implements ModelChecker{
 						verifypnpath = null;
 					}
 				}
-			}
 
-			//If pref is set
-			verifypn = Preferences.getInstance().getVerifypnLocation();
-			if (verifypn != null && !verifypn.isEmpty()) {
-				verifypnpath = verifypn;
-				return true;
-			}
+				//Search the installdir for verifytapn
+				File installdir = TAPAAL.getInstallDir();
 
-			//Search the installdir for verifytapn
-			File installdir = TAPAAL.getInstallDir();
+				String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
+				for (String s : paths) {
+					File verifypnfile = new File(installdir + s);
 
-			String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
-			for (String s : paths) {
-				File verifypnfile = new File(installdir + s);
+					if (verifypnfile.exists()){
 
-				if (verifypnfile.exists()){
+						verifypnpath = verifypnfile.getAbsolutePath();
+						VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+						if(v.isCorrectVersion()){
+							return true;
+						}else{
+							verifypn = null;
+							verifypnpath = null;
+						}
 
-					verifypnpath = verifypnfile.getAbsolutePath();
-					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
-						return true;
-					}else{
-						verifypn = null;
-						verifypnpath = null;
 					}
-
 				}
-			}
 
 
+				return false;
 
-			return false;
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	

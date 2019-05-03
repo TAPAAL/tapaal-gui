@@ -6,6 +6,11 @@ import java.util.Hashtable;
 import javax.swing.BoxLayout;
 
 import pipe.gui.CreateGui;
+
+import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Grid;
+import pipe.gui.Pipe;
+import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -79,6 +84,11 @@ public class TimedOutputArcComponent extends Arc {
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
+		this.setNameOffsetX(arc.getNameOffsetXObject());
+		this.setNameOffsetY(arc.getNameOffsetYObject());
+		this.getNameLabel().setPosition(
+				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(this.nameOffsetX, zoom))), 
+				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(this.nameOffsetY, zoom))));
 
 		//XXX: se note in funcation
 		addMouseHandler();

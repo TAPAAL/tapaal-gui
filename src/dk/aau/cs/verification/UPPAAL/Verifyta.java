@@ -174,37 +174,41 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public static boolean trySetup() {
-		
-		String verifyta = null;
-		
-		//Get from evn (overwrite other values)
-		verifyta = System.getenv("verifyta");
-		if (verifyta != null && !verifyta.equals("")) {
-			if (new File(verifyta).exists()){
+
+		try {
+			String verifyta = null;
+
+			//Get from evn (overwrite other values)
+			verifyta = System.getenv("verifyta");
+			if (verifyta != null && !verifyta.equals("")) {
+				if (new File(verifyta).exists()){
+					verifytapath = verifyta;
+					Verifyta v = new Verifyta(new FileFinder(), new MessengerImpl());
+					if(v.isCorrectVersion()){
+						return true;
+					}else{
+						verifyta = null;
+						verifytapath = null;
+					}
+				}
+			}
+
+			verifyta = Preferences.getInstance().getVerifytaLocation();
+			if (verifyta != null && !verifyta.equals("")) {
 				verifytapath = verifyta;
 				Verifyta v = new Verifyta(new FileFinder(), new MessengerImpl());
 				if(v.isCorrectVersion()){
 					return true;
 				}else{
 					verifyta = null;
-					verifytapath = null;
+					v.resetVerifyta();
 				}
 			}
+
+			return false;
+		} catch (Exception e) {
+			return false;
 		}
-		
-		verifyta = Preferences.getInstance().getVerifytaLocation();
-		if (verifyta != null && !verifyta.equals("")) {
-			verifytapath = verifyta;
-			Verifyta v = new Verifyta(new FileFinder(), new MessengerImpl());
-			if(v.isCorrectVersion()){
-				return true;
-			}else{
-				verifyta = null;
-				v.resetVerifyta();
-			}
-		}
-		
-		return false;
 	}
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {

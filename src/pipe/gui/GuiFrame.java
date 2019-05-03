@@ -1012,7 +1012,7 @@ public class GuiFrame extends JFrame  {
 			showTokenAgeCheckBox.doClick();
 		}
 		//Delay-enabled Transitions
-		showDelayEnabledTransitions(advanced);
+		//showDelayEnabledTransitions(advanced);
 		DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
 		DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
 		DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
