@@ -123,6 +123,7 @@ public class GuiFrame extends JFrame  {
 	private GuiAction engineSelectionAction;
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
+	private GuiAction smartDrawAction;
 	private GuiAction stripTimeDialogAction;
 	private GuiAction zoomOutAction;
 	private GuiAction zoomInAction;
@@ -955,7 +956,16 @@ public class GuiFrame extends JFrame  {
 		});
 		workflowDialog.setMnemonic('f');
 		toolsMenu.add(workflowDialog);
-
+		
+		JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction = new GuiAction("Smart Draw", "Rearrange the petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SmartDrawDialog.showSmartDrawDialog();
+			}
+		});
+		smartDrawDialog.setMnemonic('D');
+		toolsMenu.add(smartDrawDialog);
+		
 		//Stip off timing information
 		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
 			@Override
@@ -1270,7 +1280,8 @@ public class GuiFrame extends JFrame  {
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
-
+			
+			smartDrawAction.setEnabled(true);
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
 
@@ -1316,7 +1327,8 @@ public class GuiFrame extends JFrame  {
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
-
+			
+			smartDrawAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1363,7 +1375,8 @@ public class GuiFrame extends JFrame  {
 			redoAction.setEnabled(false);
 			prevcomponentAction.setEnabled(false);
 			nextcomponentAction.setEnabled(false);
-
+			
+			smartDrawAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
