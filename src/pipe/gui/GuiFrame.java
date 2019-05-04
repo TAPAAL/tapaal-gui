@@ -1603,7 +1603,7 @@ public class GuiFrame extends JFrame  {
 		try {
 			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
 
-			CreateGui.getCurrentTab().setFile(outFile);
+			CreateGui.getTab(index).setFile(outFile);
 
 			CreateGui.getDrawingSurface(index).setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
