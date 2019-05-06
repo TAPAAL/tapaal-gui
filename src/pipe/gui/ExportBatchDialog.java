@@ -100,7 +100,11 @@ public class ExportBatchDialog extends JDialog {
 	ModelLoader loader = new ModelLoader();
 	
 	public static boolean isDialogVisible() {
-		return exportBatchDialog.isVisible();
+		if (exportBatchDialog != null) {
+			return exportBatchDialog.isVisible();
+		} else {
+			return false;
+		}
 	}
 	
 	public static void setNoOrphanTransitions(boolean value) {

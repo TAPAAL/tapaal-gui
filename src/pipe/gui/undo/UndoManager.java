@@ -208,6 +208,7 @@ public class UndoManager {
 		if (arcBeingDrawn != null) {
 			if (arcBeingDrawn.getParent() != null) {
 				arcBeingDrawn.getParent().remove(arcBeingDrawn);
+				arcBeingDrawn.getSource().removeFromArc(arcBeingDrawn);
 			}
 			view.createArc = null;
 		}
@@ -223,9 +224,11 @@ public class UndoManager {
 	private void deleteObject(PetriNetObject pnObject) {
 		if (pnObject instanceof ArcPathPoint) {
 			if (!((ArcPathPoint) pnObject).getArcPath().getArc().isSelected()) {
-				addEdit(new DeleteArcPathPointEdit(((ArcPathPoint) pnObject)
+				Command cmd = new DeleteArcPathPointEdit(((ArcPathPoint) pnObject)
 						.getArcPath().getArc(), (ArcPathPoint) pnObject,
-						((ArcPathPoint) pnObject).getIndex()));
+						((ArcPathPoint) pnObject).getIndex());
+				cmd.redo();
+				addEdit(cmd);
 			}
 		}else{
 			//		} else if (pnObject instanceof PlaceTransitionObject) {

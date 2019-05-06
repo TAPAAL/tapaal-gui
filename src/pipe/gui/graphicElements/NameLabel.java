@@ -1,10 +1,8 @@
 package pipe.gui.graphicElements;
 
 import java.awt.Font;
-
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
-
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
