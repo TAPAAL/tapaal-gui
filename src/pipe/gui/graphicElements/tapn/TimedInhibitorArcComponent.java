@@ -71,9 +71,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
-		label.setText("");
+		pnName.setText("");
 		if(getWeight().value() > 1 || displayConstantNames){
-			label.setText(getWeight().toString(displayConstantNames));
+			pnName.setText(getWeight().toString(displayConstantNames));
 		}
 		
 		boolean focusedConstant = false;
@@ -83,9 +83,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 			}
 		}
 		if(focusedConstant){
-			label.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+			pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
 		}else{
-			label.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+			pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 		}
 		
 		this.setLabelPosition();

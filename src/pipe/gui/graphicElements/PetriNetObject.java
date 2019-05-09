@@ -217,17 +217,28 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 	public void select(boolean shouldRepaint) {
-	if (selectable && !selected) {
+		if (selectable && !selected) {
 			selected = true;
+
+			if (pnName != null) {
+				pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
+			}
+
 			if (shouldRepaint) {
 				repaint();
 			}
 		}
+
 	}
 
 	public void deselect() {
 		if (selected) {
 			selected = false;
+
+			if (pnName != null) {
+				pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+			}
+
 			repaint();
 		}
 	}
