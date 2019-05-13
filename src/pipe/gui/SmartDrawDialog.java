@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -8,6 +9,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -19,17 +24,29 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.undo.UndoManager;
 
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.verification.TAPNComposer;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.widgets.CustomJSpinner;
 
 public class SmartDrawDialog extends JDialog {
 	private static final long serialVersionUID = 6116530047981607501L;
 	
 	JPanel mainPanel;
-	TimedArcPetriNet currentTapn = CreateGui.getDrawingSurface().getModel();
-	int xSpacing = 0;
-	int ySpacing = 0;
+	ArrayList<PetriNetObject> drawingSurfaceObjects;
+	pipe.gui.undo.UndoManager undoManager;
+	ArrayList<PlaceTransitionObject> newlyPlacedObjects;
+	ArrayList<Point> pointsReserved;
+	
+	int xSpacing = 100;
+	int ySpacing = 100;
 	String searchOption = "DFS";
 	
 	static SmartDrawDialog smartDrawDialog;
@@ -42,6 +59,7 @@ public class SmartDrawDialog extends JDialog {
 			smartDrawDialog.setLocationRelativeTo(null);
 			smartDrawDialog.setResizable(true);
 		}
+		
 		smartDrawDialog.setVisible(true);
 	}
 
@@ -51,6 +69,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	private void initComponents() {
+		
 		setLayout(new FlowLayout());
 		mainPanel = new JPanel(new GridBagLayout());
 		
@@ -62,6 +81,10 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				undoManager = CreateGui.getDrawingSurface().getUndoManager();
+				drawingSurfaceObjects = CreateGui.getDrawingSurface().getPlaceTransitionObjects();
+				newlyPlacedObjects = new ArrayList<PlaceTransitionObject>();
+				pointsReserved = new ArrayList<Point>();
 				smartDraw();
 			}
 		});
@@ -154,7 +177,7 @@ public class SmartDrawDialog extends JDialog {
 		spacingPanel.add(xLabel, gbc);
 		
 		
-		final JSpinner xSpaceSpinner = new CustomJSpinner(xSpacing, 0, Integer.MAX_VALUE);
+		final JSpinner xSpaceSpinner = new CustomJSpinner(xSpacing, 50, Integer.MAX_VALUE);
 		xSpaceSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -182,7 +205,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		spacingPanel.add(yLabel, gbc);
 		
-		final JSpinner ySpaceSpinner = new CustomJSpinner(ySpacing, 0, Integer.MAX_VALUE);
+		final JSpinner ySpaceSpinner = new CustomJSpinner(ySpacing, 50, Integer.MAX_VALUE);
 		ySpaceSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -214,7 +237,55 @@ public class SmartDrawDialog extends JDialog {
 	
 	
 	public void smartDraw() {
+		undoManager.newEdit();
+		PlaceTransitionObject startingObject = (PlaceTransitionObject) drawingSurfaceObjects.get(0);
+		Point startingPoint = new Point(500,350);
+		Command command = new MovePlaceTransitionObject(startingObject, startingPoint);
+		command.redo();
+		undoManager.addEdit(command);
+		pointsReserved.add(startingPoint);
+		newlyPlacedObjects.add(startingObject);
+		
+		if(searchOption == "DFS") {
+			depthFirstDraw(startingObject);
+		} else {
+			while(!(newlyPlacedObjects.isEmpty())) {
+				PlaceTransitionObject newParent = newlyPlacedObjects.get(0);
+				breadthFirstDraw(newParent);
+			}
+		}
+		
+		CreateGui.getDrawingSurface().repaintAll();
+		CreateGui.getModel().repaintAll(true);
+		CreateGui.getDrawingSurface().updatePreferredSize();
 		System.out.println(xSpacing + " " + ySpacing);
 		System.out.println(searchOption);
 	}
+	
+	private void depthFirstDraw(PlaceTransitionObject startingObject) {
+		
+	}
+	
+	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
+		Iterator<Arc> arcFromIterator = parentObject.getConnectFromIterator();
+		Command command;
+		while(arcFromIterator.hasNext()) {
+			PlaceTransitionObject objectToPlace = arcFromIterator.next().getTarget();
+			outerloop: for(int x = ((int)parentObject.getPositionX() - xSpacing); x <= ((int)parentObject.getPositionX() + xSpacing); x += xSpacing) {
+				for(int y = ((int)parentObject.getPositionY() - ySpacing); y <= ((int)parentObject.getPositionY() + ySpacing); y += ySpacing) {
+					Point possiblePoint = new Point(x, y);
+					if(!(pointsReserved.contains(possiblePoint))) {
+						command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
+						command.redo();
+						undoManager.addEdit(command);
+						pointsReserved.add(possiblePoint);
+						newlyPlacedObjects.add(objectToPlace);
+						break outerloop;
+					}
+				}
+			}
+		}
+		newlyPlacedObjects.remove(parentObject);
+	}
+	
 }
