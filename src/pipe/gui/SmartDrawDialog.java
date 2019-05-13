@@ -269,18 +269,25 @@ public class SmartDrawDialog extends JDialog {
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
 		Iterator<Arc> arcFromIterator = parentObject.getConnectFromIterator();
 		Command command;
+		boolean objectPlaced = false;
 		while(arcFromIterator.hasNext()) {
 			PlaceTransitionObject objectToPlace = arcFromIterator.next().getTarget();
-			outerloop: for(int x = ((int)parentObject.getPositionX() - xSpacing); x <= ((int)parentObject.getPositionX() + xSpacing); x += xSpacing) {
-				for(int y = ((int)parentObject.getPositionY() - ySpacing); y <= ((int)parentObject.getPositionY() + ySpacing); y += ySpacing) {
-					Point possiblePoint = new Point(x, y);
-					if(!(pointsReserved.contains(possiblePoint))) {
-						command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
-						command.redo();
-						undoManager.addEdit(command);
-						pointsReserved.add(possiblePoint);
-						newlyPlacedObjects.add(objectToPlace);
-						break outerloop;
+			objectPlaced = false;
+			int perimeterLevel = 0;
+			while(!objectPlaced) {
+				perimeterLevel += 1;
+				outerloop: for(int x = ((int)parentObject.getPositionX() - (xSpacing*perimeterLevel)); x <= ((int)parentObject.getPositionX() + (xSpacing*perimeterLevel)); x += xSpacing) {
+					for(int y = ((int)parentObject.getPositionY() - (ySpacing * perimeterLevel)); y <= ((int)parentObject.getPositionY() + (ySpacing*perimeterLevel)); y += ySpacing) {
+						Point possiblePoint = new Point(x, y);
+						if(!(pointsReserved.contains(possiblePoint))) {
+							command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
+							command.redo();
+							undoManager.addEdit(command);
+							pointsReserved.add(possiblePoint);
+							newlyPlacedObjects.add(objectToPlace);
+							objectPlaced = true;
+							break outerloop;
+						}
 					}
 				}
 			}
