@@ -3,6 +3,8 @@ package pipe.gui.graphicElements;
 import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
+
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
@@ -41,6 +43,10 @@ public class NameLabel extends JTextArea implements Translatable,
 		setOpaque(false);
 		setBorder(BorderFactory.createEmptyBorder());
 		setBackground(Pipe.BACKGROUND_COLOR);
+
+		DefaultCaret c = new DefaultCaret();
+		c.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		setCaret(c);
 
 	}
 
