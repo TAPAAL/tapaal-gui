@@ -44,6 +44,9 @@ public class NameLabel extends JTextArea implements Translatable,
 		setBorder(BorderFactory.createEmptyBorder());
 		setBackground(Pipe.BACKGROUND_COLOR);
 
+		//When redrawing a textarea added to a scroll pane, default behaviour is to move scroll pane to the location
+        //of the lable. (https://docs.oracle.com/javase/7/docs/api/javax/swing/text/JTextComponent.html)
+        //Behaviour disabled to avoid jumping, see bug https://bugs.launchpad.net/tapaal/+bug/1828782
 		DefaultCaret c = new DefaultCaret();
 		c.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		setCaret(c);
