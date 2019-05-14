@@ -372,7 +372,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	/*
 	 * Find better name
-	 * We move all the objects so that their y-value and x-value >= 10
+	 * We move all the objects so that their y-value and x-value >= 20
 	 * Else it creates bugs with the scrollbar
 	 * So we push all objects by some factor on the y and x axis
 	 */
@@ -391,7 +391,7 @@ public class SmartDrawDialog extends JDialog {
 				}
 			}
 		}
-		if(lowestX < 10) {
+		if(lowestX < 20) {
 			Command command;
 			for(PetriNetObject object : drawingSurfaceObjects) {
 				if(object instanceof PlaceTransitionObject) {
@@ -404,7 +404,7 @@ public class SmartDrawDialog extends JDialog {
 				}
 			}
 		}
-		if(lowestY < 10) {
+		if(lowestY < 20) {
 			Command command;
 			for(PetriNetObject object : drawingSurfaceObjects) {
 				if(object instanceof PlaceTransitionObject) {
