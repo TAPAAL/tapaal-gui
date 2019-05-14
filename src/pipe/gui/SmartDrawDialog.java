@@ -34,7 +34,7 @@ public class SmartDrawDialog extends JDialog {
 	private static final long serialVersionUID = 6116530047981607501L;
 	
 	JPanel mainPanel;
-	ArrayList<PetriNetObject> drawingSurfaceObjects;
+	ArrayList<PlaceTransitionObject> placeTransitionObjects;
 	pipe.gui.undo.UndoManager undoManager;
 	ArrayList<Point> pointsReserved;
 
@@ -47,8 +47,8 @@ public class SmartDrawDialog extends JDialog {
 	ArrayList<Arc> arcsVisited;
 
 	
-	int xSpacing = 100;
-	int ySpacing = 100;
+	int xSpacing = 50;
+	int ySpacing = 50;
 	String searchOption = "DFS";
 	
 	static SmartDrawDialog smartDrawDialog;
@@ -84,7 +84,7 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				undoManager = CreateGui.getDrawingSurface().getUndoManager();
-				drawingSurfaceObjects = CreateGui.getDrawingSurface().getPlaceTransitionObjects();
+				getPlaceTransitionObjects();
 				newlyPlacedObjects = new ArrayList<PlaceTransitionObject>();
 				pointsReserved = new ArrayList<Point>();
 				smartDraw();
@@ -241,7 +241,7 @@ public class SmartDrawDialog extends JDialog {
 	public void smartDraw() {
 		undoManager.newEdit();
 		//We need a better way to choose the first object
-		PlaceTransitionObject startingObject = (PlaceTransitionObject) drawingSurfaceObjects.get(0);
+		PlaceTransitionObject startingObject = findStartingObjectCandidate();
 		
 		//We place the first object at hard coordinates
 		Point startingPoint = new Point(500,350);
@@ -370,61 +370,105 @@ public class SmartDrawDialog extends JDialog {
 		}
 		newlyPlacedObjects.remove(parentObject);
 	}
+	
+	private PlaceTransitionObject findStartingObjectCandidate() {
+		PlaceTransitionObject candidate = null;
+		ArrayList<Arc> stuff = new ArrayList<Arc>();
+		candidate = findObjectWithZeroToArcs();
+		int numberOfToArcs = 0;
+		int numberOfFromArcs = 0;
+		int candidateDifference = 0;
+		if(candidate == null) {
+			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+				while(ptObject.getConnectToIterator().hasNext()) {
+					stuff.add(ptObject.getConnectToIterator().next());
+					numberOfToArcs++;
+				}
+				while(ptObject.getConnectFromIterator().hasNext()) {
+					stuff.add(ptObject.getConnectFromIterator().next());
+					numberOfFromArcs++;
+				}
+				int difference = numberOfFromArcs - numberOfToArcs;
+				if(numberOfToArcs > candidateDifference) {
+					candidateDifference = difference;
+					candidate = ptObject;
+				}
+			}
+		}
+		return candidate;
+	}
+	
+	private PlaceTransitionObject findObjectWithZeroToArcs() {
+		PlaceTransitionObject candidate = null;
+		Iterator<Arc> arcFromIterator;
+		int numberOfFromArcs = 0;
+		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+			arcFromIterator = ptObject.getConnectFromIterator();
+			while(arcFromIterator.hasNext()) {
+				arcFromIterator.next();
+				numberOfFromArcs++;
+			}
+			if(ptObject.getConnectToIterator().hasNext() == false && numberOfFromArcs >= 1) {
+				candidate = ptObject;
+				break;
+			}
+		}
+		System.out.println(candidate.getName());
+		return candidate;
+	}
 	/*
 	 * Find better name
 	 * We move all the objects so that their y-value and x-value >= 20
 	 * Else it creates bugs with the scrollbar
 	 * So we push all objects by some factor on the y and x axis
 	 */
-
 	private void moveObjectsWithinOrigo() {
-		int lowestY = 20;
-		int lowestX = 20;
-		for(PetriNetObject object : drawingSurfaceObjects) {
-			if(object instanceof PlaceTransitionObject) {
-				PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
-				if(ptObject.getPositionX() < lowestX) {
-					lowestX = (int) ptObject.getPositionX();
-				}
-				if(ptObject.getPositionY() < lowestY) {
-					lowestY = (int) ptObject.getPositionY();
-				}
+		int lowestY = 50;
+		int lowestX = 50;
+		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+			if(ptObject.getPositionX() < lowestX) {
+				lowestX = (int) ptObject.getPositionX();
+			}
+			if(ptObject.getPositionY() < lowestY) {
+				lowestY = (int) ptObject.getPositionY();
 			}
 		}
-		if(lowestX < 20) {
+		if(lowestX < 50) {
 			Command command;
-			for(PetriNetObject object : drawingSurfaceObjects) {
-				if(object instanceof PlaceTransitionObject) {
-					PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
-					int newX = (int) (ptObject.getPositionX() + Math.abs(lowestX) + 10);
-					Point newPosition = new Point(newX, (int) ptObject.getPositionY());
-					command = new MovePlaceTransitionObject(ptObject, newPosition);
-					command.redo();
-					undoManager.addEdit(command);
-				}
+			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+				int newX = (int) (ptObject.getPositionX() + Math.abs(lowestX) + 50);
+				Point newPosition = new Point(newX, (int) ptObject.getPositionY());
+				command = new MovePlaceTransitionObject(ptObject, newPosition);
+				command.redo();
+				undoManager.addEdit(command);
+				
 			}
 		}
-		if(lowestY < 20) {
+		if(lowestY < 50) {
 			Command command;
-			for(PetriNetObject object : drawingSurfaceObjects) {
-				if(object instanceof PlaceTransitionObject) {
-					PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
-					int newY = (int) (ptObject.getPositionY() + Math.abs(lowestY) + 10);
-					Point newPosition = new Point((int) ptObject.getPositionX(), newY);
-					command = new MovePlaceTransitionObject(ptObject, newPosition);
-					command.redo();
-					undoManager.addEdit(command);
-				}
+			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+				int newY = (int) (ptObject.getPositionY() + Math.abs(lowestY) + 50);
+				Point newPosition = new Point((int) ptObject.getPositionX(), newY);
+				command = new MovePlaceTransitionObject(ptObject, newPosition);
+				command.redo();
+				undoManager.addEdit(command);
 			}
 		}
 	}
 	
-	private void printPTObjectsAndPositions() {
-		for(PetriNetObject object : drawingSurfaceObjects) {
+	private void getPlaceTransitionObjects() {
+		placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
+		for(PetriNetObject object : CreateGui.getDrawingSurface().getPlaceTransitionObjects()) {
 			if(object instanceof PlaceTransitionObject) {
 				PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
-				System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getPositionX() + " Y: " + ptObject.getPositionY());
+				placeTransitionObjects.add(ptObject);
 			}
+		}
+	}
+	//For debugging
+	private void printPTObjectsAndPositions() {
+		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+			System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getPositionX() + " Y: " + ptObject.getPositionY());
 		}
 	}
 	
