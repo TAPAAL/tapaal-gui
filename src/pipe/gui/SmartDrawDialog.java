@@ -26,8 +26,10 @@ import javax.swing.event.ChangeListener;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.undo.DeleteArcPathPointEdit;
 import pipe.gui.widgets.CustomJSpinner;
 
 public class SmartDrawDialog extends JDialog {
@@ -273,6 +275,8 @@ public class SmartDrawDialog extends JDialog {
 		moveObjectsWithinOrigo();
 		
 		
+		removeArcPathPoints();
+		
 		CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);
 		CreateGui.getDrawingSurface().updatePreferredSize();
@@ -457,6 +461,23 @@ public class SmartDrawDialog extends JDialog {
 				command.redo();
 				undoManager.addEdit(command);
 			}
+		}
+	}
+	
+	private void removeArcPathPoints() {
+		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
+		for(PetriNetObject arc : CreateGui.getDrawingSurface().getPNObjects()) {
+			if(arc instanceof Arc) {
+				ArrayList<ArcPathPoint> arcPathPoints =(ArrayList<ArcPathPoint>) ((Arc) arc).getArcPath().getArcPathPoints();
+				for(ArcPathPoint arcPathPoint : arcPathPoints) {
+					toRemove.add(arcPathPoint);
+				}
+			}
+		}
+		for(ArcPathPoint p : toRemove) {
+			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex());
+			command.redo();
+			undoManager.addEdit(command);
 		}
 	}
 	
