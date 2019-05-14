@@ -372,20 +372,25 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	private PlaceTransitionObject findStartingObjectCandidate() {
-		PlaceTransitionObject candidate = null;
-		ArrayList<Arc> stuff = new ArrayList<Arc>();
-		candidate = findObjectWithZeroToArcs();
+		//We first try to find an object with no incoming arcs
+		//and atleast 1 outgoing arc as our starting point
+		PlaceTransitionObject candidate = findObjectWithZeroToArcs();
+		Iterator<Arc> arcFromIterator;
+		Iterator<Arc> arcToIterator;
+
 		int numberOfToArcs = 0;
 		int numberOfFromArcs = 0;
 		int candidateDifference = 0;
 		if(candidate == null) {
 			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-				while(ptObject.getConnectToIterator().hasNext()) {
-					stuff.add(ptObject.getConnectToIterator().next());
+				arcFromIterator = ptObject.getConnectFromIterator();
+				arcToIterator = ptObject.getConnectToIterator();
+				while(arcToIterator.hasNext()) {
+					arcToIterator.next();
 					numberOfToArcs++;
 				}
-				while(ptObject.getConnectFromIterator().hasNext()) {
-					stuff.add(ptObject.getConnectFromIterator().next());
+				while(arcFromIterator.hasNext()) {
+					arcFromIterator.next();
 					numberOfFromArcs++;
 				}
 				int difference = numberOfFromArcs - numberOfToArcs;
@@ -413,7 +418,6 @@ public class SmartDrawDialog extends JDialog {
 				break;
 			}
 		}
-		System.out.println(candidate.getName());
 		return candidate;
 	}
 	/*
