@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -24,15 +22,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.undo.UndoManager;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.verification.TAPNComposer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.widgets.CustomJSpinner;
 
@@ -42,8 +36,16 @@ public class SmartDrawDialog extends JDialog {
 	JPanel mainPanel;
 	ArrayList<PetriNetObject> drawingSurfaceObjects;
 	pipe.gui.undo.UndoManager undoManager;
-	ArrayList<PlaceTransitionObject> newlyPlacedObjects;
 	ArrayList<Point> pointsReserved;
+
+	//For BFS
+	ArrayList<PlaceTransitionObject> newlyPlacedObjects;
+	ArrayList<PlaceTransitionObject> objectsPlaced;
+	
+	//For DFS
+	ArrayList<PlaceTransitionObject> unfinishedObjects;
+	ArrayList<Arc> arcsVisited;
+
 	
 	int xSpacing = 100;
 	int ySpacing = 100;
@@ -238,32 +240,95 @@ public class SmartDrawDialog extends JDialog {
 	
 	public void smartDraw() {
 		undoManager.newEdit();
+		//We need a better way to choose the first object
 		PlaceTransitionObject startingObject = (PlaceTransitionObject) drawingSurfaceObjects.get(0);
+		
+		//We place the first object at hard coordinates
 		Point startingPoint = new Point(500,350);
 		Command command = new MovePlaceTransitionObject(startingObject, startingPoint);
 		command.redo();
 		undoManager.addEdit(command);
 		pointsReserved.add(startingPoint);
-		newlyPlacedObjects.add(startingObject);
 		
 		if(searchOption == "DFS") {
-			depthFirstDraw(startingObject);
+			objectsPlaced = new ArrayList<PlaceTransitionObject>();
+			objectsPlaced.add(startingObject);
+			unfinishedObjects = new ArrayList<PlaceTransitionObject>();
+			unfinishedObjects.add(startingObject);
+			arcsVisited = new ArrayList<Arc>();
+			while(!(unfinishedObjects.isEmpty())) {
+				PlaceTransitionObject nextObject = unfinishedObjects.get(unfinishedObjects.size()-1);
+				depthFirstDraw(nextObject);
+			}
 		} else {
+			objectsPlaced = new ArrayList<PlaceTransitionObject>();
+			objectsPlaced.add(startingObject);
+			newlyPlacedObjects.add(startingObject);
+			
 			while(!(newlyPlacedObjects.isEmpty())) {
 				PlaceTransitionObject newParent = newlyPlacedObjects.get(0);
 				breadthFirstDraw(newParent);
 			}
 		}
+		moveObjectsWithinOrigo();
+		
 		
 		CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);
 		CreateGui.getDrawingSurface().updatePreferredSize();
-		System.out.println(xSpacing + " " + ySpacing);
-		System.out.println(searchOption);
 	}
 	
-	private void depthFirstDraw(PlaceTransitionObject startingObject) {
-		
+	private void depthFirstDraw(PlaceTransitionObject parentObject) {
+		Iterator<Arc> arcFromIterator = parentObject.getConnectFromIterator();
+		Command command;
+		boolean objectPlaced = false;
+		boolean objectHasUnvisitedArcs = false;
+		outerloop: while(arcFromIterator.hasNext()) {
+			Arc arcTraversed = arcFromIterator.next();
+			if(!(arcsVisited.contains(arcTraversed))) {
+				PlaceTransitionObject objectToPlace = arcTraversed.getTarget();
+				if(!(objectsPlaced.contains(objectToPlace))) {
+					objectPlaced = false;
+					/* layer defines what layer we are on 
+					 * in the grid like structure.
+					 * Imagine circles within circles
+					 */
+					int layer = 0;
+					while(!objectPlaced) {
+						layer += 1;
+						//Try different positions for the objects
+						for(int x = ((int)parentObject.getPositionX() - (xSpacing*layer)); x <= ((int)parentObject.getPositionX() + (xSpacing*layer)); x += xSpacing) {
+							for(int y = ((int)parentObject.getPositionY() - (ySpacing * layer)); y <= ((int)parentObject.getPositionY() + (ySpacing*layer)); y += ySpacing) {
+								Point possiblePoint = new Point(x, y);
+								if(!(pointsReserved.contains(possiblePoint))) {
+									command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
+									command.redo();
+									undoManager.addEdit(command);
+									
+									//Reserve the point and let the object in the queue
+									pointsReserved.add(possiblePoint);
+									unfinishedObjects.add(objectToPlace);
+									//Don't visit the same arc twice or place the same object twice
+									arcsVisited.add(arcTraversed);
+									objectsPlaced.add(objectToPlace);
+									objectPlaced = true;
+									break outerloop;
+								}
+							}
+						}
+					}
+				}	
+			}
+		}
+		//These remove the object if we have visited all arcs from it
+		while(arcFromIterator.hasNext()) {
+			if(!(arcsVisited.contains(arcFromIterator.next()))) {
+				objectHasUnvisitedArcs = true;
+			}
+		}
+		if(objectHasUnvisitedArcs == false) {
+			unfinishedObjects.remove(parentObject);
+		}
 	}
 	
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
@@ -272,27 +337,95 @@ public class SmartDrawDialog extends JDialog {
 		boolean objectPlaced = false;
 		while(arcFromIterator.hasNext()) {
 			PlaceTransitionObject objectToPlace = arcFromIterator.next().getTarget();
-			objectPlaced = false;
-			int perimeterLevel = 0;
-			while(!objectPlaced) {
-				perimeterLevel += 1;
-				outerloop: for(int x = ((int)parentObject.getPositionX() - (xSpacing*perimeterLevel)); x <= ((int)parentObject.getPositionX() + (xSpacing*perimeterLevel)); x += xSpacing) {
-					for(int y = ((int)parentObject.getPositionY() - (ySpacing * perimeterLevel)); y <= ((int)parentObject.getPositionY() + (ySpacing*perimeterLevel)); y += ySpacing) {
-						Point possiblePoint = new Point(x, y);
-						if(!(pointsReserved.contains(possiblePoint))) {
-							command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
-							command.redo();
-							undoManager.addEdit(command);
-							pointsReserved.add(possiblePoint);
-							newlyPlacedObjects.add(objectToPlace);
-							objectPlaced = true;
-							break outerloop;
+			//Check if we already placed it to avoid infinite loops
+			if(!(objectsPlaced.contains(objectToPlace))) {
+				objectPlaced = false;
+				/* layer defines what layer we are on 
+				 * in the grid like structure.
+				 * Imagine circles within circles
+				 */
+				int layer = 0;
+				while(!objectPlaced) {
+					layer += 1;
+					//Try different positions for the objects
+					outerloop: for(int x = ((int)parentObject.getPositionX() - (xSpacing*layer)); x <= ((int)parentObject.getPositionX() + (xSpacing*layer)); x += xSpacing) {
+						for(int y = ((int)parentObject.getPositionY() - (ySpacing * layer)); y <= ((int)parentObject.getPositionY() + (ySpacing*layer)); y += ySpacing) {
+							Point possiblePoint = new Point(x, y);
+							if(!(pointsReserved.contains(possiblePoint))) {
+								command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
+								command.redo();
+								undoManager.addEdit(command);
+								//Reserve the point and let the object in the queue
+								pointsReserved.add(possiblePoint);
+								newlyPlacedObjects.add(objectToPlace);
+								// Don't place the same object twice
+								objectsPlaced.add(objectToPlace);
+								objectPlaced = true;
+								break outerloop;
+							}
 						}
 					}
 				}
 			}
 		}
 		newlyPlacedObjects.remove(parentObject);
+	}
+	/*
+	 * Find better name
+	 * We move all the objects so that their y-value and x-value >= 10
+	 * Else it creates bugs with the scrollbar
+	 * So we push all objects by some factor on the y and x axis
+	 */
+
+	private void moveObjectsWithinOrigo() {
+		int lowestY = 20;
+		int lowestX = 20;
+		for(PetriNetObject object : drawingSurfaceObjects) {
+			if(object instanceof PlaceTransitionObject) {
+				PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
+				if(ptObject.getPositionX() < lowestX) {
+					lowestX = (int) ptObject.getPositionX();
+				}
+				if(ptObject.getPositionY() < lowestY) {
+					lowestY = (int) ptObject.getPositionY();
+				}
+			}
+		}
+		if(lowestX < 10) {
+			Command command;
+			for(PetriNetObject object : drawingSurfaceObjects) {
+				if(object instanceof PlaceTransitionObject) {
+					PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
+					int newX = (int) (ptObject.getPositionX() + Math.abs(lowestX) + 10);
+					Point newPosition = new Point(newX, (int) ptObject.getPositionY());
+					command = new MovePlaceTransitionObject(ptObject, newPosition);
+					command.redo();
+					undoManager.addEdit(command);
+				}
+			}
+		}
+		if(lowestY < 10) {
+			Command command;
+			for(PetriNetObject object : drawingSurfaceObjects) {
+				if(object instanceof PlaceTransitionObject) {
+					PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
+					int newY = (int) (ptObject.getPositionY() + Math.abs(lowestY) + 10);
+					Point newPosition = new Point((int) ptObject.getPositionX(), newY);
+					command = new MovePlaceTransitionObject(ptObject, newPosition);
+					command.redo();
+					undoManager.addEdit(command);
+				}
+			}
+		}
+	}
+	
+	private void printPTObjectsAndPositions() {
+		for(PetriNetObject object : drawingSurfaceObjects) {
+			if(object instanceof PlaceTransitionObject) {
+				PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
+				System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getPositionX() + " Y: " + ptObject.getPositionY());
+			}
+		}
 	}
 	
 }
