@@ -46,12 +46,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
-	// flag used in paintComponents() to know if a call to zoom() has been done
-	private boolean doSetViewPosition = true;
-
-	// position where the viewport must be set
-	private Point viewPosition = new Point(0, 0);
-
 	private DataLayer guiModel;
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
@@ -161,11 +155,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		selection.updateBounds();
 
-		if (doSetViewPosition) {
-			((JViewport) getParent()).setViewPosition(viewPosition);
-			app.validate();
-			doSetViewPosition = false;
-		}
 	}
 
 	public void updatePreferredSize() {
@@ -376,9 +365,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			newViewY = 0;
 		}
 
-		
-		viewPosition.setLocation(newViewX, newViewY);
-		viewport.setViewPosition(viewPosition);
+		viewport.setViewPosition(new Point(newViewX, newViewY));
+
 
 		updatePreferredSize();
 	}
