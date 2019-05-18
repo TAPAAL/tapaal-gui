@@ -3,9 +3,10 @@ package dk.aau.cs.gui.components;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.Arc;
@@ -27,8 +28,8 @@ public class SmartDrawWorker {
 	pipe.gui.undo.UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
 	
 	//weights
-	int fortyFiveDegreeWeight = 8;
-	int ninetyDegreeWeight = 5;
+	int diagonalWeight = 8;
+	int nonDiagonalWeight = 5;
 	int distanceWeight = 10;
 
 	
@@ -60,6 +61,8 @@ public class SmartDrawWorker {
 		undoManager.addEdit(command);
 		pointsReserved.add(startingPoint);
 		
+		removeArcPathPoints();
+		
 		if(searchOption == "DFS") {
 			objectsPlaced = new ArrayList<PlaceTransitionObject>();
 			objectsPlaced.add(startingObject);
@@ -83,7 +86,7 @@ public class SmartDrawWorker {
 		moveObjectsWithinOrigo();
 		
 		
-		removeArcPathPoints();
+		
 		
 		CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);
@@ -91,16 +94,23 @@ public class SmartDrawWorker {
 	}
 	
 	private void depthFirstDraw(PlaceTransitionObject parentObject) {
-		Iterator<Arc> arcFromIterator = parentObject.getConnectFromIterator();
-		Command command;
+		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
-		boolean objectHasUnvisitedArcs = false;
-		outerloop: while(arcFromIterator.hasNext()) {
-			Arc arcTraversed = arcFromIterator.next();
-			if(!(arcsVisited.contains(arcTraversed))) {
-				PlaceTransitionObject objectToPlace = arcTraversed.getTarget();
+		Point parentPoint = new Point((int)parentObject.getPositionX(), (int)parentObject.getPositionY());
+		
+		outerloop: for(Arc arc : arcsForObject) {
+			if(!(arcsVisited.contains(arc))) {
+				arcsVisited.add(arc);
+				if(arc.getTarget() != parentObject) {objectToPlace = arc.getTarget();} 
+				else {objectToPlace = arc.getSource();}
+				
+				System.out.println("ObjectsPlaced:"+objectsPlaced + "\nobjectToPlace: " + objectToPlace + "\nParentObject: " + parentObject);
 				if(!(objectsPlaced.contains(objectToPlace))) {
+
 					objectPlaced = false;
+					int smallestWeight = Integer.MAX_VALUE;
+					Point bestPoint = null;
 					/* layer defines what layer we are on 
 					 * in the grid like structure.
 					 * Imagine circles within circles
@@ -113,34 +123,60 @@ public class SmartDrawWorker {
 							for(int y = ((int)parentObject.getPositionY() - (ySpacing * layer)); y <= ((int)parentObject.getPositionY() + (ySpacing*layer)); y += ySpacing) {
 								Point possiblePoint = new Point(x, y);
 								if(!(pointsReserved.contains(possiblePoint))) {
-									command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
-									command.redo();
-									undoManager.addEdit(command);
-									
-									//Reserve the point and let the object in the queue
-									pointsReserved.add(possiblePoint);
-									unfinishedObjects.add(objectToPlace);
-									//Don't visit the same arc twice or place the same object twice
-									arcsVisited.add(arcTraversed);
-									objectsPlaced.add(objectToPlace);
-									objectPlaced = true;
-									break outerloop;
+
+									int weight = calculateWeight(possiblePoint, parentPoint, layer);
+
+									if(weight < smallestWeight) {
+										smallestWeight = weight;
+										bestPoint = possiblePoint;
+									}
 								}
 							}
+						}
+						//We try at least 3 times
+						if(layer >= 3 && bestPoint != null) {
+							moveObject(objectToPlace, bestPoint);
+							
+							//Reserve the point and let the object in the queue
+							reservePoint(bestPoint);
+							unfinishedObjects.add(objectToPlace);
+							//Don't visit the same arc twice or place the same object twice
+							objectsPlaced.add(objectToPlace);
+							objectPlaced = true;
+							break outerloop;
 						}
 					}
 				}	
 			}
 		}
 		//These remove the object if we have visited all arcs from it
-		while(arcFromIterator.hasNext()) {
-			if(!(arcsVisited.contains(arcFromIterator.next()))) {
-				objectHasUnvisitedArcs = true;
-			}
-		}
-		if(objectHasUnvisitedArcs == false) {
+		if(arcsVisited.containsAll(arcsForObject)) {
 			unfinishedObjects.remove(parentObject);
 		}
+	}
+	
+	private ArrayList<Arc> getAllArcsFromObject(PlaceTransitionObject object) {
+		ArrayList<Arc> arcsForObject = new ArrayList<Arc>();
+		Iterator<Arc> fromIterator = object.getConnectFromIterator();
+		Iterator<Arc> toIterator = object.getConnectToIterator();
+		Arc arc;
+		while(fromIterator.hasNext()) {
+			arc = fromIterator.next();
+			arcsForObject.add(arc);
+		}
+		while(toIterator.hasNext()) {
+			arc = toIterator.next();
+			arcsForObject.add(arc);
+		}
+		return arcsForObject;
+	}
+	private void moveObject(PlaceTransitionObject object, Point point) {
+		Command command = new MovePlaceTransitionObject(object, point);
+		command.redo();
+		undoManager.addEdit(command);
+	}
+	private void reservePoint(Point point) {
+		pointsReserved.add(point);
 	}
 	
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
@@ -181,6 +217,16 @@ public class SmartDrawWorker {
 			}
 		}
 		newlyPlacedObjects.remove(parentObject);
+	}
+	private int calculateWeight(Point candidatePoint, Point parentPoint, int layer) {
+		int weight = 0;
+		if(candidatePoint.x == parentPoint.x || candidatePoint.y == parentPoint.y) {
+			weight += nonDiagonalWeight * layer;
+		} else {
+			weight += diagonalWeight * layer;
+		}
+		weight += distanceWeight * ((Math.abs(candidatePoint.x - parentPoint.x) + Math.abs(candidatePoint.y - parentPoint.x)) / 1000);
+		return weight;
 	}
 	
 	private PlaceTransitionObject findStartingObjectCandidate() {

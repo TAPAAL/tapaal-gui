@@ -30,14 +30,14 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved.setPositionY(oldY);
 		Iterator<Arc> fromIterator = objectToBeMoved.getConnectFromIterator();
 		Iterator<Arc> toIterator = objectToBeMoved.getConnectToIterator();
-		while(toIterator.hasNext()) {
-			toIterator.next().updateArcPosition();
-			objectToBeMoved.updateEndPoint(toIterator.next());
+		/*while(toIterator.hasNext()) {
+			Arc arc = toIterator.next();
+			arc.updateArcPosition();
 		}
 		while(fromIterator.hasNext()) {
-			fromIterator.next().updateArcPosition();
-			objectToBeMoved.updateEndPoint(fromIterator.next());
-		}
+			Arc arc = fromIterator.next();
+			arc.updateArcPosition();
+		}*/
 
 		CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);

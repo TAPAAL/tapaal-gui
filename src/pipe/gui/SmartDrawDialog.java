@@ -50,8 +50,8 @@ public class SmartDrawDialog extends JDialog {
 	ArrayList<Arc> arcsVisited;
 
 	
-	int xSpacing = 50;
-	int ySpacing = 50;
+	int xSpacing = 80;
+	int ySpacing = 80;
 	String searchOption = "DFS";
 	
 	static SmartDrawDialog smartDrawDialog;
