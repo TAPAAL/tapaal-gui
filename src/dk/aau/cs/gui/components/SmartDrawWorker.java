@@ -21,6 +21,7 @@ public class SmartDrawWorker {
 	int ySpacing;
 	DrawingSurfaceImpl drawingSurface;
 	String searchOption;
+	Point rootPoint;
 	
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
@@ -54,12 +55,12 @@ public class SmartDrawWorker {
 		//We need a better way to choose the first object
 		PlaceTransitionObject startingObject = findStartingObjectCandidate();
 		
-		//We place the first object at hard coordinates
-		Point startingPoint = new Point(500,350);
-		Command command = new MovePlaceTransitionObject(startingObject, startingPoint);
+		//We place the first object at hard coordinates 
+		rootPoint = new Point(500,350);
+		Command command = new MovePlaceTransitionObject(startingObject, rootPoint);
 		command.redo();
 		undoManager.addEdit(command);
-		pointsReserved.add(startingPoint);
+		pointsReserved.add(rootPoint);
 		
 		removeArcPathPoints();
 		
@@ -119,12 +120,12 @@ public class SmartDrawWorker {
 					while(!objectPlaced) {
 						layer += 1;
 						//Try different positions for the objects
-						for(int x = ((int)parentObject.getPositionX() - (xSpacing*layer)); x <= ((int)parentObject.getPositionX() + (xSpacing*layer)); x += xSpacing) {
-							for(int y = ((int)parentObject.getPositionY() - (ySpacing * layer)); y <= ((int)parentObject.getPositionY() + (ySpacing*layer)); y += ySpacing) {
+						for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
+							for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 								Point possiblePoint = new Point(x, y);
 								if(!(pointsReserved.contains(possiblePoint))) {
 
-									int weight = calculateWeight(possiblePoint, parentPoint, layer);
+									int weight = calculateWeight(possiblePoint, layer);
 
 									if(weight < smallestWeight) {
 										smallestWeight = weight;
@@ -218,14 +219,14 @@ public class SmartDrawWorker {
 		}
 		newlyPlacedObjects.remove(parentObject);
 	}
-	private int calculateWeight(Point candidatePoint, Point parentPoint, int layer) {
+	private int calculateWeight(Point candidatePoint, int layer) {
 		int weight = 0;
-		if(candidatePoint.x == parentPoint.x || candidatePoint.y == parentPoint.y) {
+		if(candidatePoint.x == rootPoint.x || candidatePoint.y == rootPoint.y) {
 			weight += nonDiagonalWeight * layer;
 		} else {
 			weight += diagonalWeight * layer;
 		}
-		weight += distanceWeight * ((Math.abs(candidatePoint.x - parentPoint.x) + Math.abs(candidatePoint.y - parentPoint.x)) / 1000);
+		weight += distanceWeight * ((Math.abs(candidatePoint.x - rootPoint.x) + Math.abs(candidatePoint.y - rootPoint.x)) / 1000);
 		return weight;
 	}
 	
