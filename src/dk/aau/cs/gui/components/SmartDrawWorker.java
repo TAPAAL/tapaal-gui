@@ -106,7 +106,6 @@ public class SmartDrawWorker {
 				if(arc.getTarget() != parentObject) {objectToPlace = arc.getTarget();} 
 				else {objectToPlace = arc.getSource();}
 				
-				System.out.println("ObjectsPlaced:"+objectsPlaced + "\nobjectToPlace: " + objectToPlace + "\nParentObject: " + parentObject);
 				if(!(objectsPlaced.contains(objectToPlace))) {
 
 					objectPlaced = false;
@@ -181,14 +180,18 @@ public class SmartDrawWorker {
 	}
 	
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
-		Iterator<Arc> arcFromIterator = parentObject.getConnectFromIterator();
-		Command command;
+		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
-		while(arcFromIterator.hasNext()) {
-			PlaceTransitionObject objectToPlace = arcFromIterator.next().getTarget();
+		Point parentPoint = new Point((int)parentObject.getPositionX(), (int)parentObject.getPositionY());
+		for(Arc arc : arcsForObject) {
+			if(arc.getTarget() != parentObject) {objectToPlace = arc.getTarget();} 
+			else {objectToPlace = arc.getSource();}
 			//Check if we already placed it to avoid infinite loops
 			if(!(objectsPlaced.contains(objectToPlace))) {
 				objectPlaced = false;
+				int smallestWeight = Integer.MAX_VALUE;
+				Point bestPoint = null;
 				/* layer defines what layer we are on 
 				 * in the grid like structure.
 				 * Imagine circles within circles
@@ -197,22 +200,25 @@ public class SmartDrawWorker {
 				while(!objectPlaced) {
 					layer += 1;
 					//Try different positions for the objects
-					outerloop: for(int x = ((int)parentObject.getPositionX() - (xSpacing*layer)); x <= ((int)parentObject.getPositionX() + (xSpacing*layer)); x += xSpacing) {
-						for(int y = ((int)parentObject.getPositionY() - (ySpacing * layer)); y <= ((int)parentObject.getPositionY() + (ySpacing*layer)); y += ySpacing) {
+					for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
+						for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 							Point possiblePoint = new Point(x, y);
-							if(!(pointsReserved.contains(possiblePoint))) {
-								command = new MovePlaceTransitionObject(objectToPlace, possiblePoint);
-								command.redo();
-								undoManager.addEdit(command);
-								//Reserve the point and let the object in the queue
-								pointsReserved.add(possiblePoint);
-								newlyPlacedObjects.add(objectToPlace);
-								// Don't place the same object twice
-								objectsPlaced.add(objectToPlace);
-								objectPlaced = true;
-								break outerloop;
+							int weight = calculateWeight(possiblePoint, layer);
+
+							if(weight < smallestWeight) {
+								smallestWeight = weight;
+								bestPoint = possiblePoint;
 							}
 						}
+					}
+					if(!(pointsReserved.contains(bestPoint)) && layer >=3) {
+						moveObject(objectToPlace, bestPoint);
+						//Reserve the point and let the object in the queue
+						reservePoint(bestPoint);
+						newlyPlacedObjects.add(objectToPlace);
+						// Don't place the same object twice
+						objectsPlaced.add(objectToPlace);
+						objectPlaced = true;
 					}
 				}
 			}
