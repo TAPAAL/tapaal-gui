@@ -1,8 +1,10 @@
 package dk.aau.cs.gui.undo;
 
 import java.awt.Point;
+import java.util.Iterator;
 
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 
@@ -26,6 +28,17 @@ public class MovePlaceTransitionObject extends Command {
 	public void undo() {
 		objectToBeMoved.setPositionX(oldX);
 		objectToBeMoved.setPositionY(oldY);
+		Iterator<Arc> fromIterator = objectToBeMoved.getConnectFromIterator();
+		Iterator<Arc> toIterator = objectToBeMoved.getConnectToIterator();
+		while(toIterator.hasNext()) {
+			toIterator.next().updateArcPosition();
+			objectToBeMoved.updateEndPoint(toIterator.next());
+		}
+		while(fromIterator.hasNext()) {
+			fromIterator.next().updateArcPosition();
+			objectToBeMoved.updateEndPoint(fromIterator.next());
+		}
+
 		CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);
 		CreateGui.getDrawingSurface().updatePreferredSize();
