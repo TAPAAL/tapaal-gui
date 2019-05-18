@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -24,13 +23,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.components.SmartDrawWorker;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.undo.DeleteArcPathPointEdit;
 import pipe.gui.widgets.CustomJSpinner;
 
 public class SmartDrawDialog extends JDialog {

@@ -22,6 +22,7 @@ public class SmartDrawWorker {
 	DrawingSurfaceImpl drawingSurface;
 	String searchOption;
 	Point rootPoint;
+	int i = 0;
 	
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
@@ -32,6 +33,7 @@ public class SmartDrawWorker {
 	int diagonalWeight = 8;
 	int nonDiagonalWeight = 5;
 	int distanceWeight = 10;
+	int overlappingArcWeight = 100;
 
 	
 	//For BFS
@@ -63,13 +65,13 @@ public class SmartDrawWorker {
 		pointsReserved.add(rootPoint);
 		
 		removeArcPathPoints();
+		arcsVisited = new ArrayList<Arc>();
 		
 		if(searchOption == "DFS") {
 			objectsPlaced = new ArrayList<PlaceTransitionObject>();
 			objectsPlaced.add(startingObject);
 			unfinishedObjects = new ArrayList<PlaceTransitionObject>();
 			unfinishedObjects.add(startingObject);
-			arcsVisited = new ArrayList<Arc>();
 			while(!(unfinishedObjects.isEmpty())) {
 				PlaceTransitionObject nextObject = unfinishedObjects.get(unfinishedObjects.size()-1);
 				depthFirstDraw(nextObject);
@@ -124,7 +126,7 @@ public class SmartDrawWorker {
 								Point possiblePoint = new Point(x, y);
 								if(!(pointsReserved.contains(possiblePoint))) {
 
-									int weight = calculateWeight(possiblePoint, layer);
+									int weight = calculateWeight(possiblePoint, layer, parentObject, objectToPlace);
 
 									if(weight < smallestWeight) {
 										smallestWeight = weight;
@@ -187,6 +189,7 @@ public class SmartDrawWorker {
 		for(Arc arc : arcsForObject) {
 			if(arc.getTarget() != parentObject) {objectToPlace = arc.getTarget();} 
 			else {objectToPlace = arc.getSource();}
+			arcsVisited.add(arc);
 			//Check if we already placed it to avoid infinite loops
 			if(!(objectsPlaced.contains(objectToPlace))) {
 				objectPlaced = false;
@@ -203,7 +206,7 @@ public class SmartDrawWorker {
 					for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
 						for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 							Point possiblePoint = new Point(x, y);
-							int weight = calculateWeight(possiblePoint, layer);
+							int weight = calculateWeight(possiblePoint, layer, parentObject, objectToPlace);
 
 							if(weight < smallestWeight) {
 								smallestWeight = weight;
@@ -225,7 +228,7 @@ public class SmartDrawWorker {
 		}
 		newlyPlacedObjects.remove(parentObject);
 	}
-	private int calculateWeight(Point candidatePoint, int layer) {
+	private int calculateWeight(Point candidatePoint, int layer, PlaceTransitionObject parentObject, PlaceTransitionObject objectToPlace) {
 		int weight = 0;
 		if(candidatePoint.x == rootPoint.x || candidatePoint.y == rootPoint.y) {
 			weight += nonDiagonalWeight * layer;
@@ -233,7 +236,41 @@ public class SmartDrawWorker {
 			weight += diagonalWeight * layer;
 		}
 		weight += distanceWeight * ((Math.abs(candidatePoint.x - rootPoint.x) + Math.abs(candidatePoint.y - rootPoint.x)) / 1000);
+		weight += calculateNumberOfOverlappingArcs(candidatePoint, parentObject, objectToPlace) * overlappingArcWeight;
 		return weight;
+	}
+	
+	private int calculateNumberOfOverlappingArcs(Point candidatePoint, PlaceTransitionObject parentObject, PlaceTransitionObject objectToPlace) {
+		int number = 0;
+		Point source;
+		Point target;
+		double distanceTargetSource;
+		double distancePointSource;
+		double distanceTargetPoint;
+		System.out.println(arcsVisited.size());
+		for(PlaceTransitionObject object : objectsPlaced) {
+			for(Arc arc : getAllArcsFromObject(object)) {
+				source = getObjectPositionAsPoint(arc.getSource());
+				target = getObjectPositionAsPoint(arc.getTarget());
+				
+				distanceTargetSource = Point.distance(source.x, source.y, target.x, target.y);
+				distanceTargetPoint = Point.distance(candidatePoint.x, candidatePoint.y, target.x, target.y);
+				distancePointSource = Point.distance(candidatePoint.x, candidatePoint.y, source.x, source.y);
+				
+				if((distancePointSource + distanceTargetPoint) == distanceTargetSource)
+					number += 1;
+				else if((distancePointSource + distanceTargetSource) == distanceTargetPoint)
+					number += 1;
+				else if((distanceTargetSource + distanceTargetPoint == distancePointSource))
+					number += 1;
+			}
+		}
+		
+		return number;
+	}
+	
+	public Point getObjectPositionAsPoint(PlaceTransitionObject object) {
+		return new Point((int) object.getPositionX(), (int)object.getPositionY());
 	}
 	
 	private PlaceTransitionObject findStartingObjectCandidate() {
