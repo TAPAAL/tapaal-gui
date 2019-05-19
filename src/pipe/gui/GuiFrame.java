@@ -54,6 +54,7 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;

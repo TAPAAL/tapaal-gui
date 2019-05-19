@@ -1,9 +1,9 @@
-package dk.aau.cs.gui.components;
+package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
-
+import java.util.Random;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
@@ -23,7 +23,6 @@ public class SmartDrawWorker {
 	DrawingSurfaceImpl drawingSurface;
 	String searchOption;
 	Point rootPoint;
-	int i = 0;
 	Point rightMostPointUsed = new Point(0, 0);
 	
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
@@ -32,10 +31,10 @@ public class SmartDrawWorker {
 	pipe.gui.undo.UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
 	
 	//weights
-	int diagonalWeight = 8;
-	int nonDiagonalWeight = 5;
-	int distanceWeight = 10;
-	int overlappingArcWeight = 100;
+	int diagonalWeight;
+	int straightWeight;
+	int distanceWeight;
+	int overlappingArcWeight;
 
 	
 	//For BFS
@@ -45,13 +44,28 @@ public class SmartDrawWorker {
 	ArrayList<PlaceTransitionObject> unfinishedObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Arc> arcsVisited = new ArrayList<Arc>();
 	
-	public SmartDrawWorker(int xSpacing, int ySpacing, DrawingSurfaceImpl drawingSurface, String searchOption) {
+	public SmartDrawWorker(int xSpacing, int ySpacing, DrawingSurfaceImpl drawingSurface, String searchOption, 
+			int straightWeight, int diagonalWeight, int distanceWeight, int overlappingArcWeight, String startingObject) {
 		this.startingObject = findStartingObjectCandidate();
 		this.xSpacing = xSpacing;
 		this.ySpacing = ySpacing;
 		this.drawingSurface = drawingSurface;
 		this.searchOption = searchOption;
+		this.straightWeight = straightWeight;
+		this.diagonalWeight = diagonalWeight;
+		this.distanceWeight = distanceWeight;
+		this.overlappingArcWeight = overlappingArcWeight;
+		
+			
 		getPlaceTransitionObjects(); 
+		processStartingObject(startingObject);
+	}
+	
+	private void processStartingObject(String startingObject) {
+		if(!(startingObject == "Random"))
+			this.startingObject = drawingSurface.getPlaceTransitionObjectByName(startingObject);
+		else
+	    	this.startingObject = placeTransitionObjects.get(new Random().nextInt(placeTransitionObjects.size()));
 	}
 	
 	public void smartDraw() {
@@ -253,7 +267,7 @@ public class SmartDrawWorker {
 	private int calculateWeight(Point candidatePoint, int layer, Point parentPoint, PlaceTransitionObject objectToPlace) {
 		int weight = 0;
 		if(candidatePoint.x == parentPoint.x || candidatePoint.y == parentPoint.y) {
-			weight += nonDiagonalWeight * layer;
+			weight += straightWeight * layer;
 		} else {
 			weight += diagonalWeight * layer;
 		}
