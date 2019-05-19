@@ -159,12 +159,10 @@ public class SmartDrawWorker {
 								if(!(pointsReserved.contains(possiblePoint))) {
 
 									int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
-									System.out.println(objectToPlace.getName() + " weight: " + weight + " smallest weight: " + smallestWeight + " position " + possiblePoint);
 
 									if(weight < smallestWeight) {
 										smallestWeight = weight;
 										bestPoint = possiblePoint;
-										System.out.println("Best Point: " + bestPoint);
 									}
 								}
 							}

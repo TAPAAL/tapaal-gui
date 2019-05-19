@@ -10,6 +10,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -27,6 +28,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -38,18 +41,13 @@ public class SmartDrawDialog extends JDialog {
 	
 	JPanel mainPanel;
 	ArrayList<PlaceTransitionObject> placeTransitionObjects;
-	pipe.gui.undo.UndoManager undoManager;
-	ArrayList<Point> pointsReserved;
 	String startingObject;
 	String template;
-
-	//For BFS
-	ArrayList<PlaceTransitionObject> newlyPlacedObjects;
-	ArrayList<PlaceTransitionObject> objectsPlaced;
-	
-	//For DFS
-	ArrayList<PlaceTransitionObject> unfinishedObjects;
-	ArrayList<Arc> arcsVisited;
+	String[] objectNames;
+	String[] templateNames;
+	JComboBox objectDropdown = new JComboBox();
+	JCheckBox randomStartObjectCheckBox;
+	JComboBox templateSelector = new JComboBox();
 
 	
 	int xSpacing = 80;
@@ -62,6 +60,7 @@ public class SmartDrawDialog extends JDialog {
 	
 	static SmartDrawDialog smartDrawDialog;
 	public static void showSmartDrawDialog() {
+		
 		if(smartDrawDialog == null){
 			smartDrawDialog = new SmartDrawDialog(CreateGui.getApp(), "Smart Draw", true);
 			smartDrawDialog.pack();
@@ -70,13 +69,25 @@ public class SmartDrawDialog extends JDialog {
 			smartDrawDialog.setLocationRelativeTo(null);
 			smartDrawDialog.setResizable(true);
 		}
-		
+		smartDrawDialog.updateLists();
 		smartDrawDialog.setVisible(true);
 	}
 
 	private SmartDrawDialog(Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
 		initComponents();
+	}
+	
+	private void updateLists() {
+		objectDropdown.removeAllItems();
+		for(String name : getObjectNames()) {
+			objectDropdown.addItem(name);
+		}
+		
+		templateSelector.removeAllItems();
+		for(String name : getTemplatesAsString()) {
+			templateSelector.addItem(name);
+		}
 	}
 	
 	private void initComponents() {
@@ -88,14 +99,9 @@ public class SmartDrawDialog extends JDialog {
 		initCheckBoxes();
 		initAdvancedOptionsPanel();
 		
-		final JComboBox templateSelector = new JComboBox(getTemplatesAsString());
-		templateSelector.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				template = templateSelector.getSelectedItem().toString();
-			}
-		});
+		
+		templateSelector.setEnabled(false);
+		
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -113,7 +119,7 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SmartDrawWorker worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
-						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject);
+						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString());
 				worker.smartDraw();
 			}
 		});
@@ -134,12 +140,6 @@ public class SmartDrawDialog extends JDialog {
 		JPanel advancedOptionsPanel = new JPanel(new GridBagLayout());
 		advancedOptionsPanel.setBorder(new TitledBorder("Advanced Options"));
 		
-		String[] objectNames = {"Choose object"};
-		int i = 1;
-		for(PetriNetObject object : CreateGui.getDrawingSurface().getPlaceTransitionObjects()) {
-			objectNames[i] = object.getName();
-			i++;
-		}
 		JLabel comboBoxLabel = new JLabel("Choose Initial Object:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -151,16 +151,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(comboBoxLabel, gbc);
 		
-		final JComboBox objectDropdown = new JComboBox(objectNames);
-		objectDropdown.setSelectedIndex(0);
 		objectDropdown.setEnabled(false);
-		objectDropdown.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				startingObject = objectDropdown.getSelectedItem().toString();
-			}
-		});
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -171,7 +163,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(objectDropdown, gbc);
 		
-		final JCheckBox randomStartObjectCheckBox = new JCheckBox("Random Initial Object:", true);
+		randomStartObjectCheckBox = new JCheckBox("Random Initial Object:", true);
 		randomStartObjectCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		randomStartObjectCheckBox.addActionListener(new ActionListener() {
 			
@@ -376,6 +368,7 @@ public class SmartDrawDialog extends JDialog {
 			}
 		});
 		JRadioButton randomSearch = new JRadioButton("Random:");
+		randomSearch.setEnabled(false);
 		BFS.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -451,12 +444,16 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		spacingPanel.add(xLabel, gbc);
 		
-		
-		final JSpinner xSpaceSpinner = new CustomJSpinner(xSpacing, 0, Integer.MAX_VALUE);
-		xSpaceSpinner.addChangeListener(new ChangeListener() {
+		SpinnerModel xSpaceModel =
+		        new SpinnerNumberModel(xSpacing, //initial value
+		                               0, //min
+		                               Integer.MAX_VALUE, //max
+		                               1);
+		final JSpinner xSpinner = new JSpinner(xSpaceModel);
+		xSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				xSpacing = (Integer)xSpaceSpinner.getValue();
+				xSpacing = (Integer)xSpinner.getValue();
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -467,7 +464,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(0, 10, 10, 10);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		spacingPanel.add(xSpaceSpinner, gbc);
+		spacingPanel.add(xSpinner, gbc);
 		
 		JLabel yLabel = new JLabel("Spacing on the y-axis:");
 		gbc = new GridBagConstraints();
@@ -480,11 +477,16 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		spacingPanel.add(yLabel, gbc);
 		
-		final JSpinner ySpaceSpinner = new CustomJSpinner(ySpacing, 0, Integer.MAX_VALUE);
-		ySpaceSpinner.addChangeListener(new ChangeListener() {
+		SpinnerModel ySpaceModel =
+		        new SpinnerNumberModel(ySpacing, //initial value
+		                               0, //min
+		                               Integer.MAX_VALUE, //max
+		                               1);
+		final JSpinner ySpinner = new JSpinner(ySpaceModel);
+		ySpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				ySpacing = (Integer)ySpaceSpinner.getValue();
+				ySpacing = (Integer)ySpinner.getValue();
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -495,7 +497,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(0, 10, 10, 10);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		spacingPanel.add(ySpaceSpinner, gbc);
+		spacingPanel.add(ySpinner, gbc);
 		
 		
 		
@@ -519,6 +521,14 @@ public class SmartDrawDialog extends JDialog {
 			templateNames[i] = template.model().name();
 		}
 		return templateNames;
+	}
+	
+	static private String[] getObjectNames() {
+		ArrayList<String> names = new ArrayList<String>();
+		for(PetriNetObject object : CreateGui.getDrawingSurface().getPlaceTransitionObjects()) {
+			names.add(object.getName());
+		}
+		return Arrays.copyOf(names.toArray(), names.toArray().length, String[].class);
 	}
 	//For debugging
 	private void printPTObjectsAndPositions() {
