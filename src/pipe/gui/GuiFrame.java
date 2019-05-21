@@ -1583,7 +1583,7 @@ public class GuiFrame extends JFrame  {
 			} else {
 				path = appTab.getTitleAt(index);
 			}
-			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile();
+			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
@@ -1603,7 +1603,7 @@ public class GuiFrame extends JFrame  {
 		try {
 			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
 
-			CreateGui.getCurrentTab().setFile(outFile);
+			CreateGui.getTab(index).setFile(outFile);
 
 			CreateGui.getDrawingSurface(index).setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
