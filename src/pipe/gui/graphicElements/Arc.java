@@ -28,7 +28,7 @@ public abstract class Arc extends PetriNetObject {
 			0, -10, -7, -10 }, 4);
 	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 
-	protected NameLabel label;
+	//protected NameLabel label;
 
 	private static Point2D.Double point;
 
@@ -62,7 +62,7 @@ public abstract class Arc extends PetriNetObject {
 			double endPositionXInput, double endPositionYInput,
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		label = new NameLabel(zoom);
+		pnName = new NameLabel(zoom);
 		myPath.addPoint((float) startPositionXInput,
 				(float) startPositionYInput, ArcPathPoint.STRAIGHT);
 		myPath.addPoint((float) endPositionXInput, (float) endPositionYInput,
@@ -83,7 +83,7 @@ public abstract class Arc extends PetriNetObject {
 	 */
 	public Arc(PlaceTransitionObject newSource) {
 		isPrototype = true;
-		label = new NameLabel(zoom);
+		pnName = new NameLabel(zoom);
 		source = newSource;
 		myPath.addPoint();
 		myPath.addPoint();
@@ -96,7 +96,7 @@ public abstract class Arc extends PetriNetObject {
 	public Arc() {
 		super();
 
-		label = new NameLabel(zoom);
+		pnName = new NameLabel(zoom);
 		//XXX see comment in function
 		setLableHandler();
 	}
@@ -138,7 +138,8 @@ public abstract class Arc extends PetriNetObject {
 	}
 
 	public void setLabelPosition() {
-		label.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+
+		pnName.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))),
 						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
 	}
 	@Override
@@ -170,7 +171,7 @@ public abstract class Arc extends PetriNetObject {
 	
 	@Override 
 	public NameLabel getNameLabel() {
-		return label;
+		return pnName;
 	}
 
 	/**
@@ -279,10 +280,10 @@ public abstract class Arc extends PetriNetObject {
 		//Draw Path
 		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+			//this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+			//this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
 		g2.setStroke(new BasicStroke(0.01f * zoom));
@@ -302,10 +303,10 @@ public abstract class Arc extends PetriNetObject {
 
 		if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-			this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
+			//this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-			this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+			//this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
 		g2.setStroke(new BasicStroke(0.8f));
@@ -350,8 +351,8 @@ public abstract class Arc extends PetriNetObject {
 		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
 
 		updateArcPosition();
-		if (getParent() != null && label.getParent() == null) {
-			getParent().add(label);
+		if (getParent() != null && pnName.getParent() == null) {
+			getParent().add(pnName);
 		}
 	}
 
@@ -359,7 +360,7 @@ public abstract class Arc extends PetriNetObject {
 	public void delete() {
 		if (!deleted) {
 			if (getParent() != null) {
-				getParent().remove(label);
+				getParent().remove(pnName);
 			}
 			if(source != null) source.removeFromArc(this);
 			if(target != null) target.removeToArc(this);
@@ -388,7 +389,7 @@ public abstract class Arc extends PetriNetObject {
 
 	public void removeFromView() {
 		if (getParent() != null) {
-			getParent().remove(label);
+			getParent().remove(pnName);
 		}
 		myPath.forceHidePoints();
 		removeFromContainer();
@@ -429,8 +430,8 @@ public abstract class Arc extends PetriNetObject {
 		zoom = percent;
 		this.updateArcPosition();
 		this.updateOnMoveOrZoom();
-		label.zoomUpdate(percent);
-		label.updateSize();
+		pnName.zoomUpdate(percent);
+		pnName.updateSize();
 	}
 
 	public void setZoom(int percent) {
