@@ -7,6 +7,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
 
 public class MovePlaceTransitionObject extends Command {
 	
@@ -28,17 +29,9 @@ public class MovePlaceTransitionObject extends Command {
 	public void undo() {
 		objectToBeMoved.setPositionX(oldX);
 		objectToBeMoved.setPositionY(oldY);
-		Iterator<Arc> fromIterator = objectToBeMoved.getConnectFromIterator();
-		Iterator<Arc> toIterator = objectToBeMoved.getConnectToIterator();
-		/*while(toIterator.hasNext()) {
-			Arc arc = toIterator.next();
-			arc.updateArcPosition();
-		}
-		while(fromIterator.hasNext()) {
-			Arc arc = fromIterator.next();
-			arc.updateArcPosition();
-		}*/
 
+		//objectToBeMoved.updateConnected();
+		//CreateGui.getCurrentTab().network().buildConstraints();
 		CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);
 		CreateGui.getDrawingSurface().updatePreferredSize();
@@ -51,6 +44,11 @@ public class MovePlaceTransitionObject extends Command {
 		
 		objectToBeMoved.setPositionX(newX);
 		objectToBeMoved.setPositionY(newY);
+		
+		//objectToBeMoved.updateConnected();
+		CreateGui.getDrawingSurface().repaintAll();
+		CreateGui.getModel().repaintAll(true);
+		CreateGui.getDrawingSurface().updatePreferredSize();
 		
 	}
 

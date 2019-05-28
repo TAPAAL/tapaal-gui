@@ -1,6 +1,7 @@
 package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Point;
+import java.awt.geom.Point2D.Float;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -14,7 +15,11 @@ import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.DeleteArcPathPointEdit;
+import pipe.gui.undo.TransitionRotationEdit;
+import pipe.gui.undo.TranslatePetriNetObjectEdit;
 
 public class SmartDrawWorker {
 	PlaceTransitionObject startingObject;
@@ -76,7 +81,9 @@ public class SmartDrawWorker {
 		
 		arcsVisited = new ArrayList<Arc>();
 		objectsPlaced = new ArrayList<PlaceTransitionObject>();
-
+		
+		removeArcPathPoints();
+		setTransitionsToUpright();
 		//Do for unconnected nets too
 		while(!(objectsPlaced.containsAll(placeTransitionObjects))) {
 			if(objectsPlaced.isEmpty()) {
@@ -116,14 +123,12 @@ public class SmartDrawWorker {
 				}
 			}
 		}
-		
-		removeArcPathPoints();
+		doOffsetForLoops();
 		moveObjectsWithinOrigo();
 		
 		
 		
-		
-		CreateGui.getDrawingSurface().repaintAll();
+		CreateGui.getDrawingSurface().repaint();
 		CreateGui.getModel().repaintAll(true);
 		CreateGui.getDrawingSurface().updatePreferredSize();
 	}
@@ -441,6 +446,57 @@ public class SmartDrawWorker {
 			command.redo();
 			undoManager.addEdit(command);
 		}
+	}
+	
+	private void setTransitionsToUpright() {
+		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+			if(ptObject instanceof Transition) {
+				Command command = new TransitionRotationEdit((Transition)ptObject, 0);
+				command.redo();
+				undoManager.addEdit(command);
+			}
+		}
+	}
+	
+	private void doOffsetForLoops() {
+		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
+			if(ptObject instanceof Place) {
+				Place place = (Place)ptObject;
+				for(Arc arcOne : place.getPostset()) {
+					Transition transition = (Transition)arcOne.getTarget();
+					for(Arc arcTwo : transition.getPostset()){
+						if(arcTwo.getTarget() == place) {
+							offsetArcPointsFromMiddlepoint(arcOne, arcTwo, place, transition);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Add arcPathPoints for arcs where
+	 * A---> B --> A so they do not overlap
+	 * could maybe be a for loop or something instead
+	 */
+	private void offsetArcPointsFromMiddlepoint(Arc arcOne, Arc arcTwo, Place place, Transition transition) {
+		Point.Float pointForArcOne = new Point.Float();
+		Point.Float pointForArcTwo = new Point.Float();
+		if(transition.getPositionX() == place.getPositionX()) {
+			pointForArcOne = new Point.Float(arcOne.getArcPath().midPoint.x+30, (arcOne.getArcPath().midPoint.y));
+			pointForArcTwo = new Point.Float(arcOne.getArcPath().midPoint.x-30, (arcOne.getArcPath().midPoint.y));
+		} 
+		else if(transition.getPositionY() == place.getPositionY()) {
+			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y+30);
+			pointForArcTwo = new Point.Float((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y-30);
+		} else {
+			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x+15), arcOne.getArcPath().midPoint.y+15);
+			pointForArcTwo = new Point.Float((arcOne.getArcPath().midPoint.x-15), arcOne.getArcPath().midPoint.y-15);
+		}
+		
+		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));
+		undoManager.addEdit(arcTwo.getArcPath().insertPoint(pointForArcTwo, false));
+
 	}
 	
 	private void getPlaceTransitionObjects() {
