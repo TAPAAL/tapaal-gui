@@ -29,6 +29,7 @@ public class SmartDrawWorker {
 	String searchOption;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
+	Boolean isDone = false;
 	
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
@@ -131,6 +132,7 @@ public class SmartDrawWorker {
 		CreateGui.getDrawingSurface().repaint();
 		CreateGui.getModel().repaintAll(true);
 		CreateGui.getDrawingSurface().updatePreferredSize();
+		isDone = true;
 	}
 	
 	private void depthFirstDraw(PlaceTransitionObject parentObject) {
@@ -507,6 +509,9 @@ public class SmartDrawWorker {
 				placeTransitionObjects.add(ptObject);
 			}
 		}
+	}
+	public boolean isDone() {
+		return isDone;
 	}
 	//For debugging
 	private void printPTObjectsAndPositions() {

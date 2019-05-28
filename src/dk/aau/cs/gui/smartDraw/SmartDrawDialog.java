@@ -1,11 +1,11 @@
 package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -24,17 +26,15 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileView;
 
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.widgets.CustomJSpinner;
 
 public class SmartDrawDialog extends JDialog {
 	private static final long serialVersionUID = 6116530047981607501L;
@@ -48,6 +48,12 @@ public class SmartDrawDialog extends JDialog {
 	JComboBox objectDropdown = new JComboBox();
 	JCheckBox randomStartObjectCheckBox;
 	JComboBox templateSelector = new JComboBox();
+	JDialog loadingDialogFrame;
+	Thread workingThread;
+	Thread loadingDialogFrameThread;
+	JDialog choiceModal;
+	boolean cancel = false;
+	SmartDrawWorker worker;
 
 	
 	int xSpacing = 80;
@@ -70,6 +76,7 @@ public class SmartDrawDialog extends JDialog {
 			smartDrawDialog.setResizable(true);
 		}
 		smartDrawDialog.updateLists();
+		smartDrawDialog.setEnabled(true);
 		smartDrawDialog.setVisible(true);
 	}
 
@@ -98,7 +105,8 @@ public class SmartDrawDialog extends JDialog {
 		initSpacingSelecters();
 		initCheckBoxes();
 		initAdvancedOptionsPanel();
-		
+		initChoiceModal();
+		initLoadingFrame();
 		
 		templateSelector.setEnabled(false);
 		
@@ -118,9 +126,31 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SmartDrawWorker worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
+				cancel = false;
+				worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
 						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString());
-				worker.smartDraw();
+				loadingDialogFrameThread = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						loadingDialogFrame.setVisible(true);
+						
+					}
+				});
+				loadingDialogFrameThread.start();
+				smartDrawDialog.setVisible(false);
+				workingThread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						worker.smartDraw();
+					}
+				});
+				workingThread.run();
+				if(worker.isDone() && cancel == false) {
+					loadingDialogFrame.setVisible(false);
+					choiceModal.setVisible(true);
+				}
+				
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -536,5 +566,149 @@ public class SmartDrawDialog extends JDialog {
 			System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getPositionX() + " Y: " + ptObject.getPositionY());
 		}
 	}
+	
+	private void initLoadingFrame() {
+		loadingDialogFrame = new JDialog(smartDrawDialog, "Working...", true);
+		loadingDialogFrame.setLayout(new GridBagLayout());
+		ImageIcon loadingGIF = new ImageIcon(CreateGui.imgPath + "ajax-loader.gif");
+		
+		JLabel workingLabel = new JLabel("<html><div style='text-align: center;'>Currently doing layout...<br/>This may take several minutes depending on the size of the net...</div></html>", SwingConstants.CENTER);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		
+		loadingDialogFrame.add(workingLabel, gbc);
+		JLabel loading = new JLabel("Working... ", loadingGIF, JLabel.CENTER);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		loadingDialogFrame.add(loading, gbc);
+		
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				while(!(workingThread.isInterrupted())) {
+					workingThread.interrupt();
+					if(workingThread.isInterrupted()) {
+						CreateGui.getDrawingSurface().getUndoManager().undo();
+						CreateGui.getDrawingSurface().repaintAll();
+						loadingDialogFrame.setVisible(false);
+						smartDrawDialog.setEnabled(true);
+						cancel = true;
+					}
+				}
+			}
+		});
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		loadingDialogFrame.add(cancelButton, gbc);
+		
+
+		loadingDialogFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		loadingDialogFrame.setSize(400, 300);
+		loadingDialogFrame.setVisible(false);
+		loadingDialogFrame.setLocationRelativeTo(smartDrawDialog);
+	}
+	
+	private void initChoiceModal() {
+		choiceModal = new JDialog(smartDrawDialog, "Keep?", true);
+		choiceModal.setLayout(new GridBagLayout());
+		choiceModal.setVisible(false);
+		choiceModal.setLocationRelativeTo(smartDrawDialog);
+		choiceModal.setResizable(false);
+		choiceModal.setSize(300, 100);
+
+		
+		JLabel choiceLabel = new JLabel("<html><div style='text-align: center;'>Would you like to keep the new layout,<br/> revert or try again?</div></html>", SwingConstants.CENTER);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.gridwidth = 3;
+		gbc.anchor = GridBagConstraints.NORTH;
+		
+		choiceModal.add(choiceLabel, gbc);
+		
+		JButton keepButton = new JButton("Keep layout");
+		keepButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				smartDrawDialog.setVisible(false);
+				choiceModal.setVisible(false);				
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		choiceModal.add(keepButton, gbc);
+		
+		JButton revertButton = new JButton("Revert");
+		revertButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getDrawingSurface().getUndoManager().undo();
+				smartDrawDialog.setVisible(false);
+				choiceModal.setVisible(false);
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		choiceModal.add(revertButton, gbc);
+		
+		JButton retryButton = new JButton("Try Again");
+		retryButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				choiceModal.setVisible(false);
+				smartDrawDialog.setVisible(true);
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		choiceModal.add(retryButton, gbc);
+		
+		
+	}
+
+    
 	
 }
