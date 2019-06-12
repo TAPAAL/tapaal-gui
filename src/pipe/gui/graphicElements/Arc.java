@@ -13,8 +13,6 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
-import pipe.gui.undo.AddArcPathPointEdit;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
 
 /**
@@ -372,11 +370,6 @@ public abstract class Arc extends PetriNetObject {
 
 	public void setPathToTransitionAngle(int angle) {
 		myPath.setTransitionAngle(angle);
-	}
-
-	public Command split(Point2D.Float mouseposition) {
-		ArcPathPoint newPoint = myPath.splitSegment(mouseposition);
-		return new AddArcPathPointEdit(this, newPoint);
 	}
 
 	public Transition getTransition() {
