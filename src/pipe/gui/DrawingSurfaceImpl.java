@@ -425,7 +425,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			view.addNewPetriNetObject(pnObject);
 		}
 
-		private PlaceTransitionObject newTimedPlace(Point p) {
+		private PlaceTransitionObject newTimedPlaceAddToModelView(Point p) {
 			p = adjustPointToGridAndZoom(p, view.getZoom());
 
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
@@ -438,7 +438,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return pnObject;
 		}
 
-		private PlaceTransitionObject newTAPNTransition(Point p) {
+		private PlaceTransitionObject newTAPNTransitionAddToModelView(Point p) {
 			p = adjustPointToGridAndZoom(p, view.getZoom());
 
 			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model));
@@ -452,7 +452,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return pnObject;
 		}
 
-        private AnnotationNote newAnnotationNote(Point clickPoint) {
+        private AnnotationNote newAnnotationNoteAddToModelView(Point clickPoint) {
             Point p = adjustPointToGridAndZoom(clickPoint, view.getZoom());
 
             AnnotationNote pnObject = new AnnotationNote(p.x, p.y, true);
@@ -490,7 +490,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				switch (mode) {
 					case TAPNPLACE:
 						// create place
-						newpto = newTimedPlace(clickPoint);
+						newpto = newTimedPlaceAddToModelView(clickPoint);
 
 						if (e.isControlDown()) {
 							continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
@@ -499,7 +499,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 					case TAPNTRANS:
 						// create transition
-						newpto = newTAPNTransition(clickPoint);
+						newpto = newTAPNTransitionAddToModelView(clickPoint);
 
 						if (e.isControlDown()) {
 							continueFastMode(e, newpto, ElementType.FAST_PLACE);
@@ -507,7 +507,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						break;
 
 					case ANNOTATION:
-						newAnnotationNote(clickPoint);
+						newAnnotationNoteAddToModelView(clickPoint);
 						break;
 
 					case ARC:
@@ -517,7 +517,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					case TAPNINHIBITOR_ARC:
 						// Add point to arc in creation
 						if (createArc != null) {
-							addPoint(createArc, e);
+							addArcPathPoint(createArc, e);
 						}
 						break;
 
@@ -528,14 +528,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 					case FAST_TRANSITION:
 						// create transition
-						newpto = newTAPNTransition(e.getPoint());
+						newpto = newTAPNTransitionAddToModelView(e.getPoint());
 
                         fastDrawAction(e, newpto, ElementType.FAST_PLACE);
                         break;
 
 					case FAST_PLACE:
 						// create place
-						newpto = newTimedPlace(e.getPoint());
+						newpto = newTimedPlaceAddToModelView(e.getPoint());
 
                         fastDrawAction(e, newpto, ElementType.FAST_TRANSITION);
                         break;
@@ -561,7 +561,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
             }
         }
 
-        private void addPoint(final Arc createArc, final MouseEvent e) {
+        private void addArcPathPoint(final Arc createArc, final MouseEvent e) {
 			int x = Grid.getModifiedX(e.getX());
 			int y = Grid.getModifiedY(e.getY());
 
