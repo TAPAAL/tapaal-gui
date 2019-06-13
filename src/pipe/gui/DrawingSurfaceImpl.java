@@ -454,30 +454,30 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
 				Pipe.ElementType mode = app.getMode();
-				PlaceTransitionObject pto;
+				PlaceTransitionObject newpto; //declared here as switch is one big scope
 				switch (mode) {
 
 				case TAPNPLACE:
 					// create place
-					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
+					newpto = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedPlaceCommand(
-									(TimedPlaceComponent) pto2, model,
+									(TimedPlaceComponent) newpto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						continueFastMode(e, pto2, ElementType.FAST_TRANSITION);
+						continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
 					}
 					break;
 
 				case TAPNTRANS:
 					// create transition
-					pto = newTAPNTransition(e.getPoint());
+					newpto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedTransitionCommand(
-									(TimedTransitionComponent) pto, model,
+									(TimedTransitionComponent) newpto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						continueFastMode(e, pto, ElementType.FAST_PLACE);
+						continueFastMode(e, newpto, ElementType.FAST_PLACE);
 					}
 					break;
 
@@ -510,26 +510,26 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 				case FAST_TRANSITION:
 					// create transition
-					pto = newTAPNTransition(e.getPoint());
-					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) pto, model, guiModel, view));
+					newpto = newTAPNTransition(e.getPoint());
+					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) newpto, model, guiModel, view));
 					app.setMode(ElementType.TAPNARC);
-					pto.getMouseHandler().mouseReleased(e);
+					newpto.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
-						continueFastMode(e, pto, ElementType.FAST_PLACE);
+						continueFastMode(e, newpto, ElementType.FAST_PLACE);
 					} else{
 						app.endFastMode();
 					}
 					break;
 				case FAST_PLACE:
 					// create place
-					PlaceTransitionObject pto3 = newTimedPlace(e.getPoint());
-					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) pto3, model, guiModel, view));
+					newpto = newTimedPlace(e.getPoint());
+					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) newpto, model, guiModel, view));
 					app.setMode(ElementType.TAPNARC);
-					pto3.getMouseHandler().mouseReleased(e);
+					newpto.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
-						continueFastMode(e, pto3, ElementType.FAST_TRANSITION);
+						continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
 					} else{
 						app.endFastMode();
 					}
