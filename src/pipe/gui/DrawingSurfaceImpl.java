@@ -412,8 +412,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPoint(p, view.getZoom());
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
-			pnObject = new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid
-					.getModifiedY(p.y), tp);
+			pnObject = new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y), tp);
 			model.add(tp);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
@@ -432,6 +431,16 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
+		}
+
+		private void continueFastMode(MouseEvent e, PlaceTransitionObject pto, ElementType nextMode) {
+			// connect arc
+			app.setMode(ElementType.TAPNARC);
+			pto.getMouseHandler().mousePressed(e);
+			pto.getMouseHandler().mouseReleased(e);
+			app.setMode(nextMode);
+			// enter fast mode
+			pnObject.dispatchEvent(e);
 		}
 
 		@Override
@@ -456,13 +465,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 									(TimedPlaceComponent) pto2, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						// connect arc
-						app.setMode(ElementType.TAPNARC);
-						pto2.getMouseHandler().mousePressed(e);
-						pto2.getMouseHandler().mouseReleased(e);
-						app.setMode(ElementType.FAST_TRANSITION);
-						// enter fast mode
-						pnObject.dispatchEvent(e);
+						continueFastMode(e, pto2, ElementType.FAST_TRANSITION);
 					}
 					break;
 
@@ -474,13 +477,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 									(TimedTransitionComponent) pto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						// connect arc
-						app.setMode(ElementType.TAPNARC);
-						pto.getMouseHandler().mousePressed(e);
-						pto.getMouseHandler().mouseReleased(e);
-						// enter fast mode
-						app.setMode(ElementType.FAST_PLACE);
-						pnObject.dispatchEvent(e);
+						continueFastMode(e, pto, ElementType.FAST_PLACE);
 					}
 					break;
 
@@ -519,13 +516,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					pto.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
-						// connect arc
-						pnObject.dispatchEvent(e);
-						app.setMode(ElementType.TAPNARC);
-						pto.getMouseHandler().mousePressed(e);
-						pto.getMouseHandler().mouseReleased(e);
-						// enter fast mode
-						app.setMode(ElementType.FAST_PLACE);
+						continueFastMode(e, pto, ElementType.FAST_PLACE);
 					} else{
 						app.endFastMode();
 					}
@@ -538,13 +529,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					pto3.getMouseHandler().mouseReleased(e);
 
 					if (e.isControlDown()) {
-						// connect arc
-						pnObject.dispatchEvent(e);
-						app.setMode(ElementType.TAPNARC);
-						pto3.getMouseHandler().mousePressed(e);
-						pto3.getMouseHandler().mouseReleased(e);
-						// enter fast mode
-						app.setMode(ElementType.FAST_TRANSITION);
+						continueFastMode(e, pto3, ElementType.FAST_TRANSITION);
 					} else{
 						app.endFastMode();
 					}
