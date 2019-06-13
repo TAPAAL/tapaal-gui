@@ -398,7 +398,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			guiModel = _model;
 		}
 
-		private Point adjustPoint(Point p, int zoom) {
+		private Point adjustPointToZoom(Point p, int zoom) {
 			int offset = (int) (Zoomer.getScaleFactor(zoom)
 					* Pipe.PLACE_TRANSITION_HEIGHT / 2);
 
@@ -408,11 +408,25 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			p.setLocation(x, y);
 			return p;
 		}
+		private Point adjustPointToGrid(Point p) {
+			int x = Grid.getModifiedX(p.x);
+			int y = Grid.getModifiedY(p.y);
+
+			return new Point(x, y);
+		}
+
+		private Point adjustPointToGridAndZoom(Point p, int zoom) {
+			Point newP = adjustPointToZoom(p, zoom);
+			newP = adjustPointToGrid(newP);
+
+			return newP;
+		}
 
 		private PlaceTransitionObject newTimedPlace(Point p) {
-			p = adjustPoint(p, view.getZoom());
+			p = adjustPointToGridAndZoom(p, view.getZoom());
+
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
-			pnObject = new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y), tp);
+			pnObject = new TimedPlaceComponent(p.x, p.y, tp);
 			model.add(tp);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
@@ -420,12 +434,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		}
 
 		private PlaceTransitionObject newTAPNTransition(Point p) {
-			p = adjustPoint(p, view.getZoom());
+			p = adjustPointToGridAndZoom(p, view.getZoom());
+
 			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(
 					nameGenerator.getNewTransitionName(model));
 
-			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
-					Grid.getModifiedY(p.y), transition);
+			pnObject = new TimedTransitionComponent(p.x, p.y, transition);
 			
 			model.add(transition);
 			guiModel.addPetriNetObject(pnObject);
@@ -481,13 +495,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						break;
 
 					case ANNOTATION:
-						p = adjustPoint(e.getPoint(), view.getZoom());
+						p = adjustPointToGridAndZoom(e.getPoint(), view.getZoom());
 
 						pnObject = new AnnotationNote(p.x, p.y, true);
 						guiModel.addPetriNetObject(pnObject);
 						view.addNewPetriNetObject(pnObject);
-						getUndoManager()
-								.addNewEdit(
+						getUndoManager().addNewEdit(
 										new AddPetriNetObjectEdit(pnObject, view,
 												guiModel));
 						((AnnotationNote) pnObject).enableEditMode();
