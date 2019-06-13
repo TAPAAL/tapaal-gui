@@ -422,14 +422,18 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return newP;
 		}
 
+		private void addPetriNetObjectToModelandView(PetriNetObject pnObject) {
+			guiModel.addPetriNetObject(pnObject);
+			view.addNewPetriNetObject(pnObject);
+		}
+
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPointToGridAndZoom(p, view.getZoom());
 
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
 			pnObject = new TimedPlaceComponent(p.x, p.y, tp);
 			model.add(tp);
-			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
+			addPetriNetObjectToModelandView(pnObject);
 			return (PlaceTransitionObject) pnObject;
 		}
 
@@ -442,8 +446,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			pnObject = new TimedTransitionComponent(p.x, p.y, transition);
 			
 			model.add(transition);
-			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
+			addPetriNetObjectToModelandView(pnObject);
 			return (PlaceTransitionObject) pnObject;
 		}
 
@@ -498,8 +501,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						p = adjustPointToGridAndZoom(e.getPoint(), view.getZoom());
 
 						pnObject = new AnnotationNote(p.x, p.y, true);
-						guiModel.addPetriNetObject(pnObject);
-						view.addNewPetriNetObject(pnObject);
+						addPetriNetObjectToModelandView(pnObject);
+
 						getUndoManager().addNewEdit(
 										new AddPetriNetObjectEdit(pnObject, view,
 												guiModel));
@@ -526,6 +529,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						// create transition
 						newpto = newTAPNTransition(e.getPoint());
 						getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) newpto, model, guiModel, view));
+
 						app.setMode(ElementType.TAPNARC);
 						newpto.getMouseHandler().mouseReleased(e);
 
@@ -540,6 +544,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						// create place
 						newpto = newTimedPlace(e.getPoint());
 						getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) newpto, model, guiModel, view));
+
 						app.setMode(ElementType.TAPNARC);
 						newpto.getMouseHandler().mouseReleased(e);
 
