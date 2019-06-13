@@ -530,29 +530,15 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 						// create transition
 						newpto = newTAPNTransition(e.getPoint());
 
-						app.setMode(ElementType.TAPNARC);
-						newpto.getMouseHandler().mouseReleased(e);
-
-						if (e.isControlDown()) {
-							continueFastMode(e, newpto, ElementType.FAST_PLACE);
-						} else {
-							app.endFastMode();
-						}
-						break;
+                        fastDrawAction(e, newpto, ElementType.FAST_PLACE);
+                        break;
 
 					case FAST_PLACE:
 						// create place
 						newpto = newTimedPlace(e.getPoint());
 
-						app.setMode(ElementType.TAPNARC);
-						newpto.getMouseHandler().mouseReleased(e);
-
-						if (e.isControlDown()) {
-							continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
-						} else {
-							app.endFastMode();
-						}
-						break;
+                        fastDrawAction(e, newpto, ElementType.FAST_TRANSITION);
+                        break;
 
 					default:
 						break;
@@ -564,7 +550,18 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			updatePreferredSize();
 		}
 
-		private void addPoint(final Arc createArc, final MouseEvent e) {
+        private void fastDrawAction(MouseEvent e, PlaceTransitionObject newpto, ElementType fastTransition) {
+            app.setMode(ElementType.TAPNARC);
+            newpto.getMouseHandler().mouseReleased(e);
+
+            if (e.isControlDown()) {
+                continueFastMode(e, newpto, fastTransition);
+            } else {
+                app.endFastMode();
+            }
+        }
+
+        private void addPoint(final Arc createArc, final MouseEvent e) {
 			int x = Grid.getModifiedX(e.getX());
 			int y = Grid.getModifiedY(e.getY());
 
