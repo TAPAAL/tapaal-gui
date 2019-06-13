@@ -583,9 +583,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			}
 		}
 
-		/**
-		 * @see javax.swing.event.MouseInputAdapter#mouseDragged(java.awt.event.MouseEvent)
-		 */
+
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			// if (CreateGui.getApp().getMode() == Pipe.DRAG){
