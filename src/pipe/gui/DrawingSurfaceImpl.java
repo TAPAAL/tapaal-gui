@@ -420,7 +420,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			return (PlaceTransitionObject) pnObject;
 		}
 
-		private PlaceTransitionObject newTAPNTransition(Point p, boolean timed) {
+		private PlaceTransitionObject newTAPNTransition(Point p) {
 			p = adjustPoint(p, view.getZoom());
 			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(
 					nameGenerator.getNewTransitionName(model));
@@ -432,10 +432,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
-		}
-
-		private PlaceTransitionObject newTAPNTransition(Point p) {
-			return newTAPNTransition(p, false);
 		}
 
 		@Override
@@ -491,7 +487,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				case ARC:
 				case TAPNARC:
 				case INHIBARC:
-					// Add point to arc in creation
+				case TRANSPORTARC:
+				case TAPNINHIBITOR_ARC:
+						// Add point to arc in creation
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
@@ -509,18 +507,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 									guiModel));
 					((AnnotationNote) pnObject).enableEditMode();
 					break;
-				case TRANSPORTARC:
-					if (createArc != null) {
-						addPoint(createArc, e);
-					}
-					break;
-				case TAPNINHIBITOR_ARC:
-					// Add point to arc in creation
-					if (createArc != null) {
-						addPoint(createArc, e);
-					}
-					break;
-				case DRAG:
+					case DRAG:
 					dragStart = new Point(start);
 					break;
 
