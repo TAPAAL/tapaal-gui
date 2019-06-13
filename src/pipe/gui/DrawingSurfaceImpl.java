@@ -456,86 +456,89 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				Pipe.ElementType mode = app.getMode();
 				PlaceTransitionObject newpto; //declared here as switch is one big scope
 				switch (mode) {
+					case TAPNPLACE:
+						// create place
+						newpto = newTimedPlace(e.getPoint());
+						getUndoManager().addNewEdit(
+								new AddTimedPlaceCommand(
+										(TimedPlaceComponent) newpto, model,
+										guiModel, view));
+						if (e.isControlDown()) {
+							continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
+						}
+						break;
 
-				case TAPNPLACE:
-					// create place
-					newpto = newTimedPlace(e.getPoint());
-					getUndoManager().addNewEdit(
-							new AddTimedPlaceCommand(
-									(TimedPlaceComponent) newpto, model,
-									guiModel, view));
-					if (e.isControlDown()) {
-						continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
-					}
-					break;
+					case TAPNTRANS:
+						// create transition
+						newpto = newTAPNTransition(e.getPoint());
+						getUndoManager().addNewEdit(
+								new AddTimedTransitionCommand(
+										(TimedTransitionComponent) newpto, model,
+										guiModel, view));
+						if (e.isControlDown()) {
+							continueFastMode(e, newpto, ElementType.FAST_PLACE);
+						}
+						break;
 
-				case TAPNTRANS:
-					// create transition
-					newpto = newTAPNTransition(e.getPoint());
-					getUndoManager().addNewEdit(
-							new AddTimedTransitionCommand(
-									(TimedTransitionComponent) newpto, model,
-									guiModel, view));
-					if (e.isControlDown()) {
-						continueFastMode(e, newpto, ElementType.FAST_PLACE);
-					}
-					break;
+					case ANNOTATION:
+						p = adjustPoint(e.getPoint(), view.getZoom());
 
-				case ARC:
-				case TAPNARC:
-				case INHIBARC:
-				case TRANSPORTARC:
-				case TAPNINHIBITOR_ARC:
+						pnObject = new AnnotationNote(p.x, p.y, true);
+						guiModel.addPetriNetObject(pnObject);
+						view.addNewPetriNetObject(pnObject);
+						getUndoManager()
+								.addNewEdit(
+										new AddPetriNetObjectEdit(pnObject, view,
+												guiModel));
+						((AnnotationNote) pnObject).enableEditMode();
+						break;
+
+					case ARC:
+					case TAPNARC:
+					case INHIBARC:
+					case TRANSPORTARC:
+					case TAPNINHIBITOR_ARC:
 						// Add point to arc in creation
-					if (createArc != null) {
-						addPoint(createArc, e);
-					}
-					break;
+						if (createArc != null) {
+							addPoint(createArc, e);
+						}
+						break;
 
-				case ANNOTATION:
-					p = adjustPoint(e.getPoint(), view.getZoom());
 
-					pnObject = new AnnotationNote(p.x, p.y, true);
-					guiModel.addPetriNetObject(pnObject);
-					view.addNewPetriNetObject(pnObject);
-					getUndoManager()
-					.addNewEdit(
-							new AddPetriNetObjectEdit(pnObject, view,
-									guiModel));
-					((AnnotationNote) pnObject).enableEditMode();
-					break;
 					case DRAG:
-					dragStart = new Point(start);
-					break;
+						dragStart = new Point(start);
+						break;
 
-				case FAST_TRANSITION:
-					// create transition
-					newpto = newTAPNTransition(e.getPoint());
-					getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) newpto, model, guiModel, view));
-					app.setMode(ElementType.TAPNARC);
-					newpto.getMouseHandler().mouseReleased(e);
+					case FAST_TRANSITION:
+						// create transition
+						newpto = newTAPNTransition(e.getPoint());
+						getUndoManager().addNewEdit(new AddTimedTransitionCommand((TimedTransitionComponent) newpto, model, guiModel, view));
+						app.setMode(ElementType.TAPNARC);
+						newpto.getMouseHandler().mouseReleased(e);
 
-					if (e.isControlDown()) {
-						continueFastMode(e, newpto, ElementType.FAST_PLACE);
-					} else{
-						app.endFastMode();
-					}
-					break;
-				case FAST_PLACE:
-					// create place
-					newpto = newTimedPlace(e.getPoint());
-					getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) newpto, model, guiModel, view));
-					app.setMode(ElementType.TAPNARC);
-					newpto.getMouseHandler().mouseReleased(e);
+						if (e.isControlDown()) {
+							continueFastMode(e, newpto, ElementType.FAST_PLACE);
+						} else {
+							app.endFastMode();
+						}
+						break;
 
-					if (e.isControlDown()) {
-						continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
-					} else{
-						app.endFastMode();
-					}
-					break;
-				default:
-					break;
+					case FAST_PLACE:
+						// create place
+						newpto = newTimedPlace(e.getPoint());
+						getUndoManager().addNewEdit(new AddTimedPlaceCommand((TimedPlaceComponent) newpto, model, guiModel, view));
+						app.setMode(ElementType.TAPNARC);
+						newpto.getMouseHandler().mouseReleased(e);
+
+						if (e.isControlDown()) {
+							continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
+						} else {
+							app.endFastMode();
+						}
+						break;
+
+					default:
+						break;
 				}
 			} else {
 				setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
