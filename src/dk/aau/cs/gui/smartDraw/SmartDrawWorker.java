@@ -11,6 +11,7 @@ import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
@@ -124,7 +125,7 @@ public class SmartDrawWorker {
 				}
 			}
 		}
-		doOffsetForLoops();
+		//doOffsetForLoops();
 		moveObjectsWithinOrigo();
 		
 		
@@ -439,7 +440,8 @@ public class SmartDrawWorker {
 			if(arc instanceof Arc) {
 				ArrayList<ArcPathPoint> arcPathPoints =(ArrayList<ArcPathPoint>) ((Arc) arc).getArcPath().getArcPathPoints();
 				for(ArcPathPoint arcPathPoint : arcPathPoints) {
-					toRemove.add(arcPathPoint);
+					if(arcPathPoint.getIndex() != ((Arc) arc).getArcPath().getEndIndex() && arcPathPoint.getIndex() != 0)
+						toRemove.add(arcPathPoint);
 				}
 			}
 		}
