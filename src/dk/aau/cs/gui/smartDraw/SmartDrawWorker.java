@@ -436,14 +436,14 @@ public class SmartDrawWorker {
 	
 	private void removeArcPathPoints() {
 		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
-		for(PetriNetObject arc : CreateGui.getDrawingSurface().getPNObjects()) {
-			if(arc instanceof Arc) {
-				ArrayList<ArcPathPoint> arcPathPoints =(ArrayList<ArcPathPoint>) ((Arc) arc).getArcPath().getArcPathPoints();
-				for(ArcPathPoint arcPathPoint : arcPathPoints) {
-					if(arcPathPoint.getIndex() != ((Arc) arc).getArcPath().getEndIndex() && arcPathPoint.getIndex() != 0)
-						toRemove.add(arcPathPoint);
+		for(PetriNetObject object : CreateGui.getDrawingSurface().getPNObjects()) {
+			if(object instanceof ArcPathPoint) {
+				ArcPathPoint arcPathPoint = (ArcPathPoint)object;
+				if(!(arcPathPoint.isEndPoint())) {
+					toRemove.add(arcPathPoint);
 				}
 			}
+
 		}
 		for(ArcPathPoint p : toRemove) {
 			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex());
