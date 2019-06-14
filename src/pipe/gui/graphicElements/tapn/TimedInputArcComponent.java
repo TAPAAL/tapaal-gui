@@ -120,21 +120,21 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		}
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if (inputArc == null)
-				label.setText("");
+				pnName.setText("");
 			else {
 				if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
 					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
-						label.setText("");
+						pnName.setText("");
 					}
 					else {
-						label.setText(inputArc.interval().toString(showConstantNames));
+						pnName.setText(inputArc.interval().toString(showConstantNames));
 					}					
 				}
 				else {
-					label.setText(inputArc.interval().toString(showConstantNames));
+					pnName.setText(inputArc.interval().toString(showConstantNames));
 				}
-				
-				label.setText(getWeight().toString(showConstantNames)+" "+label.getText());
+
+				pnName.setText(getWeight().toString(showConstantNames)+" "+pnName.getText());
 				
 				// Handle constant highlighting
 				boolean focusedConstant = false;
@@ -154,9 +154,9 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 					}
 				}
 				if(focusedConstant){
-					label.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+					pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
 				}else{
-					label.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+					pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 				}
 				
 			}
@@ -169,8 +169,10 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		/*label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
 				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)
 				- ((zoom / 55) * (zoom / 55)));*/
-		label.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+
+		pnName.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))),
 						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
+
 	}
 
 	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {

@@ -320,6 +320,10 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		if (selectable && !selected) {
 			selected = true;
 
+			if (pnName != null) {
+				pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
+			}
+
 			// Select arcs that are connected from this object to another selected object.
 			for (Arc arc : getPostset()) {
 				if(arc.getTarget().isSelected()){

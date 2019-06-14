@@ -97,17 +97,19 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public void updateLabel(boolean displayConstantNames) {
 		if (isInPreSet && underlyingTransportArc != null) {
 			if (CreateGui.getApp().showZeroToInfinityIntervals()){
-				label.setText(underlyingTransportArc.interval().toString(
+				pnName.setText(underlyingTransportArc.interval().toString(
 						displayConstantNames)
 						+ " : " + getGroup());
 			}
 			else {
 				if (underlyingTransportArc.interval().toString(
 						displayConstantNames).equals("[0,inf)")) {
-					label.setText(" : " + String.valueOf(getGroup()));
+
+					pnName.setText(" : " + String.valueOf(getGroup()));
+
 				}
 				else {
-					label.setText(underlyingTransportArc.interval().toString(
+					pnName.setText(underlyingTransportArc.interval().toString(
 							displayConstantNames)
 							+ " : " + getGroup());
 				}				
@@ -131,19 +133,19 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 				}
 			}
 			if(focusedConstant){
-				label.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
 			}else{
-				label.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
 			
 		} else if (!isInPreSet) {
-			label.setText(" : " + String.valueOf(getGroup()));
+			pnName.setText(" : " + String.valueOf(getGroup()));
 		} else {
-			label.setText("");
+			pnName.setText("");
 		}
 		
 		if(underlyingTransportArc != null){
-					label.setText(getWeight().toString(displayConstantNames)+" "+label.getText());
+					pnName.setText(getWeight().toString(displayConstantNames)+" "+pnName.getText());
 		}
 		
 		this.setLabelPosition();
