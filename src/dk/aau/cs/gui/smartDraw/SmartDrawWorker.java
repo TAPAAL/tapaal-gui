@@ -53,7 +53,6 @@ public class SmartDrawWorker {
 	
 	public SmartDrawWorker(int xSpacing, int ySpacing, DrawingSurfaceImpl drawingSurface, String searchOption, 
 			int straightWeight, int diagonalWeight, int distanceWeight, int overlappingArcWeight, String startingObject) {
-		this.startingObject = findStartingObjectCandidate();
 		this.xSpacing = xSpacing;
 		this.ySpacing = ySpacing;
 		this.drawingSurface = drawingSurface;
@@ -72,13 +71,11 @@ public class SmartDrawWorker {
 		if(!(startingObject == "Random"))
 			this.startingObject = drawingSurface.getPlaceTransitionObjectByName(startingObject);
 		else
-	    	this.startingObject = placeTransitionObjects.get(new Random().nextInt(placeTransitionObjects.size()));
+	    	this.startingObject = placeTransitionObjects.get(new Random().nextInt(placeTransitionObjects.size()-1));
 	}
 	
 	public void smartDraw() {
-		undoManager.newEdit();
-		PlaceTransitionObject startingObject = null;
-		
+		undoManager.newEdit();		
 		
 		
 		arcsVisited = new ArrayList<Arc>();
@@ -89,10 +86,8 @@ public class SmartDrawWorker {
 		//Do for unconnected nets too
 		while(!(objectsPlaced.containsAll(placeTransitionObjects))) {
 			if(objectsPlaced.isEmpty()) {
-				startingObject = findStartingObjectCandidate();
 				//We place the first object at hard coordinates 
 				rootPoint = new Point(500,350);
-				
 			} else {
 				for(PlaceTransitionObject object : placeTransitionObjects) {
 					if(!(objectsPlaced.contains(object))) {
@@ -343,56 +338,7 @@ public class SmartDrawWorker {
 			rightMostPointUsed = newPoint;
 		}
 	}
-	
-	private PlaceTransitionObject findStartingObjectCandidate() {
-		//We first try to find an object with no incoming arcs
-		//and atleast 1 outgoing arc as our starting point
-		PlaceTransitionObject candidate = findObjectWithZeroToArcs();
-		Iterator<Arc> arcFromIterator;
-		Iterator<Arc> arcToIterator;
 
-		int numberOfToArcs = 0;
-		int numberOfFromArcs = 0;
-		int candidateDifference = 0;
-		if(candidate == null) {
-			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-				arcFromIterator = ptObject.getConnectFromIterator();
-				arcToIterator = ptObject.getConnectToIterator();
-				while(arcToIterator.hasNext()) {
-					arcToIterator.next();
-					numberOfToArcs++;
-				}
-				while(arcFromIterator.hasNext()) {
-					arcFromIterator.next();
-					numberOfFromArcs++;
-				}
-				int difference = numberOfFromArcs - numberOfToArcs;
-				if(numberOfToArcs > candidateDifference) {
-					candidateDifference = difference;
-					candidate = ptObject;
-				}
-			}
-		}
-		return candidate;
-	}
-	
-	private PlaceTransitionObject findObjectWithZeroToArcs() {
-		PlaceTransitionObject candidate = null;
-		Iterator<Arc> arcFromIterator;
-		int numberOfFromArcs = 0;
-		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-			arcFromIterator = ptObject.getConnectFromIterator();
-			while(arcFromIterator.hasNext()) {
-				arcFromIterator.next();
-				numberOfFromArcs++;
-			}
-			if(ptObject.getConnectToIterator().hasNext() == false && numberOfFromArcs >= 1) {
-				candidate = ptObject;
-				break;
-			}
-		}
-		return candidate;
-	}
 	
 	/*
 	 * Find better name

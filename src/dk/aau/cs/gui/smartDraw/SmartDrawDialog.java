@@ -30,6 +30,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 
@@ -123,31 +124,34 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				cancel = false;
-				worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
-						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString());
-				loadingDialogFrameThread = new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						loadingDialogFrame.setVisible(true);
+				try {
+					cancel = false;
+					worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
+							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString());
+					loadingDialogFrameThread = new Thread(new Runnable() {
 						
+						@Override
+						public void run() {
+							loadingDialogFrame.setVisible(true);
+							
+						}
+					});
+					loadingDialogFrameThread.start();
+					smartDrawDialog.setVisible(false);
+					workingThread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							worker.smartDraw();
+						}
+					});
+					workingThread.run();
+					if(worker.isDone() && cancel == false) {
+						loadingDialogFrame.setVisible(false);
+						choiceModal.setVisible(true);
 					}
-				});
-				loadingDialogFrameThread.start();
-				smartDrawDialog.setVisible(false);
-				workingThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						worker.smartDraw();
-					}
-				});
-				workingThread.run();
-				if(worker.isDone() && cancel == false) {
-					loadingDialogFrame.setVisible(false);
-					choiceModal.setVisible(true);
+				} catch (NullPointerException exception) {
+					new MessengerImpl().displayErrorMessage("You need at least one place or transition to smart draw");
 				}
-				
 			}
 		});
 		gbc = new GridBagConstraints();
