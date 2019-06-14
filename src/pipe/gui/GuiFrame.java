@@ -958,7 +958,7 @@ public class GuiFrame extends JFrame  {
 		workflowDialog.setMnemonic('f');
 		toolsMenu.add(workflowDialog);
 		
-		JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction = new GuiAction("Smart Draw", "Rearrange the petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
+		JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction = new GuiAction("Automatic Net Layout", "Rearrange the petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SmartDrawDialog.showSmartDrawDialog();
