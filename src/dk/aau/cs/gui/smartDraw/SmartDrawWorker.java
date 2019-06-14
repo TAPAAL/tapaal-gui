@@ -125,8 +125,8 @@ public class SmartDrawWorker {
 				}
 			}
 		}
-		//doOffsetForLoops();
 		moveObjectsWithinOrigo();
+		doOffsetForLoops();
 		
 		
 		
@@ -488,14 +488,16 @@ public class SmartDrawWorker {
 		Point.Float pointForArcTwo = new Point.Float();
 		if(transition.getPositionX() == place.getPositionX()) {
 			pointForArcOne = new Point.Float(arcOne.getArcPath().midPoint.x+30, (arcOne.getArcPath().midPoint.y));
-			pointForArcTwo = new Point.Float(arcOne.getArcPath().midPoint.x-30, (arcOne.getArcPath().midPoint.y));
+			pointForArcTwo = new Point.Float(arcTwo.getArcPath().midPoint.x-30, (arcTwo.getArcPath().midPoint.y));
 		} 
 		else if(transition.getPositionY() == place.getPositionY()) {
 			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y+30);
-			pointForArcTwo = new Point.Float((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y-30);
+			pointForArcTwo = new Point.Float((arcTwo.getArcPath().midPoint.x), arcTwo.getArcPath().midPoint.y-30);
 		} else {
 			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x+15), arcOne.getArcPath().midPoint.y+15);
-			pointForArcTwo = new Point.Float((arcOne.getArcPath().midPoint.x-15), arcOne.getArcPath().midPoint.y-15);
+			pointForArcTwo = new Point.Float((arcTwo.getArcPath().midPoint.x-15), arcTwo.getArcPath().midPoint.y-15);
+			System.out.println(3);
+
 		}
 		
 		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));
