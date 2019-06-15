@@ -298,16 +298,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
-				int groupMaxCounter = 0;
-
-				for (Object pt : transportArcToCreate.getTarget().getPostset()) {
-					if (pt instanceof TimedTransportArcComponent) {
-						if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
-							groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
-						}
-					}
-				}
-
+				int groupMaxCounter = getTransportArcMaxGroupNumber(transportArcToCreate);
 				((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
 
 				currentObject.addConnectTo(transportArcToCreate);
@@ -389,6 +380,21 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			}
 
 		}
+	}
+
+	private int getTransportArcMaxGroupNumber(Arc transportArcToCreate) {
+		int groupMaxCounter = 0;
+
+		for (Object pt : transportArcToCreate.getTarget().getPostset()) {
+			if (pt instanceof TimedTransportArcComponent) {
+				if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
+					groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
+				}
+			}
+		}
+
+
+		return groupMaxCounter;
 	}
 
 	private void createInhibitorArc(DrawingSurfaceImpl view, UndoManager undoManager, PlaceTransitionObject currentObject) {
