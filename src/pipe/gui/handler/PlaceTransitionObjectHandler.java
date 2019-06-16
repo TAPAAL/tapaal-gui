@@ -157,7 +157,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		Arc timedArcToCreate = view.createArc;
 
 		if (currentObject != timedArcToCreate.getSource()) {
-			view.createArc = null;
 
 			timedArcToCreate.setSelectable(true);
 
