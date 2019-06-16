@@ -177,7 +177,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace());
 					view.getModel().add(timedOutputArc);
 					outputArc.setUnderlyingArc(timedOutputArc);
-					outputArc.updateLabel(true);
+
 				} catch (RequireException ex) {
 					cleanupArc(timedArcToCreate, view);
 					JOptionPane.showMessageDialog(
@@ -188,6 +188,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									"Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+
+				outputArc.updateLabel(true);
+
 				currentObject.addConnectTo(timedArcToCreate);
 
 				// Evil hack to prevent the arc being added to GuiView twice
@@ -219,7 +222,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							TimeInterval.ZERO_INF);
 					view.getModel().add(tia);
 					timedArc.setUnderlyingArc(tia);
-					timedArc.updateLabel(true);
+
 				} catch (RequireException ex) {
 					cleanupArc(timedArcToCreate, view);
 					JOptionPane
@@ -232,12 +235,15 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
+				timedArc.updateLabel(true);
+
 				currentObject.addConnectTo(timedArcToCreate);
 				//timedArcToCreate.getTransition().updateConnected();
 
 				// Evil hack to prevent the arc being added to GuiView twice
 				//Need to be casted to cointainer, as we only add it to the canvas but not the model
 				((Container)CreateGui.getDrawingSurface()).remove(timedArcToCreate);
+
 				view.getGuiModel().addPetriNetObject((TimedOutputArcComponent) timedArcToCreate);
 				view.addNewPetriNetObject(timedArcToCreate);
 
@@ -340,8 +346,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					view.getModel().add(ta);
 					((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 					arc1.setUnderlyingArc(ta);
-					arc1.updateLabel(true);
-					((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
+
+
 				} catch (RequireException ex) {
 					cleanupArc(arc1, view);
 					cleanupArc(arc2, view);
@@ -354,6 +360,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							"Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+
+				arc1.updateLabel(true);
+				((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
 
 				// Evil hack to prevent the arc being added to GuiView twice
 				//Need to be casted to cointainer, as we only add it to the canvas but not the model
@@ -410,7 +419,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						TimeInterval.ZERO_INF);
 				view.getModel().add(tia);
 				createTAPNInhibitorArc.setUnderlyingArc(tia);
-				createTAPNInhibitorArc.updateLabel(true);
+
 			} catch (RequireException ex) {
 				cleanupArc(createTAPNInhibitorArc, view);
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -420,6 +429,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+
+			createTAPNInhibitorArc.updateLabel(true);
 
 			createTAPNInhibitorArc.setSelectable(true);
 			createTAPNInhibitorArc.setTarget(currentObject);
