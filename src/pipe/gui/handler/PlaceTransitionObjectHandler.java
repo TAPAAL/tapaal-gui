@@ -233,7 +233,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 
 				currentObject.addConnectTo(timedArcToCreate);
-				timedArcToCreate.getTransition().updateConnected();
+				//timedArcToCreate.getTransition().updateConnected();
 
 				// Evil hack to prevent the arc being added to GuiView twice
 				//Need to be casted to cointainer, as we only add it to the canvas but not the model
