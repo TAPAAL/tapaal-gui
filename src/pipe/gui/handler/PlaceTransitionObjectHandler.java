@@ -187,9 +187,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
-				currentObject.addConnectTo(timedArcToCreate);
-
-				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
 
 				undoManager.newEdit(); // new "transaction""
 
@@ -226,11 +223,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
-				currentObject.addConnectTo(timedArcToCreate);
-				//timedArcToCreate.getTransition().updateConnected();
-
-				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
-
 				undoManager.newEdit(); // new "transaction""
 
 				undoManager.addEdit(new AddTimedInputArcCommand(
@@ -239,7 +231,12 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			}
 
+			currentObject.addConnectTo(timedArcToCreate);
+			//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc)
+
 			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
+			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
+
 		}
 	}
 
