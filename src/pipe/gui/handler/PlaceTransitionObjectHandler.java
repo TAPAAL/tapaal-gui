@@ -65,6 +65,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	// Disable key bindings that are only available when drawing arcs.
 	private void sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(Arc newArc){
+		newArc.setSelectable(true);
 		newArc.sealArc();
 		newArc.disableDrawingKeyBindings();
 		CreateGui.getDrawingSurface().createArc = null;
@@ -157,8 +158,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		Arc timedArcToCreate = view.createArc;
 
 		if (currentObject != timedArcToCreate.getSource()) {
-
-			timedArcToCreate.setSelectable(true);
 
 			// Are we creating an Input or Output arc_
 			if (!(timedArcToCreate instanceof TimedInputArcComponent)) {
@@ -262,8 +261,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		Arc transportArcToCreate = view.createArc;
 
 		if (currentObject != transportArcToCreate.getSource()) {
-
-			transportArcToCreate.setSelectable(true);
 
 			// This is the first step
 			if (transportArcToCreate.getSource() instanceof Place) {
@@ -431,7 +428,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			createTAPNInhibitorArc.updateLabel(true);
 
-			createTAPNInhibitorArc.setSelectable(true);
 			createTAPNInhibitorArc.setTarget(currentObject);
 
 			currentObject.addConnectTo(createTAPNInhibitorArc);
