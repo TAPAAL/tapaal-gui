@@ -353,7 +353,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(transportArcToCreate);
 
-				arc2.setGroupNr(arc1.getGroupNr());
 			}
 
 		}
