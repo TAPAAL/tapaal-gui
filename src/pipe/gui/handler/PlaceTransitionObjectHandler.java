@@ -187,8 +187,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
-				outputArc.updateLabel(true);
-
 				currentObject.addConnectTo(timedArcToCreate);
 
 				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
@@ -227,8 +225,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									"Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-
-				timedArc.updateLabel(true);
 
 				currentObject.addConnectTo(timedArcToCreate);
 				//timedArcToCreate.getTransition().updateConnected();
@@ -341,9 +337,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
-				arc1.updateLabel(true);
-				((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
-
 				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, arc2);
 
 				currentObject.addConnectTo(arc2);
@@ -404,8 +397,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-
-			createTAPNInhibitorArc.updateLabel(true);
 
 			createTAPNInhibitorArc.setTarget(currentObject);
 
