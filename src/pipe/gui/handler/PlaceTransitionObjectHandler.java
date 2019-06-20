@@ -226,7 +226,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			}
 
 			currentObject.addConnectTo(timedArcToCreate);
-			//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc)
+
 
 			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
@@ -391,7 +391,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			createTAPNInhibitorArc.setTarget(currentObject);
 
 			currentObject.addConnectTo(createTAPNInhibitorArc);
-			createTAPNInhibitorArc.getTransition().updateConnected();
 
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, createTAPNInhibitorArc);
 
@@ -410,6 +409,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 		view.getGuiModel().addPetriNetObject(arcToCreate);
 		view.addNewPetriNetObject(arcToCreate);
+
+		//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc and inhub arc)
 	}
 
 	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
