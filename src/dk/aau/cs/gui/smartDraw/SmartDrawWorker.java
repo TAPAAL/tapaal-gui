@@ -5,11 +5,12 @@ import java.awt.geom.Point2D.Float;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
-
+import dk.aau.cs.gui.undo.ChangeNameOffsetCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.ArcPathPoint;
@@ -17,10 +18,8 @@ import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.DeleteArcPathPointEdit;
 import pipe.gui.undo.TransitionRotationEdit;
-import pipe.gui.undo.TranslatePetriNetObjectEdit;
 
 public class SmartDrawWorker {
 	PlaceTransitionObject startingObject;
@@ -124,6 +123,7 @@ public class SmartDrawWorker {
 		}
 		moveObjectsWithinOrigo();
 		doOffsetForLoops();
+		resetLabelsToDefault();
 		
 		
 		
@@ -444,8 +444,6 @@ public class SmartDrawWorker {
 		} else {
 			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x+15), arcOne.getArcPath().midPoint.y+15);
 			pointForArcTwo = new Point.Float((arcTwo.getArcPath().midPoint.x-15), arcTwo.getArcPath().midPoint.y-15);
-			System.out.println(3);
-
 		}
 		
 		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));
@@ -459,6 +457,22 @@ public class SmartDrawWorker {
 			if(object instanceof PlaceTransitionObject) {
 				PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
 				placeTransitionObjects.add(ptObject);
+			}
+		}
+	}
+	private void resetLabelsToDefault() {
+		for(PetriNetObject pNetObject : drawingSurface.getPNObjects()) {
+			if(pNetObject instanceof PlaceTransitionObject) {
+				Command cmd = new ChangeNameOffsetCommand(pNetObject, pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y);
+				cmd.redo();
+				undoManager.addEdit(cmd);
+				
+			}
+			else if(pNetObject instanceof Arc) {
+				Arc arc = (Arc) pNetObject;
+				Command cmd = new ChangeNameOffsetCommand(pNetObject, 0, 0);
+				cmd.redo();
+				undoManager.addEdit(cmd);
 			}
 		}
 	}

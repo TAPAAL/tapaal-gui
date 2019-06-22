@@ -218,7 +218,7 @@ public class SmartDrawDialog extends JDialog {
 						}
 					});
 					workingThread.run();
-					if(worker.isDone() && cancel == false) {
+					if(worker.isDone()) {
 						loadingDialogFrame.setVisible(false);
 						//choiceModal.setVisible(true);
 					}
@@ -712,7 +712,7 @@ public class SmartDrawDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				while(!(workingThread.isInterrupted())) {
 					workingThread.interrupt();
-					if(workingThread.isInterrupted()) {
+					if(workingThread.isInterrupted() && loadingDialogFrameThread.isInterrupted()) {
 						CreateGui.getDrawingSurface().getUndoManager().undo();
 						CreateGui.getDrawingSurface().repaintAll();
 						loadingDialogFrame.setVisible(false);
