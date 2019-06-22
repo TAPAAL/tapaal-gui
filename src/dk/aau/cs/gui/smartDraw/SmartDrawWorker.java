@@ -42,6 +42,7 @@ public class SmartDrawWorker {
 	int straightWeight;
 	int distanceWeight;
 	int overlappingArcWeight;
+	int minimumIterations;
 
 	
 	//For BFS
@@ -52,7 +53,7 @@ public class SmartDrawWorker {
 	ArrayList<Arc> arcsVisited = new ArrayList<Arc>();
 	
 	public SmartDrawWorker(int xSpacing, int ySpacing, DrawingSurfaceImpl drawingSurface, String searchOption, 
-			int straightWeight, int diagonalWeight, int distanceWeight, int overlappingArcWeight, String startingObject) {
+			int straightWeight, int diagonalWeight, int distanceWeight, int overlappingArcWeight, String startingObject, int minimumIterations) {
 		this.xSpacing = xSpacing;
 		this.ySpacing = ySpacing;
 		this.drawingSurface = drawingSurface;
@@ -61,6 +62,7 @@ public class SmartDrawWorker {
 		this.diagonalWeight = diagonalWeight;
 		this.distanceWeight = distanceWeight;
 		this.overlappingArcWeight = overlappingArcWeight;
+		this.minimumIterations = minimumIterations;
 		
 			
 		getPlaceTransitionObjects(); 
@@ -170,8 +172,8 @@ public class SmartDrawWorker {
 								}
 							}
 						}
-						//We try at least 3 times
-						if(layer >= 3 && bestPoint != null) {
+						//We try at least minimumIterations times
+						if(layer >= minimumIterations && bestPoint != null) {
 							moveObject(objectToPlace, bestPoint);
 							checkIfObjectIsNowRightmost(bestPoint);
 							//Reserve the point and let the object in the queue
@@ -249,8 +251,8 @@ public class SmartDrawWorker {
 							}
 						}
 					}
-					//We try at least 3 times
-					if(!(pointsReserved.contains(bestPoint)) && layer >=3) {
+					//We try at least minimumiterations times
+					if(!(pointsReserved.contains(bestPoint)) && layer >= minimumIterations) {
 						moveObject(objectToPlace, bestPoint);
 						checkIfObjectIsNowRightmost(bestPoint);
 						//Reserve the point and let the object in the queue

@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -19,16 +20,18 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextPane;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -36,6 +39,58 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class SmartDrawDialog extends JDialog {
 	private static final long serialVersionUID = 6116530047981607501L;
+	
+	
+	private static String getHelpMessage(){ 
+		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<html>");
+		buffer.append("<b>Automatic net layout options</b><br/>");
+		buffer.append("<br/><br/>");
+		buffer.append("<b>Search Option</b><br/>\n");
+                buffer.append("You can choose between drawing in a Depth First(DFS) or a Breadth First(BFS)\n");
+                buffer.append("manner. This may yield a difference as an object is only place once and thus\n");
+                buffer.append("reserves its given position. This choice affects which objects are placed first.\n");
+		buffer.append("<br/><br/>");
+		buffer.append("<b>Functionality</b><br/>");
+	        buffer.append("The automatic layout works by choosing a starting object.\n");
+	        buffer.append("From there we try different positions around the starting object and choose the position with lowest <em>weight</em>.\n");
+	    buffer.append("<br/><br/>");
+	        buffer.append("We try each multiple of x-spacing between <em>parent.x + x-spacing * layer</em> and <em>parent.x - x-spacing * layer</em>\n");
+	        buffer.append("<em>parent.x - x-spacing * layer</em> with each multiple of y-spacing\n");
+	        buffer.append("between <em>y-spacing * layer</em> and <em>-y-spacing * layer</em>.\n");
+	        buffer.append("The value of <em>layer</em> will increment with each iteration and start with value 1.\n");
+	        buffer.append("As such choosing the minimum iterations will decide how many layers we try.\n");
+	        buffer.append("Minimum Iterations heavily affects how long it will take to do the layout, so a small number is recommended.\n");
+	        buffer.append("It is also recommended that x-spacing = y-spacing.\n");
+        buffer.append("<br/><br/>");
+		buffer.append("<b>Weights</b><br/>");
+		buffer.append("The weights should be seen as punishments for choosing a position.\n");
+                buffer.append("The higher the weight the higher the punishment; the position with the lowest\n");
+                buffer.append("summed weight is where the object will be placed.");
+		buffer.append("<br/><br/>");
+			buffer.append("<em>Straight arc weight</em> is a weight punishing going straight\n");
+			buffer.append("i.e. if the candidate position's x or y equals the parent's x or y\n");
+			buffer.append("the <em>straight weight * layer</em> is added to the total weight.\n");
+			buffer.append("If not <em>Diagonal arc weight * layer</em> is added instead.");
+		buffer.append("<br/><br/>");
+			buffer.append("<em>Distance weight</em> punishes candidate positions depending on");
+			buffer.append("how far away from the starting point they are. As such a higher");
+			buffer.append("distance weight will make more compact nets.");
+		buffer.append("<br/><br/>");
+			buffer.append("<em>Overlapping arc weight</em> punishes arcs laying directly on top of each other");
+			buffer.append("pointing to the same object.");
+		buffer.append("<br/><br/>");
+			buffer.append("<b>Example:</b><br/>");
+		buffer.append("<br/><br/>");
+			buffer.append("<img src=\"" + Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "SmartDrawExampleWithLayers.png") +"\" />");
+		buffer.append("<br/><br/>");
+		buffer.append("This layout was created with the default values.");
+		buffer.append("On the figure the numbers and boxes describe the layer. Furthermore, the effect of the <em>Overlapping arc weight</em> can be seen\n");
+		buffer.append("as the objects in layer 2 prefer going diagonal rather than overlap due to the weights.");
+		buffer.append("</html>");
+		return buffer.toString(); 
+	}
 	
 	JPanel mainPanel;
 	ArrayList<PlaceTransitionObject> placeTransitionObjects;
@@ -61,6 +116,7 @@ public class SmartDrawDialog extends JDialog {
 	int diagonalWeight = 8;
 	int distanceWeight = 10;
 	int overlappingArcWeight = 100;
+	int minimumIterations = 3;
 	
 	static SmartDrawDialog smartDrawDialog;
 	public static void showSmartDrawDialog() {
@@ -89,10 +145,10 @@ public class SmartDrawDialog extends JDialog {
 			objectDropdown.addItem(name);
 		}
 		
-		templateSelector.removeAllItems();
+		/*templateSelector.removeAllItems();
 		for(String name : getTemplatesAsString()) {
 			templateSelector.addItem(name);
-		}
+		}*/
 	}
 	
 	private void initComponents() {
@@ -106,7 +162,7 @@ public class SmartDrawDialog extends JDialog {
 		initChoiceModal();
 		initLoadingFrame();
 		
-		templateSelector.setEnabled(false);
+		/*templateSelector.setEnabled(false);
 		
 		
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -117,7 +173,24 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.insets = new Insets(0, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		mainPanel.add(templateSelector, gbc);
+		mainPanel.add(templateSelector, gbc);*/
+		JButton helpButton = new JButton("Help");
+		helpButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.SOUTHWEST;
+		mainPanel.add(helpButton, gbc);
 		
 		
 		JButton drawButton = new JButton("Smart Draw");
@@ -127,7 +200,7 @@ public class SmartDrawDialog extends JDialog {
 				try {
 					cancel = false;
 					worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
-							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString());
+							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString(), minimumIterations);
 					loadingDialogFrameThread = new Thread(new Runnable() {
 						
 						@Override
@@ -147,13 +220,15 @@ public class SmartDrawDialog extends JDialog {
 					workingThread.run();
 					if(worker.isDone() && cancel == false) {
 						loadingDialogFrame.setVisible(false);
-						choiceModal.setVisible(true);
+						//choiceModal.setVisible(true);
 					}
 				} catch (NullPointerException exception) {
 					new MessengerImpl().displayErrorMessage("You need at least one place or transition to smart draw");
 				}
 			}
 		});
+		
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 3;
@@ -367,6 +442,41 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(overlappingWeightSpinner, gbc);
 		
+		JLabel minimumIterationsLabel = new JLabel("Minimum Iterations:");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(10, 20, 10, 0);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		advancedOptionsPanel.add(minimumIterationsLabel, gbc);
+		
+		SpinnerModel minimumIterationModel =
+		        new SpinnerNumberModel(minimumIterations, //initial value
+		                               0, //min
+		                               Integer.MAX_VALUE, //max
+		                               1);
+		final JSpinner minimumIterationSpinner = new JSpinner(minimumIterationModel);
+		minimumIterationSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				minimumIterations = (Integer) minimumIterationSpinner.getValue();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 5;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(10, 20, 10, 0);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		advancedOptionsPanel.add(minimumIterationSpinner, gbc);
+		
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -398,19 +508,20 @@ public class SmartDrawDialog extends JDialog {
 				searchOption = "BFS";
 			}
 		});
-		JRadioButton randomSearch = new JRadioButton("Random:");
+		
+		/*JRadioButton randomSearch = new JRadioButton("Random:");
 		randomSearch.setEnabled(false);
-		BFS.addActionListener(new ActionListener() {
+		randomSearch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				searchOption = "Random";
 			}
-		});
+		});*/
 		
 	    ButtonGroup group = new ButtonGroup();
 	    group.add(DFS);
 	    group.add(BFS);
-	    group.add(randomSearch);
+	    //group.add(randomSearch);
 	    
 	    DFS.setSelected(true);
 	    DFS.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -435,7 +546,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		checkBoxPanel.add(BFS, gbc);
 		
-		randomSearch.setHorizontalTextPosition(SwingConstants.LEFT);
+		/*randomSearch.setHorizontalTextPosition(SwingConstants.LEFT);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -444,7 +555,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(10, 20, 10, 0);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		checkBoxPanel.add(randomSearch, gbc);
+		checkBoxPanel.add(randomSearch, gbc);*/
 		
 		
 		gbc = new GridBagConstraints();
@@ -605,7 +716,7 @@ public class SmartDrawDialog extends JDialog {
 						CreateGui.getDrawingSurface().getUndoManager().undo();
 						CreateGui.getDrawingSurface().repaintAll();
 						loadingDialogFrame.setVisible(false);
-						smartDrawDialog.setEnabled(true);
+						smartDrawDialog.setVisible(true);
 						cancel = true;
 					}
 				}
@@ -627,6 +738,13 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame.setLocationRelativeTo(smartDrawDialog);
 	}
 	
+	
+	
+	
+	/*
+	 * Asks if you want to keep, revert or try again
+	 * is not used currently
+	 */
 	private void initChoiceModal() {
 		choiceModal = new JDialog(smartDrawDialog, "Keep?", true);
 		choiceModal.setLayout(new GridBagLayout());
@@ -707,7 +825,23 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTH;
 		choiceModal.add(retryButton, gbc);
 		
-		
+	}
+	
+	private Object getMessageComponent(){
+		JTextPane pane = new JTextPane();
+		pane.setContentType("text/html");
+		pane.setText(getHelpMessage());
+		pane.setEditable(false);
+		pane.setCaretPosition(0);
+		for(MouseListener listener : pane.getMouseListeners()){
+			pane.removeMouseListener(listener);
+		}
+		Dimension dim = new Dimension(500,400);
+		pane.setPreferredSize(dim);  
+		pane.setMargin(new Insets(5,5,5,5));  
+		JScrollPane scrollPane = new JScrollPane(pane);  
+		scrollPane.setPreferredSize(dim);  
+		return scrollPane;  
 	}
 
     
