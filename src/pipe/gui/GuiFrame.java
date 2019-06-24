@@ -78,7 +78,6 @@ public class GuiFrame extends JFrame  {
 			120, 140, 160, 180, 200, 300 };
 	
 	private String frameTitle;
-	private DrawingSurfaceImpl appView;
 
 	public Animator getAnimator() {
 		return animator;
@@ -455,7 +454,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CreateGui.getApp().isEditionAllowed()) {
-					appView.getUndoManager().undo();
+					CreateGui.getCurrentTab().drawingSurface().getUndoManager().undo();
 					CreateGui.getCurrentTab().network().buildConstraints();
 				}
 			}
@@ -467,7 +466,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CreateGui.getApp().isEditionAllowed()) {
-					appView.getUndoManager().redo();
+					CreateGui.getCurrentTab().drawingSurface().getUndoManager().redo();
 					CreateGui.getCurrentTab().network().buildConstraints();
 				}
 			}
@@ -521,18 +520,18 @@ public class GuiFrame extends JFrame  {
 						: JOptionPane.YES_OPTION;
 
 						if (choice == JOptionPane.YES_OPTION) {
-							appView.getUndoManager().newEdit(); // new "transaction""
+							CreateGui.getCurrentTab().drawingSurface().getUndoManager().newEdit(); // new "transaction""
 							if (queriesAffected) {
 								TabContent currentTab = CreateGui.getCurrentTab();
 								for (TAPNQuery q : queriesToDelete) {
 									Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
 									cmd.redo();
-									appView.getUndoManager().addEdit(cmd);
+									CreateGui.getCurrentTab().drawingSurface().getUndoManager().addEdit(cmd);
 								}
 							}
 
-							appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-							appView.repaint();
+							CreateGui.getCurrentTab().drawingSurface().getUndoManager().deleteSelection(CreateGui.getCurrentTab().drawingSurface().getSelectionObject().getSelection());
+							CreateGui.getCurrentTab().drawingSurface().repaint();
 							CreateGui.getCurrentTab().network().buildConstraints();
 						}
 				
@@ -614,10 +613,10 @@ public class GuiFrame extends JFrame  {
 				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean didZoom = appView.getZoomController().zoomIn();
+				boolean didZoom = CreateGui.getCurrentTab().drawingSurface().getZoomController().zoomIn();
 				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
+					CreateGui.getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 				}
 			}
 		});
@@ -626,10 +625,10 @@ public class GuiFrame extends JFrame  {
 				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean didZoom = appView.getZoomController().zoomOut();
+				boolean didZoom = CreateGui.getCurrentTab().drawingSurface().getZoomController().zoomOut();
 				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
+					CreateGui.getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 				}
 			}
 		});
@@ -642,7 +641,7 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 1.25;
 				changeSpacing(factor);
-				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				CreateGui.getCurrentTab().drawingSurface().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 			}
 		});
 
@@ -651,7 +650,7 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 0.8;
 				changeSpacing(factor);
-				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				CreateGui.getCurrentTab().drawingSurface().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 			}
 		});
 		
@@ -921,7 +920,7 @@ public class GuiFrame extends JFrame  {
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StatisticsPanel.showStatisticsPanel(appView.getModel().getStatistics());
+				StatisticsPanel.showStatisticsPanel(CreateGui.getCurrentTab().drawingSurface().getModel().getStatistics());
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
@@ -1076,10 +1075,10 @@ public class GuiFrame extends JFrame  {
 				//parse selected zoom level, and strip of %.
 				int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
-				boolean didZoom = appView.getZoomController().setZoom(newZoomLevel);
+				boolean didZoom = CreateGui.getCurrentTab().drawingSurface().getZoomController().setZoom(newZoomLevel);
 				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
+					CreateGui.getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 				}
 			}
 		});
@@ -1152,10 +1151,10 @@ public class GuiFrame extends JFrame  {
 			GuiAction newZoomAction = new GuiAction(zoomExamples[i] + "%", "Select zoom percentage", "") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					boolean didZoom = appView.getZoomController().setZoom(zoomper);
+					boolean didZoom = CreateGui.getCurrentTab().drawingSurface().getZoomController().setZoom(zoomper);
 					if (didZoom) {
 						updateZoomCombo();
-						appView.zoomToMidPoint(); //Do Zoom
+						CreateGui.getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 					}
 				}
 			};
@@ -1263,7 +1262,7 @@ public class GuiFrame extends JFrame  {
 			stripTimeDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
-			appView.getUndoManager().setUndoRedoStatus();
+			CreateGui.getCurrentTab().drawingSurface().getUndoManager().setUndoRedoStatus();
 
 			if(CreateGui.getCurrentTab().restoreWorkflowDialog()){
 				WorkflowDialog.showDialog();
@@ -1416,18 +1415,12 @@ public class GuiFrame extends JFrame  {
 
 	}
 
-	// set frame objects by array index
-	public void setObjects(int index) {
-		appView = CreateGui.getDrawingSurface(index);
-	}
 
 	//XXX 2018-05-23 kyrke, implementation close to closeTab, needs refactoring
 	private void undoAddTab(int currentlySelected) {
 		CreateGui.removeTab(appTab.getSelectedIndex() );
 		appTab.removeTabAt(appTab.getSelectedIndex());
 		appTab.setSelectedIndex(currentlySelected);
-		//Update DrawingSurfaceImpl manually. Bug #1543124
-		setObjects(appTab.getSelectedIndex());
 	}
 
 	// set tabbed pane properties and add change listener that updates tab with
@@ -1452,10 +1445,9 @@ public class GuiFrame extends JFrame  {
 			appTab.setSelectedIndex(index);
 		}
 
-		setObjects(index);
-		if (appView != null) {
-			appView.setVisible(true);
-			appView.repaint();
+		if (CreateGui.getCurrentTab() != null) {
+			CreateGui.getCurrentTab().drawingSurface().setVisible(true);
+			CreateGui.getCurrentTab().drawingSurface().repaint();
 			updateZoomCombo();
 
 			setTitle(appTab.getTitleAt(index));
@@ -1512,13 +1504,13 @@ public class GuiFrame extends JFrame  {
 	private void toggleTokenAge(){
 		toggleShowTokenAge();
 		Preferences.getInstance().setShowTokenAge(showTokenAge());
-		appView.repaintAll();
+		CreateGui.getCurrentTab().drawingSurface().repaintAll();
 	}
 
 	private void toggleZeroToInfinityIntervals() {
 		toggleShowZeroToInfinityIntervals();
 		Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals());
-		appView.repaintAll();
+		CreateGui.getCurrentTab().drawingSurface().repaintAll();
 	}
 
 	private void showComponents(boolean enable){
@@ -1673,8 +1665,6 @@ public class GuiFrame extends JFrame  {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		boolean showFileEndingChangedMessage = false;
 
-
-		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
 		if (name == null || name.equals("")) {
@@ -1736,7 +1726,6 @@ public class GuiFrame extends JFrame  {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name;
 
-		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
 		if (file == null) {
@@ -2099,7 +2088,7 @@ public class GuiFrame extends JFrame  {
 	public void updateZoomCombo() {
 		ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
 		zoomComboBox.removeActionListener(zoomComboListener);
-		zoomComboBox.setSelectedItem(appView.getZoomController().getPercent() + "%");
+		zoomComboBox.setSelectedItem(CreateGui.getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
 	
@@ -2129,7 +2118,7 @@ public class GuiFrame extends JFrame  {
 		}
 		
 		tabContent.currentTemplate().guiModel().repaintAll(true);
-		appView.updatePreferredSize();
+		CreateGui.getCurrentTab().drawingSurface().updatePreferredSize();
 	}
         
         private boolean canNetBeSavedAndShowMessage() {
@@ -2164,14 +2153,14 @@ public class GuiFrame extends JFrame  {
 	private void toggleAnimationMode() {
 		try {
 
-			if (!appView.isInAnimationMode()) {
+			if (!CreateGui.getCurrentTab().drawingSurface().isInAnimationMode()) {
 				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
 					CreateGui.getCurrentTab().rememberSelectedTemplate();
 					if (CreateGui.getCurrentTab().currentTemplate().isActive()){
 						CreateGui.getCurrentTab().setSelectedTemplateWasActive();
 					}
 					restoreMode();
-					setAnimationMode(!appView.isInAnimationMode());
+					setAnimationMode(!CreateGui.getCurrentTab().drawingSurface().isInAnimationMode());
 					if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {
 						CreateGui.getCurrentTab().restoreSelectedTemplate();
 						CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
@@ -2191,8 +2180,8 @@ public class GuiFrame extends JFrame  {
 				stepbackwardAction.setEnabled(false);
 			} else {
 				//setMode(ElementType.START);
-				appView.getSelectionObject().clearSelection();
-				setAnimationMode(!appView.isInAnimationMode());
+				CreateGui.getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
+				setAnimationMode(!CreateGui.getCurrentTab().drawingSurface().isInAnimationMode());
 				CreateGui.getCurrentTab().restoreSelectedTemplate();
 				//Enable editor focus traversal policy
 				CreateGui.getAppGui().setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
@@ -2202,7 +2191,7 @@ public class GuiFrame extends JFrame  {
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 			startAction.setSelected(false);
-			appView.changeAnimationMode(false);
+			CreateGui.getCurrentTab().drawingSurface().changeAnimationMode(false);
 			throw new RuntimeException(e);
 		}
 
@@ -2277,7 +2266,7 @@ public class GuiFrame extends JFrame  {
 				annotationAction.setSelected(false);
 			}
 
-			if (appView == null) {
+			if (CreateGui.getCurrentTab() == null) {
 				return;
 			}
 
@@ -2285,22 +2274,22 @@ public class GuiFrame extends JFrame  {
 			statusBar.changeText(typeID);
 
 			//Disable selection and deselect current selection
-			appView.getSelectionObject().disableSelection();
+			CreateGui.getCurrentTab().drawingSurface().getSelectionObject().disableSelection();
 
 			//If pending arc draw, remove it
-			if (appView.createArc != null) {
-				appView.createArc.delete();
-				appView.createArc = null;
-				appView.repaint();
+			if (CreateGui.getCurrentTab().drawingSurface().createArc != null) {
+				CreateGui.getCurrentTab().drawingSurface().createArc.delete();
+				CreateGui.getCurrentTab().drawingSurface().createArc = null;
+				CreateGui.getCurrentTab().drawingSurface().repaint();
 			}
 
 			if (typeID == ElementType.SELECT) {
-				appView.getSelectionObject().enableSelection();
-				appView.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				CreateGui.getCurrentTab().drawingSurface().getSelectionObject().enableSelection();
+				CreateGui.getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			} else if (typeID == ElementType.DRAG) {
-				appView.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				CreateGui.getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
-				appView.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				CreateGui.getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 			}
 		}
 
@@ -2488,7 +2477,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    Export.exportGuiView(appView, Export.PNG, null);
+                    Export.exportGuiView(CreateGui.getCurrentTab().drawingSurface(), Export.PNG, null);
 				}
 			}
 		});
@@ -2496,7 +2485,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportPSAction = new GuiAction("PostScript", "Export the net to PostScript format", KeyStroke.getKeyStroke('T', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+                    Export.exportGuiView(CreateGui.getCurrentTab().drawingSurface(), Export.POSTSCRIPT, null);
 				}
 			}
 		});
@@ -2505,7 +2494,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportToTikZAction = new GuiAction("TikZ", "Export the net to LaTex (TikZ) format", KeyStroke.getKeyStroke('L', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
+                    Export.exportGuiView(CreateGui.getCurrentTab().drawingSurface(), Export.TIKZ, CreateGui.getCurrentTab().drawingSurface().getGuiModel());
 				}
 			}
 		});
@@ -2523,7 +2512,7 @@ public class GuiFrame extends JFrame  {
                                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                             Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
                     }
-                    Export.exportGuiView(appView, Export.PNML, null);
+                    Export.exportGuiView(CreateGui.getCurrentTab().drawingSurface(), Export.PNML, null);
 				}
 			}
 		});
@@ -2532,7 +2521,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-					Export.exportGuiView(appView, Export.QUERY, null);
+					Export.exportGuiView(CreateGui.getCurrentTab().drawingSurface(), Export.QUERY, null);
 				}
 			}
 		});
@@ -2550,7 +2539,7 @@ public class GuiFrame extends JFrame  {
 		fileMenu.addSeparator();
 		fileMenu.add(printAction = new GuiAction("Print", "Print", KeyStroke.getKeyStroke('P', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				Export.exportGuiView(appView, Export.PRINTER, null);
+				Export.exportGuiView(CreateGui.getCurrentTab().drawingSurface(), Export.PRINTER, null);
 			}
 		});
 		
@@ -2799,9 +2788,6 @@ public class GuiFrame extends JFrame  {
 			//Close the gui part first, else we get an error bug #826578
 			appTab.removeTabAt(index);
 			CreateGui.removeTab(index);
-
-			//Update DrawingSurfaceImpl manually. Bug #1543124
-			setObjects(appTab.getSelectedIndex());
 
 			activateSelectAction();
 		}
