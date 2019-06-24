@@ -616,7 +616,4 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		guiModel.repaintAll(!isInAnimationMode());
 	}
 
-	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
-		nameGenerator.setupNameGeneratorFromTemplates(templates);
-	}
 }

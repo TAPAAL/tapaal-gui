@@ -1691,7 +1691,6 @@ public class GuiFrame extends JFrame  {
 			tab.setNetwork(loadedModel.network(), loadedModel.templates());
 			tab.setQueries(loadedModel.queries());
 			tab.setConstants(loadedModel.network().constants());
-			tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 			tab.selectFirstElements();
 
@@ -1751,7 +1750,6 @@ public class GuiFrame extends JFrame  {
 				tab.setNetwork(loadedModel.network(), loadedModel.templates());
 				tab.setQueries(loadedModel.queries());
 				tab.setConstants(loadedModel.network().constants());
-				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 				tab.selectFirstElements();
 
