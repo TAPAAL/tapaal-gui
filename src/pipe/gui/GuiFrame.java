@@ -478,7 +478,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// check if queries need to be removed
-				ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getSelectionObject().getSelection();
+				ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getSelectionObject().getSelection();
 				Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
 				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
@@ -550,7 +550,7 @@ public class GuiFrame extends JFrame  {
 		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components",  KeyStroke.getKeyStroke('A', shortcutkey )) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getDrawingSurface().getSelectionObject().selectAll();
+				CreateGui.getCurrentTab().drawingSurface().getSelectionObject().selectAll();
 			}
 		});
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
@@ -1578,10 +1578,10 @@ public class GuiFrame extends JFrame  {
 
 			CreateGui.getTab(index).setFile(outFile);
 
-			CreateGui.getDrawingSurface(index).setNetChanged(false);
+			CreateGui.getTab(index).drawingSurface().setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
 			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
-			CreateGui.getDrawingSurface(index).getUndoManager().clear();
+			CreateGui.getTab(index).drawingSurface().getUndoManager().clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 		} catch (Exception e) {
@@ -1835,7 +1835,7 @@ public class GuiFrame extends JFrame  {
 
 		if(index < 0) return false;
 
-		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
+		if (CreateGui.getTab(index).drawingSurface().getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
@@ -1924,7 +1924,7 @@ public class GuiFrame extends JFrame  {
 		case draw:
 			// Enable all draw actions
 			startAction.setSelected(false);
-			CreateGui.getDrawingSurface().changeAnimationMode(false);
+			CreateGui.getCurrentTab().drawingSurface().changeAnimationMode(false);
 
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
@@ -1938,7 +1938,7 @@ public class GuiFrame extends JFrame  {
 			showConstants(showConstants);
 			showToolTips(showToolTips);
 
-			CreateGui.getDrawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
+			CreateGui.getCurrentTab().drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
 			activateSelectAction();
 			selectAction.setSelected(true);
@@ -1982,7 +1982,7 @@ public class GuiFrame extends JFrame  {
 	}
 
 	private void hideComponentWindow(){
-		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getPNObjects();
+		ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getPNObjects();
 
 		for (PetriNetObject pn : selection) {
 			if (pn instanceof TimedPlaceComponent) {
