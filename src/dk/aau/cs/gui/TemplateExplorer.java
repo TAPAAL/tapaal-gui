@@ -555,13 +555,11 @@ public class TemplateExplorer extends JPanel {
 		nameTextField.setPreferredSize(size);
 		nameTextField.setText(nameToShow);	
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {			
-			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameTextField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
