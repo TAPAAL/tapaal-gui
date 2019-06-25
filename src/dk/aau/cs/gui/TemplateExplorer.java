@@ -530,14 +530,13 @@ public class TemplateExplorer extends JPanel {
 			}
 			else {
 				template = createNewTemplate(templateName);
+
+				int index = listModel.size();
+				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+				parent.addTemplate(template);
 			}
 		}
-		if (template != null) {
-			int index = listModel.size();
-			undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
-			parent.addTemplate(template);
-			parent.drawingSurface().setModel(template.guiModel(), template.model(), template.zoomer());
-		}
+
 		exit();
 	}
 	
