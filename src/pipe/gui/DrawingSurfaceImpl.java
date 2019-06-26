@@ -84,6 +84,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	}
 
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model, Zoomer zoomer) {
+		//Remove the old model from view
+		this.guiModel.removedFromView();
+		//Add the new model to view
+		guiModel.addedToView(this);
+
 		this.selection.disableSelection();
 
 		nameGenerator.add(model);
@@ -422,7 +427,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		private void addPetriNetObjectToModelandView(PetriNetObject pnObject) {
 			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
+			//view.addNewPetriNetObject(pnObject);
 		}
 
 		private PlaceTransitionObject newTimedPlaceAddToModelView(Point p) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -22,6 +23,26 @@ import dk.aau.cs.util.Require;
 
 
 public class DataLayer {
+
+
+	//XXX: Temp solution while refactoring, should be changed to interface to now allow to many actions
+	//Long term should use callback to not have tight coupling
+	private DrawingSurfaceImpl view;
+	public void addedToView(DrawingSurfaceImpl view){this.view = view;}
+	public void removedFromView() {this.view = null;}
+
+
+	private void removeFromViewIfConnected(PetriNetObject pno) {
+		if (view != null) {
+			view.remove(pno);
+		}
+	}
+
+	private void addToViewIfConnected(PetriNetObject pno) {
+		if (view != null) {
+			view.addNewPetriNetObject(pno);
+		}
+	}
 
 	/** PNML File Name */
 	public String pnmlName = null;
@@ -350,6 +371,7 @@ public class DataLayer {
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
 
+		addToViewIfConnected(pnObject);
 		pnObject.setGuiModel(this);
 
 		if (setPetriNetObjectArrayList(pnObject)) {
@@ -377,6 +399,8 @@ public class DataLayer {
 	 *            The PetriNetObject to be removed.
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject) {
+
+		removeFromViewIfConnected(pnObject);
 
 		//XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
 		//pnObject.setGuiModel(null);

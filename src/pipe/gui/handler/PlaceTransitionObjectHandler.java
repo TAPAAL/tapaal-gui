@@ -408,7 +408,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		((Container) CreateGui.getDrawingSurface()).remove(arcToCreate);
 
 		view.getGuiModel().addPetriNetObject(arcToCreate);
-		view.addNewPetriNetObject(arcToCreate);
+		//view.addNewPetriNetObject(arcToCreate);
 
 		//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc and inhub arc)
 	}
