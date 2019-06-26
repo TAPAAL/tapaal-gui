@@ -13,7 +13,7 @@ public class AddTransportArcCommand extends TAPNElementCommand {
 	public AddTransportArcCommand(TimedTransportArcComponent transportArcComponent,
 			TransportArc transportArc, TimedArcPetriNet tapn,
 			DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+		super(tapn, guiModel);
 		this.transportArcComponent = transportArcComponent;
 		this.transportArc = transportArc;
 	}
@@ -21,15 +21,13 @@ public class AddTransportArcCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
 		transportArcComponent.delete();
-		view.repaint();
 	}
 
 	@Override
 	public void redo() {
 		transportArcComponent.setUnderlyingArc(transportArc);
 		transportArcComponent.getConnectedTo().setUnderlyingArc(transportArc);
-		transportArcComponent.undelete(view);
+		transportArcComponent.undelete();
 		tapn.add(transportArc);
-		view.repaint();
 	}
 }

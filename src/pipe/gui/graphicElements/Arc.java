@@ -433,9 +433,9 @@ public abstract class Arc extends PetriNetObject {
 	}
 
 	@Override
-	public void undelete(DrawingSurfaceImpl view) {
+	public void undelete() {
 		if (this.isDeleted()) {
-			super.undelete(view);
+			super.undelete();
 			getSource().addConnectFrom(this);
 			getTarget().addConnectTo(this);
 			deleted = false;

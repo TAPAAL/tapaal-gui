@@ -173,14 +173,14 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public void undelete(DrawingSurfaceImpl view) {
-		super.undelete(view);
+	public void undelete() {
+		super.undelete();
 
 		//Avoid loop
 		TimedTransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a.connectedTo != null) {
-			a.undelete(view);
+			a.undelete();
 			a.connectedTo = this;
 		}
 		connectedTo = a;

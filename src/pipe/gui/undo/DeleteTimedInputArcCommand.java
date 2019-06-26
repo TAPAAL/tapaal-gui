@@ -9,21 +9,19 @@ public class DeleteTimedInputArcCommand extends TAPNElementCommand {
 	private final TimedInputArcComponent timedInputArc;
 
 	public DeleteTimedInputArcCommand(TimedInputArcComponent timedInputArc, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+		super(tapn, guiModel);
 		this.timedInputArc = timedInputArc;
 	}
 
 	@Override
 	public void redo() {
 		timedInputArc.delete();
-		view.repaint();
 	}
 
 	@Override
 	public void undo() {
-		timedInputArc.undelete(view);
+		timedInputArc.undelete();
 		tapn.add(timedInputArc.underlyingTimedInputArc());
-		view.repaint();
 	}
 
 }

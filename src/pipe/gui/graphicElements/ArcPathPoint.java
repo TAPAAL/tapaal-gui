@@ -281,7 +281,7 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void undelete(DrawingSurfaceImpl view) {
+	public void undelete() {
 	}
 
 	@Override

@@ -198,9 +198,9 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	}
 	
 	@Override
-	public void undelete(DrawingSurfaceImpl view) {
+	public void undelete() {
 		add(note);
-		super.undelete(view);
+		super.undelete();
 	}
 
 	@Override

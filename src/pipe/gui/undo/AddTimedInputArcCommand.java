@@ -10,20 +10,18 @@ public class AddTimedInputArcCommand extends TAPNElementCommand {
 
 	public AddTimedInputArcCommand(TimedInputArcComponent timedArc,
 			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+		super(tapn, guiModel);
 		this.timedArc = timedArc;
 	}
 
 	@Override
 	public void undo() {
 		timedArc.delete();
-		view.repaint();
 	}
 
 	@Override
 	public void redo() {
-		timedArc.undelete(view);
+		timedArc.undelete();
 		tapn.add(timedArc.underlyingTimedInputArc());
-		view.repaint();
 	}
 }

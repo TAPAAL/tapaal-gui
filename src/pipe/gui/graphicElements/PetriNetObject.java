@@ -278,11 +278,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		removeAll();
 	}
 
-	public void undelete(DrawingSurfaceImpl view) {
+	public void undelete() {
 		guiModel.addPetriNetObject(this);
-		if (view.isCurrentGuiModel(guiModel)) {
-			//view.addNewPetriNetObject(this);
-		}
 	}
 
 	protected void removeFromContainer() {

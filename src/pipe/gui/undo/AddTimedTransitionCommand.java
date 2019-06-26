@@ -11,21 +11,19 @@ public class AddTimedTransitionCommand extends TAPNElementCommand {
 
 	public AddTimedTransitionCommand(TimedTransitionComponent transition,
 			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+		super(tapn, guiModel);
 		this.transition = transition;
 	}
 
 	@Override
 	public void undo() {
 		transition.delete();
-		view.repaint();
 	}
 
 	@Override
 	public void redo() {
-		transition.undelete(view);
+		transition.undelete();
 		tapn.add(transition.underlyingTransition());
-		view.repaint();
 	}
 
 }

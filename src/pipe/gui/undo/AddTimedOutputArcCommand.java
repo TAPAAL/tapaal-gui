@@ -10,21 +10,19 @@ public class AddTimedOutputArcCommand extends TAPNElementCommand {
 
 	public AddTimedOutputArcCommand(TimedOutputArcComponent outputArc,
 			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+		super(tapn, guiModel);
 		this.outputArc = outputArc;
 	}
 
 	@Override
 	public void undo() {
 		outputArc.delete();
-		view.repaint();
 	}
 
 	@Override
 	public void redo() {
-		outputArc.undelete(view);
+		outputArc.undelete();
 		tapn.add(outputArc.underlyingArc());
-		view.repaint();
 	}
 
 }

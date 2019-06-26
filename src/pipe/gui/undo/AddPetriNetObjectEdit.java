@@ -36,7 +36,7 @@ public class AddPetriNetObjectEdit extends Command {
 	/** */
 	@Override
 	public void redo() {
-		pnObject.undelete(view);
+		pnObject.undelete();
 	}
 
 	@Override

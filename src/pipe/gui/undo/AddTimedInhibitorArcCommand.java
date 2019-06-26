@@ -10,21 +10,19 @@ public class AddTimedInhibitorArcCommand extends TAPNElementCommand {
 
 	public AddTimedInhibitorArcCommand(TimedInhibitorArcComponent inhibitorArc,
 			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+		super(tapn, guiModel);
 		this.inhibitorArc = inhibitorArc;
 	}
 
 	@Override
 	public void undo() {
 		inhibitorArc.delete();
-		view.repaint();
 	}
 
 	@Override
 	public void redo() {
-		inhibitorArc.undelete(view);
+		inhibitorArc.undelete();
 		tapn.add(inhibitorArc.underlyingTimedInhibitorArc());
-		view.repaint();
 	}
 
 }
