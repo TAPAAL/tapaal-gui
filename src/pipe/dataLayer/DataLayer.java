@@ -50,7 +50,7 @@ public class DataLayer {
 	private ArrayList<Arc> arcsArray = null;
 
 	/** ArrzyList holding all arcpathpoints */
-	private Set<ArcPathPoint> arcPathSet= new HashSet<>();
+	private Set<ArcPathPoint> arcPathSet= new LinkedHashSet<>();
 
 	/**
 	 * ArrayList for net-level label objects (as opposed to element-level
