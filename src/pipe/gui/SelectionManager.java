@@ -69,7 +69,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		}
 
 		// Get all the place and transition objects in the current window
-		for (PetriNetObject pnObject : drawingSurface.getPlaceTransitionObjects()) {
+		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPlaceTransitionObjects()) {
 			pnObject.select(selectionRectangle);
 		}
 	}
@@ -86,7 +86,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	public void clearSelection() {
 		// Get all the objects in the current window
-		for (PetriNetObject pnObject : drawingSurface.getPNObjects()) {
+		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPNObjects()) {
 			if (pnObject.isSelectable()) {
 				pnObject.deselect();
 			}
@@ -104,7 +104,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		Point topleft = null;
 
 		// Get all the objects in the current window, ignoring Arcs
-		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getGuiModel().getPNObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			if (pnObject.isSelected() && !(pnObject instanceof Arc)) {
 				point = pnObject.getLocation();
@@ -146,7 +146,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		ArrayList<PetriNetObject> selection = new ArrayList<PetriNetObject>();
 
 		// Get all the objects in the current window
-		for (PetriNetObject pnObject : drawingSurface.getPNObjects()) {
+		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPNObjects()) {
 			if (pnObject.isSelected()) {
 				selection.add(pnObject);
 			}
@@ -220,7 +220,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void selectAll() {
-		for (PetriNetObject pnObject : drawingSurface.getPNObjects()) {
+		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPNObjects()) {
 			pnObject.select(false);
 		}
 		drawingSurface.repaint();

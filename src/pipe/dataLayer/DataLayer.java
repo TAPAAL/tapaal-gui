@@ -1,16 +1,10 @@
 package pipe.dataLayer;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 
+import dk.aau.cs.debug.Logger;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
@@ -55,6 +49,9 @@ public class DataLayer {
 	/** ArrayList containing all the Arc objects in the Petri-Net */
 	private ArrayList<Arc> arcsArray = null;
 
+	/** ArrzyList holding all arcpathpoints */
+	private Set<ArcPathPoint> arcPathSet= new HashSet<>();
+
 	/**
 	 * ArrayList for net-level label objects (as opposed to element-level
 	 * labels).
@@ -78,6 +75,25 @@ public class DataLayer {
 	 * arcs
 	 */
 	private Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = null;
+
+
+	//XXX: Added from drawingsurface to have a way to acces all elements added,
+    //Should be refactored later to combine the existing list, however this is the quick fix during refactoring
+    private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
+
+    public ArrayList<PetriNetObject> getPNObjects() {
+        return petriNetObjects;
+    }
+
+    public ArrayList<PetriNetObject> getPlaceTransitionObjects(){
+        ArrayList<PetriNetObject> result = new ArrayList<PetriNetObject>();
+        for (PetriNetObject pnObject : petriNetObjects) {
+            if((pnObject instanceof PlaceTransitionObject)){
+                result.add(pnObject);
+            }
+        }
+        return result;
+    }
 
 	private NetType type = NetType.TAPN;
 
@@ -373,8 +389,11 @@ public class DataLayer {
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
 
-		addToViewIfConnected(pnObject);
 		pnObject.setGuiModel(this);
+		addToViewIfConnected(pnObject); // Must be called after model is set
+
+        //XXX: temp solution to have access to all elements types at once
+        petriNetObjects.add(pnObject);
 
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
@@ -388,6 +407,10 @@ public class DataLayer {
 			} else if (pnObject instanceof AnnotationNote) {
 				addAnnotation((AnnotationNote)pnObject);
 			}
+		} else if (pnObject instanceof ArcPathPoint){
+			arcPathSet.add((ArcPathPoint) pnObject);
+		} else {
+			throw new RuntimeException("Unknow element type added");
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
@@ -402,10 +425,13 @@ public class DataLayer {
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject) {
 
+        //XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
+        //pnObject.setGuiModel(null);
+
 		removeFromViewIfConnected(pnObject);
 
-		//XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
-		//pnObject.setGuiModel(null);
+        //XXX: temp solution to have access to all elements types at once
+        petriNetObjects.remove(pnObject);
 
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;

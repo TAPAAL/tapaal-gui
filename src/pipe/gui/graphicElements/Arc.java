@@ -347,7 +347,7 @@ public abstract class Arc extends PetriNetObject {
 		// called by GuiView / State viewer when adding component.
 		deleted = false;
 
-		myPath.addPointsToGui(getParent());
+		myPath.addPointsToGui(getGuiModel());
 
 		updateArcPosition();
 		if (getParent() != null && pnName.getParent() == null) {

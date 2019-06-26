@@ -1993,7 +1993,7 @@ public class GuiFrame extends JFrame  {
 	}
 
 	private void hideComponentWindow(){
-		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getPNObjects();
+		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getGuiModel().getPNObjects();
 
 		for (PetriNetObject pn : selection) {
 			if (pn instanceof TimedPlaceComponent) {

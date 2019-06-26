@@ -42,7 +42,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	private SelectionManager selection;
 	private UndoManager undoManager;
-	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
+
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
@@ -124,7 +124,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		super.add(newObject);
 
 		newObject.addedToGui();
-		petriNetObjects.add(newObject);
 
 		calculateNewBoundsForScrollPane(newObject.getBounds());
 		if(newObject.getNameLabel() != null){
@@ -253,11 +252,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		}
 	}
 
-	@Override
-	public void removeAll() {
-		petriNetObjects.clear();
-		super.removeAll();
-	}
 
 
 	public boolean isInAnimationMode() {
@@ -272,26 +266,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		netChanged = _netChanged;
 	}
 
-	public ArrayList<PetriNetObject> getPNObjects() {
-		return petriNetObjects;
-	}
 
-	public ArrayList<PetriNetObject> getPlaceTransitionObjects(){
-		ArrayList<PetriNetObject> result = new ArrayList<PetriNetObject>();
-		for (PetriNetObject pnObject : petriNetObjects) {
-			if((pnObject instanceof PlaceTransitionObject)){
-				result.add(pnObject);
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public void remove(Component comp) {
-		petriNetObjects.remove(comp);
-
-		super.remove(comp);
-	}
 
 	public void drag(Point dragStart, Point dragEnd) {
 		if (dragStart == null) {

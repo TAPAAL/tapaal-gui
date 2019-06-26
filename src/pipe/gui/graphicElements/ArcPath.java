@@ -12,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -594,7 +595,7 @@ public class ArcPath implements Shape {
 		return C;
 	}
 
-	public void addPointsToGui(DrawingSurfaceImpl editWindow) {
+	public void addPointsToGui(DataLayer model) {
 		ArcPathPointHandler pointHandler;
 
 		(pathPoints.get(0)).setDraggable(false);
@@ -609,10 +610,10 @@ public class ArcPath implements Shape {
 			// to add all the points again along with new action listeners,
 			// we just want to add the new point.
 			// Nadeem 21/06/2005
-			if (editWindow.getIndexOf(pathPoint) < 0) {
-				editWindow.addNewPetriNetObject(pathPoint);
+			//if (editWindow.getIndexOf(pathPoint) < 0) {
+				model.addPetriNetObject(pathPoint);
 				pathPoint.updatePointLocation();
-			}
+			//}
 		}
 	}
 
@@ -657,7 +658,7 @@ public class ArcPath implements Shape {
 	public void insertPoint(int index, ArcPathPoint newpoint) {
 		pathPoints.add(index, newpoint);
 
-		addPointsToGui((DrawingSurfaceImpl) myArc.getParent());
+		addPointsToGui(myArc.getGuiModel());
 
 	}
 

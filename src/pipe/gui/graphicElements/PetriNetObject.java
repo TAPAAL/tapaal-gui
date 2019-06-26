@@ -130,6 +130,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
 	}
+	//XXX: not sure if datalayer should be accessable, but needed for refactorings away from "public" view.
+	public DataLayer getGuiModel() { return this.guiModel;}
 
 	public void setId(String idInput) {
 		id = idInput;
