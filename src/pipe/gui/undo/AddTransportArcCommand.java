@@ -12,7 +12,7 @@ public class AddTransportArcCommand extends TAPNElementCommand {
 
 	public AddTransportArcCommand(TimedTransportArcComponent transportArcComponent,
 			TransportArc transportArc, TimedArcPetriNet tapn,
-			DataLayer guiModel, DrawingSurfaceImpl view) {
+			DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.transportArcComponent = transportArcComponent;
 		this.transportArc = transportArc;

@@ -9,7 +9,7 @@ public class AddTimedOutputArcCommand extends TAPNElementCommand {
 	private final TimedOutputArcComponent outputArc;
 
 	public AddTimedOutputArcCommand(TimedOutputArcComponent outputArc,
-			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
+			TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.outputArc = outputArc;
 	}

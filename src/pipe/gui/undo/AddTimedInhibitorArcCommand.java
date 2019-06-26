@@ -9,7 +9,7 @@ public class AddTimedInhibitorArcCommand extends TAPNElementCommand {
 	private final TimedInhibitorArcComponent inhibitorArc;
 
 	public AddTimedInhibitorArcCommand(TimedInhibitorArcComponent inhibitorArc,
-			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
+			TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.inhibitorArc = inhibitorArc;
 	}

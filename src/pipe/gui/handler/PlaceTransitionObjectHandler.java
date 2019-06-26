@@ -187,9 +187,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				undoManager.newEdit(); // new "transaction""
 
-				undoManager.addEdit(new AddTimedOutputArcCommand(
+				undoManager.addEdit(
+					new AddTimedOutputArcCommand(
 						(TimedOutputArcComponent) timedArcToCreate,
-						view.getModel(), view.getGuiModel(), view));
+						view.getModel(),
+						view.getGuiModel()
+					)
+				);
 
 				// else source is a place (not transition)
 			} else {
@@ -219,9 +223,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				undoManager.newEdit(); // new "transaction""
 
-				undoManager.addEdit(new AddTimedInputArcCommand(
+				undoManager.addEdit(
+					new AddTimedInputArcCommand(
 						(TimedInputArcComponent) timedArcToCreate,
-						view.getModel(), view.getGuiModel(), view));
+						view.getModel(),
+						view.getGuiModel()
+					)
+				);
 
 			}
 
@@ -339,8 +347,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								arc2,
 								arc2.underlyingTransportArc(),
 								view.getModel(),
-								view.getGuiModel(),
-								view));
+								view.getGuiModel()
+						)
+				);
 
 				sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(transportArcToCreate);
 
@@ -395,7 +404,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, createTAPNInhibitorArc);
 
 			undoManager.addNewEdit(
-					new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, view.getModel(), view.getGuiModel(), view)
+					new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, view.getModel(), view.getGuiModel())
 			);
 
 			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(createTAPNInhibitorArc);

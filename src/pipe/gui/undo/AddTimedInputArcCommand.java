@@ -9,7 +9,7 @@ public class AddTimedInputArcCommand extends TAPNElementCommand {
 	private final TimedInputArcComponent timedArc;
 
 	public AddTimedInputArcCommand(TimedInputArcComponent timedArc,
-			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
+			TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.timedArc = timedArc;
 	}
