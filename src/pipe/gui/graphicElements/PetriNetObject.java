@@ -8,6 +8,7 @@ import java.awt.event.*;
 
 import javax.swing.JComponent;
 
+import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -210,7 +211,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		}
 	}
 	public void removeLabelFromContainer() {
-		if (getParent() != null && pnName.getParent() == null) {
+		if (getParent() != null && pnName != null) {
+			Logger.log("Remove stuff");
 			getParent().remove(pnName);
 		}
 	}
