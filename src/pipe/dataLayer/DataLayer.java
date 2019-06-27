@@ -49,8 +49,11 @@ public class DataLayer {
 	/** ArrayList containing all the Arc objects in the Petri-Net */
 	private ArrayList<Arc> arcsArray = null;
 
-	/** ArrzyList holding all arcpathpoints */
-	private Set<ArcPathPoint> arcPathSet= new LinkedHashSet<>();
+	/** Set holding all ArcPathPoints
+	 * Uses the reference as lookup key (not hash code)
+	 * Collections.newSetFromMap(new IdentityHashMap<E, Boolean>());
+	 * */
+	private Set<ArcPathPoint> arcPathSet = Collections.newSetFromMap(new IdentityHashMap<>());
 
 	/**
 	 * ArrayList for net-level label objects (as opposed to element-level
