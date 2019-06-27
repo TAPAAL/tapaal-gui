@@ -26,7 +26,6 @@ public class AddTimedInputArcCommand extends TAPNElementCommand {
 
 	@Override
 	public void redo() {
-		timedArc.undelete();
 		guiModel.addPetriNetObject(timedArc);
 
 		//XXX: Should properly be part of the guiModel
