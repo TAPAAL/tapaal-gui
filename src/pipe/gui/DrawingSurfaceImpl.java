@@ -21,10 +21,7 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.undo.AddPetriNetObjectEdit;
-import pipe.gui.undo.AddTimedPlaceCommand;
-import pipe.gui.undo.AddTimedTransitionCommand;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.undo.*;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -445,7 +442,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
             AnnotationNote pnObject = new AnnotationNote(p.x, p.y, true);
             addPetriNetObjectToModelandView(pnObject);
 
-            getUndoManager().addNewEdit(new AddPetriNetObjectEdit(pnObject, view, guiModel));
+            getUndoManager().addNewEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
             pnObject.enableEditMode();
             return pnObject;
         }
