@@ -30,8 +30,9 @@ public class DeleteTimedOutputArcCommand extends TAPNElementCommand {
 		guiModel.addPetriNetObject(arc);
 		tapn.add(arc.underlyingArc());
 
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
+		//XXX: Should properly be part of the guiModel
+		if (arc.getSource() != null) arc.getSource().addConnectFrom(arc);
+		if (arc.getTarget() != null) arc.getTarget().addConnectTo(arc);
 	}
 
 }
