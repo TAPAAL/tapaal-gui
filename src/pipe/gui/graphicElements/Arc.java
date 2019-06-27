@@ -393,30 +393,6 @@ public abstract class Arc extends PetriNetObject {
 			return (Transition) getSource();
 		}
 	}
-
-	public void removeFromView() {
-		if (getParent() != null) {
-			getParent().remove(pnName);
-		}
-		myPath.forceHidePoints();
-		removeFromContainer();
-	}
-
-	public boolean getsSelected(Rectangle selectionRectangle) {
-		if (selectable) {
-			ArcPath arcPath = getArcPath();
-			if (arcPath.proximityIntersects(selectionRectangle)) {
-				arcPath.showPoints();
-			} else {
-				arcPath.hidePoints();
-			}
-			if (arcPath.intersects(selectionRectangle)) {
-				select();
-				return true;
-			}
-		}
-		return false;
-	}
 	
 	public void selectPath(){
 		if (selectable) {
