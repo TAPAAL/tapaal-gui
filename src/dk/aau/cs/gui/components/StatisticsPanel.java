@@ -148,14 +148,15 @@ public class StatisticsPanel extends JPanel{
 					List<TimedTransition> orphans = template.model().getOrphanTransitions();
 					for(TimedTransition trans : orphans){
 						TimedTransitionComponent t = (TimedTransitionComponent)template.guiModel().getTransitionByName(trans.name());
-						Command cmd = new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel(), tab.drawingSurface());
-						t.delete();
+						Command cmd = new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel());
+
 						if(first){
 							undoManager.addNewEdit(cmd);
 							first = false;
 						} else {
 							undoManager.addEdit(cmd);
 						}
+						cmd.redo();
 					}
 				}
 				

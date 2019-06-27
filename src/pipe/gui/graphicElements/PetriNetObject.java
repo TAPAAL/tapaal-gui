@@ -212,7 +212,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 	public void removeLabelFromContainer() {
 		if (getParent() != null && pnName != null) {
-			Logger.log("Remove stuff");
 			getParent().remove(pnName);
 		}
 	}

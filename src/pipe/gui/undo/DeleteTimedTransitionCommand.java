@@ -10,7 +10,7 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	private final TimedTransitionComponent transition;
 	private SharedTransition sharedTransition;
 
-	public DeleteTimedTransitionCommand(TimedTransitionComponent transition, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
+	public DeleteTimedTransitionCommand(TimedTransitionComponent transition, TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.transition = transition;
 
@@ -19,7 +19,8 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 
 	@Override
 	public void redo() {
-		transition.delete();
+		transition.underlyingTransition().delete();
+		guiModel.removePetriNetObject(transition);
 	}
 
 	@Override

@@ -232,7 +232,7 @@ public class UndoManager {
 					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel, view);
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
-					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view);
+					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel);
 				}else if(pnObject instanceof TimedTransportArcComponent){
 					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
 					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view);
