@@ -228,6 +228,8 @@ public class UndoManager {
 			//The list of selected objects is not updated when a element is deleted
 			//We might delete the same object twice, which will give an error
 			//Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
+			//There is properly a better way to track this (check model?) but while refactoring we will keeps it close
+			//to the orginal code -- kyrke 2019-06-27
 			if (!pnObject.isDeleted()) {
 				Command cmd = null;
 				if(pnObject instanceof TimedPlaceComponent){
