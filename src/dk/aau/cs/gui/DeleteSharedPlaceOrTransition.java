@@ -240,7 +240,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {
 		if(arc instanceof TimedInhibitorArcComponent){
-			return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel());
 		}else if(arc instanceof TimedTransportArcComponent){
 			TimedTransportArcComponent component = (TimedTransportArcComponent)arc;
 			return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel(), drawingSurface);
