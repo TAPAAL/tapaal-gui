@@ -359,7 +359,7 @@ public abstract class Arc extends PetriNetObject {
 	public void removedFromGui() {
 
 		//Remove label
-		if (getParent() != null && pnName.getParent() == null) {
+		if (getParent() != null && pnName != null) {
 			getParent().remove(pnName);
 		}
 
