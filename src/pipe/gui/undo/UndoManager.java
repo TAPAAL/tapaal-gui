@@ -246,7 +246,7 @@ public class UndoManager {
 					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
 					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel);
 				}else if(pnObject instanceof AnnotationNote){
-					cmd = new DeletePetriNetObjectEdit(pnObject, view, guiModel);
+					cmd = new DeleteAnnotationNoteCommand((AnnotationNote)pnObject, guiModel);
 				}else{
 					throw new RuntimeException("This should not be possible");
 				}
