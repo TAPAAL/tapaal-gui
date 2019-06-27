@@ -395,6 +395,8 @@ public class DataLayer {
         //XXX: temp solution to have access to all elements types at once
         petriNetObjects.add(pnObject);
 
+        pnObject.setDeleted(false);
+
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
 				addArc((TimedInhibitorArcComponent) pnObject);
@@ -432,6 +434,8 @@ public class DataLayer {
 
         //XXX: temp solution to have access to all elements types at once
         petriNetObjects.remove(pnObject);
+
+		pnObject.setDeleted(true);
 
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;

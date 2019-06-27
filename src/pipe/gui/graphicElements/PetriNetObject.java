@@ -296,6 +296,9 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 	public boolean isDeleted() {
 		return deleted;
 	}
