@@ -435,7 +435,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			model.add(transition);
 			addPetriNetObjectToModelandView(pnObject);
 
-			getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel, view));
+			getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
 			return pnObject;
 		}
 
