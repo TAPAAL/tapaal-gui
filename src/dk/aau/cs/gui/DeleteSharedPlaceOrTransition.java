@@ -247,7 +247,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}else if(arc instanceof TimedInputArcComponent){
 			return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
 		}else{
-			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel());
 		}
 	}
 	

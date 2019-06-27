@@ -244,7 +244,7 @@ public class UndoManager {
 					cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view);
 				}else if(pnObject instanceof TimedOutputArcComponent){
 					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
-					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel, view);
+					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel);
 				}else if(pnObject instanceof AnnotationNote){
 					cmd = new DeletePetriNetObjectEdit(pnObject, view, guiModel);
 				}else{
