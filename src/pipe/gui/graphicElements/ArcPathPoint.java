@@ -282,10 +282,6 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void undelete() {
-	}
-
-	@Override
 	public String getName() {
 		return this.getArcPath().getArc().getName() + " - Point "
 				+ this.getIndex();

@@ -201,12 +201,6 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	public String getText() {
 		return note.getText();
 	}
-	
-	@Override
-	public void undelete() {
-		add(note);
-		super.undelete();
-	}
 
 	@Override
 	public int getLayerOffset() {

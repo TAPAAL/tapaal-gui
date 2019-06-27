@@ -445,17 +445,6 @@ public abstract class Arc extends PetriNetObject {
 		zoom = percent;
 	}
 
-	@Override
-	public void undelete() {
-		if (this.isDeleted()) {
-			super.undelete();
-			getSource().addConnectFrom(this);
-			getTarget().addConnectTo(this);
-			deleted = false;
-		}
-	}
-
-
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
 	 * and action names are mapped to action objects. The key bindings are disabled when the
