@@ -9,7 +9,7 @@ public class AddTimedPlaceCommand extends TAPNElementCommand {
 	final TimedPlaceComponent timedPlace;
 
 	public AddTimedPlaceCommand(TimedPlaceComponent timedPlace,
-			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
+			TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.timedPlace = timedPlace;
 	}
@@ -17,12 +17,12 @@ public class AddTimedPlaceCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
 		tapn.remove(timedPlace.underlyingPlace());
-		timedPlace.delete();
+		guiModel.removePetriNetObject(timedPlace);
 	}
 
 	@Override
 	public void redo() {
-		timedPlace.undelete();
+		guiModel.addPetriNetObject(timedPlace);
 		tapn.add(timedPlace.underlyingPlace());
 	}
 }
