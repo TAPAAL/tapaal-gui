@@ -170,7 +170,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 						deleteArc(arc, template);
 					}
 
-					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel(), tab.drawingSurface());
+					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel());
 					cmd.redo();
 					undoManager.addEdit(cmd);
 				}

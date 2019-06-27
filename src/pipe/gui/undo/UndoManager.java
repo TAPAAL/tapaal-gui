@@ -229,7 +229,7 @@ public class UndoManager {
 				Command cmd = null;
 				if(pnObject instanceof TimedPlaceComponent){
 					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
-					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel, view);
+					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel);
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
 					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel);
