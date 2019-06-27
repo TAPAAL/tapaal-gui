@@ -356,6 +356,19 @@ public abstract class Arc extends PetriNetObject {
 	}
 
 	@Override
+	public void removedFromGui() {
+
+		//Remove label
+		if (getParent() != null && pnName.getParent() == null) {
+			getParent().remove(pnName);
+		}
+
+		//Remove arcpathpoints
+		myPath.forceHidePoints();
+
+	}
+
+	@Override
 	public void delete() {
 		if (!deleted) {
 			if (getParent() != null) {

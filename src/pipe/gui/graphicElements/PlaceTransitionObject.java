@@ -349,7 +349,12 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		updateOnMoveOrZoom();
 	}
 
-	// TODO: Find a better name for this
+    @Override
+    public void removedFromGui() {
+        removeLabelFromContainer();
+    }
+
+    // TODO: Find a better name for this
 	@Override
 	public void updateOnMoveOrZoom() {
 		updateBounds();

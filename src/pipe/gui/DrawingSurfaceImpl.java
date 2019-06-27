@@ -121,9 +121,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		newObject.zoomUpdate(zoomControl.getPercent());
-		super.add(newObject);
 
-		newObject.addedToGui();
+		super.add(newObject);
+		newObject.addedToGui(); //Must be called after added to component, as children might use referenceto Drawingsurface
 
 		calculateNewBoundsForScrollPane(newObject.getBounds());
 		if(newObject.getNameLabel() != null){
@@ -133,6 +133,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		//Does not seem to be needed
 		//validate();
 		//repaint();
+	}
+
+	//XXX temp solution while refactorting, component removes children them self
+	//migth not be best solution long term.
+	public void removePetriNetObject(PetriNetObject pno) {
+		pno.removedFromGui();
+		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
 	}
 
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex)

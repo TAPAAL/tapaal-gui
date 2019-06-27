@@ -209,6 +209,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 			getParent().add(pnName);
 		}
 	}
+	public void removeLabelFromContainer() {
+		if (getParent() != null && pnName.getParent() == null) {
+			getParent().remove(pnName);
+		}
+	}
 
 	public boolean isSelected() {
 		return selected;
@@ -270,6 +275,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 	public abstract void addedToGui();
+	public abstract void removedFromGui();
 
 	public void delete() {
 		deleted = true;

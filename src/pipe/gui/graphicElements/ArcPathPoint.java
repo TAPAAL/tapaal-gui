@@ -263,8 +263,9 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void addedToGui() {
-	}
+	public void addedToGui() {}
+	@Override
+	public void removedFromGui() {}
 
 	void hidePoint() {
 		super.removeFromContainer();

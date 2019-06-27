@@ -28,7 +28,7 @@ public class DataLayer {
 
 	private void removeFromViewIfConnected(PetriNetObject pno) {
 		if (view != null) {
-			view.remove(pno);
+			view.removePetriNetObject(pno);
 			view.repaint(); // should be in view or on object
 		}
 	}

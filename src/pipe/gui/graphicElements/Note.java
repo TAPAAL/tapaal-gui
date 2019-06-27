@@ -188,6 +188,11 @@ public abstract class Note extends PetriNetObject implements Translatable {
 		}
 	}
 
+	@Override
+	public void removedFromGui() {
+
+	}
+
 	public void setText(String text) {
 		note.setText(text);
 		note.setSize(note.getPreferredSize());
