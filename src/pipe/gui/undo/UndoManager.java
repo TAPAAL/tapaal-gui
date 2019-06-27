@@ -235,7 +235,7 @@ public class UndoManager {
 					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel);
 				}else if(pnObject instanceof TimedTransportArcComponent){
 					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
-					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view);
+					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel);
 				}else if(pnObject instanceof TimedInhibitorArcComponent){
 					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
 					cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel);
