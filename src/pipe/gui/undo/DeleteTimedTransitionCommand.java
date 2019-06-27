@@ -25,7 +25,7 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 
 	@Override
 	public void undo() {
-		transition.undelete();
+		guiModel.addPetriNetObject(transition);
 		if(sharedTransition != null) {
 			sharedTransition.makeShared(transition.underlyingTransition());
 		}
