@@ -10,11 +10,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
@@ -217,12 +213,22 @@ public class UndoManager {
 
 	private void deleteObject(PetriNetObject pnObject) {
 		if (pnObject instanceof ArcPathPoint) {
-			if (!((ArcPathPoint) pnObject).getArcPath().getArc().isSelected()) {
-				Command cmd = new DeleteArcPathPointEdit(((ArcPathPoint) pnObject)
-						.getArcPath().getArc(), (ArcPathPoint) pnObject,
-						((ArcPathPoint) pnObject).getIndex());
-				cmd.redo();
-				addEdit(cmd);
+
+            ArcPathPoint arcPathPoint = (ArcPathPoint)pnObject;
+
+            //If the arc is marked for deletion, skip deleting individual arcpathpoint
+            if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
+
+                //Don't delete the two last arc path points
+			    if (arcPathPoint.isDeleteable()) {
+                    Command cmd = new DeleteArcPathPointEdit(
+                            arcPathPoint.getArcPath().getArc(),
+                            arcPathPoint,
+                            arcPathPoint.getIndex()
+                    );
+                    cmd.redo();
+                    addEdit(cmd);
+                }
 			}
 		}else{
 			//The list of selected objects is not updated when a element is deleted
