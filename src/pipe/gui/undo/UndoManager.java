@@ -224,7 +224,8 @@ public class UndoManager {
                     Command cmd = new DeleteArcPathPointEdit(
                             arcPathPoint.getArcPath().getArc(),
                             arcPathPoint,
-                            arcPathPoint.getIndex()
+                            arcPathPoint.getIndex(),
+							view.getGuiModel()
                     );
                     cmd.redo();
                     addEdit(cmd);
