@@ -610,10 +610,10 @@ public class ArcPath implements Shape {
 			// to add all the points again along with new action listeners,
 			// we just want to add the new point.
 			// Nadeem 21/06/2005
-			//if (editWindow.getIndexOf(pathPoint) < 0) {
+			if (!model.getPNObjects().contains(pathPoint)) {
 				model.addPetriNetObject(pathPoint);
 				pathPoint.updatePointLocation();
-			//}
+			}
 		}
 	}
 
