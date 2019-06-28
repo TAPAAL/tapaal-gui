@@ -116,14 +116,14 @@ public class AnnotationPanel extends javax.swing.JPanel {
 		add(container);		this.setPreferredSize(new Dimension(400, 300));
 	}
 
-	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cancelButtonActionPerformed
+	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(annotation.isNew()){
 			annotation.delete();
 		}
 		exit();
 	}
 
-	private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_okButtonActionPerformed
+	private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		annotation.setText(textArea.getText());
 		annotation.repaint();
 		annotation.isNew();
