@@ -46,9 +46,9 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved.setPositionY(newY);
 		
 		//objectToBeMoved.updateConnected();
-		CreateGui.getDrawingSurface().repaintAll();
+		/*CreateGui.getDrawingSurface().repaintAll();
 		CreateGui.getModel().repaintAll(true);
-		CreateGui.getDrawingSurface().updatePreferredSize();
+		CreateGui.getDrawingSurface().updatePreferredSize();*/
 		
 	}
 

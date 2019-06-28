@@ -1,18 +1,20 @@
 package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Point;
-import java.awt.geom.Point2D.Float;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+
+import javax.swing.SwingWorker;
+
 import dk.aau.cs.gui.undo.ChangeNameOffsetCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
+import dk.aau.cs.util.Require;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
@@ -21,7 +23,8 @@ import pipe.gui.graphicElements.Transition;
 import pipe.gui.undo.DeleteArcPathPointEdit;
 import pipe.gui.undo.TransitionRotationEdit;
 
-public class SmartDrawWorker {
+public class SmartDrawWorker extends SwingWorker<Void, Void>{
+	List<SmartDrawListener> listeners = new ArrayList<SmartDrawListener>();
 	PlaceTransitionObject startingObject;
 	int xSpacing;
 	int ySpacing;
@@ -75,15 +78,18 @@ public class SmartDrawWorker {
 	    	this.startingObject = placeTransitionObjects.get(new Random().nextInt(placeTransitionObjects.size()-1));
 	}
 	
-	public void smartDraw() {
+	@Override
+	public Void doInBackground() {
 		undoManager.newEdit();		
 		
 		
 		arcsVisited = new ArrayList<Arc>();
 		objectsPlaced = new ArrayList<PlaceTransitionObject>();
 		
-		removeArcPathPoints();
-		setTransitionsToUpright();
+		fireStartDraw();
+		
+		
+
 		//Do for unconnected nets too
 		while(!(objectsPlaced.containsAll(placeTransitionObjects))) {
 			if(objectsPlaced.isEmpty()) {
@@ -121,16 +127,15 @@ public class SmartDrawWorker {
 				}
 			}
 		}
-		moveObjectsWithinOrigo();
-		doOffsetForLoops();
+		moveObjectsWithinScreenEdge();
+		removeArcPathPoints();
 		resetLabelsToDefault();
 		
 		
 		
-		CreateGui.getDrawingSurface().repaint();
-		CreateGui.getModel().repaintAll(true);
-		CreateGui.getDrawingSurface().updatePreferredSize();
-		isDone = true;
+		
+		
+		return null;
 	}
 	
 	private void depthFirstDraw(PlaceTransitionObject parentObject) {
@@ -174,6 +179,7 @@ public class SmartDrawWorker {
 						}
 						//We try at least minimumIterations times
 						if(layer >= minimumIterations && bestPoint != null) {
+							fireStatusChanged(objectsPlaced.size());
 							moveObject(objectToPlace, bestPoint);
 							checkIfObjectIsNowRightmost(bestPoint);
 							//Reserve the point and let the object in the queue
@@ -253,6 +259,7 @@ public class SmartDrawWorker {
 					}
 					//We try at least minimumiterations times
 					if(!(pointsReserved.contains(bestPoint)) && layer >= minimumIterations) {
+						fireStatusChanged(objectsPlaced.size());
 						moveObject(objectToPlace, bestPoint);
 						checkIfObjectIsNowRightmost(bestPoint);
 						//Reserve the point and let the object in the queue
@@ -348,7 +355,7 @@ public class SmartDrawWorker {
 	 * Else it creates bugs with the scrollbar
 	 * So we push all objects by some factor on the y and x axis
 	 */
-	private void moveObjectsWithinOrigo() {
+	private void moveObjectsWithinScreenEdge() {
 		int lowestY = 50;
 		int lowestX = 50;
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
@@ -400,7 +407,7 @@ public class SmartDrawWorker {
 		}
 	}
 	
-	private void setTransitionsToUpright() {
+	public void setTransitionsToUpright() {
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
 			if(ptObject instanceof Transition) {
 				Command command = new TransitionRotationEdit((Transition)ptObject, 0);
@@ -410,7 +417,7 @@ public class SmartDrawWorker {
 		}
 	}
 	
-	private void doOffsetForLoops() {
+	public void doOffsetForLoops() {
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
 			if(ptObject instanceof Place) {
 				Place place = (Place)ptObject;
@@ -460,7 +467,7 @@ public class SmartDrawWorker {
 			}
 		}
 	}
-	private void resetLabelsToDefault() {
+	public void resetLabelsToDefault() {
 		for(PetriNetObject pNetObject : drawingSurface.getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
 				Command cmd = new ChangeNameOffsetCommand(pNetObject, pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y);
@@ -476,8 +483,48 @@ public class SmartDrawWorker {
 			}
 		}
 	}
-	public boolean isDone() {
-		return isDone;
+	
+	
+	public void addSmartDrawListener(SmartDrawListener listener){
+		Require.that(listener != null, "Listener cannot be null");
+		listeners.add(listener);
+	}
+
+	public void removeSmartDrawListener(SmartDrawListener listener){
+		Require.that(listener != null, "Listener cannot be null");
+		listeners.remove(listener);
+	}
+	
+	void fireStatusChanged(int objectsPlaced) {
+		for(SmartDrawListener listener : listeners) {
+			listener.fireStatusChanged(objectsPlaced);
+		}
+	}
+	void fireStartDraw() {
+		for(SmartDrawListener listener : listeners) {
+			listener.fireStartDraw();
+		}
+	}
+	void fireDone(){
+		for(SmartDrawListener listener : listeners) {
+			listener.fireDone();
+		}
+	}
+	
+	void fireCancel(){
+		for(SmartDrawListener listener : listeners) {
+			listener.fireCancel();
+		}
+	}
+	
+	@Override
+	protected void done(){
+		CreateGui.getModel().repaintAll(true);
+		setTransitionsToUpright();
+		doOffsetForLoops();
+		CreateGui.getDrawingSurface().updatePreferredSize();
+
+		fireDone();
 	}
 	//For debugging
 	private void printPTObjectsAndPositions() {

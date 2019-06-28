@@ -12,6 +12,8 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,6 +31,7 @@ import javax.swing.JTextPane;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -107,6 +110,10 @@ public class SmartDrawDialog extends JDialog {
 	JDialog choiceModal;
 	boolean cancel = false;
 	SmartDrawWorker worker;
+	JLabel timerLabel = new JLabel("Time Elapsed: ");
+	JLabel progressLabel = new JLabel("Objects Placed: ");
+	long startTimeMs;
+	int objectsProgress;
 
 	
 	int xSpacing = 80;
@@ -117,6 +124,14 @@ public class SmartDrawDialog extends JDialog {
 	int distanceWeight = 10;
 	int overlappingArcWeight = 100;
 	int minimumIterations = 3;
+	
+	private Timer timer = new Timer(1000, new AbstractAction() {
+		private static final long serialVersionUID = 2126744033604698592L;
+
+		public void actionPerformed(ActionEvent e) {
+			timerLabel.setText("Time elapsed: " + (System.currentTimeMillis() - startTimeMs) / 1000 + " s");
+		}
+	});
 	
 	static SmartDrawDialog smartDrawDialog;
 	public static void showSmartDrawDialog() {
@@ -159,7 +174,7 @@ public class SmartDrawDialog extends JDialog {
 		initSpacingSelecters();
 		initCheckBoxes();
 		initAdvancedOptionsPanel();
-		initChoiceModal();
+		//initChoiceModal();
 		initLoadingFrame();
 		
 		/*templateSelector.setEnabled(false);
@@ -201,29 +216,43 @@ public class SmartDrawDialog extends JDialog {
 					cancel = false;
 					worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
 							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString(), minimumIterations);
-					loadingDialogFrameThread = new Thread(new Runnable() {
+					worker.addSmartDrawListener(new SmartDrawListener() {
 						
 						@Override
-						public void run() {
-							loadingDialogFrame.setVisible(true);
+						public void fireStatusChanged(int objectsPlaced) {
+							progressLabel.setText("Objects Placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getPlaceTransitionObjects().size());
+							
+						}
+						
+						@Override
+						public void fireStartDraw() {
+							if (timer.isRunning())
+								timer.restart();
+							else
+								timer.start();
+							startTimeMs = System.currentTimeMillis();
+							
+						}
+						
+						@Override
+						public void fireDone() {
+							loadingDialogFrame.setVisible(false);
+						}
+						
+						@Override
+						public void fireCancel() {
+							// TODO Auto-generated method stub
 							
 						}
 					});
-					loadingDialogFrameThread.start();
+					worker.execute();
 					smartDrawDialog.setVisible(false);
-					workingThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							worker.smartDraw();
-						}
-					});
-					workingThread.run();
+					loadingDialogFrame.setVisible(true);
 					if(worker.isDone()) {
-						loadingDialogFrame.setVisible(false);
-						//choiceModal.setVisible(true);
+						
 					}
 				} catch (NullPointerException exception) {
-					new MessengerImpl().displayErrorMessage("You need at least one place or transition to smart draw");
+					new MessengerImpl().displayErrorMessage("You need at least one place or transition do automatic layout");
 				}
 			}
 		});
@@ -693,8 +722,9 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(0, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.NORTH;
-		
 		loadingDialogFrame.add(workingLabel, gbc);
+		
+		
 		JLabel loading = new JLabel("Working... ", loadingGIF, JLabel.CENTER);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -705,25 +735,46 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTH;
 		loadingDialogFrame.add(loading, gbc);
 		
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		loadingDialogFrame.add(timerLabel, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.NORTH;
+		loadingDialogFrame.add(progressLabel, gbc);
+		
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				while(!(workingThread.isInterrupted())) {
-					workingThread.interrupt();
-					if(workingThread.isInterrupted() && loadingDialogFrameThread.isInterrupted()) {
-						CreateGui.getDrawingSurface().getUndoManager().undo();
-						CreateGui.getDrawingSurface().repaintAll();
-						loadingDialogFrame.setVisible(false);
-						smartDrawDialog.setVisible(true);
-						cancel = true;
+				System.out.println("Hello");
+				if (workingThread != null && !worker.isDone()) {
+					do {
+						workingThread.interrupt();
 					}
+					while(!(workingThread.isInterrupted()));
+						
+					CreateGui.getDrawingSurface().getUndoManager().undo();
+					CreateGui.getDrawingSurface().repaintAll();
+					loadingDialogFrame.setVisible(false);
+					smartDrawDialog.setVisible(true);
+					cancel = true;
 				}
 			}
 		});
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 4;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.NONE;
@@ -745,7 +796,7 @@ public class SmartDrawDialog extends JDialog {
 	 * Asks if you want to keep, revert or try again
 	 * is not used currently
 	 */
-	private void initChoiceModal() {
+	/*private void initChoiceModal() {
 		choiceModal = new JDialog(smartDrawDialog, "Keep?", true);
 		choiceModal.setLayout(new GridBagLayout());
 		choiceModal.setVisible(false);
@@ -825,7 +876,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTH;
 		choiceModal.add(retryButton, gbc);
 		
-	}
+	}*/
 	
 	private Object getMessageComponent(){
 		JTextPane pane = new JTextPane();
