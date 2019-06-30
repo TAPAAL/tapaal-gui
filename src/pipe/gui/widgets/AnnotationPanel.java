@@ -118,7 +118,7 @@ public class AnnotationPanel extends javax.swing.JPanel {
 
 	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(annotation.isNew()){
-			annotation.delete();
+			 annotation.getGuiModel().removePetriNetObject(annotation);
 		}
 		exit();
 	}
