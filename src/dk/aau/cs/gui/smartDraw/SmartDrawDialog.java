@@ -249,7 +249,7 @@ public class SmartDrawDialog extends JDialog {
 					smartDrawDialog.setVisible(false);
 					loadingDialogFrame.setVisible(true);
 					if(worker.isDone()) {
-						
+						loadingDialogFrame.setVisible(false);
 					}
 				} catch (NullPointerException exception) {
 					new MessengerImpl().displayErrorMessage("You need at least one place or transition do automatic layout");
