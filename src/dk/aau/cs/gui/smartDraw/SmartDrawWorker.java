@@ -79,7 +79,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	@Override
-	public Void doInBackground() {
+	public Void doInBackground() throws Exception {
 		undoManager.newEdit();		
 		
 		
@@ -508,12 +508,6 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	void fireDone(){
 		for(SmartDrawListener listener : listeners) {
 			listener.fireDone();
-		}
-	}
-	
-	void fireCancel(){
-		for(SmartDrawListener listener : listeners) {
-			listener.fireCancel();
 		}
 	}
 	

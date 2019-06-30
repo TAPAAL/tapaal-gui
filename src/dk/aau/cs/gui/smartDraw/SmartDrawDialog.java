@@ -112,6 +112,7 @@ public class SmartDrawDialog extends JDialog {
 	SmartDrawWorker worker;
 	JLabel timerLabel = new JLabel("Time Elapsed: ");
 	JLabel progressLabel = new JLabel("Objects Placed: ");
+	JLabel statusLabel;
 	long startTimeMs;
 	int objectsProgress;
 
@@ -215,7 +216,7 @@ public class SmartDrawDialog extends JDialog {
 				try {
 					cancel = false;
 					worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
-							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, objectDropdown.getSelectedItem().toString(), minimumIterations);
+							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
 					worker.addSmartDrawListener(new SmartDrawListener() {
 						
 						@Override
@@ -226,6 +227,7 @@ public class SmartDrawDialog extends JDialog {
 						
 						@Override
 						public void fireStartDraw() {
+							statusLabel.setText("Working...");
 							if (timer.isRunning())
 								timer.restart();
 							else
@@ -237,12 +239,6 @@ public class SmartDrawDialog extends JDialog {
 						@Override
 						public void fireDone() {
 							loadingDialogFrame.setVisible(false);
-						}
-						
-						@Override
-						public void fireCancel() {
-							// TODO Auto-generated method stub
-							
 						}
 					});
 					worker.execute();
@@ -287,6 +283,13 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(comboBoxLabel, gbc);
 		
 		objectDropdown.setEnabled(false);
+		objectDropdown.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startingObject = objectDropdown.getSelectedItem().toString();
+			}
+		});
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -725,7 +728,7 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame.add(workingLabel, gbc);
 		
 		
-		JLabel loading = new JLabel("Working... ", loadingGIF, JLabel.CENTER);
+		statusLabel = new JLabel("Working... ", loadingGIF, JLabel.CENTER);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weightx = 1.0;
@@ -733,7 +736,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(0, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.NORTH;
-		loadingDialogFrame.add(loading, gbc);
+		loadingDialogFrame.add(statusLabel, gbc);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -758,19 +761,14 @@ public class SmartDrawDialog extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Hello");
-				if (workingThread != null && !worker.isDone()) {
-					do {
-						workingThread.interrupt();
-					}
-					while(!(workingThread.isInterrupted()));
-						
-					CreateGui.getDrawingSurface().getUndoManager().undo();
-					CreateGui.getDrawingSurface().repaintAll();
-					loadingDialogFrame.setVisible(false);
-					smartDrawDialog.setVisible(true);
-					cancel = true;
-				}
+				statusLabel.setText("Cancelling...");
+				cancelWorker();
+				statusLabel.setText("Restoring Net...");
+				CreateGui.getDrawingSurface().getUndoManager().undo();
+				CreateGui.getDrawingSurface().repaintAll();
+				loadingDialogFrame.setVisible(false);
+				smartDrawDialog.setVisible(true);
+				cancel = true;
 			}
 		});
 		gbc.gridx = 0;
@@ -893,6 +891,15 @@ public class SmartDrawDialog extends JDialog {
 		JScrollPane scrollPane = new JScrollPane(pane);  
 		scrollPane.setPreferredSize(dim);  
 		return scrollPane;  
+	}
+	
+	private void cancelWorker() {
+		if (worker != null && !worker.isDone()) {
+			boolean cancelled = false;
+			do {
+				cancelled = worker.cancel(true);
+			} while (!cancelled);
+		}
 	}
 
     
