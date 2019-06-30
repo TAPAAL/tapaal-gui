@@ -97,7 +97,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	JPanel mainPanel;
-	String startingObject;
+	String startingObject = "Random";
 	//String template;
 	String[] objectNames;
 	//String[] templateNames;
@@ -176,7 +176,6 @@ public class SmartDrawDialog extends JDialog {
 		initCheckBoxes();
 		initAdvancedOptionsPanel();
 		//initChoiceModal();
-		initLoadingFrame();
 		
 		/*templateSelector.setEnabled(false);
 		
@@ -243,9 +242,7 @@ public class SmartDrawDialog extends JDialog {
 				});
 				worker.execute();
 				smartDrawDialog.setVisible(false);
-				if(!(worker.isDone())) {
-					loadingDialogFrame.dispose();
-				}
+				loadingDialogFrame.setVisible(true);
 			}
 		});
 		
@@ -285,7 +282,7 @@ public class SmartDrawDialog extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(objectDropdown.getSelectedItem() != null)
+				if(objectDropdown.getSelectedItem() != null && objectDropdown.isEnabled())
 					startingObject = objectDropdown.getSelectedItem().toString();
 			}
 		});

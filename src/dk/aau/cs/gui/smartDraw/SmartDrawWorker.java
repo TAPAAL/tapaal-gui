@@ -72,7 +72,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	private void processStartingObject(String startingObject) {
-		if(!(startingObject == "Random"))
+		if(!(startingObject.equals("Random")))
 			this.startingObject = drawingSurface.getPlaceTransitionObjectByName(startingObject);
 		else
 	    	this.startingObject = placeTransitionObjects.get(new Random().nextInt(placeTransitionObjects.size()-1));
