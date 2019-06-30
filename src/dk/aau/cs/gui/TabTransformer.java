@@ -8,6 +8,7 @@ import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 public class TabTransformer {
@@ -45,7 +46,7 @@ public class TabTransformer {
                     TimedTransition destination = template.model().getTransitionByName(arc.getTarget().getName());
 
                     TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight());
-                    template.model().add(addedArc);
+
 
                     // GUI
                     DataLayer guiModel = template.guiModel();
@@ -76,67 +77,76 @@ public class TabTransformer {
                     guiSource.addConnectFrom(newArc);
                     guiTarget.addConnectTo(newArc);
 
-                }
-                // Output arc
-                else if(arc.getSource() instanceof Transition){
-                    DataLayer guiModel = template.guiModel();
+                    //Change the partner
 
+                    TimedOutputArcComponent arc2 = convertPartner(arc.getConnectedTo(), template, guiModel);
+                    removeTransportArc(arc, guiModel);
 
-
-                    //Add new arc
-
-                    TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
-                    TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
-
-                    TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight());
+                    //Add arc to model and GUI
                     template.model().add(addedArc);
+                    template.model().add(arc2.underlyingArc());
 
-                    // GUI
-
-                    Place guiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
-                    Transition guiSource = guiModel.getTransitionByName(arc.getSource().getName());
-                    Arc newArc = new TimedOutputArcComponent(
-                            0d,
-                            0d,
-                            0d,
-                            0d,
-                            guiSource,
-                            guiTarget,
-                            arc.getWeight().value(),
-                            arc.getSource().getName() + "_to_" + arc.getTarget().getName(),
-                            false
-                    );
-
-                    // Build ArcPath
-                    Place oldGuiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
-                    Transition oldGuiSource = guiModel.getTransitionByName(arc.getSource().getName());
-                    ArcPath newArcPath = createArcPath(guiModel, oldGuiSource, oldGuiTarget, newArc);
-
-                    // Set arcPath, guiModel and connectors
-                    ((TimedOutputArcComponent) newArc).setUnderlyingArc(addedArc);
-                    newArc.setArcPath(newArcPath);
-                    newArc.updateArcPosition();
-                    guiModel.addPetriNetObject(newArc);
-                    guiSource.addConnectFrom(newArc);
-                    guiTarget.addConnectTo(newArc);
-
-                    // Delete the transport arc
-                    arc.underlyingTransportArc().delete();
-                    TimedTransportArcComponent partner = arc.getConnectedTo();
-
-                    //XXX: Should properly be part of the guiModel
-                    if (arc.getSource() != null) arc.getSource().removeFromArc(arc);
-                    if (arc.getTarget() != null) arc.getTarget().removeToArc(arc);
-
-                    //XXX: Should properly be part of the guiModel
-                    if (partner.getSource() != null) partner.getSource().removeFromArc(partner);
-                    if (partner.getTarget() != null) partner.getTarget().removeToArc(partner);
-
-                    guiModel.removePetriNetObject(arc);
-                    guiModel.removePetriNetObject(partner);
                 }
+
             }
         }
+    }
+    static void removeTransportArc(TimedTransportArcComponent arc, DataLayer guiModel){
+        // Delete the transport arc
+        arc.underlyingTransportArc().delete();
+        TimedTransportArcComponent partner = arc.getConnectedTo();
+
+        //XXX: Should properly be part of the guiModel
+        if (arc.getSource() != null) arc.getSource().removeFromArc(arc);
+        if (arc.getTarget() != null) arc.getTarget().removeToArc(arc);
+
+        //XXX: Should properly be part of the guiModel
+        if (partner.getSource() != null) partner.getSource().removeFromArc(partner);
+        if (partner.getTarget() != null) partner.getTarget().removeToArc(partner);
+
+        guiModel.removePetriNetObject(arc);
+        guiModel.removePetriNetObject(partner);
+    }
+    static TimedOutputArcComponent convertPartner(TimedTransportArcComponent arc, Template template, DataLayer guiModel) {
+        //Add new arc
+
+        TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
+        TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
+
+        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight());
+        //template.model().add(addedArc);
+
+        // GUI
+
+        Place guiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
+        Transition guiSource = guiModel.getTransitionByName(arc.getSource().getName());
+        TimedOutputArcComponent newArc = new TimedOutputArcComponent(
+                0d,
+                0d,
+                0d,
+                0d,
+                guiSource,
+                guiTarget,
+                arc.getWeight().value(),
+                arc.getSource().getName() + "_to_" + arc.getTarget().getName(),
+                false
+        );
+
+        // Build ArcPath
+        Place oldGuiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
+        Transition oldGuiSource = guiModel.getTransitionByName(arc.getSource().getName());
+        ArcPath newArcPath = createArcPath(guiModel, oldGuiSource, oldGuiTarget, newArc);
+
+        // Set arcPath, guiModel and connectors
+        newArc.setUnderlyingArc(addedArc);
+        newArc.setArcPath(newArcPath);
+        newArc.updateArcPosition();
+        guiModel.addPetriNetObject(newArc);
+        guiSource.addConnectFrom(newArc);
+        guiTarget.addConnectTo(newArc);
+
+        return newArc;
+
     }
 
     private static ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc) {
