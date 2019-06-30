@@ -214,6 +214,7 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				initLoadingFrame();
 				worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
 						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
 				worker.addSmartDrawListener(new SmartDrawListener() {
@@ -237,14 +238,13 @@ public class SmartDrawDialog extends JDialog {
 					
 					@Override
 					public void fireDone() {
-						loadingDialogFrame.setVisible(false);
+						loadingDialogFrame.dispose();
 					}
 				});
 				worker.execute();
 				smartDrawDialog.setVisible(false);
-				loadingDialogFrame.setVisible(true);
-				if(worker.isDone()) {
-					loadingDialogFrame.setVisible(false);
+				if(!(worker.isDone())) {
+					loadingDialogFrame.dispose();
 				}
 			}
 		});
@@ -268,6 +268,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.setBorder(new TitledBorder("Advanced Options"));
 		
 		JLabel comboBoxLabel = new JLabel("Choose Initial Object:");
+		comboBoxLabel.setToolTipText("Choose a starting  object");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -284,7 +285,8 @@ public class SmartDrawDialog extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				startingObject = objectDropdown.getSelectedItem().toString();
+				if(objectDropdown.getSelectedItem() != null)
+					startingObject = objectDropdown.getSelectedItem().toString();
 			}
 		});
 
@@ -882,7 +884,9 @@ public class SmartDrawDialog extends JDialog {
 		if(CreateGui.getDrawingSurface().getPlaceTransitionObjects().size() > 0) {
 			drawButton.setEnabled(true);
 			drawButton.setToolTipText("Smart draw with the current options");
-			objectDropdown.setEnabled(true);
+			if(!(randomStartObjectCheckBox.isSelected()))
+				objectDropdown.setEnabled(true);
+			
 			randomStartObjectCheckBox.setEnabled(true);
 		} else {
 			drawButton.setEnabled(false);

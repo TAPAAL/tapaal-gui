@@ -107,6 +107,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			Command command = new MovePlaceTransitionObject(startingObject, rootPoint);
 			command.redo();
 			undoManager.addEdit(command);
+			rightMostPointUsed = rootPoint;
 			reservePoint(rootPoint);
 			
 			if(searchOption == "DFS") {
