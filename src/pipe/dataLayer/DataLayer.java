@@ -3,6 +3,7 @@ package pipe.dataLayer;
 import java.util.*;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.util.RequireException;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -454,16 +455,21 @@ public class DataLayer {
 						attachedArcs = arcsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all in inverse order!
-						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-							try {
-								((Arc) attachedArcs.get(i)).delete();
-							} catch (IndexOutOfBoundsException e) {
-								// XXX - this is a hack
-								// This is OK, it just means that the transport
-								// arc already has been removed
-							}
+						//for (int i = attachedArcs.size() - 1; i >= 0; i--) {
+						//	try {
+						//		((Arc) attachedArcs.get(i)).delete();
+						//	} catch (IndexOutOfBoundsException e) {
+						//		// XXX - this is a hack
+						//		// This is OK, it just means that the transport
+						//		// arc already has been removed
+						//	}
 
+						//}
+
+						if (attachedArcs.size() > 0) {
+							throw new RequireException("Arc to/from the object must be delete first");
 						}
+
 						arcsMap.remove(pnObject);
 					}
 
@@ -473,8 +479,11 @@ public class DataLayer {
 						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all in inverse order!
-						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-							((Arc) attachedArcs.get(i)).delete();
+						//for (int i = attachedArcs.size() - 1; i >= 0; i--) {
+						//	((Arc) attachedArcs.get(i)).delete();
+						//}
+						if (attachedArcs.size() > 0) {
+							throw new RequireException("Arc to/from the object must be delete first");
 						}
 						tapnInhibitorsMap.remove(pnObject);
 					}
