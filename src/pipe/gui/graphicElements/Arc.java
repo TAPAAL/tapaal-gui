@@ -374,8 +374,6 @@ public abstract class Arc extends PetriNetObject {
 			if (getParent() != null) {
 				getParent().remove(pnName);
 			}
-			if(source != null) source.removeFromArc(this);
-			if(target != null) target.removeToArc(this);
 			myPath.forceHidePoints();
 			super.delete();
 			deleted = true;

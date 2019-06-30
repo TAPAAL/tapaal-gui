@@ -17,20 +17,12 @@ public class AddTimedOutputArcCommand extends TAPNElementCommand {
 	public void undo() {
 		outputArc.underlyingArc().delete();
 
-		//XXX: Should properly be part of the guiModel
-		if (outputArc.getSource() != null) outputArc.getSource().removeFromArc(outputArc);
-		if (outputArc.getTarget() != null) outputArc.getTarget().removeToArc(outputArc);
-
 		guiModel.removePetriNetObject(outputArc);
 	}
 
 	@Override
 	public void redo() {
 		guiModel.addPetriNetObject(outputArc);
-
-		//XXX: Should properly be part of the guiModel
-		if (outputArc.getSource() != null) outputArc.getSource().addConnectFrom(outputArc);
-		if (outputArc.getTarget() != null) outputArc.getTarget().addConnectTo(outputArc);
 
 		tapn.add(outputArc.underlyingArc());
 	}

@@ -17,20 +17,12 @@ public class AddTimedInhibitorArcCommand extends TAPNElementCommand {
 	public void undo() {
 		inhibitorArc.underlyingTimedInhibitorArc().delete();
 
-		//XXX: Should properly be part of the guiModel
-		if (inhibitorArc.getSource() != null) inhibitorArc.getSource().removeFromArc(inhibitorArc);
-		if (inhibitorArc.getTarget() != null) inhibitorArc.getTarget().removeToArc(inhibitorArc);
-
 		guiModel.removePetriNetObject(inhibitorArc);
 	}
 
 	@Override
 	public void redo() {
 		guiModel.addPetriNetObject(inhibitorArc);
-
-		//XXX: Should properly be part of the guiModel
-		if (inhibitorArc.getSource() != null) inhibitorArc.getSource().addConnectFrom(inhibitorArc);
-		if (inhibitorArc.getTarget() != null) inhibitorArc.getTarget().addConnectTo(inhibitorArc);
 
 
 		tapn.add(inhibitorArc.underlyingTimedInhibitorArc());

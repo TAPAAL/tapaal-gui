@@ -401,6 +401,15 @@ public class DataLayer {
 
         pnObject.setDeleted(false);
 
+        if (pnObject instanceof Arc ) {
+
+        	Arc arc = (Arc)pnObject;
+
+        	arc.getSource().addConnectFrom(arc);
+        	arc.getTarget().addConnectTo(arc);
+
+		}
+
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
 				addArc((TimedInhibitorArcComponent) pnObject);
@@ -441,6 +450,16 @@ public class DataLayer {
 
 		pnObject.setDeleted(true);
 
+		//XXX: is also called down below
+		if (pnObject instanceof Arc ) {
+
+			Arc arc = (Arc)pnObject;
+
+			arc.getSource().removeFromArc(arc);
+			arc.getTarget().removeToArc(arc);
+
+		}
+
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;
 
@@ -467,6 +486,7 @@ public class DataLayer {
 						//}
 
 						if (attachedArcs.size() > 0) {
+							//XXX Model is no longer valid as the pno is removed from petriNetObjects list
 							throw new RequireException("Arc to/from the object must be delete first");
 						}
 
@@ -483,6 +503,7 @@ public class DataLayer {
 						//	((Arc) attachedArcs.get(i)).delete();
 						//}
 						if (attachedArcs.size() > 0) {
+							//XXX Model is no longer valid as the pno is removed from petriNetObjects list
 							throw new RequireException("Arc to/from the object must be delete first");
 						}
 						tapnInhibitorsMap.remove(pnObject);

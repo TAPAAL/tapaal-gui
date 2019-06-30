@@ -162,9 +162,6 @@ public class TimedOutputArcComponent extends Arc {
 		newCopyArc.setTarget(oldToNewMapping.get(this.getTarget()));
 		newCopyArc.setUnderlyingArc(tapn.getOutputArcFromTransitionAndPlace(tapn.getTransitionByName(outputArc.source().name()), tapn.getPlaceByName(outputArc.destination().name())));
 		
-		newCopyArc.getSource().addConnectFrom(newCopyArc);
-		newCopyArc.getTarget().addConnectTo(newCopyArc);
-		
 		return newCopyArc;
 	}
 

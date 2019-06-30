@@ -129,9 +129,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
 		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
-		
 		arc.setUnderlyingArc(tapn.getInhibitorArcFromPlaceAndTransition(tapn.getPlaceByName(inhibitorArc.source().name()), tapn.getTransitionByName(inhibitorArc.destination().name())));
 		
 		return arc;

@@ -17,10 +17,6 @@ public class DeleteTimedInputArcCommand extends TAPNElementCommand {
 	public void redo() {
 		timedInputArc.underlyingTimedInputArc().delete();
 
-		//XXX: Should properly be part of the guiModel
-		if (timedInputArc.getSource() != null) timedInputArc.getSource().removeFromArc(timedInputArc);
-		if (timedInputArc.getTarget() != null) timedInputArc.getTarget().removeToArc(timedInputArc);
-
 		guiModel.removePetriNetObject(timedInputArc);
 	}
 
@@ -28,10 +24,6 @@ public class DeleteTimedInputArcCommand extends TAPNElementCommand {
 	public void undo() {
 
 		guiModel.addPetriNetObject(timedInputArc);
-
-		//XXX: Should properly be part of the guiModel
-		if (timedInputArc.getSource() != null) timedInputArc.getSource().addConnectFrom(timedInputArc);
-		if (timedInputArc.getTarget() != null) timedInputArc.getTarget().addConnectTo(timedInputArc);
 
 		tapn.add(timedInputArc.underlyingTimedInputArc());
 	}

@@ -74,8 +74,6 @@ public class TabTransformer {
                     newArc.setArcPath(newArcPath);
                     newArc.updateArcPosition();
                     guiModel.addPetriNetObject(newArc);
-                    guiSource.addConnectFrom(newArc);
-                    guiTarget.addConnectTo(newArc);
 
                     //Change the partner
 
@@ -95,14 +93,6 @@ public class TabTransformer {
         // Delete the transport arc
         arc.underlyingTransportArc().delete();
         TimedTransportArcComponent partner = arc.getConnectedTo();
-
-        //XXX: Should properly be part of the guiModel
-        if (arc.getSource() != null) arc.getSource().removeFromArc(arc);
-        if (arc.getTarget() != null) arc.getTarget().removeToArc(arc);
-
-        //XXX: Should properly be part of the guiModel
-        if (partner.getSource() != null) partner.getSource().removeFromArc(partner);
-        if (partner.getTarget() != null) partner.getTarget().removeToArc(partner);
 
         guiModel.removePetriNetObject(arc);
         guiModel.removePetriNetObject(partner);
@@ -142,8 +132,6 @@ public class TabTransformer {
         newArc.setArcPath(newArcPath);
         newArc.updateArcPosition();
         guiModel.addPetriNetObject(newArc);
-        guiSource.addConnectFrom(newArc);
-        guiTarget.addConnectTo(newArc);
 
         return newArc;
 

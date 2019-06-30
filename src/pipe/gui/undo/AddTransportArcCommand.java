@@ -22,14 +22,6 @@ public class AddTransportArcCommand extends TAPNElementCommand {
 
 		TimedTransportArcComponent partner = transportArcComponent.getConnectedTo();
 
-		//XXX: Should properly be part of the guiModel
-		if (transportArcComponent.getSource() != null) transportArcComponent.getSource().removeFromArc(transportArcComponent);
-		if (transportArcComponent.getTarget() != null) transportArcComponent.getTarget().removeToArc(transportArcComponent);
-
-		if (partner.getSource() != null) partner.getSource().removeFromArc(partner);
-		if (partner.getTarget() != null) partner.getTarget().removeToArc(partner);
-
-
 		guiModel.removePetriNetObject(transportArcComponent);
 		guiModel.removePetriNetObject(partner);
 
@@ -42,13 +34,6 @@ public class AddTransportArcCommand extends TAPNElementCommand {
 
 		guiModel.addPetriNetObject(transportArcComponent);
 		guiModel.addPetriNetObject(partner);
-
-		//XXX: Should properly be part of the guiModel
-		if (transportArcComponent.getSource() != null) transportArcComponent.getSource().addConnectFrom(transportArcComponent);
-		if (transportArcComponent.getTarget() != null) transportArcComponent.getTarget().addConnectTo(transportArcComponent);
-
-		if (partner.getSource() != null) partner.getSource().addConnectFrom(partner);
-		if (partner.getTarget() != null) partner.getTarget().addConnectTo(partner);
 
 		tapn.add(transportArc);
 	}

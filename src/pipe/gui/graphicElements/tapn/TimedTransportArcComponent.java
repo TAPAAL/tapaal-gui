@@ -243,9 +243,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		arc.setUnderlyingArc(tapn.getTransportArcFromPlaceTransitionAndPlace(tapn.getPlaceByName(underlyingTransportArc.source().name()), 
 																			 tapn.getTransitionByName(underlyingTransportArc.transition().name()), 
 																			 tapn.getPlaceByName(underlyingTransportArc.destination().name())));
-		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
+
 		
 		return arc;
 	}

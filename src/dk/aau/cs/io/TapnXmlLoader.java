@@ -535,8 +535,6 @@ public class TapnXmlLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(outputArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -558,8 +556,6 @@ public class TapnXmlLoader {
 				new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
 				inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
@@ -639,8 +635,6 @@ public class TapnXmlLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inputArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -668,8 +662,6 @@ public class TapnXmlLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inhibArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 

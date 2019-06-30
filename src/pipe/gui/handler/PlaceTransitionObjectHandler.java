@@ -54,7 +54,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		newArc.setZoom(CreateGui.getDrawingSurface().getZoom());
 		//Need to be casted to cointainer, as we only add it to the canvas but not the model
 		((Container)CreateGui.getDrawingSurface()).add(newArc);
-		currentObject.addConnectFrom(newArc);
+
 		CreateGui.getDrawingSurface().createArc = newArc;
 		// addPetriNetObject a handler for shift & esc actions drawing arc
 		// this is removed when the arc is finished drawing:
@@ -233,9 +233,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			}
 
-			currentObject.addConnectTo(timedArcToCreate);
-
-
 			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
 
@@ -288,7 +285,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				int groupMaxCounter = getTransportArcMaxGroupNumber(transportArcToCreate);
 				((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
 
-				currentObject.addConnectTo(transportArcToCreate);
 				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, transportArcToCreate);
 
 				sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(transportArcToCreate);
@@ -337,8 +333,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 
 				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, arc2);
-
-				currentObject.addConnectTo(arc2);
 
 				undoManager.newEdit();
 
@@ -398,8 +392,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			}
 
 			createTAPNInhibitorArc.setTarget(currentObject);
-
-			currentObject.addConnectTo(createTAPNInhibitorArc);
 
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, createTAPNInhibitorArc);
 
