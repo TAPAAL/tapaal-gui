@@ -79,6 +79,12 @@ public class TabTransformer {
                 }
                 // Output arc
                 else if(arc.getSource() instanceof Transition){
+                    DataLayer guiModel = template.guiModel();
+
+
+
+                    //Add new arc
+
                     TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
                     TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
 
@@ -86,7 +92,7 @@ public class TabTransformer {
                     template.model().add(addedArc);
 
                     // GUI
-                    DataLayer guiModel = template.guiModel();
+
                     Place guiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
                     Transition guiSource = guiModel.getTransitionByName(arc.getSource().getName());
                     Arc newArc = new TimedOutputArcComponent(
@@ -115,7 +121,19 @@ public class TabTransformer {
                     guiTarget.addConnectTo(newArc);
 
                     // Delete the transport arc
-                    arc.delete();
+                    arc.underlyingTransportArc().delete();
+                    TimedTransportArcComponent partner = arc.getConnectedTo();
+
+                    //XXX: Should properly be part of the guiModel
+                    if (arc.getSource() != null) arc.getSource().removeFromArc(arc);
+                    if (arc.getTarget() != null) arc.getTarget().removeToArc(arc);
+
+                    //XXX: Should properly be part of the guiModel
+                    if (partner.getSource() != null) partner.getSource().removeFromArc(partner);
+                    if (partner.getTarget() != null) partner.getTarget().removeToArc(partner);
+
+                    guiModel.removePetriNetObject(arc);
+                    guiModel.removePetriNetObject(partner);
                 }
             }
         }
