@@ -578,11 +578,6 @@ public class TabContent extends JSplitPane {
 		return templateExplorer.selectedModel();
 	}
 
-	public void setCurrentTemplate(Template template) {
-		drawingSurface.setModel(template.guiModel(), template.model(),
-				template.zoomer());
-	}
-
 	public Iterable<TAPNQuery> queries() {
 		return queries.getQueries();
 	}
@@ -601,10 +596,6 @@ public class TabContent extends JSplitPane {
 
 	public void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
-	}
-
-	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
-		drawingSurface.setupNameGeneratorsFromTemplates(templates);
 	}
 
 	public void setNetwork(TimedArcPetriNetNetwork network,

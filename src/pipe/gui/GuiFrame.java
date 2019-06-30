@@ -78,7 +78,6 @@ public class GuiFrame extends JFrame  {
 			120, 140, 160, 180, 200, 300 };
 	
 	private String frameTitle;
-	private DrawingSurfaceImpl appView;
 
 	public Animator getAnimator() {
 		return animator;
@@ -454,9 +453,9 @@ public class GuiFrame extends JFrame  {
 				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (CreateGui.getApp().isEditionAllowed()) {
-					appView.getUndoManager().undo();
-					CreateGui.getCurrentTab().network().buildConstraints();
+				if (isEditionAllowed()) {
+					getCurrentTab().drawingSurface().getUndoManager().undo();
+					getCurrentTab().network().buildConstraints();
 				}
 			}
 		});
@@ -466,9 +465,9 @@ public class GuiFrame extends JFrame  {
 				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (CreateGui.getApp().isEditionAllowed()) {
-					appView.getUndoManager().redo();
-					CreateGui.getCurrentTab().network().buildConstraints();
+				if (isEditionAllowed()) {
+					getCurrentTab().drawingSurface().getUndoManager().redo();
+					getCurrentTab().network().buildConstraints();
 				}
 			}
 		});
@@ -479,8 +478,8 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// check if queries need to be removed
-				ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getSelectionObject().getSelection();
-				Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
+				ArrayList<PetriNetObject> selection = getCurrentTab().drawingSurface().getSelectionObject().getSelection();
+				Iterable<TAPNQuery> queries = getCurrentTab().queries();
 				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
 				boolean queriesAffected = false;
@@ -521,19 +520,19 @@ public class GuiFrame extends JFrame  {
 						: JOptionPane.YES_OPTION;
 
 						if (choice == JOptionPane.YES_OPTION) {
-							appView.getUndoManager().newEdit(); // new "transaction""
+							getCurrentTab().drawingSurface().getUndoManager().newEdit(); // new "transaction""
 							if (queriesAffected) {
-								TabContent currentTab = CreateGui.getCurrentTab();
+								TabContent currentTab = getCurrentTab();
 								for (TAPNQuery q : queriesToDelete) {
 									Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
 									cmd.redo();
-									appView.getUndoManager().addEdit(cmd);
+									getCurrentTab().drawingSurface().getUndoManager().addEdit(cmd);
 								}
 							}
 
-							appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-							appView.repaint();
-							CreateGui.getCurrentTab().network().buildConstraints();
+							getCurrentTab().drawingSurface().getUndoManager().deleteSelection(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
+							getCurrentTab().drawingSurface().repaint();
+							getCurrentTab().network().buildConstraints();
 						}
 				
 			}
@@ -551,7 +550,7 @@ public class GuiFrame extends JFrame  {
 		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components",  KeyStroke.getKeyStroke('A', shortcutkey )) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getDrawingSurface().getSelectionObject().selectAll();
+				getCurrentTab().drawingSurface().getSelectionObject().selectAll();
 			}
 		});
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
@@ -614,10 +613,10 @@ public class GuiFrame extends JFrame  {
 				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean didZoom = appView.getZoomController().zoomIn();
+				boolean didZoom = getCurrentTab().drawingSurface().getZoomController().zoomIn();
 				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
+					getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 				}
 			}
 		});
@@ -626,10 +625,10 @@ public class GuiFrame extends JFrame  {
 				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean didZoom = appView.getZoomController().zoomOut();
+				boolean didZoom = getCurrentTab().drawingSurface().getZoomController().zoomOut();
 				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
+					getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 				}
 			}
 		});
@@ -642,7 +641,7 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 1.25;
 				changeSpacing(factor);
-				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				getCurrentTab().drawingSurface().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 			}
 		});
 
@@ -651,7 +650,7 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 0.8;
 				changeSpacing(factor);
-				appView.getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				getCurrentTab().drawingSurface().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 			}
 		});
 		
@@ -787,20 +786,20 @@ public class GuiFrame extends JFrame  {
 				"Step backward", "pressed LEFT") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getCurrentTab().getAnimationHistory().stepBackwards();
+				getCurrentTab().getAnimationHistory().stepBackwards();
 				getAnimator().stepBack();
 				updateMouseOverInformation();
-				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 			}
 		});
 		animateMenu.add(
 				stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						CreateGui.getCurrentTab().getAnimationHistory().stepForward();
+						getCurrentTab().getAnimationHistory().stepForward();
 						getAnimator().stepForward();
 						updateMouseOverInformation();
-						CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+						getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 					}
 				});
 
@@ -809,7 +808,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getAnimator().letTimePass(BigDecimal.ONE);
-				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 				updateMouseOverInformation();
 			}
 		});
@@ -818,8 +817,8 @@ public class GuiFrame extends JFrame  {
 				"Delay and fire selected transition", "F") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
-				CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+				getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
+				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 				updateMouseOverInformation();
 			}
 		});
@@ -828,7 +827,7 @@ public class GuiFrame extends JFrame  {
 				"Previous component", "pressed UP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getCurrentTab().getTemplateExplorer().selectPrevious();
+				getCurrentTab().getTemplateExplorer().selectPrevious();
 			}
 		});
 
@@ -836,7 +835,7 @@ public class GuiFrame extends JFrame  {
 				"Next component", "pressed DOWN") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getCurrentTab().getTemplateExplorer().selectNext();
+				getCurrentTab().getTemplateExplorer().selectNext();
 			}
 		});
 
@@ -913,7 +912,7 @@ public class GuiFrame extends JFrame  {
 
 		verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				CreateGui.getCurrentTab().verifySelectedQuery();
+				getCurrentTab().verifySelectedQuery();
 			}
 		};
 		toolsMenu.add(verifyAction).setMnemonic('m');
@@ -921,7 +920,7 @@ public class GuiFrame extends JFrame  {
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StatisticsPanel.showStatisticsPanel(appView.getModel().getStatistics());
+				StatisticsPanel.showStatisticsPanel(getCurrentTab().drawingSurface().getModel().getStatistics());
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
@@ -992,7 +991,7 @@ public class GuiFrame extends JFrame  {
 		showQueries(true);
 		showEnabledTransitionsList(true);
 		showToolTips(true);
-		CreateGui.getCurrentTab().setResizeingDefault();
+		getCurrentTab().setResizeingDefault();
 		if(!showZeroToInfinityIntervals()){
 			showZeroToInfinityIntervalsCheckBox.doClick();
 		}
@@ -1076,10 +1075,10 @@ public class GuiFrame extends JFrame  {
 				//parse selected zoom level, and strip of %.
 				int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
-				boolean didZoom = appView.getZoomController().setZoom(newZoomLevel);
+				boolean didZoom = getCurrentTab().drawingSurface().getZoomController().setZoom(newZoomLevel);
 				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomToMidPoint(); //Do Zoom
+					getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 				}
 			}
 		});
@@ -1152,10 +1151,10 @@ public class GuiFrame extends JFrame  {
 			GuiAction newZoomAction = new GuiAction(zoomExamples[i] + "%", "Select zoom percentage", "") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					boolean didZoom = appView.getZoomController().setZoom(zoomper);
+					boolean didZoom = getCurrentTab().drawingSurface().getZoomController().setZoom(zoomper);
 					if (didZoom) {
 						updateZoomCombo();
-						appView.zoomToMidPoint(); //Do Zoom
+						getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
 					}
 				}
 			};
@@ -1255,17 +1254,17 @@ public class GuiFrame extends JFrame  {
 			showEnabledTransitionsAction.setEnabled(false);
 			showDelayEnabledTransitionsAction.setEnabled(false);
 
-			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
-			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
-			appView.getUndoManager().setUndoRedoStatus();
+			getCurrentTab().drawingSurface().getUndoManager().setUndoRedoStatus();
 
-			if(CreateGui.getCurrentTab().restoreWorkflowDialog()){
+			if(getCurrentTab().restoreWorkflowDialog()){
 				WorkflowDialog.showDialog();
 			}
 
@@ -1309,19 +1308,19 @@ public class GuiFrame extends JFrame  {
 			stripTimeDialogAction.setEnabled(false);
 
 			// Remove constant highlight
-			CreateGui.getCurrentTab().removeConstantHighlights();
+			getCurrentTab().removeConstantHighlights();
 
-			CreateGui.getCurrentTab().getAnimationController().requestFocusInWindow();
+			getCurrentTab().getAnimationController().requestFocusInWindow();
 
 			// Event repeater
-			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
-			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_right_hold", stepforwardAction);
-			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
-			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_left_hold", stepbackwardAction);
-			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
-			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
-			CreateGui.getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
-			CreateGui.getCurrentTab().getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
+			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
+			getCurrentTab().getAnimationController().getActionMap().put("_right_hold", stepforwardAction);
+			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
+			getCurrentTab().getAnimationController().getActionMap().put("_left_hold", stepbackwardAction);
+			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
+			getCurrentTab().getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
+			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
+			getCurrentTab().getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
 			exportTraceAction.setEnabled(false);
@@ -1416,18 +1415,12 @@ public class GuiFrame extends JFrame  {
 
 	}
 
-	// set frame objects by array index
-	public void setObjects(int index) {
-		appView = CreateGui.getDrawingSurface(index);
-	}
 
 	//XXX 2018-05-23 kyrke, implementation close to closeTab, needs refactoring
 	private void undoAddTab(int currentlySelected) {
 		CreateGui.removeTab(appTab.getSelectedIndex() );
 		appTab.removeTabAt(appTab.getSelectedIndex());
 		appTab.setSelectedIndex(currentlySelected);
-		//Update DrawingSurfaceImpl manually. Bug #1543124
-		setObjects(appTab.getSelectedIndex());
 	}
 
 	// set tabbed pane properties and add change listener that updates tab with
@@ -1452,10 +1445,9 @@ public class GuiFrame extends JFrame  {
 			appTab.setSelectedIndex(index);
 		}
 
-		setObjects(index);
-		if (appView != null) {
-			appView.setVisible(true);
-			appView.repaint();
+		if (getCurrentTab() != null) {
+			getCurrentTab().drawingSurface().setVisible(true);
+			getCurrentTab().drawingSurface().repaint();
 			updateZoomCombo();
 
 			setTitle(appTab.getTitleAt(index));
@@ -1476,7 +1468,7 @@ public class GuiFrame extends JFrame  {
 
 	private void showQueries(boolean enable){
 		showQueries = enable;
-		CreateGui.getCurrentTab().showQueries(enable);
+		getCurrentTab().showQueries(enable);
 
 	}
 	private void toggleQueries(){
@@ -1485,7 +1477,7 @@ public class GuiFrame extends JFrame  {
 
 	private void showConstants(boolean enable){
 		showConstants = enable;
-		CreateGui.getCurrentTab().showConstantsPanel(enable);
+		getCurrentTab().showConstantsPanel(enable);
 
 	}
 	private void toggleConstants(){
@@ -1512,18 +1504,18 @@ public class GuiFrame extends JFrame  {
 	private void toggleTokenAge(){
 		toggleShowTokenAge();
 		Preferences.getInstance().setShowTokenAge(showTokenAge());
-		appView.repaintAll();
+		getCurrentTab().drawingSurface().repaintAll();
 	}
 
 	private void toggleZeroToInfinityIntervals() {
 		toggleShowZeroToInfinityIntervals();
 		Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals());
-		appView.repaintAll();
+		getCurrentTab().drawingSurface().repaintAll();
 	}
 
 	private void showComponents(boolean enable){
 		showComponents = enable;
-		CreateGui.getCurrentTab().showComponents(enable);
+		getCurrentTab().showComponents(enable);
 
 	}
 	private void toggleComponents(){
@@ -1532,7 +1524,7 @@ public class GuiFrame extends JFrame  {
 
 	private void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
-		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
+		getCurrentTab().showEnabledTransitionsList(enable);
 
 	}
 	private void toggleEnabledTransitionsList(){
@@ -1541,7 +1533,7 @@ public class GuiFrame extends JFrame  {
 
 	private void showDelayEnabledTransitions(boolean enable){
 		showDelayEnabledTransitions = enable;
-		CreateGui.getCurrentTab().showDelayEnabledTransitions(enable);
+		getCurrentTab().showDelayEnabledTransitions(enable);
 	}
 	private void toggleDelayEnabledTransitions(){
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
@@ -1552,7 +1544,7 @@ public class GuiFrame extends JFrame  {
 	}
 
 	private boolean saveOperation(int index, boolean forceSaveAs) {
-		File modelFile = CreateGui.getTab(index).getFile();
+		File modelFile = getTab(index).getFile();
 		boolean result;
 		if (!forceSaveAs && modelFile != null && !(modelFile.getName().endsWith(".xml"))) { // ordinary save
 			saveNet(index, modelFile);
@@ -1582,14 +1574,14 @@ public class GuiFrame extends JFrame  {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			saveNet(index, outFile, (List<TAPNQuery>) CreateGui.getTab(index).queries());
+			saveNet(index, outFile, (List<TAPNQuery>) getTab(index).queries());
 
-			CreateGui.getTab(index).setFile(outFile);
+			getTab(index).setFile(outFile);
 
-			CreateGui.getDrawingSurface(index).setNetChanged(false);
+			getTab(index).drawingSurface().setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
 			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
-			CreateGui.getDrawingSurface(index).getUndoManager().clear();
+			getTab(index).drawingSurface().getUndoManager().clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 		} catch (Exception e) {
@@ -1602,7 +1594,7 @@ public class GuiFrame extends JFrame  {
 	
 	public void saveNet(int index, File outFile, List<TAPNQuery> queries) {
 		try {
-			TabContent currentTab = CreateGui.getTab(index);
+			TabContent currentTab = getTab(index);
 			NetworkMarking currentMarking = null;
 			if(getGUIMode().equals(GUIMode.animation)){
 				currentMarking = currentTab.network().marking();
@@ -1673,8 +1665,6 @@ public class GuiFrame extends JFrame  {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		boolean showFileEndingChangedMessage = false;
 
-
-		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
 		if (name == null || name.equals("")) {
@@ -1687,7 +1677,7 @@ public class GuiFrame extends JFrame  {
 				name = name + ".tapn";
 		}
 
-		TabContent tab = CreateGui.getTab(freeSpace);
+		TabContent tab = getTab(freeSpace);
 		appTab.addTab(name, null, tab, null);
 		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
 		appTab.setSelectedIndex(freeSpace);
@@ -1701,7 +1691,6 @@ public class GuiFrame extends JFrame  {
 			tab.setNetwork(loadedModel.network(), loadedModel.templates());
 			tab.setQueries(loadedModel.queries());
 			tab.setConstants(loadedModel.network().constants());
-			tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 			tab.selectFirstElements();
 
@@ -1736,7 +1725,6 @@ public class GuiFrame extends JFrame  {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name;
 
-		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
 		if (file == null) {
@@ -1762,13 +1750,11 @@ public class GuiFrame extends JFrame  {
 				tab.setNetwork(loadedModel.network(), loadedModel.templates());
 				tab.setQueries(loadedModel.queries());
 				tab.setConstants(loadedModel.network().constants());
-				tab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 				tab.selectFirstElements();
 
-				if (CreateGui.getApp() != null) {
-					CreateGui.getApp().restoreMode();
-				}
+				restoreMode();
+
 
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);
@@ -1819,7 +1805,7 @@ public class GuiFrame extends JFrame  {
 			String composedName = appTab.getTitleAt(index);
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
-			CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+			createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			System.console().printf(e1.getMessage());
 		}
@@ -1846,7 +1832,7 @@ public class GuiFrame extends JFrame  {
 
 		if(index < 0) return false;
 
-		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
+		if (getTab(index).drawingSurface().getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
@@ -1886,10 +1872,10 @@ public class GuiFrame extends JFrame  {
 	public void setRandomAnimationMode(boolean on) {
 
 		if (!(on)) {
-			stepforwardAction.setEnabled(CreateGui.getCurrentTab().getAnimationHistory().isStepForwardAllowed());
-			stepbackwardAction.setEnabled(CreateGui.getCurrentTab().getAnimationHistory().isStepBackAllowed());
+			stepforwardAction.setEnabled(getCurrentTab().getAnimationHistory().isStepForwardAllowed());
+			stepbackwardAction.setEnabled(getCurrentTab().getAnimationHistory().isStepBackAllowed());
 
-			CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+			getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 
 		} else {
 			stepbackwardAction.setEnabled(false);
@@ -1935,7 +1921,7 @@ public class GuiFrame extends JFrame  {
 		case draw:
 			// Enable all draw actions
 			startAction.setSelected(false);
-			CreateGui.getDrawingSurface().changeAnimationMode(false);
+			getCurrentTab().drawingSurface().changeAnimationMode(false);
 
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
@@ -1943,26 +1929,26 @@ public class GuiFrame extends JFrame  {
 				hideComponentWindow();
 			}
 
-			CreateGui.getCurrentTab().switchToEditorComponents();
+			getCurrentTab().switchToEditorComponents();
 			showComponents(showComponents);
 			showQueries(showQueries);
 			showConstants(showConstants);
 			showToolTips(showToolTips);
 
-			CreateGui.getDrawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
+			getCurrentTab().drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
 			activateSelectAction();
 			selectAction.setSelected(true);
 			break;
 		case animation:
-			TabContent tab = CreateGui.getCurrentTab();
-			getAnimator().setTabContent(tab);
-			tab.switchToAnimationComponents(showEnabledTransitions);
+
+			getAnimator().setTabContent(getCurrentTab());
+			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
-			tab.drawingSurface().changeAnimationMode(true);
-			tab.drawingSurface().repaintAll();
+			getCurrentTab().drawingSurface().changeAnimationMode(true);
+			getCurrentTab().drawingSurface().repaintAll();
 			getAnimator().reset(false);
 			getAnimator().storeModel();
 			getAnimator().highlightEnabledTransitions();
@@ -1972,15 +1958,14 @@ public class GuiFrame extends JFrame  {
 			statusBar.changeText(statusBar.textforAnimation);
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
-			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
-			CreateGui.getCurrentTab().getAnimationController().requestFocusInWindow();
+			getCurrentTab().drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			getCurrentTab().getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
 			statusBar.changeText(statusBar.textforNoNet);
-			if(CreateGui.getAppGui() != null){
-				CreateGui.getAppGui().setFocusTraversalPolicy(null);
-			}
+			setFocusTraversalPolicy(null);
+
 			break;
 
 		default:
@@ -1993,7 +1978,7 @@ public class GuiFrame extends JFrame  {
 	}
 
 	private void hideComponentWindow(){
-		ArrayList<PetriNetObject> selection = CreateGui.getDrawingSurface().getPNObjects();
+		ArrayList<PetriNetObject> selection = getCurrentTab().drawingSurface().getPNObjects();
 
 		for (PetriNetObject pn : selection) {
 			if (pn instanceof TimedPlaceComponent) {
@@ -2032,9 +2017,9 @@ public class GuiFrame extends JFrame  {
 		// gowing on
 		mode = prev_mode;
 
-		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+		verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
-		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+		verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
 		//XXX - why preform null check, is set in constructor?
 		if (transAction != null) {
@@ -2099,7 +2084,7 @@ public class GuiFrame extends JFrame  {
 	public void updateZoomCombo() {
 		ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
 		zoomComboBox.removeActionListener(zoomComboListener);
-		zoomComboBox.setSelectedItem(appView.getZoomController().getPercent() + "%");
+		zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
 	
@@ -2129,11 +2114,11 @@ public class GuiFrame extends JFrame  {
 		}
 		
 		tabContent.currentTemplate().guiModel().repaintAll(true);
-		appView.updatePreferredSize();
+		getCurrentTab().drawingSurface().updatePreferredSize();
 	}
         
         private boolean canNetBeSavedAndShowMessage() {
-                if (CreateGui.getCurrentTab().network().paintNet()) {
+                if (getCurrentTab().network().paintNet()) {
                         return true;
                 } else {
                         String message = "The net is too big and cannot be saved or exported.";
@@ -2164,23 +2149,23 @@ public class GuiFrame extends JFrame  {
 	private void toggleAnimationMode() {
 		try {
 
-			if (!appView.isInAnimationMode()) {
-				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
-					CreateGui.getCurrentTab().rememberSelectedTemplate();
-					if (CreateGui.getCurrentTab().currentTemplate().isActive()){
-						CreateGui.getCurrentTab().setSelectedTemplateWasActive();
+			if (!getCurrentTab().drawingSurface().isInAnimationMode()) {
+				if (getCurrentTab().numberOfActiveTemplates() > 0) {
+					getCurrentTab().rememberSelectedTemplate();
+					if (getCurrentTab().currentTemplate().isActive()){
+						getCurrentTab().setSelectedTemplateWasActive();
 					}
 					restoreMode();
-					setAnimationMode(!appView.isInAnimationMode());
-					if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {
-						CreateGui.getCurrentTab().restoreSelectedTemplate();
-						CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
+					setAnimationMode(!getCurrentTab().drawingSurface().isInAnimationMode());
+					if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
+						getCurrentTab().restoreSelectedTemplate();
+						getCurrentTab().resetSelectedTemplateWasActive();
 					}
 					else {
-						CreateGui.getCurrentTab().selectFirstActiveTemplate();
+						getCurrentTab().selectFirstActiveTemplate();
 					}
 					//Enable simulator focus traversal policy
-					CreateGui.getAppGui().setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+					setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 				} else {
 					JOptionPane.showMessageDialog(GuiFrame.this,
 							"You need at least one active template to enter simulation mode",
@@ -2191,18 +2176,18 @@ public class GuiFrame extends JFrame  {
 				stepbackwardAction.setEnabled(false);
 			} else {
 				//setMode(ElementType.START);
-				appView.getSelectionObject().clearSelection();
-				setAnimationMode(!appView.isInAnimationMode());
-				CreateGui.getCurrentTab().restoreSelectedTemplate();
+				getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
+				setAnimationMode(!getCurrentTab().drawingSurface().isInAnimationMode());
+				getCurrentTab().restoreSelectedTemplate();
 				//Enable editor focus traversal policy
-				CreateGui.getAppGui().setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
+				setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 			}
 		} catch (Exception e) {
 			Logger.log(e);
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 			startAction.setSelected(false);
-			appView.changeAnimationMode(false);
+			getCurrentTab().drawingSurface().changeAnimationMode(false);
 			throw new RuntimeException(e);
 		}
 
@@ -2213,7 +2198,7 @@ public class GuiFrame extends JFrame  {
 			// This is a fix for bug #812694 where on mac some menues are gray after
 			// changing from simulation mode, when displaying a trace. Showing and
 			// hiding a menu seems to fix this problem
-			JDialog a = new JDialog(CreateGui.getAppGui(), false);
+			JDialog a = new JDialog(this, false);
 			a.setUndecorated(true);
 			a.setVisible(true);
 			a.dispose();
@@ -2277,7 +2262,7 @@ public class GuiFrame extends JFrame  {
 				annotationAction.setSelected(false);
 			}
 
-			if (appView == null) {
+			if (getCurrentTab() == null) {
 				return;
 			}
 
@@ -2285,22 +2270,22 @@ public class GuiFrame extends JFrame  {
 			statusBar.changeText(typeID);
 
 			//Disable selection and deselect current selection
-			appView.getSelectionObject().disableSelection();
+			getCurrentTab().drawingSurface().getSelectionObject().disableSelection();
 
 			//If pending arc draw, remove it
-			if (appView.createArc != null) {
-				appView.createArc.delete();
-				appView.createArc = null;
-				appView.repaint();
+			if (getCurrentTab().drawingSurface().createArc != null) {
+				getCurrentTab().drawingSurface().createArc.delete();
+				getCurrentTab().drawingSurface().createArc = null;
+				getCurrentTab().drawingSurface().repaint();
 			}
 
 			if (typeID == ElementType.SELECT) {
-				appView.getSelectionObject().enableSelection();
-				appView.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				getCurrentTab().drawingSurface().getSelectionObject().enableSelection();
+				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			} else if (typeID == ElementType.DRAG) {
-				appView.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
-				appView.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 			}
 		}
 
@@ -2460,7 +2445,7 @@ public class GuiFrame extends JFrame  {
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()){
 						FileBrowser.userPath = f.getParent();
-						SUMOQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());
+						SUMOQueryLoader.importQueries(f, getCurrentTab().network());
 					}
 				}
 			}
@@ -2473,7 +2458,7 @@ public class GuiFrame extends JFrame  {
 						for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
-								XMLQueryLoader.importQueries(f, CreateGui.getCurrentTab().network());
+								XMLQueryLoader.importQueries(f, getCurrentTab().network());
 							}
 						}
 					}	
@@ -2488,7 +2473,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    Export.exportGuiView(appView, Export.PNG, null);
+                    Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PNG, null);
 				}
 			}
 		});
@@ -2496,7 +2481,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportPSAction = new GuiAction("PostScript", "Export the net to PostScript format", KeyStroke.getKeyStroke('T', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    Export.exportGuiView(appView, Export.POSTSCRIPT, null);
+                    Export.exportGuiView(getCurrentTab().drawingSurface(), Export.POSTSCRIPT, null);
 				}
 			}
 		});
@@ -2505,7 +2490,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportToTikZAction = new GuiAction("TikZ", "Export the net to LaTex (TikZ) format", KeyStroke.getKeyStroke('L', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
+                    Export.exportGuiView(getCurrentTab().drawingSurface(), Export.TIKZ, getCurrentTab().drawingSurface().getGuiModel());
 				}
 			}
 		});
@@ -2523,7 +2508,7 @@ public class GuiFrame extends JFrame  {
                                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                             Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
                     }
-                    Export.exportGuiView(appView, Export.PNML, null);
+                    Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PNML, null);
 				}
 			}
 		});
@@ -2532,7 +2517,7 @@ public class GuiFrame extends JFrame  {
 		exportMenu.add(exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-					Export.exportGuiView(appView, Export.QUERY, null);
+					Export.exportGuiView(getCurrentTab().drawingSurface(), Export.QUERY, null);
 				}
 			}
 		});
@@ -2550,7 +2535,7 @@ public class GuiFrame extends JFrame  {
 		fileMenu.addSeparator();
 		fileMenu.add(printAction = new GuiAction("Print", "Print", KeyStroke.getKeyStroke('P', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				Export.exportGuiView(appView, Export.PRINTER, null);
+				Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PRINTER, null);
 			}
 		});
 		
@@ -2711,8 +2696,7 @@ public class GuiFrame extends JFrame  {
 
 	private void showNewPNDialog() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Create a New Petri Net", true);
+		EscapableDialog guiDialog = new EscapableDialog(this, "Create a New Petri Net", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -2781,6 +2765,10 @@ public class GuiFrame extends JFrame  {
 	}
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); }
+
+	public TabContent getCurrentTab() { return CreateGui.getCurrentTab(); }
+	public TabContent getTab(int tabIndex) { return CreateGui.getTab(tabIndex); }
+
 	public void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
 			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
@@ -2793,15 +2781,12 @@ public class GuiFrame extends JFrame  {
 	//XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
 	public void closeTab(int index) {
 
-		if(appTab.getTabCount() > 0 && CreateGui.getApp().checkForSave(index)){
-			if(appTab.getTabCount() == 1) { CreateGui.getApp().setGUIMode(GUIMode.noNet); }
+		if(appTab.getTabCount() > 0 && checkForSave(index)){
+			if(appTab.getTabCount() == 1) { setGUIMode(GUIMode.noNet); }
 
 			//Close the gui part first, else we get an error bug #826578
 			appTab.removeTabAt(index);
 			CreateGui.removeTab(index);
-
-			//Update DrawingSurfaceImpl manually. Bug #1543124
-			setObjects(appTab.getSelectedIndex());
 
 			activateSelectAction();
 		}
