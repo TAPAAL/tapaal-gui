@@ -39,6 +39,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.widgets.CustomJSpinner;
 
 public class SmartDrawDialog extends JDialog {
 	private static final long serialVersionUID = 6116530047981607501L;
@@ -96,23 +97,21 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	JPanel mainPanel;
-	ArrayList<PlaceTransitionObject> placeTransitionObjects;
 	String startingObject;
-	String template;
+	//String template;
 	String[] objectNames;
-	String[] templateNames;
-	JComboBox objectDropdown = new JComboBox();
+	//String[] templateNames;
+	JComboBox<String> objectDropdown = new JComboBox<String>();
 	JCheckBox randomStartObjectCheckBox;
-	JComboBox templateSelector = new JComboBox();
+	//JComboBox<Object> templateSelector = new JComboBox<Object>();
 	JDialog loadingDialogFrame;
-	Thread workingThread;
-	Thread loadingDialogFrameThread;
-	JDialog choiceModal;
-	boolean cancel = false;
+	//JDialog choiceModal;
 	SmartDrawWorker worker;
 	JLabel timerLabel = new JLabel("Time Elapsed: ");
 	JLabel progressLabel = new JLabel("Objects Placed: ");
 	JLabel statusLabel;
+	JSpinner xSpinner;
+	JButton drawButton;
 	long startTimeMs;
 	int objectsProgress;
 
@@ -146,6 +145,7 @@ public class SmartDrawDialog extends JDialog {
 			smartDrawDialog.setResizable(true);
 		}
 		smartDrawDialog.updateLists();
+		smartDrawDialog.enableButtons();
 		smartDrawDialog.setEnabled(true);
 		smartDrawDialog.setVisible(true);
 	}
@@ -191,6 +191,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		mainPanel.add(templateSelector, gbc);*/
 		JButton helpButton = new JButton("Help");
+		helpButton.setToolTipText("Help with the different options");
 		helpButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -209,46 +210,41 @@ public class SmartDrawDialog extends JDialog {
 		mainPanel.add(helpButton, gbc);
 		
 		
-		JButton drawButton = new JButton("Smart Draw");
+		drawButton = new JButton("Smart Draw");
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					cancel = false;
-					worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
-							straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
-					worker.addSmartDrawListener(new SmartDrawListener() {
+				worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
+						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
+				worker.addSmartDrawListener(new SmartDrawListener() {
+					
+					@Override
+					public void fireStatusChanged(int objectsPlaced) {
+						progressLabel.setText("Objects Placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getPlaceTransitionObjects().size());
 						
-						@Override
-						public void fireStatusChanged(int objectsPlaced) {
-							progressLabel.setText("Objects Placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getPlaceTransitionObjects().size());
-							
-						}
+					}
+					
+					@Override
+					public void fireStartDraw() {
+						statusLabel.setText("Working...");
+						if (timer.isRunning())
+							timer.restart();
+						else
+							timer.start();
+						startTimeMs = System.currentTimeMillis();
 						
-						@Override
-						public void fireStartDraw() {
-							statusLabel.setText("Working...");
-							if (timer.isRunning())
-								timer.restart();
-							else
-								timer.start();
-							startTimeMs = System.currentTimeMillis();
-							
-						}
-						
-						@Override
-						public void fireDone() {
-							loadingDialogFrame.setVisible(false);
-						}
-					});
-					worker.execute();
-					smartDrawDialog.setVisible(false);
-					loadingDialogFrame.setVisible(true);
-					if(worker.isDone()) {
+					}
+					
+					@Override
+					public void fireDone() {
 						loadingDialogFrame.setVisible(false);
 					}
-				} catch (NullPointerException exception) {
-					new MessengerImpl().displayErrorMessage("You need at least one place or transition do automatic layout");
+				});
+				worker.execute();
+				smartDrawDialog.setVisible(false);
+				loadingDialogFrame.setVisible(true);
+				if(worker.isDone()) {
+					loadingDialogFrame.setVisible(false);
 				}
 			}
 		});
@@ -283,6 +279,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(comboBoxLabel, gbc);
 		
 		objectDropdown.setEnabled(false);
+		objectDropdown.setToolTipText("Choose a starting object");
 		objectDropdown.addActionListener(new ActionListener() {
 			
 			@Override
@@ -331,6 +328,7 @@ public class SmartDrawDialog extends JDialog {
 		
 		
 		JLabel straightWeightLabel = new JLabel("Straight Arc Weight:");
+		straightWeightLabel.setToolTipText("Set weight for arcs going straight");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -341,13 +339,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(straightWeightLabel, gbc);
 		
-		
-		SpinnerModel straightWeightModel =
-		        new SpinnerNumberModel(straightWeight, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner straightWeightSpinner = new JSpinner(straightWeightModel);
+		final JSpinner straightWeightSpinner = new CustomJSpinner(straightWeight);
+		straightWeightSpinner.setToolTipText("Set weight for arcs going straight");
 		straightWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -367,6 +360,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(straightWeightSpinner, gbc);
 		
 		JLabel diagonalWeightLabel = new JLabel("Diagonal Arc Weight:");
+		diagonalWeightLabel.setToolTipText("Set weight for arcs going diagonal");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -377,13 +371,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(diagonalWeightLabel, gbc);
 		
-		
-		SpinnerModel diagonalWeightModel =
-		        new SpinnerNumberModel(diagonalWeight, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner diagonalWeightSpinner = new JSpinner(diagonalWeightModel);
+		final JSpinner diagonalWeightSpinner = new CustomJSpinner(diagonalWeight);
+		diagonalWeightSpinner.setToolTipText("Set weight for arcs going diagonal");
 		diagonalWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -403,6 +392,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(diagonalWeightSpinner, gbc);
 		
 		JLabel distanceWeightLabel = new JLabel("Distance Weight:");
+		distanceWeightLabel.setToolTipText("Set weight for distance to start object");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 3;
@@ -413,13 +403,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(distanceWeightLabel, gbc);
 		
-		
-		SpinnerModel distanceWeightModel =
-		        new SpinnerNumberModel(distanceWeight, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner distanceWeightSpinner = new JSpinner(distanceWeightModel);
+		final JSpinner distanceWeightSpinner = new CustomJSpinner(distanceWeight);
+		distanceWeightSpinner.setToolTipText("Set weight for distance to start object");
 		distanceWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -439,6 +424,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(distanceWeightSpinner, gbc);
 		
 		JLabel overlappingWeightLabel = new JLabel("Overlapping Arc Weight:");
+		overlappingWeightLabel.setToolTipText("Set weight for overlapping arcs");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -449,13 +435,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(overlappingWeightLabel, gbc);
 		
-		
-		SpinnerModel overlappingWeightModel =
-		        new SpinnerNumberModel(overlappingArcWeight, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner overlappingWeightSpinner = new JSpinner(overlappingWeightModel);
+		final JSpinner overlappingWeightSpinner = new CustomJSpinner(overlappingArcWeight);
+		overlappingWeightSpinner.setToolTipText("Set weight for overlapping arcs");
 		overlappingWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -475,6 +456,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(overlappingWeightSpinner, gbc);
 		
 		JLabel minimumIterationsLabel = new JLabel("Minimum Iterations:");
+		minimumIterationsLabel.setToolTipText("Set minimum iterations for each object");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
@@ -485,12 +467,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(minimumIterationsLabel, gbc);
 		
-		SpinnerModel minimumIterationModel =
-		        new SpinnerNumberModel(minimumIterations, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner minimumIterationSpinner = new JSpinner(minimumIterationModel);
+		final JSpinner minimumIterationSpinner = new CustomJSpinner(minimumIterations);
+		minimumIterationSpinner.setToolTipText("Set minimum iterations for each object");
 		minimumIterationSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -527,6 +505,7 @@ public class SmartDrawDialog extends JDialog {
 		checkBoxPanel.setBorder(new TitledBorder("Search Option"));
 		
 		JRadioButton DFS = new JRadioButton("DFS:");
+		DFS.setToolTipText("Draw in a depth first manner from start object");
 		DFS.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -534,6 +513,8 @@ public class SmartDrawDialog extends JDialog {
 			}
 		});
 		JRadioButton BFS = new JRadioButton("BFS:");
+		BFS.setToolTipText("Draw in a breadth first manner from start object");
+
 		BFS.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -608,6 +589,7 @@ public class SmartDrawDialog extends JDialog {
 		
 		
 		JLabel xLabel = new JLabel("Spacing on the x-axis:");
+		xLabel.setToolTipText("Set the distance there should be between objects on the x-axis");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -618,12 +600,9 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		spacingPanel.add(xLabel, gbc);
 		
-		SpinnerModel xSpaceModel =
-		        new SpinnerNumberModel(xSpacing, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner xSpinner = new JSpinner(xSpaceModel);
+		xSpinner = new CustomJSpinner(xSpacing);
+		xSpinner.setToolTipText("Set the distance there should be between objects on the x-axis");
+
 		xSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -641,6 +620,7 @@ public class SmartDrawDialog extends JDialog {
 		spacingPanel.add(xSpinner, gbc);
 		
 		JLabel yLabel = new JLabel("Spacing on the y-axis:");
+		yLabel.setToolTipText("Set the distance there should be between objects on the y-axis");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -651,12 +631,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		spacingPanel.add(yLabel, gbc);
 		
-		SpinnerModel ySpaceModel =
-		        new SpinnerNumberModel(ySpacing, //initial value
-		                               0, //min
-		                               Integer.MAX_VALUE, //max
-		                               1);
-		final JSpinner ySpinner = new JSpinner(ySpaceModel);
+		final JSpinner ySpinner = new CustomJSpinner(ySpacing);
+		ySpinner.setToolTipText("Set the distance there should be between objects on the y-axis");
 		ySpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -706,8 +682,9 @@ public class SmartDrawDialog extends JDialog {
 	}
 	//For debugging
 	private void printPTObjectsAndPositions() {
-		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-			System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getPositionX() + " Y: " + ptObject.getPositionY());
+		for(PetriNetObject ptObject : CreateGui.getDrawingSurface().getPlaceTransitionObjects()) {
+			PlaceTransitionObject placeTransitionObject = (PlaceTransitionObject)ptObject;
+			System.out.println("Name: " + placeTransitionObject.getName() + " X: " + placeTransitionObject.getPositionX() + " Y: " + placeTransitionObject.getPositionY());
 		}
 	}
 	
@@ -768,7 +745,6 @@ public class SmartDrawDialog extends JDialog {
 				CreateGui.getDrawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
 				smartDrawDialog.setVisible(true);
-				cancel = true;
 			}
 		});
 		gbc.gridx = 0;
@@ -901,7 +877,18 @@ public class SmartDrawDialog extends JDialog {
 			} while (!cancelled);
 		}
 	}
-
-    
 	
+	private void enableButtons() {
+		if(CreateGui.getDrawingSurface().getPlaceTransitionObjects().size() > 0) {
+			drawButton.setEnabled(true);
+			drawButton.setToolTipText("Smart draw with the current options");
+			objectDropdown.setEnabled(true);
+			randomStartObjectCheckBox.setEnabled(true);
+		} else {
+			drawButton.setEnabled(false);
+			drawButton.setToolTipText("You must have at least one object to smart draw");
+			objectDropdown.setEnabled(false);
+			randomStartObjectCheckBox.setEnabled(false);
+		}
+	}
 }
