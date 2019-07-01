@@ -617,14 +617,6 @@ public class ArcPath implements Shape {
 		}
 	}
 
-
-
-	public void delete() { // Michael: Tells the arc points to remove themselves
-		while (!pathPoints.isEmpty()) {
-			(pathPoints.get(0)).kill(); // force delete of ALL points
-		}
-	}
-
 	public String[][] getArcPathDetails() {
 		int length = getEndIndex() + 1;
 		String[][] details = new String[length][3];
