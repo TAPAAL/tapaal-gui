@@ -213,12 +213,6 @@ public class ArcPathPoint extends PetriNetObject {
 		return (i > 0 && i != myArcPath.getNumPoints() - 1);
 	}
 
-	public void kill() { // delete without the safety check :)
-		super.removeFromContainer(); // called internally by ArcPoint and parent
-										// ArcPath
-		myArcPath.deletePoint(this);
-	}
-
 	public Point2D.Float getControl1() {
 		return control1;
 	}
