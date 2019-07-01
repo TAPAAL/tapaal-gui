@@ -102,7 +102,7 @@ public class UnderApproximation implements ITAPNApproximation {
 				guiModel.removePetriNetObject(arc1);
 			}
 		}
-		guiTransition.delete();
+		guiModel.removePetriNetObject(guiTransition);
 	}
 	
 	private void deleteArcsFromTransition(TimedTransition transitionToDelete) {
