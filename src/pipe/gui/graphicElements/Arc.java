@@ -14,6 +14,8 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
+import pipe.gui.handler.PetriNetObjectHandler;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
    Implementation of Element for drawing an arc
@@ -452,8 +454,7 @@ public abstract class Arc extends PetriNetObject {
 		public void actionPerformed(ActionEvent e) {
 			DrawingSurfaceImpl aView = CreateGui.getDrawingSurface();
 			if (aView.createArc == arcBeingDraw) {
-				aView.createArc = null;
-				delete();
+				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
 
 				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE)
 						|| (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
