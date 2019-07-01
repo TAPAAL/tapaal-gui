@@ -64,7 +64,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	}
 
 	// Disable key bindings that are only available when drawing arcs.
-	private void sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(Arc newArc){
+	private static void sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(Arc newArc){
 		newArc.setSelectable(true);
 		newArc.sealArc();
 		newArc.disableDrawingKeyBindings();
@@ -414,8 +414,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc and inhub arc)
 	}
 
-	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
-		arc.delete();
+	public static void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
+		//XXX this is problematic if we are creating a transport arc and it part2, then part1 is never cleanup!
+
+		//Called delete, only removes is from view since it finished, should be same af view.remove()
+		//arc.delete();
 		sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(arc);
 		
 		view.remove(arc);

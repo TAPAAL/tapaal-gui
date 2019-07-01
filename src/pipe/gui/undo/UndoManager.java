@@ -18,6 +18,8 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
+import pipe.gui.handler.PetriNetObjectHandler;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
  * Class to handle undo & redo functionality
@@ -194,13 +196,9 @@ public class UndoManager {
 
 	// removes the arc currently being drawn if any
 	private void checkArcBeingDrawn() {
-		Arc arcBeingDrawn = view.createArc;
-		if (arcBeingDrawn != null) {
-			if (arcBeingDrawn.getParent() != null) {
-				arcBeingDrawn.getParent().remove(arcBeingDrawn);
-				arcBeingDrawn.getSource().removeFromArc(arcBeingDrawn);
-			}
-			view.createArc = null;
+
+		if (view.createArc != null) {
+			PlaceTransitionObjectHandler.cleanupArc(view.createArc, view);
 		}
 	}
 

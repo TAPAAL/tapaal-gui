@@ -41,6 +41,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -2289,9 +2290,7 @@ public class GuiFrame extends JFrame  {
 
 			//If pending arc draw, remove it
 			if (appView.createArc != null) {
-				appView.createArc.delete();
-				appView.createArc = null;
-				appView.repaint();
+				PlaceTransitionObjectHandler.cleanupArc(appView.createArc, appView);
 			}
 
 			if (typeID == ElementType.SELECT) {
