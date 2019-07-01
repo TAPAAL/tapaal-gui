@@ -416,7 +416,9 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	public void setTransitionsToUpright() {
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
 			if(ptObject instanceof Transition) {
-				Command command = new TransitionRotationEdit((Transition)ptObject, 0);
+				Transition transition = (Transition)ptObject;
+				int newAngle = 0 - transition.getAngle();
+				Command command = new TransitionRotationEdit(transition, newAngle);
 				command.redo();
 				undoManager.addEdit(command);
 			}
