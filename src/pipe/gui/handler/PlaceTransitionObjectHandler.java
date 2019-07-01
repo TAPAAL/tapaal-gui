@@ -254,7 +254,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				// Check if arc has leagal target
 				PlaceTransitionObject target = transportArcToCreate.getTarget();
 				if (!(target instanceof Transition)) {
-					transportArcToCreate.delete();
+					cleanupArc(transportArcToCreate, view);
 					return;
 				}
 
@@ -278,7 +278,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					}
 				}
 				if (existsArc) {
-					transportArcToCreate.delete();
+					cleanupArc(transportArcToCreate, view);
 					return;
 				}
 
