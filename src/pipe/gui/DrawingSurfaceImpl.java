@@ -127,9 +127,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			calculateNewBoundsForScrollPane(newObject.getNameLabel().getBounds());
 		}
 
-		//Does not seem to be needed
-		//validate();
-		//repaint();
+		validate();
+		repaint();
 	}
 
 	//XXX temp solution while refactorting, component removes children them self
