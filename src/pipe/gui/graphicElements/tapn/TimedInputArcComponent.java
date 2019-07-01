@@ -63,13 +63,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		mouseHandler = new TimedArcHandler(this);
 	}
 
-	@Override
-	public void delete() {
-		if (inputArc != null)
-			inputArc.delete();
-		super.delete();
-	}
-
 	public String getGuardAsString() {
 		return getGuardAsString(true);
 	}

@@ -63,13 +63,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public void delete() {
-		if (inhibitorArc != null)
-			inhibitorArc.delete();
-		super.delete();
-	}
-
-	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		pnName.setText("");
 		if(getWeight().value() > 1 || displayConstantNames){

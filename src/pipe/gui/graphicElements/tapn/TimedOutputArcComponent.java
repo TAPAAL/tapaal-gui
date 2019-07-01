@@ -118,13 +118,6 @@ public class TimedOutputArcComponent extends Arc {
 		pnName.setText(getWeight().toString(displayConstantNames)+" " + pnName.getText());
 		setLabelPosition();
 	}
-
-	@Override
-	public void delete() {
-		if (outputArc != null)
-			outputArc.delete();
-		super.delete();
-	}
 	
 	public void showTimeIntervalEditor() {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);

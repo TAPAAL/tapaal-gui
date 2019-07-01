@@ -370,18 +370,6 @@ public abstract class Arc extends PetriNetObject {
 
 	}
 
-	@Override
-	public void delete() {
-		if (!deleted) {
-			if (getParent() != null) {
-				getParent().remove(pnName);
-			}
-			myPath.forceHidePoints();
-			super.delete();
-			deleted = true;
-		}
-	}
-
 	public void setPathToTransitionAngle(int angle) {
 		myPath.setTransitionAngle(angle);
 	}

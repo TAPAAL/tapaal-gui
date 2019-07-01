@@ -213,17 +213,6 @@ public class ArcPathPoint extends PetriNetObject {
 		return (i > 0 && i != myArcPath.getNumPoints() - 1);
 	}
 
-	@Override
-	public void delete() {// Won't delete if only two points left. General delete.
-		if (isDeleteable()) {
-			if (getArcPath().getArc().isSelected()) {
-				return;
-			}
-			kill();
-			myArcPath.updateArc();
-		}
-	}
-
 	public void kill() { // delete without the safety check :)
 		super.removeFromContainer(); // called internally by ArcPoint and parent
 										// ArcPath

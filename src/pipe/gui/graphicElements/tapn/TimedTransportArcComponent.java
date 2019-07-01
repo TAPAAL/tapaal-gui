@@ -150,28 +150,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		this.setLabelPosition();
 	}
 
-	@Override
-	public void delete() {
-		if (underlyingTransportArc != null) {
-			underlyingTransportArc.delete();
-			underlyingTransportArc = null;
-			connectedTo.underlyingTransportArc = null;
-		}
-
-		// kyrke - do ekstra suff when deleting a transport arc
-
-		super.delete();
-
-		//Avoid delete loop (but we need to save connected to for undo redo)
-		TimedTransportArcComponent a = connectedTo;
-		connectedTo = null;
-		if (a != null && a.connectedTo != null) {
-			a.delete();
-		}
-		connectedTo = a;
-
-	}
-
 	public boolean isInPreSet() {
 		return isInPreSet;
 	}

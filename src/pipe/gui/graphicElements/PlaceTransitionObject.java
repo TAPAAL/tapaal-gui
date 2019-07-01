@@ -304,14 +304,6 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 				+ getHeight() / 2.0);
 	}
 
-	@Override
-	public void delete() {
-		if (getParent() != null) {
-			getParent().remove(pnName);
-		}
-		super.delete();
-	}
-
 	/** Handles selection for Place/Transitions */
 	@Override
 	public void select() {
