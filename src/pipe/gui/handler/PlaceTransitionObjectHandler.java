@@ -285,8 +285,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				int groupMaxCounter = getTransportArcMaxGroupNumber(transportArcToCreate);
 				((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
 
-				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, transportArcToCreate);
-
 				sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(transportArcToCreate);
 
 				// Create the next arc
@@ -333,6 +331,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 
 				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, arc2);
+				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, arc1);
 
 				undoManager.newEdit();
 
@@ -419,6 +418,15 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 		//Called delete, only removes is from view since it finished, should be same af view.remove()
 		//arc.delete();
+
+		if (arc instanceof TimedTransportArcComponent) {
+			TimedTransportArcComponent partner = ((TimedTransportArcComponent)arc).getConnectedTo();
+			if (partner != null) {
+				partner.disableDrawingKeyBindings();
+				view.remove(partner);
+			}
+		}
+
 		sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(arc);
 		
 		view.remove(arc);
