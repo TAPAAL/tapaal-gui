@@ -250,10 +250,6 @@ public class ArcPathPoint extends PetriNetObject {
 	@Override
 	public void removedFromGui() {}
 
-	void hidePoint() {
-		super.removeFromContainer();
-	}
-
 	@Override
 	public int getLayerOffset() {
 		return Pipe.ARC_POINT_LAYER_OFFSET;
