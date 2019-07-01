@@ -136,6 +136,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	public void removePetriNetObject(PetriNetObject pno) {
 		pno.removedFromGui();
 		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
+
+		validate();
+		repaint();
 	}
 
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
