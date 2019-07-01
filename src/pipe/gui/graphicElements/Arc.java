@@ -366,7 +366,9 @@ public abstract class Arc extends PetriNetObject {
 		}
 
 		//Remove arcpathpoints
-		myPath.forceHidePoints();
+		for (ArcPathPoint p : myPath.getArcPathPoints()){
+			getGuiModel().removePetriNetObject(p);
+		}
 
 	}
 
