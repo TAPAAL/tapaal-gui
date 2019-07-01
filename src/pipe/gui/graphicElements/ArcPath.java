@@ -417,13 +417,6 @@ public class ArcPath implements Shape {
 		}
 	}
 
-	//
-	public void forceHidePoints() {
-		for (ArcPathPoint pathPoint : pathPoints) {
-			pathPoint.hidePoint();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
