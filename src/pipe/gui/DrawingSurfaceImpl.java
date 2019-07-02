@@ -29,7 +29,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  * The petrinet is drawn onto this frame.
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
-	private static final long serialVersionUID = 4434596266503933386L;
 
 	private boolean animationmode = false;
 
