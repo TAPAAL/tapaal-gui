@@ -428,7 +428,7 @@ public class TabContent extends JSplitPane {
 
 		templateExplorer.switchToEditorMode();
 		this.setLeftComponent(editorSplitPaneScroller);
-		drawingSurface.repaintAll();
+		//drawingSurface.repaintAll();
 	}
 
 	public AnimationHistoryComponent<String> getUntimedAnimationHistory() {
