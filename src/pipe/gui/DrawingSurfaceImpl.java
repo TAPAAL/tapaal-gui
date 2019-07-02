@@ -593,10 +593,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		}
 	}
 
-	public boolean isCurrentGuiModel(DataLayer dataLayer) {
-		return guiModel.equals(dataLayer);
-	}
-
 	public void repaintAll() {
 		this.repaint();
 		guiModel.repaintAll(!isInAnimationMode());
