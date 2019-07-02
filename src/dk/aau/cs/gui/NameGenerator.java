@@ -46,12 +46,6 @@ public class NameGenerator {
 		return TEMPLATE_NAME_PREFIX + (++tapnId); 
 	}
 
-	public void setupNameGeneratorFromTemplates(Iterable<Template> templates) {
-		for(Template tapn : templates) {
-			setupTemplate(tapn.model());
-		}
-	}
-
 	private void setupTemplate(TimedArcPetriNet tapn) {
 		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
 		

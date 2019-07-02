@@ -74,6 +74,9 @@ public class CreateGui {
 	}
 
 	public static TabContent getTab(int index) {
+		if (index < 0) {
+			return null;
+		}
 		return tabs.get(index);
 	}
 

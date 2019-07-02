@@ -598,10 +598,6 @@ public class TabContent extends JSplitPane {
 		tapnNetwork.setConstants(constants);
 	}
 
-	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
-		drawingSurface.setupNameGeneratorsFromTemplates(templates);
-	}
-
 	public void setNetwork(TimedArcPetriNetNetwork network,
 			Collection<Template> templates) {
 		Require.that(network != null, "network cannot be null");
