@@ -758,4 +758,13 @@ public class TabContent extends JSplitPane {
 	public void setWorkflowDialog(WorkflowDialog dialog) {
 		this.workflowDialog = dialog;
 	}
+
+	private boolean netChanged = false;
+	public boolean getNetChanged() {
+		return netChanged;
+	}
+
+	public void setNetChanged(boolean _netChanged) {
+		netChanged = _netChanged;
+	}
 }

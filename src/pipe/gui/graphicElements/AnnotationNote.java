@@ -305,7 +305,7 @@ public class AnnotationNote extends Note {
 			if ((typeMask & RIGHT) == RIGHT) {
 				myNote.adjustRight(Zoomer.getUnzoomedValue(x, zoom));
 			}
-			CreateGui.getDrawingSurface().setNetChanged(true);
+			CreateGui.getCurrentTab().setNetChanged(true);
 		}
 
 		public void myPaintComponent(Graphics g) {

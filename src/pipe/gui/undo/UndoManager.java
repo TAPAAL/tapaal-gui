@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
@@ -133,7 +134,7 @@ public class UndoManager {
 		undoneEdits = 0;
 		app.setUndoActionEnabled(true);
 		app.setRedoActionEnabled(false);
-		view.setNetChanged(true);
+		CreateGui.getCurrentTab().setNetChanged(true);
 
 		ArrayList<Command> compoundEdit = new ArrayList<Command>();
 		edits.set(indexOfNextAdd, compoundEdit);

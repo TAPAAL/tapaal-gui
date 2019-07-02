@@ -30,7 +30,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	private static final long serialVersionUID = 4434596266503933386L;
-	private boolean netChanged = false;
+
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
@@ -263,16 +263,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	public boolean isInAnimationMode() {
 		return animationmode;
 	}
-
-	public boolean getNetChanged() {
-		return netChanged;
-	}
-
-	public void setNetChanged(boolean _netChanged) {
-		netChanged = _netChanged;
-	}
-
-
 
 	public void drag(Point dragStart, Point dragEnd) {
 		if (dragStart == null) {

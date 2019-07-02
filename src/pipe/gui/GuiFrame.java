@@ -1579,7 +1579,7 @@ public class GuiFrame extends JFrame  {
 
 			getTab(index).setFile(outFile);
 
-			getTab(index).drawingSurface().setNetChanged(false);
+			getTab(index).setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
 			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
 			getTab(index).drawingSurface().getUndoManager().clear();
@@ -1833,7 +1833,7 @@ public class GuiFrame extends JFrame  {
 
 		if(index < 0) return false;
 
-		if (getTab(index).drawingSurface().getNetChanged()) {
+		if (getTab(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
