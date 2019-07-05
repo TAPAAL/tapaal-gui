@@ -224,7 +224,7 @@ public class UndoManager {
                             arcPathPoint.getArcPath().getArc(),
                             arcPathPoint,
                             arcPathPoint.getIndex(),
-							view.getGuiModel()
+							guiModel
                     );
                     cmd.redo();
                     addEdit(cmd);
