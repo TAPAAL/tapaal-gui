@@ -41,6 +41,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -1578,7 +1579,7 @@ public class GuiFrame extends JFrame  {
 
 			getTab(index).setFile(outFile);
 
-			getTab(index).drawingSurface().setNetChanged(false);
+			getTab(index).setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
 			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
 			getTab(index).drawingSurface().getUndoManager().clear();
@@ -1832,7 +1833,7 @@ public class GuiFrame extends JFrame  {
 
 		if(index < 0) return false;
 
-		if (getTab(index).drawingSurface().getNetChanged()) {
+		if (getTab(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
@@ -1978,7 +1979,7 @@ public class GuiFrame extends JFrame  {
 	}
 
 	private void hideComponentWindow(){
-		ArrayList<PetriNetObject> selection = getCurrentTab().drawingSurface().getPNObjects();
+		ArrayList<PetriNetObject> selection = getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
 
 		for (PetriNetObject pn : selection) {
 			if (pn instanceof TimedPlaceComponent) {
@@ -2274,9 +2275,7 @@ public class GuiFrame extends JFrame  {
 
 			//If pending arc draw, remove it
 			if (getCurrentTab().drawingSurface().createArc != null) {
-				getCurrentTab().drawingSurface().createArc.delete();
-				getCurrentTab().drawingSurface().createArc = null;
-				getCurrentTab().drawingSurface().repaint();
+				PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
 			}
 
 			if (typeID == ElementType.SELECT) {

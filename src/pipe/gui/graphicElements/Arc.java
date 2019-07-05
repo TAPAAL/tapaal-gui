@@ -14,6 +14,8 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
+import pipe.gui.handler.PetriNetObjectHandler;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
    Implementation of Element for drawing an arc
@@ -347,7 +349,7 @@ public abstract class Arc extends PetriNetObject {
 		// called by GuiView / State viewer when adding component.
 		deleted = false;
 
-		myPath.addPointsToGui(getParent());
+		myPath.addPointsToGui(getGuiModel());
 
 		updateArcPosition();
 		if (getParent() != null && pnName.getParent() == null) {
@@ -356,17 +358,18 @@ public abstract class Arc extends PetriNetObject {
 	}
 
 	@Override
-	public void delete() {
-		if (!deleted) {
-			if (getParent() != null) {
-				getParent().remove(pnName);
-			}
-			if(source != null) source.removeFromArc(this);
-			if(target != null) target.removeToArc(this);
-			myPath.forceHidePoints();
-			super.delete();
-			deleted = true;
+	public void removedFromGui() {
+
+		//Remove label
+		if (getParent() != null && pnName != null) {
+			getParent().remove(pnName);
 		}
+
+		//Remove arcpathpoints
+		for (ArcPathPoint p : myPath.getArcPathPoints()){
+			getGuiModel().removePetriNetObject(p);
+		}
+
 	}
 
 	public void setPathToTransitionAngle(int angle) {
@@ -379,30 +382,6 @@ public abstract class Arc extends PetriNetObject {
 		} else {
 			return (Transition) getSource();
 		}
-	}
-
-	public void removeFromView() {
-		if (getParent() != null) {
-			getParent().remove(pnName);
-		}
-		myPath.forceHidePoints();
-		removeFromContainer();
-	}
-
-	public boolean getsSelected(Rectangle selectionRectangle) {
-		if (selectable) {
-			ArcPath arcPath = getArcPath();
-			if (arcPath.proximityIntersects(selectionRectangle)) {
-				arcPath.showPoints();
-			} else {
-				arcPath.hidePoints();
-			}
-			if (arcPath.intersects(selectionRectangle)) {
-				select();
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	public void selectPath(){
@@ -431,17 +410,6 @@ public abstract class Arc extends PetriNetObject {
 	public void setZoom(int percent) {
 		zoom = percent;
 	}
-
-	@Override
-	public void undelete(DrawingSurfaceImpl view) {
-		if (this.isDeleted()) {
-			super.undelete(view);
-			getSource().addConnectFrom(this);
-			getTarget().addConnectTo(this);
-			deleted = false;
-		}
-	}
-
 
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
@@ -476,8 +444,7 @@ public abstract class Arc extends PetriNetObject {
 		public void actionPerformed(ActionEvent e) {
 			DrawingSurfaceImpl aView = CreateGui.getDrawingSurface();
 			if (aView.createArc == arcBeingDraw) {
-				aView.createArc = null;
-				delete();
+				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
 
 				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE)
 						|| (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {

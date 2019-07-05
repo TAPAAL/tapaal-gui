@@ -151,12 +151,6 @@ public abstract class Place extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void addedToGui() {
-		super.addedToGui();
-		update(true);
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
 			pnName.setText("");

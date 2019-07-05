@@ -21,10 +21,7 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.undo.AddPetriNetObjectEdit;
-import pipe.gui.undo.AddTimedPlaceCommand;
-import pipe.gui.undo.AddTimedTransitionCommand;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.undo.*;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -32,8 +29,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  * The petrinet is drawn onto this frame.
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
-	private static final long serialVersionUID = 4434596266503933386L;
-	private boolean netChanged = false;
+
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
@@ -42,7 +38,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	private SelectionManager selection;
 	private UndoManager undoManager;
-	private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
+
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
@@ -84,6 +80,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	}
 
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model, Zoomer zoomer) {
+		//Remove the old model from view
+		this.guiModel.removedFromView();
+		//Add the new model to view
+		guiModel.addedToView(this);
+
 		this.selection.disableSelection();
 
 		nameGenerator.add(model);
@@ -116,19 +117,27 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		newObject.zoomUpdate(zoomControl.getPercent());
-		super.add(newObject);
 
-		newObject.addedToGui();
-		petriNetObjects.add(newObject);
+		super.add(newObject);
+		newObject.addedToGui(); //Must be called after added to component, as children might use referenceto Drawingsurface
 
 		calculateNewBoundsForScrollPane(newObject.getBounds());
 		if(newObject.getNameLabel() != null){
 			calculateNewBoundsForScrollPane(newObject.getNameLabel().getBounds());
 		}
 
-		//Does not seem to be needed
-		//validate();
-		//repaint();
+		validate();
+		repaint();
+	}
+
+	//XXX temp solution while refactorting, component removes children them self
+	//migth not be best solution long term.
+	public void removePetriNetObject(PetriNetObject pno) {
+		pno.removedFromGui();
+		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
+
+		validate();
+		repaint();
 	}
 
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
@@ -248,44 +257,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		}
 	}
 
-	@Override
-	public void removeAll() {
-		petriNetObjects.clear();
-		super.removeAll();
-	}
 
 
 	public boolean isInAnimationMode() {
 		return animationmode;
-	}
-
-	public boolean getNetChanged() {
-		return netChanged;
-	}
-
-	public void setNetChanged(boolean _netChanged) {
-		netChanged = _netChanged;
-	}
-
-	public ArrayList<PetriNetObject> getPNObjects() {
-		return petriNetObjects;
-	}
-
-	public ArrayList<PetriNetObject> getPlaceTransitionObjects(){
-		ArrayList<PetriNetObject> result = new ArrayList<PetriNetObject>();
-		for (PetriNetObject pnObject : petriNetObjects) {
-			if((pnObject instanceof PlaceTransitionObject)){
-				result.add(pnObject);
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public void remove(Component comp) {
-		petriNetObjects.remove(comp);
-
-		super.remove(comp);
 	}
 
 	public void drag(Point dragStart, Point dragEnd) {
@@ -422,7 +397,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		private void addPetriNetObjectToModelandView(PetriNetObject pnObject) {
 			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
+			//view.addNewPetriNetObject(pnObject);
 		}
 
 		private PlaceTransitionObject newTimedPlaceAddToModelView(Point p) {
@@ -433,7 +408,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			model.add(tp);
 			addPetriNetObjectToModelandView(pnObject);
 
-			getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel, view));
+			getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel));
 
 			return pnObject;
 		}
@@ -448,7 +423,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			model.add(transition);
 			addPetriNetObjectToModelandView(pnObject);
 
-			getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel, view));
+			getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
 			return pnObject;
 		}
 
@@ -458,7 +433,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
             AnnotationNote pnObject = new AnnotationNote(p.x, p.y, true);
             addPetriNetObjectToModelandView(pnObject);
 
-            getUndoManager().addNewEdit(new AddPetriNetObjectEdit(pnObject, view, guiModel));
+            getUndoManager().addNewEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
             pnObject.enableEditMode();
             return pnObject;
         }
@@ -605,10 +580,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 				getParent().dispatchEvent(e);
 			}
 		}
-	}
-
-	public boolean isCurrentGuiModel(DataLayer dataLayer) {
-		return guiModel.equals(dataLayer);
 	}
 
 	public void repaintAll() {

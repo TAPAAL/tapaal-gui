@@ -387,12 +387,6 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 	}
 
-	@Override
-	public void addedToGui() {
-		super.addedToGui();
-		update(true);
-	}
-
 	private String getText() {
 		return "";
 	}

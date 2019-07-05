@@ -2576,7 +2576,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getDrawingSurface().setNetChanged(true);
+						CreateGui.getCurrentTab().setNetChanged(true);
 						exit();
 					}
 				}
@@ -2586,7 +2586,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved and verified, the net is marked as modified
-						CreateGui.getDrawingSurface().setNetChanged(true);
+						CreateGui.getCurrentTab().setNetChanged(true);
 						exit();
 						TAPNQuery query = getQuery();
 

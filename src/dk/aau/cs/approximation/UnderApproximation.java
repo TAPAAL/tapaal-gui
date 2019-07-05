@@ -95,14 +95,14 @@ public class UnderApproximation implements ITAPNApproximation {
 		
 		for (Arc arc1 : guiModel.getArcs()){
 			if (arc1.getTarget() instanceof Place && arc1.getSource() == guiTransition) //If arc1 is an output arc
-			{ 
-				arc1.delete();
+			{
+				guiModel.removePetriNetObject(arc1);
 			}
 			else if (arc1.getTarget() instanceof Transition && arc1.getTarget() == guiTransition){ //Else if arc1 is an input arc
-				arc1.delete();
+				guiModel.removePetriNetObject(arc1);
 			}
 		}
-		guiTransition.delete();
+		guiModel.removePetriNetObject(guiTransition);
 	}
 	
 	private void deleteArcsFromTransition(TimedTransition transitionToDelete) {

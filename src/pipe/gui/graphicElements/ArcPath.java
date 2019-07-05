@@ -12,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -416,13 +417,6 @@ public class ArcPath implements Shape {
 		}
 	}
 
-	//
-	public void forceHidePoints() {
-		for (ArcPathPoint pathPoint : pathPoints) {
-			pathPoint.hidePoint();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -594,7 +588,7 @@ public class ArcPath implements Shape {
 		return C;
 	}
 
-	public void addPointsToGui(DrawingSurfaceImpl editWindow) {
+	public void addPointsToGui(DataLayer model) {
 		ArcPathPointHandler pointHandler;
 
 		(pathPoints.get(0)).setDraggable(false);
@@ -609,18 +603,10 @@ public class ArcPath implements Shape {
 			// to add all the points again along with new action listeners,
 			// we just want to add the new point.
 			// Nadeem 21/06/2005
-			if (editWindow.getIndexOf(pathPoint) < 0) {
-				editWindow.addNewPetriNetObject(pathPoint);
+			if (!model.getPNObjects().contains(pathPoint)) {
+				model.addPetriNetObject(pathPoint);
 				pathPoint.updatePointLocation();
 			}
-		}
-	}
-
-
-
-	public void delete() { // Michael: Tells the arc points to remove themselves
-		while (!pathPoints.isEmpty()) {
-			(pathPoints.get(0)).kill(); // force delete of ALL points
 		}
 	}
 
@@ -657,7 +643,7 @@ public class ArcPath implements Shape {
 	public void insertPoint(int index, ArcPathPoint newpoint) {
 		pathPoints.add(index, newpoint);
 
-		addPointsToGui((DrawingSurfaceImpl) myArc.getParent());
+		addPointsToGui(myArc.getGuiModel());
 
 	}
 
@@ -696,7 +682,7 @@ public class ArcPath implements Shape {
 		createPath();
 		myArc.updateArcPosition();
 
-		return new AddArcPathPointEdit(this.getArc(), newPoint);
+		return new AddArcPathPointEdit(this.getArc(), newPoint, getArc().getGuiModel());
 	}
 
 	private int findPoint(final Point2D.Float mouseposition) {

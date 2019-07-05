@@ -1,15 +1,11 @@
 package pipe.dataLayer;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
+import dk.aau.cs.debug.Logger;
+import dk.aau.cs.util.RequireException;
+import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
@@ -23,6 +19,26 @@ import dk.aau.cs.util.Require;
 
 public class DataLayer {
 
+
+	//XXX: Temp solution while refactoring, should be changed to interface to now allow to many actions
+	//Long term should use callback to not have tight coupling
+	private DrawingSurfaceImpl view;
+	public void addedToView(DrawingSurfaceImpl view){this.view = view;}
+	public void removedFromView() {this.view = null;}
+
+
+	private void removeFromViewIfConnected(PetriNetObject pno) {
+		if (view != null) {
+			view.removePetriNetObject(pno);
+		}
+	}
+
+	private void addToViewIfConnected(PetriNetObject pno) {
+		if (view != null) {
+			view.addNewPetriNetObject(pno);
+		}
+	}
+
 	/** PNML File Name */
 	public String pnmlName = null;
 	/** List containing all the Place objects in the Petri-Net */
@@ -31,6 +47,12 @@ public class DataLayer {
 	private ArrayList<Transition> transitionsArray = null;
 	/** ArrayList containing all the Arc objects in the Petri-Net */
 	private ArrayList<Arc> arcsArray = null;
+
+	/** Set holding all ArcPathPoints
+	 * Uses the reference as lookup key (not hash code)
+	 * Collections.newSetFromMap(new IdentityHashMap<E, Boolean>());
+	 * */
+	private Set<ArcPathPoint> arcPathSet = Collections.newSetFromMap(new IdentityHashMap<>());
 
 	/**
 	 * ArrayList for net-level label objects (as opposed to element-level
@@ -55,6 +77,25 @@ public class DataLayer {
 	 * arcs
 	 */
 	private Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = null;
+
+
+	//XXX: Added from drawingsurface to have a way to acces all elements added,
+    //Should be refactored later to combine the existing list, however this is the quick fix during refactoring
+    private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
+
+    public ArrayList<PetriNetObject> getPNObjects() {
+        return petriNetObjects;
+    }
+
+    public ArrayList<PetriNetObject> getPlaceTransitionObjects(){
+        ArrayList<PetriNetObject> result = new ArrayList<PetriNetObject>();
+        for (PetriNetObject pnObject : petriNetObjects) {
+            if((pnObject instanceof PlaceTransitionObject)){
+                result.add(pnObject);
+            }
+        }
+        return result;
+    }
 
 	private NetType type = NetType.TAPN;
 
@@ -351,6 +392,21 @@ public class DataLayer {
 	public void addPetriNetObject(PetriNetObject pnObject) {
 
 		pnObject.setGuiModel(this);
+		addToViewIfConnected(pnObject); // Must be called after model is set
+
+        //XXX: temp solution to have access to all elements types at once
+        petriNetObjects.add(pnObject);
+
+        pnObject.setDeleted(false);
+
+        if (pnObject instanceof Arc ) {
+
+        	Arc arc = (Arc)pnObject;
+
+        	arc.getSource().addConnectFrom(arc);
+        	arc.getTarget().addConnectTo(arc);
+
+		}
 
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedInhibitorArcComponent) {
@@ -364,6 +420,10 @@ public class DataLayer {
 			} else if (pnObject instanceof AnnotationNote) {
 				addAnnotation((AnnotationNote)pnObject);
 			}
+		} else if (pnObject instanceof ArcPathPoint){
+			arcPathSet.add((ArcPathPoint) pnObject);
+		} else {
+			throw new RuntimeException("Unknow element type added");
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
@@ -378,8 +438,25 @@ public class DataLayer {
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject) {
 
-		//XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
-		//pnObject.setGuiModel(null);
+        //XXX: Should remove guiModel for object, but is used for undelete action, KYRKE 2018-10-18
+        //pnObject.setGuiModel(null);
+
+		removeFromViewIfConnected(pnObject);
+
+        //XXX: temp solution to have access to all elements types at once
+        petriNetObjects.remove(pnObject);
+
+		pnObject.setDeleted(true);
+
+		//XXX: is also called down below
+		if (pnObject instanceof Arc ) {
+
+			Arc arc = (Arc)pnObject;
+
+			arc.getSource().removeFromArc(arc);
+			arc.getTarget().removeToArc(arc);
+
+		}
 
 		boolean didSomething = false;
 		ArrayList<?> attachedArcs = null;
@@ -395,16 +472,22 @@ public class DataLayer {
 						attachedArcs = arcsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all in inverse order!
-						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-							try {
-								((Arc) attachedArcs.get(i)).delete();
-							} catch (IndexOutOfBoundsException e) {
-								// XXX - this is a hack
-								// This is OK, it just means that the transport
-								// arc already has been removed
-							}
+						//for (int i = attachedArcs.size() - 1; i >= 0; i--) {
+						//	try {
+						//		((Arc) attachedArcs.get(i)).delete();
+						//	} catch (IndexOutOfBoundsException e) {
+						//		// XXX - this is a hack
+						//		// This is OK, it just means that the transport
+						//		// arc already has been removed
+						//	}
 
+						//}
+
+						if (attachedArcs.size() > 0) {
+							//XXX Model is no longer valid as the pno is removed from petriNetObjects list
+							throw new RequireException("Arc to/from the object must be delete first");
 						}
+
 						arcsMap.remove(pnObject);
 					}
 
@@ -414,8 +497,12 @@ public class DataLayer {
 						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all in inverse order!
-						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-							((Arc) attachedArcs.get(i)).delete();
+						//for (int i = attachedArcs.size() - 1; i >= 0; i--) {
+						//	((Arc) attachedArcs.get(i)).delete();
+						//}
+						if (attachedArcs.size() > 0) {
+							//XXX Model is no longer valid as the pno is removed from petriNetObjects list
+							throw new RequireException("Arc to/from the object must be delete first");
 						}
 						tapnInhibitorsMap.remove(pnObject);
 					}

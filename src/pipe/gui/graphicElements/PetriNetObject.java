@@ -8,6 +8,7 @@ import java.awt.event.*;
 
 import javax.swing.JComponent;
 
+import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -130,6 +131,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
 	}
+	//XXX: not sure if datalayer should be accessable, but needed for refactorings away from "public" view.
+	public DataLayer getGuiModel() { return this.guiModel;}
 
 	public void setId(String idInput) {
 		id = idInput;
@@ -207,6 +210,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 			getParent().add(pnName);
 		}
 	}
+	public void removeLabelFromContainer() {
+		if (getParent() != null && pnName != null) {
+			getParent().remove(pnName);
+		}
+	}
 
 	public boolean isSelected() {
 		return selected;
@@ -268,32 +276,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 	public abstract void addedToGui();
+	public abstract void removedFromGui();
 
-	public void delete() {
-		deleted = true;
-		if(guiModel != null) {
-			guiModel.removePetriNetObject(this);
-		}
-		removeFromContainer();
-		removeAll();
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
-
-	public void undelete(DrawingSurfaceImpl view) {
-		guiModel.addPetriNetObject(this);
-		if (view.isCurrentGuiModel(guiModel)) {
-			view.addNewPetriNetObject(this);
-		}
-	}
-
-	protected void removeFromContainer() {
-		Container c = getParent();
-
-		if (c != null) {
-			c.remove(this);
-		}
-	}
-
-
 	public boolean isDeleted() {
 		return deleted;
 	}

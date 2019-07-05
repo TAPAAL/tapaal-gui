@@ -7,15 +7,12 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public abstract class TAPNElementCommand extends Command {
 
-	protected final DrawingSurfaceImpl view;
 	protected final TimedArcPetriNet tapn;
 	protected final DataLayer guiModel;
 
-	public TAPNElementCommand(TimedArcPetriNet tapn, DataLayer guiModel,
-			DrawingSurfaceImpl view) {
+	public TAPNElementCommand(TimedArcPetriNet tapn, DataLayer guiModel) {
 		super();
 		this.tapn = tapn;
 		this.guiModel = guiModel;
-		this.view = view;
 	}
 }

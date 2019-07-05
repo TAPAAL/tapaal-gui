@@ -200,7 +200,7 @@ public class ArcPathPoint extends PetriNetObject {
 				pointType, myArcPath);
 		myArcPath.insertPoint(i + 1, newPoint);
 		myArcPath.getArc().updateArcPosition();
-		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint);
+		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
 	}
 
 	public Point2D.Float getMidPoint(ArcPathPoint target) {
@@ -211,23 +211,6 @@ public class ArcPathPoint extends PetriNetObject {
 	public boolean isDeleteable() {
 		int i = getIndex();
 		return (i > 0 && i != myArcPath.getNumPoints() - 1);
-	}
-
-	@Override
-	public void delete() {// Won't delete if only two points left. General delete.
-		if (isDeleteable()) {
-			if (getArcPath().getArc().isSelected()) {
-				return;
-			}
-			kill();
-			myArcPath.updateArc();
-		}
-	}
-
-	public void kill() { // delete without the safety check :)
-		super.removeFromContainer(); // called internally by ArcPoint and parent
-										// ArcPath
-		myArcPath.deletePoint(this);
 	}
 
 	public Point2D.Float getControl1() {
@@ -263,12 +246,9 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void addedToGui() {
-	}
-
-	void hidePoint() {
-		super.removeFromContainer();
-	}
+	public void addedToGui() {}
+	@Override
+	public void removedFromGui() {}
 
 	@Override
 	public int getLayerOffset() {
@@ -278,10 +258,6 @@ public class ArcPathPoint extends PetriNetObject {
 	public void translate(int x, int y) {
 		this.setPointLocation(point.x + x, point.y + y);
 		myArcPath.updateArc();
-	}
-
-	@Override
-	public void undelete(DrawingSurfaceImpl view) {
 	}
 
 	@Override

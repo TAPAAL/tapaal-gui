@@ -7,14 +7,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
@@ -22,6 +19,8 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
+import pipe.gui.handler.PetriNetObjectHandler;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
  * Class to handle undo & redo functionality
@@ -135,7 +134,7 @@ public class UndoManager {
 		undoneEdits = 0;
 		app.setUndoActionEnabled(true);
 		app.setRedoActionEnabled(false);
-		view.setNetChanged(true);
+		CreateGui.getCurrentTab().setNetChanged(true);
 
 		ArrayList<Command> compoundEdit = new ArrayList<Command>();
 		edits.set(indexOfNextAdd, compoundEdit);
@@ -198,13 +197,9 @@ public class UndoManager {
 
 	// removes the arc currently being drawn if any
 	private void checkArcBeingDrawn() {
-		Arc arcBeingDrawn = view.createArc;
-		if (arcBeingDrawn != null) {
-			if (arcBeingDrawn.getParent() != null) {
-				arcBeingDrawn.getParent().remove(arcBeingDrawn);
-				arcBeingDrawn.getSource().removeFromArc(arcBeingDrawn);
-			}
-			view.createArc = null;
+
+		if (view.createArc != null) {
+			PlaceTransitionObjectHandler.cleanupArc(view.createArc, view);
 		}
 	}
 
@@ -217,36 +212,52 @@ public class UndoManager {
 
 	private void deleteObject(PetriNetObject pnObject) {
 		if (pnObject instanceof ArcPathPoint) {
-			if (!((ArcPathPoint) pnObject).getArcPath().getArc().isSelected()) {
-				Command cmd = new DeleteArcPathPointEdit(((ArcPathPoint) pnObject)
-						.getArcPath().getArc(), (ArcPathPoint) pnObject,
-						((ArcPathPoint) pnObject).getIndex());
-				cmd.redo();
-				addEdit(cmd);
+
+            ArcPathPoint arcPathPoint = (ArcPathPoint)pnObject;
+
+            //If the arc is marked for deletion, skip deleting individual arcpathpoint
+            if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
+
+                //Don't delete the two last arc path points
+			    if (arcPathPoint.isDeleteable()) {
+                    Command cmd = new DeleteArcPathPointEdit(
+                            arcPathPoint.getArcPath().getArc(),
+                            arcPathPoint,
+                            arcPathPoint.getIndex(),
+							view.getGuiModel()
+                    );
+                    cmd.redo();
+                    addEdit(cmd);
+                }
 			}
 		}else{
+			//The list of selected objects is not updated when a element is deleted
+			//We might delete the same object twice, which will give an error
+			//Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
+			//There is properly a better way to track this (check model?) but while refactoring we will keeps it close
+			//to the orginal code -- kyrke 2019-06-27
 			if (!pnObject.isDeleted()) {
 				Command cmd = null;
 				if(pnObject instanceof TimedPlaceComponent){
 					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
-					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel, view);
+					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel);
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
-					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view);
+					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel);
 				}else if(pnObject instanceof TimedTransportArcComponent){
 					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
-					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view);
+					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel);
 				}else if(pnObject instanceof TimedInhibitorArcComponent){
 					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
-					cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel, view);
+					cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel);
 				}else if(pnObject instanceof TimedInputArcComponent){
 					TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
-					cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view);
+					cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel);
 				}else if(pnObject instanceof TimedOutputArcComponent){
 					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
-					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel, view);
+					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel);
 				}else if(pnObject instanceof AnnotationNote){
-					cmd = new DeletePetriNetObjectEdit(pnObject, view, guiModel);
+					cmd = new DeleteAnnotationNoteCommand((AnnotationNote)pnObject, guiModel);
 				}else{
 					throw new RuntimeException("This should not be possible");
 				}

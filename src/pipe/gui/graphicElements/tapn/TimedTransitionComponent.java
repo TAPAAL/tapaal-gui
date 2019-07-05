@@ -86,14 +86,6 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	@Override
-	public void delete() {
-		if (transition != null) {
-			transition.delete();
-		}
-		super.delete();
-	}
-
-	@Override
 	public void showEditor() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),

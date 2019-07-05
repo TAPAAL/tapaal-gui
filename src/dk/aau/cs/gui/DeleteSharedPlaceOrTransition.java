@@ -170,7 +170,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 						deleteArc(arc, template);
 					}
 
-					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel(), tab.drawingSurface());
+					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel());
 					cmd.redo();
 					undoManager.addEdit(cmd);
 				}
@@ -240,14 +240,14 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {
 		if(arc instanceof TimedInhibitorArcComponent){
-			return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel());
 		}else if(arc instanceof TimedTransportArcComponent){
 			TimedTransportArcComponent component = (TimedTransportArcComponent)arc;
-			return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel());
 		}else if(arc instanceof TimedInputArcComponent){
-			return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel());
 		}else{
-			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel());
 		}
 	}
 	
@@ -290,8 +290,9 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 						deleteArc(arc, template);
 					}
 
-					undoManager.addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
-					transition.delete();
+					Command c = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel());
+					undoManager.addEdit(c);
+					c.redo();
 				}
 			}
 			tab.drawingSurface().repaint();

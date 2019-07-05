@@ -54,7 +54,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		newArc.setZoom(CreateGui.getDrawingSurface().getZoom());
 		//Need to be casted to cointainer, as we only add it to the canvas but not the model
 		((Container)CreateGui.getDrawingSurface()).add(newArc);
-		currentObject.addConnectFrom(newArc);
+
 		CreateGui.getDrawingSurface().createArc = newArc;
 		// addPetriNetObject a handler for shift & esc actions drawing arc
 		// this is removed when the arc is finished drawing:
@@ -64,7 +64,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	}
 
 	// Disable key bindings that are only available when drawing arcs.
-	private void sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(Arc newArc){
+	private static void sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(Arc newArc){
 		newArc.setSelectable(true);
 		newArc.sealArc();
 		newArc.disableDrawingKeyBindings();
@@ -187,9 +187,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				undoManager.newEdit(); // new "transaction""
 
-				undoManager.addEdit(new AddTimedOutputArcCommand(
+				undoManager.addEdit(
+					new AddTimedOutputArcCommand(
 						(TimedOutputArcComponent) timedArcToCreate,
-						view.getModel(), view.getGuiModel(), view));
+						view.getModel(),
+						view.getGuiModel()
+					)
+				);
 
 				// else source is a place (not transition)
 			} else {
@@ -219,14 +223,15 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				undoManager.newEdit(); // new "transaction""
 
-				undoManager.addEdit(new AddTimedInputArcCommand(
+				undoManager.addEdit(
+					new AddTimedInputArcCommand(
 						(TimedInputArcComponent) timedArcToCreate,
-						view.getModel(), view.getGuiModel(), view));
+						view.getModel(),
+						view.getGuiModel()
+					)
+				);
 
 			}
-
-			currentObject.addConnectTo(timedArcToCreate);
-
 
 			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
@@ -249,7 +254,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				// Check if arc has leagal target
 				PlaceTransitionObject target = transportArcToCreate.getTarget();
 				if (!(target instanceof Transition)) {
-					transportArcToCreate.delete();
+					cleanupArc(transportArcToCreate, view);
 					return;
 				}
 
@@ -273,15 +278,12 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					}
 				}
 				if (existsArc) {
-					transportArcToCreate.delete();
+					cleanupArc(transportArcToCreate, view);
 					return;
 				}
 
 				int groupMaxCounter = getTransportArcMaxGroupNumber(transportArcToCreate);
 				((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
-
-				currentObject.addConnectTo(transportArcToCreate);
-				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, transportArcToCreate);
 
 				sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(transportArcToCreate);
 
@@ -329,8 +331,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 
 				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, arc2);
-
-				currentObject.addConnectTo(arc2);
+				removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, arc1);
 
 				undoManager.newEdit();
 
@@ -339,8 +340,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								arc2,
 								arc2.underlyingTransportArc(),
 								view.getModel(),
-								view.getGuiModel(),
-								view));
+								view.getGuiModel()
+						)
+				);
 
 				sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(transportArcToCreate);
 
@@ -390,12 +392,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			createTAPNInhibitorArc.setTarget(currentObject);
 
-			currentObject.addConnectTo(createTAPNInhibitorArc);
-
 			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, createTAPNInhibitorArc);
 
 			undoManager.addNewEdit(
-					new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, view.getModel(), view.getGuiModel(), view)
+					new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, view.getModel(), view.getGuiModel())
 			);
 
 			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(createTAPNInhibitorArc);
@@ -408,13 +408,25 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		((Container) CreateGui.getDrawingSurface()).remove(arcToCreate);
 
 		view.getGuiModel().addPetriNetObject(arcToCreate);
-		view.addNewPetriNetObject(arcToCreate);
+		//view.addNewPetriNetObject(arcToCreate);
 
 		//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc and inhub arc)
 	}
 
-	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
-		arc.delete();
+	public static void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
+		//XXX this is problematic if we are creating a transport arc and it part2, then part1 is never cleanup!
+
+		//Called delete, only removes is from view since it finished, should be same af view.remove()
+		//arc.delete();
+
+		if (arc instanceof TimedTransportArcComponent) {
+			TimedTransportArcComponent partner = ((TimedTransportArcComponent)arc).getConnectedTo();
+			if (partner != null) {
+				partner.disableDrawingKeyBindings();
+				view.remove(partner);
+			}
+		}
+
 		sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(arc);
 		
 		view.remove(arc);

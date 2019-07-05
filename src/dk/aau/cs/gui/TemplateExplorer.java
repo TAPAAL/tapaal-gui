@@ -779,7 +779,7 @@ public class TemplateExplorer extends JPanel {
 		if (tapn != null) {
 			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
 		}
-		parent.drawingSurface().repaintAll();
+		//parent.drawingSurface().repaintAll();
 	}
 
 	public Template selectedModel() {

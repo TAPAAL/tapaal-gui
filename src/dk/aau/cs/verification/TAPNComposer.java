@@ -394,8 +394,6 @@ public class TAPNComposer implements ITAPNComposer {
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
-					guiSource.addConnectFrom(newArc);
-					guiTarget.addConnectTo(newArc);
 				}
 			}
 			i++;
@@ -451,8 +449,6 @@ public class TAPNComposer implements ITAPNComposer {
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
-					guiSource.addConnectTo(newArc);
-					guiTarget.addConnectFrom(newArc);
 				}
 			}
 			i++;
@@ -524,9 +520,6 @@ public class TAPNComposer implements ITAPNComposer {
 					newInArc.updateArcPosition();
 					guiModel.addPetriNetObject(newInArc);
 					
-					guiSourceIn.addConnectTo(newInArc);
-					guiTargetIn.addConnectFrom(newInArc);
-					
 					// Calculate the next group number for this transport arc
 					// By looking at the target of the newInArc -> a transition
 					// Then finding the largest existing group number of outgoing transport arcs from this transition
@@ -569,13 +562,7 @@ public class TAPNComposer implements ITAPNComposer {
 					newOutArc.setArcPath(newArcPathOut);
 					newOutArc.updateArcPosition();
 					guiModel.addPetriNetObject(newOutArc);
-					
-					// Add connection references to the two transport arcs
-					newInArc.setConnectedTo(newOutArc);
-					newOutArc.setConnectedTo(newInArc);
-					
-					guiSourceOut.addConnectTo(newOutArc);
-					guiTargetOut.addConnectFrom(newOutArc);
+
 				}
 			}
 			i++;
@@ -639,8 +626,6 @@ public class TAPNComposer implements ITAPNComposer {
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
-					guiSource.addConnectTo(newArc);
-					guiTarget.addConnectFrom(newArc);
 				}
 			}
 			i++;

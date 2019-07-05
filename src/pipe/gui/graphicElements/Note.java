@@ -188,6 +188,11 @@ public abstract class Note extends PetriNetObject implements Translatable {
 		}
 	}
 
+	@Override
+	public void removedFromGui() {
+
+	}
+
 	public void setText(String text) {
 		note.setText(text);
 		note.setSize(note.getPreferredSize());
@@ -195,12 +200,6 @@ public abstract class Note extends PetriNetObject implements Translatable {
 
 	public String getText() {
 		return note.getText();
-	}
-	
-	@Override
-	public void undelete(DrawingSurfaceImpl view) {
-		add(note);
-		super.undelete(view);
 	}
 
 	@Override

@@ -8,22 +8,22 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class AddTimedInputArcCommand extends TAPNElementCommand {
 	private final TimedInputArcComponent timedArc;
 
-	public AddTimedInputArcCommand(TimedInputArcComponent timedArc,
-			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+	public AddTimedInputArcCommand(TimedInputArcComponent timedArc, TimedArcPetriNet tapn, DataLayer guiModel) {
+		super(tapn, guiModel);
 		this.timedArc = timedArc;
 	}
 
 	@Override
 	public void undo() {
-		timedArc.delete();
-		view.repaint();
+		timedArc.underlyingTimedInputArc().delete();
+
+		guiModel.removePetriNetObject(timedArc);
 	}
 
 	@Override
 	public void redo() {
-		timedArc.undelete(view);
+		guiModel.addPetriNetObject(timedArc);
+
 		tapn.add(timedArc.underlyingTimedInputArc());
-		view.repaint();
 	}
 }

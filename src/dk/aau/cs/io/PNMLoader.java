@@ -427,9 +427,6 @@ public class PNMLoader {
 			arc.setUnderlyingArc(inputArc);
 
 			template.guiModel().addPetriNetObject(arc);
-
-			source.addConnectFrom(arc);
-			target.addConnectTo(arc);
 		}
 		
 		template.model().add(inputArc);
@@ -460,8 +457,6 @@ public class PNMLoader {
 
 			template.guiModel().addPetriNetObject(arc);
 
-			source.addConnectFrom(arc);
-			target.addConnectTo(arc);
 		}
 		
 		template.model().add(outputArc);
@@ -483,8 +478,6 @@ public class PNMLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inhibArc);
 
-		source.addConnectFrom(tempArc);
-		target.addConnectTo(tempArc);
 		return tempArc;
 	}
 	

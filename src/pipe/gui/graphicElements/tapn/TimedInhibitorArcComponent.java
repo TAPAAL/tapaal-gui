@@ -63,13 +63,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public void delete() {
-		if (inhibitorArc != null)
-			inhibitorArc.delete();
-		super.delete();
-	}
-
-	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		pnName.setText("");
 		if(getWeight().value() > 1 || displayConstantNames){
@@ -128,9 +121,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		TimedInhibitorArcComponent arc = new TimedInhibitorArcComponent(this);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
-		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
 		
 		arc.setUnderlyingArc(tapn.getInhibitorArcFromPlaceAndTransition(tapn.getPlaceByName(inhibitorArc.source().name()), tapn.getTransitionByName(inhibitorArc.destination().name())));
 		

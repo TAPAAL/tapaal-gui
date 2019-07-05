@@ -118,13 +118,6 @@ public class TimedOutputArcComponent extends Arc {
 		pnName.setText(getWeight().toString(displayConstantNames)+" " + pnName.getText());
 		setLabelPosition();
 	}
-
-	@Override
-	public void delete() {
-		if (outputArc != null)
-			outputArc.delete();
-		super.delete();
-	}
 	
 	public void showTimeIntervalEditor() {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);
@@ -161,9 +154,6 @@ public class TimedOutputArcComponent extends Arc {
 		newCopyArc.setSource(oldToNewMapping.get(this.getSource()));
 		newCopyArc.setTarget(oldToNewMapping.get(this.getTarget()));
 		newCopyArc.setUnderlyingArc(tapn.getOutputArcFromTransitionAndPlace(tapn.getTransitionByName(outputArc.source().name()), tapn.getPlaceByName(outputArc.destination().name())));
-		
-		newCopyArc.getSource().addConnectFrom(newCopyArc);
-		newCopyArc.getTarget().addConnectTo(newCopyArc);
 		
 		return newCopyArc;
 	}

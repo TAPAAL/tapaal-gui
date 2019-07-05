@@ -63,13 +63,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		mouseHandler = new TimedArcHandler(this);
 	}
 
-	@Override
-	public void delete() {
-		if (inputArc != null)
-			inputArc.delete();
-		super.delete();
-	}
-
 	public String getGuardAsString() {
 		return getGuardAsString(true);
 	}
@@ -184,9 +177,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
 		arc.setUnderlyingArc(tapn.getInputArcFromPlaceToTransition(tapn.getPlaceByName(inputArc.source().name()), tapn.getTransitionByName(inputArc.destination().name())));
-		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
 		
 		return arc;
 	}
