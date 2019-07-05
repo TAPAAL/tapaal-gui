@@ -36,8 +36,7 @@ public class UndoManager {
 	private int startOfBuffer = 0;
 	private int undoneEdits = 0;
 
-	private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(
-			UNDO_BUFFER_CAPACITY);
+	private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
 	private DrawingSurfaceImpl view;
 	private DataLayer guiModel;
