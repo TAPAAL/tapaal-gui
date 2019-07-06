@@ -779,9 +779,15 @@ public class TabContent extends JSplitPane {
 		//If the template is currently selected
 		// kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
 		if (CreateGui.getCurrentTab() == this) {
+			GuiFrame app = CreateGui.getApp();
 
-			CreateGui.getApp().updateZoomCombo();
+			app.updateZoomCombo();
 
+			if (drawingSurface.isInAnimationMode()) {
+				app.getAnimator().highlightEnabledTransitions();
+				app.getAnimator().unhighlightDisabledTransitions();
+				app.getAnimator().reportBlockingPlaces();
+			}
 		}
     }
 }
