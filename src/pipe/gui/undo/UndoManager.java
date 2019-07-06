@@ -168,8 +168,8 @@ public class UndoManager {
 	// removes the arc currently being drawn if any
 	private void checkArcBeingDrawn() {
 
-		if (view.createArc != null) {
-			PlaceTransitionObjectHandler.cleanupArc(view.createArc, view);
+		if (CreateGui.getDrawingSurface().createArc != null) {
+			PlaceTransitionObjectHandler.cleanupArc(CreateGui.getDrawingSurface().createArc, CreateGui.getDrawingSurface());
 		}
 	}
 
