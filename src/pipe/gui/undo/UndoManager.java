@@ -38,20 +38,12 @@ public class UndoManager {
 
 	private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private DrawingSurfaceImpl view;
-	private DataLayer guiModel;
 	private GuiFrame app;
-
-	public void setModel(DataLayer guiModel) {
-		this.guiModel = guiModel;
-	}
 
 	/**
 	 * Creates a new instance of UndoManager
 	 */
-	public UndoManager(DrawingSurfaceImpl _view, DataLayer _model, GuiFrame _app) {
-		view = _view;
-		guiModel = _model;
+	public UndoManager(GuiFrame _app) {
 		app = _app;
 		app.setUndoActionEnabled(false);
 		app.setRedoActionEnabled(false);

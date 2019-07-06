@@ -62,7 +62,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		addMouseWheelListener(mouseHandler);
 
 		selection = new SelectionManager(this);
-		undoManager = new UndoManager(this, guiModel, app);
+		undoManager = new UndoManager(app);
 	}
 
 	public NameGenerator getNameGenerator() {
@@ -87,7 +87,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		nameGenerator.add(model);
 		this.mouseHandler.setModel(guiModel, model);
-		this.undoManager.setModel(guiModel);
 		this.guiModel = guiModel;
 		this.model = model;
 		this.zoomControl = zoomer;
