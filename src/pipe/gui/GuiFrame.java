@@ -532,7 +532,7 @@ public class GuiFrame extends JFrame  {
 							}
 
 							getCurrentTab().drawingSurface().deleteSelection(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
-							getCurrentTab().drawingSurface().repaint();
+							//getCurrentTab().drawingSurface().repaint();
 							getCurrentTab().network().buildConstraints();
 						}
 				
