@@ -50,9 +50,12 @@ import dk.aau.cs.util.Require;
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
 
+	//Model and state
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+
+	//GUI
 	private JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
