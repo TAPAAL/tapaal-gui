@@ -105,7 +105,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
-				CreateGui.getDrawingSurface().getUndoManager().translateSelection(
+				CreateGui.getDrawingSurface().translateSelection(
 						myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
 				totalX = 0;
 				totalY = 0;

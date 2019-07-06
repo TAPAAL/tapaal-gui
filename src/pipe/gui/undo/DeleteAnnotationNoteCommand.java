@@ -9,7 +9,7 @@ public class DeleteAnnotationNoteCommand extends Command {
     private AnnotationNote note;
     private DataLayer model;
 
-    DeleteAnnotationNoteCommand(AnnotationNote note, DataLayer model){
+    public DeleteAnnotationNoteCommand(AnnotationNote note, DataLayer model){
         this.note = note;
         this.model = model;
     }

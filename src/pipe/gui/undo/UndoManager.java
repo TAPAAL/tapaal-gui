@@ -156,35 +156,6 @@ public class UndoManager {
 		addEdit(undoableEdit);
 	}
 
-	private void deleteSelection(PetriNetObject pnObject) {
-		if(pnObject instanceof PlaceTransitionObject){
-			PlaceTransitionObject pto = (PlaceTransitionObject)pnObject;
-
-			for(Arc arc : pto.getPreset()){
-				deleteObject(arc);
-			}
-
-			for(Arc arc : pto.getPostset()){
-				deleteObject(arc);
-			}
-		}
-
-		deleteObject(pnObject);
-	}
-
-	public void deleteSelection(ArrayList<PetriNetObject> selection) {
-		for (PetriNetObject pnObject : selection) {
-			deleteSelection(pnObject);
-		}
-	}
-
-	public void translateSelection(ArrayList<PetriNetObject> objects,
-			int transX, int transY) {
-		newEdit(); // new "transaction""
-		for (PetriNetObject pnobject : objects) {
-			addEdit(new TranslatePetriNetObjectEdit(pnobject, transX, transY));
-		}
-	}
 
 	private int currentIndex() {
 		int lastAdd = indexOfNextAdd - 1;
@@ -209,60 +180,5 @@ public class UndoManager {
 		}
 	}
 
-	private void deleteObject(PetriNetObject pnObject) {
-		if (pnObject instanceof ArcPathPoint) {
 
-            ArcPathPoint arcPathPoint = (ArcPathPoint)pnObject;
-
-            //If the arc is marked for deletion, skip deleting individual arcpathpoint
-            if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
-
-                //Don't delete the two last arc path points
-			    if (arcPathPoint.isDeleteable()) {
-                    Command cmd = new DeleteArcPathPointEdit(
-                            arcPathPoint.getArcPath().getArc(),
-                            arcPathPoint,
-                            arcPathPoint.getIndex(),
-							guiModel
-                    );
-                    cmd.redo();
-                    addEdit(cmd);
-                }
-			}
-		}else{
-			//The list of selected objects is not updated when a element is deleted
-			//We might delete the same object twice, which will give an error
-			//Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
-			//There is properly a better way to track this (check model?) but while refactoring we will keeps it close
-			//to the orginal code -- kyrke 2019-06-27
-			if (!pnObject.isDeleted()) {
-				Command cmd = null;
-				if(pnObject instanceof TimedPlaceComponent){
-					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
-					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel);
-				}else if(pnObject instanceof TimedTransitionComponent){
-					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
-					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel);
-				}else if(pnObject instanceof TimedTransportArcComponent){
-					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
-					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel);
-				}else if(pnObject instanceof TimedInhibitorArcComponent){
-					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
-					cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel);
-				}else if(pnObject instanceof TimedInputArcComponent){
-					TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
-					cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel);
-				}else if(pnObject instanceof TimedOutputArcComponent){
-					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
-					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel);
-				}else if(pnObject instanceof AnnotationNote){
-					cmd = new DeleteAnnotationNoteCommand((AnnotationNote)pnObject, guiModel);
-				}else{
-					throw new RuntimeException("This should not be possible");
-				}
-				cmd.redo();
-				addEdit(cmd);
-			}
-		}
-	}
 }
