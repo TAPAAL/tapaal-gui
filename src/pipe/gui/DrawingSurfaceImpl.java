@@ -93,7 +93,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		this.guiModel = guiModel;
 		this.model = model;
 		this.zoomControl = zoomer;
-		app.updateZoomCombo();
 
 		if (animationmode) {
 			app.getAnimator().highlightEnabledTransitions();

@@ -29,13 +29,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.AnimationController;
-import pipe.gui.AnimationHistoryComponent;
-import pipe.gui.Animator;
-import pipe.gui.DelayEnabledTransitionControl;
-import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Zoomer;
+import pipe.gui.*;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import net.tapaal.swinghelpers.JSplitPaneFix;
@@ -776,4 +770,18 @@ public class TabContent extends JSplitPane {
 	public void setNetChanged(boolean _netChanged) {
 		netChanged = _netChanged;
 	}
+
+    public void changeToTemplate(Template tapn) {
+		Require.notNull(tapn, "Can't change to a Template that is null");
+
+		drawingSurface.setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
+
+		//If the template is currently selected
+		// kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
+		if (CreateGui.getCurrentTab() == this) {
+
+			CreateGui.getApp().updateZoomCombo();
+
+		}
+    }
 }

@@ -777,7 +777,7 @@ public class TemplateExplorer extends JPanel {
 	public void openSelectedTemplate() {
 		Template tapn = selectedModel();
 		if (tapn != null) {
-			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
+			parent.changeToTemplate(tapn);
 		}
 		//parent.drawingSurface().repaintAll();
 	}
