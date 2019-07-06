@@ -19,7 +19,7 @@ public class Context { // TODO: consider having only currentTab as a field and h
 		currentTab = tab;
 		network = tab.network();
 		selectedTemplate = tab.currentTemplate();
-		undoManager = tab.drawingSurface().getUndoManager();
+		undoManager = tab.getUndoManager();
 	}
 	
 	public TimedArcPetriNetNetwork network(){

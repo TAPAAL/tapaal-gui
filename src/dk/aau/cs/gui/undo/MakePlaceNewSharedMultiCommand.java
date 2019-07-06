@@ -54,7 +54,7 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 			this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
 			guiModels = context.tabContent().getGuiModels();
 			this.originalName = originalName;
-			undoManager = currentTab.drawingSurface().getUndoManager();
+			undoManager = currentTab.getUndoManager();
 			//oldTokens = place.tokens();
 			newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 		}

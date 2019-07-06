@@ -142,7 +142,7 @@ public class StatisticsPanel extends JPanel{
 				TabContent tab = CreateGui.getCurrentTab();
 				Iterable<Template> templates = tab.allTemplates();
 				
-				UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
+				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
 				boolean first = true;
 				for(Template template : templates){
 					List<TimedTransition> orphans = template.model().getOrphanTransitions();

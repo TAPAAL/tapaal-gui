@@ -12,6 +12,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
@@ -35,18 +36,20 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	private static final int DRAWING_SURFACE_GROW = 100;
 
 	private SelectionManager selection;
-	private UndoManager undoManager;
+
 
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
 	private DataLayer guiModel;
+	private TabContent tabContent;
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
 	private NameGenerator nameGenerator = new NameGenerator();
 
-	public DrawingSurfaceImpl(DataLayer dataLayer) {
+	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent) {
 		guiModel = dataLayer;
+		this.tabContent = tabContent;
 		setLayout(null);
 		setOpaque(true);
 		setDoubleBuffered(true);
@@ -62,7 +65,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		addMouseWheelListener(mouseHandler);
 
 		selection = new SelectionManager(this);
-		undoManager = new UndoManager(app);
+
 	}
 
 	public NameGenerator getNameGenerator() {
@@ -218,10 +221,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	public SelectionManager getSelectionObject() {
 		return selection;
-	}
-
-	public UndoManager getUndoManager() {
-		return undoManager;
 	}
 
 	public Zoomer getZoomController() {
@@ -405,7 +404,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			model.add(tp);
 			addPetriNetObjectToModelandView(pnObject);
 
-			getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel));
+			tabContent.getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel));
 
 			return pnObject;
 		}
@@ -420,7 +419,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			model.add(transition);
 			addPetriNetObjectToModelandView(pnObject);
 
-			getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
+			tabContent.getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
 			return pnObject;
 		}
 
@@ -430,7 +429,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
             AnnotationNote pnObject = new AnnotationNote(p.x, p.y, true);
             addPetriNetObjectToModelandView(pnObject);
 
-            getUndoManager().addNewEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
+			tabContent.getUndoManager().addNewEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
             pnObject.enableEditMode();
             return pnObject;
         }
@@ -602,7 +601,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 							guiModel
 					);
 					cmd.redo();
-					undoManager.addEdit(cmd);
+					tabContent.getUndoManager().addEdit(cmd);
 				}
 			}
 		}else{
@@ -637,7 +636,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 					throw new RuntimeException("This should not be possible");
 				}
 				cmd.redo();
-				undoManager.addEdit(cmd);
+				tabContent.getUndoManager().addEdit(cmd);
 			}
 		}
 	}
@@ -666,9 +665,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	}
 
 	public void translateSelection(ArrayList<PetriNetObject> objects, int transX, int transY) {
-		undoManager.newEdit(); // new "transaction""
+		tabContent.getUndoManager().newEdit(); // new "transaction""
 		for (PetriNetObject pnobject : objects) {
-			undoManager.addEdit(new TranslatePetriNetObjectEdit(pnobject, transX, transY));
+			tabContent.getUndoManager().addEdit(new TranslatePetriNetObjectEdit(pnobject, transX, transY));
 		}
 	}
 }

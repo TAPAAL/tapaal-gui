@@ -102,7 +102,7 @@ public class TemplateExplorer extends JPanel {
 
 	public TemplateExplorer(TabContent parent, boolean hideButtons) {
 		this.parent = parent;
-		undoManager = parent.drawingSurface().getUndoManager();
+		undoManager = parent.getUndoManager();
 		init(hideButtons);
 	}
 	

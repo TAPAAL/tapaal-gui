@@ -68,7 +68,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		this.list = list;
 		this.sharedPlacesAndTransitionsPanel = sharedPlacesAndTransitionsPanel;
 		this.tab = tab;
-		undoManager = tab.drawingSurface().getUndoManager();
+		undoManager = tab.getUndoManager();
 		this.sharedPlacesListModel = sharedPlacesListModel;
 		this.sharedTransitionsListModel = sharedTransitionsListModel;
 		this.nameGenerator = nameGenerator;

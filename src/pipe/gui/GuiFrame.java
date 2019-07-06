@@ -455,7 +455,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (isEditionAllowed()) {
-					getCurrentTab().drawingSurface().getUndoManager().undo();
+					getCurrentTab().getUndoManager().undo();
 					getCurrentTab().network().buildConstraints();
 				}
 			}
@@ -467,7 +467,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (isEditionAllowed()) {
-					getCurrentTab().drawingSurface().getUndoManager().redo();
+					getCurrentTab().getUndoManager().redo();
 					getCurrentTab().network().buildConstraints();
 				}
 			}
@@ -521,13 +521,13 @@ public class GuiFrame extends JFrame  {
 						: JOptionPane.YES_OPTION;
 
 						if (choice == JOptionPane.YES_OPTION) {
-							getCurrentTab().drawingSurface().getUndoManager().newEdit(); // new "transaction""
+							getCurrentTab().getUndoManager().newEdit(); // new "transaction""
 							if (queriesAffected) {
 								TabContent currentTab = getCurrentTab();
 								for (TAPNQuery q : queriesToDelete) {
 									Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
 									cmd.redo();
-									getCurrentTab().drawingSurface().getUndoManager().addEdit(cmd);
+									getCurrentTab().getUndoManager().addEdit(cmd);
 								}
 							}
 
@@ -642,7 +642,7 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 1.25;
 				changeSpacing(factor);
-				getCurrentTab().drawingSurface().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				getCurrentTab().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 			}
 		});
 
@@ -651,7 +651,7 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				double factor = 0.8;
 				changeSpacing(factor);
-				getCurrentTab().drawingSurface().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				getCurrentTab().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
 			}
 		});
 		
@@ -1263,7 +1263,7 @@ public class GuiFrame extends JFrame  {
 			stripTimeDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
-			getCurrentTab().drawingSurface().getUndoManager().setUndoRedoStatus();
+			getCurrentTab().getUndoManager().setUndoRedoStatus();
 
 			if(getCurrentTab().restoreWorkflowDialog()){
 				WorkflowDialog.showDialog();
@@ -1582,7 +1582,7 @@ public class GuiFrame extends JFrame  {
 			getTab(index).setNetChanged(false);
 			appTab.setTitleAt(index, outFile.getName());
 			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
-			getTab(index).drawingSurface().getUndoManager().clear();
+			getTab(index).getUndoManager().clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 		} catch (Exception e) {

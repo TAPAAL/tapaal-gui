@@ -81,7 +81,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");
 
-		undoManager = tab.drawingSurface().getUndoManager();
+		undoManager = tab.getUndoManager();
 		nameGenerator = tab.drawingSurface().getNameGenerator();
 		this.tab = tab;
 

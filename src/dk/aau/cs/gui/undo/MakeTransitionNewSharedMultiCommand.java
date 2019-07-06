@@ -51,7 +51,7 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 		this.currentTab = context.tabContent();
 		this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
 		guiModels = context.tabContent().getGuiModels();
-		undoManager = currentTab.drawingSurface().getUndoManager();
+		undoManager = currentTab.getUndoManager();
 		//oldTokens = place.tokens();
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}

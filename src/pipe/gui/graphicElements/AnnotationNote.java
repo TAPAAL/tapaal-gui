@@ -166,7 +166,7 @@ public class AnnotationNote extends Note {
 		String newText = note.getText();
 		if (oldText != null && !newText.equals(oldText)) {
 			// Text has been changed
-			CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
+			CreateGui.getCurrentTab().getUndoManager().addNewEdit(
 					new AnnotationTextEdit(this, oldText, newText));
 			updateBounds();
 		}

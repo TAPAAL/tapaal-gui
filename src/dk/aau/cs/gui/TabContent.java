@@ -36,6 +36,7 @@ import pipe.gui.DelayEnabledTransitionControl;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
@@ -54,6 +55,11 @@ public class TabContent extends JSplitPane {
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+
+	private UndoManager undoManager = new UndoManager(CreateGui.getApp());
+	public UndoManager getUndoManager() {
+		return undoManager;
+	}
 
 	//GUI
 	private JScrollPane drawingSurfaceScroller;
@@ -105,7 +111,7 @@ public class TabContent extends JSplitPane {
 			zoomLevels.put(net, new Zoomer());
 		}
 		
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer());
+		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));

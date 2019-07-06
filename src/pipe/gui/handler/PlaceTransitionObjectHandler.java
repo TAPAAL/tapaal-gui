@@ -119,7 +119,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	public void mouseReleased(MouseEvent e) {
 
 		DrawingSurfaceImpl view = CreateGui.getDrawingSurface();
-		UndoManager undoManager = view.getUndoManager();
+		UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
 		GuiFrame app = CreateGui.getApp();
 
 		super.mouseReleased(e);

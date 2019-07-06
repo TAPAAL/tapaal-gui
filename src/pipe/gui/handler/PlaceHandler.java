@@ -63,7 +63,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {
-				UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
+				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
 
 				switch (CreateGui.getApp().getMode()) {
 				case ADDTOKEN:

@@ -22,7 +22,7 @@ public class EditAnnotationBorderAction extends AbstractAction {
 
 	/** Action for editing the text in an AnnotationNote */
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
+		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
 				selected.showBorder(!selected.isShowingBorder()));
 	}
 
