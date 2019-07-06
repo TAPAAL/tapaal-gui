@@ -333,7 +333,7 @@ public abstract class Arc extends PetriNetObject {
 		point = new Point2D.Double(x + myPath.getBounds().getX()
 				- COMPONENT_DRAW_OFFSET - zoomGrow, y
 				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
-		if (!CreateGui.getDrawingSurface().isInAnimationMode()) {
+		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
 				myPath.showPoints();

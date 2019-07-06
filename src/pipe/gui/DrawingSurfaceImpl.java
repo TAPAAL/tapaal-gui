@@ -29,7 +29,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
-	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
 
@@ -203,14 +202,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		return rect;
 	}
 
-	public void changeAnimationMode(boolean status) {
-		animationmode = status;
-		if(status){
-			selection.disableSelection();
-		}else{
-			selection.enableSelection();
-		}
-	}
+
 
 	public SelectionManager getSelectionObject() {
 		return selection;
@@ -244,12 +236,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 			//and its scrollbars.
 			revalidate();
 		}
-	}
-
-
-
-	public boolean isInAnimationMode() {
-		return animationmode;
 	}
 
 	public void drag(Point dragStart, Point dragEnd) {
@@ -573,7 +559,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	public void repaintAll() {
 		this.repaint();
-		guiModel.repaintAll(!isInAnimationMode());
+		guiModel.repaintAll(!tabContent.isInAnimationMode());
 	}
 
 	//XXX: function moved from undoManager --kyrke - 2019-07-06

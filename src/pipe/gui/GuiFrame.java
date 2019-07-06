@@ -1922,7 +1922,7 @@ public class GuiFrame extends JFrame  {
 		case draw:
 			// Enable all draw actions
 			startAction.setSelected(false);
-			getCurrentTab().drawingSurface().changeAnimationMode(false);
+			getCurrentTab().changeAnimationMode(false);
 
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
@@ -1948,7 +1948,7 @@ public class GuiFrame extends JFrame  {
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
-			getCurrentTab().drawingSurface().changeAnimationMode(true);
+			getCurrentTab().changeAnimationMode(true);
 			getCurrentTab().drawingSurface().repaintAll();
 			getAnimator().reset(false);
 			getAnimator().storeModel();
@@ -2150,14 +2150,14 @@ public class GuiFrame extends JFrame  {
 	private void toggleAnimationMode() {
 		try {
 
-			if (!getCurrentTab().drawingSurface().isInAnimationMode()) {
+			if (!getCurrentTab().isInAnimationMode()) {
 				if (getCurrentTab().numberOfActiveTemplates() > 0) {
 					getCurrentTab().rememberSelectedTemplate();
 					if (getCurrentTab().currentTemplate().isActive()){
 						getCurrentTab().setSelectedTemplateWasActive();
 					}
 					restoreMode();
-					setAnimationMode(!getCurrentTab().drawingSurface().isInAnimationMode());
+					setAnimationMode(!getCurrentTab().isInAnimationMode());
 					if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
 						getCurrentTab().restoreSelectedTemplate();
 						getCurrentTab().resetSelectedTemplateWasActive();
@@ -2178,7 +2178,7 @@ public class GuiFrame extends JFrame  {
 			} else {
 				//setMode(ElementType.START);
 				getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
-				setAnimationMode(!getCurrentTab().drawingSurface().isInAnimationMode());
+				setAnimationMode(!getCurrentTab().isInAnimationMode());
 				getCurrentTab().restoreSelectedTemplate();
 				//Enable editor focus traversal policy
 				setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
@@ -2188,7 +2188,7 @@ public class GuiFrame extends JFrame  {
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 			startAction.setSelected(false);
-			getCurrentTab().drawingSurface().changeAnimationMode(false);
+			getCurrentTab().changeAnimationMode(false);
 			throw new RuntimeException(e);
 		}
 

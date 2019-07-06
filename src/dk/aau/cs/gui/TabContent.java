@@ -777,17 +777,37 @@ public class TabContent extends JSplitPane {
 		drawingSurface.setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
 
 		//If the template is currently selected
-		// kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
+		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
 		if (CreateGui.getCurrentTab() == this) {
 			GuiFrame app = CreateGui.getApp();
 
 			app.updateZoomCombo();
 
-			if (drawingSurface.isInAnimationMode()) {
+			if (isInAnimationMode()) {
 				app.getAnimator().highlightEnabledTransitions();
 				app.getAnimator().unhighlightDisabledTransitions();
 				app.getAnimator().reportBlockingPlaces();
 			}
 		}
     }
+
+
+    //Animation mode stuff, moved from view
+	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
+
+	private boolean animationmode = false;
+	public void changeAnimationMode(boolean status) {
+		animationmode = status;
+		if(status){
+			drawingSurface.getSelectionObject().disableSelection();
+		}else{
+			drawingSurface.getSelectionObject().enableSelection();
+		}
+	}
+
+	public boolean isInAnimationMode() {
+		return animationmode;
+	}
+
+
 }

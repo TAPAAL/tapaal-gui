@@ -104,7 +104,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof TimedPlaceComponent) && !isDragging) {// &&
-				if (CreateGui.getDrawingSurface().isInAnimationMode()) {
+				if (CreateGui.getCurrentTab().isInAnimationMode()) {
 					((TimedPlaceComponent) myObject).showAgeOfTokens(true);
 				}
 			}
@@ -118,7 +118,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if ((myObject instanceof TimedPlaceComponent)) {// &&
-			if (CreateGui.getDrawingSurface().isInAnimationMode()) {
+			if (CreateGui.getCurrentTab().isInAnimationMode()) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 			}
 		}

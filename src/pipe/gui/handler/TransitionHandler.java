@@ -109,7 +109,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof TimedTransitionComponent) && !isDragging) {// &&
-				if (CreateGui.getDrawingSurface().isInAnimationMode()) {
+				if (CreateGui.getCurrentTab().isInAnimationMode()) {
 					((TimedTransitionComponent) myObject).showDInterval(true);
 				}
 			}
@@ -123,7 +123,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if ((myObject instanceof TimedTransitionComponent)) {// &&
-			if (CreateGui.getDrawingSurface().isInAnimationMode()) {
+			if (CreateGui.getCurrentTab().isInAnimationMode()) {
 				((TimedTransitionComponent) myObject).showDInterval(false);
 			}
 		}
@@ -132,7 +132,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mouseEngfstered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof pipe.gui.graphicElements.tapn.TimedTransitionComponent) && !isDragging) {// &&
-				if (CreateGui.getDrawingSurface().isInAnimationMode()) {
+				if (CreateGui.getCurrentTab().isInAnimationMode()) {
 					((TimedTransitionComponent) myObject).updateToolTip(true);
 				} else {
 					((TimedTransitionComponent) myObject).updateToolTip(false);
