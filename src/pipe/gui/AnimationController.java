@@ -265,7 +265,11 @@ public class AnimationController extends JPanel {
 	}
 
 	public void updateFiringModeComboBox() {
-		FiringMode currentFiringMode = CreateGui.getAnimator().getFiringmode();
+		Animator animator = CreateGui.getAnimator();
+		FiringMode currentFiringMode = null;
+		if (animator != null) {
+			currentFiringMode = animator.getFiringmode();
+		}
 		if (currentFiringMode == null) {
 			firermodebox.setSelectedItem("Manual");
 		} else {

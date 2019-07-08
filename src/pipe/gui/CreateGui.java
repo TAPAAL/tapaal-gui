@@ -89,7 +89,10 @@ public class CreateGui {
 	 */
 	@Deprecated
 	public static Animator getAnimator() {
-		return appGui.getAnimator();
+		if (getCurrentTab() == null) {
+			return null;
+		}
+		return getCurrentTab().getAnimator();
 	}
 	
 	//XXX Two Methodes to access same data (created after auto encapsulate)

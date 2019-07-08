@@ -784,9 +784,9 @@ public class TabContent extends JSplitPane {
 			app.updateZoomCombo();
 
 			if (isInAnimationMode()) {
-				app.getAnimator().highlightEnabledTransitions();
-				app.getAnimator().unhighlightDisabledTransitions();
-				app.getAnimator().reportBlockingPlaces();
+				getAnimator().highlightEnabledTransitions();
+				getAnimator().unhighlightDisabledTransitions();
+				getAnimator().reportBlockingPlaces();
 			}
 		}
     }
@@ -808,6 +808,12 @@ public class TabContent extends JSplitPane {
 	public boolean isInAnimationMode() {
 		return animationmode;
 	}
+
+	public Animator getAnimator() {
+		return animator;
+	}
+
+	private Animator animator = new Animator();
 
 
 }

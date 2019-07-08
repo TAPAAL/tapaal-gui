@@ -80,11 +80,6 @@ public class GuiFrame extends JFrame  {
 	
 	private String frameTitle;
 
-	public Animator getAnimator() {
-		return animator;
-	}
-
-	private Animator animator;
 	private Pipe.ElementType mode, prev_mode;
 	private GUIMode guiMode = GUIMode.noNet;
 
@@ -214,8 +209,6 @@ public class GuiFrame extends JFrame  {
 		getContentPane().add(appTab);
 		setChangeListenerOnTab(); // sets Tab properties
 
-
-		animator = new Animator();
 		Grid.enableGrid();
 
 		loadPrefrences();
@@ -788,7 +781,7 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getCurrentTab().getAnimationHistory().stepBackwards();
-				getAnimator().stepBack();
+				getCurrentTab().getAnimator().stepBack();
 				updateMouseOverInformation();
 				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 			}
@@ -798,7 +791,7 @@ public class GuiFrame extends JFrame  {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						getCurrentTab().getAnimationHistory().stepForward();
-						getAnimator().stepForward();
+						getCurrentTab().getAnimator().stepForward();
 						updateMouseOverInformation();
 						getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 					}
@@ -808,7 +801,7 @@ public class GuiFrame extends JFrame  {
 				"Let time pass one time unit", "W") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getAnimator().letTimePass(BigDecimal.ONE);
+				getCurrentTab().getAnimator().letTimePass(BigDecimal.ONE);
 				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
 				updateMouseOverInformation();
 			}
@@ -1599,7 +1592,7 @@ public class GuiFrame extends JFrame  {
 			NetworkMarking currentMarking = null;
 			if(getGUIMode().equals(GUIMode.animation)){
 				currentMarking = currentTab.network().marking();
-				currentTab.network().setMarking(getAnimator().getInitialMarking());
+				currentTab.network().setMarking(getCurrentTab().getAnimator().getInitialMarking());
 			}
 
 			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
@@ -1926,7 +1919,7 @@ public class GuiFrame extends JFrame  {
 
 			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
-				getAnimator().restoreModel();
+				getCurrentTab().getAnimator().restoreModel();
 				hideComponentWindow();
 			}
 
@@ -1943,18 +1936,18 @@ public class GuiFrame extends JFrame  {
 			break;
 		case animation:
 
-			getAnimator().setTabContent(getCurrentTab());
+			getCurrentTab().getAnimator().setTabContent(getCurrentTab());
 			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
 			getCurrentTab().changeAnimationMode(true);
 			getCurrentTab().drawingSurface().repaintAll();
-			getAnimator().reset(false);
-			getAnimator().storeModel();
-			getAnimator().highlightEnabledTransitions();
-			getAnimator().reportBlockingPlaces();
-			getAnimator().setFiringmode("Random");
+			getCurrentTab().getAnimator().reset(false);
+			getCurrentTab().getAnimator().storeModel();
+			getCurrentTab().getAnimator().highlightEnabledTransitions();
+			getCurrentTab().getAnimator().reportBlockingPlaces();
+			getCurrentTab().getAnimator().setFiringmode("Random");
 
 			statusBar.changeText(statusBar.textforAnimation);
 			selectAction.setSelected(false);
