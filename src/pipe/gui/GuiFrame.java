@@ -1577,7 +1577,7 @@ public class GuiFrame extends JFrame  {
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 		} catch (Exception e) {
-			System.err.println(e);
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
 			return;
