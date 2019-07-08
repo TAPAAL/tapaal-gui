@@ -51,7 +51,7 @@ public class TabContent extends JSplitPane {
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
-	private UndoManager undoManager = new UndoManager(CreateGui.getApp());
+	private UndoManager undoManager = new UndoManager();
 	public UndoManager getUndoManager() {
 		return undoManager;
 	}
@@ -781,7 +781,6 @@ public class TabContent extends JSplitPane {
 		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
 		if (CreateGui.getCurrentTab() == this) {
 
-
 			app.ifPresent(GuiFrameActions::updateZoomCombo);
 
 			if (isInAnimationMode()) {
@@ -819,5 +818,6 @@ public class TabContent extends JSplitPane {
 	Optional<GuiFrameActions>  app = Optional.empty();
 	public void setApp(GuiFrameActions app) {
 		this.app = Optional.ofNullable(app);
+		undoManager.setApp(app);
 	}
 }

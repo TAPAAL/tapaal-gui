@@ -2064,11 +2064,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return getGUIMode() == GUIMode.draw;
 	}
 
-
+    @Override
 	public void setUndoActionEnabled(boolean flag) {
 		undoAction.setEnabled(flag);
 	}
 
+	@Override
 	public void setRedoActionEnabled(boolean flag) {
 		redoAction.setEnabled(flag);
 	}
@@ -2084,6 +2085,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 *         the box's selected item is updated to keep track of ZoomActions
 	 *         called from other sources, a duplicate ZoomAction is not called
 	 */
+	@Override
 	public void updateZoomCombo() {
 		ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
 		zoomComboBox.removeActionListener(zoomComboListener);

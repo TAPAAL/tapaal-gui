@@ -5,12 +5,10 @@ package pipe.gui.undo;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Optional;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.GuiFrame;
-import pipe.gui.Pipe;
+import pipe.gui.*;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
@@ -38,15 +36,18 @@ public class UndoManager {
 
 	private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private GuiFrame app;
+	private Optional<GuiFrameActions> app = Optional.empty();
+	public void setApp(GuiFrameActions app) {
+		this.app = Optional.ofNullable(app);
+	}
 
 	/**
 	 * Creates a new instance of UndoManager
 	 */
-	public UndoManager(GuiFrame _app) {
-		app = _app;
-		app.setUndoActionEnabled(false);
-		app.setRedoActionEnabled(false);
+	public UndoManager() {
+
+		app.ifPresent(a -> a.setUndoActionEnabled(false));
+		app.ifPresent(a -> a.setRedoActionEnabled(false));
 		for (int i = 0; i < UNDO_BUFFER_CAPACITY; i++) {
 			edits.add(null);
 		}
@@ -66,19 +67,19 @@ public class UndoManager {
 			sizeOfBuffer++;
 			undoneEdits--;
 			if (undoneEdits == 0) {
-				app.setRedoActionEnabled(false);
+				app.ifPresent(a -> a.setRedoActionEnabled(false));
 			}
-			app.setUndoActionEnabled(true);
+			app.ifPresent(a -> a.setUndoActionEnabled(true));
 		}
 	}
 
 	public void setUndoRedoStatus() {
 
 		boolean canRedo = (undoneEdits != 0);
-		app.setRedoActionEnabled(canRedo);
+		app.ifPresent(a -> a.setRedoActionEnabled(canRedo));
 
 		boolean canUndo = sizeOfBuffer != 0;
-		app.setUndoActionEnabled(canUndo);
+		app.ifPresent(a -> a.setUndoActionEnabled(canUndo));
 
 	}
 
@@ -101,9 +102,9 @@ public class UndoManager {
 			}
 
 			if (sizeOfBuffer == 0) {
-				app.setUndoActionEnabled(false);
+				app.ifPresent(a -> a.setUndoActionEnabled(false));
 			}
-			app.setRedoActionEnabled(true);
+			app.ifPresent(a -> a.setRedoActionEnabled(true));
 		}
 	}
 
@@ -112,8 +113,8 @@ public class UndoManager {
 		sizeOfBuffer = 0;
 		startOfBuffer = 0;
 		undoneEdits = 0;
-		app.setUndoActionEnabled(false);
-		app.setRedoActionEnabled(false);
+		app.ifPresent(a -> a.setUndoActionEnabled(false));
+		app.ifPresent(a -> a.setRedoActionEnabled(false));
 	}
 
 	public void newEdit() {
@@ -123,8 +124,8 @@ public class UndoManager {
 		}
 
 		undoneEdits = 0;
-		app.setUndoActionEnabled(true);
-		app.setRedoActionEnabled(false);
+		app.ifPresent(a -> a.setUndoActionEnabled(true));
+		app.ifPresent(a -> a.setRedoActionEnabled(false));
 		CreateGui.getCurrentTab().setNetChanged(true);
 
 		ArrayList<Command> compoundEdit = new ArrayList<Command>();
@@ -166,9 +167,9 @@ public class UndoManager {
 	}
 
 	private void checkMode() {
-		if ((app.getMode() == Pipe.ElementType.FAST_PLACE)
-				|| (app.getMode() == Pipe.ElementType.FAST_TRANSITION)) {
-			app.endFastMode();
+		Pipe.ElementType mode = CreateGui.getApp().getMode();
+		if ((mode == Pipe.ElementType.FAST_PLACE) || (mode == Pipe.ElementType.FAST_TRANSITION)) {
+			CreateGui.getApp().endFastMode();
 		}
 	}
 

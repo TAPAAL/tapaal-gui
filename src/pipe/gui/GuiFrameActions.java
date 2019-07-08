@@ -8,4 +8,7 @@ public interface GuiFrameActions {
 
     void updateZoomCombo();
 
+    void setRedoActionEnabled(boolean b);
+
+    void setUndoActionEnabled(boolean b);
 }
