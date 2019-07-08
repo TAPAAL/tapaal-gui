@@ -1440,8 +1440,6 @@ public class GuiFrame extends JFrame  {
 		}
 
 		if (getCurrentTab() != null) {
-			getCurrentTab().drawingSurface().setVisible(true);
-			getCurrentTab().drawingSurface().repaint();
 			updateZoomCombo();
 
 			setTitle(appTab.getTitleAt(index));
