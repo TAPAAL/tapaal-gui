@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -779,9 +780,9 @@ public class TabContent extends JSplitPane {
 		//If the template is currently selected
 		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
 		if (CreateGui.getCurrentTab() == this) {
-			GuiFrame app = CreateGui.getApp();
 
-			app.updateZoomCombo();
+
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
 
 			if (isInAnimationMode()) {
 				getAnimator().highlightEnabledTransitions();
@@ -815,5 +816,8 @@ public class TabContent extends JSplitPane {
 
 	private Animator animator = new Animator();
 
-
+	Optional<GuiFrameActions>  app = Optional.empty();
+	public void setApp(GuiFrameActions app) {
+		this.app = Optional.ofNullable(app);
+	}
 }

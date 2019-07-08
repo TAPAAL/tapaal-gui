@@ -72,7 +72,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
-public class GuiFrame extends JFrame  {
+public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
@@ -1435,10 +1435,17 @@ public class GuiFrame extends JFrame  {
 		});
 	}
 
-	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
-	//TODO: Refactor the setObject (bad name), inline in changeToTab/Close Tab and use changeToTab in newTab
 
+	Optional<TabContent> currentTab = Optional.empty();
+	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
+	//XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
 	private void changeToTab(int index) {
+
+		//De-register old model
+		currentTab.ifPresent(t -> t.setApp(null));
+
+		//Set current tab
+		currentTab = Optional.ofNullable(getCurrentTab());
 
 		//If tab is changed by something else that by clicking a tab then change to the tab.
 		if (appTab.getSelectedIndex() != index) {
@@ -1446,7 +1453,7 @@ public class GuiFrame extends JFrame  {
 		}
 
 		if (getCurrentTab() != null) {
-			updateZoomCombo();
+			currentTab.ifPresent(t->t.setApp(this));
 
 			setTitle(appTab.getTitleAt(index));
 			setGUIMode(GUIMode.draw);
