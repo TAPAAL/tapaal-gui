@@ -27,6 +27,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
+import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.NetWriter;
@@ -85,7 +86,7 @@ public class GuiFrame extends JFrame  {
 
 	private int newNameCounter = 1;
 
-	private JTabbedPane appTab;
+	private ExtendedJTabbedPane<TabContent> appTab;
 
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
@@ -205,7 +206,12 @@ public class GuiFrame extends JFrame  {
 
 		//XXX: Moved appTab from creategui needs further refacotring
 		//kyrke 2018-05-20
-		appTab = new JTabbedPane();
+		appTab = new ExtendedJTabbedPane<TabContent>() {
+			@Override
+			public Component generator() {
+				return new TabComponent(this);
+			}
+		};
 		getContentPane().add(appTab);
 		setChangeListenerOnTab(); // sets Tab properties
 
@@ -1638,7 +1644,6 @@ public class GuiFrame extends JFrame  {
 		CreateGui.addTab(tab);
 		appTab.addTab(name, tab);
 		int newTabIndex = appTab.getTabCount()-1;
-		appTab.setTabComponentAt(newTabIndex, new TabComponent(appTab));
 
 		//appView.setNetChanged(false); // Status is unchanged
 		//appView.updatePreferredSize();
@@ -1671,7 +1676,6 @@ public class GuiFrame extends JFrame  {
 
 		TabContent tab = getTab(freeSpace);
 		appTab.addTab(name, null, tab, null);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
 		appTab.setSelectedIndex(freeSpace);
 
 
@@ -1727,7 +1731,7 @@ public class GuiFrame extends JFrame  {
 
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name, null, tab, null);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
+
 		appTab.setSelectedIndex(freeSpace);
 
 		if (file != null) {
