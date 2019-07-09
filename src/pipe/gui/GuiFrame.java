@@ -1800,21 +1800,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	/**
-	 * @deprecated Replaced with setGUIMode
-	 * @param on
-	 *            enable or disable animation mode
-	 */
-	public void setAnimationMode(boolean on) {
-
-		if (on) {
-			setGUIMode(GUIMode.animation);
-		} else {
-			setGUIMode(GUIMode.draw);
-		}
-
-	}
-
-	/**
 	 * Returns the current GUIMode
 	 * 
 	 * @author Kenneth Yrke Joergensen (kyrke)
@@ -2018,7 +2003,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 						getCurrentTab().setSelectedTemplateWasActive();
 					}
                     activateSelectAction();
-                    setAnimationMode(!getCurrentTab().isInAnimationMode());
+
+					setGUIMode(GUIMode.animation);
+
 					if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
 						getCurrentTab().restoreSelectedTemplate();
 						getCurrentTab().resetSelectedTemplateWasActive();
@@ -2039,7 +2026,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			} else {
 				//setMode(ElementType.START);
 				getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
-				setAnimationMode(!getCurrentTab().isInAnimationMode());
+
+				setGUIMode(GUIMode.draw);
+
 				getCurrentTab().restoreSelectedTemplate();
 				//Enable editor focus traversal policy
 				setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
