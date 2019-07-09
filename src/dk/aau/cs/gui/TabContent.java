@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.*;
 
 import javax.swing.*;
@@ -812,6 +813,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private Animator animator = new Animator();
 
+	/* GUI Model / Actions helpers */
+	/**
+	 * Updates the mouseOver label showing token ages in animationmode
+	 * when a "animation" action is happening. "live updates" any mouseOver label
+	 */
+	private void updateMouseOverInformation() {
+		// update mouseOverView
+		for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
+			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
+				((TimedPlaceComponent) p).showAgeOfTokens(true);
+			}
+		}
+
+	}
+
 	/* GUI Model / Actions */
 
 	Optional<GuiFrameActions>  app = Optional.empty();
@@ -908,6 +924,36 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	@Override
+	public void stepBackwards() {
+		getAnimationHistory().stepBackwards();
+		getAnimator().stepBack();
+		updateMouseOverInformation();
+		getAnimationController().setAnimationButtonsEnabled();
+	}
+
+	@Override
+	public void stepForward() {
+		getAnimationHistory().stepForward();
+		getAnimator().stepForward();
+		updateMouseOverInformation();
+		getAnimationController().setAnimationButtonsEnabled();
+	}
+
+	@Override
+	public void timeDelay() {
+		getAnimator().letTimePass(BigDecimal.ONE);
+		getAnimationController().setAnimationButtonsEnabled();
+		updateMouseOverInformation();
+	}
+
+	@Override
+	public void delayAndFire() {
+		getTransitionFireingComponent().fireSelectedTransition();
+		getAnimationController().setAnimationButtonsEnabled();
+		updateMouseOverInformation();
+	}
+
+	@Override
 	public void undo() {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			getUndoManager().undo();
@@ -922,4 +968,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			network().buildConstraints();
 		}
 	}
+
+
+
 }

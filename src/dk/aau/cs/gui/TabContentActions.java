@@ -17,5 +17,13 @@ public interface TabContentActions{
     void selectAll();
 
     void deleteSelection();
+
+    //public interface Animation {}
+    void stepBackwards();
+    void stepForward();
+
+    void timeDelay();
+
+    void delayAndFire();
 }
 

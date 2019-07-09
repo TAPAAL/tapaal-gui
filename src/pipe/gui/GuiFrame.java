@@ -712,20 +712,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Step backward", "pressed LEFT") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getCurrentTab().getAnimationHistory().stepBackwards();
-				getCurrentTab().getAnimator().stepBack();
-				updateMouseOverInformation();
-				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+                currentTab.ifPresent(TabContentActions::stepBackwards);
 			}
 		});
 		animateMenu.add(
 				stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						getCurrentTab().getAnimationHistory().stepForward();
-						getCurrentTab().getAnimator().stepForward();
-						updateMouseOverInformation();
-						getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+                        currentTab.ifPresent(TabContentActions::stepForward);
 					}
 				});
 
@@ -733,9 +727,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Let time pass one time unit", "W") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getCurrentTab().getAnimator().letTimePass(BigDecimal.ONE);
-				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
-				updateMouseOverInformation();
+				currentTab.ifPresent(TabContentActions::timeDelay);
 			}
 		});
 
@@ -743,9 +735,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Delay and fire selected transition", "F") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
-				getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
-				updateMouseOverInformation();
+				currentTab.ifPresent(TabContentActions::delayAndFire);
 			}
 		});
 
@@ -2059,20 +2049,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
                 return false;
         }
 
-
-	/**
-	 * Updates the mouseOver label showing token ages in animationmode
-	 * when a "animation" action is happening. "live updates" any mouseOver label
-	 */
-	private void updateMouseOverInformation() {
-		// update mouseOverView
-		for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
-			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
-				((TimedPlaceComponent) p).showAgeOfTokens(true);
-			}
-		}
-
-	}
 
 	/**
 	 * Starts/Stops Animation mode
