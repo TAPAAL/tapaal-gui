@@ -85,8 +85,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		//Add the new model to view
 		guiModel.addedToView(this);
 
-		this.selection.disableSelection();
-
 		nameGenerator.add(model);
 		this.mouseHandler.setModel(guiModel, model);
 		this.guiModel = guiModel;
@@ -98,10 +96,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			pnObject.zoomUpdate(zoomer.getPercent());
 			addNewPetriNetObject(pnObject);
-		}
-
-		if(app.getMode() == ElementType.SELECT) {
-			this.selection.enableSelection();
 		}
 
 	}
