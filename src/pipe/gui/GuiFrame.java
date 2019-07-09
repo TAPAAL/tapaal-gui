@@ -18,8 +18,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+
 import com.apple.eawt.Application;
 import dk.aau.cs.gui.*;
 import dk.aau.cs.model.tapn.*;
@@ -53,8 +52,6 @@ import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
@@ -78,7 +75,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	
 	private String frameTitle;
 
-	private Pipe.ElementType mode, prev_mode;
+	private Pipe.ElementType mode;
 	private GUIMode guiMode = GUIMode.noNet;
 
 	private int newNameCounter = 1;
@@ -1614,8 +1611,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			tab.selectFirstElements();
 
 			if (CreateGui.getApp() != null) {
-				CreateGui.getApp().restoreMode();
-			}
+                CreateGui.getApp().activateSelectAction();
+            }
 
 			tab.setFile(null);
 		} catch (Exception e) {
@@ -1672,10 +1669,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 				tab.selectFirstElements();
 
-				restoreMode();
+                activateSelectAction();
 
 
-			} catch (Exception e) {
+            } catch (Exception e) {
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
@@ -1922,7 +1919,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	public void setMode(Pipe.ElementType _mode) {
 		// Don't bother unless new mode is different.
 		if (mode != _mode) {
-			prev_mode = mode;
 			mode = _mode;
 		}
 	}
@@ -1931,48 +1927,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return mode;
 	}
 
-	private void restoreMode() {
-		// xxx - This must be refactored when someone findes out excatly what is
-		// gowing on
-		mode = prev_mode;
-
-		verifyAction.setEnabled(getCurrentTab().isQueryPossible());
-
-		verifyAction.setEnabled(getCurrentTab().isQueryPossible());
-
-		//XXX - why preform null check, is set in constructor?
-		if (transAction != null) {
-			transAction.setSelected(mode == ElementType.IMMTRANS);
-		}
-
-		if (timedArcAction != null)
-			timedArcAction.setSelected(mode == ElementType.TAPNARC);
-
-		if (transportArcAction != null)
-			transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
-
-		if (timedPlaceAction != null)
-			timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
-
-		if (tokenAction != null)
-			tokenAction.setSelected(mode == ElementType.ADDTOKEN);
-
-		if (deleteTokenAction != null)
-			deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
-
-		if (selectAction != null)
-			selectAction.setSelected(mode == ElementType.SELECT);
-
-		if (annotationAction != null)
-			annotationAction.setSelected(mode == ElementType.ANNOTATION);
-
-
-
-
-
-	}
-
-	public void setTitle(String title) {
+    public void setTitle(String title) {
 		super.setTitle((title == null) ? frameTitle : frameTitle + ": " + title);
 	}
 
@@ -2062,8 +2017,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 					if (getCurrentTab().currentTemplate().isActive()){
 						getCurrentTab().setSelectedTemplateWasActive();
 					}
-					restoreMode();
-					setAnimationMode(!getCurrentTab().isInAnimationMode());
+                    activateSelectAction();
+                    setAnimationMode(!getCurrentTab().isInAnimationMode());
 					if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
 						getCurrentTab().restoreSelectedTemplate();
 						getCurrentTab().resetSelectedTemplateWasActive();
