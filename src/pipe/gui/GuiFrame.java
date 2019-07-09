@@ -21,7 +21,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import com.apple.eawt.Application;
-import dk.aau.cs.gui.TabTransformer;
+import dk.aau.cs.gui.*;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
@@ -52,9 +52,6 @@ import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.BatchProcessingDialog;
-import dk.aau.cs.gui.TabComponent;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
@@ -453,10 +450,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (isEditionAllowed()) {
-					getCurrentTab().getUndoManager().undo();
-					getCurrentTab().network().buildConstraints();
-				}
+				currentTab.ifPresent(TabContentActions::undo);
 			}
 		});
 		
@@ -465,10 +459,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (isEditionAllowed()) {
-					getCurrentTab().getUndoManager().redo();
-					getCurrentTab().network().buildConstraints();
-				}
+				currentTab.ifPresent(TabContentActions::redo);
 			}
 		});
 		editMenu.addSeparator();
@@ -1436,7 +1427,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 
-	Optional<TabContent> currentTab = Optional.empty();
+	Optional<TabContentActions> currentTab = Optional.empty();
 	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
 	//XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
 	private void changeToTab(int index) {

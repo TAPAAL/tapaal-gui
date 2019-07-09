@@ -43,7 +43,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
 
-public class TabContent extends JSplitPane {
+public class TabContent extends JSplitPane implements TabContentActions{
 	private static final long serialVersionUID = -648006317150905097L;
 
 	//Model and state
@@ -816,8 +816,25 @@ public class TabContent extends JSplitPane {
 	private Animator animator = new Animator();
 
 	Optional<GuiFrameActions>  app = Optional.empty();
+	@Override
 	public void setApp(GuiFrameActions app) {
 		this.app = Optional.ofNullable(app);
 		undoManager.setApp(app);
+	}
+
+	@Override
+	public void undo() {
+		if (CreateGui.getApp().isEditionAllowed()) {
+			getUndoManager().undo();
+			network().buildConstraints();
+		}
+	}
+
+	@Override
+	public void redo() {
+		if (CreateGui.getApp().isEditionAllowed()) {
+			getUndoManager().redo();
+			network().buildConstraints();
+		}
 	}
 }
