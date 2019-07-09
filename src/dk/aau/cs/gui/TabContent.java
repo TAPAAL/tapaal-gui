@@ -823,6 +823,24 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	@Override
+	public void zoomOut() {
+		boolean didZoom = drawingSurface().getZoomController().zoomOut();
+		if (didZoom) {
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			drawingSurface().zoomToMidPoint(); //Do Zoom
+		}
+	}
+
+	@Override
+	public void zoomIn() {
+		boolean didZoom = drawingSurface().getZoomController().zoomIn();
+		if (didZoom) {
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			drawingSurface().zoomToMidPoint(); //Do Zoom
+		}
+	}
+
+	@Override
 	public void undo() {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			getUndoManager().undo();

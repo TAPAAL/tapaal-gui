@@ -604,11 +604,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean didZoom = getCurrentTab().drawingSurface().getZoomController().zoomIn();
-				if (didZoom) {
-					updateZoomCombo();
-					getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
-				}
+                currentTab.ifPresent(TabContentActions::zoomIn);
 			}
 		});
 
@@ -616,11 +612,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean didZoom = getCurrentTab().drawingSurface().getZoomController().zoomOut();
-				if (didZoom) {
-					updateZoomCombo();
-					getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
-				}
+                currentTab.ifPresent(TabContentActions::zoomOut);
 			}
 		});
 		viewMenu.add(zoomMenu);

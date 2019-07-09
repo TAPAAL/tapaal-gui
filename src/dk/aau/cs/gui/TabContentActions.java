@@ -11,4 +11,6 @@ public interface TabContentActions{
 
     void setApp(GuiFrameActions app);
 
+    void zoomOut();
+    void zoomIn();
 }

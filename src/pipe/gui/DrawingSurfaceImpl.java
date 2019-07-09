@@ -264,7 +264,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		return (new java.awt.Point((int) midpointX, (int) midpointY));
 	}
 
-	void zoomToMidPoint() {
+	public void zoomToMidPoint() {
 
 		Point midpoint = midpoint(zoomControl.getPercent());
 		zoomTo(midpoint);
