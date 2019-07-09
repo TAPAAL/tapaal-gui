@@ -16,5 +16,6 @@ public interface TabContentActions{
 
     void selectAll();
 
+    void deleteSelection();
 }
 

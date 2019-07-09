@@ -7,21 +7,15 @@ import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
@@ -31,6 +25,9 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import net.tapaal.swinghelpers.JSplitPaneFix;
@@ -847,7 +844,70 @@ public class TabContent extends JSplitPane implements TabContentActions{
         drawingSurface().getSelectionObject().selectAll();
     }
 
-    @Override
+	@Override
+	public void deleteSelection() {
+		// check if queries need to be removed
+		ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+		Iterable<TAPNQuery> queries = queries();
+		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+
+		boolean queriesAffected = false;
+		for (PetriNetObject pn : selection) {
+			if (pn instanceof TimedPlaceComponent) {
+				TimedPlaceComponent place = (TimedPlaceComponent)pn;
+				if(!place.underlyingPlace().isShared()){
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
+					}
+				}
+			} else if (pn instanceof TimedTransitionComponent){
+				TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+				if(!transition.underlyingTransition().isShared()){
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
+					}
+				}
+			}
+		}
+		StringBuilder s = new StringBuilder();
+		s.append("The following queries are associated with the currently selected objects:\n\n");
+		for (TAPNQuery q : queriesToDelete) {
+			s.append(q.getName());
+			s.append('\n');
+		}
+		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+
+		int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+				CreateGui.getApp(), s.toString(), "Warning",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+				: JOptionPane.YES_OPTION;
+
+		if (choice == JOptionPane.YES_OPTION) {
+			getUndoManager().newEdit(); // new "transaction""
+			if (queriesAffected) {
+				TabContent currentTab = this;
+				for (TAPNQuery q : queriesToDelete) {
+					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+					cmd.redo();
+					getUndoManager().addEdit(cmd);
+				}
+			}
+
+			drawingSurface().deleteSelection(drawingSurface().getSelectionObject().getSelection());
+			//getCurrentTab().drawingSurface().repaint();
+			network().buildConstraints();
+		}
+
+
+	}
+
+	@Override
 	public void undo() {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			getUndoManager().undo();
