@@ -815,6 +815,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private Animator animator = new Animator();
 
+	/* GUI Model / Actions */
+
 	Optional<GuiFrameActions>  app = Optional.empty();
 	@Override
 	public void setApp(GuiFrameActions app) {
@@ -840,7 +842,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
-	@Override
+    @Override
+    public void selectAll() {
+        drawingSurface().getSelectionObject().selectAll();
+    }
+
+    @Override
 	public void undo() {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			getUndoManager().undo();

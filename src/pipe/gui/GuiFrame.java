@@ -541,7 +541,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components",  KeyStroke.getKeyStroke('A', shortcutkey )) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getCurrentTab().drawingSurface().getSelectionObject().selectAll();
+				currentTab.ifPresent(TabContentActions::selectAll);
 			}
 		});
 		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('A', shortcutkey), "SelectAll");
