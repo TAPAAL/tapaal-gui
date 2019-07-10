@@ -1400,7 +1400,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			// TODO: change this code... it's ugly :)
 			if (getMode() == ElementType.SELECT) {
-				activateSelectAction();
+				setMode(ElementType.SELECT);
 			}
 
 		} else {
@@ -1638,8 +1638,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			tab.selectFirstElements();
 
 			if (CreateGui.getApp() != null) {
-                CreateGui.getApp().activateSelectAction();
-            }
+				CreateGui.getApp().setMode(ElementType.SELECT);
+			}
 
 			tab.setFile(null);
 		} catch (Exception e) {
@@ -1696,10 +1696,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 				tab.selectFirstElements();
 
-                activateSelectAction();
+				setMode(ElementType.SELECT);
 
 
-            } catch (Exception e) {
+			} catch (Exception e) {
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
@@ -1865,8 +1865,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			getCurrentTab().drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
-			activateSelectAction();
+			setMode(ElementType.SELECT);
 			selectAction.setSelected(true);
+
+
 			break;
 		case animation:
 
@@ -1994,12 +1996,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		redoAction.setEnabled(flag);
 	}
 
-	public void activateSelectAction() {
-		// Set selection mode at startup
-		setMode(ElementType.SELECT);
-		selectAction.actionPerformed(null);
-	}
-
 	/**
 	 * @author Ben Kirby Remove the listener from the zoomComboBox, so that when
 	 *         the box's selected item is updated to keep track of ZoomActions
@@ -2066,7 +2062,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 					if (getCurrentTab().currentTemplate().isActive()){
 						getCurrentTab().setSelectedTemplateWasActive();
 					}
-                    activateSelectAction();
+					setMode(ElementType.SELECT);
 
 					setGUIMode(GUIMode.animation);
 
@@ -2107,7 +2103,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 
 		if(getGUIMode().equals(GUIMode.draw)){
-			activateSelectAction();
+			setMode(ElementType.SELECT);
 
 			// XXX
 			// This is a fix for bug #812694 where on mac some menues are gray after
@@ -2613,7 +2609,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			appTab.removeTabAt(index);
 			CreateGui.removeTab(index);
 
-			activateSelectAction();
+			setMode(ElementType.SELECT);
 		}
 
 	}
