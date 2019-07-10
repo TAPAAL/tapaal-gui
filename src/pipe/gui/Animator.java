@@ -226,9 +226,11 @@ public class Animator {
 	 * unhighlighted
 	 */
 	public void restoreModel() {
-		disableTransitions();
-		tab.network().setMarking(initialMarking);
-		currentAction = -1;
+		if (tab != null) {
+			disableTransitions();
+			tab.network().setMarking(initialMarking);
+			currentAction = -1;
+		}
 	}
 
 	/**
