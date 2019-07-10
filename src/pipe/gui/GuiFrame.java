@@ -1959,7 +1959,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			statusBar.changeText(mode);
 
 			//Disable selection and deselect current selection
-			getCurrentTab().drawingSurface().getSelectionObject().disableSelection();
+			getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
 
 			//If pending arc draw, remove it
 			if (getCurrentTab().drawingSurface().createArc != null) {
@@ -1967,7 +1967,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			}
 
 			if (mode == ElementType.SELECT) {
-				getCurrentTab().drawingSurface().getSelectionObject().enableSelection();
 				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			} else if (mode == ElementType.DRAG) {
 				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));

@@ -782,10 +782,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			app.ifPresent(GuiFrameActions::updateZoomCombo);
 
 			//XXX: moved from drawingsurface, temp while refactoring, there is a better way
-			drawingSurface.getSelectionObject().disableSelection();
-			if(CreateGui.getApp().getMode() == Pipe.ElementType.SELECT) {
-				drawingSurface.getSelectionObject().enableSelection();
-			}
+			drawingSurface.getSelectionObject().clearSelection();
 
 			if (isInAnimationMode()) {
 				getAnimator().highlightEnabledTransitions();
@@ -802,11 +799,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private boolean animationmode = false;
 	public void changeAnimationMode(boolean status) {
 		animationmode = status;
-		if(status){
-			drawingSurface.getSelectionObject().disableSelection();
-		}else{
-			drawingSurface.getSelectionObject().enableSelection();
-		}
 	}
 
 	public boolean isInAnimationMode() {

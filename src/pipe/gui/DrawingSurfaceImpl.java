@@ -483,6 +483,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
                         fastDrawAction(e, newpto, ElementType.FAST_TRANSITION);
                         break;
+					case SELECT:
+						getSelectionObject().dispatchEvent(e);
 
 					default:
 						break;
@@ -517,6 +519,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			if (dragStart != null) {
+				dragStart = null;
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+			if (app.getMode() == ElementType.SELECT) {
+				getSelectionObject().dispatchEvent(e);
+			}
 		}
 
 		@Override
@@ -530,9 +539,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			// if (CreateGui.getApp().getMode() == Pipe.DRAG){
-			view.drag(dragStart, e.getPoint());
-			// }
+			if (dragStart != null) {
+				view.drag(dragStart, e.getPoint());
+			} else if (app.getMode() == ElementType.SELECT) {
+				getSelectionObject().dispatchEvent(e);
+			}
 		}
 
 		@Override

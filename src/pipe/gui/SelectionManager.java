@@ -27,12 +27,13 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	private static final long serialVersionUID = 9057152447545103393L;
 	private Point startPoint;
+
+	private Point upperLeftCorner = new Point(0,0);
 	private Rectangle selectionRectangle = new Rectangle(-1, -1);
 	private boolean isSelecting;
 	private static final Color selectionColor = new Color(0, 0, 255, 30);
 	private static final Color selectionColorOutline = new Color(0, 0, 100);
 	private DrawingSurfaceImpl drawingSurface;
-	private boolean enabled = true;
 
 	public SelectionManager(DrawingSurfaceImpl _view) {
 		addMouseListener(this);
@@ -42,25 +43,21 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void updateBounds() {
-		if (enabled) {
-			setBounds(0, 0, drawingSurface.getWidth(), drawingSurface.getHeight());
-		}
+		setBounds(
+				upperLeftCorner.x,
+				upperLeftCorner.y,
+				selectionRectangle.width+1,
+				selectionRectangle.height+1
+		);
 	}
 
-	public void enableSelection() {
-		if (!(enabled)) {
-			drawingSurface.add(this);
-			enabled = true;
-			updateBounds();
-		}
+	private void enableSelection() {
+		drawingSurface.add(this);
 	}
 
-	public void disableSelection() {
-		if (enabled) {
-			this.clearSelection();
-			drawingSurface.remove(this);
-			enabled = false;
-		}
+	private void disableSelection() {
+		//this.clearSelection();
+		drawingSurface.remove(this);
 	}
 
 	private void processSelection(MouseEvent e) {
@@ -68,9 +65,16 @@ public class SelectionManager extends javax.swing.JComponent implements
 			clearSelection();
 		}
 
+		Rectangle intersectionRectangle = new Rectangle(
+				upperLeftCorner.x,
+				upperLeftCorner.y,
+				selectionRectangle.width + 1,
+				selectionRectangle.height +1
+		);
+
 		// Get all the place and transition objects in the current window
 		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPlaceTransitionObjects()) {
-			pnObject.select(selectionRectangle);
+			pnObject.select(intersectionRectangle);
 		}
 	}
 
@@ -158,11 +162,14 @@ public class SelectionManager extends javax.swing.JComponent implements
 		CreateGui.getCurrentTab().removeConstantHighlights();
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
+			enableSelection();
 			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
 			startPoint = e.getPoint();
-			selectionRectangle.setRect(startPoint.getX(), startPoint.getY(), 0, 0);
+			selectionRectangle.setSize(0, 0);
+			upperLeftCorner.setLocation(e.getPoint());
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
+			updateBounds();
 			repaint();
 		} else {
 			startPoint = e.getPoint();
@@ -175,7 +182,10 @@ public class SelectionManager extends javax.swing.JComponent implements
 			processSelection(e);
 			isSelecting = false;
 			drawingSurface.setLayer(this, Pipe.LOWEST_LAYER_OFFSET);
-			selectionRectangle.setRect(-1, -1, 0, 0);
+			selectionRectangle.setSize(0, 0);
+			upperLeftCorner.setLocation(0,0);
+			updateBounds();
+			disableSelection();
 			repaint();
 		}
 	}
@@ -184,16 +194,18 @@ public class SelectionManager extends javax.swing.JComponent implements
 		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
 		
 		if (isSelecting) {
-			selectionRectangle.setSize((int) Math.abs(e.getX()
-					- startPoint.getX()), (int) Math.abs(e.getY()
-					- startPoint.getY()));
-			selectionRectangle.setLocation((int) Math.min(startPoint.getX(), e
-					.getX()), (int) Math.min(startPoint.getY(), e.getY()));
+			selectionRectangle.setSize(
+					(int) Math.abs(e.getX() - startPoint.getX()),
+					(int) Math.abs(e.getY() - startPoint.getY())
+			);
+			upperLeftCorner.setLocation(
+					(int) Math.min(startPoint.getX(), e.getX()),
+					(int) Math.min(startPoint.getY(), e.getY())
+			);
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
+			updateBounds();
 			repaint();
-		} else {
-			drawingSurface.drag(startPoint, e.getPoint());
 		}
 	}
 
