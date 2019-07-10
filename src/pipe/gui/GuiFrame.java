@@ -1905,6 +1905,43 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		// Don't bother unless new mode is different.
 		if (mode != _mode) {
 			mode = _mode;
+
+			// deselect other actions
+			transAction.setSelected(mode == ElementType.TAPNTRANS);
+			timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
+			timedArcAction.setSelected(mode == ElementType.TAPNARC);
+			transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
+			inhibarcAction.setSelected(mode == ElementType.INHIBARC);
+			tokenAction.setSelected(mode == ElementType.ADDTOKEN);
+			deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
+			selectAction.setSelected(mode == ElementType.SELECT);
+			annotationAction.setSelected(mode == ElementType.ANNOTATION);
+
+			if (getCurrentTab() == null) {
+				return;
+			}
+
+			statusBar.changeText(mode);
+
+			//Disable selection and deselect current selection
+			getCurrentTab().drawingSurface().getSelectionObject().disableSelection();
+
+			//If pending arc draw, remove it
+			if (getCurrentTab().drawingSurface().createArc != null) {
+				PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
+			}
+
+			if (mode == ElementType.SELECT) {
+				getCurrentTab().drawingSurface().getSelectionObject().enableSelection();
+				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			} else if (mode == ElementType.DRAG) {
+				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+			} else {
+				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			}
+
+
+
 		}
 	}
 
@@ -2077,65 +2114,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		public void actionPerformed(ActionEvent e) {
 
-			this.setSelected(true);
-
-			// deselect other actions
-			if (this != transAction) {
-				transAction.setSelected(false);
-			}
-
-			if (this != timedArcAction) {
-				timedArcAction.setSelected(false);
-			}
-
-			if (this != timedPlaceAction) {
-				timedPlaceAction.setSelected(false);
-			}
-			if (this != transportArcAction) {
-				transportArcAction.setSelected(false);
-			}
-
-			if (this != inhibarcAction) {
-				inhibarcAction.setSelected(false);
-			}
-
-			if (this != tokenAction) {
-				tokenAction.setSelected(false);
-			}
-			if (this != deleteTokenAction) {
-				deleteTokenAction.setSelected(false);
-			}
-
-			if (this != selectAction) {
-				selectAction.setSelected(false);
-			}
-			if (this != annotationAction) {
-				annotationAction.setSelected(false);
-			}
-
-			if (getCurrentTab() == null) {
-				return;
-			}
-
 			setMode(typeID);
-			statusBar.changeText(typeID);
-
-			//Disable selection and deselect current selection
-			getCurrentTab().drawingSurface().getSelectionObject().disableSelection();
-
-			//If pending arc draw, remove it
-			if (getCurrentTab().drawingSurface().createArc != null) {
-				PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
-			}
-
-			if (typeID == ElementType.SELECT) {
-				getCurrentTab().drawingSurface().getSelectionObject().enableSelection();
-				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			} else if (typeID == ElementType.DRAG) {
-				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-			} else {
-				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-			}
 		}
 
 	}
