@@ -1396,7 +1396,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			currentTab.ifPresent(t->t.setApp(this));
 
 			setTitle(appTab.getTitleAt(index));
-			setGUIMode(GUIMode.draw);
+
+			//XXX
+			if (getCurrentTab().isInAnimationMode()) {
+				setGUIMode(GUIMode.animation);
+			} else {
+				setGUIMode(GUIMode.draw);
+			}
 
 			// TODO: change this code... it's ugly :)
 			if (getMode() == ElementType.SELECT) {
