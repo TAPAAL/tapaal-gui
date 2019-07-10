@@ -1872,8 +1872,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			getCurrentTab().drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
 			setMode(ElementType.SELECT);
-			selectAction.setSelected(true);
-
 
 			break;
 		case animation:
@@ -1937,46 +1935,42 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	public void setMode(Pipe.ElementType _mode) {
-		// Don't bother unless new mode is different.
-		if (mode != _mode) {
-			mode = _mode;
 
-			// deselect other actions
-			transAction.setSelected(mode == ElementType.TAPNTRANS);
-			timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
-			timedArcAction.setSelected(mode == ElementType.TAPNARC);
-			transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
-			inhibarcAction.setSelected(mode == ElementType.INHIBARC);
-			tokenAction.setSelected(mode == ElementType.ADDTOKEN);
-			deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
-			selectAction.setSelected(mode == ElementType.SELECT);
-			annotationAction.setSelected(mode == ElementType.ANNOTATION);
+		mode = _mode;
 
-			if (getCurrentTab() == null) {
-				return;
-			}
+		// deselect other actions
+		transAction.setSelected(mode == ElementType.TAPNTRANS);
+		timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
+		timedArcAction.setSelected(mode == ElementType.TAPNARC);
+		transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
+		inhibarcAction.setSelected(mode == ElementType.INHIBARC);
+		tokenAction.setSelected(mode == ElementType.ADDTOKEN);
+		deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
+		selectAction.setSelected(mode == ElementType.SELECT);
+		annotationAction.setSelected(mode == ElementType.ANNOTATION);
 
-			statusBar.changeText(mode);
-
-			//Disable selection and deselect current selection
-			getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
-
-			//If pending arc draw, remove it
-			if (getCurrentTab().drawingSurface().createArc != null) {
-				PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
-			}
-
-			if (mode == ElementType.SELECT) {
-				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			} else if (mode == ElementType.DRAG) {
-				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-			} else {
-				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-			}
-
-
-
+		if (getCurrentTab() == null) {
+			return;
 		}
+
+		statusBar.changeText(mode);
+
+		//Disable selection and deselect current selection
+		getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
+
+		//If pending arc draw, remove it
+		if (getCurrentTab().drawingSurface().createArc != null) {
+			PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
+		}
+
+		if (mode == ElementType.SELECT) {
+			getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		} else if (mode == ElementType.DRAG) {
+			getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		} else {
+			getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+		}
+
 	}
 
 	public Pipe.ElementType getMode() {
