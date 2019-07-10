@@ -121,19 +121,19 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction decSpacingAction;
 	public GuiAction deleteAction;
 
-	private TypeAction annotationAction;
-	private TypeAction inhibarcAction;
-	private TypeAction transAction;
-	private TypeAction tokenAction;
-	private TypeAction selectAction;
-	private TypeAction deleteTokenAction;
-	private TypeAction timedPlaceAction;
+	private GuiAction annotationAction;
+	private GuiAction inhibarcAction;
+	private GuiAction transAction;
+	private GuiAction tokenAction;
+	private GuiAction selectAction;
+	private GuiAction deleteTokenAction;
+	private GuiAction timedPlaceAction;
 
 	private JMenuItem statistics;
 	private JMenuItem verification;
 
-	private TypeAction timedArcAction;
-	private TypeAction transportArcAction;
+	private GuiAction timedArcAction;
+	private GuiAction transportArcAction;
 
 	private GuiAction showTokenAgeAction;
 	private GuiAction showComponentsAction;
@@ -494,37 +494,64 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		/* Draw menu */
 		JMenu drawMenu = new JMenu("Draw");
 		drawMenu.setMnemonic('D');
-		drawMenu.add( selectAction = new TypeAction("Select",
-				ElementType.SELECT, "Select components (S)", "S", true));
+
+		drawMenu.add( selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.SELECT);
+			}
+		});
 		drawMenu.addSeparator();
 
-		drawMenu.add( timedPlaceAction = new TypeAction("Place",
-				ElementType.TAPNPLACE, "Add a place (P)", "P", true));
+		drawMenu.add( timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.TAPNPLACE);
+			}
+		});
 
-		drawMenu.add( transAction = new TypeAction("Transition",
-				ElementType.TAPNTRANS, "Add a transition (T)", "T", true));
+		drawMenu.add( transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.TAPNTRANS);
+			}
+		});
 
-		drawMenu.add( timedArcAction = new TypeAction("Arc",
-				ElementType.TAPNARC, "Add an arc (A)", "A", true));
+		drawMenu.add( timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.TAPNARC);
+			}
+		});
 
-		drawMenu.add( transportArcAction = new TypeAction(
-				"Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
-				true));
+		drawMenu.add( transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.TRANSPORTARC);
+			}
+		});
 
-		drawMenu.add( inhibarcAction = new TypeAction("Inhibitor arc",
-				ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
+		drawMenu.add( inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.TAPNINHIBITOR_ARC);
+			}
+		});
 
-		drawMenu.add(annotationAction = new TypeAction("Annotation",
-				ElementType.ANNOTATION, "Add an annotation (N)", "N", true));
+		drawMenu.add(annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.ANNOTATION);
+			}
+		});
 
 		drawMenu.addSeparator();
 
-		drawMenu.add( tokenAction = new TypeAction("Add token",
-				ElementType.ADDTOKEN, "Add a token (+)", "typed +", true));
+		drawMenu.add( tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
+			public void actionPerformed(ActionEvent e) {
+				setMode(ElementType.ADDTOKEN);
+			}
+		});
 
-		drawMenu.add( deleteTokenAction = new TypeAction(
-				"Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
-				true));
+		drawMenu.add( deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
+			public void actionPerformed(ActionEvent e) {
+
+				setMode(ElementType.DELTOKEN);
+			}
+		});
 		return drawMenu;
 	}
 
@@ -2093,36 +2120,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 	}
 
-	class TypeAction extends GuiAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1333311291148756241L;
-		private Pipe.ElementType typeID;
-
-		TypeAction(String name, Pipe.ElementType typeID, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-			this.typeID = typeID;
-		}
-
-		TypeAction(String name, Pipe.ElementType typeID, String tooltip, String keystroke,
-				boolean toggleable) {
-			super(name, tooltip, keystroke, toggleable);
-			this.typeID = typeID;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-
-			setMode(typeID);
-		}
-
-	}
-
-
-
-	
-	
 
 	public void showAbout() {
 		StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
