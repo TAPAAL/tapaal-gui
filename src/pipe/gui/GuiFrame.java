@@ -1853,6 +1853,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	public void setGUIMode(GUIMode mode) {
 		switch (mode) {
 		case draw:
+			getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
+
 			// Enable all draw actions
 			startAction.setSelected(false);
 			getCurrentTab().changeAnimationMode(false);
@@ -1873,8 +1875,32 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			setMode(ElementType.SELECT);
 
+			getCurrentTab().restoreSelectedTemplate();
+			//Enable editor focus traversal policy
+			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
+
+			stepforwardAction.setEnabled(false);
+			stepbackwardAction.setEnabled(false);
+
+			setMode(ElementType.SELECT);
+
+			// XXX
+			// This is a fix for bug #812694 where on mac some menues are gray after
+			// changing from simulation mode, when displaying a trace. Showing and
+			// hiding a menu seems to fix this problem
+			JDialog a = new JDialog(this, false);
+			a.setUndecorated(true);
+			a.setVisible(true);
+			a.dispose();
 			break;
 		case animation:
+
+			getCurrentTab().rememberSelectedTemplate();
+			if (getCurrentTab().currentTemplate().isActive()){
+				getCurrentTab().setSelectedTemplateWasActive();
+			}
+
+			setMode(ElementType.SELECT);
 
 			getCurrentTab().getAnimator().setTabContent(getCurrentTab());
 			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
@@ -1894,6 +1920,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			// Set a light blue backgound color for animation mode
 			getCurrentTab().drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			getCurrentTab().getAnimationController().requestFocusInWindow();
+
+			if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
+				getCurrentTab().restoreSelectedTemplate();
+				getCurrentTab().resetSelectedTemplateWasActive();
+			}
+			else {
+				getCurrentTab().selectFirstActiveTemplate();
+			}
+			//Enable simulator focus traversal policy
+			setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 			break;
 		case noNet:
 			// Disable All Actions
@@ -2057,40 +2093,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			if (!getCurrentTab().isInAnimationMode()) {
 				if (getCurrentTab().numberOfActiveTemplates() > 0) {
-					getCurrentTab().rememberSelectedTemplate();
-					if (getCurrentTab().currentTemplate().isActive()){
-						getCurrentTab().setSelectedTemplateWasActive();
-					}
-					setMode(ElementType.SELECT);
-
 					setGUIMode(GUIMode.animation);
-
-					if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
-						getCurrentTab().restoreSelectedTemplate();
-						getCurrentTab().resetSelectedTemplateWasActive();
-					}
-					else {
-						getCurrentTab().selectFirstActiveTemplate();
-					}
-					//Enable simulator focus traversal policy
-					setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 				} else {
 					JOptionPane.showMessageDialog(GuiFrame.this,
 							"You need at least one active template to enter simulation mode",
 							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				}
-
-				stepforwardAction.setEnabled(false);
-				stepbackwardAction.setEnabled(false);
 			} else {
-				//setMode(ElementType.START);
-				getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
-
 				setGUIMode(GUIMode.draw);
-
-				getCurrentTab().restoreSelectedTemplate();
-				//Enable editor focus traversal policy
-				setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 			}
 		} catch (Exception e) {
 			Logger.log(e);
@@ -2101,18 +2111,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			throw new RuntimeException(e);
 		}
 
-		if(getGUIMode().equals(GUIMode.draw)){
-			setMode(ElementType.SELECT);
-
-			// XXX
-			// This is a fix for bug #812694 where on mac some menues are gray after
-			// changing from simulation mode, when displaying a trace. Showing and
-			// hiding a menu seems to fix this problem
-			JDialog a = new JDialog(this, false);
-			a.setUndecorated(true);
-			a.setVisible(true);
-			a.dispose();
-		}
 	}
 
 
