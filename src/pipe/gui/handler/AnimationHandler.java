@@ -31,7 +31,12 @@ public class AnimationHandler extends javax.swing.event.MouseInputAdapter {
 			if (SwingUtilities.isLeftMouseButton(e)) {
 				if(transition.isDEnabled()){
 					CreateGui.getAnimator().dFireTransition(transition);
-					CreateGui.getApp().setRandomAnimationMode(false);
+					GuiFrame guiFrame = CreateGui.getApp();
+					guiFrame.stepforwardAction.setEnabled(guiFrame.getCurrentTab().getAnimationHistory().isStepForwardAllowed());
+					guiFrame.stepbackwardAction.setEnabled(guiFrame.getCurrentTab().getAnimationHistory().isStepBackAllowed());
+
+					guiFrame.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+
 				}
 			}
 		}

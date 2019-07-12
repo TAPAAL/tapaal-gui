@@ -1813,20 +1813,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return true;
 	}
 
-	public void setRandomAnimationMode(boolean on) {
-
-		if (!(on)) {
-			stepforwardAction.setEnabled(getCurrentTab().getAnimationHistory().isStepForwardAllowed());
-			stepbackwardAction.setEnabled(getCurrentTab().getAnimationHistory().isStepBackAllowed());
-
-			getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
-
-		} else {
-			stepbackwardAction.setEnabled(false);
-			stepforwardAction.setEnabled(false);
-		}
-	}
-
 	/**
 	 * Returns the current GUIMode
 	 * 

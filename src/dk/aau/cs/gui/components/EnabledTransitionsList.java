@@ -26,6 +26,7 @@ import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
@@ -54,7 +55,12 @@ public class EnabledTransitionsList extends JPanel{
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2){
 					fireSelectedTransition();
-					CreateGui.getApp().setRandomAnimationMode(false);
+					GuiFrame guiFrame = CreateGui.getApp();
+					guiFrame.stepforwardAction.setEnabled(guiFrame.getCurrentTab().getAnimationHistory().isStepForwardAllowed());
+					guiFrame.stepbackwardAction.setEnabled(guiFrame.getCurrentTab().getAnimationHistory().isStepBackAllowed());
+
+					guiFrame.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+
 				}
 				
 				if(e.getClickCount() == 1){
