@@ -1882,8 +1882,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			stepforwardAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 
-			setMode(ElementType.SELECT);
-
 			// XXX
 			// This is a fix for bug #812694 where on mac some menues are gray after
 			// changing from simulation mode, when displaying a trace. Showing and
