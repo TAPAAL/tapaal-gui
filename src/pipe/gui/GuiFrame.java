@@ -2593,11 +2593,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	public void closeTab(int index) {
 
 		if(appTab.getTabCount() > 0 && checkForSave(index)){
-			if(appTab.getTabCount() == 1) { setGUIMode(GUIMode.noNet); }
-
 			//Close the gui part first, else we get an error bug #826578
 			appTab.removeTabAt(index);
 			CreateGui.removeTab(index);
+
+			if(appTab.getTabCount() == 0) {
+				setGUIMode(GUIMode.noNet);
+			} else {
+				//XXX: The removeTabAt doews trigger changeToTab via tabChanged listener, but at this time
+				//the model is not updated yet, which make it change to a wrong tab, so we change it again
+				// --kyrke -2019-07-13
+				changeToTab(appTab.getSelectedIndex());
+			}
+
+
 
 		}
 
