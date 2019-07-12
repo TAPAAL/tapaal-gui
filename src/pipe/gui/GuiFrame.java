@@ -1914,7 +1914,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			getCurrentTab().getAnimator().setFiringmode("Random");
 
 			statusBar.changeText(statusBar.textforAnimation);
-			selectAction.setSelected(false);
+
 			// Set a light blue backgound color for animation mode
 			getCurrentTab().drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			getCurrentTab().getAnimationController().requestFocusInWindow();
