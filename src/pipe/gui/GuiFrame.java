@@ -1404,11 +1404,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				setGUIMode(GUIMode.draw);
 			}
 
-			// TODO: change this code... it's ugly :)
-			if (getMode() == ElementType.SELECT) {
-				setMode(ElementType.SELECT);
-			}
-
 		} else {
 			setTitle(null);
 		}
@@ -2604,7 +2599,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			appTab.removeTabAt(index);
 			CreateGui.removeTab(index);
 
-			setMode(ElementType.SELECT);
 		}
 
 	}
