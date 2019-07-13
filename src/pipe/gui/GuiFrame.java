@@ -1832,7 +1832,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 * @return the current GUIMode
 	 */
-	public GUIMode getGUIMode() {
+	private GUIMode getGUIMode() {
 		return guiMode;
 	}
 
