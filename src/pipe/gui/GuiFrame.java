@@ -2002,7 +2002,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	public boolean isEditionAllowed() {
-		return getGUIMode() == GUIMode.draw;
+		return !getCurrentTab().isInAnimationMode();
 	}
 
     @Override
