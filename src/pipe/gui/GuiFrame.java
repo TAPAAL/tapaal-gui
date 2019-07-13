@@ -726,7 +726,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"M", true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleAnimationMode();
+				currentTab.ifPresent(o->o.changeAnimationMode(isSelected()));
 			}
 		});
 		
@@ -1842,7 +1842,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			// Enable all draw actions
 			startAction.setSelected(false);
-			getCurrentTab().changeAnimationMode(false);
 
 			if (getCurrentTab().isInAnimationMode()) {
 				getCurrentTab().getAnimator().restoreModel();
@@ -1871,13 +1870,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			setMode(ElementType.SELECT);
 
-			getCurrentTab().getAnimator().setTabContent(getCurrentTab());
 			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
+			getCurrentTab().getAnimator().setTabContent(getCurrentTab());
+
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
 			if (!getCurrentTab().isInAnimationMode()) {
-				getCurrentTab().changeAnimationMode(true);
 				getCurrentTab().drawingSurface().repaintAll();
 				getCurrentTab().getAnimator().reset(false);
 				getCurrentTab().getAnimator().storeModel();
@@ -2058,35 +2057,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
                 }
                 return false;
         }
-
-
-	/**
-	 * Starts/Stops Animation mode
-	 */
-	private void toggleAnimationMode() {
-		try {
-
-			if (!getCurrentTab().isInAnimationMode()) {
-				if (getCurrentTab().numberOfActiveTemplates() > 0) {
-					setGUIMode(GUIMode.animation);
-				} else {
-					JOptionPane.showMessageDialog(GuiFrame.this,
-							"You need at least one active template to enter simulation mode",
-							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
-				}
-			} else {
-				setGUIMode(GUIMode.draw);
-			}
-		} catch (Exception e) {
-			Logger.log(e);
-			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-					"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
-			startAction.setSelected(false);
-			getCurrentTab().changeAnimationMode(false);
-			throw new RuntimeException(e);
-		}
-
-	}
 
 
 	public void showAbout() {

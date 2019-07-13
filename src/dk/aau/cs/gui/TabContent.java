@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -797,8 +798,26 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
 
 	private boolean animationmode = false;
+	@Override
 	public void changeAnimationMode(boolean status) {
-		animationmode = status;
+
+		if (status) {
+			if (numberOfActiveTemplates() > 0) {
+				Logger.log("Change to animation mode");
+				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
+			} else {
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"You need at least one active template to enter simulation mode",
+						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
+				animationmode = false;
+				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+			}
+		} else {
+			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+			animationmode = false;
+		}
+
 	}
 
 	public boolean isInAnimationMode() {

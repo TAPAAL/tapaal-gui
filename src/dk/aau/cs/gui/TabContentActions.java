@@ -25,5 +25,7 @@ public interface TabContentActions{
     void timeDelay();
 
     void delayAndFire();
+
+    void changeAnimationMode(boolean status);
 }
 
