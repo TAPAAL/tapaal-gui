@@ -1859,15 +1859,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			getCurrentTab().restoreSelectedTemplate();
 			//Enable editor focus traversal policy
 			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
+			fixBug812694GrayMenuAfterSimulationOnMac();
 
-			// XXX
-			// This is a fix for bug #812694 where on mac some menues are gray after
-			// changing from simulation mode, when displaying a trace. Showing and
-			// hiding a menu seems to fix this problem
-			JDialog a = new JDialog(this, false);
-			a.setUndecorated(true);
-			a.setVisible(true);
-			a.dispose();
 			break;
 		case animation:
 
@@ -1923,6 +1916,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		// Enable actions based on GUI mode
 		enableGUIActions();
 
+	}
+
+	private void fixBug812694GrayMenuAfterSimulationOnMac() {
+		// XXX
+		// This is a fix for bug #812694 where on mac some menues are gray after
+		// changing from simulation mode, when displaying a trace. Showing and
+		// hiding a menu seems to fix this problem
+		JDialog a = new JDialog(this, false);
+		a.setUndecorated(true);
+		a.setVisible(true);
+		a.dispose();
 	}
 
 	private void hideComponentWindow(){
