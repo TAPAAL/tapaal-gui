@@ -1208,6 +1208,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				WorkflowDialog.showDialog();
 			}
 
+			statusBar.changeText(statusBar.textforDrawing);
+			//Enable editor focus traversal policy
+			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
+			fixBug812694GrayMenuAfterSimulationOnMac();
 			break;
 
 		case animation:
@@ -1261,6 +1265,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			getCurrentTab().getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
 			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
 			getCurrentTab().getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
+
+			statusBar.changeText(statusBar.textforAnimation);
+			//Enable simulator focus traversal policy
+			setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+
 			break;
 		case noNet:
 			exportTraceAction.setEnabled(false);
@@ -1295,6 +1304,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			stripTimeDialogAction.setEnabled(false);
 
 			enableAllActions(false);
+
+			// Disable All Actions
+			statusBar.changeText(statusBar.textforNoNet);
+			setFocusTraversalPolicy(null);
 
 			break;
 		}
@@ -1840,7 +1853,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			startAction.setSelected(false);
 			getCurrentTab().changeAnimationMode(false);
 
-			statusBar.changeText(statusBar.textforDrawing);
 			if (this.guiMode.equals(GUIMode.animation)) {
 				getCurrentTab().getAnimator().restoreModel();
 				hideComponentWindow();
@@ -1857,9 +1869,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			setMode(ElementType.SELECT);
 
 			getCurrentTab().restoreSelectedTemplate();
-			//Enable editor focus traversal policy
-			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
-			fixBug812694GrayMenuAfterSimulationOnMac();
 
 			break;
 		case animation:
@@ -1886,8 +1895,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				getCurrentTab().getAnimator().setFiringmode("Random");
 			}
 
-			statusBar.changeText(statusBar.textforAnimation);
-
 			// Set a light blue backgound color for animation mode
 			getCurrentTab().drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			getCurrentTab().getAnimationController().requestFocusInWindow();
@@ -1899,14 +1906,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			else {
 				getCurrentTab().selectFirstActiveTemplate();
 			}
-			//Enable simulator focus traversal policy
-			setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+
 			break;
 		case noNet:
-			// Disable All Actions
-			statusBar.changeText(statusBar.textforNoNet);
-			setFocusTraversalPolicy(null);
-
 			break;
 
 		default:
