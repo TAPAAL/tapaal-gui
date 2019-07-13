@@ -1860,9 +1860,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			//Enable editor focus traversal policy
 			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 
-			stepforwardAction.setEnabled(false);
-			stepbackwardAction.setEnabled(false);
-
 			// XXX
 			// This is a fix for bug #812694 where on mac some menues are gray after
 			// changing from simulation mode, when displaying a trace. Showing and
