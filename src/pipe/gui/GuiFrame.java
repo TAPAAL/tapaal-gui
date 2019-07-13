@@ -76,7 +76,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private String frameTitle;
 
 	private Pipe.ElementType mode;
-	private GUIMode guiMode = GUIMode.noNet;
 
 	private int newNameCounter = 1;
 
@@ -1159,8 +1158,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * 
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 * */
-	private void enableGUIActions() {
-		switch (getGUIMode()) {
+	private void enableGUIActions(GUIMode mode) {
+		switch (mode) {
 		case draw:
 			enableAllActions(true);
 			exportTraceAction.setEnabled(false);
@@ -1555,7 +1554,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		try {
 			TabContent currentTab = getTab(index);
 			NetworkMarking currentMarking = null;
-			if(getGUIMode().equals(GUIMode.animation)){
+			if(getCurrentTab().isInAnimationMode()){
 				currentMarking = currentTab.network().marking();
 				currentTab.network().setMarking(getCurrentTab().getAnimator().getInitialMarking());
 			}
@@ -1569,7 +1568,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			tapnWriter.savePNML(outFile);
 
-			if(getGUIMode().equals(GUIMode.animation)){
+			if(getCurrentTab().isInAnimationMode()){
 				currentTab.network().setMarking(currentMarking);
 			}
 		} catch (Exception e) {
@@ -1826,15 +1825,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return true;
 	}
 
-	/**
-	 * Returns the current GUIMode
-	 * 
-	 * @author Kenneth Yrke Joergensen (kyrke)
-	 * @return the current GUIMode
-	 */
-	private GUIMode getGUIMode() {
-		return guiMode;
-	}
+
 
 	/**
 	 * Set the current mode of the GUI, and changes possible actions
@@ -1853,7 +1844,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			startAction.setSelected(false);
 			getCurrentTab().changeAnimationMode(false);
 
-			if (this.guiMode.equals(GUIMode.animation)) {
+			if (getCurrentTab().isInAnimationMode()) {
 				getCurrentTab().getAnimator().restoreModel();
 				hideComponentWindow();
 			}
@@ -1914,9 +1905,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		default:
 			break;
 		}
-		this.guiMode = mode;
+
 		// Enable actions based on GUI mode
-		enableGUIActions();
+		enableGUIActions(mode);
 
 	}
 
