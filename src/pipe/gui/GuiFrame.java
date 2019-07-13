@@ -1886,13 +1886,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
-			getCurrentTab().changeAnimationMode(true);
-			getCurrentTab().drawingSurface().repaintAll();
-			getCurrentTab().getAnimator().reset(false);
-			getCurrentTab().getAnimator().storeModel();
-			getCurrentTab().getAnimator().highlightEnabledTransitions();
-			getCurrentTab().getAnimator().reportBlockingPlaces();
-			getCurrentTab().getAnimator().setFiringmode("Random");
+			if (!getCurrentTab().isInAnimationMode()) {
+				getCurrentTab().changeAnimationMode(true);
+				getCurrentTab().drawingSurface().repaintAll();
+				getCurrentTab().getAnimator().reset(false);
+				getCurrentTab().getAnimator().storeModel();
+				getCurrentTab().getAnimator().highlightEnabledTransitions();
+				getCurrentTab().getAnimator().reportBlockingPlaces();
+				getCurrentTab().getAnimator().setFiringmode("Random");
+			}
 
 			statusBar.changeText(statusBar.textforAnimation);
 
