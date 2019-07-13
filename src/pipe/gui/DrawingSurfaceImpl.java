@@ -419,7 +419,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if(app.getGUIMode().equals(GUIMode.animation)) return;
+			if(app.getCurrentTab().isInAnimationMode()) return;
 
 			// check for control down here enables it to attach the arc being drawn to an existing place/transition
 

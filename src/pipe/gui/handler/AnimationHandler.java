@@ -25,7 +25,7 @@ public class AnimationHandler extends javax.swing.event.MouseInputAdapter {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (e.getComponent() instanceof TimedTransitionComponent && CreateGui.getApp().getGUIMode().equals(GuiFrame.GUIMode.animation)) {
+		if (e.getComponent() instanceof TimedTransitionComponent && CreateGui.getCurrentTab().isInAnimationMode()) {
 			TimedTransition transition = ((TimedTransitionComponent) e.getComponent()).underlyingTransition();
 
 			if (SwingUtilities.isLeftMouseButton(e)) {

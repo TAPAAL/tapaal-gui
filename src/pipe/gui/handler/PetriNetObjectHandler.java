@@ -67,7 +67,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
@@ -91,7 +91,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		// Have to check for popup here as well as on pressed for
 		// crossplatform!!
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {

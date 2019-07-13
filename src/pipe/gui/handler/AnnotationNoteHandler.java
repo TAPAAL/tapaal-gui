@@ -62,7 +62,7 @@ public class AnnotationNoteHandler extends NoteHandler {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		
 		if ((e.getComponent() == myObject || !e.getComponent().isEnabled())
 				&& (SwingUtilities.isLeftMouseButton(e))) {

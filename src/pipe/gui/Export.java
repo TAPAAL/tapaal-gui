@@ -70,7 +70,7 @@ public class Export {
 			IOException, ParserConfigurationException, TransformerException {
 		TabContent currentTab = CreateGui.getCurrentTab();
 		NetworkMarking currentMarking = null;
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+		if(CreateGui.getCurrentTab().isInAnimationMode()){
 			currentMarking = currentTab.network().marking();
 			currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
 		}
@@ -82,7 +82,7 @@ public class Export {
 
 		tapnWriter.savePNML(new File(filename));
 
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+		if(CreateGui.getCurrentTab().isInAnimationMode()){
 			currentTab.network().setMarking(currentMarking);
 		}
 	}

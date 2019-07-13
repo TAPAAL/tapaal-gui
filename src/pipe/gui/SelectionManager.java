@@ -191,7 +191,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		
 		if (isSelecting) {
 			selectionRectangle.setSize(

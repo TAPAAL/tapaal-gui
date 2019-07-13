@@ -236,7 +236,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 			myPoint.myNote.setDraggable(false);
 			myPoint.isPressed = true;
 			myPoint.repaint();
@@ -245,7 +245,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid
 					.getModifiedY(e.getY() - start.y));
@@ -255,7 +255,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {			
-			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.myNote.setDraggable(true);
 			myPoint.isPressed = false;
