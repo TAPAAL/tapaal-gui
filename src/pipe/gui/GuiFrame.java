@@ -1842,13 +1842,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			// Enable all draw actions
 			startAction.setSelected(false);
-			getCurrentTab().changeAnimationMode(false);
+
 
 			if (getCurrentTab().isInAnimationMode()) {
 				getCurrentTab().getAnimator().restoreModel();
 				hideComponentWindow();
 			}
-
+            getCurrentTab().changeAnimationMode(false);
 			getCurrentTab().switchToEditorComponents();
 			showComponents(showComponents);
 			showQueries(showQueries);
