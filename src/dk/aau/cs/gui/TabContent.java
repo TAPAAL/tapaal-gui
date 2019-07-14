@@ -798,7 +798,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		if (status) {
 			if (numberOfActiveTemplates() > 0) {
-				Logger.log("Change to animation mode");
 				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
 			} else {
