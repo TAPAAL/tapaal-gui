@@ -799,6 +799,31 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (status) {
 			if (numberOfActiveTemplates() > 0) {
 				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+				drawingSurface().repaintAll();
+
+				rememberSelectedTemplate();
+				if (currentTemplate().isActive()){
+					setSelectedTemplateWasActive();
+				}
+
+				getAnimator().reset(false);
+				getAnimator().storeModel();
+				getAnimator().highlightEnabledTransitions();
+				getAnimator().reportBlockingPlaces();
+				getAnimator().setFiringmode("Random");
+
+				// Set a light blue backgound color for animation mode
+				drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+				getAnimationController().requestFocusInWindow();
+
+				if (templateWasActiveBeforeSimulationMode()) {
+					restoreSelectedTemplate();
+					resetSelectedTemplateWasActive();
+				}
+				else {
+					selectFirstActiveTemplate();
+				}
+
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
 			} else {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),

@@ -1863,10 +1863,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			break;
 		case animation:
 
-			getCurrentTab().rememberSelectedTemplate();
-			if (getCurrentTab().currentTemplate().isActive()){
-				getCurrentTab().setSelectedTemplateWasActive();
-			}
+
 
 			setMode(ElementType.SELECT);
 
@@ -1875,26 +1872,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			showComponents(showComponents);
 
 			startAction.setSelected(true);
-			if (!getCurrentTab().isInAnimationMode()) {
-				getCurrentTab().drawingSurface().repaintAll();
-				getCurrentTab().getAnimator().reset(false);
-				getCurrentTab().getAnimator().storeModel();
-				getCurrentTab().getAnimator().highlightEnabledTransitions();
-				getCurrentTab().getAnimator().reportBlockingPlaces();
-				getCurrentTab().getAnimator().setFiringmode("Random");
-			}
 
-			// Set a light blue backgound color for animation mode
-			getCurrentTab().drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
-			getCurrentTab().getAnimationController().requestFocusInWindow();
-
-			if (getCurrentTab().templateWasActiveBeforeSimulationMode()) {
-				getCurrentTab().restoreSelectedTemplate();
-				getCurrentTab().resetSelectedTemplateWasActive();
-			}
-			else {
-				getCurrentTab().selectFirstActiveTemplate();
-			}
 
 			break;
 		case noNet:
