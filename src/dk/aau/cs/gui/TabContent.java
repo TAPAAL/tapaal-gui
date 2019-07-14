@@ -823,7 +823,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return animator;
 	}
 
-	private Animator animator = new Animator();
+	private Animator animator = new Animator(this);
 
 	/* GUI Model / Actions helpers */
 	/**

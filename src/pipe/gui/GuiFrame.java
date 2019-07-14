@@ -1871,7 +1871,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			setMode(ElementType.SELECT);
 
 			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
-			getCurrentTab().getAnimator().setTabContent(getCurrentTab());
 
 			showComponents(showComponents);
 

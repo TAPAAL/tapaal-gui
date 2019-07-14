@@ -55,13 +55,14 @@ public class Animator {
 		return isUrgentTransitionEnabled;
 	}
 
-	public Animator() {
+	public Animator(TabContent tab) {
 		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
 		currentAction = -1;
 		markings = new ArrayList<NetworkMarking>();
+		setTabContent(tab);
 	}
 
-	public void setTabContent(TabContent tab)  {
+	private void setTabContent(TabContent tab)  {
 		this.tab = tab;
 	}
 
