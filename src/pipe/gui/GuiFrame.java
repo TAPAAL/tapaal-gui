@@ -1252,16 +1252,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			getCurrentTab().getAnimationController().requestFocusInWindow();
 
-			// Event repeater
-			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
-			getCurrentTab().getAnimationController().getActionMap().put("_right_hold", stepforwardAction);
-			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
-			getCurrentTab().getAnimationController().getActionMap().put("_left_hold", stepbackwardAction);
-			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
-			getCurrentTab().getAnimationController().getActionMap().put("_up_hold", prevcomponentAction);
-			getCurrentTab().getAnimationController().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
-			getCurrentTab().getAnimationController().getActionMap().put("_down_hold", nextcomponentAction);
-
 			statusBar.changeText(statusBar.textforAnimation);
 			//Enable simulator focus traversal policy
 			setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
