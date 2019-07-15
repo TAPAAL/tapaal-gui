@@ -1863,10 +1863,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			break;
 		case animation:
 
-
-
-			setMode(ElementType.SELECT);
-
 			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
 
 			showComponents(showComponents);

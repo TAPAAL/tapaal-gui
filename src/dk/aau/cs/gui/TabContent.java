@@ -1,9 +1,6 @@
 package dk.aau.cs.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -823,6 +820,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				else {
 					selectFirstActiveTemplate();
 				}
+				drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
 			} else {
