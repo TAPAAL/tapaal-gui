@@ -869,9 +869,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	Optional<GuiFrameActions>  app = Optional.empty();
 	@Override
-	public void setApp(GuiFrameActions app) {
-		this.app = Optional.ofNullable(app);
-		undoManager.setApp(app);
+	public void setApp(GuiFrameActions newApp) {
+		this.app = Optional.ofNullable(newApp);
+		undoManager.setApp(newApp);
+
+		//XXX
+		if (isInAnimationMode()) {
+			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
+		} else {
+			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
+		}
+
 	}
 
 	@Override

@@ -11,4 +11,6 @@ public interface GuiFrameActions {
     void setRedoActionEnabled(boolean b);
 
     void setUndoActionEnabled(boolean b);
+
+    void setGUIMode(GuiFrame.GUIMode animation);
 }

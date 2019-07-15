@@ -1406,13 +1406,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			setTitle(appTab.getTitleAt(index));
 
-			//XXX
-			if (getCurrentTab().isInAnimationMode()) {
-				setGUIMode(GUIMode.animation);
-			} else {
-				setGUIMode(GUIMode.draw);
-			}
-
 		} else {
 			setTitle(null);
 		}
@@ -1829,6 +1822,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 */
 	//TODO
+	@Override
 	public void setGUIMode(GUIMode mode) {
 		switch (mode) {
 		case draw:
