@@ -39,6 +39,9 @@ public class UndoManager {
 	private Optional<GuiFrameActions> app = Optional.empty();
 	public void setApp(GuiFrameActions app) {
 		this.app = Optional.ofNullable(app);
+
+		// Undo/Redo is enabled based on undo/redo manager
+		setUndoRedoStatus();
 	}
 
 	/**

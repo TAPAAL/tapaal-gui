@@ -832,6 +832,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			}
 		} else {
 			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+
+			// Undo/Redo is enabled based on undo/redo manager
+			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
 		}
 

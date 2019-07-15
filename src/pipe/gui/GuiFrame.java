@@ -1200,9 +1200,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
 
-			// Undo/Redo is enabled based on undo/redo manager
-			getCurrentTab().getUndoManager().setUndoRedoStatus();
-
 			if(getCurrentTab().restoreWorkflowDialog()){
 				WorkflowDialog.showDialog();
 			}
