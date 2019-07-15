@@ -679,7 +679,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				KeyStroke.getKeyStroke('7', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleToolTips();
+				showToolTips(!showToolTips);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction);
@@ -1450,9 +1450,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		ToolTipManager.sharedInstance().setInitialDelay(400);
 		ToolTipManager.sharedInstance().setReshowDelay(800);
 		ToolTipManager.sharedInstance().setDismissDelay(60000);
-	}
-	private void toggleToolTips(){
-		showToolTips(!showToolTips);
 	}
 
 	boolean isShowingToolTips(){
