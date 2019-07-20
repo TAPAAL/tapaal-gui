@@ -3,6 +3,7 @@ package dk.aau.cs.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
@@ -15,6 +16,8 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.helpers.Reference.MutableReference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
@@ -102,7 +105,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			zoomLevels.put(net, new Zoomer());
 		}
 		
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
+		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -1014,6 +1017,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
+    AbstractDrawingSurfaceManager manager = new AbstractDrawingSurfaceManager(){
+        @Override
+        public void registerEvents() {
+            //No-thing manager
+        }
+    };
+    MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(manager);
+    private void setManager(AbstractDrawingSurfaceManager newManager) {
+        //De-register old manager
+        manager.deregisterManager();
+        manager = newManager;
+        managerRef.setReference(manager);
+        manager.registerManager();
+    }
 
 
 }

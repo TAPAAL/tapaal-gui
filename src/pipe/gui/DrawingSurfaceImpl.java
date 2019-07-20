@@ -14,6 +14,8 @@ import javax.swing.event.MouseInputAdapter;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.GuiFrame.GUIMode;
@@ -42,13 +44,15 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	private DataLayer guiModel;
 	private TabContent tabContent;
+	private Reference<AbstractDrawingSurfaceManager> managerRef;
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
 	private NameGenerator nameGenerator = new NameGenerator();
 
-	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent) {
+	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
 		guiModel = dataLayer;
 		this.tabContent = tabContent;
+		this.managerRef = managerRef;
 		setLayout(null);
 		setOpaque(true);
 		setDoubleBuffered(true);
@@ -103,6 +107,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		newObject.zoomUpdate(zoomControl.getPercent());
+		newObject.setManagerRef(managerRef);
 
 		super.add(newObject);
 		newObject.addedToGui(); //Must be called after added to component, as children might use referenceto Drawingsurface
@@ -120,6 +125,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	//migth not be best solution long term.
 	public void removePetriNetObject(PetriNetObject pno) {
 		pno.removedFromGui();
+		pno.setManagerRef(null);
 		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
 
 		validate();
@@ -418,7 +424,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		}
 
 		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (managerRef!=null && managerRef.get() != null) {
+				managerRef.get().drawingSurfaceMouseClicked(e);
+			}
+		}
+
+		@Override
 		public void mousePressed(MouseEvent e) {
+			if (managerRef!=null && managerRef.get() != null) {
+				managerRef.get().drawingSurfaceMousePressed(e);
+			}
 			if(app.getCurrentTab().isInAnimationMode()) return;
 
 			// check for control down here enables it to attach the arc being drawn to an existing place/transition
@@ -518,6 +534,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			if (managerRef!=null && managerRef.get() != null) {
+				managerRef.get().drawingSurfaceMouseReleased(e);
+			}
 			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 			if (dragStart != null) {
 				dragStart = null;
@@ -530,6 +549,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
+			if (managerRef!=null && managerRef.get() != null) {
+				managerRef.get().drawingSurfaceMouseMoved(e);
+			}
 			if (createArc != null) {
 				createArc.setEndPoint(Grid.getModifiedX(e.getX()), Grid
 						.getModifiedY(e.getY()), e.isShiftDown());
@@ -539,6 +561,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if (managerRef!=null && managerRef.get() != null) {
+				managerRef.get().drawingSurfaceMouseDragged(e);
+			}
 			if (dragStart != null) {
 				view.drag(dragStart, e.getPoint());
 			} else if (app.getMode() == ElementType.SELECT) {
@@ -548,6 +573,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
+			if (managerRef!=null && managerRef.get() != null) {
+				managerRef.get().drawingSurfaceMouseWheelMoved(e);
+			}
 			if (e.isControlDown()) {
 				if (e.getWheelRotation() > 0) {
 					view.zoomIn();

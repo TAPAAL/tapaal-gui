@@ -9,6 +9,8 @@ import java.awt.event.*;
 import javax.swing.JComponent;
 
 import dk.aau.cs.debug.Logger;
+import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -55,6 +57,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	// Integer value which represents a zoom percentage
 	protected int zoom = Pipe.ZOOM_DEFAULT;
 	private DataLayer guiModel;
+	private Reference<AbstractDrawingSurfaceManager> managerRef = null;
 
 	public PetriNetObjectHandler getMouseHandler() {
 		return mouseHandler;
@@ -67,6 +70,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.clicked
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseClicked(e);
 				}
@@ -74,6 +82,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.pressed
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mousePressed(e);
 				}
@@ -81,6 +94,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.released
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseReleased(e);
 				}
@@ -88,6 +106,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.entered
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseEntered(e);
 				}
@@ -95,6 +118,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseExited(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.exited
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseExited(e);
 				}
@@ -104,6 +132,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.wheel
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseWheelMoved(e);
 				}
@@ -113,6 +146,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.dragged
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseDragged(e);
 				}
@@ -120,6 +158,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				/*if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.moved
+					));
+				}*/
 				if (mouseHandler != null) {
 					mouseHandler.mouseMoved(e);
 				}
@@ -307,4 +350,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 
+	public Reference<AbstractDrawingSurfaceManager> getManagerRef() {
+		return managerRef;
+	}
+
+	public void setManagerRef(Reference<AbstractDrawingSurfaceManager> manager) {
+		this.managerRef = manager;
+	}
 }
