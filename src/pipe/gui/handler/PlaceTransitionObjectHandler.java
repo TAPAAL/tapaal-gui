@@ -6,7 +6,7 @@ import java.util.Iterator;
 import javax.swing.JOptionPane;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
@@ -24,7 +24,6 @@ import pipe.gui.undo.AddTimedOutputArcCommand;
 import pipe.gui.undo.AddTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;

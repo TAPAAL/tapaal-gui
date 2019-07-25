@@ -8,13 +8,12 @@ import java.awt.geom.Point2D;
 import javax.swing.*;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
-import pipe.gui.handler.PetriNetObjectHandler;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**

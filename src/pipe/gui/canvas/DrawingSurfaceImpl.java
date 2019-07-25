@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.canvas;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -17,8 +17,7 @@ import dk.aau.cs.gui.undo.Command;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Template;
-import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.*;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;

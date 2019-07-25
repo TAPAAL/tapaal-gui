@@ -48,7 +48,7 @@ import dk.aau.cs.verification.TAPNComposer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**
@@ -65,7 +65,7 @@ public class Export {
 	public static final int PNML = 6;
 	public static final int QUERY = 7;	
 
-	private static void toPnml(DrawingSurfaceImpl g, String filename) 
+	private static void toPnml(DrawingSurfaceImpl g, String filename)
 			throws NullPointerException, DOMException, TransformerConfigurationException, 
 			IOException, ParserConfigurationException, TransformerException {
 		TabContent currentTab = CreateGui.getCurrentTab();

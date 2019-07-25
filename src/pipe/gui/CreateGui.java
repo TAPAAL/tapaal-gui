@@ -5,6 +5,7 @@ import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
 
