@@ -28,7 +28,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 /**
  * The petrinet is drawn onto this frame.
  */
-public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canvas {
+public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canvas, PrototypeCanvas {
 
 
 	public Arc createArc; // no longer static
@@ -326,7 +326,24 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		return zoomControl.getPercent();
 	}
 
-	class MouseHandler extends MouseInputAdapter {
+    @Override
+    public void addPrototype(PetriNetObject pno) {
+        add(pno, Pipe.PROTOTYPE_LAYER_OFFSET);
+    }
+
+    @Override
+    public void removePrototype(PetriNetObject pno) {
+        remove(pno);
+    }
+
+    @Override
+    public void clearAllPrototype() {
+        for (Component c : getComponentsInLayer(Pipe.PROTOTYPE_LAYER_OFFSET)) {
+                remove(c);
+        }
+    }
+
+    class MouseHandler extends MouseInputAdapter {
 
 		private DrawingSurfaceImpl view;
 
