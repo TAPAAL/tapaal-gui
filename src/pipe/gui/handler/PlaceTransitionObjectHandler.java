@@ -51,8 +51,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	private void createArc(Arc newArc, PlaceTransitionObject currentObject) {
 		newArc.setZoom(CreateGui.getDrawingSurface().getZoom());
-		//Need to be casted to cointainer, as we only add it to the canvas but not the model
-		((Container)CreateGui.getDrawingSurface()).add(newArc);
+
+		CreateGui.getDrawingSurface().addPrototype(newArc);
 
 		CreateGui.getDrawingSurface().createArc = newArc;
 		// addPetriNetObject a handler for shift & esc actions drawing arc
@@ -402,9 +402,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	}
 
 	private void removeProtoTypeFromViewAndAddNewArcToViewAndModel(DrawingSurfaceImpl view, Arc arcToCreate) {
-		// Evil hack to prevent the arc being added to GuiView twice
-		//Need to be casted to cointainer, as we only add it to the canvas but not the model (remove is overwritten)
-		((Container) CreateGui.getDrawingSurface()).remove(arcToCreate);
+
+		CreateGui.getDrawingSurface().removePrototype(arcToCreate);
 
 		view.getGuiModel().addPetriNetObject(arcToCreate);
 		//view.addNewPetriNetObject(arcToCreate);
