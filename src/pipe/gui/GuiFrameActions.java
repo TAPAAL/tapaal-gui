@@ -13,4 +13,7 @@ public interface GuiFrameActions {
     void setUndoActionEnabled(boolean b);
 
     void setGUIMode(GuiFrame.GUIMode animation);
+
+    //XXX temp while refactoring, kyrke - 2019-07-25
+    void updateMode(Pipe.ElementType mode);
 }

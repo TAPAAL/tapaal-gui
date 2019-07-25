@@ -29,6 +29,7 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import net.tapaal.swinghelpers.JSplitPaneFix;
@@ -840,6 +841,29 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			animationmode = false;
 		}
 
+	}
+
+	//XXX temp while refactoring, kyrke - 2019-07-25
+	@Override
+	public void setMode(Pipe.ElementType mode) {
+
+		app.ifPresent(o->o.updateMode(mode));
+
+		//Disable selection and deselect current selection
+		drawingSurface().getSelectionObject().clearSelection();
+
+		//If pending arc draw, remove it
+		if (drawingSurface().createArc != null) {
+			PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+		}
+
+		if (mode == Pipe.ElementType.SELECT) {
+			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		} else if (mode == Pipe.ElementType.DRAG) {
+			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		} else {
+			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+		}
 	}
 
 	public boolean isInAnimationMode() {

@@ -433,10 +433,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 		private void continueFastMode(MouseEvent e, PlaceTransitionObject pto, ElementType nextMode) {
 			// connect arc
-			app.setMode(ElementType.TAPNARC);
+			CreateGui.getCurrentTab().setMode(ElementType.TAPNARC);
 			pto.getMouseHandler().mousePressed(e);
 			pto.getMouseHandler().mouseReleased(e);
-			app.setMode(nextMode);
+			CreateGui.getCurrentTab().setMode(nextMode);
 			// enter fast mode
 			pto.dispatchEvent(e);
 		}
@@ -531,7 +531,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		}
 
         private void fastDrawAction(MouseEvent e, PlaceTransitionObject newpto, ElementType fastTransition) {
-            app.setMode(ElementType.TAPNARC);
+			CreateGui.getCurrentTab().setMode(ElementType.TAPNARC);
             newpto.getMouseHandler().mouseReleased(e);
 
             if (e.isControlDown()) {

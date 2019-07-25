@@ -1,6 +1,7 @@
 package dk.aau.cs.gui;
 
 import pipe.gui.GuiFrameActions;
+import pipe.gui.Pipe;
 
 public interface TabContentActions{
 
@@ -27,5 +28,7 @@ public interface TabContentActions{
     void delayAndFire();
 
     void changeAnimationMode(boolean status);
+
+    void setMode(Pipe.ElementType mode);
 }
 

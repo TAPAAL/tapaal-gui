@@ -496,44 +496,44 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		drawMenu.add( selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.SELECT);
+				currentTab.ifPresent(o->o.setMode(ElementType.SELECT));
 			}
 		});
 		drawMenu.addSeparator();
 
 		drawMenu.add( timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.TAPNPLACE);
+				currentTab.ifPresent(o->o.setMode(ElementType.TAPNPLACE));
 			}
 		});
 
 		drawMenu.add( transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.TAPNTRANS);
+				currentTab.ifPresent(o->o.setMode(ElementType.TAPNTRANS));
 			}
 		});
 
 		drawMenu.add( timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.TAPNARC);
+				currentTab.ifPresent(o->o.setMode(ElementType.TAPNARC));
 			}
 		});
 
 		drawMenu.add( transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.TRANSPORTARC);
+				currentTab.ifPresent(o->o.setMode(ElementType.TRANSPORTARC));
 			}
 		});
 
 		drawMenu.add( inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.TAPNINHIBITOR_ARC);
+				currentTab.ifPresent(o->o.setMode(ElementType.TAPNINHIBITOR_ARC));
 			}
 		});
 
 		drawMenu.add(annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.ANNOTATION);
+				currentTab.ifPresent(o->o.setMode(ElementType.ANNOTATION));
 			}
 		});
 
@@ -541,14 +541,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		drawMenu.add( tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
 			public void actionPerformed(ActionEvent e) {
-				setMode(ElementType.ADDTOKEN);
+				currentTab.ifPresent(o->o.setMode(ElementType.ADDTOKEN));
 			}
 		});
 
 		drawMenu.add( deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
 			public void actionPerformed(ActionEvent e) {
-
-				setMode(ElementType.DELTOKEN);
+				currentTab.ifPresent(o->o.setMode(ElementType.DELTOKEN));
 			}
 		});
 		return drawMenu;
@@ -1627,8 +1626,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			tab.selectFirstElements();
 
-			if (CreateGui.getApp() != null) {
-				CreateGui.getApp().setMode(ElementType.SELECT);
+			if (CreateGui.getCurrentTab() != null) {
+				CreateGui.getCurrentTab().setMode(ElementType.SELECT);
 			}
 
 			tab.setFile(null);
@@ -1686,7 +1685,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 				tab.selectFirstElements();
 
-				setMode(ElementType.SELECT);
+				tab.setMode(ElementType.SELECT);
 
 
 			} catch (Exception e) {
@@ -1834,7 +1833,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			getCurrentTab().drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
-			setMode(ElementType.SELECT);
+			getCurrentTab().setMode(ElementType.SELECT);
 
 			getCurrentTab().restoreSelectedTemplate();
 
@@ -1895,7 +1894,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			mode=ElementType.SELECT;
 	}
 
-	public void setMode(Pipe.ElementType _mode) {
+	//XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
+	@Override
+	public void updateMode(Pipe.ElementType _mode) {
 
 		mode = _mode;
 
@@ -1915,23 +1916,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 
 		statusBar.changeText(mode);
-
-		//Disable selection and deselect current selection
-		getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
-
-		//If pending arc draw, remove it
-		if (getCurrentTab().drawingSurface().createArc != null) {
-			PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
-		}
-
-		if (mode == ElementType.SELECT) {
-			getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		} else if (mode == ElementType.DRAG) {
-			getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-		} else {
-			getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		}
-
 	}
 
 	public Pipe.ElementType getMode() {
