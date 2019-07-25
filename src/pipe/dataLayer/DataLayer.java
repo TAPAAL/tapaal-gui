@@ -3,6 +3,7 @@ package pipe.dataLayer;
 import java.util.*;
 
 import dk.aau.cs.util.RequireException;
+import pipe.gui.canvas.Canvas;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -21,11 +22,12 @@ public class DataLayer {
 
 	//XXX: Temp solution while refactoring, should be changed to interface to now allow to many actions
 	//Long term should use callback to not have tight coupling
-	private DrawingSurfaceImpl view;
-	public void addedToView(DrawingSurfaceImpl view){this.view = view;}
+	private Canvas view;
+	public void addedToView(Canvas view){this.view = view;}
 	public void removedFromView() {this.view = null;}
 
-
+	//XXX temp solution while refactorting, component removes children them self
+	//migth not be best solution long term.
 	private void removeFromViewIfConnected(PetriNetObject pno) {
 		if (view != null) {
 			view.removePetriNetObject(pno);

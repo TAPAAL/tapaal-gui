@@ -28,7 +28,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 /**
  * The petrinet is drawn onto this frame.
  */
-public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
+public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canvas {
 
 
 	public Arc createArc; // no longer static
@@ -103,6 +103,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	}
 
+	@Override
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		newObject.zoomUpdate(zoomControl.getPercent());
@@ -122,6 +123,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 
 	//XXX temp solution while refactorting, component removes children them self
 	//migth not be best solution long term.
+	@Override
 	public void removePetriNetObject(PetriNetObject pno) {
 		pno.removedFromGui();
 		pno.setManagerRef(null);
