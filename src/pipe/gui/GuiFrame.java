@@ -1815,8 +1815,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	public void setGUIMode(GUIMode mode) {
 		switch (mode) {
 		case draw:
-			getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
-
 			// Enable all draw actions
 			startAction.setSelected(false);
 
@@ -1830,12 +1828,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			showQueries(showQueries);
 			showConstants(showConstants);
 			showToolTips(showToolTips);
-
-			getCurrentTab().drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-
-			getCurrentTab().setMode(ElementType.SELECT);
-
-			getCurrentTab().restoreSelectedTemplate();
 
 			break;
 		case animation:

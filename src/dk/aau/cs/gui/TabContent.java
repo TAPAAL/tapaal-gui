@@ -834,7 +834,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
 			}
 		} else {
+			drawingSurface().getSelectionObject().clearSelection();
 			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+
+			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
+			setMode(Pipe.ElementType.SELECT);
+
+			restoreSelectedTemplate();
 
 			// Undo/Redo is enabled based on undo/redo manager
 			getUndoManager().setUndoRedoStatus();
