@@ -77,26 +77,6 @@ public class ArcHandler extends PetriNetObjectHandler {
 		}
 	}
 
-	
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		switch (CreateGui.getApp().getMode()) {
-		case SELECT:
-			if (!isDragging) {
-				break;
-			}
-			Arc currentObject = (Arc) myObject;
-			Point oldLocation = currentObject.getLocation();
-			// Calculate translation in mouse
-			int transX = (Grid.getModifiedX(e.getX() - dragInit.x));
-			int transY = (Grid.getModifiedY(e.getY() - dragInit.y));
-			myObject.getParent().getSelectionObject()
-					.translateSelection(transX, transY);
-			dragInit.translate(
-					-(currentObject.getLocation().x - oldLocation.x - transX),
-					-(currentObject.getLocation().y - oldLocation.y - transY));
-		}
-	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
