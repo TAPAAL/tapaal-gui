@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.handler.TAPNTransitionHandler;
+import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 import dk.aau.cs.gui.Context;
@@ -69,7 +69,7 @@ public class TimedTransitionComponent extends Transition {
 	private void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TAPNTransitionHandler(this);
+		mouseHandler = new TransitionHandler(this);
 	}
 
 	private TimedTransitionListener timedTransitionListener(){
