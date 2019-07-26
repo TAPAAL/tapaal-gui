@@ -77,14 +77,4 @@ public class ArcHandler extends PetriNetObjectHandler {
 		}
 	}
 
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-
-		if (!(CreateGui.getApp().isEditionAllowed())) {
-			return;
-		}
-		
-	}
-
 }
