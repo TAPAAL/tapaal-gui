@@ -13,7 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
@@ -27,6 +27,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
@@ -37,9 +38,6 @@ import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane implements TabContentActions{
@@ -138,7 +136,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		this.setContinuousLayout(true);
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
-		this.setDividerSize(8);	
+		this.setDividerSize(8);
+		//XXX must be after the animationcontroller is created
+		animationModeController = new CanvasAnimationController(getAnimator(), getAnimationController());
 	}
 	
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -799,6 +799,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (status) {
 			if (numberOfActiveTemplates() > 0) {
 				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+
+				setManager(animationModeController);
+
 				drawingSurface().repaintAll();
 
 				rememberSelectedTemplate();
@@ -836,6 +839,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		} else {
 			drawingSurface().getSelectionObject().clearSelection();
 			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+			setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 			setMode(Pipe.ElementType.SELECT);
@@ -1046,19 +1050,49 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
-    AbstractDrawingSurfaceManager manager = new AbstractDrawingSurfaceManager(){
+    final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
         @Override
         public void registerEvents() {
             //No-thing manager
         }
     };
-    MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(manager);
+	final AbstractDrawingSurfaceManager animationModeController;
+
+	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+
+		private final Animator animator;
+		private final AnimationController animationController;
+
+		public CanvasAnimationController(Animator animator, AnimationController animationController) {
+			this.animator = animator;
+			this.animationController = animationController;
+		}
+
+		@Override
+		public void registerEvents() {
+			registerEvent(
+					e -> e.a == MouseAction.clicked && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
+					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
+			);
+		}
+
+		void transitionLeftClicked(TimedTransitionComponent t) {
+			TimedTransition transition = t.underlyingTransition();
+
+			if (transition.isDEnabled()) {
+				animator.dFireTransition(transition);
+				animationController.setAnimationButtonsEnabled();
+			}
+		}
+	}
+
+
+    MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
     private void setManager(AbstractDrawingSurfaceManager newManager) {
         //De-register old manager
-        manager.deregisterManager();
-        manager = newManager;
-        managerRef.setReference(manager);
-        manager.registerManager();
+		managerRef.get().deregisterManager();
+        managerRef.setReference(newManager);
+		managerRef.get().registerManager();
     }
 
 
