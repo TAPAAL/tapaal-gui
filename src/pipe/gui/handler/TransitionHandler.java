@@ -98,13 +98,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		}
 	}
 
-	// Override
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if (CreateGui.getApp().isEditionAllowed()) {
-			super.mousePressed(e);
-		}
-	}
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
