@@ -157,6 +157,18 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	public void mouseWheelMoved(MouseWheelEvent e) {
 	}
 
+	@Override
+	public void mouseClicked(MouseEvent e) {}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {}
+
 	//Changes dispatches an event to the parent component, with the mouse location updated to the parent
 	//MouseLocation is relative to the component
 	public void dispatchToParentWithMouseLocationUpdated(MouseEvent e) {
