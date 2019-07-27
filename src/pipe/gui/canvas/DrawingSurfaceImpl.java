@@ -12,6 +12,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
@@ -328,7 +329,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     @Override
     public void addPrototype(PetriNetObject pno) {
-        add(pno, Pipe.PROTOTYPE_LAYER_OFFSET);
+        add(pno);
+        setLayer(pno, Pipe.PROTOTYPE_LAYER_OFFSET);
+        validate();
+        repaint();
     }
 
     @Override
@@ -339,8 +343,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     @Override
     public void clearAllPrototype() {
         for (Component c : getComponentsInLayer(Pipe.PROTOTYPE_LAYER_OFFSET)) {
-                remove(c);
+        	remove(c);
         }
+        validate();
+        repaint();
     }
 
     class MouseHandler extends MouseInputAdapter {
