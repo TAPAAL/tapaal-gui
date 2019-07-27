@@ -124,17 +124,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		}
 	}
 
-	// Override
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if (CreateGui.getApp().isEditionAllowed()) {
-			super.mousePressed(e);
-		}
-
-	}
-
-	int i = 0;
-
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
