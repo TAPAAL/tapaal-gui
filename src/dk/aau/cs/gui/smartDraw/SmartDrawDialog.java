@@ -104,8 +104,8 @@ public class SmartDrawDialog extends JDialog {
 	JDialog loadingDialogFrame;
 	//JDialog choiceModal;
 	SmartDrawWorker worker;
-	JLabel timerLabel = new JLabel("Time Elapsed: ");
-	JLabel progressLabel = new JLabel("Objects Placed: ");
+	JLabel timerLabel = new JLabel("Time elapsed: ");
+	JLabel progressLabel = new JLabel("Objects placed: ");
 	JLabel statusLabel;
 	JSpinner xSpinner;
 	JButton drawButton;
@@ -217,7 +217,7 @@ public class SmartDrawDialog extends JDialog {
 					
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
-						progressLabel.setText("Objects Placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getPlaceTransitionObjects().size());
+						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getPlaceTransitionObjects().size());
 						
 					}
 					
@@ -720,7 +720,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.insets = new Insets(0, 10, 0, 0);
 		gbc.anchor = GridBagConstraints.NORTH;
 		loadingDialogFrame.add(timerLabel, gbc);
 		
@@ -729,7 +729,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(0, 0, 0, 0);
+		gbc.insets = new Insets(0, 10, 0, 0);
 		gbc.anchor = GridBagConstraints.NORTH;
 		loadingDialogFrame.add(progressLabel, gbc);
 		
