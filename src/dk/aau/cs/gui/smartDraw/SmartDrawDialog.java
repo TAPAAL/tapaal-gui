@@ -55,7 +55,7 @@ public class SmartDrawDialog extends JDialog {
 		buffer.append("<br/><br/>");
 		buffer.append("<b>Functionality</b><br/>");
 	        buffer.append("The automatic layout works by choosing a starting object.\n");
-	        buffer.append("From there we try different positions around the starting object and choose the position with lowest <em>weight</em>.\n");
+	        buffer.append("From there we try different positions around the starting object and choose the position with lowest <em>penalty</em>.\n");
 	    buffer.append("<br/><br/>");
 	        buffer.append("We try each multiple of x-spacing between <em>parent.x + x-spacing * layer</em> and <em>parent.x - x-spacing * layer</em>\n");
 	        buffer.append("<em>parent.x - x-spacing * layer</em> with each multiple of y-spacing\n");
@@ -65,21 +65,21 @@ public class SmartDrawDialog extends JDialog {
 	        buffer.append("Minimum Iterations heavily affects how long it will take to do the layout, so a small number is recommended.\n");
 	        buffer.append("It is also recommended that x-spacing = y-spacing.\n");
         buffer.append("<br/><br/>");
-		buffer.append("<b>Weights</b><br/>");
-		buffer.append("The weights should be seen as punishments for choosing a position.\n");
-                buffer.append("The higher the weight the higher the punishment; the position with the lowest\n");
-                buffer.append("summed weight is where the object will be placed.");
+		buffer.append("<b>Penalties</b><br/>");
+		buffer.append("The penalties should be seen as punishments for choosing a position.\n");
+                buffer.append("The higher the penalty the higher the punishment; the position with the lowest\n");
+                buffer.append("summed penalty is where the object will be placed.");
 		buffer.append("<br/><br/>");
-			buffer.append("<em>Straight arc weight</em> is a weight punishing going straight\n");
+			buffer.append("<em>Straight arc penalty</em> is a penalty punishing going straight\n");
 			buffer.append("i.e. if the candidate position's x or y equals the parent's x or y\n");
-			buffer.append("the <em>straight weight * layer</em> is added to the total weight.\n");
-			buffer.append("If not <em>Diagonal arc weight * layer</em> is added instead.");
+			buffer.append("the <em>straight penalty * layer</em> is added to the total penalty.\n");
+			buffer.append("If not <em>Diagonal arc penalty * layer</em> is added instead.");
 		buffer.append("<br/><br/>");
-			buffer.append("<em>Distance weight</em> punishes candidate positions depending on");
+			buffer.append("<em>Distance penalty</em> punishes candidate positions depending on");
 			buffer.append("how far away from the starting point they are. As such a higher");
-			buffer.append("distance weight will make more compact nets.");
+			buffer.append("distance penalty will make more compact nets.");
 		buffer.append("<br/><br/>");
-			buffer.append("<em>Overlapping arc weight</em> punishes arcs laying directly on top of each other");
+			buffer.append("<em>Overlapping arc penalty</em> punishes arcs laying directly on top of each other");
 			buffer.append("pointing to the same object.");
 		buffer.append("<br/><br/>");
 			buffer.append("<b>Example:</b><br/>");
@@ -87,8 +87,8 @@ public class SmartDrawDialog extends JDialog {
 			buffer.append("<img src=\"" + Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "SmartDrawExampleWithLayers.png") +"\" />");
 		buffer.append("<br/><br/>");
 		buffer.append("This layout was created with the default values.");
-		buffer.append("On the figure the numbers and boxes describe the layer. Furthermore, the effect of the <em>Overlapping arc weight</em> can be seen\n");
-		buffer.append("as the objects in layer 2 prefer going diagonal rather than overlap due to the weights.");
+		buffer.append("On the figure the numbers and boxes describe the layer. Furthermore, the effect of the <em>Overlapping arc penalty</em> can be seen\n");
+		buffer.append("as the objects in layer 2 prefer going diagonal rather than overlap due to the penaltys.");
 		buffer.append("</html>");
 		return buffer.toString(); 
 	}
@@ -240,6 +240,8 @@ public class SmartDrawDialog extends JDialog {
 				worker.execute();
 				smartDrawDialog.setVisible(false);
 				loadingDialogFrame.setVisible(true);
+				loadingDialogFrame.toFront();
+				loadingDialogFrame.requestFocus();
 			}
 		});
 		
@@ -323,8 +325,8 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(randomStartObjectCheckBox, gbc);
 		
 		
-		JLabel straightWeightLabel = new JLabel("Straight Arc Weight:");
-		straightWeightLabel.setToolTipText("Set weight for arcs going straight");
+		JLabel straightWeightLabel = new JLabel("Straight Arc Penalty:");
+		straightWeightLabel.setToolTipText("Higher number decreases the number of horizontal and vertical arcs");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -336,7 +338,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(straightWeightLabel, gbc);
 		
 		final JSpinner straightWeightSpinner = new CustomJSpinner(straightWeight);
-		straightWeightSpinner.setToolTipText("Set weight for arcs going straight");
+		straightWeightSpinner.setToolTipText("Higher number decreases the number of horizontal and vertical arcs");
 		straightWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -355,8 +357,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(straightWeightSpinner, gbc);
 		
-		JLabel diagonalWeightLabel = new JLabel("Diagonal Arc Weight:");
-		diagonalWeightLabel.setToolTipText("Set weight for arcs going diagonal");
+		JLabel diagonalWeightLabel = new JLabel("Diagonal Arc Penalty:");
+		diagonalWeightLabel.setToolTipText("Higher number decreases the number of diagonal arcs");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -368,7 +370,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(diagonalWeightLabel, gbc);
 		
 		final JSpinner diagonalWeightSpinner = new CustomJSpinner(diagonalWeight);
-		diagonalWeightSpinner.setToolTipText("Set weight for arcs going diagonal");
+		diagonalWeightSpinner.setToolTipText("Higher number decreases the number of diagonal arcs");
 		diagonalWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -387,8 +389,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(diagonalWeightSpinner, gbc);
 		
-		JLabel distanceWeightLabel = new JLabel("Distance Weight:");
-		distanceWeightLabel.setToolTipText("Set weight for distance to start object");
+		JLabel distanceWeightLabel = new JLabel("Distance Penalty:");
+		distanceWeightLabel.setToolTipText("Higher penalty will make the layout more compact");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 3;
@@ -400,7 +402,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(distanceWeightLabel, gbc);
 		
 		final JSpinner distanceWeightSpinner = new CustomJSpinner(distanceWeight);
-		distanceWeightSpinner.setToolTipText("Set weight for distance to start object");
+		distanceWeightSpinner.setToolTipText("Higher penalty will make the layout more compact");
 		distanceWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -419,8 +421,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		advancedOptionsPanel.add(distanceWeightSpinner, gbc);
 		
-		JLabel overlappingWeightLabel = new JLabel("Overlapping Arc Weight:");
-		overlappingWeightLabel.setToolTipText("Set weight for overlapping arcs");
+		JLabel overlappingWeightLabel = new JLabel("Overlapping Arc Penalty:");
+		overlappingWeightLabel.setToolTipText("Higher penalty will decrease the number of arcs that cross other objects");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -432,7 +434,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(overlappingWeightLabel, gbc);
 		
 		final JSpinner overlappingWeightSpinner = new CustomJSpinner(overlappingArcWeight);
-		overlappingWeightSpinner.setToolTipText("Set weight for overlapping arcs");
+		overlappingWeightSpinner.setToolTipText("Higher penalty will decrease the number of arcs that cross other objects");
 		overlappingWeightSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -452,7 +454,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(overlappingWeightSpinner, gbc);
 		
 		JLabel minimumIterationsLabel = new JLabel("Minimum Iterations:");
-		minimumIterationsLabel.setToolTipText("Set minimum iterations for each object");
+		minimumIterationsLabel.setToolTipText("Higher number increases the number of positions tried for each object");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
@@ -464,7 +466,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.add(minimumIterationsLabel, gbc);
 		
 		final JSpinner minimumIterationSpinner = new CustomJSpinner(minimumIterations);
-		minimumIterationSpinner.setToolTipText("Set minimum iterations for each object");
+		minimumIterationSpinner.setToolTipText("Higher number increases the number of positions tried for each object");
 		minimumIterationSpinner.addChangeListener(new ChangeListener() {
 			
 			@Override
