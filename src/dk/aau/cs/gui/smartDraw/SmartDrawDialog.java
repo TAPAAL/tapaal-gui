@@ -244,6 +244,7 @@ public class SmartDrawDialog extends JDialog {
 				loadingDialogFrame.setVisible(true);
 				loadingDialogFrame.toFront();
 				loadingDialogFrame.requestFocus();
+				loadingDialogFrame.setAlwaysOnTop(true);
 			}
 		});
 		
