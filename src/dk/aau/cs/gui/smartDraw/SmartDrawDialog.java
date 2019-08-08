@@ -235,6 +235,8 @@ public class SmartDrawDialog extends JDialog {
 					@Override
 					public void fireDone() {
 						loadingDialogFrame.dispose();
+						CreateGui.getAppGui().toFront();
+						CreateGui.getAppGui().requestFocus();
 					}
 				});
 				worker.execute();

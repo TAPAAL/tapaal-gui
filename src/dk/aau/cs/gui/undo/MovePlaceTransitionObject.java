@@ -16,6 +16,7 @@ public class MovePlaceTransitionObject extends Command {
 	private PlaceTransitionObject objectToBeMoved;
 	private double oldY;
 	private double oldX;
+	private boolean doUpdate = false;
 	
 	
 	public MovePlaceTransitionObject(PlaceTransitionObject object, Point point) {
@@ -46,9 +47,12 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved.setPositionY(newY);
 		
 		//objectToBeMoved.updateConnected();
-		CreateGui.getDrawingSurface().repaintAll();
-		CreateGui.getModel().repaintAll(true);
-		CreateGui.getDrawingSurface().updatePreferredSize();
+		if(doUpdate) {
+			CreateGui.getDrawingSurface().repaintAll();
+			CreateGui.getModel().repaintAll(true);
+			CreateGui.getDrawingSurface().updatePreferredSize();
+		}
+		doUpdate = true;
 		
 	}
 
