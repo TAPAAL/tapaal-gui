@@ -692,7 +692,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	private void initLoadingFrame() {
-		loadingDialogFrame = new JDialog(smartDrawDialog, "Working...", true);
+		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
 		loadingDialogFrame.setType(Window.Type.POPUP);
 		ImageIcon loadingGIF = new ImageIcon(CreateGui.imgPath + "ajax-loader.gif");
