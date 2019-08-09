@@ -6,6 +6,8 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
+import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
@@ -242,9 +244,9 @@ public class SmartDrawDialog extends JDialog {
 				worker.execute();
 				smartDrawDialog.setVisible(false);
 				loadingDialogFrame.setVisible(true);
-				loadingDialogFrame.toFront();
+				/*loadingDialogFrame.toFront();
 				loadingDialogFrame.requestFocus();
-				loadingDialogFrame.setAlwaysOnTop(true);
+				loadingDialogFrame.setAlwaysOnTop(true);*/
 			}
 		});
 		
@@ -692,6 +694,7 @@ public class SmartDrawDialog extends JDialog {
 	private void initLoadingFrame() {
 		loadingDialogFrame = new JDialog(smartDrawDialog, "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
+		loadingDialogFrame.setType(Window.Type.POPUP);
 		ImageIcon loadingGIF = new ImageIcon(CreateGui.imgPath + "ajax-loader.gif");
 		
 		JLabel workingLabel = new JLabel("<html><div style='text-align: center;'>Currently doing layout...<br/>This may take several minutes depending on the size of the net...</div></html>", SwingConstants.CENTER);
@@ -758,10 +761,11 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame.add(cancelButton, gbc);
 		
 
-		loadingDialogFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		loadingDialogFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingDialogFrame.setSize(400, 300);
 		loadingDialogFrame.setVisible(false);
-		loadingDialogFrame.setLocationRelativeTo(smartDrawDialog);
+		loadingDialogFrame.setLocationRelativeTo(CreateGui.getAppGui());
+		loadingDialogFrame.pack();
 	}
 	
 	
