@@ -11,6 +11,7 @@ import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -688,13 +689,6 @@ public class SmartDrawDialog extends JDialog {
 		}
 		return Arrays.copyOf(names.toArray(), names.toArray().length, String[].class);
 	}
-	//For debugging
-	private void printPTObjectsAndPositions() {
-		for(PetriNetObject ptObject : CreateGui.getDrawingSurface().getPlaceTransitionObjects()) {
-			PlaceTransitionObject placeTransitionObject = (PlaceTransitionObject)ptObject;
-			System.out.println("Name: " + placeTransitionObject.getName() + " X: " + placeTransitionObject.getPositionX() + " Y: " + placeTransitionObject.getPositionY());
-		}
-	}
 	
 	private void initLoadingFrame() {
 		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
@@ -748,10 +742,8 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cancelWorker();
-				System.out.println("undo begin");
 				CreateGui.getDrawingSurface().getUndoManager().undo();
-				System.out.println("undo done");
-				//CreateGui.getDrawingSurface().repaintAll();
+				CreateGui.getDrawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
 				//smartDrawDialog.setVisible(true);
 				CreateGui.getAppGui().toFront();

@@ -1,6 +1,7 @@
 package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Point;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -112,9 +113,9 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			moveObject(startingObject, rootPoint);
 			rightMostPointUsed = rootPoint;
 			reservePoint(rootPoint);
-			
+			objectsPlaced.add(startingObject);
+
 			if(searchOption == "DFS") {
-				objectsPlaced.add(startingObject);
 				unfinishedObjects = new ArrayList<PlaceTransitionObject>();
 				unfinishedObjects.add(startingObject);
 					while(!(unfinishedObjects.isEmpty())) {
@@ -122,7 +123,6 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 						depthFirstDraw(nextObject);
 					}
 			} else {
-				objectsPlaced.add(startingObject);
 				newlyPlacedObjects.add(startingObject);
 				
 				while(!(newlyPlacedObjects.isEmpty())) {
@@ -221,9 +221,8 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
 		Command command = new MovePlaceTransitionObject(object, point);
-		command.redo();
 		undoManager.addEdit(command);
-		System.out.println("placed a place");
+		command.redo();
 	}
 	private void reservePoint(Point point) {
 		pointsReserved.add(point);
@@ -515,11 +514,10 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	@Override
 	protected void done(){
 		if(objectsPlaced.size() == drawingSurface.getPlaceTransitionObjects().size()) {
-			CreateGui.getModel().repaintAll(true);
 			setTransitionsToUpright();
 			doOffsetForLoops();
+			CreateGui.getModel().repaintAll(true);
 			CreateGui.getDrawingSurface().updatePreferredSize();
-			System.out.println("Helloooooo");
 			fireDone(false);
 		} else {
 			fireDone(true);
