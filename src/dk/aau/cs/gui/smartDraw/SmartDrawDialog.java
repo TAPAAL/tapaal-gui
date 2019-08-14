@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -132,7 +133,7 @@ public class SmartDrawDialog extends JDialog {
 		}
 	});
 	
-	static SmartDrawDialog smartDrawDialog;
+	public static SmartDrawDialog smartDrawDialog;
 	public static void showSmartDrawDialog() {
 		
 		if(smartDrawDialog == null){
@@ -235,10 +236,14 @@ public class SmartDrawDialog extends JDialog {
 					}
 					
 					@Override
-					public void fireDone() {
-						loadingDialogFrame.dispose();
-						CreateGui.getAppGui().toFront();
-						CreateGui.getAppGui().requestFocus();
+					public void fireDone(boolean cancelled) {
+						if(!(cancelled)) {
+							loadingDialogFrame.dispose();
+							CreateGui.getAppGui().toFront();
+							CreateGui.getAppGui().requestFocus();
+						} else {
+							statusLabel.setText("Cancelling/Undoing");
+						}
 					}
 				});
 				worker.execute();
@@ -742,13 +747,13 @@ public class SmartDrawDialog extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				statusLabel.setText("Cancelling...");
 				cancelWorker();
-				statusLabel.setText("Restoring Net...");
 				CreateGui.getDrawingSurface().getUndoManager().undo();
 				CreateGui.getDrawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
-				smartDrawDialog.setVisible(true);
+				//smartDrawDialog.setVisible(true);
+				CreateGui.getAppGui().toFront();
+				CreateGui.getAppGui().requestFocus();
 			}
 		});
 		gbc.gridx = 0;
@@ -873,6 +878,7 @@ public class SmartDrawDialog extends JDialog {
 		scrollPane.setPreferredSize(dim);  
 		return scrollPane;  
 	}
+
 	
 	private void cancelWorker() {
 		if (worker != null && !worker.isDone()) {

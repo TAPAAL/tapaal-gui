@@ -513,20 +513,26 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			listener.fireStartDraw();
 		}
 	}
-	void fireDone(){
+	void fireDone(boolean cancelled){
 		for(SmartDrawListener listener : listeners) {
-			listener.fireDone();
+			listener.fireDone(cancelled);
 		}
 	}
 	
 	@Override
 	protected void done(){
-		CreateGui.getModel().repaintAll(true);
-		setTransitionsToUpright();
-		doOffsetForLoops();
-		CreateGui.getDrawingSurface().updatePreferredSize();
+		if(objectsPlaced.size() == drawingSurface.getPlaceTransitionObjects().size()) {
+			CreateGui.getModel().repaintAll(true);
+			setTransitionsToUpright();
+			doOffsetForLoops();
+			CreateGui.getDrawingSurface().updatePreferredSize();
+			System.out.println("Helloooooo");
+			fireDone(false);
+		} else {
+			fireDone(true);
+		}
 
-		fireDone();
+		
 	}
 	//For debugging
 	private void printPTObjectsAndPositions() {
