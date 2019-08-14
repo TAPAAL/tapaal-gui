@@ -748,12 +748,15 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cancelWorker();
+				System.out.println("undo begin");
 				CreateGui.getDrawingSurface().getUndoManager().undo();
-				CreateGui.getDrawingSurface().repaintAll();
+				System.out.println("undo done");
+				//CreateGui.getDrawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
 				//smartDrawDialog.setVisible(true);
 				CreateGui.getAppGui().toFront();
 				CreateGui.getAppGui().requestFocus();
+				
 			}
 		});
 		gbc.gridx = 0;

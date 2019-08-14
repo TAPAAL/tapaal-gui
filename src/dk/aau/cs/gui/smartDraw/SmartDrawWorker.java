@@ -109,9 +109,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 				}
 				rootPoint = new Point(rightMostPointUsed.x + 500, 350);
 			}
-			Command command = new MovePlaceTransitionObject(startingObject, rootPoint);
-			command.redo();
-			undoManager.addEdit(command);
+			moveObject(startingObject, rootPoint);
 			rightMostPointUsed = rootPoint;
 			reservePoint(rootPoint);
 			
@@ -225,6 +223,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		Command command = new MovePlaceTransitionObject(object, point);
 		command.redo();
 		undoManager.addEdit(command);
+		System.out.println("placed a place");
 	}
 	private void reservePoint(Point point) {
 		pointsReserved.add(point);
@@ -373,24 +372,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			}
 		}
 		if(lowestX < 50) {
-			Command command;
 			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
 				int newX = (int) (ptObject.getPositionX() + Math.abs(lowestX) + 50);
 				Point newPosition = new Point(newX, (int) ptObject.getPositionY());
-				command = new MovePlaceTransitionObject(ptObject, newPosition);
-				command.redo();
-				undoManager.addEdit(command);
+				moveObject(ptObject, newPosition);
 				
 			}
 		}
 		if(lowestY < 50) {
-			Command command;
 			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
 				int newY = (int) (ptObject.getPositionY() + Math.abs(lowestY) + 50);
 				Point newPosition = new Point((int) ptObject.getPositionX(), newY);
-				command = new MovePlaceTransitionObject(ptObject, newPosition);
-				command.redo();
-				undoManager.addEdit(command);
+				moveObject(ptObject, newPosition);
 			}
 		}
 	}

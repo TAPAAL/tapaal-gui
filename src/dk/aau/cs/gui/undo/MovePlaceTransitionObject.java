@@ -30,11 +30,9 @@ public class MovePlaceTransitionObject extends Command {
 	public void undo() {
 		objectToBeMoved.setPositionX(oldX);
 		objectToBeMoved.setPositionY(oldY);
-
-		//objectToBeMoved.updateConnected();
-		//CreateGui.getCurrentTab().network().buildConstraints();
-		CreateGui.getDrawingSurface().repaintAll();
-		CreateGui.getModel().repaintAll(true);
+		
+		objectToBeMoved.repaint();
+		objectToBeMoved.updateOnMoveOrZoom();
 		CreateGui.getDrawingSurface().updatePreferredSize();
 	}
 
@@ -46,10 +44,9 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved.setPositionX(newX);
 		objectToBeMoved.setPositionY(newY);
 		
-		//objectToBeMoved.updateConnected();
 		if(doUpdate) {
-			CreateGui.getDrawingSurface().repaintAll();
-			CreateGui.getModel().repaintAll(true);
+			objectToBeMoved.updateOnMoveOrZoom();
+			objectToBeMoved.repaint();
 			CreateGui.getDrawingSurface().updatePreferredSize();
 		}
 		doUpdate = true;
