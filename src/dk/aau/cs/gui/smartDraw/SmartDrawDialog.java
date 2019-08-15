@@ -143,7 +143,7 @@ public class SmartDrawDialog extends JDialog {
 			smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
 			smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
 			smartDrawDialog.setLocationRelativeTo(null);
-			smartDrawDialog.setResizable(true);
+			smartDrawDialog.setResizable(false);
 		}
 		smartDrawDialog.updateLists();
 		smartDrawDialog.enableButtons();
