@@ -53,7 +53,7 @@ public class SmartDrawDialog extends JDialog {
 		buffer.append("<b>Automatic net layout options</b><br/>");
 		buffer.append("<br/><br/>");
 		buffer.append("<b>Search Option</b><br/>\n");
-                buffer.append("You can choose between drawing in a Depth First(DFS) or a Breadth First(BFS)\n");
+                buffer.append("You can choose between drawing in a Depth First (DFS) or a Breadth First (BFS)\n");
                 buffer.append("manner. This may yield a difference as an object is only place once and thus\n");
                 buffer.append("reserves its given position. This choice affects which objects are placed first.\n");
 		buffer.append("<br/><br/>");
@@ -72,15 +72,15 @@ public class SmartDrawDialog extends JDialog {
 		buffer.append("<b>Penalties</b><br/>");
 		buffer.append("The penalties should be seen as punishments for choosing a position.\n");
                 buffer.append("The higher the penalty the higher the punishment; the position with the lowest\n");
-                buffer.append("summed penalty is where the object will be placed.");
+                buffer.append("accumulated penalty is where the object will be placed.");
 		buffer.append("<br/><br/>");
 			buffer.append("<em>Straight arc penalty</em> is a penalty punishing going straight\n");
 			buffer.append("i.e. if the candidate position's x or y equals the parent's x or y\n");
 			buffer.append("the <em>straight penalty * layer</em> is added to the total penalty.\n");
 			buffer.append("If not <em>Diagonal arc penalty * layer</em> is added instead.");
 		buffer.append("<br/><br/>");
-			buffer.append("<em>Distance penalty</em> punishes candidate positions depending on");
-			buffer.append("how far away from the starting point they are. As such a higher");
+			buffer.append("<em>Distance penalty</em> punishes candidate positions depending on\n");
+			buffer.append("how far away from the starting point they are. As such a higher\n");
 			buffer.append("distance penalty will make more compact nets.");
 		buffer.append("<br/><br/>");
 			buffer.append("<em>Overlapping arc penalty</em> punishes arcs laying directly on top of each other");
@@ -90,7 +90,7 @@ public class SmartDrawDialog extends JDialog {
 		buffer.append("<br/><br/>");
 			buffer.append("<img src=\"" + Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "SmartDrawExampleWithLayers.png") +"\" />");
 		buffer.append("<br/><br/>");
-		buffer.append("This layout was created with the default values.");
+		buffer.append("This layout was created with the default values.\n");
 		buffer.append("On the figure the numbers and boxes describe the layer. Furthermore, the effect of the <em>Overlapping arc penalty</em> can be seen\n");
 		buffer.append("as the objects in layer 2 prefer going diagonal rather than overlap due to the penaltys.");
 		buffer.append("</html>");
