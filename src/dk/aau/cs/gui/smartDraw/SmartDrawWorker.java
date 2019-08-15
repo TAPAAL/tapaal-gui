@@ -476,7 +476,6 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 				
 			}
 			else if(pNetObject instanceof Arc) {
-				Arc arc = (Arc) pNetObject;
 				Command cmd = new ChangeNameOffsetCommand(pNetObject, 0, 0);
 				cmd.redo();
 				undoManager.addEdit(cmd);

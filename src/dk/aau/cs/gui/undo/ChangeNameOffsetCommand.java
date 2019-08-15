@@ -1,5 +1,6 @@
 package dk.aau.cs.gui.undo;
 
+import pipe.gui.Grid;
 import pipe.gui.graphicElements.PetriNetObject;
 
 public class ChangeNameOffsetCommand extends Command {
@@ -13,15 +14,11 @@ public class ChangeNameOffsetCommand extends Command {
 		this.object = object;
 		this.newX = xOffset;
 		this.newY = yOffset;
-		
-		
 	}
 
 	@Override
 	public void undo() {
-		object.setNameOffsetX(oldX);
-		object.setNameOffsetY(oldY);
-		
+		object.getNameLabel().setPosition(object.getX() + Grid.getModifiedX(oldX), object.getY() + Grid.getModifiedX(oldY));
 		object.updateOnMoveOrZoom();
 	}
 
@@ -30,11 +27,8 @@ public class ChangeNameOffsetCommand extends Command {
 		oldY = object.getNameOffsetXObject();
 		oldX = object.getNameOffsetYObject();
 		
-		
-		object.setNameOffsetX(newX);
-		object.setNameOffsetY(newY);
-		
-		//object.updateOnMoveOrZoom();
+		object.getNameLabel().setPosition(object.getX() + Grid.getModifiedX(newX), object.getY() + Grid.getModifiedX(newY));
+		object.updateOnMoveOrZoom();
 	}
 }
 

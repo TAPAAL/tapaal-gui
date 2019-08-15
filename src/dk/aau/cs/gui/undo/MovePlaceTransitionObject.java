@@ -31,8 +31,9 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved.setPositionX(oldX);
 		objectToBeMoved.setPositionY(oldY);
 		
-		objectToBeMoved.repaint();
+		
 		objectToBeMoved.updateOnMoveOrZoom();
+		objectToBeMoved.repaint();
 		CreateGui.getDrawingSurface().updatePreferredSize();
 	}
 
