@@ -644,4 +644,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
 		nameGenerator.setupNameGeneratorFromTemplates(templates);
 	}
+	
+	public PlaceTransitionObject getPlaceTransitionObjectByName(String name) {
+		for(PetriNetObject object : getPlaceTransitionObjects()) {
+			if(object.getName() == name) {
+				return ((PlaceTransitionObject)object);
+			}
+		}
+		return null;
+	}
 }

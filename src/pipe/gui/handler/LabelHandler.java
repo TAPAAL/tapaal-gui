@@ -65,8 +65,8 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		// obj.setNameOffsetY((e.getYOnScreen() - dragInit.y)); //causes
 		// exception in Windows!
 		// dragInit = e.getLocationOnScreen(); //causes exception in Windows!
-		obj.setNameOffsetX((p.x - dragInit.x));
-		obj.setNameOffsetY((p.y - dragInit.y));
+		obj.updateNameOffsetX((p.x - dragInit.x));
+		obj.updateNameOffsetY((p.y - dragInit.y));
 		dragInit = p;
 		obj.updateOnMoveOrZoom();
 	}

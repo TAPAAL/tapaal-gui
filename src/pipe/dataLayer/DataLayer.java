@@ -777,6 +777,7 @@ public class DataLayer {
 		repaintPlaces(displayConstantNames);
 
 		for (Transition t : transitionsArray) {
+			t.updateOnMoveOrZoom();
 			t.repaint();
 		}
 
