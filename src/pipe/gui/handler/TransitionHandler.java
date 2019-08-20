@@ -98,32 +98,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		}
 	}
 
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		super.mouseEntered(e);
-		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-			if ((myObject instanceof TimedTransitionComponent) && !isDragging) {// &&
-				if (CreateGui.getCurrentTab().isInAnimationMode()) {
-					((TimedTransitionComponent) myObject).showDInterval(true);
-				}
-			}
-		}
 
-		if (isDragging) {
-			((TimedTransitionComponent) myObject).showDInterval(false);
-		}
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		super.mouseExited(e);
-		if ((myObject instanceof TimedTransitionComponent)) {// &&
-			if (CreateGui.getCurrentTab().isInAnimationMode()) {
-				((TimedTransitionComponent) myObject).showDInterval(false);
-			}
-		}
-	}
-	
 	public void mouseEngfstered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof pipe.gui.graphicElements.tapn.TimedTransitionComponent) && !isDragging) {// &&

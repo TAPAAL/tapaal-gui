@@ -100,31 +100,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		 */
 	}
 
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		super.mouseEntered(e);
-		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-			if ((myObject instanceof TimedPlaceComponent) && !isDragging) {// &&
-				if (CreateGui.getCurrentTab().isInAnimationMode()) {
-					((TimedPlaceComponent) myObject).showAgeOfTokens(true);
-				}
-			}
-		}
 
-		if (isDragging) {
-			((TimedPlaceComponent) myObject).showAgeOfTokens(false);
-		}
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		super.mouseExited(e);
-		if ((myObject instanceof TimedPlaceComponent)) {// &&
-			if (CreateGui.getCurrentTab().isInAnimationMode()) {
-				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
-			}
-		}
-	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {

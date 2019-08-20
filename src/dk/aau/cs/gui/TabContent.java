@@ -27,6 +27,8 @@ import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -1074,6 +1076,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					e -> e.a == MouseAction.clicked && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
 					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
 			);
+			registerEvent(
+					e->e.a == MouseAction.entered && e.pno instanceof PlaceTransitionObject,
+					e->mouseEnterPTO((PlaceTransitionObject)e.pno)
+			);
+			registerEvent(
+					e->e.a == MouseAction.exited && e.pno instanceof PlaceTransitionObject,
+					e->mouseExitPTO((PlaceTransitionObject)e.pno)
+			);
 		}
 
 		void transitionLeftClicked(TimedTransitionComponent t) {
@@ -1082,6 +1092,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			if (transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 				animationController.setAnimationButtonsEnabled();
+			}
+		}
+
+		void mouseEnterPTO(PlaceTransitionObject pto) {
+			if (pto instanceof TimedPlaceComponent) {
+				((TimedPlaceComponent) pto).showAgeOfTokens(true);
+			} else if (pto instanceof TimedTransitionComponent) {
+				((TimedTransitionComponent) pto).showDInterval(true);
+			}
+		}
+		void mouseExitPTO(PlaceTransitionObject pto) {
+			if (pto instanceof TimedPlaceComponent) {
+				((TimedPlaceComponent) pto).showAgeOfTokens(false);
+			} else if (pto instanceof TimedTransitionComponent) {
+				((TimedTransitionComponent) pto).showDInterval(false);
 			}
 		}
 	}
