@@ -96,24 +96,10 @@ public abstract class Place extends PlaceTransitionObject {
 		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, zoom);
 		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, zoom);
 
-		Arc someArc = CreateGui.getDrawingSurface().createArc;
-		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
-			if ((proximityPlace.contains((int) unZoomedX, (int) unZoomedY) || placeEllipse
-					.contains((int) unZoomedX, (int) unZoomedY))
-					&& areNotSameType(someArc.getSource())) {
-				// assume we are only snapping the target...
-				if (someArc.getTarget() != this) {
-					someArc.setTarget(this);
-				}
-				someArc.updateArcPosition();
-				return true;
-			} else {
-				if (someArc.getTarget() == this) {
-					someArc.setTarget(null);
-					updateConnected();
-				}
-				return false;
-			}
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+			return (proximityPlace.contains((int) unZoomedX, (int) unZoomedY) ||
+					placeEllipse.contains((int) unZoomedX, (int) unZoomedY));
 		} else {
 			return placeEllipse.contains((int) unZoomedX, (int) unZoomedY);
 		}

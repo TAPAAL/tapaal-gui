@@ -100,6 +100,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
+		super.mouseEntered(e);
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof TimedTransitionComponent) && !isDragging) {// &&
 				if (CreateGui.getCurrentTab().isInAnimationMode()) {
@@ -115,6 +116,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+		super.mouseExited(e);
 		if ((myObject instanceof TimedTransitionComponent)) {// &&
 			if (CreateGui.getCurrentTab().isInAnimationMode()) {
 				((TimedTransitionComponent) myObject).showDInterval(false);

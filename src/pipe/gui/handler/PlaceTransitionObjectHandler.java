@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.debug.Logger;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
@@ -68,6 +69,49 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		newArc.sealArc();
 		newArc.disableDrawingKeyBindings();
 		CreateGui.getDrawingSurface().createArc = null;
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		PlaceTransitionObject pto = (PlaceTransitionObject)myObject;
+
+		if (createArc != null) {
+			if (pto.areNotSameType(createArc.getSource())){
+				createArc.setTarget(pto);
+				createArc.updateArcPosition();
+				//pto.updateConnected();
+			}
+		}
+
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		super.mouseMoved(e);
+
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		PlaceTransitionObject pto = (PlaceTransitionObject)myObject;
+		if (createArc != null) {
+			if (!pto.areNotSameType(createArc.getSource())) {
+				dispatchToParentWithMouseLocationUpdated(e);
+			}
+		}
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		PlaceTransitionObject pto = (PlaceTransitionObject)myObject;
+
+		if (createArc != null) {
+			//XXX might need to check if target is pto (depends on order of events)
+			createArc.setTarget(null);
+			createArc.updateArcPosition();
+			//pto.removeArcCompareObject(pto);
+			//pto.updateConnected();
+		}
 	}
 
 	@Override

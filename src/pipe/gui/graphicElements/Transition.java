@@ -226,31 +226,13 @@ public abstract class Transition extends PlaceTransitionObject {
 	public boolean contains(int x, int y) {
 		int zoomPercentage = zoom;
 
-		double unZoomedX = (x - COMPONENT_DRAW_OFFSET)
-				/ (zoomPercentage / 100.0);
-		double unZoomedY = (y - COMPONENT_DRAW_OFFSET)
-				/ (zoomPercentage / 100.0);
+		double unZoomedX = (x - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
+		double unZoomedY = (y - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 
-		Arc someArc = CreateGui.getDrawingSurface().createArc;
-		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
-			if ((proximityTransition.contains((int) unZoomedX, (int) unZoomedY) || transition
-					.contains((int) unZoomedX, (int) unZoomedY))
-					&& areNotSameType(someArc.getSource())) {
-				// assume we are only snapping the target...
-				if (someArc.getTarget() != this) {
-					someArc.setTarget(this);
-				}
-				someArc.updateArcPosition();
-				return true;
-			} else {
-				if (someArc.getTarget() == this) {
-
-					someArc.setTarget(null);
-					removeArcCompareObject(someArc);
-					updateConnected();
-				}
-				return false;
-			}
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+			return (proximityTransition.contains((int) unZoomedX, (int) unZoomedY) ||
+					transition.contains((int) unZoomedX, (int) unZoomedY));
 		} else {
 			return transition.contains((int) unZoomedX, (int) unZoomedY);
 		}
