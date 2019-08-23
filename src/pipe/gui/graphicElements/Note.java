@@ -81,29 +81,27 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	public void updateBounds() {
 		int newHeight = note.getPreferredSize().height;
 
-		if ((note.getHeight() < newHeight)
-				&& (newHeight >= note.getMinimumSize().height)) {
+		if ((note.getHeight() < newHeight) && (newHeight >= note.getMinimumSize().height)) {
 			note.setSize(note.getWidth(), newHeight);
 		}
 
 		int rectWidth = note.getWidth() + Pipe.RESERVED_BORDER;
 		int rectHeight = note.getHeight() + Pipe.RESERVED_BORDER;
 
-		noteRect.setFrame(Pipe.RESERVED_BORDER / 2, Pipe.RESERVED_BORDER / 2,
-				rectWidth, rectHeight);
-		setSize(rectWidth + Pipe.ANNOTATION_SIZE_OFFSET, rectHeight
-				+ Pipe.ANNOTATION_SIZE_OFFSET);
+		noteRect.setFrame(Pipe.RESERVED_BORDER / 2, Pipe.RESERVED_BORDER / 2, rectWidth, rectHeight);
+		setSize(rectWidth + Pipe.ANNOTATION_SIZE_OFFSET, rectHeight + Pipe.ANNOTATION_SIZE_OFFSET);
 
-		note.setLocation((int) noteRect.getX() + (rectWidth - note.getWidth())
-				/ 2, (int) noteRect.getY() + (rectHeight - note.getHeight())
-				/ 2);
+		note.setLocation(
+				(int) noteRect.getX() + (rectWidth - note.getWidth()) / 2,
+				(int) noteRect.getY() + (rectHeight - note.getHeight()) / 2
+		);
 
-		bounds.setBounds(Zoomer.getZoomedValue(originalX, zoom), Zoomer
-				.getZoomedValue(originalY, zoom), (int) ((rectWidth
-				+ Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer
-				.getScaleFactor(zoom)), (int) ((rectHeight
-				+ Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer
-				.getScaleFactor(zoom)));
+		bounds.setBounds(
+				Zoomer.getZoomedValue(originalX, zoom),
+				Zoomer.getZoomedValue(originalY, zoom),
+				(int) ((rectWidth + Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(zoom)),
+				(int) ((rectHeight + Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(zoom))
+		);
 		setBounds(bounds);
 	}
 
