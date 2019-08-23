@@ -26,11 +26,6 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	protected boolean attributesVisible = false;
 
-	// The "real" x/y coordinate of this place or transition in the net.
-	// i.e. the x position at 100% zoom.
-	private double locationX;
-	private double locationY;
-
 	/**
 	 * Create Petri-Net Object
 	 * 

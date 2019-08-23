@@ -27,17 +27,19 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	private static final long serialVersionUID = 2693171860021066729L;
 
 	protected static final int COMPONENT_DRAW_OFFSET= 5;
-	/** X-axis Position on screen */
+	/** x/y position position on screen (zoomed) */
 	protected double positionX;
-	/** Y-axis Position on screen */
 	protected double positionY;
 
-	/** X-axis Position on screen */
+	/** X/Y-axis Position on screen */
 	protected double nameOffsetX;
-	/** Y-axis Position on screen */
 	protected double nameOffsetY;
-	
-	
+
+	// The x/y coordinate of object at 100% zoom.
+	//XXX: pushed down from PlaceTransitionObject, need further refactoring and rename, //kyrke 2019-08-23
+	protected double locationX;
+	protected double locationY;
+
 	protected String id = null;
 
 	/* Name Label for displaying name */
@@ -52,6 +54,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	// Integer value which represents a zoom percentage
 	protected int zoom = Pipe.ZOOM_DEFAULT;
+
 	private DataLayer guiModel;
 	private Reference<AbstractDrawingSurfaceManager> managerRef = null;
 
