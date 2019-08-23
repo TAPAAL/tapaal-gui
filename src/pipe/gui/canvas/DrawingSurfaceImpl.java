@@ -12,7 +12,6 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
@@ -394,18 +393,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			return newP;
 		}
 
-		private void addPetriNetObjectToModelandView(PetriNetObject pnObject) {
-			guiModel.addPetriNetObject(pnObject);
-			//view.addNewPetriNetObject(pnObject);
-		}
-
 		private PlaceTransitionObject newTimedPlaceAddToModelView(Point p) {
 			p = adjustPointToGridAndZoom(p, view.getZoom());
 
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
 			TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
 			model.add(tp);
-			addPetriNetObjectToModelandView(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 
 			tabContent.getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel));
 
@@ -420,7 +414,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
 
 			model.add(transition);
-			addPetriNetObjectToModelandView(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 
 			tabContent.getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
 			return pnObject;
@@ -430,7 +424,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
             Point p = adjustPointToGridAndZoom(clickPoint, view.getZoom());
 
             AnnotationNote pnObject = new AnnotationNote(p.x, p.y, true);
-            addPetriNetObjectToModelandView(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 
 			tabContent.getUndoManager().addNewEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
             pnObject.enableEditMode();
