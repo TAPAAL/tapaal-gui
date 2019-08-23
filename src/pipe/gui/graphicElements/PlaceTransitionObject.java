@@ -27,8 +27,8 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	protected boolean attributesVisible = false;
 
 	public PlaceTransitionObject(
-			double positionXInput,
-			double positionYInput,
+			int positionXInput,
+			int positionYInput,
 			String idInput,
 			double nameOffsetXInput,
 			double nameOffsetYInput
@@ -50,7 +50,22 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		pnName.setPosition((int) nameOffsetX, (int) nameOffsetY);
 
 	}
+	public PlaceTransitionObject(int positionXInput, int positionYInput) {
+		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
+	}
 
+	@Deprecated
+	public PlaceTransitionObject(
+			double positionXInput,
+			double positionYInput,
+			String idInput,
+			double nameOffsetXInput,
+			double nameOffsetYInput
+	) {
+		this((int)positionXInput, (int) positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+	}
+
+	@Deprecated
 	public PlaceTransitionObject(double positionXInput, double positionYInput) {
 		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
 	}
