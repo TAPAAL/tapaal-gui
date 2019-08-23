@@ -26,47 +26,19 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	protected boolean attributesVisible = false;
 
-	/**
-	 * Create Petri-Net Object
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 * @param idInput
-	 *            Place id
-	 * @param nameOffsetXInput
-	 *            Name X-axis Position
-	 * @param nameOffsetYInput
-	 *            Name Y-axis Position
-	 */
-	public PlaceTransitionObject(double positionXInput, double positionYInput,
-			String idInput, double nameOffsetXInput,
-			double nameOffsetYInput) {
-		this(positionXInput, positionYInput);
-		id = idInput;
-		nameOffsetX = nameOffsetXInput;
-		nameOffsetY = nameOffsetYInput;
-		pnName.setPosition((int) nameOffsetX, (int) nameOffsetY);
-		// setName(nameInput);
-	}
-
-	/**
-	 * Create Petri-Net Object This constructor does all the work, the others
-	 * just call it.
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 */
-	public PlaceTransitionObject(double positionXInput, double positionYInput) {
-
+	public PlaceTransitionObject(
+			double positionXInput,
+			double positionYInput,
+			String idInput,
+			double nameOffsetXInput,
+			double nameOffsetYInput
+	){
 		setPositionX(positionXInput);
 		setPositionY(positionYInput);
 
-		nameOffsetX = Pipe.DEFAULT_OFFSET_X;
-		nameOffsetY = Pipe.DEFAULT_OFFSET_Y;
+		id = idInput;
+		nameOffsetX = nameOffsetXInput;
+		nameOffsetY = nameOffsetYInput;
 
 		// sets up Namelabel for each PN object
 		pnName = new NameLabel(zoom);
@@ -74,6 +46,13 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		getNameLabel().addMouseListener(labelHandler);
 		getNameLabel().addMouseMotionListener(labelHandler);
 		getNameLabel().addMouseWheelListener(labelHandler);
+
+		pnName.setPosition((int) nameOffsetX, (int) nameOffsetY);
+
+	}
+
+	public PlaceTransitionObject(double positionXInput, double positionYInput) {
+		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
 	}
 
 	/**
