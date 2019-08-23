@@ -35,8 +35,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	protected double nameOffsetY;
 
 	// The x/y coordinate of object at 100% zoom.
-	//XXX: pushed down from PlaceTransitionObject, need further refactoring and rename, //kyrke 2019-08-23
-	//XXX: should by int not double (location are tracked as ints) //kyrke 2019-08-23
+	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
 	protected int originalX;
 	protected int originalY;
 
