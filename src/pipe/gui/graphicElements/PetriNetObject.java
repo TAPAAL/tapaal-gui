@@ -1,6 +1,5 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
@@ -38,8 +37,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	// The x/y coordinate of object at 100% zoom.
 	//XXX: pushed down from PlaceTransitionObject, need further refactoring and rename, //kyrke 2019-08-23
 	//XXX: should by int not double (location are tracked as ints) //kyrke 2019-08-23
-	protected double locationX;
-	protected double locationY;
+	protected int originalX;
+	protected int originalY;
 
 	protected String id = null;
 
@@ -350,23 +349,33 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		this.managerRef = manager;
 	}
 
+
+	public int getOriginalX() {
+		return originalX;
+	}
+
+	public int getOriginalY() {
+		return originalY;
+	}
     /**
      * Get X-axis position, returns null if value not yet entered
      *
      * @return Double value for X-axis position
+	 * @deprecated use getOriginalX
      */
+    @Deprecated
     public Double getPositionXObject() {
-        return locationX;
-        // return new Double(positionX);
+        return (double) originalX;
     }
 
     /**
      * Get Y-axis position, returns null if value not yet entered
      *
      * @return Double value for Y-axis position
+	 * @deprecated use getOriginalY
      */
+    @Deprecated
     public Double getPositionYObject() {
-        return locationY;
-        // return new Double(positionY);
+        return (double) originalY;
     }
 }

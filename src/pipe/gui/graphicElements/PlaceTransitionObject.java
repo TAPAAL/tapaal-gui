@@ -84,7 +84,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 */
 	public void setPositionX(double positionXInput) {
 		positionX = positionXInput;
-		locationX = Zoomer.getUnzoomedValue(positionX, zoom);
+		originalX = (int)Zoomer.getUnzoomedValue(positionX, zoom);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 */
 	public void setPositionY(double positionYInput) {
 		positionY = positionYInput;
-		locationY = Zoomer.getUnzoomedValue(positionY, zoom);
+		originalY = (int)Zoomer.getUnzoomedValue(positionY, zoom);
 	}
 
 	/**
@@ -213,8 +213,8 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	/** Calculates the BoundsOffsets used for setBounds() method */
 	public void updateBounds() {
 		double scaleFactor = Zoomer.getScaleFactor(zoom);
-		positionX = locationX * scaleFactor;
-		positionY = locationY * scaleFactor;
+		positionX = originalX * scaleFactor;
+		positionY = originalY * scaleFactor;
 		bounds.setBounds((int) positionX, (int) positionY,
 				(int) (componentWidth * scaleFactor),
 				(int) (componentHeight * scaleFactor));
