@@ -29,8 +29,6 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	protected JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;
 	protected RectangularShape noteRect = new Rectangle();
-	private int originalX;
-	private int originalY;
 
 	public Note(int x, int y) {
 		originalX = Zoomer.getUnzoomedValue(x, zoom);
@@ -202,14 +200,6 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	@Override
 	public int getLayerOffset() {
 		return Pipe.NOTE_LAYER_OFFSET;
-	}
-
-	public int getOriginalX() {
-		return originalX;
-	}
-
-	public int getOriginalY() {
-		return originalY;
 	}
 
 	public void zoomUpdate(int percent) {
