@@ -42,8 +42,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	/* Name Label for displaying name */
 	protected NameLabel pnName;
-	protected Color objectColour = Pipe.ELEMENT_LINE_COLOUR;
-	protected Color selectionBorderColour = Pipe.SELECTION_LINE_COLOUR;
 	protected boolean selected = false; // True if part of the current selection.
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
@@ -306,14 +304,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	public void setDraggable(boolean allow) {
 		draggable = allow;
-	}
-
-	public void setObjectColour(Color c) {
-		objectColour = c;
-	}
-
-	public void setSelectionBorderColour(Color c) {
-		selectionBorderColour = c;
 	}
 
 	public abstract void addedToGui();
