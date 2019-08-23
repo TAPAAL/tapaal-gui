@@ -348,4 +348,24 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void setManagerRef(Reference<AbstractDrawingSurfaceManager> manager) {
 		this.managerRef = manager;
 	}
+
+    /**
+     * Get X-axis position, returns null if value not yet entered
+     *
+     * @return Double value for X-axis position
+     */
+    public Double getPositionXObject() {
+        return locationX;
+        // return new Double(positionX);
+    }
+
+    /**
+     * Get Y-axis position, returns null if value not yet entered
+     *
+     * @return Double value for Y-axis position
+     */
+    public Double getPositionYObject() {
+        return locationY;
+        // return new Double(positionY);
+    }
 }

@@ -169,25 +169,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		return nameOffsetY;
 	}
 
-	/**
-	 * Get X-axis position, returns null if value not yet entered
-	 * 
-	 * @return Double value for X-axis position
-	 */
-	public Double getPositionXObject() {
-		return locationX;
-		// return new Double(positionX);
-	}
 
-	/**
-	 * Get Y-axis position, returns null if value not yet entered
-	 * 
-	 * @return Double value for Y-axis position
-	 */
-	public Double getPositionYObject() {
-		return locationY;
-		// return new Double(positionY);
-	}
 
 	/**
 	 * Implemented in subclasses as involves some tailoring according to the
