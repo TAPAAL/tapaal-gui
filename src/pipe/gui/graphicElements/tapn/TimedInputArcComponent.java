@@ -150,18 +150,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		}
 	}
 
-	@Override
-	public void setLabelPosition() {
-		/*label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)
-				- ((zoom / 55) * (zoom / 55)));*/
-
-		pnName.setPosition(Grid.getModifiedX( (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))),
-						  Grid.getModifiedY( (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
-
-
-	}
-
 	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {
 		return inputArc;
 	}
