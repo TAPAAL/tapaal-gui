@@ -43,8 +43,6 @@ public class ArcPathPoint extends PetriNetObject {
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
-		zoom = Pipe.ZOOM_DEFAULT;
-
 		//XXX: see note in function
 		addMouseHandler();
 	}
