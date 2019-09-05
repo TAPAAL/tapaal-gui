@@ -647,6 +647,16 @@ public class DataLayer {
 		return all;
 	}
 
+	public Iterable<PetriNetObject> getPetriNetObjectsWithArcPathPoint() {
+		ArrayList<PetriNetObject> all = new ArrayList<PetriNetObject>(placesArray);
+		all.addAll(transitionsArray);
+		all.addAll(arcsArray);
+		all.addAll(labelsArray);
+		all.addAll(arcPathSet);
+
+		return all;
+	}
+
 	/**
 	 * Get a List of all the Place objects in the Petri-Net
 	 * 
