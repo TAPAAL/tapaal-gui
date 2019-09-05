@@ -98,6 +98,7 @@ public class ArcPath implements Shape {
 		int c = 0;
 		currentPoint = pathPoints.get(c++);
 
+		//Calculate the arc mid-point for lable placement
 		if (getEndIndex() < 2) {
 			midPoint.x = (float) (((pathPoints.get(0)).getPoint().x + (pathPoints
 					.get(1)).getPoint().x) * 0.5);
