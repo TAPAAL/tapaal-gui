@@ -403,10 +403,6 @@ public abstract class Arc extends PetriNetObject {
 		pnName.updateSize();
 	}
 
-	public void setZoom(int percent) {
-		zoom = percent;
-	}
-
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
 	 * and action names are mapped to action objects. The key bindings are disabled when the
