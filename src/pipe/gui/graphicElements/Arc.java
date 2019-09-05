@@ -27,8 +27,6 @@ public abstract class Arc extends PetriNetObject {
 			0, -10, -7, -10 }, 4);
 	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 
-	//protected NameLabel label;
-
 	/** References to the objects this arc connects */
 	private PlaceTransitionObject source = null;
 	private PlaceTransitionObject target = null;
