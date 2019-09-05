@@ -368,7 +368,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	public abstract void toggleAttributesVisible();
 
 	public void zoomUpdate(int value) {
-		zoom = value;
+		super.zoomUpdate(value);
 		update(true);
 	}
 

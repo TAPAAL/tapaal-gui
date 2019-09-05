@@ -264,7 +264,7 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public void zoomUpdate(int zoom) {
-		this.zoom = zoom;
+		super.zoomUpdate(zoom);
 		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed out
 		if (zoom > 213) {
 			SIZE = 5;

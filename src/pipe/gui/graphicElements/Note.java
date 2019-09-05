@@ -203,7 +203,7 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	}
 
 	public void zoomUpdate(int percent) {
-		zoom = percent;
+		super.zoomUpdate(percent);
 		updateBounds();
 	}
 

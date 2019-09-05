@@ -377,4 +377,9 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
     public Double getPositionYObject() {
         return (double) originalY;
     }
+
+	@Override
+	public void zoomUpdate(int zoom) {
+		this.zoom = zoom;
+	}
 }
