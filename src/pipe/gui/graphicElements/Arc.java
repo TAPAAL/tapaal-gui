@@ -29,8 +29,6 @@ public abstract class Arc extends PetriNetObject {
 
 	//protected NameLabel label;
 
-	private static Point2D.Double point;
-
 	/** References to the objects this arc connects */
 	private PlaceTransitionObject source = null;
 	private PlaceTransitionObject target = null;
@@ -329,7 +327,7 @@ public abstract class Arc extends PetriNetObject {
 
 	@Override
 	public boolean contains(int x, int y) {
-		point = new Point2D.Double(x + myPath.getBounds().getX()
+		Point2D.Double point = new Point2D.Double(x + myPath.getBounds().getX()
 				- COMPONENT_DRAW_OFFSET - zoomGrow, y
 				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
 		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
