@@ -328,6 +328,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     @Override
     public void addPrototype(PetriNetObject pno) {
+		pno.zoomUpdate(getZoom());
+
         add(pno);
         setLayer(pno, Pipe.PROTOTYPE_LAYER_OFFSET);
         validate();

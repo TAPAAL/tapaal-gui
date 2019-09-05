@@ -51,7 +51,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	}
 
 	private void createArc(Arc newArc, PlaceTransitionObject currentObject) {
-		newArc.setZoom(CreateGui.getDrawingSurface().getZoom());
+
+		//XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+		//to avoid this we change the endpoint to set the end point to the same as the end point
+		//needs further refactorings //kyrke 2019-09-05
+		newArc.setEndPoint(currentObject.getPositionX(), currentObject.getPositionY(), false);
 
 		CreateGui.getDrawingSurface().addPrototype(newArc);
 
