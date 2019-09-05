@@ -101,7 +101,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			addNewPetriNetObject(pnObject);
 		}
 
-
+		validate();
+		repaint();
 	}
 
 	@Override
