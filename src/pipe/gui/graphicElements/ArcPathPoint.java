@@ -65,14 +65,6 @@ public class ArcPathPoint extends PetriNetObject {
 		//XXX: see note in function
 		addMouseHandler();
 	}
-	
-	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a, int zoomLevel) {
-		this(x,y,_pointType,a);
-		zoom = zoomLevel;
-
-		//XXX: see note in function
-		addMouseHandler();
-	}
 
 	private void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when

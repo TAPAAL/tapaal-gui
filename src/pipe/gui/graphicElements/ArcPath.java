@@ -320,11 +320,6 @@ public class ArcPath implements Shape {
 		pathPoints.add(new ArcPathPoint((float) x, (float) y, type, this));
 	}
 	
-	public void addPoint(double x, double y, boolean type,int zoom) {		
-		pathPoints.add(new ArcPathPoint((float) x, (float) y, type, this,zoom));
-	}
-	
-	
 
 	public void addPoint() {
 		pathPoints.add(new ArcPathPoint(this));
@@ -390,6 +385,9 @@ public class ArcPath implements Shape {
 	public Point2D.Float getPoint(int index) {
 		return (pathPoints.get(index)).getPoint();
 	}
+    public Point2D.Float getRealPoint(int index) {
+        return (pathPoints.get(index)).getRealPoint();
+    }
 
 	public ArcPathPoint getPathPoint(int index) {
 		return (pathPoints.get(index));
