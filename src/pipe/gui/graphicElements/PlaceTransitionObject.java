@@ -33,6 +33,8 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 			double nameOffsetXInput,
 			double nameOffsetYInput
 	){
+		super();
+
 		setPositionX(positionXInput);
 		setPositionY(positionYInput);
 
