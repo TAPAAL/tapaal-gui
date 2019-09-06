@@ -59,7 +59,7 @@ public class NameLabel extends JTextArea implements Translatable,
 		updatePosition();
 	}
 
-	public void updateSize() {
+	private void updateSize() {
 		// To get round Java bug #4352983 I have to expand the size a bit
 		setSize((int) (getPreferredSize().width * 1.2),
 				(int) (getPreferredSize().height * 1.2));

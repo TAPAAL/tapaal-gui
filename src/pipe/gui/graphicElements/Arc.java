@@ -400,7 +400,6 @@ public abstract class Arc extends PetriNetObject {
 		this.updateArcPosition();
 		this.updateOnMoveOrZoom();
 		pnName.zoomUpdate(percent);
-		pnName.updateSize();
 	}
 
 	/**
