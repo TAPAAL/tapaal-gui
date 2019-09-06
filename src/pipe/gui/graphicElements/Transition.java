@@ -378,12 +378,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void toggleAttributesVisible() {
-		attributesVisible = !attributesVisible;
-		update(true);
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		pnName.setText(getText());
 		pnName.zoomUpdate(getZoom());

@@ -367,7 +367,10 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		return Pipe.PLACE_TRANSITION_LAYER_OFFSET;
 	}
 
-	public abstract void toggleAttributesVisible();
+	public void toggleAttributesVisible() {
+		attributesVisible = !attributesVisible;
+		update(true);
+	};
 
 	public void zoomUpdate(int value) {
 		super.zoomUpdate(value);

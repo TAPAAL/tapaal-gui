@@ -131,12 +131,6 @@ public abstract class Place extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void toggleAttributesVisible() {
-		attributesVisible = !attributesVisible;
-		update(true);
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
 			pnName.setText("");
