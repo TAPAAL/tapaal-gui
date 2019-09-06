@@ -43,6 +43,7 @@ public class ArcPathPoint extends PetriNetObject {
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
+	    super();
 		//XXX: see note in function
 		addMouseHandler();
 	}
