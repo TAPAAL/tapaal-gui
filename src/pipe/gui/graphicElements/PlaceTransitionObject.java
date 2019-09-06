@@ -41,7 +41,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		nameOffsetY = nameOffsetYInput;
 
 		// sets up Namelabel for each PN object
-		pnName = new NameLabel(zoom);
+		pnName = new NameLabel(getZoom());
 		LabelHandler labelHandler = new LabelHandler(pnName, this);
 		getNameLabel().addMouseListener(labelHandler);
 		getNameLabel().addMouseMotionListener(labelHandler);
@@ -78,7 +78,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 */
 	public void setPositionX(double positionXInput) {
 		positionX = positionXInput;
-		originalX = (int)Zoomer.getUnzoomedValue(positionX, zoom);
+		originalX = (int)Zoomer.getUnzoomedValue(positionX, getZoom());
 	}
 
 	/**
@@ -89,7 +89,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 */
 	public void setPositionY(double positionYInput) {
 		positionY = positionYInput;
-		originalY = (int)Zoomer.getUnzoomedValue(positionY, zoom);
+		originalY = (int)Zoomer.getUnzoomedValue(positionY, getZoom());
 	}
 
 	/**
@@ -175,7 +175,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 		Graphics2D g2 = (Graphics2D) g;
 		g2.translate(COMPONENT_DRAW_OFFSET, COMPONENT_DRAW_OFFSET);
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 	}
 
 	public Point2D getIntersectOffset(Point2D start) {
@@ -190,7 +190,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 * @return Top offset of Place
 	 */
 	public int centreOffsetTop() {
-		return (int) (Zoomer.getZoomedValue(componentHeight / 2.0, zoom));
+		return (int) (Zoomer.getZoomedValue(componentHeight / 2.0, getZoom()));
 	}
 
 	/**
@@ -201,12 +201,12 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 * @return Left offset of Place
 	 */
 	public int centreOffsetLeft() {
-		return (int) (Zoomer.getZoomedValue(componentWidth / 2.0, zoom));
+		return (int) (Zoomer.getZoomedValue(componentWidth / 2.0, getZoom()));
 	}
 
 	/** Calculates the BoundsOffsets used for setBounds() method */
 	public void updateBounds() {
-		double scaleFactor = Zoomer.getScaleFactor(zoom);
+		double scaleFactor = Zoomer.getScaleFactor(getZoom());
 		positionX = originalX * scaleFactor;
 		positionY = originalY * scaleFactor;
 		bounds.setBounds((int) positionX, (int) positionY,

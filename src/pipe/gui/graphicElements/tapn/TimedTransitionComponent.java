@@ -162,7 +162,7 @@ public class TimedTransitionComponent extends Transition {
 		if(transition != null) {
 			pnName.setName(transition.name());
 			pnName.setVisible(attributesVisible);
-			pnName.zoomUpdate(zoom);
+			pnName.zoomUpdate(getZoom());
 		}
 		else {
 			pnName.setText("");

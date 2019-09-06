@@ -52,7 +52,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	protected boolean deleted = false;
 
 	// Integer value which represents a zoom percentage
-	protected int zoom = Pipe.ZOOM_DEFAULT;
+	private int zoom = Pipe.ZOOM_DEFAULT;
 
 	private DataLayer guiModel;
 	private Reference<AbstractDrawingSurfaceManager> managerRef = null;
@@ -182,8 +182,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	
 	protected void updateLabelLocation() {
 		this.getNameLabel().setPosition(
-				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
+				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
+				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom())))
 		);
 	}
 	
@@ -197,7 +197,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 *            Double value for name X-axis offset
 	 */
 	public void setNameOffsetX(double nameOffsetXInput) {
-		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
+		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
 	}
 
 	/**
@@ -207,7 +207,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 *            Double value for name Y-axis offset
 	 */
 	public void setNameOffsetY(double nameOffsetYInput) {
-		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
+		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
 	}
 	/**
 	 * Get X-axis offset for ...

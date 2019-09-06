@@ -88,13 +88,13 @@ public abstract class Place extends PlaceTransitionObject {
 	 * Returns the diameter of this Place at the current zoom
 	 */
 	private int getDiameter() {
-		return (Zoomer.getZoomedValue(DIAMETER, zoom));
+		return (Zoomer.getZoomedValue(DIAMETER, getZoom()));
 	}
 
 	@Override
 	public boolean contains(int x, int y) {
-		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, zoom);
-		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, zoom);
+		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, getZoom());
+		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, getZoom());
 
 		Arc createArc = CreateGui.getDrawingSurface().createArc;
 		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
@@ -143,7 +143,7 @@ public abstract class Place extends PlaceTransitionObject {
 		} else {
 			pnName.setText("");
 		}
-		pnName.zoomUpdate(zoom);
+		pnName.zoomUpdate(getZoom());
 		super.update(displayConstantNames);
 		repaint();
 	}

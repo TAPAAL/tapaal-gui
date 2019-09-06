@@ -57,7 +57,7 @@ public abstract class Arc extends PetriNetObject {
 			double endPositionXInput, double endPositionYInput,
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		pnName = new NameLabel(zoom);
+		pnName = new NameLabel(getZoom());
 		myPath.addPoint((float) startPositionXInput,
 				(float) startPositionYInput, ArcPathPoint.STRAIGHT);
 		myPath.addPoint((float) endPositionXInput, (float) endPositionYInput,
@@ -78,7 +78,7 @@ public abstract class Arc extends PetriNetObject {
 	 */
 	public Arc(PlaceTransitionObject newSource) {
 		isPrototype = true;
-		pnName = new NameLabel(zoom);
+		pnName = new NameLabel(getZoom());
 		source = newSource;
 		myPath.addPoint();
 		myPath.addPoint();
@@ -91,7 +91,7 @@ public abstract class Arc extends PetriNetObject {
 	public Arc() {
 		super();
 
-		pnName = new NameLabel(zoom);
+		pnName = new NameLabel(getZoom());
 		//XXX see comment in function
 		setLableHandler();
 	}
@@ -134,8 +134,8 @@ public abstract class Arc extends PetriNetObject {
 
 	public void setLabelPosition() {
 
-		pnName.setPosition(Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom)),
-						  Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom)));
+		pnName.setPosition(Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, getZoom())),
+						  Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, getZoom())));
 
 	}
 	@Override
@@ -282,7 +282,7 @@ public abstract class Arc extends PetriNetObject {
 			//this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
-		g2.setStroke(new BasicStroke(0.01f * zoom));
+		g2.setStroke(new BasicStroke(0.01f * getZoom()));
 		g2.draw(myPath);
 
 		//Draw Arrow-head
@@ -294,7 +294,7 @@ public abstract class Arc extends PetriNetObject {
 		g2.rotate(myPath.getEndAngle() + Math.PI);
 		g2.setColor(java.awt.Color.WHITE);
 
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
 
 		if (selected) {

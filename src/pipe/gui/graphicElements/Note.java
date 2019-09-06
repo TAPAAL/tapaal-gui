@@ -31,8 +31,8 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	protected RectangularShape noteRect = new Rectangle();
 
 	public Note(int x, int y) {
-		originalX = Zoomer.getUnzoomedValue(x, zoom);
-		originalY = Zoomer.getUnzoomedValue(y, zoom);
+		originalX = Zoomer.getUnzoomedValue(x, getZoom());
+		originalY = Zoomer.getUnzoomedValue(y, getZoom());
 
 		note.setAlignmentX(Component.CENTER_ALIGNMENT);
 		note.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -95,10 +95,10 @@ public abstract class Note extends PetriNetObject implements Translatable {
 		);
 
 		bounds.setBounds(
-				Zoomer.getZoomedValue(originalX, zoom),
-				Zoomer.getZoomedValue(originalY, zoom),
-				(int) ((rectWidth + Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(zoom)),
-				(int) ((rectHeight + Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(zoom))
+				Zoomer.getZoomedValue(originalX, getZoom()),
+				Zoomer.getZoomedValue(originalY, getZoom()),
+				(int) ((rectWidth + Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom())),
+				(int) ((rectHeight + Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom()))
 		);
 		setBounds(bounds);
 	}
@@ -134,8 +134,8 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	/** Translates the component by x,y */
 	public void translate(int x, int y) {
 		setLocation(getX() + x, getY() + y);
-		originalX += Zoomer.getUnzoomedValue(x, zoom);
-		originalY += Zoomer.getUnzoomedValue(y, zoom);
+		originalX += Zoomer.getUnzoomedValue(x, getZoom());
+		originalY += Zoomer.getUnzoomedValue(y, getZoom());
 		updateBounds();
 	}
 
@@ -169,8 +169,8 @@ public abstract class Note extends PetriNetObject implements Translatable {
 
 	@Override
 	public boolean contains(int x, int y) {
-		return noteRect.contains(x / Zoomer.getScaleFactor(zoom), y
-				/ Zoomer.getScaleFactor(zoom));
+		return noteRect.contains(x / Zoomer.getScaleFactor(getZoom()), y
+				/ Zoomer.getScaleFactor(getZoom()));
 	}
 
 	// 

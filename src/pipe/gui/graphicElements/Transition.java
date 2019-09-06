@@ -5,8 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -224,7 +222,7 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	@Override
 	public boolean contains(int x, int y) {
-		int zoomPercentage = zoom;
+		int zoomPercentage = getZoom();
 
 		double unZoomedX = (x - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 		double unZoomedY = (y - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
@@ -296,7 +294,7 @@ public abstract class Transition extends PlaceTransitionObject {
 				.toRadians(angle + Math.PI));
 		Point2D.Double transformed = new Point2D.Double();
 
-		transform.concatenate(Zoomer.getTransform(zoom));
+		transform.concatenate(Zoomer.getTransform(getZoom()));
 
 		arcIterator = top.iterator();
 		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT),
@@ -388,7 +386,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	@Override
 	public void update(boolean displayConstantNames) {
 		pnName.setText(getText());
-		pnName.zoomUpdate(zoom);
+		pnName.zoomUpdate(getZoom());
 		super.update(displayConstantNames);
 		this.repaint();
 	}

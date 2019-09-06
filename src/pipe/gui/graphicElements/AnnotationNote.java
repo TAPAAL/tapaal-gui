@@ -14,7 +14,6 @@ import javax.swing.JDialog;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.AnnotationNoteHandler;
@@ -95,38 +94,38 @@ public class AnnotationNote extends Note {
 		if (dragPoints != null) {
 			// TOP-LEFT
 			dragPoints[0].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMinY(), zoom));
-			dragPoints[0].setZoom(zoom);
+					getZoom()), Zoomer.getZoomedValue(noteRect.getMinY(), getZoom()));
+			dragPoints[0].setZoom(getZoom());
 			// TOP-MIDDLE
 			dragPoints[1].setLocation(Zoomer.getZoomedValue(noteRect
-					.getCenterX(), zoom), Zoomer.getZoomedValue(noteRect
-					.getMinY(), zoom));
-			dragPoints[1].setZoom(zoom);
+					.getCenterX(), getZoom()), Zoomer.getZoomedValue(noteRect
+					.getMinY(), getZoom()));
+			dragPoints[1].setZoom(getZoom());
 			// TOP-RIGHT
 			dragPoints[2].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMinY(), zoom));
-			dragPoints[2].setZoom(zoom);
+					getZoom()), Zoomer.getZoomedValue(noteRect.getMinY(), getZoom()));
+			dragPoints[2].setZoom(getZoom());
 			// MIDDLE-RIGHT
 			dragPoints[3].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getCenterY(), zoom));
-			dragPoints[3].setZoom(zoom);
+					getZoom()), Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom()));
+			dragPoints[3].setZoom(getZoom());
 			// BOTTOM-RIGHT
 			dragPoints[4].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMaxY(), zoom));
-			dragPoints[4].setZoom(zoom);
+					getZoom()), Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom()));
+			dragPoints[4].setZoom(getZoom());
 			// BOTTOM-MIDDLE
 			dragPoints[5].setLocation(Zoomer.getZoomedValue(noteRect
-					.getCenterX(), zoom), Zoomer.getZoomedValue(noteRect
-					.getMaxY(), zoom));
-			dragPoints[5].setZoom(zoom);
+					.getCenterX(), getZoom()), Zoomer.getZoomedValue(noteRect
+					.getMaxY(), getZoom()));
+			dragPoints[5].setZoom(getZoom());
 			// BOTTOM-LEFT
 			dragPoints[6].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMaxY(), zoom));
-			dragPoints[6].setZoom(zoom);
+					getZoom()), Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom()));
+			dragPoints[6].setZoom(getZoom());
 			// MIDDLE-LEFT
 			dragPoints[7].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getCenterY(), zoom));
-			dragPoints[7].setZoom(zoom);
+					getZoom()), Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom()));
+			dragPoints[7].setZoom(getZoom());
 		}
 	}
 
@@ -185,7 +184,7 @@ public class AnnotationNote extends Note {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
 				RenderingHints.VALUE_STROKE_NORMALIZE);
 
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 		if (selected) {
 			g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
 			g2.fill(noteRect);
@@ -207,7 +206,7 @@ public class AnnotationNote extends Note {
 			dragPoints[i].myPaintComponent(g);
 		}
 
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 	}
 
 	@Override
@@ -294,16 +293,16 @@ public class AnnotationNote extends Note {
 
 		private void drag(int x, int y) {
 			if ((typeMask & TOP) == TOP) {
-				myNote.adjustTop(Zoomer.getUnzoomedValue(y, zoom));
+				myNote.adjustTop(Zoomer.getUnzoomedValue(y, getZoom()));
 			}
 			if ((typeMask & BOTTOM) == BOTTOM) {
-				myNote.adjustBottom(Zoomer.getUnzoomedValue(y, zoom));
+				myNote.adjustBottom(Zoomer.getUnzoomedValue(y, getZoom()));
 			}
 			if ((typeMask & LEFT) == LEFT) {
-				myNote.adjustLeft(Zoomer.getUnzoomedValue(x, zoom));
+				myNote.adjustLeft(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
 			if ((typeMask & RIGHT) == RIGHT) {
-				myNote.adjustRight(Zoomer.getUnzoomedValue(x, zoom));
+				myNote.adjustRight(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
 			CreateGui.getCurrentTab().setNetChanged(true);
 		}
@@ -333,11 +332,11 @@ public class AnnotationNote extends Note {
 
 		// Change ResizePoint's size a little bit acording to the zoom percent
 		private void setZoom(int percent) {
-			if (zoom >= 220) {
+			if (getZoom() >= 220) {
 				SIZE = 5;
-			} else if (zoom >= 120) {
+			} else if (getZoom() >= 120) {
 				SIZE = 4;
-			} else if (zoom >= 60) {
+			} else if (getZoom() >= 60) {
 				SIZE = 3;
 			}
 		}
