@@ -116,6 +116,13 @@ public abstract class Arc extends PetriNetObject {
 
 	abstract public void setWeight(Weight weight);
 	abstract public Weight getWeight();
+	
+	public double getNameOffsetX() {
+		return nameOffsetX;
+	}
+	public double getNameOffsetY() {
+		return nameOffsetY;
+	}
 
 	/**
 	 * Set source

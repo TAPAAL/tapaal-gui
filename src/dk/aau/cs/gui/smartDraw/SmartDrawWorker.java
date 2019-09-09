@@ -9,7 +9,7 @@ import java.util.Random;
 
 import javax.swing.SwingWorker;
 
-import dk.aau.cs.gui.undo.SetNameLabelPositionCommand;
+import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
@@ -470,13 +470,15 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	public void resetLabelsToDefault() {
 		for(PetriNetObject pNetObject : drawingSurface.getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
-				Command cmd = new SetNameLabelPositionCommand(pNetObject, pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y);
+				Command cmd = new UpdateNameLabelOffsetCommand(pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y, ((PlaceTransitionObject) pNetObject).getNameOffsetX(), 
+																((PlaceTransitionObject) pNetObject).getNameOffsetY(), pNetObject);
 				cmd.redo();
 				undoManager.addEdit(cmd);
 				
 			}
 			else if(pNetObject instanceof Arc) {
-				Command cmd = new SetNameLabelPositionCommand(pNetObject, 0, 0);
+				Command cmd = new UpdateNameLabelOffsetCommand(0, 0, ((Arc) pNetObject).getNameOffsetX(), 
+						((Arc) pNetObject).getNameOffsetY(), pNetObject);
 				cmd.redo();
 				undoManager.addEdit(cmd);
 			}
