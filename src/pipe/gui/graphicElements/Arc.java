@@ -69,8 +69,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		setSource(sourceInput);
 		setTarget(targetInput);
 
-		//XXX see comment in function
-		setLableHandler();
 	}
 
 
@@ -86,29 +84,15 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		myPath.addPoint();
 		myPath.createPath();
 
-		//XXX see comment in function
-		setLableHandler();
 	}
 
 	public Arc() {
 		super(0,0);
 
-		//XXX see comment in function
-		setLableHandler();
 	}
 
 
-	private void setLableHandler() {
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		LabelHandler labelHandler = new LabelHandler(this.getNameLabel(), this);
-
-		getNameLabel().addMouseListener(labelHandler);
-		getNameLabel().addMouseMotionListener(labelHandler);
-		getNameLabel().addMouseWheelListener(labelHandler);
-
-	}
 
 	abstract public void setWeight(Weight weight);
 	abstract public Weight getWeight();

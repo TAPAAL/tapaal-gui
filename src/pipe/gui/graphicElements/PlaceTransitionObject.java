@@ -40,13 +40,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
 		id = idInput;
 
-		// sets up Namelabel for each PN object
-		NameLabel pnName = getNameLabel();
-		LabelHandler labelHandler = new LabelHandler(pnName, this);
-		getNameLabel().addMouseListener(labelHandler);
-		getNameLabel().addMouseMotionListener(labelHandler);
-		getNameLabel().addMouseWheelListener(labelHandler);
-
 	}
 	public PlaceTransitionObject(int positionXInput, int positionYInput) {
 		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);

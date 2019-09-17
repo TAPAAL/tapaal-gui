@@ -3,6 +3,7 @@ package pipe.gui.graphicElements;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
 
 public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
@@ -20,6 +21,20 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         this.nameOffsetY = nameOffsetY;
 
         pnName.setPosition(nameOffsetX, nameOffsetY);
+
+        //See note in function
+        setLableHandler();
+    }
+
+    private void setLableHandler() {
+
+        //XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+        //XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+        LabelHandler labelHandler = new LabelHandler(this.getNameLabel(), this);
+
+        getNameLabel().addMouseListener(labelHandler);
+        getNameLabel().addMouseMotionListener(labelHandler);
+        getNameLabel().addMouseWheelListener(labelHandler);
 
     }
 
