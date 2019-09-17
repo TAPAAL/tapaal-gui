@@ -23,7 +23,7 @@ import dk.aau.cs.gui.undo.Command;
  * This abstract class is the base class for AnnotationNote class and for
  * Parameter class
  */
-public abstract class Note extends PetriNetObject implements Translatable {
+public abstract class Note extends PetriNetObject {
 
 	private static final long serialVersionUID = 8965208519103066242L;
 	protected JTextArea note = new JTextArea();
