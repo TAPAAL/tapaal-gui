@@ -106,21 +106,21 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		}
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if (inputArc == null)
-				pnName.setText("");
+				getNameLabel().setText("");
 			else {
 				if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
 					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
-						pnName.setText("");
+						getNameLabel().setText("");
 					}
 					else {
-						pnName.setText(inputArc.interval().toString(showConstantNames));
+						getNameLabel().setText(inputArc.interval().toString(showConstantNames));
 					}					
 				}
 				else {
-					pnName.setText(inputArc.interval().toString(showConstantNames));
+					getNameLabel().setText(inputArc.interval().toString(showConstantNames));
 				}
 
-				pnName.setText(getWeight().toString(showConstantNames)+" "+pnName.getText());
+				getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());
 				
 				// Handle constant highlighting
 				boolean focusedConstant = false;
@@ -140,9 +140,9 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 					}
 				}
 				if(focusedConstant){
-					pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+					getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
 				}else{
-					pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+					getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 				}
 				
 			}

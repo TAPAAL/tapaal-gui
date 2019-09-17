@@ -95,7 +95,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public void updateLabel(boolean displayConstantNames) {
 		if (isInPreSet && underlyingTransportArc != null) {
 			if (CreateGui.getApp().showZeroToInfinityIntervals()){
-				pnName.setText(underlyingTransportArc.interval().toString(
+				getNameLabel().setText(underlyingTransportArc.interval().toString(
 						displayConstantNames)
 						+ " : " + getGroup());
 			}
@@ -103,11 +103,11 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 				if (underlyingTransportArc.interval().toString(
 						displayConstantNames).equals("[0,inf)")) {
 
-					pnName.setText(" : " + getGroup());
+					getNameLabel().setText(" : " + getGroup());
 
 				}
 				else {
-					pnName.setText(underlyingTransportArc.interval().toString(
+					getNameLabel().setText(underlyingTransportArc.interval().toString(
 							displayConstantNames)
 							+ " : " + getGroup());
 				}				
@@ -131,19 +131,19 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 				}
 			}
 			if(focusedConstant){
-				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+				getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
 			}else{
-				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+				getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
 			
 		} else if (!isInPreSet) {
-			pnName.setText(" : " + getGroup());
+			getNameLabel().setText(" : " + getGroup());
 		} else {
-			pnName.setText("");
+			getNameLabel().setText("");
 		}
 		
 		if(underlyingTransportArc != null){
-					pnName.setText(getWeight().toString(displayConstantNames)+" "+pnName.getText());
+			getNameLabel().setText(getWeight().toString(displayConstantNames)+" "+getNameLabel().getText());
 		}
 		
 		this.setLabelPosition();

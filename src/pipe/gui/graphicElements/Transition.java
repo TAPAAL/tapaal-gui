@@ -379,8 +379,8 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	@Override
 	public void update(boolean displayConstantNames) {
-		pnName.setText(getText());
-		pnName.zoomUpdate(getZoom());
+		getNameLabel().setText(getText());
+
 		super.update(displayConstantNames);
 		this.repaint();
 	}

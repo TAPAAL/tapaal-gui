@@ -160,12 +160,12 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(transition != null) {
-			pnName.setName(transition.name());
-			pnName.setVisible(attributesVisible);
-			pnName.zoomUpdate(getZoom());
+			getNameLabel().setName(transition.name());
+			getNameLabel().setVisible(attributesVisible);
+			getNameLabel().zoomUpdate(getZoom());
 		}
 		else {
-			pnName.setText("");
+			getNameLabel().setText("");
 		}
 		super.update(displayConstantNames);
 		repaint();
@@ -209,7 +209,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;

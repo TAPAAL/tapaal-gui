@@ -30,26 +30,22 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			int positionXInput,
 			int positionYInput,
 			String idInput,
-			double nameOffsetXInput,
-			double nameOffsetYInput
+			int nameOffsetXInput,
+			int nameOffsetYInput
 	){
-		super();
+		super(nameOffsetXInput, nameOffsetYInput);
 
 		setPositionX(positionXInput);
 		setPositionY(positionYInput);
 
 		id = idInput;
-		nameOffsetX = nameOffsetXInput;
-		nameOffsetY = nameOffsetYInput;
 
 		// sets up Namelabel for each PN object
-		pnName = new NameLabel(getZoom());
+		NameLabel pnName = getNameLabel();
 		LabelHandler labelHandler = new LabelHandler(pnName, this);
 		getNameLabel().addMouseListener(labelHandler);
 		getNameLabel().addMouseMotionListener(labelHandler);
 		getNameLabel().addMouseWheelListener(labelHandler);
-
-		pnName.setPosition((int) nameOffsetX, (int) nameOffsetY);
 
 	}
 	public PlaceTransitionObject(int positionXInput, int positionYInput) {
@@ -64,7 +60,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			double nameOffsetXInput,
 			double nameOffsetYInput
 	) {
-		this((int)positionXInput, (int) positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+		this((int)positionXInput, (int) positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput);
 	}
 
 	@Deprecated
@@ -104,7 +100,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	public void setName(String nameInput) {
 		// sets the text within the label
 		// System.out.println("setting name to: " + nameInput);
-		pnName.setName(nameInput);
+		getNameLabel().setName(nameInput);
 	}
 
 	/**
@@ -154,16 +150,10 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 */
 	@Override
 	public String getName() {
-		return (pnName != null) ? pnName.getName() : "";
+		return (getNameLabel() != null) ? getNameLabel().getName() : "";
 	}
 
-	public double getNameOffsetX() {
-		return nameOffsetX;
-	}
 
-	public double getNameOffsetY() {
-		return nameOffsetY;
-	}
 
 
 
@@ -283,8 +273,8 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		if (selectable && !selected) {
 			selected = true;
 
-			if (pnName != null) {
-				pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
+			if (getNameLabel() != null) {
+				getNameLabel().setForeground(Pipe.SELECTION_LINE_COLOUR);
 			}
 
 			// Select arcs that are connected from this object to another selected object.

@@ -352,12 +352,12 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
-			pnName.setName(place.name());
+			getNameLabel().setName(place.name());
 
 			if (!(place.invariant().upperBound() instanceof InfBound)) {
-				pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+				getNameLabel().setText("\nInv: " + place.invariant().toString(displayConstantNames));
 			}else{
-				pnName.setText("");
+				getNameLabel().setText("");
 			}
 			
 			// Handle constant highlighting
@@ -368,18 +368,18 @@ public class TimedPlaceComponent extends Place {
 				}
 			}
 			if(focusedConstant){
-				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+				getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
 			}else{
-				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+				getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
-			
-			pnName.displayName(attributesVisible);
+
+			getNameLabel().displayName(attributesVisible);
 			
 		} else {
-			pnName.setName("");
-			pnName.setText("");
+			getNameLabel().setName("");
+			getNameLabel().setText("");
 		}
-		pnName.zoomUpdate(getZoom());
+		getNameLabel().zoomUpdate(getZoom());
 		updateOnMoveOrZoom();
 		repaint();
 	}
@@ -429,7 +429,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, getNameOffsetX(), getNameOffsetY());
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		return placeComponent;

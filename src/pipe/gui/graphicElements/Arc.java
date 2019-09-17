@@ -57,7 +57,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			double endPositionXInput, double endPositionYInput,
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		pnName = new NameLabel(getZoom());
+		super(0,0);
+
 		myPath.addPoint((float) startPositionXInput,
 				(float) startPositionYInput, ArcPathPoint.STRAIGHT);
 		myPath.addPoint((float) endPositionXInput, (float) endPositionYInput,
@@ -77,8 +78,9 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
+		super(0,0);
 		isPrototype = true;
-		pnName = new NameLabel(getZoom());
+
 		source = newSource;
 		myPath.addPoint();
 		myPath.addPoint();
@@ -89,9 +91,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	}
 
 	public Arc() {
-		super();
+		super(0,0);
 
-		pnName = new NameLabel(getZoom());
 		//XXX see comment in function
 		setLableHandler();
 	}
@@ -134,8 +135,10 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	public void setLabelPosition() {
 
-		pnName.setPosition(Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, getZoom())),
-						  Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, getZoom())));
+		getNameLabel().setPosition(
+				Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(getNameOffsetX(), getZoom())),
+				Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))
+		);
 
 	}
 	@Override
@@ -163,11 +166,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	@Override
 	public String getName() {
 		return getId();
-	}
-	
-	@Override 
-	public NameLabel getNameLabel() {
-		return pnName;
 	}
 
 	/**
@@ -347,8 +345,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		myPath.addPointsToGui(getGuiModel());
 
 		updateArcPosition();
-		if (getParent() != null && pnName.getParent() == null) {
-			getParent().add(pnName);
+		if (getParent() != null && getNameLabel().getParent() == null) {
+			getParent().add(getNameLabel());
 		}
 	}
 
@@ -356,8 +354,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public void removedFromGui() {
 
 		//Remove label
-		if (getParent() != null && pnName != null) {
-			getParent().remove(pnName);
+		if (getParent() != null && getNameLabel() != null) {
+			getParent().remove(getNameLabel());
 		}
 
 		//Remove arcpathpoints
@@ -399,7 +397,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 		this.updateArcPosition();
 		this.updateOnMoveOrZoom();
-		pnName.zoomUpdate(percent);
 	}
 
 	/**

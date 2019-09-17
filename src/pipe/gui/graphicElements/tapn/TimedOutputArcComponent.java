@@ -84,8 +84,8 @@ public class TimedOutputArcComponent extends Arc {
 		this.setNameOffsetX(arc.getNameOffsetXObject());
 		this.setNameOffsetY(arc.getNameOffsetYObject());
 		this.getNameLabel().setPosition(
-				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(this.nameOffsetX, getZoom()))),
-				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(this.nameOffsetY, getZoom()))));
+				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
+				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))));
 
 		//XXX: se note in funcation
 		addMouseHandler();
@@ -111,8 +111,8 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public void updateLabel(boolean displayConstantNames) {
-		pnName.setText("");
-		pnName.setText(getWeight().toString(displayConstantNames)+" " + pnName.getText());
+		getNameLabel().setText("");
+		getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
 		setLabelPosition();
 	}
 	

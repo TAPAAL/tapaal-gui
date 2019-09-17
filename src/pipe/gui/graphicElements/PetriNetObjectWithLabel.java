@@ -8,13 +8,19 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
 
     /* Name Label for displaying name */
-    protected NameLabel pnName;
+    private NameLabel pnName = new NameLabel(Pipe.ZOOM_DEFAULT);
     /** X/Y-axis Position on screen */
-    protected double nameOffsetX;
-    protected double nameOffsetY;
+    private double nameOffsetX;
+    private double nameOffsetY;
 
-    PetriNetObjectWithLabel() {
+    PetriNetObjectWithLabel(int nameOffsetX, int nameOffsetY) {
         super();
+
+        this.nameOffsetX = nameOffsetX;
+        this.nameOffsetY = nameOffsetY;
+
+        pnName.setPosition(nameOffsetX, nameOffsetY);
+
     }
 
     protected void updateLabelLocation() {
@@ -62,6 +68,14 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      * @return Double value for Y-axis offset of ...
      */
     public Double getNameOffsetYObject() {
+        return nameOffsetY;
+    }
+
+    //XXX pushed up from PlaceTransitionObject while refactorings, dublicates getNameOffsetXObject? //kyrke 2019-09-17
+    public double getNameOffsetX() {
+        return nameOffsetX;
+    }
+    public double getNameOffsetY() {
         return nameOffsetY;
     }
 
@@ -113,4 +127,12 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         }
     }
 
+
+    @Override
+    public void zoomUpdate(int zoom) {
+        super.zoomUpdate(zoom);
+        if (pnName != null) {
+            pnName.zoomUpdate(zoom);
+        }
+    }
 }
