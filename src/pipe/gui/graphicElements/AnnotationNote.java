@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.util.EnumMap;
 
 import javax.swing.JDialog;
 
@@ -27,7 +28,7 @@ public class AnnotationNote extends Note {
 
 	private boolean fillNote = true;
 
-	private ResizePoint[] dragPoints = new ResizePoint[8];
+	private EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
 
 	private AffineTransform prova = new AffineTransform();
 	
@@ -67,25 +68,32 @@ public class AnnotationNote extends Note {
 
 
 	private void setDragPoints() {
-		dragPoints[0] = new ResizePoint(this, ResizePoint.TOP
-				| ResizePoint.LEFT);
-		dragPoints[1] = new ResizePoint(this, ResizePoint.TOP);
-		dragPoints[2] = new ResizePoint(this, ResizePoint.TOP
-				| ResizePoint.RIGHT);
-		dragPoints[3] = new ResizePoint(this, ResizePoint.RIGHT);
-		dragPoints[4] = new ResizePoint(this, ResizePoint.BOTTOM
-				| ResizePoint.RIGHT);
-		dragPoints[5] = new ResizePoint(this, ResizePoint.BOTTOM);
-		dragPoints[6] = new ResizePoint(this, ResizePoint.BOTTOM
-				| ResizePoint.LEFT);
-		dragPoints[7] = new ResizePoint(this, ResizePoint.LEFT);
+		dragPoints.put(dragPoint.TOP_LEFT, new ResizePoint(this, ResizePoint.TOP | ResizePoint.LEFT));
+		dragPoints.put(dragPoint.TOP_MIDDLE, new ResizePoint(this, ResizePoint.TOP));
+		dragPoints.put(dragPoint.TOP_RIGHT, new ResizePoint(this, ResizePoint.TOP | ResizePoint.RIGHT));
+		dragPoints.put(dragPoint.MIDDLE_RIGHT, new ResizePoint(this, ResizePoint.RIGHT));
+		dragPoints.put(dragPoint.BOTTOM_RIGHT, new ResizePoint(this, ResizePoint.BOTTOM | ResizePoint.RIGHT));
+		dragPoints.put(dragPoint.BOTTOM_MIDDLE, new ResizePoint(this, ResizePoint.BOTTOM));
+		dragPoints.put(dragPoint.BOTTOM_LEFT, new ResizePoint(this, ResizePoint.BOTTOM | ResizePoint.LEFT));
+		dragPoints.put(dragPoint.MIDDLE_LEFT, new ResizePoint(this, ResizePoint.LEFT));
 
-		for (int i = 0; i < 8; i++) {
-			ResizePointHandler handler = new ResizePointHandler(dragPoints[i]);
-			dragPoints[i].addMouseListener(handler);
-			dragPoints[i].addMouseMotionListener(handler);
-			add(dragPoints[i]);
+		for (ResizePoint p : dragPoints.values()) {
+			ResizePointHandler handler = new ResizePointHandler(p);
+			p.addMouseListener(handler);
+			p.addMouseMotionListener(handler);
+			add(p);
 		}
+	}
+
+	enum dragPoint {
+		TOP_LEFT, // 0
+		TOP_MIDDLE, // 1
+		TOP_RIGHT, //2
+		MIDDLE_RIGHT, // 3
+		BOTTOM_RIGHT, //4
+		BOTTOM_MIDDLE, //5
+		BOTTOM_LEFT, //6
+		MIDDLE_LEFT, //7
 	}
 
 	@Override
@@ -93,39 +101,60 @@ public class AnnotationNote extends Note {
 		super.updateBounds();
 		if (dragPoints != null) {
 			// TOP-LEFT
-			dragPoints[0].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					getZoom()), Zoomer.getZoomedValue(noteRect.getMinY(), getZoom()));
-			dragPoints[0].setZoom(getZoom());
+			dragPoints.get(dragPoint.TOP_LEFT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
+			);
+			dragPoints.get(dragPoint.TOP_LEFT).setZoom(getZoom());
+
 			// TOP-MIDDLE
-			dragPoints[1].setLocation(Zoomer.getZoomedValue(noteRect
-					.getCenterX(), getZoom()), Zoomer.getZoomedValue(noteRect
-					.getMinY(), getZoom()));
-			dragPoints[1].setZoom(getZoom());
+			dragPoints.get(dragPoint.TOP_MIDDLE).setLocation(
+					Zoomer.getZoomedValue(noteRect.getCenterX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
+			);
+			dragPoints.get(dragPoint.TOP_MIDDLE).setZoom(getZoom());
+
 			// TOP-RIGHT
-			dragPoints[2].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					getZoom()), Zoomer.getZoomedValue(noteRect.getMinY(), getZoom()));
-			dragPoints[2].setZoom(getZoom());
+			dragPoints.get(dragPoint.TOP_RIGHT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
+			);
+			dragPoints.get(dragPoint.TOP_RIGHT).setZoom(getZoom());
+
 			// MIDDLE-RIGHT
-			dragPoints[3].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					getZoom()), Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom()));
-			dragPoints[3].setZoom(getZoom());
+			dragPoints.get(dragPoint.MIDDLE_RIGHT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom())
+			);
+			dragPoints.get(dragPoint.MIDDLE_RIGHT).setZoom(getZoom());
+
 			// BOTTOM-RIGHT
-			dragPoints[4].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					getZoom()), Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom()));
-			dragPoints[4].setZoom(getZoom());
+			dragPoints.get(dragPoint.BOTTOM_RIGHT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
+			);
+			dragPoints.get(dragPoint.BOTTOM_RIGHT).setZoom(getZoom());
+
 			// BOTTOM-MIDDLE
-			dragPoints[5].setLocation(Zoomer.getZoomedValue(noteRect
-					.getCenterX(), getZoom()), Zoomer.getZoomedValue(noteRect
-					.getMaxY(), getZoom()));
-			dragPoints[5].setZoom(getZoom());
+			dragPoints.get(dragPoint.BOTTOM_MIDDLE).setLocation(
+					Zoomer.getZoomedValue(noteRect.getCenterX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
+			);
+			dragPoints.get(dragPoint.BOTTOM_MIDDLE).setZoom(getZoom());
+
 			// BOTTOM-LEFT
-			dragPoints[6].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					getZoom()), Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom()));
-			dragPoints[6].setZoom(getZoom());
+			dragPoints.get(dragPoint.BOTTOM_LEFT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
+			);
+			dragPoints.get(dragPoint.BOTTOM_LEFT).setZoom(getZoom());
+
 			// MIDDLE-LEFT
-			dragPoints[7].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					getZoom()), Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom()));
-			dragPoints[7].setZoom(getZoom());
+			dragPoints.get(dragPoint.MIDDLE_LEFT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom())
+			);
+			dragPoints.get(dragPoint.MIDDLE_LEFT).setZoom(getZoom());
 		}
 	}
 
@@ -133,9 +162,8 @@ public class AnnotationNote extends Note {
 	public boolean contains(int x, int y) {
 		boolean pointContains = false;
 
-		for (int i = 0; i < 8; i++) {
-			pointContains |= dragPoints[i].contains(x - dragPoints[i].getX(), y
-					- dragPoints[i].getY());
+		for (ResizePoint p : dragPoints.values()) {
+			pointContains |= p.contains(x - p.getX(), y - p.getY());
 		}
 
 		return super.contains(x, y) || pointContains;
@@ -202,9 +230,10 @@ public class AnnotationNote extends Note {
 				g2.draw(noteRect);
 			}
 		}
-		for (int i = 0; i < 8; i++) {
-			dragPoints[i].myPaintComponent(g);
-		}
+		dragPoints.forEach((dragPoint, resizePoint) -> resizePoint.myPaintComponent(g));
+		//for (int i = 0; i < 8; i++) {
+		//	dragPoints[i].myPaintComponent(g);
+		//}
 
 		g2.transform(Zoomer.getTransform(getZoom()));
 	}
