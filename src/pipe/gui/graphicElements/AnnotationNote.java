@@ -367,6 +367,8 @@ public class AnnotationNote extends Note {
 				SIZE = 4;
 			} else if (getZoom() >= 60) {
 				SIZE = 3;
+			} else {
+				SIZE = 2;
 			}
 		}
 	}
