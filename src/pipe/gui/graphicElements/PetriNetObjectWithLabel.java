@@ -13,6 +13,10 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
     protected double nameOffsetX;
     protected double nameOffsetY;
 
+    PetriNetObjectWithLabel() {
+        super();
+    }
+
     protected void updateLabelLocation() {
         this.getNameLabel().setPosition(
                 Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
