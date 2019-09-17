@@ -105,56 +105,48 @@ public class AnnotationNote extends Note {
 					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
 			);
-			dragPoints.get(dragPoint.TOP_LEFT).setZoom(getZoom());
 
 			// TOP-MIDDLE
 			dragPoints.get(dragPoint.TOP_MIDDLE).setLocation(
 					Zoomer.getZoomedValue(noteRect.getCenterX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
 			);
-			dragPoints.get(dragPoint.TOP_MIDDLE).setZoom(getZoom());
 
 			// TOP-RIGHT
 			dragPoints.get(dragPoint.TOP_RIGHT).setLocation(
 					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
 			);
-			dragPoints.get(dragPoint.TOP_RIGHT).setZoom(getZoom());
 
 			// MIDDLE-RIGHT
 			dragPoints.get(dragPoint.MIDDLE_RIGHT).setLocation(
 					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom())
 			);
-			dragPoints.get(dragPoint.MIDDLE_RIGHT).setZoom(getZoom());
 
 			// BOTTOM-RIGHT
 			dragPoints.get(dragPoint.BOTTOM_RIGHT).setLocation(
 					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
 			);
-			dragPoints.get(dragPoint.BOTTOM_RIGHT).setZoom(getZoom());
 
 			// BOTTOM-MIDDLE
 			dragPoints.get(dragPoint.BOTTOM_MIDDLE).setLocation(
 					Zoomer.getZoomedValue(noteRect.getCenterX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
 			);
-			dragPoints.get(dragPoint.BOTTOM_MIDDLE).setZoom(getZoom());
 
 			// BOTTOM-LEFT
 			dragPoints.get(dragPoint.BOTTOM_LEFT).setLocation(
 					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
 			);
-			dragPoints.get(dragPoint.BOTTOM_LEFT).setZoom(getZoom());
 
 			// MIDDLE-LEFT
 			dragPoints.get(dragPoint.MIDDLE_LEFT).setLocation(
 					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
 					Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom())
 			);
-			dragPoints.get(dragPoint.MIDDLE_LEFT).setZoom(getZoom());
 		}
 	}
 
@@ -282,7 +274,7 @@ public class AnnotationNote extends Note {
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {			
+		public void mouseReleased(MouseEvent e) {
 			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.myNote.setDraggable(true);
@@ -291,6 +283,14 @@ public class AnnotationNote extends Note {
 			myPoint.repaint();
 		}
 
+	}
+
+	@Override
+	public void zoomUpdate(int percent) {
+		super.zoomUpdate(percent);
+		for (ResizePoint p : dragPoints.values()) {
+			p.setZoom(percent);
+		}
 	}
 
 	public class ResizePoint extends javax.swing.JComponent {
