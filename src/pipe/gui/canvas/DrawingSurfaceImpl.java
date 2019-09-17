@@ -97,7 +97,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		this.removeAll();
 		setPreferredSize(new Dimension(0,0));
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjectsWithArcPathPoint()) {
-			pnObject.zoomUpdate(zoomer.getPercent());
 			addNewPetriNetObject(pnObject);
 		}
 
