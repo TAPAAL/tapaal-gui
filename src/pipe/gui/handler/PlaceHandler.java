@@ -1,7 +1,5 @@
 package pipe.gui.handler;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
@@ -9,11 +7,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.Zoomer;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
+import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.undo.UndoManager;
@@ -89,9 +87,12 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
-					int x = Zoomer.getZoomedValue(myObject.getNameOffsetXObject().intValue(), myObject.getZoom());
-					int y = Zoomer.getZoomedValue(myObject.getNameOffsetYObject().intValue(), myObject.getZoom());
-					m.show(myObject, x, y);
+
+					if (myObject instanceof PetriNetObjectWithLabel) {
+						int x = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetXObject().intValue(), myObject.getZoom());
+						int y = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetYObject().intValue(), myObject.getZoom());
+						m.show(myObject, x, y);
+					}
 				}
 			}
 		}/*

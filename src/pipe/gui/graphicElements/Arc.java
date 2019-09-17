@@ -19,7 +19,7 @@ import pipe.gui.handler.PlaceTransitionObjectHandler;
 /**
    Implementation of Element for drawing an arc
  */
-public abstract class Arc extends PetriNetObject {
+public abstract class Arc extends PetriNetObjectWithLabel {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 

@@ -8,19 +8,19 @@ import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.NameLabel;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
 
-	private PetriNetObject obj;
+	private PetriNetObjectWithLabel obj;
 
 	private NameLabel nl;
 
 	protected Point dragInit = new Point();
 
-	public LabelHandler(NameLabel _nl, PetriNetObject _obj) {
+	public LabelHandler(NameLabel _nl, PetriNetObjectWithLabel _obj) {
 		obj = _obj;
 		nl = _nl;
 	}

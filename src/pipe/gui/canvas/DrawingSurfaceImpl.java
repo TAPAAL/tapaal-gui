@@ -114,8 +114,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		newObject.addedToGui(); //Must be called after added to component, as children might use referenceto Drawingsurface
 
 		calculateNewBoundsForScrollPane(newObject.getBounds());
-		if(newObject.getNameLabel() != null){
-			calculateNewBoundsForScrollPane(newObject.getNameLabel().getBounds());
+		//XXX: templ solution while refactoring, kyrke 2019-09-17
+		if(newObject instanceof PetriNetObjectWithLabel && ((PetriNetObjectWithLabel)newObject).getNameLabel() != null){
+			calculateNewBoundsForScrollPane(((PetriNetObjectWithLabel)newObject).getNameLabel().getBounds());
 		}
 
 		validate();

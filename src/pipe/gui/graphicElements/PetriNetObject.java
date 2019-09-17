@@ -30,10 +30,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	protected double positionX;
 	protected double positionY;
 
-	/** X/Y-axis Position on screen */
-	protected double nameOffsetX;
-	protected double nameOffsetY;
-
 	// The x/y coordinate of object at 100% zoom.
 	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
 	protected int originalX;
@@ -41,8 +37,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	protected String id = null;
 
-	/* Name Label for displaying name */
-	protected NameLabel pnName;
+
 	protected boolean selected = false; // True if part of the current selection.
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
@@ -180,52 +175,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		setName(idInput);
 	}
 	
-	protected void updateLabelLocation() {
-		this.getNameLabel().setPosition(
-				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
-				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom())))
-		);
-	}
+
 	
-	public void updateOnMoveOrZoom() {
-		updateLabelLocation();
-	}
-	/**
-	 * Set X-axis offset for name position
-	 * 
-	 * @param nameOffsetXInput
-	 *            Double value for name X-axis offset
-	 */
-	public void setNameOffsetX(double nameOffsetXInput) {
-		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
-	}
+	public void updateOnMoveOrZoom() {}
 
-	/**
-	 * Set Y-axis offset for name position
-	 * 
-	 * @param nameOffsetYInput
-	 *            Double value for name Y-axis offset
-	 */
-	public void setNameOffsetY(double nameOffsetYInput) {
-		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
-	}
-	/**
-	 * Get X-axis offset for ...
-	 * 
-	 * @return Double value for X-axis offset of ...
-	 */
-	public Double getNameOffsetXObject() {
-		return nameOffsetX;
-	}
 
-	/**
-	 * Moved to PetriNetObject Get Y-axis offset for ...
-	 * 
-	 * @return Double value for Y-axis offset of ...
-	 */
-	public Double getNameOffsetYObject() {
-		return nameOffsetY;
-	}
 
 	/**
 	 * Get id returns null if value not yet entered
@@ -236,26 +190,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		return getName();
 	}
 
-	/**
-	 * Returns Name Label - is used by GuiView
-	 * 
-	 * @return PetriNetObject's Name Label (Model View Controller Design
-	 *         Pattern)
-	 */
-	public NameLabel getNameLabel() {
-		return pnName;
-	}
 
-	public void addLabelToContainer() {
-		if (getParent() != null && pnName.getParent() == null) {
-			getParent().add(pnName);
-		}
-	}
-	public void removeLabelFromContainer() {
-		if (getParent() != null && pnName != null) {
-			getParent().remove(pnName);
-		}
-	}
 
 	public boolean isSelected() {
 		return selected;
@@ -269,10 +204,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		if (selectable && !selected) {
 			selected = true;
 
-			if (pnName != null) {
-				pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
-			}
-
 			if (shouldRepaint) {
 				repaint();
 			}
@@ -283,10 +214,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void deselect() {
 		if (selected) {
 			selected = false;
-
-			if (pnName != null) {
-				pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
-			}
 
 			repaint();
 		}
