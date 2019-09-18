@@ -39,7 +39,7 @@ public class ArcPath implements Shape {
 			Pipe.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
 	private int transitionAngle;
-	private boolean showControlPoints = false;
+	private final static boolean showDebugCurvedControlPoints = true;
 
 	public Point2D.Float midPoint = new Point2D.Float();
 
@@ -75,7 +75,7 @@ public class ArcPath implements Shape {
 				path.lineTo(currentPoint.getPoint().x,
 						currentPoint.getPoint().y);
 			} else if (currentPoint.getPointType() == ArcPathPoint.CURVED) {
-				if (showControlPoints) {
+				if (showDebugCurvedControlPoints) {
 					// draw control lines for illustrative purposes
 					path.lineTo(currentPoint.getControl1().x, currentPoint
 							.getControl1().y);
