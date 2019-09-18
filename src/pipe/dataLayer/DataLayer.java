@@ -205,6 +205,7 @@ public class DataLayer {
 				}
 			}
 
+			//XXX: this is still nedede as nets loaded from file (XML/tapn) does not set connectedTo correctly //2019-09-18
 			// Transportarc fix boddy
 			if (arcInput instanceof TimedTransportArcComponent) {
 				TimedTransportArcComponent tmp = (TimedTransportArcComponent) arcInput;
