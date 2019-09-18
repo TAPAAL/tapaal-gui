@@ -39,7 +39,7 @@ public class ArcPath implements Shape {
 			Pipe.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
 	private int transitionAngle;
-	private final static boolean showDebugCurvedControlPoints = true;
+	private final static boolean showDebugCurvedControlPoints = false;
 
 	public Point2D.Float midPoint = new Point2D.Float();
 
