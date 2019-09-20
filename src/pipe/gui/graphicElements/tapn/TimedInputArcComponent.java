@@ -4,9 +4,7 @@ import java.util.Hashtable;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -22,11 +20,10 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	
 	private static final long serialVersionUID = 8263782840119274756L;
 	private TimedInputArc inputArc;
-	protected String timeInterval;
 
 	public TimedInputArcComponent(PlaceTransitionObject source) {
 		super(source);
-		init();
+		updateLabel(true);
 
 		//XXX: se note in funcation
 		addMouseHandler();
@@ -35,26 +32,17 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
-		init();
+		updateLabel(true);
 
 		//XXX: se note in funcation
 		addMouseHandler();
 
 	}
 
+	/** @deprecated */
+	@Deprecated
 	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
-		super(arc);
-		timeInterval = guard;
-		updateLabel(true);
-
-		//XXX: se note in funcation
-		addMouseHandler();
-
-	}
-
-	private void init() {
-		timeInterval = "[0,inf)";
-		updateLabel(true);
+		this(arc);
 	}
 
 	private void addMouseHandler() {
