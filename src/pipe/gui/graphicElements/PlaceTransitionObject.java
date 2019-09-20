@@ -125,10 +125,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		g2.transform(Zoomer.getTransform(getZoom()));
 	}
 
-	public Point2D getIntersectOffset(Point2D start) {
-		return new Point2D.Double();
-	}
-
 	/**
 	 * Returns the distance between the outside of the component to the centre,
 	 * in order to position the centre of the place where the mouse clicks on
