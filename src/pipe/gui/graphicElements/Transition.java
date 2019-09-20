@@ -372,12 +372,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void setCentre(double x, double y) {
-		super.setCentre(x, y);
-		update(true);
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		getNameLabel().setText(getText());
 
