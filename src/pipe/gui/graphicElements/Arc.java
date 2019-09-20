@@ -59,10 +59,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
 		super(0,0);
 
-		myPath.addPoint((float) startPositionXInput,
-				(float) startPositionYInput, ArcPathPoint.STRAIGHT);
-		myPath.addPoint((float) endPositionXInput, (float) endPositionYInput,
-				ArcPathPoint.STRAIGHT);
+		myPath.addPoint(startPositionXInput, startPositionYInput, ArcPathPoint.STRAIGHT);
+		myPath.addPoint(endPositionXInput, endPositionYInput, ArcPathPoint.STRAIGHT);
 		myPath.createPath();
 		updateBounds();
 		id = idInput;
