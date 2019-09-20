@@ -217,11 +217,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		updateOnMoveOrZoom();
 	}
 
-	public Point2D.Double getCentre() {
-		return new Point2D.Double(positionX + getWidth() / 2.0, positionY
-				+ getHeight() / 2.0);
-	}
-
 	/** Handles selection for Place/Transitions */
 	@Override
 	public void select() {
