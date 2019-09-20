@@ -29,35 +29,21 @@ public class TimedOutputArcComponent extends Arc {
 
 	private dk.aau.cs.model.tapn.TimedOutputArc outputArc;
 
-	/**
-	 * Create Petri-Net Arc object
-	 * 
-	 * @param startPositionXInput
-	 *            Start X-axis Position
-	 * @param startPositionYInput
-	 *            Start Y-axis Position
-	 * @param endPositionXInput
-	 *            End X-axis Position
-	 * @param endPositionYInput
-	 *            End Y-axis Position
-	 * @param sourceInput
-	 *            Arc source
-	 * @param targetInput
-	 *            Arc target
-	 * @param idInput
-	 *            Arc id
-	 */
+	public TimedOutputArcComponent(PlaceTransitionObject sourceInput, PlaceTransitionObject targetInput, int weightInput, String idInput) {
+		super(sourceInput, targetInput, weightInput, idInput);
+
+		//XXX: se note in funcation
+		addMouseHandler();
+	}
+
+	/** @deprecated */
+	@Deprecated
 	public TimedOutputArcComponent(double startPositionXInput,
 			double startPositionYInput, double endPositionXInput,
 			double endPositionYInput, PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput,
 			boolean taggedInput) {
-		super(startPositionXInput, startPositionYInput, endPositionXInput,
-				endPositionYInput, sourceInput, targetInput, weightInput,
-				idInput);
-
-		//XXX: se note in funcation
-		addMouseHandler();
+		this(sourceInput, targetInput, weightInput, idInput);
 	}
 
 	/**

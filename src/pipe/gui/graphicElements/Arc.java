@@ -53,14 +53,13 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 * 
 	 */
-	public Arc(double startPositionXInput, double startPositionYInput,
-			double endPositionXInput, double endPositionYInput,
+	public Arc(
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
 		super(0,0);
 
-		myPath.addPoint(startPositionXInput, startPositionYInput, ArcPathPoint.STRAIGHT);
-		myPath.addPoint(endPositionXInput, endPositionYInput, ArcPathPoint.STRAIGHT);
+		myPath.addPoint();
+		myPath.addPoint();
 		myPath.createPath();
 		updateBounds();
 		id = idInput;
