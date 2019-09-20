@@ -168,23 +168,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	}
 
 	/**
-	 * Get X-axis value of start position
-	 * 
-	 * @return Double value for X-axis of start position
-	 */
-	public double getStartPositionX() {
-		return myPath.getPoint(0).getX();
-	}
-
-	/**
-	 * Get Y-axis value of start position
-	 * 
-	 * @return Double value for Y-axis of start position
-	 */
-	public double getStartPositionY() {
-		return myPath.getPoint(0).getY();
-	}
-	/**
 	 * Updates the start position of the arc, resets the arrowhead and updates
 	 * the bounds
 	 */
