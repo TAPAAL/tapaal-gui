@@ -18,10 +18,6 @@ public abstract class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
 
-
-	// Value of the capacity restriction; 0 means no capacity restriction 
-	protected Integer capacity = 0;
-
 	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
