@@ -309,4 +309,48 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void zoomUpdate(int zoom) {
 		this.zoom = zoom;
 	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Set X-axis position
+	 *
+	 * @param positionXInput
+	 *            Double value for X-axis position
+	 */
+	public void setPositionX(double positionXInput) {
+		positionX = positionXInput;
+		originalX = (int)Zoomer.getUnzoomedValue(positionX, getZoom());
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Set Y-axis position
+	 *
+	 * @param positionYInput
+	 *            Double value for Y-axis position
+	 */
+	public void setPositionY(double positionYInput) {
+		positionY = positionYInput;
+		originalY = (int)Zoomer.getUnzoomedValue(positionY, getZoom());
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Get X-axis position
+	 *
+	 * @return Double value for X-axis position
+	 */
+	public double getPositionX() {
+		return positionX;
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Get Y-axis position
+	 *
+	 * @return Double value for Y-axis position
+	 */
+	public double getPositionY() {
+		return positionY;
+	}
 }
