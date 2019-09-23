@@ -64,7 +64,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
 		this(0,0);
 
-		updateBounds();
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
