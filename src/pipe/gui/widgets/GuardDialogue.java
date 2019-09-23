@@ -129,7 +129,7 @@ public class GuardDialogue extends JPanel /*
 
 				dk.aau.cs.model.tapn.TimeInterval guard  = null;
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
-					guard = composeGuard(arc.getGuard());
+					guard = composeGuard(((TimedInputArcComponent)arc).getGuard());
 				}
 				
 				// Check if target transition is urgent

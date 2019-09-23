@@ -151,9 +151,4 @@ public class TimedOutputArcComponent extends Arc {
 		return outputArc.getWeight();
 	}
 
-	public TimeInterval getGuard() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

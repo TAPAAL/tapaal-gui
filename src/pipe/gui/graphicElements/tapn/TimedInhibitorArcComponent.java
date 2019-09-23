@@ -85,12 +85,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public String getGuardAsString() {
-		return inhibitorArc.interval().toString();
-	}
-        
-
-	@Override
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
 		TimeInterval oldTimeInterval = inhibitorArc.interval();
