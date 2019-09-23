@@ -143,7 +143,7 @@ public class TikZExporter {
                 if (arc.getWeight().value() > 1) {
                         arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
                 }
-				arcLabel += "$\\mathrm{" + replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsString(false)) + "}$";
+				arcLabel += "$\\mathrm{" + replaceWithMathLatex(getGuardAsStringIfNotHidden((TimedInputArcComponent) arc)) + "}$";
 				if (arc instanceof TimedTransportArcComponent)
 					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
 				arcLabel += "};\n";
@@ -160,6 +160,14 @@ public class TikZExporter {
             }
     	}
 		return arcLabel;
+	}
+
+	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
+        if (!CreateGui.getApp().showZeroToInfinityIntervals() &&  arc.getGuardAsString().equals("[0,inf)")){
+			return "";
+		} else {
+			return arc.getGuardAsString();
+		}
 	}
 
 	private StringBuffer exportTransitions(Transition[] transitions) {

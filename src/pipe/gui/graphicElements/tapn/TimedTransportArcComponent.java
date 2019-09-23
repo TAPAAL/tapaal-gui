@@ -171,16 +171,10 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-        public String getGuardAsString() {
-		return getGuardAsString(true);
+	public String getGuardAsString() {
+		return underlyingTransportArc.interval().toString();
 	}
 
-        public String getGuardAsString(boolean showZeroToInfinityIntervals) {
-                if (!showZeroToInfinityIntervals && !CreateGui.getApp().showZeroToInfinityIntervals() && underlyingTransportArc.interval().toString().equals("[0,inf)")) {
-                        return "";
-                } 
-                return underlyingTransportArc.interval().toString();
-        }
         
 
 	@Override
