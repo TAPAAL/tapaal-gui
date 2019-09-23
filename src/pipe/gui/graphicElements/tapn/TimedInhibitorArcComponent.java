@@ -23,8 +23,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		super(arc);
 	}
 
+	@Deprecated
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard) {
-		super(arc, guard);
+		this(arc);
 	}
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
