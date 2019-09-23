@@ -23,9 +23,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 
-	protected Shape head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
-			0, -10, -7, -10 }, 4);
-	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
+	private Shape head = null;
+	private boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 
 	/** References to the objects this arc connects */
 	private PlaceTransitionObject source = null;
@@ -58,6 +57,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
 		super(0,0);
 
+		setHead();
+
 		myPath.addPoint();
 		myPath.addPoint();
 		myPath.createPath();
@@ -75,6 +76,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public Arc(PlaceTransitionObject newSource) {
 		super(0,0);
 		isPrototype = true;
+		setHead();
 
 		source = newSource;
 		myPath.addPoint();
@@ -85,6 +87,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	public Arc() {
 		super(0,0);
+		setHead();
 
 	}
 
@@ -405,5 +408,17 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 				aView.repaint();
 			}
 		}
+	}
+
+	protected final void setHead(Shape head, Boolean fillHead) {
+		this.head = head;
+		this.fillHead = fillHead;
+	}
+
+	/**
+	 * This method should be overwritten in any class that wishes to set an other arc head.
+	 */
+	protected void setHead() {
+		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {0, -10, -7, -10 }, 4), true) ;
 	}
 }

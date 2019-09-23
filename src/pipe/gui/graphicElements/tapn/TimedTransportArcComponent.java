@@ -28,7 +28,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
-		setHead();
+
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);
@@ -41,7 +41,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
 		super(timedArc, "");
 		this.isInPreSet = isInPreSet;
-		setHead();
+
 		this.setGroup(group);
 		// hack to reprint the label of the arc
 		updateLabel(true);
@@ -66,9 +66,9 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		return underlyingTransportArc;
 	}
 
-	private void setHead() {
-		head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] { 0, -11, -18,
-				-11 }, 4);
+	@Override
+	protected void setHead() {
+		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] { 0, -11, -18, -11 }, 4), true);;
 	}
 
 	public void setColor() {

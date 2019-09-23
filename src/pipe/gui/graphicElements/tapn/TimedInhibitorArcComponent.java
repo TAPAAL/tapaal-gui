@@ -23,15 +23,12 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		super(arc);
 		//XXX: se note in funcation
 		addMouseHandler();
-		setHead();
 	}
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc, guard);
 		//XXX: se note in funcation
 		addMouseHandler();
-		setHead();
-
 	}
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
@@ -39,7 +36,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 		//XXX: se note in funcation
 		addMouseHandler();
-		setHead();
 	}
 
 	private void addMouseHandler() {
@@ -57,9 +53,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		return inhibitorArc;
 	}
 
+	@Override
 	protected void setHead() {
-		head = new Ellipse2D.Double(-4, -8, 8, 8);
-		fillHead = false;
+		setHead(new Ellipse2D.Double(-4, -8, 8, 8), false);
 	}
 
 	@Override
