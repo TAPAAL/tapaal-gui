@@ -1,6 +1,5 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.Color;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
@@ -9,7 +8,6 @@ import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import pipe.gui.undo.TransportArcGroupEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.ConstantWeight;
@@ -71,15 +69,13 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] { 0, -11, -18, -11 }, 4), true);;
 	}
 
-	public Command setGroupNr(int groupNr) {
-		int oldGroup = this.getGroup();
+	public void setGroupNr(int groupNr) {
 		setGroup(groupNr);
 
 		// hacks - I use the weight to display the TimeInterval
 		updateLabel(true);
 		repaint();
 
-		return new TransportArcGroupEdit(this, oldGroup, this.getGroup());
 	}
 
 	public int getGroupNr() {
