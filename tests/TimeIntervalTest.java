@@ -1,9 +1,9 @@
+import dk.aau.cs.model.tapn.*;
 import org.junit.Test;
 
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.util.RequireException;
+
+import static org.junit.Assert.*;
 
 public class TimeIntervalTest  {
 	
@@ -46,8 +46,20 @@ public class TimeIntervalTest  {
 	public void TimeInterval_Infinity_lower(){
 		new TimeInterval(true, Bound.Infinity, Bound.Infinity, false);
 	}
-	
-	
+
+	//XXX tests used when refactoring toString to call toString(true)
+	@Test
+	public void IntervalToStringTrueIsSameAsIntervalToString() {
+		TimeInterval t = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+		TimeInterval t2 = new TimeInterval(true, new ConstantBound(new Constant("k", 5)),new IntBound(8), false);
+
+		assertEquals(t.toString(), t.toString(true));
+		assertEquals(t.toString(), t.toString(false));
+
+		assertEquals(t2.toString(), t2.toString(true));
+		assertNotEquals(t2.toString(), t2.toString(false));
+
+	}
 	
 	@Test()
 	public void timeInterval(){

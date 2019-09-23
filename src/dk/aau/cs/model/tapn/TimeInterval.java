@@ -54,13 +54,7 @@ public class TimeInterval {
 
 	@Override
 	public String toString() {
-		StringBuilder buffer = new StringBuilder();
-		buffer.append(isLowerIncluded ? "[" : "(");
-		buffer.append(lower);
-		buffer.append(',');
-		buffer.append(upper);
-		buffer.append(isUpperIncluded ? "]" : ")");
-		return buffer.toString();
+		return toString(true);
 	}
 
 	public String toString(boolean displayConstantNames) {
