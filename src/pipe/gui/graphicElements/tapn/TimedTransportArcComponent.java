@@ -71,11 +71,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] { 0, -11, -18, -11 }, 4), true);;
 	}
 
-	public void setColor() {
-		getGraphics().setColor(Color.RED);
-		repaint();
-	}
-
 	public Command setGroupNr(int groupNr) {
 		int oldGroup = this.getGroup();
 		setGroup(groupNr);
