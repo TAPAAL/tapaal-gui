@@ -23,10 +23,10 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         pnName.setPosition(nameOffsetX, nameOffsetY);
 
         //See note in function
-        setLableHandler();
+        setLabelHandler();
     }
 
-    private void setLableHandler() {
+    protected void setLabelHandler() {
 
         //XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
         //XXX: handler is called. Make static constructor and add handler from there, to make it safe.
