@@ -52,11 +52,8 @@ public class TimedOutputArcComponent extends Arc {
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
 
-		myPath = new ArcPath(this);
-		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
-			myPath.addPoint(arc.myPath.getRealPoint(i).getX(), arc.myPath.getRealPoint(i).getY(), arc.myPath.getPointType(i));
-		}
-		myPath.createPath();
+		myPath = new ArcPath(this, arc.myPath);
+
 		this.updateBounds();
 		id = arc.id;
 		this.setSource(arc.getSource());

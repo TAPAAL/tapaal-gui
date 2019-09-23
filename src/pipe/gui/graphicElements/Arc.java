@@ -60,9 +60,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		setHead();
         addMouseHandler();
 
-		myPath.addPoint();
-		myPath.addPoint();
-		myPath.createPath();
 		updateBounds();
 		id = idInput;
 		setSource(sourceInput);
@@ -81,9 +78,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
         addMouseHandler();
 
 		source = newSource;
-		myPath.addPoint();
-		myPath.addPoint();
-		myPath.createPath();
 
 	}
 

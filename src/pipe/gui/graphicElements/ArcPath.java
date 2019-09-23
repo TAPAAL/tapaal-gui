@@ -15,6 +15,7 @@ import java.util.List;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.handler.ArcPathPointHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -43,9 +44,27 @@ public class ArcPath implements Shape {
 
 	public Point2D.Float midPoint = new Point2D.Float();
 
+	private ArcPath(Arc a, int transitionAngle) {
+		super();
+
+		this.myArc = a;
+		this.transitionAngle = transitionAngle;
+	}
+
 	public ArcPath(Arc a) {
-		myArc = a;
-		transitionAngle = 0;
+		this(a, 0);
+
+		//Add the start/end point
+		addPoint();
+		addPoint();
+	}
+
+	public ArcPath(Arc a, ArcPath path) {
+		this(a, 0);
+
+		for (int i = 0; i <= path.getEndIndex(); i++) {
+			addPoint(path.getRealPoint(i).getX(), path.getRealPoint(i).getY(), path.getPointType(i));
+		}
 	}
 
 	public List<ArcPathPoint> getArcPathPoints(){
