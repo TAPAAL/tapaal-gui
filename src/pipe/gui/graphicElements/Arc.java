@@ -81,16 +81,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	}
 
-	public Arc() {
-		super(0,0);
-		setHead();
-        addMouseHandler();
-
-	}
-
-
-
-
 	abstract public void setWeight(Weight weight);
 	abstract public Weight getWeight();
 
