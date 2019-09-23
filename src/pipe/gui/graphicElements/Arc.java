@@ -48,6 +48,13 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
+	private Arc(int nameOffsetX, int nameOffsetY) {
+	    super(nameOffsetX, nameOffsetY);
+
+        setHead();
+        addMouseHandler();
+    }
+
 	/**
 	 * Create Petri-Net Arc object
 	 * 
@@ -55,10 +62,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public Arc(
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		super(0,0);
-
-		setHead();
-        addMouseHandler();
+		this(0,0);
 
 		updateBounds();
 		id = idInput;
@@ -72,12 +76,10 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
-		super(0,0);
+		this(0,0);
 		isPrototype = true;
-		setHead();
-        addMouseHandler();
 
-		source = newSource;
+		setSource(newSource);
 
 	}
 
