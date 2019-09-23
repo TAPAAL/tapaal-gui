@@ -31,9 +31,6 @@ public class TimedOutputArcComponent extends Arc {
 
 	public TimedOutputArcComponent(PlaceTransitionObject sourceInput, PlaceTransitionObject targetInput, int weightInput, String idInput) {
 		super(sourceInput, targetInput, weightInput, idInput);
-
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
 	/** @deprecated */
@@ -51,9 +48,6 @@ public class TimedOutputArcComponent extends Arc {
 	 */
 	public TimedOutputArcComponent(PlaceTransitionObject newSource) {
 		super(newSource);
-
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
@@ -73,11 +67,10 @@ public class TimedOutputArcComponent extends Arc {
 				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
 				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))));
 
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new ArcHandler(this);
@@ -101,7 +94,7 @@ public class TimedOutputArcComponent extends Arc {
 		getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
 		setLabelPosition();
 	}
-	
+
 	public void showTimeIntervalEditor() {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);
 

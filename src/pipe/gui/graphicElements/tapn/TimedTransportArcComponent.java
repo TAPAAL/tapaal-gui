@@ -31,9 +31,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		// hack to reprint the label of the arc
 		updateLabel(true);
 		isPrototype = true;
-
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
 	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
@@ -43,12 +40,10 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		this.setGroup(group);
 		// hack to reprint the label of the arc
 		updateLabel(true);
-
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new TransportArcHandler(this);
