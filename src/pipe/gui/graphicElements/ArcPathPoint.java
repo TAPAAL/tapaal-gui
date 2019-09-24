@@ -32,8 +32,7 @@ public class ArcPathPoint extends PetriNetObject {
 	// The offset in x for the new point resulting from splitting a point
 	private final int DELTA = 10;
 
-	private static RectangularShape shape;
-	private ArcPath myArcPath;
+    private ArcPath myArcPath;
 	private Point2D.Float point = new Point2D.Float();
 	private Point2D.Float realPoint = new Point2D.Float();
 
@@ -140,7 +139,8 @@ public class ArcPathPoint extends PetriNetObject {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
 				RenderingHints.VALUE_STROKE_NORMALIZE);
 
-		if (pointType == CURVED) {
+        RectangularShape shape;
+        if (pointType == CURVED) {
 			shape = new Ellipse2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
 		} else {
 			shape = new Rectangle2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
