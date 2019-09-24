@@ -37,7 +37,7 @@ public abstract class Place extends PlaceTransitionObject {
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
 	public Place(double positionXInput, double positionYInput, String idInput,
-			Double nameOffsetXInput, Double nameOffsetYInput) {
+			double nameOffsetXInput, double nameOffsetYInput) {
 		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 		componentWidth = DIAMETER;
 		componentHeight = DIAMETER;

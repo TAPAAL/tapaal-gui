@@ -61,8 +61,8 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
-			String idInput, Double nameOffsetXInput,
-			Double nameOffsetYInput) {
+			String idInput, double nameOffsetXInput,
+			double nameOffsetYInput) {
 
 		super(positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput);
