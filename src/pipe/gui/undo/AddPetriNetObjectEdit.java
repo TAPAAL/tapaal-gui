@@ -31,12 +31,14 @@ public class AddPetriNetObjectEdit extends Command {
 	@Override
 	public void undo() {
 		pnObject.delete();
+		view.repaint();
 	}
 
 	/** */
 	@Override
 	public void redo() {
 		pnObject.undelete(view);
+		view.repaint();
 	}
 
 	@Override
