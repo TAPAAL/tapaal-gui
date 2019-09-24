@@ -35,8 +35,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	){
 		super(nameOffsetXInput, nameOffsetYInput);
 
-		addMouseHandler();
-
 		setPositionX(positionXInput);
 		setPositionY(positionYInput);
 

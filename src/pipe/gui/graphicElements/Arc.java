@@ -52,7 +52,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	    super(nameOffsetX, nameOffsetY);
 
         setHead();
-        addMouseHandler();
     }
 
 	/**

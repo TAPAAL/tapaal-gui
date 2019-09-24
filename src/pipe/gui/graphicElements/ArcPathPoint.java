@@ -44,17 +44,12 @@ public class ArcPathPoint extends PetriNetObject {
 
 	private ArcPathPoint() {
 	    super();
-		//XXX: see note in function
-		addMouseHandler();
 	}
 
 	public ArcPathPoint(ArcPath a) {
 		this();
 		myArcPath = a;
 		setPointLocation(0, 0);
-
-		//XXX: see note in function
-		addMouseHandler();
 	}
 
 	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a) {
@@ -62,9 +57,6 @@ public class ArcPathPoint extends PetriNetObject {
 		myArcPath = a;
 		setPointLocation(x, y);
 		pointType = _pointType;
-
-		//XXX: see note in function
-		addMouseHandler();
 	}
 
 	@Override
