@@ -58,9 +58,6 @@ public class TimedPlaceComponent extends Place {
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
 	}
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
@@ -73,12 +70,10 @@ public class TimedPlaceComponent extends Place {
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new PlaceHandler(this);

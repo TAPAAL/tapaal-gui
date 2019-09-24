@@ -67,7 +67,8 @@ public class ArcPathPoint extends PetriNetObject {
 		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new ArcPathPointHandler(this);

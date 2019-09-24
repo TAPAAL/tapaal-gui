@@ -39,9 +39,8 @@ public class AnnotationNote extends Note {
 		setDragPoints();
 		this.isNew = isNew;
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
+        getNote().addMouseListener(getMouseHandler());
+        getNote().addMouseMotionListener(getMouseHandler());
 	}
 
 	public AnnotationNote(String text, int x, int y, int w, int h, boolean border, boolean isNew) {
@@ -49,20 +48,16 @@ public class AnnotationNote extends Note {
 		this.isNew = isNew;
 		setDragPoints();
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
+        getNote().addMouseListener(getMouseHandler());
+        getNote().addMouseMotionListener(getMouseHandler());
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 
-		AnnotationNoteHandler h = new AnnotationNoteHandler(this);
-		mouseHandler = h;
-
-		getNote().addMouseListener(h);
-		getNote().addMouseMotionListener(h);
+        mouseHandler = new AnnotationNoteHandler(this);
 
 	}
 

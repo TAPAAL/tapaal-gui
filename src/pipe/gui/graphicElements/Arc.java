@@ -409,6 +409,4 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	protected void setHead() {
 		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {0, -10, -7, -10 }, 4), true) ;
 	}
-
-	protected abstract void addMouseHandler();
 }

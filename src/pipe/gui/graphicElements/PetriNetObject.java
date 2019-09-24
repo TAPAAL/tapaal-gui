@@ -59,7 +59,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	protected PetriNetObjectHandler mouseHandler;
 
 	PetriNetObject() {
-
+		addMouseHandler();
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -163,6 +163,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		});
 
 	}
+
+	protected abstract void addMouseHandler();
 
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
