@@ -1549,6 +1549,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			}
 		} catch (Exception e) {
 			Logger.log(e);
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -1633,6 +1634,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			tab.setFile(null);
 		} catch (Exception e) {
 			undoAddTab(currentlySelected);
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this,
 					"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
 					"Error loading file: " + name,
@@ -1690,6 +1692,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);
+				e.printStackTrace();
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
 						"Error loading file: " + name,
@@ -1715,6 +1718,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			TabContent tab = createNewTabFromFile(stream, file.getName());
 			if (tab != null) tab.setFile(file);
 		}catch (FileNotFoundException e) {
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this,
 					"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString(),
 					"Error loading file: " + file.getName(),
@@ -1739,6 +1743,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			composedName += "-untimed";
 			createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
+			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
 		}
 	}
@@ -2026,6 +2031,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
 			Logger.log("Cannot open the browser.");
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);
