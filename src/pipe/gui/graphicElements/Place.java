@@ -36,20 +36,33 @@ public abstract class Place extends PlaceTransitionObject {
 	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
-	public Place(double positionXInput, double positionYInput, String idInput,
-			double nameOffsetXInput, double nameOffsetYInput) {
+
+	public Place(
+			int positionXInput,
+			int positionYInput,
+			String idInput,
+			int nameOffsetXInput,
+			int nameOffsetYInput
+	){
 		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 		componentWidth = DIAMETER;
 		componentHeight = DIAMETER;
 		setCentre((int) positionX, (int) positionY);
 	}
 
-	
+	@Deprecated
+	public Place(double positionXInput, double positionYInput, String idInput,
+			double nameOffsetXInput, double nameOffsetYInput) {
+		this((int)positionXInput, (int)positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput);
+	}
+
+	@Deprecated
 	public Place(double positionXInput, double positionYInput) {
-		super(positionXInput, positionYInput);
-		componentWidth = DIAMETER;
-		componentHeight = DIAMETER;
-		setCentre((int) positionX, (int) positionY);
+		this((int)positionXInput, (int)positionYInput, null, 0,0);
+	}
+
+	public Place(int positionXInput, int positionYInput) {
+		this(positionXInput, positionYInput, null, 0,0);
 	}
 
 	@Override
