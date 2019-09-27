@@ -157,7 +157,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			Grid.drawGrid(g);
 		}
 
-		selection.updateBounds();
+		//selection.updateBounds();
 
 	}
 
