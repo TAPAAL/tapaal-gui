@@ -31,6 +31,8 @@ public abstract class Note extends PetriNetObject {
 	protected RectangularShape noteRect = new Rectangle();
 
 	public Note(int x, int y) {
+		super();
+
 		originalX = Zoomer.getUnzoomedValue(x, getZoom());
 		originalY = Zoomer.getUnzoomedValue(y, getZoom());
 
