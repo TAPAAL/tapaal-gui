@@ -60,14 +60,6 @@ public abstract class Note extends PetriNetObject {
 		setLocation(x - Pipe.RESERVED_BORDER / 2, y - Pipe.RESERVED_BORDER / 2);
 	}
 
-	public Note(String id, String text, int x, int y) {
-		this(x, y);
-		this.id = id;
-		note.setText(text);
-		note.setSize(note.getPreferredSize().width,
-				note.getPreferredSize().height);
-		updateBounds();
-	}
 
 	public Note(String text, int x, int y, int w, int h, boolean border) {
 		this(x, y);
