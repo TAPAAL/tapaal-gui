@@ -33,8 +33,8 @@ public abstract class Note extends PetriNetObject {
 	public Note(int x, int y) {
 		super();
 
-		originalX = Zoomer.getUnzoomedValue(x, getZoom());
-		originalY = Zoomer.getUnzoomedValue(y, getZoom());
+		originalX = x;
+		originalY = y;
 
 		note.setAlignmentX(Component.CENTER_ALIGNMENT);
 		note.setAlignmentY(Component.CENTER_ALIGNMENT);
