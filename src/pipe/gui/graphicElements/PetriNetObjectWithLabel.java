@@ -49,6 +49,16 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         updateLabelLocation();
     }
 
+    @Override
+    public void addedToGui() {
+        addLabelToContainer();
+    }
+
+    @Override
+    public void removedFromGui() {
+        removeLabelFromContainer();
+    }
+
     /**
      * Set X-axis offset for name position
      *

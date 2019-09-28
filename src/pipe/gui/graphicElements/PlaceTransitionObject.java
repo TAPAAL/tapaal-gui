@@ -239,15 +239,10 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	@Override
 	public void addedToGui() {
 		deleted = false;
-		addLabelToContainer();
+		super.addedToGui();
 		update(true);
 		updateOnMoveOrZoom();
 	}
-
-    @Override
-    public void removedFromGui() {
-        removeLabelFromContainer();
-    }
 
     // TODO: Find a better name for this
 	@Override

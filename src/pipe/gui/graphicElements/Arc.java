@@ -299,18 +299,13 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		myPath.addPointsToGui(getGuiModel());
 
 		updateArcPosition();
-		if (getParent() != null && getNameLabel().getParent() == null) {
-			getParent().add(getNameLabel());
-		}
+		super.addedToGui();
 	}
 
 	@Override
 	public void removedFromGui() {
 
-		//Remove label
-		if (getParent() != null && getNameLabel() != null) {
-			getParent().remove(getNameLabel());
-		}
+		super.removedFromGui();
 
 		//Remove arcpathpoints
 		for (ArcPathPoint p : myPath.getArcPathPoints()){
