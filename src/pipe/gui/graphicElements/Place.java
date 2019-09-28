@@ -47,7 +47,6 @@ public abstract class Place extends PlaceTransitionObject {
 		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 		componentWidth = DIAMETER;
 		componentHeight = DIAMETER;
-		setCentre((int) positionX, (int) positionY);
 	}
 
 	@Deprecated

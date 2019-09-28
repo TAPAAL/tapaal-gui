@@ -203,13 +203,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		updateOnMoveOrZoom();
 	}
 
-	/** Sets the center of the component to position x, y */
-	public void setCentre(double x, double y) {
-		setPositionX(x - (getWidth() / 2.0));
-		setPositionY(y - (getHeight() / 2.0));
-		update(true);
-	}
-
 	public void update(boolean displayConstantNames) {
 		updateOnMoveOrZoom();
 	}

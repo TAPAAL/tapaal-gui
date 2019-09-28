@@ -76,7 +76,6 @@ public abstract class Transition extends PlaceTransitionObject {
 		componentHeight = TRANSITION_HEIGHT;// sets height
 		constructTransition();
 		angle = 0;
-		setCentre((int) positionX, (int) positionY);
 		rotate(angleInput);
 		updateBounds();
 	}
