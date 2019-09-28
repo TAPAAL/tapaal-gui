@@ -47,6 +47,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
 	private NameGenerator nameGenerator = new NameGenerator();
+	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
 		guiModel = dataLayer;
@@ -155,6 +156,19 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		if (Grid.isEnabled()) {
 			Grid.updateSize(this);
 			Grid.drawGrid(g);
+		}
+
+		if (showDebugBounds) {
+			Graphics2D g2 = (Graphics2D) g;
+			for (Component c : getComponents()) {
+				Paint p = new Color(255,0,0, 80);
+
+				g2.setPaint(p);
+				g2.fill(c.getBounds());
+				g2.setPaint(Color.black);
+				g2.draw(c.getBounds());
+
+			}
 		}
 
 		//selection.updateBounds();
