@@ -57,7 +57,6 @@ public abstract class Note extends PetriNetObject {
 		note.setDisabledTextColor(Pipe.NOTE_DISABLED_COLOUR);
 		note.setForeground(Pipe.NOTE_EDITING_COLOUR);
 		add(note);
-		setLocation(x - Pipe.RESERVED_BORDER / 2, y - Pipe.RESERVED_BORDER / 2);
 	}
 
 
