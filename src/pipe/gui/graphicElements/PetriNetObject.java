@@ -312,6 +312,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		this.zoom = zoom;
 	}
 
+	@Override
+	public void translate(int x, int y) {
+		//TODO
+	}
+
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
 	/**
 	 * Set X-axis position
