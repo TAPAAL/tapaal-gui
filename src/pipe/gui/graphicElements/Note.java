@@ -87,6 +87,7 @@ public abstract class Note extends PetriNetObject {
 				(int) noteRect.getY() + (rectHeight - note.getHeight()) / 2
 		);
 
+		Rectangle bounds = new Rectangle();
 		bounds.setBounds(
 				Zoomer.getZoomedValue(originalX, getZoom()),
 				Zoomer.getZoomedValue(originalY, getZoom()),

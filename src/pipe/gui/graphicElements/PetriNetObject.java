@@ -42,8 +42,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
 
-	protected Rectangle bounds = new Rectangle();
-
 	protected boolean deleted = false;
 
 	// Integer value which represents a zoom percentage

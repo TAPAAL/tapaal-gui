@@ -197,7 +197,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	/** Updates the bounding box of the arc component based on the arcs bounds */
 	public void updateBounds() {
-		bounds = myPath.getBounds();
+        Rectangle bounds = myPath.getBounds();
 		bounds.grow(COMPONENT_DRAW_OFFSET + zoomGrow, COMPONENT_DRAW_OFFSET
 				+ zoomGrow);
 		setBounds(bounds);

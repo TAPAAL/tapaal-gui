@@ -1,7 +1,6 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -153,6 +152,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		double scaleFactor = Zoomer.getScaleFactor(getZoom());
 		positionX = originalX * scaleFactor;
 		positionY = originalY * scaleFactor;
+		Rectangle bounds = new Rectangle();
 		bounds.setBounds((int) positionX, (int) positionY,
 				(int) (componentWidth * scaleFactor),
 				(int) (componentHeight * scaleFactor));
