@@ -160,4 +160,9 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
             pnName.zoomUpdate(zoom);
         }
     }
+
+    @Override
+    public void translate(int x, int y) {
+        super.translate(x, y);
+    }
 }
