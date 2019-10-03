@@ -180,8 +180,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
 	/** Updates location of any attached arcs */
 	public void updateConnected() {
-		Iterator<Arc> arcsFrom = connectFrom.iterator();
-
 		for (Arc someArc : connectFrom) {
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
