@@ -375,7 +375,6 @@ public class TimedPlaceComponent extends Place {
 			getNameLabel().setText("");
 		}
 		getNameLabel().zoomUpdate(getZoom());
-		updateOnMoveOrZoom();
 		repaint();
 	}
 
