@@ -204,7 +204,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	}
 
 	public void update(boolean displayConstantNames) {
-		updateOnMoveOrZoom();
 	}
 
 	/** Handles selection for Place/Transitions */
