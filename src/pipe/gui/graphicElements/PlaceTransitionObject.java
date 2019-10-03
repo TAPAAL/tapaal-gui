@@ -215,7 +215,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			for (Arc arc : getPostset()) {
 				if(arc.getTarget().isSelected()){
 					arc.select();
-					arc.selectPath();
 				}
 			}
 
@@ -223,7 +222,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			for (Arc arc : getPreset()) {
 				if(arc.getSource().isSelected()){
 					arc.select();
-					arc.selectPath();
 				}
 			}
 			repaint();

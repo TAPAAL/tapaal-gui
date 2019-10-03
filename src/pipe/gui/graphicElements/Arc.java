@@ -326,11 +326,16 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		}
 	}
 	
-	public void selectPath(){
+	private void selectPath(){
 		if (selectable) {
 			myPath.selectAllPoints();
 		}
 	}
+
+    public void select() {
+	    super.select();
+	    selectPath();
+    }
 
 	@Override
 	public int getLayerOffset() {
