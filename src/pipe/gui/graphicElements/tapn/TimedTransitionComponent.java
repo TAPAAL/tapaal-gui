@@ -156,7 +156,6 @@ public class TimedTransitionComponent extends Transition {
 		if(transition != null) {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
-			getNameLabel().zoomUpdate(getZoom());
 		}
 		else {
 			getNameLabel().setText("");
