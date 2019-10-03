@@ -310,6 +310,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	@Override
 	public void zoomUpdate(int zoom) {
 		this.zoom = zoom;
+		updateOnMoveOrZoom();
 	}
 
 	@Override

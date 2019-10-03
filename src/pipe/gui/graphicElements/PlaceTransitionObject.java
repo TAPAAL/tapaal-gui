@@ -297,9 +297,4 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		update(true);
 	};
 
-	public void zoomUpdate(int value) {
-		super.zoomUpdate(value);
-		update(true);
-	}
-
 }

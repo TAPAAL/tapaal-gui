@@ -343,9 +343,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	public void zoomUpdate(int percent) {
 		super.zoomUpdate(percent);
-
 		this.updateArcPosition();
-		this.updateOnMoveOrZoom();
 	}
 
 	/**
