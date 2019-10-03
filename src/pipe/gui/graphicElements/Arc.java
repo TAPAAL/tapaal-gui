@@ -294,7 +294,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	@Override
 	public void addedToGui() {
 		// called by GuiView / State viewer when adding component.
-		deleted = false;
+		setDeleted(false);
 
 		myPath.addPointsToGui(getGuiModel());
 

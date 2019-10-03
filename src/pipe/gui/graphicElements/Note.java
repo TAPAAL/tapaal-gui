@@ -171,7 +171,7 @@ public abstract class Note extends PetriNetObject {
 	@Override
 	public void addedToGui() {
 		if (CreateGui.getDrawingSurface() != null) {
-			deleted = false;
+			setDeleted(false);
 			updateBounds();
 			// CreateGui.getDrawingSurface().setNetChanged(true);
 		}
