@@ -317,14 +317,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public void setPathToTransitionAngle(int angle) {
 		myPath.setTransitionAngle(angle);
 	}
-
-	public Transition getTransition() {
-		if (getTarget() instanceof Transition) {
-			return (Transition) getTarget();
-		} else {
-			return (Transition) getSource();
-		}
-	}
 	
 	private void selectPath(){
 		if (selectable) {
