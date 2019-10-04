@@ -28,7 +28,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -538,9 +537,6 @@ public class TapnLegacyXmlLoader {
 		int angle = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"orientation");
 		int priority = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"priority");
 
-		positionXInput = Grid.getModifiedX(positionXInput);
-		positionYInput = Grid.getModifiedY(positionYInput);
-
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
 		}
@@ -569,9 +565,6 @@ public class TapnLegacyXmlLoader {
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
 		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
 		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
-
-		positionXInput = Grid.getModifiedX(positionXInput);
-		positionYInput = Grid.getModifiedY(positionYInput);
 
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
