@@ -107,17 +107,14 @@ public class Grid {
 		
 		for(PetriNetObject object : petriNetObjects) {
 			PlaceTransitionObject ptobject = (PlaceTransitionObject)object;
-			System.out.println(ptobject.getPositionX() + "," + ptobject.getPositionY());
 			int x = Grid.getModifiedX(ptobject.getPositionX());
 			int y = Grid.getModifiedY(ptobject.getPositionY());
 			Point point = new Point(x,y);
-			System.out.println(point);
 			Command command = new MovePlaceTransitionObject(ptobject, point);
 			command.redo();
 			undoManager.addEdit(command);
-			System.out.println(ptobject.getPositionX() + "," + ptobject.getPositionY());
+			ptobject.updateOnMoveOrZoom();
 		}
-		CreateGui.getDrawingSurface().repaintAll();
 		
 	}
 
