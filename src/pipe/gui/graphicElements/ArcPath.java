@@ -91,24 +91,23 @@ public class ArcPath implements Shape {
 			currentPoint = pathPoints.get(c);
 
 			if (currentPoint.getPointType() == ArcPathPoint.STRAIGHT) {
-				path.lineTo(currentPoint.getPoint().x,
-						currentPoint.getPoint().y);
+				path.lineTo(currentPoint.getPoint().x, currentPoint.getPoint().y);
 			} else if (currentPoint.getPointType() == ArcPathPoint.CURVED) {
 				if (showDebugCurvedControlPoints) {
 					// draw control lines for illustrative purposes
-					path.lineTo(currentPoint.getControl1().x, currentPoint
-							.getControl1().y);
-					path.lineTo(currentPoint.getControl2().x, currentPoint
-							.getControl2().y);
-					path.lineTo(currentPoint.getPoint().x, currentPoint
-							.getPoint().y);
-					path.moveTo(previousPoint.getPoint().x, previousPoint
-							.getPoint().y);
+					path.lineTo(currentPoint.getControl1().x, currentPoint.getControl1().y);
+					path.lineTo(currentPoint.getControl2().x, currentPoint.getControl2().y);
+					path.lineTo(currentPoint.getPoint().x, currentPoint.getPoint().y);
+					path.moveTo(previousPoint.getPoint().x, previousPoint.getPoint().y);
 				}
-				path.curveTo(currentPoint.getControl1().x, currentPoint
-						.getControl1().y, currentPoint.getControl2().x,
+				path.curveTo(
+						currentPoint.getControl1().x,
+						currentPoint.getControl1().y,
+						currentPoint.getControl2().x,
 						currentPoint.getControl2().y,
-						currentPoint.getPoint().x, currentPoint.getPoint().y);
+						currentPoint.getPoint().x,
+						currentPoint.getPoint().y
+				);
 			}
 			length += getMod(currentPoint.getPoint(), previousPoint.getPoint());
 		}
