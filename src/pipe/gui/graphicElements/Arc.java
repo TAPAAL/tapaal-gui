@@ -286,7 +286,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		g2.transform(reset);
 	}
 
-	public void drawCenteredCircle(Graphics2D g, double x, double y, Color c) {
+	private void drawCenteredCircle(Graphics2D g, double x, double y, Color c) {
 		int r = 10;
 		x = x-(r/2);
 		y = y-(r/2);
