@@ -35,6 +35,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	//Indicated wither the arc is being drawed (true), used to dispatch mouse events to parent
 	//Set to true, when using constructor for creating new arc when drawing
 	protected boolean isPrototype = false;
+	private static final boolean debugShowArcPathPoints = false;
 
 	public boolean isPrototype() {
 		return isPrototype;
@@ -237,6 +238,16 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		g2.setStroke(new BasicStroke(0.01f * getZoom()));
 		g2.draw(myPath);
 
+		if (debugShowArcPathPoints) {
+			Color c = g2.getColor();
+			for (ArcPathPoint p : getArcPath().getArcPathPoints()) {
+				drawCenteredCircle(g2, p.getPoint().x, p.getPoint().y, new Color(255, 0, 0, 80));
+				drawCenteredCircle(g2, p.getControl1().x, p.getControl1().y, new Color(0, 255, 0, 80));
+				drawCenteredCircle(g2, p.getControl2().x, p.getControl2().y, new Color(0, 0, 255, 80));
+			}
+			g2.setColor(c);
+		}
+
 		//Draw Arrow-head
 		//Jump to arc end
 		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
@@ -273,6 +284,14 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		}
 
 		g2.transform(reset);
+	}
+
+	public void drawCenteredCircle(Graphics2D g, double x, double y, Color c) {
+		int r = 10;
+		x = x-(r/2);
+		y = y-(r/2);
+		g.setColor(c);
+		g.fillOval((int)x,(int)y,r,r);
 	}
 
 	@Override
