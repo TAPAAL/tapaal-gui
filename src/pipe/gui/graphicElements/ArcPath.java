@@ -293,7 +293,7 @@ public class ArcPath implements Shape {
 		PlaceTransitionObject target = getArc().getTarget();
 		double anAngle = Math.toRadians(transitionAngle);
 
-		if (!(getEndIndex() > 0)) {
+		if (getEndIndex() <= 0) {
 			return;
 		} else if (source != null && source instanceof Transition
 				&& (pathPoints.get(1)).getPointType()) {
