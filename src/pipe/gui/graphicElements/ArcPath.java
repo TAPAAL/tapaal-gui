@@ -261,27 +261,45 @@ public class ArcPath implements Shape {
 			myCurrentPoint = pathPoints.get(c);
 
 			if (!(myCurrentPoint.getPointType())) {
-				myCurrentPoint.setControl1(getControlPoint(myPreviousPoint
-						.getPoint(), myCurrentPoint.getPoint(), myPreviousPoint
-						.getPoint(), myCurrentPoint.getPoint()));
-				myCurrentPoint.setControl2(getControlPoint(myCurrentPoint
-						.getPoint(), myPreviousPoint.getPoint(), myCurrentPoint
-						.getPoint(), myPreviousPoint.getPoint()));
+				myCurrentPoint.setControl1(
+						getControlPoint(
+								myPreviousPoint.getPoint(),
+								myCurrentPoint.getPoint(),
+								myPreviousPoint.getPoint(),
+								myCurrentPoint.getPoint()
+						)
+				);
+				myCurrentPoint.setControl2(
+						getControlPoint(
+								myCurrentPoint.getPoint(),
+								myPreviousPoint.getPoint(),
+								myCurrentPoint.getPoint(),
+								myPreviousPoint.getPoint()
+						)
+				);
 			} else {
 				if (c > 1 && !(myPreviousPoint.getPointType())) {
 					myPreviousButOnePoint = pathPoints.get(c - 2);
-					myCurrentPoint.setControl1(getControlPoint(
-							myPreviousButOnePoint.getPoint(), myPreviousPoint
-									.getPoint(), myPreviousPoint.getPoint(),
-							myCurrentPoint.getPoint()));
+					myCurrentPoint.setControl1(
+							getControlPoint(
+									myPreviousButOnePoint.getPoint(),
+									myPreviousPoint.getPoint(),
+									myPreviousPoint.getPoint(),
+									myCurrentPoint.getPoint()
+							)
+					);
 				}
 				if (c < getEndIndex()) {
 					myNextPoint = pathPoints.get(c + 1);
 					if (!(myNextPoint.getPointType())) {
-						myCurrentPoint.setControl2(getControlPoint(myNextPoint
-								.getPoint(), myCurrentPoint.getPoint(),
-								myCurrentPoint.getPoint(), myPreviousPoint
-										.getPoint()));
+						myCurrentPoint.setControl2(
+								getControlPoint(
+										myNextPoint.getPoint(),
+										myCurrentPoint.getPoint(),
+										myCurrentPoint.getPoint(),
+										myPreviousPoint.getPoint()
+								)
+						);
 					}
 				}
 			}
