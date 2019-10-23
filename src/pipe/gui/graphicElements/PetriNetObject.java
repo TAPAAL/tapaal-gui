@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.util.EventListener;
 
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
 
 import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
@@ -214,6 +215,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void addLabelToContainer() {
 		if (getParent() != null && pnName.getParent() == null) {
 			getParent().add(pnName);
+			getParent().setLayer(pnName, JLayeredPane.DEFAULT_LAYER + pnName.getLayerOffset());
 		}
 	}
 
