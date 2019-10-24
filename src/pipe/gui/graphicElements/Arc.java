@@ -470,17 +470,8 @@ public abstract class Arc extends PetriNetObject {
 		// Bind keyboard keys to action names.
 		iMap.put(KeyStroke.getKeyStroke("ESCAPE"), "deleteArc");
 		iMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteArc");
-		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "none");
-		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "none");
-
-		// Associate action names with actions.
-		aMap.put("none", new AbstractAction() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				return;
-			}
-		});
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "deleteArc");
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "deleteArc");
 		aMap.put("deleteArc", new DeleteAction(this));
 	}
 
