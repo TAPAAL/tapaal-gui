@@ -2,6 +2,8 @@ package pipe.gui.graphicElements;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
@@ -468,6 +470,8 @@ public abstract class Arc extends PetriNetObject {
 		// Bind keyboard keys to action names.
 		iMap.put(KeyStroke.getKeyStroke("ESCAPE"), "deleteArc");
 		iMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteArc");
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "deleteArc");
+		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "deleteArc");
 
 		// Associate action names with actions.
 		aMap.put("deleteArc", new DeleteAction(this));
