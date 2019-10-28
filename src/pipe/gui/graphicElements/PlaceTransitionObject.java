@@ -296,9 +296,13 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		setPositionY(y - (getHeight() / 2.0));
 		update(true);
 	}
-
+	
 	public void update(boolean displayConstantNames) {
-		updateOnMoveOrZoom();
+		update(displayConstantNames, true);
+	}
+
+	public void update(boolean displayConstantNames, boolean alignToGrid) {
+		updateOnMoveOrZoom(alignToGrid);
 	}
 
 	public Point2D.Double getCentre() {
@@ -350,13 +354,17 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		update(true);
 		updateOnMoveOrZoom();
 	}
-
-	// TODO: Find a better name for this
+	
 	@Override
 	public void updateOnMoveOrZoom() {
+		updateOnMoveOrZoom(true);
+	}
+	
+	// TODO: Find a better name for this
+	public void updateOnMoveOrZoom(boolean alignToGrid) {
 		updateBounds();
 		updateConnected();
-		updateLabelLocation();
+		updateLabelLocation(alignToGrid);
 	}
 
 	public boolean areNotSameType(PlaceTransitionObject o) {
@@ -403,7 +411,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	public void zoomUpdate(int value) {
 		zoom = value;
-		update(true);
+		update(true, false);
 	}
 
 }
