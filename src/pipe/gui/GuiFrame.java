@@ -1020,18 +1020,34 @@ public class GuiFrame extends JFrame  {
 		QueryDialog.setAdvancedView(advanced);
 		showComponents(advanced);
 		showConstants(advanced);
-
+		showConstantsAction.setSelected(advanced);
+		showComponentsAction.setSelected(advanced);
+		showQueriesAction.setSelected(true);
 		//Queries and enabled transitions should always be shown
 		showQueries(true);
 		showEnabledTransitionsList(true);
 		showToolTips(true);
 		CreateGui.getCurrentTab().setResizeingDefault();
-		if(!showZeroToInfinityIntervals()){
-			showZeroToInfinityIntervalsCheckBox.doClick();
+		if(advanced) {
+			
+			if(!showZeroToInfinityIntervals()){
+				showZeroToInfinityIntervalsCheckBox.doClick();
+			}
+			if(!showTokenAge()){
+				showTokenAgeCheckBox.doClick();
+			}
+			
+		} else {
+			if(showZeroToInfinityIntervals()) {
+				showZeroToInfinityIntervalsCheckBox.doClick();
+			}
+			if(showTokenAge()) {
+				showTokenAgeCheckBox.doClick();
+			}
 		}
-		if(!showTokenAge()){
-			showTokenAgeCheckBox.doClick();
-		}
+		
+		
+		
 		//Delay-enabled Transitions
 		//showDelayEnabledTransitions(advanced);
 		DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
