@@ -466,8 +466,15 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CreateGui.getApp().isEditionAllowed()) {
-					appView.getUndoManager().undo();
-					CreateGui.getCurrentTab().network().buildConstraints();
+					//If arc is being drawn delete it
+					if(appView.createArc == null) {
+						appView.getUndoManager().undo();
+						CreateGui.getCurrentTab().network().buildConstraints();
+					} else {
+						appView.createArc.delete();
+						appView.createArc = null;
+						appView.repaint();
+					}
 				}
 			}
 		});
@@ -478,8 +485,15 @@ public class GuiFrame extends JFrame  {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CreateGui.getApp().isEditionAllowed()) {
-					appView.getUndoManager().redo();
-					CreateGui.getCurrentTab().network().buildConstraints();
+					//If arc is being drawn delete it
+					if(appView.createArc == null) {
+						appView.getUndoManager().redo();
+						CreateGui.getCurrentTab().network().buildConstraints();
+					} else {
+						appView.createArc.delete();
+						appView.createArc = null;
+						appView.repaint();
+					}
 				}
 			}
 		});
