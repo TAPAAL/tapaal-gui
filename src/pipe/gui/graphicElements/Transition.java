@@ -401,9 +401,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		public int compareTo(ArcAngleCompare arg0) {
-			double angle2 = arg0.angle;
-
-			return (angle < angle2 ? -1 : (angle == angle2 ? 0 : 1));
+			return (Double.compare(this.angle, arg0.angle));
 		}
 
 		private void calcAngle() {
