@@ -725,7 +725,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"M", true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentTab.ifPresent(o->o.changeAnimationMode(isSelected()));
+				boolean isInEditorMode = isEditionAllowed();
+				currentTab.ifPresent(o->o.changeAnimationMode(isInEditorMode));
 			}
 		});
 		
