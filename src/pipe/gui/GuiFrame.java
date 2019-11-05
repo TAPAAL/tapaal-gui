@@ -2445,7 +2445,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return showDelayEnabledTransitions;
 	}
 
-	public void toggleShowZeroToInfinityIntervals() {
+	private void toggleShowZeroToInfinityIntervals() {
 		showZeroToInfinityIntervals = !showZeroToInfinityIntervals;
 	}
 
@@ -2457,16 +2457,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return showTokenAge;
 	}
 
-	public void toggleShowTokenAge(){
+	private void toggleShowTokenAge(){
 		showTokenAge = !showTokenAge;
 	}
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); }
 
 	public TabContent getCurrentTab() { return CreateGui.getCurrentTab(); }
-	public TabContent getTab(int tabIndex) { return CreateGui.getTab(tabIndex); }
+	private TabContent getTab(int tabIndex) { return CreateGui.getTab(tabIndex); }
 
-	public void showFileEndingChangedMessage(boolean showMessage) {
+	private void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
 			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
 					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
