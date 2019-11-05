@@ -172,11 +172,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
 	private JCheckBoxMenuItem showTokenAgeCheckBox;
 
-	private boolean showComponents = true;
-	private boolean showConstants = true;
-	private boolean showQueries = true;
-	private boolean showEnabledTransitions = true;
-	private boolean showDelayEnabledTransitions = true;
+	//XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
+	boolean showComponents = true;
+	boolean showConstants = true;
+	boolean showQueries = true;
+	boolean showEnabledTransitions = true;
+	boolean showDelayEnabledTransitions = true;
 	private boolean showToolTips = true;
 	private boolean showZeroToInfinityIntervals = true;
 	private boolean showTokenAge = true;
@@ -712,7 +713,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		viewMenu.add( saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				saveWorkspace();
+				guiFrameController.ifPresent(GuiFrameControllerActions::saveWorkspace);
 			}
 		});
 		return viewMenu;
@@ -944,32 +945,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
 		DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
 	}
-
-	private void saveWorkspace(){
-		Preferences prefs = Preferences.getInstance();
-
-		prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
-		prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
-		prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
-		prefs.setWindowSize(this.getSize());
-
-		prefs.setShowComponents(showComponents);
-		prefs.setShowQueries(showQueries);
-		prefs.setShowConstants(showConstants);
-
-		prefs.setShowEnabledTrasitions(showEnabledTransitions);
-		prefs.setShowDelayEnabledTransitions(showDelayEnabledTransitions);
-		prefs.setShowTokenAge(showTokenAge());
-		prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
-		prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
-		prefs.setDelayEnabledTransitionIsRandomTransition(DelayEnabledTransitionControl.isRandomTransition());
-
-		JOptionPane.showMessageDialog(this, 
-				"The workspace has now been saved into your preferences.\n" 
-						+ "It will be used as the initial workspace next time you run the tool.",
-						"Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
-	}
-
 
 	private void buildToolbar() {
 

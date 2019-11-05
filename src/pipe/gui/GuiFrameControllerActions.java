@@ -8,4 +8,6 @@ public interface GuiFrameControllerActions {
     void openURL(String s);
 
     void showNewPNDialog();
+
+    void saveWorkspace();
 }

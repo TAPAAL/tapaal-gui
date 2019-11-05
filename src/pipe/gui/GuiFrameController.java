@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -8,6 +9,7 @@ import net.tapaal.Preferences;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.NewTAPNPanel;
+import pipe.gui.widgets.QueryDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,7 +80,33 @@ class GuiFrameController implements GuiFrameControllerActions{
 
     }
 
-    ;
+    @Override
+    public void saveWorkspace() {
+
+        Preferences prefs = Preferences.getInstance();
+
+        prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
+        prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
+        prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
+        prefs.setWindowSize(guiFrameDirectAccess.getSize());
+
+        prefs.setShowComponents(guiFrameDirectAccess.showComponents);
+        prefs.setShowQueries(guiFrameDirectAccess.showQueries);
+        prefs.setShowConstants(guiFrameDirectAccess.showConstants);
+
+        prefs.setShowEnabledTrasitions(guiFrameDirectAccess.showEnabledTransitions);
+        prefs.setShowDelayEnabledTransitions(guiFrameDirectAccess.showDelayEnabledTransitions);
+        prefs.setShowTokenAge(guiFrameDirectAccess.showTokenAge());
+        prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
+        prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
+        prefs.setDelayEnabledTransitionIsRandomTransition(DelayEnabledTransitionControl.isRandomTransition());
+
+        JOptionPane.showMessageDialog(guiFrameDirectAccess,
+                "The workspace has now been saved into your preferences.\n"
+                        + "It will be used as the initial workspace next time you run the tool.",
+                "Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
+
+    }
 
     private static void openBrowser(URI url){
         //open the default bowser on this page
