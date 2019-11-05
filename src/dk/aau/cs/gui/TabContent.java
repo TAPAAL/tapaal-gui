@@ -709,7 +709,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public boolean isQueryPossible() {
 		return queries.isQueryPossible();
 	}
-	
+
+	@Override
 	public void verifySelectedQuery() {
 		queries.verifySelectedQuery();
 	}

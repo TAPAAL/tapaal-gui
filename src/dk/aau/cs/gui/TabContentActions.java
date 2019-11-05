@@ -41,4 +41,6 @@ public interface TabContentActions {
     void importXMLQueries();
 
     void workflowAnalyse();
+
+    void verifySelectedQuery();
 }

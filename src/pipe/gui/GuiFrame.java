@@ -854,7 +854,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				getCurrentTab().verifySelectedQuery();
+				currentTab.ifPresent(TabContentActions::verifySelectedQuery);
 			}
 		};
 		toolsMenu.add(verifyAction).setMnemonic('m');
@@ -1769,7 +1769,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	/**
 	 * If current net has modifications, asks if you want to save and does it if
 	 * you want.
-	 * 
+	 *
 	 * @return true if handled, false if cancelled
 	 */
 	private boolean checkForSaveAll() {
