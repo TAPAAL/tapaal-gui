@@ -4,6 +4,7 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import net.tapaal.Preferences;
+import pipe.gui.widgets.EngineDialogPanel;
 
 class GuiFrameController implements GuiFrameControllerActions{
 
@@ -29,5 +30,10 @@ class GuiFrameController implements GuiFrameControllerActions{
         Verifyta.reset();
         VerifyTAPN.reset();
         VerifyTAPNDiscreteVerification.reset();
+    }
+
+    @Override
+    public void showEngineDialog() {
+        new EngineDialogPanel().showDialog();
     }
 }

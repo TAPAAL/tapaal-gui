@@ -904,7 +904,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new EngineDialogPanel().showDialog();
+				guiFrameController.ifPresent(o->o.showEngineDialog());
 			}
 		});
 		toolsMenu.add(engineSelection);
