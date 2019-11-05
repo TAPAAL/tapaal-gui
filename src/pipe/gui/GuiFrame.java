@@ -405,7 +405,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				Preferences.getInstance().setLatestVersion(null);
 				dialog.setVisible(false);
 				dialog.dispose();
-				GuiFrame.showInBrowser("http://www.tapaal.net/download");
+				GuiFrameController.showInBrowserDeprecatedDirectCall("http://www.tapaal.net/download");
 			});
 			ignoreButton.addActionListener(e -> {
 				Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
@@ -805,7 +805,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		helpMenu.add(showHomepage = new GuiAction("Visit TAPAAL home", "Visit the TAPAAL homepage") {
 			public void actionPerformed(ActionEvent arg0) {
-				showInBrowser("http://www.tapaal.net");
+				guiFrameController.ifPresent(o->o.openURL("http://www.tapaal.net"));
 			}
 		});
 
@@ -819,17 +819,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		helpMenu.add(showFAQAction = new GuiAction("Show FAQ", "See TAPAAL frequently asked questions") {
 			public void actionPerformed(ActionEvent arg0) {
-				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
+				guiFrameController.ifPresent(o->o.openURL("https://answers.launchpad.net/tapaal/+faqs"));
 			}
 		});
 		helpMenu.add(showAskQuestionAction = new GuiAction("Ask a question", "Ask a question about TAPAAL") {
 			public void actionPerformed(ActionEvent arg0) {
-				showInBrowser("https://answers.launchpad.net/tapaal/+addquestion");
+				guiFrameController.ifPresent(o->o.openURL("https://answers.launchpad.net/tapaal/+addquestion"));
 			}
 		});
 		helpMenu.add(showReportBugAction = new GuiAction("Report bug", "Report a bug in TAPAAL") {
 			public void actionPerformed(ActionEvent arg0) {
-				showInBrowser("https://bugs.launchpad.net/tapaal/+filebug");
+				guiFrameController.ifPresent(o->o.openURL("https://bugs.launchpad.net/tapaal/+filebug"));
 			}
 		});
 
@@ -2032,30 +2032,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 
-	private static void openBrowser(URI url){
-		//open the default bowser on this page
-		try {
-			java.awt.Desktop.getDesktop().browse(url);
-		} catch (IOException e) {
-			Logger.log("Cannot open the browser.");
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
-					"Please open the url in your browser by entering " + url.toString(), 
-					"Error opening browser", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
-	}
-
-	public static void showInBrowser(String address) {
-		try {
-			URI url = new URI(address);
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-	}
 
 
 
