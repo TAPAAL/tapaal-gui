@@ -20,8 +20,8 @@ public class CreateGui {
 	public static final String imgPath = "resources/Images/";
 
 	public static void init() {
-		appGuiController = new GuiFrameController();
-		appGui = new GuiFrame(TAPAAL.getProgramName(), appGuiController);
+		appGui = new GuiFrame(TAPAAL.getProgramName());
+        appGuiController = new GuiFrameController(appGui);
 
 		if (Platform.isMac()){
 			try {

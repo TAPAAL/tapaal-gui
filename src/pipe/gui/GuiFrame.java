@@ -182,11 +182,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private JMenu importMenu, exportMenu, zoomMenu;
 
-	public GuiFrame(String title, GuiFrameControllerActions appGuiController) {
+	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
 		// name to be appended to basic window title
-
-		this.guiFrameController = Optional.of(appGuiController);
 
 		frameTitle = title;
 		setTitle(null);
@@ -1916,6 +1914,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 
 		statusBar.changeText(mode);
+	}
+
+	@Override
+	public void registerController(GuiFrameControllerActions guiFrameController) {
+		this.guiFrameController = Optional.of(guiFrameController);
 	}
 
 	public Pipe.ElementType getMode() {
