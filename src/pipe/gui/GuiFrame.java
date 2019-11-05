@@ -7,8 +7,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
@@ -27,6 +25,7 @@ import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
+import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.NetWriter;
@@ -41,7 +40,6 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
@@ -1028,7 +1026,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		toolBar.addSeparator();
 		toolBar.add(toggleGrid).setRequestFocusEnabled(false);
 
-		toolBar.add(new ToggleButton(startAction));
+		toolBar.add(new ToggleButtonWithoutText(startAction));
 
 		// Start drawingToolBar
 		drawingToolBar = new JToolBar();
@@ -1037,23 +1035,23 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		drawingToolBar.setRequestFocusEnabled(false);
 
 		// Normal arraw
-		drawingToolBar.add(new ToggleButton(selectAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
 
 
 		// Drawing elements
 		drawingToolBar.addSeparator();
-		drawingToolBar.add(new ToggleButton(timedPlaceAction));
-		drawingToolBar.add(new ToggleButton(transAction));
-		drawingToolBar.add(new ToggleButton(timedArcAction));
-		drawingToolBar.add(new ToggleButton(transportArcAction));
-		drawingToolBar.add(new ToggleButton(inhibarcAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(timedPlaceAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(transAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(timedArcAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(transportArcAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(inhibarcAction));
 
-		drawingToolBar.add(new ToggleButton(annotationAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(annotationAction));
 
 		// Tokens
 		drawingToolBar.addSeparator();
-		drawingToolBar.add(new ToggleButton(tokenAction));
-		drawingToolBar.add(new ToggleButton(deleteTokenAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(tokenAction));
+		drawingToolBar.add(new ToggleButtonWithoutText(deleteTokenAction));
 
 		// Create panel to put toolbars in
 		JPanel toolBarPanel = new JPanel();
@@ -2352,26 +2350,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 		return nets;
 	}
-	
-
-
-
-	/**
-	 * A JToggleButton that without any text
-	 */
-	class ToggleButton extends JToggleButton {
-
-		public ToggleButton(Action a) {
-			super(a);
-			if (a.getValue(Action.SMALL_ICON) != null) {
-				// toggle buttons like to have images *and* text, nasty
-				setText(null);
-			}
-			this.setRequestFocusEnabled(false);
-		}
-
-	}
-
 
 
 	public void setEnabledStepForwardAction(boolean b) {
