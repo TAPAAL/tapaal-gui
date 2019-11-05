@@ -32,7 +32,7 @@ public class CreateGui {
 		}
 
 		appGui.setVisible(true);
-		appGui.checkForUpdate(false);
+		appGuiController.checkForUpdate(false);
 	}
 
 	public static DataLayer getModel() {

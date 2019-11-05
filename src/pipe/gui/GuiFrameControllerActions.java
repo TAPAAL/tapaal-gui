@@ -10,4 +10,6 @@ public interface GuiFrameControllerActions {
     void showNewPNDialog();
 
     void saveWorkspace();
+
+    void checkForUpdate();
 }
