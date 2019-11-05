@@ -859,7 +859,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StatisticsPanel.showStatisticsPanel(getCurrentTab().drawingSurface().getModel().getStatistics());
+				currentTab.ifPresent(o->o.showStatistics());
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');

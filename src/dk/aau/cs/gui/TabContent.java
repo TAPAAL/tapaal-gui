@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.model.tapn.*;
@@ -876,6 +877,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		} else {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
+	}
+
+	@Override
+	public void showStatistics() {
+		StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
 	}
 
 	public boolean isInAnimationMode() {

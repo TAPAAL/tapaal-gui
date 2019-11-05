@@ -30,5 +30,7 @@ public interface TabContentActions{
     void changeAnimationMode(boolean status);
 
     void setMode(Pipe.ElementType mode);
+
+    void showStatistics();
 }
 
