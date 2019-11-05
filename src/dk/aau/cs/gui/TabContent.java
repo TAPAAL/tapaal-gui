@@ -14,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.io.queries.SUMOQueryLoader;
+import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
@@ -42,6 +44,7 @@ import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.util.Require;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 	private static final long serialVersionUID = -648006317150905097L;
@@ -882,6 +885,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	@Override
 	public void showStatistics() {
 		StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
+	}
+
+	@Override
+	public void importSUMOQueries() {
+		File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
+		for(File f : files){
+			if(f.exists() && f.isFile() && f.canRead()){
+				FileBrowser.userPath = f.getParent();
+				SUMOQueryLoader.importQueries(f, network());
+			}
+		}
+	}
+
+	@Override
+	public void importXMLQueries() {
+		File[] files = FileBrowser.constructor("Import XML queries", "xml", FileBrowser.userPath).openFiles();
+		for(File f : files){
+			if(f.exists() && f.isFile() && f.canRead()){
+				FileBrowser.userPath = f.getParent();
+				XMLQueryLoader.importQueries(f, network());
+			}
+		}
 	}
 
 	public boolean isInAnimationMode() {

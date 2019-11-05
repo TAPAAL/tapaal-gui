@@ -2120,26 +2120,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		importMenu.add(importSUMOAction = new GuiAction("SUMO queries (.txt)", "Import SUMO queries in a plain text format") {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
-				for(File f : files){
-					if(f.exists() && f.isFile() && f.canRead()){
-						FileBrowser.userPath = f.getParent();
-						SUMOQueryLoader.importQueries(f, getCurrentTab().network());
-					}
-				}
+				currentTab.ifPresent(TabContentActions::importSUMOQueries);
 			}
 		});
 
 		importMenu.add(
 				importXMLAction = new GuiAction("XML queries (.xml)", "Import MCC queries in XML format", KeyStroke.getKeyStroke('R', shortcutkey)) {
 					public void actionPerformed(ActionEvent arg0) {
-						File[] files = FileBrowser.constructor("Import XML queries", "xml", FileBrowser.userPath).openFiles();
-						for(File f : files){
-							if(f.exists() && f.isFile() && f.canRead()){
-								FileBrowser.userPath = f.getParent();
-								XMLQueryLoader.importQueries(f, getCurrentTab().network());
-							}
-						}
+						currentTab.ifPresent(TabContentActions::importXMLQueries);
 					}	
 				});
 		fileMenu.add(importMenu);
