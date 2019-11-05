@@ -862,7 +862,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentTab.ifPresent(o->o.showStatistics());
+				currentTab.ifPresent(TabContentActions::showStatistics);
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
@@ -883,7 +883,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentTab.ifPresent(o->o.workflowAnalyse());
+				currentTab.ifPresent(TabContentActions::workflowAnalyse);
 			}
 		});
 		workflowDialog.setMnemonic('f');
@@ -905,7 +905,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				guiFrameController.ifPresent(o->o.showEngineDialog());
+				guiFrameController.ifPresent(GuiFrameControllerActions::showEngineDialog);
 			}
 		});
 		toolsMenu.add(engineSelection);
@@ -915,7 +915,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction = new GuiAction("Clear all preferences", "Clear all custom preferences to default") {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				guiFrameController.ifPresent(o->o.clearPreferences());
+				guiFrameController.ifPresent(GuiFrameControllerActions::clearPreferences);
 			}
 		});
 		toolsMenu.add(clearPreferences);
