@@ -6,4 +6,6 @@ public interface GuiFrameControllerActions {
     void showEngineDialog();
 
     void openURL(String s);
+
+    void showNewPNDialog();
 }

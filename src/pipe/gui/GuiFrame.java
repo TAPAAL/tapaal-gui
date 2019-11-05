@@ -2052,7 +2052,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		createAction = new GuiAction("New", "Create a new Petri net",  KeyStroke.getKeyStroke('N', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-				showNewPNDialog();
+				guiFrameController.ifPresent(GuiFrameControllerActions::showNewPNDialog);
 			}
 		};
 		fileMenu.add(createAction);
@@ -2340,28 +2340,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		stepforwardAction.setEnabled(b);
 	}
 
-	private void showNewPNDialog() {
-		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(this, "Create a New Petri Net", true);
 
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add Place editor
-		contentPane.add(new NewTAPNPanel(guiDialog.getRootPane(), this));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-
-	}
 
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);

@@ -6,8 +6,11 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import net.tapaal.Preferences;
 import pipe.gui.widgets.EngineDialogPanel;
+import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.NewTAPNPanel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,7 +50,35 @@ class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void openURL(String address) {
         showInBrowser(address);
-    };
+    }
+
+    @Override
+    public void showNewPNDialog() {
+
+        // Build interface
+        EscapableDialog guiDialog = new EscapableDialog(guiFrameDirectAccess, "Create a New Petri Net", true);
+
+        Container contentPane = guiDialog.getContentPane();
+
+        // 1 Set layout
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+
+        // 2 Add Place editor
+        contentPane.add(new NewTAPNPanel(guiDialog.getRootPane(), guiFrameDirectAccess));
+
+        guiDialog.setResizable(false);
+
+        // Make window fit contents' preferred size
+        guiDialog.pack();
+
+        // Move window to the middle of the screen
+        guiDialog.setLocationRelativeTo(null);
+        guiDialog.setVisible(true);
+
+
+    }
+
+    ;
 
     private static void openBrowser(URI url){
         //open the default bowser on this page
