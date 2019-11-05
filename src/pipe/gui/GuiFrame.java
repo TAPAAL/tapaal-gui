@@ -883,7 +883,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				WorkflowDialog.showDialog();
+				currentTab.ifPresent(o->o.workflowAnalyse());
 			}
 		});
 		workflowDialog.setMnemonic('f');

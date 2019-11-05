@@ -40,4 +40,5 @@ public interface TabContentActions {
 
     void importXMLQueries();
 
+    void workflowAnalyse();
 }

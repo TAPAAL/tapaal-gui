@@ -909,6 +909,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
+	@Override
+	public void workflowAnalyse() {
+		WorkflowDialog.showDialog();
+	}
+
 	public boolean isInAnimationMode() {
 		return animationmode;
 	}
