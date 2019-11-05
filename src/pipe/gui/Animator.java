@@ -486,7 +486,7 @@ public class Animator {
 		return tab.currentTemplate().guiModel();
 	}
 
-	public void resethistory() {
+	private void resethistory() {
 		actionHistory.clear();
 		markings.clear();
 		currentAction = -1;
