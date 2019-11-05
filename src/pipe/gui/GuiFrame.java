@@ -110,6 +110,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction netStatisticsAction;
 	private GuiAction batchProcessingAction;
 	private GuiAction engineSelectionAction;
+	private GuiAction clearPreferencesAction;
+
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
 	private GuiAction stripTimeDialogAction;
@@ -907,14 +909,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		});
 		toolsMenu.add(engineSelection);
 
-		JMenuItem clearPreferences = new JMenuItem("Clear all preferences");
-		clearPreferences.addActionListener(arg0 -> {
-			// Clear persistent storage
-			Preferences.getInstance().clear();
-			// Engines reset individually to remove preferences for already setup engines
-			Verifyta.reset();
-			VerifyTAPN.reset();
-			VerifyTAPNDiscreteVerification.reset();
+
+
+		JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction = new GuiAction("Clear all preferences", "Clear all custom preferences to default") {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				// Clear persistent storage
+				Preferences.getInstance().clear();
+				// Engines reset individually to remove preferences for already setup engines
+				Verifyta.reset();
+				VerifyTAPN.reset();
+				VerifyTAPNDiscreteVerification.reset();
+			}
 		});
 		toolsMenu.add(clearPreferences);
 
