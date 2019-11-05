@@ -155,7 +155,7 @@ public class Animator {
 	/**
 	 * Called during animation to unhighlight previously highlighted transitions
 	 */
-	public void unhighlightDisabledTransitions() {
+	private void unhighlightDisabledTransitions() {
 		DataLayer current = activeGuiModel();
 
 		Iterator<Transition> transitionIterator = current.returnTransitions();
@@ -612,7 +612,7 @@ public class Animator {
 		}
 	}
 
-	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
+	private List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Select Tokens", true);
 
 		Container contentPane = guiDialog.getContentPane();
@@ -642,7 +642,7 @@ public class Animator {
 		}
 	}
 
-	public boolean removeSetTrace(boolean askUser){
+	private boolean removeSetTrace(boolean askUser){
 		if(askUser && isShowingTrace()){ //Warn about deleting trace
 			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
 					"You are about to remove the current trace.", 
@@ -672,7 +672,7 @@ public class Animator {
 		return answer;
 	}
 
-	public boolean isShowingTrace(){
+	private boolean isShowingTrace(){
 		return isDisplayingUntimedTrace || trace != null;
 	}
         
