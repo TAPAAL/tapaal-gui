@@ -77,6 +77,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private int newNameCounter = 1;
 
+	Optional<GuiFrameControllerActions> guiFrameController = Optional.empty();
+
 	private ExtendedJTabbedPane<TabContent> appTab;
 
 	private StatusBar statusBar;
@@ -180,9 +182,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private JMenu importMenu, exportMenu, zoomMenu;
 
-	public GuiFrame(String title) {
+	public GuiFrame(String title, GuiFrameControllerActions appGuiController) {
 		// HAK-arrange for frameTitle to be initialized and the default file
 		// name to be appended to basic window title
+
+		this.guiFrameController = Optional.of(appGuiController);
 
 		frameTitle = title;
 		setTitle(null);

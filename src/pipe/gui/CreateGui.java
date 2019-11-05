@@ -13,12 +13,15 @@ import dk.aau.cs.gui.TabContent;
 public class CreateGui {
 
 	private static GuiFrame appGui;
+	private static GuiFrameController appGuiController;
+
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	public static final String imgPath = "resources/Images/";
 
 	public static void init() {
-		appGui = new GuiFrame(TAPAAL.getProgramName());
+		appGuiController = new GuiFrameController();
+		appGui = new GuiFrame(TAPAAL.getProgramName(), appGuiController);
 
 		if (Platform.isMac()){
 			try {
