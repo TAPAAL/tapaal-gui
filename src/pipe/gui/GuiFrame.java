@@ -914,12 +914,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction = new GuiAction("Clear all preferences", "Clear all custom preferences to default") {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				// Clear persistent storage
-				Preferences.getInstance().clear();
-				// Engines reset individually to remove preferences for already setup engines
-				Verifyta.reset();
-				VerifyTAPN.reset();
-				VerifyTAPNDiscreteVerification.reset();
+				guiFrameController.ifPresent(o->o.clearPreferences());
 			}
 		});
 		toolsMenu.add(clearPreferences);

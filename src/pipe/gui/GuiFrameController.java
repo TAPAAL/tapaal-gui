@@ -1,5 +1,10 @@
 package pipe.gui;
 
+import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
+import net.tapaal.Preferences;
+
 class GuiFrameController implements GuiFrameControllerActions{
 
     GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
@@ -14,5 +19,15 @@ class GuiFrameController implements GuiFrameControllerActions{
         appGui.registerController(this);
 
 
+    }
+
+    @Override
+    public void clearPreferences() {
+        // Clear persistent storage
+        Preferences.getInstance().clear();
+        // Engines reset individually to remove preferences for already setup engines
+        Verifyta.reset();
+        VerifyTAPN.reset();
+        VerifyTAPNDiscreteVerification.reset();
     }
 }
