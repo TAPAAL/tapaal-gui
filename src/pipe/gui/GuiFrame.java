@@ -2336,16 +2336,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 
-	public void setEnabledStepForwardAction(boolean b) {
-		stepforwardAction.setEnabled(b);
-	}
-
-
-
-	public void setEnabledStepBackwardAction(boolean b) {
-		stepbackwardAction.setEnabled(b);
-	}
-
 
 
 

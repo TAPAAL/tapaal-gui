@@ -371,8 +371,6 @@ public class AnimationController extends JPanel {
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
 
-		CreateGui.getAppGui().setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
-		CreateGui.getAppGui().setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
 	}
 	
 	private void initializeDocumentFilterForDelayInput() {
