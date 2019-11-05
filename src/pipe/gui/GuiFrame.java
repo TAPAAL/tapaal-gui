@@ -2357,19 +2357,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 
 	/**
-	 * A JToggleButton that watches an Action for selection change
-	 * 
-	 * @author Maxim
-	 * 
-	 *         Selection must be stored in the action using
-	 *         putValue("selected",Boolean);
+	 * A JToggleButton that without any text
 	 */
-	class ToggleButton extends JToggleButton implements PropertyChangeListener {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -5085200741780612997L;
+	class ToggleButton extends JToggleButton {
 
 		public ToggleButton(Action a) {
 			super(a);
@@ -2378,9 +2368,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				setText(null);
 			}
 			this.setRequestFocusEnabled(false);
-		}
-
-		public void propertyChange(PropertyChangeEvent evt) {
 		}
 
 	}
