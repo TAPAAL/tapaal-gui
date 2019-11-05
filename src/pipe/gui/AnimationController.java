@@ -17,14 +17,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
@@ -35,8 +28,6 @@ import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
 import java.util.Hashtable;
-import javax.swing.JButton;
-import javax.swing.JSlider;
 
 /**
  * Implementes af class handling drawing of animation functions
@@ -243,11 +234,11 @@ public class AnimationController extends JPanel {
 		// Disable shortcuts when focused
 		TimeDelayField.addFocusListener(new FocusListener() {
 			public void focusLost(FocusEvent arg0) {
-				CreateGui.getApp().setStepShotcutEnabled(true);
+				setStepShotcutEnabled(true);
 			}
 
 			public void focusGained(FocusEvent arg0) {
-				CreateGui.getApp().setStepShotcutEnabled(false);
+				setStepShotcutEnabled(false);
 			}
 		});
 
@@ -262,6 +253,16 @@ public class AnimationController extends JPanel {
 		timedelayPanel.add(okButton);
 
 		animationToolBar.add(timedelayPanel);
+	}
+
+	void setStepShotcutEnabled(boolean enabled){
+		if(enabled){
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
+		} else {
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
+		}
 	}
 
 	public void updateFiringModeComboBox() {

@@ -2347,15 +2347,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 
-	public void setStepShotcutEnabled(boolean enabled){
-		if(enabled){
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
-		} else {
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
-		}
-	}
+
 
 	public int getNameCounter() {
 		return newNameCounter;
