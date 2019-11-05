@@ -911,6 +911,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void workflowAnalyse() {
+		//XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
 		WorkflowDialog.showDialog();
 	}
 
