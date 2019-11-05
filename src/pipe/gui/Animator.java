@@ -676,8 +676,8 @@ public class Animator {
 		return isDisplayingUntimedTrace || trace != null;
 	}
         
-        public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
-            return actionHistory;
-        }   
+	public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
+		return actionHistory;
+	}
 	
 }
