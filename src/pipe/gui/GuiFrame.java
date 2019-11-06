@@ -1434,8 +1434,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			appTab.setTitleAt(index, outFile.getName());
 			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
 			getTab(index).getUndoManager().clear();
-			undoAction.setEnabled(false);
-			redoAction.setEnabled(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
