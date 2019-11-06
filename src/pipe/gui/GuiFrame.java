@@ -179,8 +179,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private boolean showZeroToInfinityIntervals = true;
 	private boolean showTokenAge = true;
 
-
-	private JMenu importMenu, exportMenu, zoomMenu;
+	private JMenu zoomMenu;
 
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
@@ -2011,7 +2010,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 				
 		// Import menu
-		importMenu = new JMenu("Import");
+		JMenu importMenu = new JMenu("Import");
 		importMenu.setIcon(new ImageIcon(
 				Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")
 		));
@@ -2044,7 +2043,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		fileMenu.add(importMenu);
 
 		// Export menu
-		exportMenu = new JMenu("Export");
+		JMenu exportMenu = new JMenu("Export");
 		exportMenu.setIcon(new ImageIcon(
 				Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
 		
