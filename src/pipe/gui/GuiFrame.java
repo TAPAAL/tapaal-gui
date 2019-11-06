@@ -157,7 +157,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private GuiAction selectAllAction;
 
-	public GuiAction startAction;
+	private GuiAction startAction;
 	public GuiAction stepforwardAction;
 	public GuiAction stepbackwardAction;
 	private GuiAction timeAction;
