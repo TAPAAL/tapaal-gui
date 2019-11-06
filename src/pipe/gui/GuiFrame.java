@@ -710,7 +710,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Previous component", "pressed UP") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getCurrentTab().getTemplateExplorer().selectPrevious();
+				currentTab.ifPresent(TabContentActions::previousComponent);
 			}
 		});
 
@@ -718,7 +718,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Next component", "pressed DOWN") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getCurrentTab().getTemplateExplorer().selectNext();
+				currentTab.ifPresent(TabContentActions::nextComponent);
 			}
 		});
 

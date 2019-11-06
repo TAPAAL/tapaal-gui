@@ -43,4 +43,8 @@ public interface TabContentActions {
     void workflowAnalyse();
 
     void verifySelectedQuery();
+
+    void previousComponent();
+
+    void nextComponent();
 }

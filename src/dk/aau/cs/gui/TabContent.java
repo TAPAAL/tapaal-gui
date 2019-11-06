@@ -714,7 +714,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void verifySelectedQuery() {
 		queries.verifySelectedQuery();
 	}
-	
+
+	@Override
+	public void previousComponent() {
+		getTemplateExplorer().selectPrevious();
+	}
+
+	@Override
+	public void nextComponent() {
+		getTemplateExplorer().selectNext();
+	}
+
 	public void editSelectedQuery(){
 		queries.showEditDialog();
 	}
