@@ -130,9 +130,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction deleteTokenAction;
 	private GuiAction timedPlaceAction;
 
-	private JMenuItem statistics;
-	private JMenuItem verification;
-
 	private GuiAction timedArcAction;
 	private GuiAction transportArcAction;
 
