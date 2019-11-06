@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
@@ -723,6 +724,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	@Override
 	public void nextComponent() {
 		getTemplateExplorer().selectNext();
+	}
+
+	@Override
+	public void exportTrace() {
+		TraceImportExport.exportTrace();
+	}
+
+	@Override
+	public void importTrace() {
+		TraceImportExport.importTrace();
 	}
 
 	public void editSelectedQuery(){

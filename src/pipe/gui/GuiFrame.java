@@ -727,13 +727,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		animateMenu.add( exportTraceAction = new GuiAction("Export trace",
 				"Export the current trace","") {
 					public void actionPerformed(ActionEvent arg0) {
-						TraceImportExport.exportTrace();
+						currentTab.ifPresent(TabContentActions::exportTrace);
 					}		
 		});
 		animateMenu.add( importTraceAction = new GuiAction("Import trace",
 				"Import trace to simulator",""){
 			public void actionPerformed(ActionEvent arg0) {
-				TraceImportExport.importTrace();
+				currentTab.ifPresent(TabContentActions::importTrace);
 			}		
 		});
 

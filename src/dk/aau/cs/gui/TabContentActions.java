@@ -47,4 +47,8 @@ public interface TabContentActions {
     void previousComponent();
 
     void nextComponent();
+
+    void exportTrace();
+
+    void importTrace();
 }
