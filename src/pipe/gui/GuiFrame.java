@@ -1345,10 +1345,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		ToolTipManager.sharedInstance().setDismissDelay(60000);
 	}
 
-	boolean isShowingToolTips(){
-		return showToolTips;
-	}
-
 	private void toggleTokenAge(){
 		toggleShowTokenAge();
 		Preferences.getInstance().setShowTokenAge(showTokenAge());
