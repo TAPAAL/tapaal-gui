@@ -1563,7 +1563,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
-	public void createNewTabFromPNMLFile(File file) {
+	private void createNewTabFromPNMLFile(File file) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name;
 
