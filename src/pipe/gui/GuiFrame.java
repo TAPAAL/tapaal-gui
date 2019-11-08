@@ -927,11 +927,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				//parse selected zoom level, and strip of %.
 				int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
-				boolean didZoom = getCurrentTab().drawingSurface().getZoomController().setZoom(newZoomLevel);
-				if (didZoom) {
-					updateZoomCombo();
-					getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
-				}
+				currentTab.ifPresent(o->o.zoomTo(newZoomLevel));
 			}
 		});
 		toolBar.add(zoomInAction).setRequestFocusEnabled(false);

@@ -51,4 +51,6 @@ public interface TabContentActions {
     void exportTrace();
 
     void importTrace();
+
+    void zoomTo(int newZoomLevel);
 }

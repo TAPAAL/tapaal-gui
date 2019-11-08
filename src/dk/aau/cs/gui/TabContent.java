@@ -736,6 +736,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		TraceImportExport.importTrace();
 	}
 
+	@Override
+	public void zoomTo(int newZoomLevel) {
+		boolean didZoom = drawingSurface().getZoomController().setZoom(newZoomLevel);
+		if (didZoom) {
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			drawingSurface().zoomToMidPoint(); //Do Zoom
+		}
+	}
+
 	public void editSelectedQuery(){
 		queries.showEditDialog();
 	}
