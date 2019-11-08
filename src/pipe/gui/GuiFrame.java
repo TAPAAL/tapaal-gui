@@ -1475,7 +1475,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		createNewTab(name, tab);
 	}
 
-	public void createNewTab(String name, TabContent tab) {
+	private void createNewTab(String name, TabContent tab) {
 		//int freeSpace = CreateGui.getFreeSpace(netType);
 
 		//setObjects(freeSpace);
