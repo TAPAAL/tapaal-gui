@@ -42,22 +42,15 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
-import pipe.gui.widgets.EngineDialogPanel;
-import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
-import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.io.TraceImportExport;
-import dk.aau.cs.io.queries.SUMOQueryLoader;
-import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -668,8 +661,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"M", true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean isInEditorMode = isEditionAllowed();
-				currentTab.ifPresent(o->o.changeAnimationMode(isInEditorMode));
+				currentTab.ifPresent(TabContentActions::toggleAnimationMode);
 			}
 		});
 		

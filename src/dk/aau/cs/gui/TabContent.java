@@ -31,9 +31,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
@@ -831,9 +829,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private boolean animationmode = false;
 	@Override
-	public void changeAnimationMode(boolean status) {
+	public void toggleAnimationMode() {
 
-		if (status) {
+		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
 				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
 

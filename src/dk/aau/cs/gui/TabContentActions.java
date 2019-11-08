@@ -30,7 +30,7 @@ public interface TabContentActions {
 
     void delayAndFire();
 
-    void changeAnimationMode(boolean status);
+    void toggleAnimationMode();
 
     void setMode(Pipe.ElementType mode);
 
