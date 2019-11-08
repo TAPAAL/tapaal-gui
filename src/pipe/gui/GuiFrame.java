@@ -1673,7 +1673,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return checkForSave(appTab.getSelectedIndex());
 	}
 
-	public boolean checkForSave(int index) {
+	private boolean checkForSave(int index) {
 
 		if(index < 0) return false;
 
