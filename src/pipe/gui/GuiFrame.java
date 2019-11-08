@@ -115,8 +115,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
 	private GuiAction stripTimeDialogAction;
+
 	private GuiAction zoomOutAction;
 	private GuiAction zoomInAction;
+	private GuiAction zoomToAction;
 
 	private GuiAction incSpacingAction;
 	private GuiAction decSpacingAction;
@@ -161,6 +163,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction delayFireAction;
 	private GuiAction prevcomponentAction;
 	private GuiAction nextcomponentAction;
+
 
 	public enum GUIMode {
 		draw, animation, noNet
@@ -920,7 +923,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		// Zoom
 		toolBar.addSeparator();
 		toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
-		addZoomComboBox(toolBar, new GuiAction("Zoom", "Select zoom percentage ", "") {
+		addZoomComboBox(toolBar, zoomToAction = new GuiAction("Zoom", "Select zoom percentage ", "") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
