@@ -1002,11 +1002,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			GuiAction newZoomAction = new GuiAction(zoomExamples[i] + "%", "Select zoom percentage", "") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					boolean didZoom = getCurrentTab().drawingSurface().getZoomController().setZoom(zoomper);
-					if (didZoom) {
-						updateZoomCombo();
-						getCurrentTab().drawingSurface().zoomToMidPoint(); //Do Zoom
-					}
+					currentTab.ifPresent(o->o.zoomTo(zoomper));
 				}
 			};
 
