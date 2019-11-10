@@ -1495,7 +1495,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public TabContent createNewTabFromFile(InputStream file, String name) {
-		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
+		TabContent tab = new TabContent(NetType.TAPN);
+
 		boolean showFileEndingChangedMessage = false;
 
 		int currentlySelected = appTab.getSelectedIndex();
@@ -1510,9 +1511,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				name = name + ".tapn";
 		}
 
-		TabContent tab = getTab(freeSpace);
-		appTab.addTab(name, null, tab, null);
-		appTab.setSelectedIndex(freeSpace);
+
 
 
 		try {
@@ -1532,7 +1531,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			tab.setFile(null);
 		} catch (Exception e) {
-			undoAddTab(currentlySelected);
+			//undoAddTab(currentlySelected);
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this,
 					"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
@@ -1541,11 +1540,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			return null;
 		}
 
-
-		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-		setTitle(name);// Change the program caption
-		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
-		selectAction.actionPerformed(null);
+		createNewTab(name, tab);
 		showFileEndingChangedMessage(showFileEndingChangedMessage);
 		return tab;
 	}
