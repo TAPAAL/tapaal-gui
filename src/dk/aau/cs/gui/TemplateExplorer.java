@@ -192,7 +192,7 @@ public class TemplateExplorer extends JPanel {
 
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1) {
+				if (parent.numberOfActiveTemplates() > 1) {
 					removeTemplateButton.setEnabled(false);
 				} else {
 					removeTemplateButton.setEnabled(true);
@@ -776,7 +776,7 @@ public class TemplateExplorer extends JPanel {
 
 	public void openSelectedTemplate() {
 		Template tapn = selectedModel();
-		if (tapn != null) {
+		if (tapn != null && parent.isTabInFocus()) {
 			parent.changeToTemplate(tapn);
 		}
 		//parent.drawingSurface().repaintAll();
@@ -907,7 +907,7 @@ public class TemplateExplorer extends JPanel {
 			if (!selectedModel().isActive()){
 				removeTemplateButton.setEnabled(true);
 			}else {
-				if (CreateGui.getCurrentTab().numberOfActiveTemplates() <= 1) {
+				if (parent.numberOfActiveTemplates() <= 1) {
 					removeTemplateButton.setEnabled(false);
 				} else {
 					removeTemplateButton.setEnabled(true);
@@ -963,7 +963,7 @@ public class TemplateExplorer extends JPanel {
 					sortButton.setEnabled(false);
 				} else {
 					if (buttonPanel != null) {
-						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1){
+						if (parent.numberOfActiveTemplates() > 1){
 							removeTemplateButton.setEnabled(true);
 						}else{
 							if (selectedModel().isActive()){
