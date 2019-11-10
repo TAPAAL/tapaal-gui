@@ -1645,7 +1645,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private void convertToUntimedTab(TabContent tab){
 		TabTransformer.removeTimingInformation(tab);
-		setGUIMode(GuiFrame.GUIMode.draw);
 	}
 
 
