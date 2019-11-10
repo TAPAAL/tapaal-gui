@@ -855,8 +855,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private void duplicateAndConvertUntimed() {
-		duplicateTab((TabContent) appTab.getSelectedComponent());
-		convertToUntimedTab((TabContent) appTab.getSelectedComponent());
+		TabContent duplicate = duplicateTab((TabContent) appTab.getSelectedComponent());
+		convertToUntimedTab(duplicate);
 	}
 
 	private void showAdvancedWorkspace(boolean advanced){
@@ -1625,7 +1625,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 	}
 
-	private void duplicateTab(TabContent tabToDuplicate) {
+	private TabContent duplicateTab(TabContent tabToDuplicate) {
 		int index = appTab.indexOfComponent(tabToDuplicate);
 
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
@@ -1640,11 +1640,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String composedName = appTab.getTitleAt(index);
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
-			createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+			return createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
 		}
+		return null;
 	}
 
 	private void convertToUntimedTab(TabContent tab){
