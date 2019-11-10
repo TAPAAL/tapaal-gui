@@ -1258,14 +1258,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	}
 
-
-	//XXX 2018-05-23 kyrke, implementation close to closeTab, needs refactoring
-	private void undoAddTab(int currentlySelected) {
-		CreateGui.removeTab(appTab.getSelectedIndex() );
-		appTab.removeTabAt(appTab.getSelectedIndex());
-		appTab.setSelectedIndex(currentlySelected);
-	}
-
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
 	public void setChangeListenerOnTab() {
