@@ -1186,5 +1186,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		managerRef.get().registerManager();
     }
 
-
+    //XXX: A quick function made while refactoring to test if the tab is currently
+	// the tab selected, and is allowed to change gui the gui. Should be controlled an other way
+	// /kyrke 2019-11-10
+	public boolean isTabInFocus(){
+		return app.isPresent();
+	}
 }
