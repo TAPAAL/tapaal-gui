@@ -12,4 +12,8 @@ public interface GuiFrameControllerActions {
     void saveWorkspace();
 
     void checkForUpdate();
+
+    void showAbout();
+
+    void exit();
 }

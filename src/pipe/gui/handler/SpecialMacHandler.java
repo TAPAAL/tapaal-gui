@@ -3,6 +3,7 @@ package pipe.gui.handler;
 import java.awt.Window;
 import java.lang.reflect.Method;
 
+import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.CreateGui;
 
 import com.apple.eawt.AboutHandler;
@@ -11,6 +12,7 @@ import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
+import pipe.gui.GuiFrameControllerActions;
 
 /**
  * See http://developer.apple.com/library/mac/documentation/Java/Reference/JavaSE6_AppleExtensionsRef/api/com/apple/eawt/package-summary.html
@@ -19,8 +21,11 @@ import com.apple.eawt.QuitResponse;
  */
 public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFilesHandler, PreferencesHandler, PrintFilesHandler,  , AppReOpenedListener*/ {
 
-	
-	public SpecialMacHandler() {
+
+	private final Reference<GuiFrameControllerActions> guiFrameController;
+
+	public SpecialMacHandler(Reference<GuiFrameControllerActions> guiFrameController) {
+		this.guiFrameController = guiFrameController;
 		//Registrate the handlers
 		Application app = Application.getApplication();
 		app.setAboutHandler(this);
@@ -29,11 +34,11 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 	}
 	
 	public void handleAbout(AboutEvent arg0) {
-		CreateGui.getAppGui().showAbout();
+		guiFrameController.ifPresent(GuiFrameControllerActions::showAbout);
 	}
 
 	public void handleQuitRequestWith(QuitEvent arg0, QuitResponse arg1) {
-		CreateGui.getAppGui().exit();
+		guiFrameController.ifPresent(o->o.exit());
 	}
 
 	public static void postprocess(){

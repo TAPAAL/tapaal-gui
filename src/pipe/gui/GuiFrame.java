@@ -290,7 +290,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		if (Platform.isMac()){
 
 			try{
-				new SpecialMacHandler();
+				new SpecialMacHandler(guiFrameController);
 			} catch (NoClassDefFoundError e) {
 				//Failed loading special mac handler, ignore and run program without MacOS integration
 			}
@@ -771,7 +771,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		helpMenu.add(showAboutAction = new GuiAction("About", "Show the About menu") {
 			public void actionPerformed(ActionEvent arg0) {
-				showAbout();
+				guiFrameController.ifPresent(GuiFrameControllerActions::showAbout);
 			}
 		});
 		return helpMenu;
@@ -1873,46 +1873,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
                 }
                 return false;
         }
-
-
-	public void showAbout() {
-		StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
-		buffer.append("\n\n");
-		buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
-		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
-		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
-		buffer.append("Credits\n\n");
-		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Graesboell, ");
-		buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-		buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2019\n\n");
-		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
-		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2019\n\n");
-		buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
-                buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
-		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2019\n\n");
-		buffer.append("TAPAAL Untimed Engine (verifypn):\n");
-                buffer.append("Frederik Meyer Boenneland, Jakob Dyhr, Peter Fogh, ");
-                buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, ");
-                buffer.append("Tobias S. Jepsen, Mads Johannsen,\nIsabella Kaufmann, ");
-                buffer.append("Andreas H. Klostergaard, Soeren M. Nielsen,\nThomas S. Nielsen, Lars K. Oestergaard, ");
-                buffer.append("Samuel Pastva and Jiri Srba\n");
-                buffer.append("Aalborg University 2014-2019\n\n");
-
-
-		buffer.append("\n");
-		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
-				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
-	}
-
-
-
-
-
-
 
 	public void exit(){
 		if (checkForSaveAll()) {
