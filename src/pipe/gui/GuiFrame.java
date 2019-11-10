@@ -825,8 +825,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				duplicateTab((TabContent) appTab.getSelectedComponent());
-				convertToUntimedTab((TabContent) appTab.getSelectedComponent());
+				duplicateAndConvertUntimed();
 			}
 		});
 		stripTimeDialog.setMnemonic('e');
@@ -853,6 +852,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		toolsMenu.add(clearPreferences);
 
 		return toolsMenu;
+	}
+
+	private void duplicateAndConvertUntimed() {
+		duplicateTab((TabContent) appTab.getSelectedComponent());
+		convertToUntimedTab((TabContent) appTab.getSelectedComponent());
 	}
 
 	private void showAdvancedWorkspace(boolean advanced){
