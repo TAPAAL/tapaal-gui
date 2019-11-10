@@ -1104,7 +1104,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void undo() {
-		if (CreateGui.getApp().isEditionAllowed()) {
+		if (!isInAnimationMode()) {
 			getUndoManager().undo();
 			network().buildConstraints();
 		}
@@ -1112,7 +1112,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void redo() {
-		if (CreateGui.getApp().isEditionAllowed()) {
+		if (!isInAnimationMode()) {
 			getUndoManager().redo();
 			network().buildConstraints();
 		}
