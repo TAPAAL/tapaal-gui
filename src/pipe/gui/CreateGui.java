@@ -64,11 +64,6 @@ public class CreateGui {
 	}
 
 
-	public static int getFreeSpace(NetType netType) {
-		tabs.add(new TabContent(netType));
-		return tabs.size() - 1;
-	}
-
 	public static void addTab (TabContent tab ) {
 		tabs.add(tab);
 	}
