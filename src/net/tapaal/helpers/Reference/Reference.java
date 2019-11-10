@@ -10,15 +10,18 @@ public class Reference<T> {
 
     private T ref;
 
-    public Reference(T ref) {
+    // You properly want to create a MutableReference
+    Reference(T ref) {
+        super();
+
         setReference(ref);
     }
+
     public final T get() {
         return ref;
     }
 
     void setReference(T ref) {
-        Require.notNull(ref, "Can't make a reference to null");
         this.ref = ref;
     }
 

@@ -12,8 +12,11 @@ public class MutableReference<T> extends Reference<T> {
         super(ref);
     }
 
+    public MutableReference() {
+        super(null);
+    }
+
     public void setReference(T ref) {
-        Require.notNull(ref, "Can't make a reference to null");
         super.setReference(ref);
     }
 }

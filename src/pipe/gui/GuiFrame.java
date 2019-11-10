@@ -24,6 +24,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
+import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.dataLayer.DataLayer;
@@ -70,7 +71,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private int newNameCounter = 1;
 
-	Optional<GuiFrameControllerActions> guiFrameController = Optional.empty();
+	final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
 	private ExtendedJTabbedPane<TabContent> appTab;
 
@@ -1795,7 +1796,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	@Override
 	public void registerController(GuiFrameControllerActions guiFrameController) {
-		this.guiFrameController = Optional.of(guiFrameController);
+		this.guiFrameController.setReference(guiFrameController);
 	}
 
 	public Pipe.ElementType getMode() {
