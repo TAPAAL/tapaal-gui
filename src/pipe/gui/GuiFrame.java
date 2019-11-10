@@ -1550,7 +1550,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	private void createNewTabFromPNMLFile(File file) {
-		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
+		TabContent tab = new TabContent(NetType.TAPN);
 		String name;
 
 		int currentlySelected = appTab.getSelectedIndex();
@@ -1560,11 +1560,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		} else {
 			name = file.getName().replaceAll(".pnml", ".tapn");
 		}
-
-		TabContent tab = CreateGui.getTab(freeSpace);
-		appTab.addTab(name, null, tab, null);
-
-		appTab.setSelectedIndex(freeSpace);
 
 		if (file != null) {
 			try {
@@ -1585,7 +1580,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 
 			} catch (Exception e) {
-				undoAddTab(currentlySelected);
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
@@ -1597,9 +1591,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		setTitle(name);// Change the program caption
-		//appTab.setTitleAt(freeSpace, name); //Set above in addTab
-		selectAction.actionPerformed(null);
+		createNewTab(name, tab);
 	}
 
 
