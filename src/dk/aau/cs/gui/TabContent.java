@@ -982,6 +982,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
+			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
 		}
 
 	}
