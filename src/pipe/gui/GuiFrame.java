@@ -1777,7 +1777,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
 		timedArcAction.setSelected(mode == ElementType.TAPNARC);
 		transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
-		inhibarcAction.setSelected(mode == ElementType.INHIBARC);
+		inhibarcAction.setSelected(mode == ElementType.TAPNINHIBITOR_ARC);
 		tokenAction.setSelected(mode == ElementType.ADDTOKEN);
 		deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
 		selectAction.setSelected(mode == ElementType.SELECT);
