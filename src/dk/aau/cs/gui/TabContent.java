@@ -953,13 +953,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private Animator animator = new Animator(this);
 
 	/* GUI Model / Actions helpers */
+	//XXX: Should be moved to animationController or similar
 	/**
 	 * Updates the mouseOver label showing token ages in animationmode
 	 * when a "animation" action is happening. "live updates" any mouseOver label
 	 */
 	private void updateMouseOverInformation() {
 		// update mouseOverView
-		for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
+		for (pipe.gui.graphicElements.Place p : getModel().getPlaces()) {
 			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
 				((TimedPlaceComponent) p).showAgeOfTokens(true);
 			}
