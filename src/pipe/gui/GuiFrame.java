@@ -1783,10 +1783,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		selectAction.setSelected(mode == ElementType.SELECT);
 		annotationAction.setSelected(mode == ElementType.ANNOTATION);
 
-		if (getCurrentTab() == null) {
-			return;
-		}
-
 		statusBar.changeText(mode);
 	}
 
