@@ -1518,10 +1518,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			tab.selectFirstElements();
 
-			if (CreateGui.getCurrentTab() != null) {
-				CreateGui.getCurrentTab().setMode(ElementType.SELECT);
-			}
-
 			tab.setFile(null);
 		} catch (Exception e) {
 			//undoAddTab(currentlySelected);
