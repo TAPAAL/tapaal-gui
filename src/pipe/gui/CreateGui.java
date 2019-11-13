@@ -35,10 +35,12 @@ public class CreateGui {
 		appGuiController.checkForUpdate(false);
 	}
 
+	@Deprecated
 	public static DataLayer getModel() {
 		return getModel(appGui.getSelectedTabIndex());
 	}
 
+	@Deprecated
 	public static DataLayer getModel(int index) {
 		if (index < 0) {
 			return null;
@@ -48,10 +50,12 @@ public class CreateGui {
 		return tab.getModel();
 	}
 
+	@Deprecated
 	public static DrawingSurfaceImpl getDrawingSurface() {
 		return getDrawingSurface(appGui.getSelectedTabIndex());
 	}
 
+	@Deprecated
 	public static DrawingSurfaceImpl getDrawingSurface(int index) {
 
 		if (index < 0) {
@@ -63,15 +67,17 @@ public class CreateGui {
 		return tab.drawingSurface();
 	}
 
-
+	@Deprecated
 	public static void addTab (TabContent tab ) {
 		tabs.add(tab);
 	}
 
+	@Deprecated
 	public static void removeTab(int index) {
 		tabs.remove(index);
 	}
 
+	@Deprecated
 	public static TabContent getTab(int index) {
 		if (index < 0) {
 			return null;
@@ -79,6 +85,7 @@ public class CreateGui {
 		return tabs.get(index);
 	}
 
+	@Deprecated
 	public static TabContent getCurrentTab() {
 		return getTab(appGui.getSelectedTabIndex());
 	}
@@ -95,9 +102,11 @@ public class CreateGui {
 	}
 	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
+	@Deprecated
 	public static GuiFrame getApp() { // returns a reference to the application
 		return getAppGui();
 	}
+	@Deprecated
 	public static GuiFrame getAppGui() {
 		return appGui;
 	}
