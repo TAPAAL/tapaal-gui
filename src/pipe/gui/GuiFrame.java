@@ -198,7 +198,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		appTab = new ExtendedJTabbedPane<TabContent>() {
 			@Override
 			public Component generator() {
-				return new TabComponent(this);
+				return new TabComponent(this) {
+                    @Override
+                    protected void closeTab(int index) {
+                        GuiFrame.this.closeTab(index);
+                    }
+                };
 			}
 		};
 		getContentPane().add(appTab);

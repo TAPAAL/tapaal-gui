@@ -60,7 +60,7 @@ import dk.aau.cs.util.Require;
  * button for closing the tab.
  * 
  */
-public class TabComponent extends JPanel {
+public abstract class TabComponent extends JPanel {
 	/**
 	 * 
 	 */
@@ -114,7 +114,7 @@ public class TabComponent extends JPanel {
 			setRolloverEnabled(true);
 			addActionListener(arg0 -> {
 				int index = pane.indexOfTabComponent(TabComponent.this);
-				CreateGui.getApp().closeTab(index);
+				closeTab(index);
 			});
 		}
 
@@ -139,6 +139,8 @@ public class TabComponent extends JPanel {
 		}
 
 	}
+
+	protected abstract void closeTab(int index);
 
 	private static final MouseListener buttonMouseListener = new MouseAdapter() {
 		@Override
