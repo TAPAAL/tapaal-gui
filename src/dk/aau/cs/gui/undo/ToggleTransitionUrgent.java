@@ -15,13 +15,11 @@ public class ToggleTransitionUrgent extends Command {
 	@Override
 	public void redo() {
 		transition.setUrgent(!oldValue);
-		CreateGui.getCurrentTab().repaint();
 	}
 
 	@Override
 	public void undo() {
 		transition.setUrgent(oldValue);
-		CreateGui.getCurrentTab().repaint();
 	}
 
 }
