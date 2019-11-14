@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 
 import javax.swing.JDialog;
@@ -154,6 +156,13 @@ public class AnnotationNote extends Note {
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));
 		// Make window fit contents' preferred size
+		guiDialog.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				if(isNew()) {
+					delete();
+				}
+			}
+		});
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
