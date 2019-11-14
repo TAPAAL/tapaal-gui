@@ -275,6 +275,10 @@ public abstract class Transition extends PlaceTransitionObject {
 		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
+			if (thisArc.arc.getTarget()!=this) {
+				arcIterator.remove();
+				continue;
+			}
 			if (thisArc.arc == arc) {
 				thisArc.calcAngle();
 				match = true;
