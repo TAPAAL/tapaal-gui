@@ -24,7 +24,7 @@ public class LoadingNetDialog extends JDialog{
 		initLoadingDialogComponents();
 		setType(Window.Type.POPUP);
 		pack();
-		setSize(400, 300);
+		setSize(300, 200);
 		setLocationRelativeTo(frame);
 	}
 	
