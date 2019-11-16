@@ -166,7 +166,8 @@ public class GuiFrame extends JFrame  {
 	private GuiAction showReportBugAction;
 	private GuiAction showFAQAction;
 	private GuiAction checkUpdate;
-
+	
+	private LoadingNetDialog loadingNetDialog;
 
 	private GuiAction selectAllAction;
 
@@ -2472,7 +2473,7 @@ public class GuiFrame extends JFrame  {
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
-				final LoadingNetDialog loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
+				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
 			        protected Void doInBackground() throws InterruptedException {
@@ -2533,7 +2534,7 @@ public class GuiFrame extends JFrame  {
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-				final LoadingNetDialog loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
+				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
 			        protected Void doInBackground() throws InterruptedException {
@@ -2887,8 +2888,10 @@ public class GuiFrame extends JFrame  {
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
 	public void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
+			loadingNetDialog.dispose();
 			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
 					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+			
 		}
 	}
 
