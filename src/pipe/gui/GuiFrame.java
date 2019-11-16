@@ -46,6 +46,7 @@ import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.widgets.loadingDialogs.LoadingNetDialog;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
@@ -2470,13 +2471,26 @@ public class GuiFrame extends JFrame  {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
-				for (File f : files) {
-					if (f.exists() && f.isFile() && f.canRead()) {
-						FileBrowser.userPath = f.getParent();
-						createNewTabFromFile(f);
-					}
-				}
+				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
+				final LoadingNetDialog loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException {
+			        	for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								FileBrowser.userPath = f.getParent();
+								createNewTabFromFile(f);
+							}
+						}
+			        	return null;
+			        }
+			        @Override
+			        protected void done() {
+			            loadingNetDialog.dispose();
+			        }
+			    };
+			    worker.execute();
+			    loadingNetDialog.setVisible(true);
 			}
 		});
 
@@ -2518,13 +2532,26 @@ public class GuiFrame extends JFrame  {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-				for(File f : files){
-					if(f.exists() && f.isFile() && f.canRead()){
-						FileBrowser.userPath = f.getParent();
-						createNewTabFromPNMLFile(f);
-					}
-				}
+				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+				final LoadingNetDialog loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException {
+			        	for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								FileBrowser.userPath = f.getParent();
+								createNewTabFromPNMLFile(f);
+							}
+						}
+			        	return null;
+			        }
+			        @Override
+			        protected void done() {
+			            loadingNetDialog.dispose();
+			        }
+			    };
+			    worker.execute();
+			    loadingNetDialog.setVisible(true);
 			}
 		});
 		
