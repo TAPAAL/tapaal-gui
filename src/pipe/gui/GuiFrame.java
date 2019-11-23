@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
@@ -2474,15 +2475,48 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
 				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
-			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-			        @Override
-			        protected Void doInBackground() throws InterruptedException {
-			        	for(File f : files){
+				
+				Thread mainThread = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
 								createNewTabFromFile(f);
 							}
 						}
+					}
+				});
+				
+				Thread loadingThread = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						loadingNetDialog.setVisible(true);
+					}
+				});
+				loadingThread.start();
+				try {
+					loadingThread.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				mainThread.start();
+				try {
+					mainThread.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				loadingNetDialog.setVisible(false);
+				
+				
+			    /*SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException {
+			        	
 			        	return null;
 			        }
 			        @Override
@@ -2491,7 +2525,7 @@ public class GuiFrame extends JFrame  {
 			        }
 			    };
 			    worker.execute();
-			    loadingNetDialog.setVisible(true);
+			    loadingNetDialog.setVisible(true);*/
 			}
 		});
 
@@ -2535,6 +2569,15 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
 				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
+				//Show loadingNetDialog
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+					    loadingNetDialog.setVisible(true);						
+					}
+				}).start();
+				//Do loading of net
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
 			        protected Void doInBackground() throws InterruptedException {
@@ -2552,7 +2595,17 @@ public class GuiFrame extends JFrame  {
 			        }
 			    };
 			    worker.execute();
-			    loadingNetDialog.setVisible(true);
+			    
+			    //Sleep redrawing thread (EDT) until worker is done
+			    while(!worker.isDone()) {
+			    	try {
+			    		System.out.println("Goddav");
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }
 			}
 		});
 		
