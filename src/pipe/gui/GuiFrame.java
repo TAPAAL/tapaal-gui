@@ -2604,7 +2604,6 @@ public class GuiFrame extends JFrame  {
 			    //Sleep redrawing thread (EDT) until worker is done
 			    while(!worker.isDone()) {
 			    	try {
-			    		System.out.println("Goddav");
 			    		Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
