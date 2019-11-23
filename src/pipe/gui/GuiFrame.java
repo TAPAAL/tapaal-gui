@@ -50,7 +50,6 @@ import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
-import pipe.gui.widgets.loadingDialogs.LoadingNetDialog;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
@@ -171,7 +170,6 @@ public class GuiFrame extends JFrame  {
 	private GuiAction showFAQAction;
 	private GuiAction checkUpdate;
 	
-	private LoadingNetDialog loadingNetDialog;
 
 	private GuiAction selectAllAction;
 
@@ -2477,58 +2475,35 @@ public class GuiFrame extends JFrame  {
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
-				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
 				
-				Thread mainThread = new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						for(File f : files){
+				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException {
+			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
 								createNewTabFromFile(f);
 							}
 						}
-					}
-				});
-				
-				Thread loadingThread = new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						loadingNetDialog.setVisible(true);
-					}
-				});
-				loadingThread.start();
-				try {
-					loadingThread.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				mainThread.start();
-				try {
-					mainThread.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				loadingNetDialog.setVisible(false);
-				
-				
-			    /*SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-			        @Override
-			        protected Void doInBackground() throws InterruptedException {
-			        	
 			        	return null;
 			        }
 			        @Override
 			        protected void done() {
-			            loadingNetDialog.dispose();
+					    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			        }
 			    };
 			    worker.execute();
-			    loadingNetDialog.setVisible(true);*/
+			    
+			    //Sleep redrawing thread (EDT) until worker is done
+			    while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }
 			}
 		});
 
@@ -2571,16 +2546,6 @@ public class GuiFrame extends JFrame  {
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-				LocalTime startTime = LocalTime.now();
-				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
-				//Show loadingNetDialog
-				/*new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-					    loadingNetDialog.setVisible(true);						
-					}
-				}).start();*/
 				//Do loading of net
 				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
@@ -2594,10 +2559,10 @@ public class GuiFrame extends JFrame  {
 						}
 			        	return null;
 			        }
-			        /*@Override
+			        @Override
 			        protected void done() {
-			            loadingNetDialog.dispose();
-			        }*/
+					    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        }
 			    };
 			    worker.execute();
 			    
@@ -2610,7 +2575,6 @@ public class GuiFrame extends JFrame  {
 						e.printStackTrace();
 					}
 			    }
-			    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		
@@ -2946,7 +2910,7 @@ public class GuiFrame extends JFrame  {
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
 	public void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
-			loadingNetDialog.dispose();
+		    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
 					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
 			
