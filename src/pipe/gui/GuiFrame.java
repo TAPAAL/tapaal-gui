@@ -12,8 +12,11 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -2568,15 +2571,16 @@ public class GuiFrame extends JFrame  {
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+				LocalTime startTime = LocalTime.now();
 				loadingNetDialog = new LoadingNetDialog(CreateGui.getApp(), "Loading net...", true);
 				//Show loadingNetDialog
-				new Thread(new Runnable() {
+				/*new Thread(new Runnable() {
 					
 					@Override
 					public void run() {
 					    loadingNetDialog.setVisible(true);						
 					}
-				}).start();
+				}).start();*/
 				//Do loading of net
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
@@ -2589,10 +2593,10 @@ public class GuiFrame extends JFrame  {
 						}
 			        	return null;
 			        }
-			        @Override
+			        /*@Override
 			        protected void done() {
 			            loadingNetDialog.dispose();
-			        }
+			        }*/
 			    };
 			    worker.execute();
 			    
@@ -2600,7 +2604,7 @@ public class GuiFrame extends JFrame  {
 			    while(!worker.isDone()) {
 			    	try {
 			    		System.out.println("Goddav");
-						Thread.sleep(1000);
+			    		Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
