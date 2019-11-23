@@ -2582,6 +2582,7 @@ public class GuiFrame extends JFrame  {
 					}
 				}).start();*/
 				//Do loading of net
+				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
 			        protected Void doInBackground() throws InterruptedException {
@@ -2610,6 +2611,7 @@ public class GuiFrame extends JFrame  {
 						e.printStackTrace();
 					}
 			    }
+			    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		
