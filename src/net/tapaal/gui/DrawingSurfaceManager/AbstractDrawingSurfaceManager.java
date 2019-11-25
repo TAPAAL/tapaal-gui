@@ -81,6 +81,18 @@ public abstract class AbstractDrawingSurfaceManager {
         //Select and run event from filter
         //If not matched, run next if not null (else ignore)
 
+        /* ALTERNATIVE IMPLEMENTATION
+        boolean eventTriggered = false;
+        for (Predicate<DrawingSurfaceEvent> predicate : filter.keySet()){
+            if (predicate.test(e)) {
+                eventTriggered = true;
+                filter.get(predicate).accept(e);
+            }
+        }
+        if (!eventTriggered && next !=null) {
+            next.triggerEvent(e);
+        }
+        */
         boolean handled = filter.keySet().stream().filter(f -> (f.test(e))).findFirst().
                 map(
                         f->{
