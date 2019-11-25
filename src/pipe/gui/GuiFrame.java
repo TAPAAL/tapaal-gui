@@ -12,8 +12,12 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
@@ -165,7 +169,7 @@ public class GuiFrame extends JFrame  {
 	private GuiAction showReportBugAction;
 	private GuiAction showFAQAction;
 	private GuiAction checkUpdate;
-
+	
 
 	private GuiAction selectAllAction;
 
@@ -2470,13 +2474,38 @@ public class GuiFrame extends JFrame  {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
-				for (File f : files) {
-					if (f.exists() && f.isFile() && f.canRead()) {
-						FileBrowser.userPath = f.getParent();
-						createNewTabFromFile(f);
+				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
+				//show loading cursor
+				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				//Do loading
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException {
+			        	for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								FileBrowser.userPath = f.getParent();
+								createNewTabFromFile(f);
+							}
+						}
+			        	return null;
+			        }
+			        @Override
+			        protected void done() {
+					    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        }
+			    };
+			    worker.execute();
+			    
+			    //Sleep redrawing thread (EDT) until worker is done
+			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
+			    while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				}
+			    }
 			}
 		});
 
@@ -2518,13 +2547,39 @@ public class GuiFrame extends JFrame  {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-				for(File f : files){
-					if(f.exists() && f.isFile() && f.canRead()){
-						FileBrowser.userPath = f.getParent();
-						createNewTabFromPNMLFile(f);
+				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+				
+				//Show loading cursor
+				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				//Do loading of net
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException {
+			        	for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								FileBrowser.userPath = f.getParent();
+								createNewTabFromPNMLFile(f);
+							}
+						}
+			        	return null;
+			        }
+			        @Override
+			        protected void done() {
+					    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        }
+			    };
+			    worker.execute();
+			    
+			    //Sleep redrawing thread (EDT) until worker is done
+			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
+			    while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				}
+			    }
 			}
 		});
 		
@@ -2860,8 +2915,15 @@ public class GuiFrame extends JFrame  {
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
 	public void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
-			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
-					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+			//We thread this so it does not block the EDT
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+				}
+			}).start();
 		}
 	}
 
