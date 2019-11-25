@@ -1427,21 +1427,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		try {
 			TabContent currentTab = getTab(index);
 			NetworkMarking currentMarking = null;
-			if(getCurrentTab().isInAnimationMode()){
+			if(currentTab.isInAnimationMode()){
 				currentMarking = currentTab.network().marking();
-				currentTab.network().setMarking(getCurrentTab().getAnimator().getInitialMarking());
+				currentTab.network().setMarking(currentTab.getAnimator().getInitialMarking());
 			}
 
 			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 					currentTab.network(),
-					currentTab.allTemplates(), 
+					currentTab.allTemplates(),
 					queries, 
 					currentTab.network().constants()
 					);
 
 			tapnWriter.savePNML(outFile);
 
-			if(getCurrentTab().isInAnimationMode()){
+			if(currentTab.isInAnimationMode()){
 				currentTab.network().setMarking(currentMarking);
 			}
 		} catch (Exception e) {
