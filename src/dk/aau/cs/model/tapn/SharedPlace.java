@@ -88,7 +88,8 @@ public class SharedPlace extends TimedPlace{
 		currentMarking = marking;
 		fireMarkingChanged();
 	}
-	
+
+	@Override
 	public void addToken(TimedToken timedToken) {
 		Require.that(timedToken != null, "timedToken cannot be null");
 		Require.that(timedToken.place().equals(this), "token is located in a different place");
@@ -96,7 +97,8 @@ public class SharedPlace extends TimedPlace{
 		currentMarking.add(timedToken);
 		fireMarkingChanged();
 	}
-	
+
+	@Override
 	public void addTokens(Iterable<TimedToken> tokens) {
 		Require.that(tokens != null, "tokens cannot be null"); // TODO: maybe check that tokens are in this place?
 		
@@ -106,12 +108,14 @@ public class SharedPlace extends TimedPlace{
 		fireMarkingChanged();
 	}
 
+	@Override
 	public void removeToken(TimedToken timedToken) {
 		Require.that(timedToken != null, "timedToken cannot be null");
 		currentMarking.remove(timedToken);
 		fireMarkingChanged();
 	}
 
+	@Override
 	public void removeToken() {
 		if (numberOfTokens() > 0) {
 			currentMarking.remove(tokens().get(0));
