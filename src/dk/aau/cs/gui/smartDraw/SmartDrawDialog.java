@@ -267,6 +267,10 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		mainPanel.add(drawButton, gbc);
 		
+		
+		this.getRootPane().setDefaultButton(drawButton);
+		drawButton.requestFocus();
+		
 		setContentPane(mainPanel);
 	}
 	
