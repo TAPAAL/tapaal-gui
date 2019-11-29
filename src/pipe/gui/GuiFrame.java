@@ -1750,7 +1750,7 @@ public class GuiFrame extends JFrame  {
 	public TabContent createNewTabFromFile(InputStream file, String name) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		boolean showFileEndingChangedMessage = false;
-
+		String origName = name;
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
@@ -1791,8 +1791,8 @@ public class GuiFrame extends JFrame  {
 		} catch (Exception e) {
 			undoAddTab(currentlySelected);
 			JOptionPane.showMessageDialog(GuiFrame.this,
-					"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
-					"Error loading file: " + name,
+					"TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString(),
+					"Error loading file: " + origName,
 					JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
@@ -1809,6 +1809,7 @@ public class GuiFrame extends JFrame  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception 
 	 */
 	public void createNewTabFromPNMLFile(File file) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
@@ -1849,10 +1850,12 @@ public class GuiFrame extends JFrame  {
 				}
 
 			} catch (Exception e) {
+				//throw new Exception(e.toString());
+				e.printStackTrace();
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
-						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
-						"Error loading file: " + name,
+						"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString(),
+						"Error loading file: " + file.getName(),
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
