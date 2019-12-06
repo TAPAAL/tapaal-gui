@@ -30,6 +30,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -241,6 +242,7 @@ public class ConstantsPane extends JPanel {
 			for(int i = 0; i < model.getSize(); i++){
 				((Constant) model.getElementAt(i)).setFocused(false);
 			}
+			blinkConstant(c);
 			c.setFocused(true);
 			CreateGui.getCurrentTab().drawingSurface().repaintAll();
 		}
@@ -256,6 +258,29 @@ public class ConstantsPane extends JPanel {
 		}catch(Exception e){
 			// It is okay, the tab has just been closed
 		}
+	}
+	
+	private void blinkConstant(final Constant c) {
+		Timer timer = new Timer(200, new ActionListener() {
+			long startTime = System.currentTimeMillis();
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(System.currentTimeMillis() - startTime < 3000) {
+					if(!c.hasFocus()) {
+						c.setFocused(true);
+						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					} else {
+						c.setFocused(false);
+						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					}
+				} else {
+					((Timer) e.getSource()).stop();
+				}
+			}
+		});
+		timer.setRepeats(true);
+	    timer.setCoalesce(true);
+		timer.start();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
