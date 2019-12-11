@@ -119,6 +119,7 @@ public class GuiFrame extends JFrame  {
 
 	private GuiAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
+	private GuiAction alignToGrid;
 	private GuiAction netStatisticsAction;
 	private GuiAction batchProcessingAction;
 	private GuiAction engineSelectionAction;
@@ -667,6 +668,15 @@ public class GuiFrame extends JFrame  {
 						Grid.increment();
 						repaint();			
 					}		
+		});
+		
+		viewMenu.add(alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", 
+				KeyStroke.getKeyStroke("shift G")) {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Grid.alignPNObjectsToGrid();
+			}
 		});
 		
 
@@ -1407,6 +1417,7 @@ public class GuiFrame extends JFrame  {
 		incSpacingAction.setEnabled(enable);
 
 		toggleGrid.setEnabled(enable);
+		alignToGrid.setEnabled(enable);
 
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
