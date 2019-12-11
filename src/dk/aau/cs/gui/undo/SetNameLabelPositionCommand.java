@@ -3,14 +3,14 @@ package dk.aau.cs.gui.undo;
 import pipe.gui.Grid;
 import pipe.gui.graphicElements.PetriNetObject;
 
-public class ChangeNameOffsetCommand extends Command {
+public class SetNameLabelPositionCommand extends Command {
 	PetriNetObject object;
 	double newX;
 	double newY;
 	double oldY;
 	double oldX;
 		
-	public ChangeNameOffsetCommand(PetriNetObject object, double xOffset, double yOffset) {
+	public SetNameLabelPositionCommand(PetriNetObject object, double xOffset, double yOffset) {
 		this.object = object;
 		this.newX = xOffset;
 		this.newY = yOffset;
