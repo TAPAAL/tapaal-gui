@@ -23,7 +23,6 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
@@ -356,8 +355,6 @@ public class TapnXmlLoader {
 		int priority = Integer.parseInt(transition.getAttribute("priority"));
 		boolean displayName = transition.getAttribute("displayName").equals("false") ? false : true;
 
-		positionXInput = Grid.getModifiedX(positionXInput);
-		positionYInput = Grid.getModifiedY(positionYInput);
 
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
@@ -401,8 +398,6 @@ public class TapnXmlLoader {
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
 		
-		positionXInput = Grid.getModifiedX(positionXInput);
-		positionYInput = Grid.getModifiedY(positionYInput);
 
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
