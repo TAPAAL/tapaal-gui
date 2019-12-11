@@ -35,6 +35,8 @@ public final class AnnotationTextEdit extends Command {
 	@Override
 	public void redo() {
 		annotationNote.setText(newText);
+		annotationNote.updateBounds();
+		annotationNote.repaint();
 	}
 
 	@Override
