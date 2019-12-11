@@ -122,4 +122,8 @@ public class NameLabel extends JTextArea implements Translatable,
 			super.setText(text);
 		}
 	}
+	
+	public int getLayerOffset() {
+		return Pipe.NAMELABEL_LAYER_OFFSET;
+	}
 }

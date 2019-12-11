@@ -360,6 +360,7 @@ public abstract class Arc extends PetriNetObject {
 
 		updateArcPosition();
 		if (getParent() != null && pnName.getParent() == null) {
+			getParent().setLayer(pnName, JLayeredPane.DEFAULT_LAYER + pnName.getLayerOffset());
 			getParent().add(pnName);
 		}
 	}
