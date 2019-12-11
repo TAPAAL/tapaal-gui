@@ -12,12 +12,8 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
@@ -1727,10 +1723,13 @@ public class GuiFrame extends JFrame  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception 
 	 */
-	public TabContent createNewTabFromFile(InputStream file, String name) {
+	public TabContent createNewTabFromFile(InputStream file, String name) throws Exception {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		boolean showFileEndingChangedMessage = false;
+
+		String origName = name;
 
 		int currentlySelected = appTab.getSelectedIndex();
 
@@ -1768,11 +1767,12 @@ public class GuiFrame extends JFrame  {
 			tab.setFile(null);
 		} catch (Exception e) {
 			undoAddTab(currentlySelected);
-			JOptionPane.showMessageDialog(GuiFrame.this,
-					"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
-					"Error loading file: " + name,
+			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
+			/*JOptionPane.showMessageDialog(GuiFrame.this,
+					"TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString(),
+					"Error loading file: " + origName,
 					JOptionPane.ERROR_MESSAGE);
-			return null;
+			return null;*/
 		}
 
 
@@ -1787,8 +1787,9 @@ public class GuiFrame extends JFrame  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception 
 	 */
-	public void createNewTabFromPNMLFile(File file) {
+	public void createNewTabFromPNMLFile(File file) throws Exception {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name;
 
@@ -1825,11 +1826,13 @@ public class GuiFrame extends JFrame  {
 
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);
-				JOptionPane.showMessageDialog(GuiFrame.this,
-						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
-						"Error loading file: " + name,
+				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
+				//e.printStackTrace();
+				/*JOptionPane.showMessageDialog(GuiFrame.this,
+						"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString(),
+						"Error loading file: " + file.getName(),
 						JOptionPane.ERROR_MESSAGE);
-				return;
+				return;*/
 			}
 		}
 
@@ -1843,17 +1846,19 @@ public class GuiFrame extends JFrame  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws FileNotFoundException 
 	 */
-	public void createNewTabFromFile(File file) {
+	public void createNewTabFromFile(File file) throws Exception {
 		try {
 			InputStream stream = new FileInputStream(file);
 			TabContent tab = createNewTabFromFile(stream, file.getName());
 			if (tab != null) tab.setFile(file);
 		}catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(GuiFrame.this,
+			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
+			/*JOptionPane.showMessageDialog(GuiFrame.this,
 					"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString(),
 					"Error loading file: " + file.getName(),
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE);*/
 		}
 	}
 
@@ -2454,7 +2459,7 @@ public class GuiFrame extends JFrame  {
 				//Do loading
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
-			        protected Void doInBackground() throws InterruptedException {
+			        protected Void doInBackground() throws InterruptedException, Exception, FileNotFoundException {
 			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
@@ -2465,7 +2470,16 @@ public class GuiFrame extends JFrame  {
 			        }
 			        @Override
 			        protected void done() {
-					    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					    try {
+			        		CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        		get();
+						} catch (Exception e) {
+					    	JOptionPane.showMessageDialog(GuiFrame.this,
+									e.getMessage(),
+									"Error loading file",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 			        }
 			    };
 			    worker.execute();
@@ -2528,7 +2542,7 @@ public class GuiFrame extends JFrame  {
 				//Do loading of net
 			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			        @Override
-			        protected Void doInBackground() throws InterruptedException {
+			        protected Void doInBackground() throws InterruptedException, Exception {
 			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
@@ -2539,7 +2553,16 @@ public class GuiFrame extends JFrame  {
 			        }
 			        @Override
 			        protected void done() {
-					    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        	try {
+					    	CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					    	get();
+			        	} catch (Exception e) {
+			        		JOptionPane.showMessageDialog(GuiFrame.this,
+									e.getMessage(),
+									"Error loading file",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 			        }
 			    };
 			    worker.execute();
@@ -2678,7 +2701,12 @@ public class GuiFrame extends JFrame  {
 					GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
-							createNewTabFromFile(file, netname);
+							try {
+								createNewTabFromFile(file, netname);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					};
 					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
