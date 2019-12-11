@@ -457,9 +457,16 @@ public class GuiFrame extends JFrame  {
 				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				if (isEditionAllowed()) {
-					getCurrentTab().drawingSurface().getUndoManager().undo();
-					getCurrentTab().network().buildConstraints();
+					//If arc is being drawn delete it
+					if(getCurrentTab().drawingSurface().createArc == null) {
+						getCurrentTab().drawingSurface().getUndoManager().undo();
+						getCurrentTab().network().buildConstraints();
+					} else {
+						PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
+					}
+
 				}
 			}
 		});
@@ -469,9 +476,16 @@ public class GuiFrame extends JFrame  {
 				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				if (isEditionAllowed()) {
-					getCurrentTab().drawingSurface().getUndoManager().redo();
-					getCurrentTab().network().buildConstraints();
+					//If arc is being drawn delete it
+					if(getCurrentTab().drawingSurface().createArc == null) {
+						getCurrentTab().drawingSurface().getUndoManager().redo();
+						getCurrentTab().network().buildConstraints();
+					} else {
+						PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
+					}
+
 				}
 			}
 		});
