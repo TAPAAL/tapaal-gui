@@ -18,7 +18,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
@@ -81,6 +80,7 @@ public class TapnLegacyXmlLoader {
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
+	private IdResolver idResolver = new IdResolver();
 
 	public TapnLegacyXmlLoader() {
 		presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
@@ -125,6 +125,7 @@ public class TapnLegacyXmlLoader {
     }
 
 	private LoadedModel parse(Document tapnDoc) throws FormatException { 
+		idResolver.clear();
 		ArrayList<Template> templates = new ArrayList<Template>();
 
 		NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
@@ -518,6 +519,8 @@ public class TapnLegacyXmlLoader {
 		boolean infiniteServer = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "infiniteServer");
 		int angle = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"orientation");
 		int priority = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"priority");
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
@@ -547,7 +550,7 @@ public class TapnLegacyXmlLoader {
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
 		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
 		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
-
+		
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
 		}
@@ -563,6 +566,7 @@ public class TapnLegacyXmlLoader {
 				firstPlaceRenameWarning = false;
 			}
 		}
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		Place place = null;
 
@@ -575,7 +579,7 @@ public class TapnLegacyXmlLoader {
 //		} else {
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
 					idInput, nameOffsetXInput, nameOffsetYInput);
-
+			
 			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
 			
@@ -605,10 +609,13 @@ public class TapnLegacyXmlLoader {
 			nameOffsetXInput = 0;
 			nameOffsetYInput = 0;
 		}
+		
+		sourceInput = idResolver.get(tapn.name(), sourceInput);
+		targetInput = idResolver.get(tapn.name(), targetInput);
 
 		PlaceTransitionObject sourceIn = guiModel.getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = guiModel.getPlaceTransitionObject(targetInput);
-
+		
 		// add the insets and offset
 		int aStartx = sourceIn.getX() + sourceIn.centreOffsetLeft();
 		int aStarty = sourceIn.getY() + sourceIn.centreOffsetTop();

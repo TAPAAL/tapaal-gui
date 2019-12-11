@@ -457,14 +457,18 @@ public class GuiFrame extends JFrame  {
 				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				if (isEditionAllowed()) {
+
 					//If arc is being drawn delete it
+
 					if(getCurrentTab().drawingSurface().createArc == null) {
 						getCurrentTab().drawingSurface().getUndoManager().undo();
 						getCurrentTab().network().buildConstraints();
+
 					} else {
+
 						PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
+
 					}
 
 				}
@@ -478,12 +482,16 @@ public class GuiFrame extends JFrame  {
 			public void actionPerformed(ActionEvent e) {
 
 				if (isEditionAllowed()) {
+
 					//If arc is being drawn delete it
+
 					if(getCurrentTab().drawingSurface().createArc == null) {
 						getCurrentTab().drawingSurface().getUndoManager().redo();
 						getCurrentTab().network().buildConstraints();
+
 					} else {
 						PlaceTransitionObjectHandler.cleanupArc(getCurrentTab().drawingSurface().createArc, getCurrentTab().drawingSurface());
+
 					}
 
 				}
@@ -1031,6 +1039,7 @@ public class GuiFrame extends JFrame  {
 		showToolTips(true);
 
 		getCurrentTab().setResizeingDefault();
+
 		if(advanced) {
 			
 			if(!showZeroToInfinityIntervals()){
@@ -1048,7 +1057,6 @@ public class GuiFrame extends JFrame  {
 				showTokenAgeCheckBox.doClick();
 			}
 		}
-		
 
 		//Delay-enabled Transitions
 		//showDelayEnabledTransitions(advanced);
@@ -2226,7 +2234,9 @@ public class GuiFrame extends JFrame  {
 							"You need at least one active template to enter simulation mode",
 							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				}
+
 				getCurrentTab().drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
 				
