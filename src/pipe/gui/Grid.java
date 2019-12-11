@@ -101,7 +101,7 @@ public class Grid {
 	}
 	
 	public static void alignPNObjectsToGrid() {
-		ArrayList<PetriNetObject> petriNetObjects = CreateGui.getDrawingSurface().getPlaceTransitionObjects();
+		ArrayList<PetriNetObject> petriNetObjects = CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects();
 		pipe.gui.undo.UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
 		undoManager.newEdit();
 		

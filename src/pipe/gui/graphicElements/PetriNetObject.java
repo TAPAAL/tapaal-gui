@@ -140,10 +140,20 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 	
 	protected void updateLabelLocation() {
-		this.getNameLabel().setPosition(
-				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
-		);
+		updateLabelLocation(true);
+	}
+	
+	protected void updateLabelLocation(boolean alignToGrid) {
+		if(alignToGrid) {
+			this.getNameLabel().setPosition(
+					Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+					Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
+			);
+		} else {
+			this.getNameLabel().setPosition(
+					((int)(positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+					((int)(positionY + Zoomer.getZoomedValue(nameOffsetY, zoom))));
+		}
 	}
 	
 	public void updateOnMoveOrZoom() {
