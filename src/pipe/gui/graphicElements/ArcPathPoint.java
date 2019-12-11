@@ -290,5 +290,12 @@ public class ArcPathPoint extends PetriNetObject {
 	public void setRealPoint(Point2D.Float realPoint) {
 		this.realPoint = realPoint;
 	}
+	
+	public boolean isEndPoint() {
+		if(this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex()) {
+			return true;
+		} else
+			return false;
+	}
 
 }

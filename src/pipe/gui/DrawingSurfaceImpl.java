@@ -587,4 +587,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable {
 		guiModel.repaintAll(!isInAnimationMode());
 	}
 
+	public PlaceTransitionObject getPlaceTransitionObjectByName(String name) {
+		for(PetriNetObject object : guiModel.getPlaceTransitionObjects()) {
+			if(object.getName() == name) {
+				return ((PlaceTransitionObject)object);
+			}
+		}
+		return null;
+	}
+
 }

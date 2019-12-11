@@ -150,23 +150,30 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		updateLabelLocation();
 	}
 	/**
-	 * Set X-axis offset for name position
+	 * Update X-axis offset for name position
 	 * 
 	 * @param nameOffsetXInput
 	 *            Double value for name X-axis offset
 	 */
-	public void setNameOffsetX(double nameOffsetXInput) {
+	public void updateNameOffsetX(double nameOffsetXInput) {
 		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
 	}
 
 	/**
-	 * Set Y-axis offset for name position
+	 * Update Y-axis offset for name position
 	 * 
 	 * @param nameOffsetYInput
 	 *            Double value for name Y-axis offset
 	 */
-	public void setNameOffsetY(double nameOffsetYInput) {
+	public void updateNameOffsetY(double nameOffsetYInput) {
 		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
+	}
+	
+	public void setNameOffsetX(double nameOffsetXInput) {
+		nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
+	}
+	public void setNameOffsetY(double nameOffsetYInput) {
+		nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
 	}
 	/**
 	 * Get X-axis offset for ...

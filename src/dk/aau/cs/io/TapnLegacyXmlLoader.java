@@ -657,8 +657,8 @@ public class TapnLegacyXmlLoader {
 			}
 
 		}
-		tempArc.setNameOffsetX(nameOffsetXInput);
-		tempArc.setNameOffsetY(nameOffsetYInput);
+		tempArc.updateNameOffsetX(nameOffsetXInput);
+		tempArc.updateNameOffsetY(nameOffsetYInput);
 
 		parseArcPathAsOldFormat(inputArcElement, tempArc);
 	}
