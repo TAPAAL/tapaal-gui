@@ -2196,9 +2196,10 @@ public class GuiFrame extends JFrame  {
 							"You need at least one active template to enter simulation mode",
 							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				}
-
+				appView.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
+				
 			} else {
 				//setMode(ElementType.START);
 				getCurrentTab().drawingSurface().getSelectionObject().clearSelection();
