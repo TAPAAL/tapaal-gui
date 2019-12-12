@@ -38,15 +38,21 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
     }
 
-    protected void updateLabelLocation() {
-        this.getNameLabel().setPosition(
-                Grid.getModifiedX((positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
-                Grid.getModifiedY((positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom())))
-        );
+    protected void updateLabelLocation(boolean alignToGrid) {
+        if(alignToGrid) {
+            this.getNameLabel().setPosition(
+                    Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
+                    Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom())))
+            );
+        } else {
+            this.getNameLabel().setPosition(
+                    ((int)(positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
+                    ((int)(positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom()))));
+        }
     }
 
     public void updateOnMoveOrZoom() {
-        updateLabelLocation();
+        updateLabelLocation(true);
     }
 
     @Override

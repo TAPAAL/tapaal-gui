@@ -44,6 +44,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private Context context;
 	
 	private int maxNumberOfTransitionsToShowAtOnce = 20;
+	boolean doNewEdit = true;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
 		rootPane = _rootPane;
@@ -375,8 +376,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
 			return false;
 		}
-			
-		context.undoManager().newEdit(); // new "transaction""
+		//Only do new edit if it has not already been done
+		if(doNewEdit) {
+			context.undoManager().newEdit(); // new "transaction""
+			doNewEdit = false;
+		}
 		
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){

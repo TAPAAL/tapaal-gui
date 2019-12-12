@@ -62,6 +62,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private TimedPlaceComponent place;
 	private Context context;
 	private boolean makeNewShared = false;
+	private boolean doNewEdit = true;
 	
 	private Vector<TimedPlace> sharedPlaces;
 	private int maxNumberOfPlacesToShowAtOnce = 20;
@@ -625,9 +626,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-
-		context.undoManager().newEdit(); // new "transaction""
-
+		//Only make new edit if it has not already been done
+		if(doNewEdit) {
+			context.undoManager().newEdit(); // new "transaction""
+			doNewEdit = false;
+		}
 		TimedPlace underlyingPlace = place.underlyingPlace();
 
 		SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();

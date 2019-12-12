@@ -1105,18 +1105,42 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void undo() {
+
 		if (!isInAnimationMode()) {
-			getUndoManager().undo();
-			network().buildConstraints();
+
+			//If arc is being drawn delete it
+
+			if (drawingSurface().createArc == null) {
+				getUndoManager().undo();
+				network().buildConstraints();
+
+			} else {
+
+				PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+
+			}
 		}
+
+
 	}
 
 	@Override
 	public void redo() {
-		if (!isInAnimationMode()) {
-			getUndoManager().redo();
-			network().buildConstraints();
-		}
+
+			if (!isInAnimationMode()) {
+
+				//If arc is being drawn delete it
+
+				if (drawingSurface().createArc == null) {
+					getUndoManager().redo();
+					network().buildConstraints();
+
+				} else {
+
+					PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+
+				}
+			}
 	}
 
     final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){

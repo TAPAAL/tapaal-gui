@@ -871,6 +871,7 @@ public class DataLayer {
 		repaintPlaces(displayConstantNames);
 
 		for (Transition t : transitionsArray) {
+			t.updateOnMoveOrZoom();
 			t.repaint();
 		}
 
@@ -931,5 +932,12 @@ public class DataLayer {
 		
 		return guiModel;
 	}
-	
+	public PlaceTransitionObject getPlaceTransitionObjectByName(String name) {
+		for(PetriNetObject object : getPlaceTransitionObjects()) {
+			if(object.getName() == name) {
+				return ((PlaceTransitionObject)object);
+			}
+		}
+		return null;
+	}
 }

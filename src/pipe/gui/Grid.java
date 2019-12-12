@@ -4,7 +4,14 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.geom.GeneralPath;
+import java.util.ArrayList;
+
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 
 /**
  * @author Peter Kyme
@@ -91,6 +98,24 @@ public class Grid {
 			return (int) y;
 		}
 		return (int) (Math.round(y / gridSpacing) * gridSpacing);
+	}
+	
+	public static void alignPNObjectsToGrid() {
+		ArrayList<PetriNetObject> petriNetObjects = CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects();
+		pipe.gui.undo.UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+		undoManager.newEdit();
+		
+		for(PetriNetObject object : petriNetObjects) {
+			PlaceTransitionObject ptobject = (PlaceTransitionObject)object;
+			int x = Grid.getModifiedX(ptobject.getPositionX());
+			int y = Grid.getModifiedY(ptobject.getPositionY());
+			Point point = new Point(x,y);
+			Command command = new MovePlaceTransitionObject(ptobject, point);
+			command.redo();
+			undoManager.addEdit(command);
+			ptobject.updateOnMoveOrZoom();
+		}
+		
 	}
 
 }

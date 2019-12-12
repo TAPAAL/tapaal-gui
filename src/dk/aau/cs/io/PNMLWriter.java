@@ -177,8 +177,9 @@ public class PNMLWriter implements NetWriter {
 		
 		Element initialMarking = document.createElement("initialMarking"); //Name
 		placeElement.appendChild(name);
-		Element initialMarkingGraphics = document.createElement("graphics");
-		initialMarking.appendChild(initialMarkingGraphics);
+		//Seems to break the PNML file
+		/*Element initialMarkingGraphics = document.createElement("graphics");
+		initialMarking.appendChild(initialMarkingGraphics);*/
 		Element initialMarkingText = document.createElement("text");
 		initialMarking.appendChild(initialMarkingText);
 		initialMarkingText.setTextContent(((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));

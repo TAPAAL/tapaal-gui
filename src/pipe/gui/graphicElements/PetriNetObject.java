@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.event.*;
 
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
 
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
@@ -176,12 +177,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		id = idInput;
 		setName(idInput);
 	}
-	
 
-	
 	public void updateOnMoveOrZoom() {}
-
-
 
 	/**
 	 * Get id returns null if value not yet entered
@@ -191,8 +188,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public String getId() {
 		return getName();
 	}
-
-
 
 	public boolean isSelected() {
 		return selected;

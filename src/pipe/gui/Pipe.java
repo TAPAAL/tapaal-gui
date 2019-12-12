@@ -43,6 +43,7 @@ public class Pipe {
 	public static final int PLACE_TRANSITION_LAYER_OFFSET = 30;
 	public static final int NOTE_LAYER_OFFSET = 10;
 	public static final int SELECTION_LAYER_OFFSET = 90;
+	public static final int NAMELABEL_LAYER_OFFSET = 15;
 	public static final int LOWEST_LAYER_OFFSET = 0;
 
 	// For AnnotationNote appearance:

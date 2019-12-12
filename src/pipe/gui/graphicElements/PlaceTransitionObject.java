@@ -198,7 +198,24 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		updateOnMoveOrZoom();
 	}
 
+	/** Sets the center of the component to position x, y */
+	public void setCentre(double x, double y) {
+		setPositionX(x - (getWidth() / 2.0));
+		setPositionY(y - (getHeight() / 2.0));
+		update(true);
+	}
+
 	public void update(boolean displayConstantNames) {
+		update(displayConstantNames, true);
+	}
+
+	public void update(boolean displayConstantNames, boolean alignToGrid) {
+		updateOnMoveOrZoom(alignToGrid);
+	}
+
+	public Point2D.Double getCentre() {
+		return new Point2D.Double(positionX + getWidth() / 2.0, positionY
+				+ getHeight() / 2.0);
 	}
 
 	/** Handles selection for Place/Transitions */
@@ -236,12 +253,22 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		updateOnMoveOrZoom();
 	}
 
+
+    @Override
+    public void removedFromGui() {}
+
     // TODO: Find a better name for this
+
 	@Override
 	public void updateOnMoveOrZoom() {
+		updateOnMoveOrZoom(true);
+	}
+	
+	// TODO: Find a better name for this
+	public void updateOnMoveOrZoom(boolean alignToGrid) {
 		updateBounds();
 		updateConnected();
-		updateLabelLocation();
+		updateLabelLocation(alignToGrid);
 	}
 
 	public boolean areNotSameType(PlaceTransitionObject o) {
@@ -284,9 +311,15 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		return Pipe.PLACE_TRANSITION_LAYER_OFFSET;
 	}
 
+
 	public void toggleAttributesVisible() {
 		attributesVisible = !attributesVisible;
 		update(true);
 	};
+
+	public void zoomUpdate(int value) {
+		super.zoomUpdate(value);
+		update(true, false);
+	}
 
 }

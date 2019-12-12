@@ -47,6 +47,13 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.BatchProcessingDialog;
+import dk.aau.cs.gui.TabComponent;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
@@ -101,6 +108,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private GuiAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GuiAction toggleGrid;
+	private GuiAction alignToGrid;
 	private GuiAction netStatisticsAction;
 	private GuiAction batchProcessingAction;
 	private GuiAction engineSelectionAction;
@@ -108,6 +116,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
+	private GuiAction smartDrawAction;
 	private GuiAction stripTimeDialogAction;
 
 	private GuiAction zoomOutAction;
@@ -146,7 +155,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction showReportBugAction;
 	private GuiAction showFAQAction;
 	private GuiAction checkUpdate;
-
+	
 
 	private GuiAction selectAllAction;
 
@@ -397,7 +406,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				currentTab.ifPresent(TabContentActions::redo);
+
 			}
 		});
 		editMenu.addSeparator();
@@ -554,6 +565,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 						Grid.increment();
 						repaint();			
 					}		
+		});
+		
+		viewMenu.add(alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", 
+				KeyStroke.getKeyStroke("shift G")) {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Grid.alignPNObjectsToGrid();
+			}
 		});
 		
 
@@ -826,7 +846,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		});
 		workflowDialog.setMnemonic('f');
 		toolsMenu.add(workflowDialog);
-
+		
+		JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction = new GuiAction("Automatic Net Layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SmartDrawDialog.showSmartDrawDialog();
+			}
+		});
+		smartDrawDialog.setMnemonic('D');
+		toolsMenu.add(smartDrawDialog);
+		
 		//Stip off timing information
 		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
 			@Override
@@ -869,18 +898,34 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		QueryDialog.setAdvancedView(advanced);
 		showComponents(advanced);
 		showConstants(advanced);
-
+		showConstantsAction.setSelected(advanced);
+		showComponentsAction.setSelected(advanced);
+		showQueriesAction.setSelected(true);
 		//Queries and enabled transitions should always be shown
 		showQueries(true);
 		showEnabledTransitionsList(true);
 		showToolTips(true);
+
 		getCurrentTab().setResizeingDefault();
-		if(!showZeroToInfinityIntervals()){
-			showZeroToInfinityIntervalsCheckBox.doClick();
+
+		if(advanced) {
+			
+			if(!showZeroToInfinityIntervals()){
+				showZeroToInfinityIntervalsCheckBox.doClick();
+			}
+			if(!showTokenAge()){
+				showTokenAgeCheckBox.doClick();
+			}
+			
+		} else {
+			if(showZeroToInfinityIntervals()) {
+				showZeroToInfinityIntervalsCheckBox.doClick();
+			}
+			if(showTokenAge()) {
+				showTokenAgeCheckBox.doClick();
+			}
 		}
-		if(!showTokenAge()){
-			showTokenAgeCheckBox.doClick();
-		}
+
 		//Delay-enabled Transitions
 		//showDelayEnabledTransitions(advanced);
 		DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
@@ -1105,7 +1150,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
-			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
+			smartDrawAction.setEnabled(true);
 
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
@@ -1153,7 +1198,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
-
+			
+			smartDrawAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1195,7 +1241,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			redoAction.setEnabled(false);
 			prevcomponentAction.setEnabled(false);
 			nextcomponentAction.setEnabled(false);
-
+			
+			smartDrawAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1242,6 +1289,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		incSpacingAction.setEnabled(enable);
 
 		toggleGrid.setEnabled(enable);
+		alignToGrid.setEnabled(enable);
 
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
@@ -1491,11 +1539,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception 
 	 */
-	public TabContent createNewTabFromFile(InputStream file, String name) {
+
+	public TabContent createNewTabFromFile(InputStream file, String name) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
 
 		boolean showFileEndingChangedMessage = false;
+
+		String origName = name;
 
 		int currentlySelected = appTab.getSelectedIndex();
 
@@ -1525,13 +1577,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			tab.setFile(null);
 		} catch (Exception e) {
-			//undoAddTab(currentlySelected);
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(GuiFrame.this,
-					"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
-					"Error loading file: " + name,
-					JOptionPane.ERROR_MESSAGE);
-			return null;
+			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
 		createNewTab(name, tab);
@@ -1542,9 +1588,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception 
 	 */
-	private void createNewTabFromPNMLFile(File file) {
+
+	private void createNewTabFromPNMLFile(File file) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
+
 		String name;
 
 		int currentlySelected = appTab.getSelectedIndex();
@@ -1574,12 +1623,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(GuiFrame.this,
-						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(),
-						"Error loading file: " + name,
-						JOptionPane.ERROR_MESSAGE);
-				return;
+				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
 			}
 		}
 
@@ -1591,18 +1635,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws FileNotFoundException 
 	 */
-	public void createNewTabFromFile(File file) {
+	public void createNewTabFromFile(File file) throws Exception {
 		try {
 			InputStream stream = new FileInputStream(file);
 			TabContent tab = createNewTabFromFile(stream, file.getName());
 			if (tab != null) tab.setFile(file);
 		}catch (FileNotFoundException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(GuiFrame.this,
-					"TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString(),
-					"Error loading file: " + file.getName(),
-					JOptionPane.ERROR_MESSAGE);
+			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
 		}
 	}
 
@@ -1893,13 +1934,47 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
-				for (File f : files) {
-					if (f.exists() && f.isFile() && f.canRead()) {
-						FileBrowser.userPath = f.getParent();
-						createNewTabFromFile(f);
+				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
+				//show loading cursor
+				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				//Do loading
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException, Exception, FileNotFoundException {
+			        	for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								FileBrowser.userPath = f.getParent();
+								createNewTabFromFile(f);
+							}
+						}
+			        	return null;
+			        }
+			        @Override
+			        protected void done() {
+					    try {
+			        		CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			        		get();
+						} catch (Exception e) {
+					    	JOptionPane.showMessageDialog(GuiFrame.this,
+									e.getMessage(),
+									"Error loading file",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+			        }
+			    };
+			    worker.execute();
+			    
+			    //Sleep redrawing thread (EDT) until worker is done
+			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
+			    while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				}
+			    }
 			}
 		});
 
@@ -1941,13 +2016,48 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-				for(File f : files){
-					if(f.exists() && f.isFile() && f.canRead()){
-						FileBrowser.userPath = f.getParent();
-						createNewTabFromPNMLFile(f);
+				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+				
+				//Show loading cursor
+				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				//Do loading of net
+			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			        @Override
+			        protected Void doInBackground() throws InterruptedException, Exception {
+			        	for(File f : files){
+							if(f.exists() && f.isFile() && f.canRead()){
+								FileBrowser.userPath = f.getParent();
+								createNewTabFromPNMLFile(f);
+							}
+						}
+			        	return null;
+			        }
+			        @Override
+			        protected void done() {
+			        	try {
+					    	CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					    	get();
+			        	} catch (Exception e) {
+			        		JOptionPane.showMessageDialog(GuiFrame.this,
+									e.getMessage(),
+									"Error loading file",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+			        }
+			    };
+			    worker.execute();
+			    
+			    //Sleep redrawing thread (EDT) until worker is done
+			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
+			    while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				}
+			    }
 			}
 		});
 		
@@ -2060,7 +2170,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 					GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
-							createNewTabFromFile(file, netname);
+							try {
+								createNewTabFromFile(file, netname);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					};
 					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
@@ -2200,8 +2315,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
-			new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
-					+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+			//We thread this so it does not block the EDT
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+				}
+			}).start();
 		}
 	}
 

@@ -4,6 +4,9 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
+
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
@@ -19,6 +22,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	private NameLabel nl;
 
 	protected Point dragInit = new Point();
+	private double originalOffsetX, originalOffsetY;
 
 	public LabelHandler(NameLabel _nl, PetriNetObjectWithLabel _obj) {
 		obj = _obj;
@@ -32,6 +36,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		
 		if(obj instanceof Arc) {
 			if (((Arc) obj).isPrototype()) {
 				return;
@@ -49,6 +54,8 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		dragInit = e.getPoint(); //
 		// dragInit = e.getLocationOnScreen(); //causes exception in Windows!
 		dragInit = javax.swing.SwingUtilities.convertPoint(nl, dragInit, obj);
+		originalOffsetX = obj.getNameOffsetXObject();
+		originalOffsetY = obj.getNameOffsetYObject();
 	}
 
 	@Override
@@ -65,10 +72,21 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		// obj.setNameOffsetY((e.getYOnScreen() - dragInit.y)); //causes
 		// exception in Windows!
 		// dragInit = e.getLocationOnScreen(); //causes exception in Windows!
+		
+		
 		obj.setNameOffsetX((p.x - dragInit.x));
 		obj.setNameOffsetY((p.y - dragInit.y));
 		dragInit = p;
 		obj.updateOnMoveOrZoom();
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		Point p = javax.swing.SwingUtilities
+				.convertPoint(nl, e.getPoint(), obj);
+		
+		CreateGui.getCurrentTab().getUndoManager().addNewEdit(new UpdateNameLabelOffsetCommand(obj.getNameOffsetXObject(), obj.getNameOffsetYObject(), originalOffsetX, originalOffsetY, obj));
+		
 	}
 
 	@Override
