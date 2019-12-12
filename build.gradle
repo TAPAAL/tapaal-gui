@@ -48,20 +48,20 @@ jar {
 }
 
 dependencies {
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
-    compile group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.3'
-    compile group: 'net.java.dev.jna', name: 'jna', version: '4.5.1'
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    implementation group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.3'
+    implementation group: 'net.java.dev.jna', name: 'jna', version: '4.5.1'
     //compile group: 'com.apple', name: 'AppleJavaExtensions', version: '1.4' // Not working
 
     //Add jars from libs dir
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     //Junit
-    testCompile(
+    testImplementation(
             'junit:junit:4.12',
             'org.junit.jupiter:junit-jupiter-api:5.4.0'
     )
-    testRuntime(
+    testRuntimeOnly(
             'org.junit.jupiter:junit-jupiter-engine:5.4.0',
             'org.junit.vintage:junit-vintage-engine:5.4.0'
     )
