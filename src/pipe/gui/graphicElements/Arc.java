@@ -320,6 +320,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		myPath.addPointsToGui(getGuiModel());
 
 		updateArcPosition();
+		updateLabel(true);
+
 
 		super.addedToGui();
 	}
