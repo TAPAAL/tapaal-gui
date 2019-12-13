@@ -458,6 +458,8 @@ public class DataLayer {
 			arc.getSource().removeFromArc(arc);
 			arc.getTarget().removeToArc(arc);
 
+		}else if (pnObject instanceof ArcPathPoint) {
+			arcPathSet.remove(pnObject);
 		}
 
 		boolean didSomething = false;
