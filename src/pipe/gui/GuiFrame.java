@@ -1311,6 +1311,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	// linked model and view
 	public void setChangeListenerOnTab() {
 
+		//This event will only fire if the tab index is changed, so it won't trigger if once
+		// also if code calls setSelectedIndex(index), thereby avoiding a loop.
 		appTab.addChangeListener(e -> {
 
 			int index = appTab.getSelectedIndex();
@@ -1331,10 +1333,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		//Set current tab
 		currentTab = Optional.ofNullable(getCurrentTab());
 
-		//If tab is changed by something else that by clicking a tab then change to the tab.
-		if (appTab.getSelectedIndex() != index) {
-			appTab.setSelectedIndex(index);
-		}
+		//Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
+		// create a tabChanged event loop.
+		appTab.setSelectedIndex(index);
+
 
 		if (getCurrentTab() != null) {
 			currentTab.ifPresent(t->t.setApp(this));
