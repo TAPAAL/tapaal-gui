@@ -1314,10 +1314,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		//This event will only fire if the tab index is changed, so it won't trigger if once
 		// also if code calls setSelectedIndex(index), thereby avoiding a loop.
 		appTab.addChangeListener(e -> {
-
-			int index = appTab.getSelectedIndex();
-			changeToTab(index);
-
+			changeToTab((TabContent) appTab.getSelectedComponent());
 		});
 	}
 
@@ -1325,27 +1322,23 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	Optional<TabContentActions> currentTab = Optional.empty();
 	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
 	//XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
-	private void changeToTab(int index) {
+	private void changeToTab(TabContent tab) {
 
 		//De-register old model
 		currentTab.ifPresent(t -> t.setApp(null));
 
-		//Set current tab
-		currentTab = Optional.ofNullable(getCurrentTab());
-
 		//Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
 		// create a tabChanged event loop.
-		appTab.setSelectedIndex(index);
+		// Throw exception if tab is not found
+		appTab.setSelectedComponent(tab);
+
+		//Set current tab
+		currentTab = Optional.ofNullable(tab);
+
+		currentTab.ifPresent(t->t.setApp(this));
+		currentTab.ifPresent(t->setTitle(appTab.getTitleAt(appTab.indexOfComponent(tab))));
 
 
-		if (getCurrentTab() != null) {
-			currentTab.ifPresent(t->t.setApp(this));
-
-			setTitle(appTab.getTitleAt(index));
-
-		} else {
-			setTitle(null);
-		}
 	}
 
 
@@ -1491,9 +1484,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		CreateGui.addTab(tab);
 		appTab.addTab(name, tab);
-		int newTabIndex = appTab.getTabCount()-1;
 
-		changeToTab(newTabIndex);
+		changeToTab(tab);
 	}
 
 
@@ -2303,7 +2295,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				//XXX: The removeTabAt doews trigger changeToTab via tabChanged listener, but at this time
 				//the model is not updated yet, which make it change to a wrong tab, so we change it again
 				// --kyrke -2019-07-13
-				changeToTab(appTab.getSelectedIndex());
+				//changeToTab(appTab.getSelectedIndex());
 			}
 
 
