@@ -112,6 +112,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		if (createArc != null) {
 			//XXX might need to check if target is pto (depends on order of events)
 			createArc.setTarget(null);
+			//XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
+			// Relates to bug #1849786
+			if (pto instanceof Transition) {
+				((Transition)pto).removeArcCompareObject(createArc);
+			}
 			createArc.updateArcPosition();
 			//pto.removeArcCompareObject(pto);
 			//pto.updateConnected();
