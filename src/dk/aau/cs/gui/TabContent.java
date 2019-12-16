@@ -1153,7 +1153,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	final AbstractDrawingSurfaceManager animationModeController;
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
-	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, GuiFrame guiFrame) {
+	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite) {
 		try {
 			NetworkMarking currentMarking = null;
 			if(isInAnimationMode()){
@@ -1176,13 +1176,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		} catch (Exception e) {
 			Logger.log(e);
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(guiFrame, e.toString(),
+			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	public void writeNetToFile(File outFile, GuiFrame guiFrame) {
-		writeNetToFile(outFile, (List<TAPNQuery>) queries(), guiFrame);
+		writeNetToFile(outFile, (List<TAPNQuery>) queries());
 	}
 
 	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
