@@ -28,8 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
@@ -487,7 +486,7 @@ public class QueryPane extends JPanel {
 		//File is deleted on exit
 		try {
 			tempFile = File.createTempFile(CreateGui.getAppGui().getCurrentTabName(), ".xml");
-			CreateGui.getAppGui().saveNet(CreateGui.getApp().getSelectedTabIndex(), tempFile, selectedQueries);
+			CreateGui.getAppGui().writeNetToFile(CreateGui.getApp().getSelectedTabIndex(), tempFile, selectedQueries);
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {

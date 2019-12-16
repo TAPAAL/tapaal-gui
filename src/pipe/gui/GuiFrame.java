@@ -1452,7 +1452,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			saveNet(index, outFile, (List<TAPNQuery>) getTab(index).queries());
+			writeNetToFile(index, outFile, (List<TAPNQuery>) getTab(index).queries());
 
 			getTab(index).setFile(outFile);
 
@@ -1468,7 +1468,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 	}
 	
-	public void saveNet(int index, File outFile, List<TAPNQuery> queries) {
+	public void writeNetToFile(int index, File outFile, List<TAPNQuery> queries) {
 		try {
 			TabContent currentTab = getTab(index);
 			NetworkMarking currentMarking = null;
