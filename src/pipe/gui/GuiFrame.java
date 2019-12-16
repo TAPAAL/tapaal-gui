@@ -1494,7 +1494,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * @throws Exception 
 	 */
 
-	public TabContent createNewTabFromFile(InputStream file, String name) throws Exception {
+	public TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
 
 		boolean showFileEndingChangedMessage = false;
@@ -1592,7 +1592,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	public void createNewTabFromFile(File file) throws Exception {
 		try {
 			InputStream stream = new FileInputStream(file);
-			TabContent tab = createNewTabFromFile(stream, file.getName());
+			TabContent tab = createNewTabFromInputStream(stream, file.getName());
 			if (tab != null) tab.setFile(file);
 		}catch (FileNotFoundException e) {
 			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
@@ -1614,7 +1614,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String composedName = appTab.getTitleAt(index);
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
-			return createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
@@ -2123,7 +2123,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
 							try {
-								createNewTabFromFile(file, netname);
+								createNewTabFromInputStream(file, netname);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
