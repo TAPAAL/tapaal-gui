@@ -1,5 +1,7 @@
 package pipe.gui;
 
+import dk.aau.cs.gui.TabContent;
+
 /**
  * Used to delegate control of the state of AppGUI to tabs
  * control accessible functions -- kyrke - 2019-07-08
@@ -11,6 +13,8 @@ public interface GuiFrameActions {
     void setRedoActionEnabled(boolean b);
 
     void setUndoActionEnabled(boolean b);
+
+    void attachNewTabToGuiFrame(String name, TabContent tab);
 
     void setGUIMode(GuiFrame.GUIMode animation);
 

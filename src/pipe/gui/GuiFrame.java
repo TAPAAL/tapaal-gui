@@ -50,10 +50,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
@@ -1509,10 +1506,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template, false);
 
-		createNewTab(name, tab);
+		attachNewTabToGuiFrame(name, tab);
 	}
 
-	private void createNewTab(String name, TabContent tab) {
+	@Override
+	public void attachNewTabToGuiFrame(String name, TabContent tab) {
 
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".tapn";
@@ -1569,7 +1567,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
-		createNewTab(name, tab);
+		attachNewTabToGuiFrame(name, tab);
 		showFileEndingChangedMessage(showFileEndingChangedMessage);
 		return tab;
 	}
@@ -1618,7 +1616,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		createNewTab(name, tab);
+		attachNewTabToGuiFrame(name, tab);
 	}
 
 
