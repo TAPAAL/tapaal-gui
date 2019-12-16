@@ -1452,7 +1452,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			writeNetToFile(index, outFile, (List<TAPNQuery>) getTab(index).queries());
+			writeNetToFile(getTab(index), outFile);
 
 			getTab(index).setFile(outFile);
 
@@ -1467,27 +1467,30 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			return;
 		}
 	}
-	
-	public void writeNetToFile(int index, File outFile, List<TAPNQuery> queries) {
+
+	public void writeNetToFile(TabContent tab, File outFile) {
+		writeNetToFile(tab, outFile, (List<TAPNQuery>)tab.queries());
+	};
+	//Writes a tapaal net to a file, with the posibility to overwrite the quires
+	public void writeNetToFile(TabContent tab, File outFile, List<TAPNQuery> queriesOverwrite) {
 		try {
-			TabContent currentTab = getTab(index);
 			NetworkMarking currentMarking = null;
-			if(currentTab.isInAnimationMode()){
-				currentMarking = currentTab.network().marking();
-				currentTab.network().setMarking(currentTab.getAnimator().getInitialMarking());
+			if(tab.isInAnimationMode()){
+				currentMarking = tab.network().marking();
+				tab.network().setMarking(tab.getAnimator().getInitialMarking());
 			}
 
 			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-					currentTab.network(),
-					currentTab.allTemplates(),
-					queries, 
-					currentTab.network().constants()
-					);
+					tab.network(),
+					tab.allTemplates(),
+					queriesOverwrite,
+					tab.network().constants()
+			);
 
 			tapnWriter.savePNML(outFile);
 
-			if(currentTab.isInAnimationMode()){
-				currentTab.network().setMarking(currentMarking);
+			if(tab.isInAnimationMode()){
+				tab.network().setMarking(currentMarking);
 			}
 		} catch (Exception e) {
 			Logger.log(e);
