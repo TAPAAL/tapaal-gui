@@ -279,12 +279,36 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		this.drawingSurface = drawingSurface;
 	}
 
+
+	//XXX this is a temp solution while refactoring
+	// to keep the name of the net when the when a file is not set.
+	String initialName;
+	public void setInitialName(String name) {
+		if (name == null || name.isEmpty()) {
+			name = "New Petri net " + (CreateGui.getApp().getNameCounter()) + ".tapn";
+			CreateGui.getApp().incrementNameCounter();
+		} else if (!name.toLowerCase().endsWith(".tapn")){
+			name = name + ".tapn";
+		}
+		this.initialName = name;
+	}
+	public String getTabTitle() {
+		if (getFile()!=null) {
+			return getFile().getName();
+		} else {
+			return initialName;
+		}
+	}
+
 	public File getFile() {
 		return appFile;
 	}
 
 	public void setFile(File file) {
-		appFile = file;
+		if (file != null) {
+			appFile = file;
+			initialName = null;
+		}
 	}
 
 	/** Creates a new animationHistory text area, and returns a reference to it */

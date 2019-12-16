@@ -1466,23 +1466,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	public void createNewEmptyTab(String name, NetType netType){
 		TabContent tab = new TabContent(NetType.TAPN);
+		tab.setInitialName(name);
 
 		//Set Default Template
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template, false);
 
-		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (newNameCounter++) + ".tapn";
-		}
-
-		attachTabToGuiFrame(name, tab);
+		attachTabToGuiFrame(tab);
 	}
 
 	@Override
-	public void attachTabToGuiFrame(String name, TabContent tab) {
+	public void attachTabToGuiFrame(TabContent tab) {
 		CreateGui.addTab(tab);
-		appTab.addTab(name, tab);
+		appTab.addTab(tab.getTabTitle(), tab);
 
 		changeToTab(tab);
 	}
@@ -1495,6 +1492,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	public TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
+		tab.setInitialName(name);
 
 		boolean showFileEndingChangedMessage = false;
 
@@ -1502,11 +1500,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		int currentlySelected = appTab.getSelectedIndex();
 
-		if (name == null || name.equals("")) {
-			name = "New Petri net " + (newNameCounter++) + ".tapn";
-		} else if (!name.toLowerCase().endsWith(".tapn")){
-				name = name + ".tapn";
-		}
+
 
 
 
@@ -1527,7 +1521,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
-		attachTabToGuiFrame(name, tab);
+		attachTabToGuiFrame(tab);
 
 		return tab;
 	}
@@ -1541,15 +1535,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private void createNewTabFromPNMLFile(File file) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
 
-		String name;
+		String name = null;
 
 		int currentlySelected = appTab.getSelectedIndex();
 
-		if (file == null) {
-			name = "New Petri net " + (newNameCounter++) + ".tapn";
-		} else {
+		if (file != null) {
 			name = file.getName().replaceAll(".pnml", ".tapn");
 		}
+		tab.setInitialName(name);
 
 		if (file != null) {
 			try {
@@ -1576,7 +1569,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		attachTabToGuiFrame(name, tab);
+		attachTabToGuiFrame(tab);
 	}
 
 
