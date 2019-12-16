@@ -1417,7 +1417,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private boolean saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = getTab(index).getFile();
 		boolean result;
-		if (!forceSaveAs && modelFile != null && !(modelFile.getName().endsWith(".xml"))) { // ordinary save
+		if (!forceSaveAs && modelFile != null ) { // ordinary save
 			saveNet(index, modelFile);
 			result = true;
 		} else { // save as
@@ -1506,10 +1506,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		if (name == null || name.equals("")) {
 			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		} else if (!name.toLowerCase().endsWith(".tapn")){
-			if(name.endsWith(".xml")){
-				name = name.replaceAll(".xml", ".tapn");
-				showFileEndingChangedMessage = true;
-			}else
 				name = name + ".tapn";
 		}
 
@@ -1533,7 +1529,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 
 		attachTabToGuiFrame(name, tab);
-		showFileEndingChangedMessage(showFileEndingChangedMessage);
+
 		return tab;
 	}
 
@@ -1591,9 +1587,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 */
 	public void createNewTabFromFile(File file) throws Exception {
 		try {
+			String name = file.getName();
+			boolean showFileEndingChangedMessage = false;
+
+			if(name.toLowerCase().endsWith(".xml")){
+				name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
+				showFileEndingChangedMessage = true;
+			}
+
 			InputStream stream = new FileInputStream(file);
-			TabContent tab = createNewTabFromInputStream(stream, file.getName());
-			if (tab != null) tab.setFile(file);
+			TabContent tab = createNewTabFromInputStream(stream, name);
+			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
+
+			showFileEndingChangedMessage(showFileEndingChangedMessage);
+
 		}catch (FileNotFoundException e) {
 			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
 		}
