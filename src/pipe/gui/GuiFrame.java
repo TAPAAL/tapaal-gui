@@ -1450,9 +1450,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return result;
 	}
 
-	;
-
-
 	public void createNewEmptyTab(String name, NetType netType){
 		TabContent tab = new TabContent(NetType.TAPN);
 		tab.setInitialName(name);
