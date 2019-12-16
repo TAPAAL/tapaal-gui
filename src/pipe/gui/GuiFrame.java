@@ -1323,21 +1323,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
 	//XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
 	private void changeToTab(TabContent tab) {
-		if (tab != null) {
-			//De-register old model
-			currentTab.ifPresent(t -> t.setApp(null));
 
+		//De-register old model
+		currentTab.ifPresent(t -> t.setApp(null));
+
+		//Set current tab
+		currentTab = Optional.ofNullable(tab);
+
+		if (tab != null) {
 			//Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
 			// create a tabChanged event loop.
 			// Throw exception if tab is not found
 			appTab.setSelectedComponent(tab);
 
-			//Set current tab
-			currentTab = Optional.ofNullable(tab);
-
 			currentTab.ifPresent(t -> t.setApp(this));
 			setTitle(tab.getTabTitle());
 
+		}else{
+			setTitle(null);
 		}
 	}
 
