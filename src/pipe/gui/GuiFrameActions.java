@@ -14,7 +14,7 @@ public interface GuiFrameActions {
 
     void setUndoActionEnabled(boolean b);
 
-    void attachNewTabToGuiFrame(String name, TabContent tab);
+    void attachTabToGuiFrame(String name, TabContent tab);
 
     void setGUIMode(GuiFrame.GUIMode animation);
 

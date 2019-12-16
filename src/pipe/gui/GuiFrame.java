@@ -1477,11 +1477,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template, false);
 
-		attachNewTabToGuiFrame(name, tab);
+		attachTabToGuiFrame(name, tab);
 	}
 
 	@Override
-	public void attachNewTabToGuiFrame(String name, TabContent tab) {
+	public void attachTabToGuiFrame(String name, TabContent tab) {
 
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".tapn";
@@ -1538,7 +1538,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
-		attachNewTabToGuiFrame(name, tab);
+		attachTabToGuiFrame(name, tab);
 		showFileEndingChangedMessage(showFileEndingChangedMessage);
 		return tab;
 	}
@@ -1587,7 +1587,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		attachNewTabToGuiFrame(name, tab);
+		attachTabToGuiFrame(name, tab);
 	}
 
 
