@@ -1421,7 +1421,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		File modelFile = getTab(index).getFile();
 		boolean result;
 		if (!forceSaveAs && modelFile != null ) { // ordinary save
-			saveNet(getTab(index), modelFile);
+			getTab(index).saveNet(modelFile);
 			result = true;
 		} else { // save as
 			String path;
@@ -1433,7 +1433,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
 			if (filename != null) {
 				modelFile = new File(filename);
-				saveNet(getTab(index), modelFile);
+				getTab(index).saveNet(modelFile);
 				result = true;
 			}else{
 				result = false;
@@ -1448,25 +1448,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		// model name
 		appTab.getTabComponentAt(index).doLayout();
 		return result;
-	}
-
-	private void saveNet(TabContent tab, File outFile) {
-		try {
-			tab.writeNetToFile(outFile);
-
-			tab.setFile(outFile);
-
-			tab.setNetChanged(false);
-			tab.getUndoManager().clear();
-
-
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-					"File Output Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
 	}
 
 	;

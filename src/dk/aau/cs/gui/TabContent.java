@@ -1209,6 +1209,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		writeNetToFile(outFile, (List<TAPNQuery>) queries());
 	}
 
+	public void saveNet(File outFile) {
+		try {
+			writeNetToFile(outFile);
+
+			setFile(outFile);
+
+			setNetChanged(false);
+			getUndoManager().clear();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
