@@ -1445,7 +1445,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			getTab(index).writeNetToFile(outFile, this);
+			getTab(index).writeNetToFile(outFile);
 
 			getTab(index).setFile(outFile);
 
