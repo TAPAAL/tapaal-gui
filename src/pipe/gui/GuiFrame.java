@@ -1513,26 +1513,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private void createNewTab(String name, TabContent tab) {
-		//int freeSpace = CreateGui.getFreeSpace(netType);
-
-		//setObjects(freeSpace);
-		//CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		}
-		
-		//tab.setCurrentTemplate(template);
+
 		CreateGui.addTab(tab);
 		appTab.addTab(name, tab);
 		int newTabIndex = appTab.getTabCount()-1;
 
-		//appView.setNetChanged(false); // Status is unchanged
-		//appView.updatePreferredSize();
-
-		//setTitle(name);// Change the program caption
-		//appTab.setTitleAt(freeSpace, name);
-		//selectAction.actionPerformed(null);
 		changeToTab(newTabIndex);
 	}
 
