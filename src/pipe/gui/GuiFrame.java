@@ -1421,7 +1421,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		File modelFile = getTab(index).getFile();
 		boolean result;
 		if (!forceSaveAs && modelFile != null ) { // ordinary save
-			saveNet(index, modelFile);
+			saveNet(getTab(index), modelFile);
 			result = true;
 		} else { // save as
 			String path;
@@ -1433,10 +1433,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
 			if (filename != null) {
 				modelFile = new File(filename);
-				saveNet(index, modelFile);
+				saveNet(getTab(index), modelFile);
 				result = true;
 			}else{
 				result = false;
+			}
+			if (result) {
+				appTab.setTitleAt(index, getTab(index).getTabTitle());
+				if(index == appTab.getSelectedIndex()) setTitle(getTab(index).getTabTitle()); // Change the window title
 			}
 		}
 
@@ -1446,16 +1450,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return result;
 	}
 
-	private void saveNet(int index, File outFile) {
+	private void saveNet(TabContent tab, File outFile) {
 		try {
-			getTab(index).writeNetToFile(outFile);
+			tab.writeNetToFile(outFile);
 
-			getTab(index).setFile(outFile);
+			tab.setFile(outFile);
 
-			getTab(index).setNetChanged(false);
-			appTab.setTitleAt(index, outFile.getName());
-			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
-			getTab(index).getUndoManager().clear();
+			tab.setNetChanged(false);
+			tab.getUndoManager().clear();
+
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
