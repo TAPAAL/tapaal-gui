@@ -6,14 +6,17 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -24,10 +27,8 @@ import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
+import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -1150,6 +1151,39 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     };
 	final AbstractDrawingSurfaceManager animationModeController;
+
+	//Writes a tapaal net to a file, with the posibility to overwrite the quires
+	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, GuiFrame guiFrame) {
+		try {
+			NetworkMarking currentMarking = null;
+			if(isInAnimationMode()){
+				currentMarking = network().marking();
+				network().setMarking(getAnimator().getInitialMarking());
+			}
+
+			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+					network(),
+					allTemplates(),
+					queriesOverwrite,
+					network().constants()
+			);
+
+			tapnWriter.savePNML(outFile);
+
+			if(isInAnimationMode()){
+				network().setMarking(currentMarking);
+			}
+		} catch (Exception e) {
+			Logger.log(e);
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(guiFrame, e.toString(),
+					"File Output Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public void writeNetToFile(File outFile, GuiFrame guiFrame) {
+		writeNetToFile(outFile, (List<TAPNQuery>) queries(), guiFrame);
+	}
 
 	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 

@@ -11,7 +11,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
 import java.util.*;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
@@ -30,7 +29,6 @@ import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
@@ -1452,7 +1450,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	private void saveNet(int index, File outFile) {
 		try {
-			writeNetToFile(getTab(index), outFile);
+			getTab(index).writeNetToFile(outFile, this);
 
 			getTab(index).setFile(outFile);
 
@@ -1468,37 +1466,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 	}
 
-	public void writeNetToFile(TabContent tab, File outFile) {
-		writeNetToFile(tab, outFile, (List<TAPNQuery>)tab.queries());
-	};
-	//Writes a tapaal net to a file, with the posibility to overwrite the quires
-	public void writeNetToFile(TabContent tab, File outFile, List<TAPNQuery> queriesOverwrite) {
-		try {
-			NetworkMarking currentMarking = null;
-			if(tab.isInAnimationMode()){
-				currentMarking = tab.network().marking();
-				tab.network().setMarking(tab.getAnimator().getInitialMarking());
-			}
-
-			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-					tab.network(),
-					tab.allTemplates(),
-					queriesOverwrite,
-					tab.network().constants()
-			);
-
-			tapnWriter.savePNML(outFile);
-
-			if(tab.isInAnimationMode()){
-				tab.network().setMarking(currentMarking);
-			}
-		} catch (Exception e) {
-			Logger.log(e);
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-					"File Output Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
+	;
 
 
 	public void createNewEmptyTab(String name, NetType netType){

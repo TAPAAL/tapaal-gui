@@ -488,7 +488,7 @@ public class QueryPane extends JPanel {
 			tempFile = File.createTempFile(CreateGui.getAppGui().getCurrentTabName(), ".xml");
 
 			TabContent tab = CreateGui.getApp().getCurrentTab();
-			CreateGui.getAppGui().writeNetToFile(tab, tempFile, selectedQueries);
+			tab.writeNetToFile(tempFile, selectedQueries, CreateGui.getAppGui());
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {
