@@ -1919,14 +1919,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			    
 			    //Sleep redrawing thread (EDT) until worker is done
 			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    while(!worker.isDone()) {
+			    /*while(!worker.isDone()) {
 			    	try {
 			    		Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			    }
+			    }*/
 			}
 		});
 
@@ -2002,14 +2002,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			    
 			    //Sleep redrawing thread (EDT) until worker is done
 			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    while(!worker.isDone()) {
+			    /*while(!worker.isDone()) {
 			    	try {
 			    		Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			    }
+			    }*/
 			}
 		});
 		
