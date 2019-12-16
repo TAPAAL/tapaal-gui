@@ -1472,16 +1472,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template, false);
 
+		if (name == null || name.isEmpty()) {
+			name = "New Petri net " + (newNameCounter++) + ".tapn";
+		}
+
 		attachTabToGuiFrame(name, tab);
 	}
 
 	@Override
 	public void attachTabToGuiFrame(String name, TabContent tab) {
-
-		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (newNameCounter++) + ".tapn";
-		}
-
 		CreateGui.addTab(tab);
 		appTab.addTab(name, tab);
 
