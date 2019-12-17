@@ -1451,18 +1451,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return result;
 	}
 
-	public TabContent createNewEmptyTab(String name, NetType netType){
-		TabContent tab = new TabContent(NetType.TAPN);
-		tab.setInitialName(name);
-
-		//Set Default Template
-		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
-		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
-		tab.addTemplate(template, false);
-
-		return tab;
-	}
-
 	@Override
 	public void attachTabToGuiFrame(TabContent tab) {
 		CreateGui.addTab(tab);

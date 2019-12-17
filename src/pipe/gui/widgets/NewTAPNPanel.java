@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
@@ -98,7 +96,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			TabContent tab = frame.createNewEmptyTab(name, type);
+			TabContent tab = TabContent.createNewEmptyTab(name, type);
 			frame.attachTabToGuiFrame(tab);
 		} catch (Exception e) {
 			JOptionPane

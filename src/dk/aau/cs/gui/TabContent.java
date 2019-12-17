@@ -85,6 +85,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return tab;
 	}
 
+	public static TabContent createNewEmptyTab(String name, NetType netType){
+		TabContent tab = new TabContent(NetType.TAPN);
+		tab.setInitialName(name);
+
+		//Set Default Template
+		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
+		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
+		tab.addTemplate(template, false);
+
+		return tab;
+	}
+
 	public UndoManager getUndoManager() {
 		return undoManager;
 	}
