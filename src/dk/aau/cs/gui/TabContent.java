@@ -3,10 +3,7 @@ package dk.aau.cs.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
@@ -1344,6 +1341,27 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	public TabContent duplicateTab() {
+		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+				network(),
+				allTemplates(),
+				queries(),
+				network().constants()
+		);
+
+		try {
+			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+			String composedName = getTabTitle();
+			composedName = composedName.replace(".tapn", "");
+			composedName += "-untimed";
+			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			System.console().printf(e1.getMessage());
+		}
+		return null;
 	}
 
 	class CanvasAnimationController extends AbstractDrawingSurfaceManager {

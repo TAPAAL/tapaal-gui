@@ -27,7 +27,6 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.NetWriter;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Arc;
@@ -48,7 +47,6 @@ import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.ResourceManager;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -880,7 +878,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private void duplicateAndConvertUntimed() {
-		TabContent duplicate = duplicateTab((TabContent) appTab.getSelectedComponent());
+		TabContent duplicate = ((TabContent) appTab.getSelectedComponent()).duplicateTab();
 		convertToUntimedTab(duplicate);
 		attachTabToGuiFrame(duplicate);
 	}
@@ -1460,27 +1458,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return tab;
 	}
 
-
-	private TabContent duplicateTab(TabContent tabToDuplicate) {
-		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-				tabToDuplicate.network(),
-				tabToDuplicate.allTemplates(),
-				tabToDuplicate.queries(),
-				tabToDuplicate.network().constants()
-		);
-
-		try {
-			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-			String composedName = tabToDuplicate.getTabTitle();
-			composedName = composedName.replace(".tapn", "");
-			composedName += "-untimed";
-			return TabContent.createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			System.console().printf(e1.getMessage());
-		}
-		return null;
-	}
 
 	private void convertToUntimedTab(TabContent tab){
 		TabTransformer.removeTimingInformation(tab);
