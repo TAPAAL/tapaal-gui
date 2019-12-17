@@ -1587,8 +1587,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private TabContent duplicateTab(TabContent tabToDuplicate) {
-		int index = appTab.indexOfComponent(tabToDuplicate);
-
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				tabToDuplicate.network(),
 				tabToDuplicate.allTemplates(),
@@ -1598,7 +1596,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-			String composedName = appTab.getTitleAt(index);
+			String composedName = tabToDuplicate.getTabTitle();
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
 			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
