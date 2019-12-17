@@ -2117,7 +2117,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
 							try {
-								createNewTabFromInputStreamAndAttach(file, netname);
+								TabContent net = createNewTabFromInputStream(file, netname);
+								attachTabToGuiFrame(net);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
