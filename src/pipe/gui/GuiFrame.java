@@ -888,6 +888,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private void duplicateAndConvertUntimed() {
 		TabContent duplicate = duplicateTab((TabContent) appTab.getSelectedComponent());
 		convertToUntimedTab(duplicate);
+		attachTabToGuiFrame(duplicate);
 	}
 
 	private void showAdvancedWorkspace(boolean advanced){
@@ -1600,7 +1601,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String composedName = appTab.getTitleAt(index);
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
-			return createNewTabFromInputStreamAndAttach(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
