@@ -305,10 +305,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void setFile(File file) {
-		if (file != null) {
 			appFile = file;
-			initialName = null;
-		}
 	}
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
