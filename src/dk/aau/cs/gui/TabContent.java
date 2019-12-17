@@ -17,10 +17,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.ModelLoader;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.io.TraceImportExport;
+import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
@@ -94,6 +91,49 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template, false);
 
+		return tab;
+	}
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception
+	 */
+
+	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
+		TabContent tab = new TabContent(NetType.TAPN);
+
+		String name = null;
+
+		if (file != null) {
+			name = file.getName().replaceAll(".pnml", ".tapn");
+		}
+		tab.setInitialName(name);
+
+		if (file != null) {
+			try {
+
+				LoadedModel loadedModel;
+
+				PNMLoader loader = new PNMLoader();
+				loadedModel = loader.load(file);
+
+
+				tab.setNetwork(loadedModel.network(), loadedModel.templates());
+				tab.setQueries(loadedModel.queries());
+				tab.setConstants(loadedModel.network().constants());
+
+				tab.selectFirstElements();
+
+				tab.setMode(Pipe.ElementType.SELECT);
+
+
+			} catch (Exception e) {
+				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
+			}
+		}
+
+		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
+		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
 		return tab;
 	}
 

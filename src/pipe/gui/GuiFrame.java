@@ -19,7 +19,6 @@ import javax.swing.*;
 
 import com.apple.eawt.Application;
 import dk.aau.cs.gui.*;
-import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import com.sun.jna.Platform;
@@ -27,10 +26,8 @@ import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Arc;
@@ -50,8 +47,6 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
@@ -1468,52 +1463,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws Exception 
-	 */
-
-	private TabContent createNewTabFromPNMLFile(File file) throws Exception {
-		TabContent tab = new TabContent(NetType.TAPN);
-
-		String name = null;
-
-		int currentlySelected = appTab.getSelectedIndex();
-
-		if (file != null) {
-			name = file.getName().replaceAll(".pnml", ".tapn");
-		}
-		tab.setInitialName(name);
-
-		if (file != null) {
-			try {
-
-				LoadedModel loadedModel;
-
-				PNMLoader loader = new PNMLoader();
-				loadedModel = loader.load(file);
-
-
-				tab.setNetwork(loadedModel.network(), loadedModel.templates());
-				tab.setQueries(loadedModel.queries());
-				tab.setConstants(loadedModel.network().constants());
-
-				tab.selectFirstElements();
-
-				tab.setMode(ElementType.SELECT);
-
-
-			} catch (Exception e) {
-				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
-			}
-		}
-
-		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		return tab;
-	}
-
-
-	/**
-	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * @throws FileNotFoundException 
 	 */
 	public TabContent createNewTabFromFile(File file) throws Exception {
@@ -1920,7 +1869,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
-								fileOpened.add(createNewTabFromPNMLFile(f));
+								fileOpened.add(TabContent.createNewTabFromPNMLFile(f));
 							}
 						}
 			        	return fileOpened;
