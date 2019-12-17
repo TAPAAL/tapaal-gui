@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import dk.aau.cs.gui.TabContent;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -69,7 +70,7 @@ public class TAPAAL {
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
 					try {
-						CreateGui.getAppGui().createNewTabFromFile(file);
+						TabContent.createNewTabFromFile(file);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

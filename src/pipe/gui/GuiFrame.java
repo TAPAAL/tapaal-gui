@@ -1461,32 +1461,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 
-	/**
-	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws FileNotFoundException 
-	 */
-	public TabContent createNewTabFromFile(File file) throws Exception {
-		try {
-			String name = file.getName();
-			boolean showFileEndingChangedMessage = false;
-
-			if(name.toLowerCase().endsWith(".xml")){
-				name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
-				showFileEndingChangedMessage = true;
-			}
-
-			InputStream stream = new FileInputStream(file);
-			TabContent tab = TabContent.createNewTabFromInputStream(stream, name);
-			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
-
-			showFileEndingChangedMessage(showFileEndingChangedMessage);
-
-			return tab;
-		}catch (FileNotFoundException e) {
-			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
-		}
-	}
-
 	private TabContent duplicateTab(TabContent tabToDuplicate) {
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				tabToDuplicate.network(),
@@ -1783,7 +1757,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
-								filesOpened.add(createNewTabFromFile(f));
+								filesOpened.add(TabContent.createNewTabFromFile(f));
 							}
 						}
 			        	return filesOpened;
@@ -2158,20 +2132,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	public TabContent getCurrentTab() { return CreateGui.getCurrentTab(); }
 	private TabContent getTab(int tabIndex) { return CreateGui.getTab(tabIndex); }
-
-	private void showFileEndingChangedMessage(boolean showMessage) {
-		if(showMessage) {
-			//We thread this so it does not block the EDT
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
-							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
-				}
-			}).start();
-		}
-	}
 
 
 	//If needed, add boolean forceClose, where net is not checkedForSave and just closed

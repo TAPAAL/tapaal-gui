@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
@@ -135,6 +137,46 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
 		return tab;
+	}
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws FileNotFoundException
+	 */
+	public static TabContent createNewTabFromFile(File file) throws Exception {
+		try {
+			String name = file.getName();
+			boolean showFileEndingChangedMessage = false;
+
+			if(name.toLowerCase().endsWith(".xml")){
+				name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
+				showFileEndingChangedMessage = true;
+			}
+
+			InputStream stream = new FileInputStream(file);
+			TabContent tab = createNewTabFromInputStream(stream, name);
+			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
+
+			showFileEndingChangedMessage(showFileEndingChangedMessage);
+
+			return tab;
+		}catch (FileNotFoundException e) {
+			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
+		}
+	}
+
+	private static void showFileEndingChangedMessage(boolean showMessage) {
+		if(showMessage) {
+			//We thread this so it does not block the EDT
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+				}
+			}).start();
+		}
 	}
 
 	public UndoManager getUndoManager() {
