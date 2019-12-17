@@ -1480,14 +1480,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		TabContent tab = new TabContent(NetType.TAPN);
 		tab.setInitialName(name);
 
-		boolean showFileEndingChangedMessage = false;
-
-		String origName = name;
-
-		int currentlySelected = appTab.getSelectedIndex();
-
 		try {
-
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
@@ -1499,10 +1492,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			tab.setFile(null);
 		} catch (Exception e) {
-			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
+			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
 		}
-
-
 
 		return tab;
 	}
