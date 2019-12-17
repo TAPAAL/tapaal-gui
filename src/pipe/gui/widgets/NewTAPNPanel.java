@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
@@ -97,7 +98,8 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			frame.createNewEmptyTab(name, type);
+			TabContent tab = frame.createNewEmptyTab(name, type);
+			frame.attachTabToGuiFrame(tab);
 		} catch (Exception e) {
 			JOptionPane
 					.showMessageDialog(

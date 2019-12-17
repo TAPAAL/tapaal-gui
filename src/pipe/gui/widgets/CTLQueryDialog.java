@@ -2438,7 +2438,7 @@ public class CTLQueryDialog extends JPanel {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
 						composedName = composedName.replace(".tapn", "");
-						CreateGui.getApp().createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+						CreateGui.getApp().createNewTabFromInputStreamAndAttach(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
 					} catch (Exception e1) {
 						System.console().printf(e1.getMessage());

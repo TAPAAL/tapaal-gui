@@ -11,6 +11,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
@@ -1450,7 +1451,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		return result;
 	}
 
-	public void createNewEmptyTab(String name, NetType netType){
+	public TabContent createNewEmptyTab(String name, NetType netType){
 		TabContent tab = new TabContent(NetType.TAPN);
 		tab.setInitialName(name);
 
@@ -1459,7 +1460,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template, false);
 
-		attachTabToGuiFrame(tab);
+		return tab;
 	}
 
 	@Override
@@ -1470,12 +1471,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		changeToTab(tab);
 	}
 
-
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-
 	public TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
 		tab.setInitialName(name);
@@ -1485,11 +1484,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		String origName = name;
 
 		int currentlySelected = appTab.getSelectedIndex();
-
-
-
-
-
 
 		try {
 
@@ -1507,8 +1501,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + origName + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
-		attachTabToGuiFrame(tab);
 
+
+		return tab;
+	}
+
+	public TabContent createNewTabFromInputStreamAndAttach(InputStream file, String name) throws Exception {
+		TabContent tab = createNewTabFromInputStream(file, name);
+		attachTabToGuiFrame(tab);
 		return tab;
 	}
 
@@ -1518,7 +1518,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * @throws Exception 
 	 */
 
-	private void createNewTabFromPNMLFile(File file) throws Exception {
+	private TabContent createNewTabFromPNMLFile(File file) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
 
 		String name = null;
@@ -1555,7 +1555,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
 		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		attachTabToGuiFrame(tab);
+		return tab;
 	}
 
 
@@ -1563,7 +1563,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * @throws FileNotFoundException 
 	 */
-	public void createNewTabFromFile(File file) throws Exception {
+	public TabContent createNewTabFromFile(File file) throws Exception {
 		try {
 			String name = file.getName();
 			boolean showFileEndingChangedMessage = false;
@@ -1579,6 +1579,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			showFileEndingChangedMessage(showFileEndingChangedMessage);
 
+			return tab;
 		}catch (FileNotFoundException e) {
 			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
 		}
@@ -1599,7 +1600,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String composedName = appTab.getTitleAt(index);
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
-			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+			return createNewTabFromInputStreamAndAttach(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
@@ -1875,28 +1876,31 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				//show loading cursor
 				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				//Do loading
-			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			    SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
 			        @Override
-			        protected Void doInBackground() throws InterruptedException, Exception, FileNotFoundException {
+			        protected List<TabContent> doInBackground() throws InterruptedException, Exception, FileNotFoundException {
+			        	List<TabContent> filesOpened = new ArrayList<>();
 			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
-								createNewTabFromFile(f);
+								filesOpened.add(createNewTabFromFile(f));
 							}
 						}
-			        	return null;
+			        	return filesOpened;
 			        }
 			        @Override
 			        protected void done() {
 					    try {
-			        		CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			        		get();
+			        		List<TabContent> tabs = get();
+			        		tabs.forEach(o->attachTabToGuiFrame(o));
 						} catch (Exception e) {
 					    	JOptionPane.showMessageDialog(GuiFrame.this,
 									e.getMessage(),
 									"Error loading file",
 									JOptionPane.ERROR_MESSAGE);
 							return;
+						}finally {
+							CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 			        }
 			    };
@@ -1958,28 +1962,32 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 				//Show loading cursor
 				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				//Do loading of net
-			    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			    SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
 			        @Override
-			        protected Void doInBackground() throws InterruptedException, Exception {
+			        protected List<TabContent> doInBackground() throws InterruptedException, Exception {
+			        	List<TabContent> fileOpened = new ArrayList<>();
 			        	for(File f : files){
 							if(f.exists() && f.isFile() && f.canRead()){
 								FileBrowser.userPath = f.getParent();
-								createNewTabFromPNMLFile(f);
+								fileOpened.add(createNewTabFromPNMLFile(f));
 							}
 						}
-			        	return null;
+			        	return fileOpened;
 			        }
 			        @Override
 			        protected void done() {
 			        	try {
-					    	CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					    	get();
+					    	List<TabContent> tabs = get();
+					    	tabs.forEach(o->attachTabToGuiFrame(o));
+
 			        	} catch (Exception e) {
 			        		JOptionPane.showMessageDialog(GuiFrame.this,
 									e.getMessage(),
 									"Error loading file",
 									JOptionPane.ERROR_MESSAGE);
 							return;
+						}finally {
+							CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 			        }
 			    };
@@ -2108,7 +2116,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
 							try {
-								createNewTabFromInputStream(file, netname);
+								createNewTabFromInputStreamAndAttach(file, netname);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
