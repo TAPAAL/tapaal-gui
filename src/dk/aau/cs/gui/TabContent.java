@@ -143,6 +143,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * @throws FileNotFoundException
 	 */
+	//XXX should properly be in controller?
 	public static TabContent createNewTabFromFile(File file) throws Exception {
 		try {
 			String name = file.getName();
