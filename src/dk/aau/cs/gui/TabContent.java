@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
@@ -16,6 +17,8 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.TraceImportExport;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
@@ -55,6 +58,33 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
 	private UndoManager undoManager = new UndoManager();
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception
+	 */
+	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
+		TabContent tab = new TabContent(NetType.TAPN);
+		tab.setInitialName(name);
+
+		try {
+			ModelLoader loader = new ModelLoader();
+			LoadedModel loadedModel = loader.load(file);
+
+			tab.setNetwork(loadedModel.network(), loadedModel.templates());
+			tab.setQueries(loadedModel.queries());
+			tab.setConstants(loadedModel.network().constants());
+
+			tab.selectFirstElements();
+
+			tab.setFile(null);
+		} catch (Exception e) {
+			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+		}
+
+		return tab;
+	}
+
 	public UndoManager getUndoManager() {
 		return undoManager;
 	}

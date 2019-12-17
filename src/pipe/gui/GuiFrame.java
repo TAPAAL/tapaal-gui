@@ -51,7 +51,6 @@ import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
@@ -1472,34 +1471,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		changeToTab(tab);
 	}
 
-	/**
-	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws Exception
-	 */
-	public TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
-		TabContent tab = new TabContent(NetType.TAPN);
-		tab.setInitialName(name);
-
-		try {
-			ModelLoader loader = new ModelLoader();
-			LoadedModel loadedModel = loader.load(file);
-
-			tab.setNetwork(loadedModel.network(), loadedModel.templates());
-			tab.setQueries(loadedModel.queries());
-			tab.setConstants(loadedModel.network().constants());
-
-			tab.selectFirstElements();
-
-			tab.setFile(null);
-		} catch (Exception e) {
-			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
-		}
-
-		return tab;
-	}
-
 	public TabContent createNewTabFromInputStreamAndAttach(InputStream file, String name) throws Exception {
-		TabContent tab = createNewTabFromInputStream(file, name);
+		TabContent tab = TabContent.createNewTabFromInputStream(file, name);
 		attachTabToGuiFrame(tab);
 		return tab;
 	}
@@ -1566,7 +1539,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			}
 
 			InputStream stream = new FileInputStream(file);
-			TabContent tab = createNewTabFromInputStream(stream, name);
+			TabContent tab = TabContent.createNewTabFromInputStream(stream, name);
 			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
 
 			showFileEndingChangedMessage(showFileEndingChangedMessage);
@@ -1590,7 +1563,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			String composedName = tabToDuplicate.getTabTitle();
 			composedName = composedName.replace(".tapn", "");
 			composedName += "-untimed";
-			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+			return TabContent.createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
@@ -2106,7 +2079,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 						public void actionPerformed(ActionEvent arg0) {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
 							try {
-								TabContent net = createNewTabFromInputStream(file, netname);
+								TabContent net = TabContent.createNewTabFromInputStream(file, netname);
 								attachTabToGuiFrame(net);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
