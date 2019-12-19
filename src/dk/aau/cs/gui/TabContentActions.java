@@ -53,4 +53,6 @@ public interface TabContentActions {
     void importTrace();
 
     void zoomTo(int newZoomLevel);
+
+    String getTabTitle();
 }

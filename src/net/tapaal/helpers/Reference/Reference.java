@@ -3,6 +3,7 @@ package net.tapaal.helpers.Reference;
 import dk.aau.cs.util.Require;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,9 +31,18 @@ public class Reference<T> {
             consumer.accept(ref);
     }
 
-    public<U> U map(Function<? super T, ? extends U> mapper) {
+    public void ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) {
+        if (this.ref != null) {
+            action.accept(this.ref);
+        } else {
+            emptyAction.run();
+        }
+
+    }
+
+    public<U> Optional<U> map(Function<? super T, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
-        return mapper.apply(ref);
+        return ref==null ? Optional.empty() : Optional.of(mapper.apply(ref));
     }
 
 }
