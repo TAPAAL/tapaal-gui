@@ -1313,7 +1313,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 
-	Optional<TabContentActions> currentTab = Optional.empty();
+	final MutableReference<TabContentActions> currentTab = new MutableReference<>();
 	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
 	//XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
 	private void changeToTab(TabContent tab) {
@@ -1322,7 +1322,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		currentTab.ifPresent(t -> t.setApp(null));
 
 		//Set current tab
-		currentTab = Optional.ofNullable(tab);
+		currentTab.setReference(tab);
 
 		if (tab != null) {
 			//Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
