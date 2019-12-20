@@ -41,6 +41,7 @@ import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -66,6 +67,7 @@ public class PNMLoader {
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
 	private int maxNetSize = 4000;
+	private boolean hasPositionalInfo = false;
 	
 	public PNMLoader() {
 	}
@@ -119,6 +121,7 @@ public class PNMLoader {
 		Template template = new Template(tapn, new DataLayer(), new Zoomer());
 	
 		parseTimedArcPetriNet(netNode, tapn, template);
+		CreateGui.getAppGui().setHasPositionalInfo(hasPositionalInfo);
 		
 		network.setPaintNet(isNetDrawable());
 		tapn.setCheckNames(true);
@@ -363,6 +366,7 @@ public class PNMLoader {
 				return new Point(100, 100);
 		}
 		
+		hasPositionalInfo = true;
 		Element offset = (Element)getFirstDirectChild(node, type == GraphicsType.Offset ? "offset" : "position");
 		
 		String x = offset.getAttribute("x");

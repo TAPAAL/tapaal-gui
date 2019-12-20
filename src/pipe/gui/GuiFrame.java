@@ -192,6 +192,7 @@ public class GuiFrame extends JFrame  {
 	private boolean showToolTips = true;
 	private boolean showZeroToInfinityIntervals = true;
 	private boolean showTokenAge = true;
+	private boolean hasPositionalInfo = true;
 
 
 	private JMenu importMenu, exportMenu, zoomMenu;
@@ -2601,6 +2602,12 @@ public class GuiFrame extends JFrame  {
 						e.printStackTrace();
 					}
 			    }
+			    if(!getHasPositionalInfo()) {
+				    int dialogResult = JOptionPane.showConfirmDialog (null, "We noticed you do not have any positional info. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+				    if(dialogResult == JOptionPane.YES_OPTION) {
+				    	SmartDrawDialog.showSmartDrawDialog();
+				    }
+			    }
 			}
 		});
 		
@@ -2936,6 +2943,14 @@ public class GuiFrame extends JFrame  {
 
 	public void toggleShowTokenAge(){
 		showTokenAge = !showTokenAge;
+	}
+	
+	public void setHasPositionalInfo(boolean positionalInfo) {
+		hasPositionalInfo = positionalInfo;
+	}
+	
+	public boolean getHasPositionalInfo() {
+		return hasPositionalInfo;
 	}
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); };
