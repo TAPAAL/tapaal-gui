@@ -1440,7 +1440,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		guiFrameController.ifPresent(o->o.changeToTab(tab));
 	}
 
-
+	@Override
 	public void detachTabFromGuiFrame(TabContent tab) {
 		appTab.remove(tab);
 	}

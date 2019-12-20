@@ -18,6 +18,8 @@ public interface GuiFrameActions {
 
     void attachTabToGuiFrame(TabContent tab);
 
+    void detachTabFromGuiFrame(TabContent tab);
+
     void setGUIMode(GuiFrame.GUIMode animation);
 
     //XXX temp while refactoring, kyrke - 2019-07-25
