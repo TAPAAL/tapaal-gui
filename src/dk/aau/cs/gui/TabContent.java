@@ -1328,6 +1328,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		writeNetToFile(outFile, (List<TAPNQuery>) queries());
 	}
 
+	@Override
 	public void saveNet(File outFile) {
 		try {
 			writeNetToFile(outFile);

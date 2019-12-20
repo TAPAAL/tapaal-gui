@@ -3,6 +3,8 @@ package dk.aau.cs.gui;
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Pipe;
 
+import java.io.File;
+
 public interface TabContentActions {
 
     //public interface UndoRedo {
@@ -55,4 +57,6 @@ public interface TabContentActions {
     void zoomTo(int newZoomLevel);
 
     String getTabTitle();
+
+    void saveNet(File outFile);
 }
