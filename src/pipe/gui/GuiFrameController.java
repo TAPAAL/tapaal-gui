@@ -2,12 +2,14 @@ package pipe.gui;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TabContentActions;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import net.tapaal.helpers.Reference.MutableReference;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.NewTAPNPanel;
@@ -31,9 +33,27 @@ class GuiFrameController implements GuiFrameControllerActions{
         guiFrame = appGui;
         guiFrameDirectAccess = appGui;
 
-        appGui.registerController(this);
+        appGui.registerController(this, currentTab);
 
 
+    }
+
+    final MutableReference<TabContentActions> currentTab = new MutableReference<>();
+    //TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
+    //XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
+    @Override
+    public void changeToTab(TabContent tab) {
+
+        //De-register old model
+        currentTab.ifPresent(t -> t.setApp(null));
+
+        //Set current tab
+        currentTab.setReference(tab);
+
+        guiFrame.changeToTab(tab);
+
+        currentTab.ifPresent(t -> t.setApp(guiFrame));
+        guiFrameDirectAccess.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
     }
 
     @Override

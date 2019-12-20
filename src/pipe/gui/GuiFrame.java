@@ -24,6 +24,7 @@ import net.tapaal.Preferences;
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.dataLayer.NetType;
@@ -1305,34 +1306,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	// linked model and view
 	public void setChangeListenerOnTab() {
 
-		//This event will only fire if the tab index is changed, so it won't trigger if once
-		// also if code calls setSelectedIndex(index), thereby avoiding a loop.
+
 		appTab.addChangeListener(e -> {
-			changeToTab((TabContent) appTab.getSelectedComponent());
-		});
-	}
+					//This event will only fire if the tab index is changed, so it won't trigger if once
+					// also if code calls setSelectedIndex(index), thereby avoiding a loop.
+					TabContent tab = (TabContent) appTab.getSelectedComponent();
 
+					if (tab != null) {
+						guiFrameController.ifPresent(o -> o.changeToTab(tab));
+					}
+				}
+		);
 
-	final MutableReference<TabContentActions> currentTab = new MutableReference<>();
-	//TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
-	//XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
-	public void changeToTab(TabContent tab) {
-
-		//De-register old model
-		currentTab.ifPresent(t -> t.setApp(null));
-
-		//Set current tab
-		currentTab.setReference(tab);
-
-		if (tab !=null) {
-			//Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
-			// create a tabChanged event loop.
-			// Throw exception if tab is not found
-			appTab.setSelectedComponent(tab);
-		}
-
-		currentTab.ifPresent(t -> t.setApp(this));
-		setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
 	}
 
 
@@ -1444,7 +1429,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		CreateGui.addTab(tab);
 		appTab.addTab(tab.getTabTitle(), tab);
 
-		changeToTab(tab);
+		//XXX: changeToTab should be in controller, but for now we keep the reference directly
+		guiFrameController.ifPresent(o->o.changeToTab(tab));
 	}
 
 	public TabContent createNewTabFromInputStreamAndAttach(InputStream file, String name) throws Exception {
@@ -1616,9 +1602,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		statusBar.changeText(mode);
 	}
 
+
+	Reference<TabContentActions> currentTab = null;
 	@Override
-	public void registerController(GuiFrameControllerActions guiFrameController) {
+	public void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab) {
 		this.guiFrameController.setReference(guiFrameController);
+		this.currentTab = currentTab;
+	}
+
+	@Override
+	public void changeToTab(TabContent tab) {
+		if (tab !=null) {
+			//Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
+			// create a tabChanged event loop.
+			// Throw exception if tab is not found
+			appTab.setSelectedComponent(tab);
+		}
 	}
 
 	public Pipe.ElementType getMode() {

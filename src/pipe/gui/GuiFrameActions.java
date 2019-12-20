@@ -1,6 +1,8 @@
 package pipe.gui;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TabContentActions;
+import net.tapaal.helpers.Reference.Reference;
 
 /**
  * Used to delegate control of the state of AppGUI to tabs
@@ -21,5 +23,7 @@ public interface GuiFrameActions {
     //XXX temp while refactoring, kyrke - 2019-07-25
     void updateMode(Pipe.ElementType mode);
 
-    void registerController(GuiFrameControllerActions guiFrameController);
+    void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab);
+
+    void changeToTab(TabContent tab);
 }
