@@ -1387,11 +1387,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
 	}
 
-	private  void save() {
+	private void save() {
 		saveAs(appTab.getSelectedIndex(), false);
 	}
 	private void saveAs(){
 		saveAs(appTab.getSelectedIndex(), true);
+	}
+
+	private boolean save(int index) {
+		return saveAs(index, false);
 	}
 
 	private boolean saveAs(int index, boolean forceSaveAs) {
@@ -1477,7 +1481,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			switch (result) {
 			case JOptionPane.YES_OPTION:
-				boolean saved = saveAs(index, false);
+				boolean saved = save(index);
 				if(!saved) return false;
 				break;
 			case JOptionPane.CLOSED_OPTION:
