@@ -1433,6 +1433,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		guiFrameController.ifPresent(o->o.changeToTab(tab));
 	}
 
+
+	public void detachTabFromGuiFrame(TabContent tab) {
+		appTab.remove(tab);
+	}
+
 	public TabContent createNewTabFromInputStreamAndAttach(InputStream file, String name) throws Exception {
 		TabContent tab = TabContent.createNewTabFromInputStream(file, name);
 		attachTabToGuiFrame(tab);
@@ -2104,26 +2109,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	public TabContent getCurrentTab() { return CreateGui.getCurrentTab(); }
 	private TabContent getTab(int tabIndex) { return CreateGui.getTab(tabIndex); }
 
-
 	//If needed, add boolean forceClose, where net is not checkedForSave and just closed
 	//XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
 	public void closeTab(int index) {
 
 		if(appTab.getTabCount() > 0 && checkForSave(index)){
+
+			TabContent tab = (TabContent) appTab.getComponentAt(index);
+
 			//Close the gui part first, else we get an error bug #826578
-			appTab.removeTabAt(index);
+			detachTabFromGuiFrame(tab);
 			CreateGui.removeTab(index);
 
 			if(appTab.getTabCount() == 0) {
 				setGUIMode(GUIMode.noNet);
-			} else {
-				//XXX: The removeTabAt doews trigger changeToTab via tabChanged listener, but at this time
-				//the model is not updated yet, which make it change to a wrong tab, so we change it again
-				// --kyrke -2019-07-13
-				//changeToTab(appTab.getSelectedIndex());
 			}
-
-
 
 		}
 
