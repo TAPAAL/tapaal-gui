@@ -1387,11 +1387,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
 	}
 
-	private void saveOperation(boolean forceSave){
-		saveOperation(appTab.getSelectedIndex(), forceSave);
+	private void saveAs(boolean forceSave){
+		saveAs(appTab.getSelectedIndex(), forceSave);
 	}
 
-	private boolean saveOperation(int index, boolean forceSaveAs) {
+	private boolean saveAs(int index, boolean forceSaveAs) {
 		File modelFile = getTab(index).getFile();
 		boolean result;
 		if (!forceSaveAs && modelFile != null ) { // ordinary save
@@ -1474,7 +1474,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 			switch (result) {
 			case JOptionPane.YES_OPTION:
-				boolean saved = saveOperation(index, false);
+				boolean saved = saveAs(index, false);
 				if(!saved) return false;
 				break;
 			case JOptionPane.CLOSED_OPTION:
@@ -1784,7 +1784,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		fileMenu.add(saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				 if (canNetBeSavedAndShowMessage()) {
-                     saveOperation(false); 
+                     saveAs(false);
 				 }
 			}			
 		});
@@ -1793,7 +1793,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		fileMenu.add(saveAsAction = new GuiAction("Save as", "Save as...", KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK))) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    saveOperation(true); 
+                    saveAs(true);
 				}	
 			}
 		});
