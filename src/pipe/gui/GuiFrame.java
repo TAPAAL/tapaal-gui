@@ -1387,8 +1387,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
 	}
 
-	private void saveAs(boolean forceSave){
-		saveAs(appTab.getSelectedIndex(), forceSave);
+	private  void save() {
+		saveAs(appTab.getSelectedIndex(), false);
+	}
+	private void saveAs(){
+		saveAs(appTab.getSelectedIndex(), true);
 	}
 
 	private boolean saveAs(int index, boolean forceSaveAs) {
@@ -1784,7 +1787,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		fileMenu.add(saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				 if (canNetBeSavedAndShowMessage()) {
-                     saveAs(false);
+                     save();
 				 }
 			}			
 		});
@@ -1793,7 +1796,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		fileMenu.add(saveAsAction = new GuiAction("Save as", "Save as...", KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK))) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    saveAs(true);
+                    saveAs();
 				}	
 			}
 		});
