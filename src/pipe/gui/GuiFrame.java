@@ -1443,6 +1443,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	@Override
 	public void detachTabFromGuiFrame(TabContent tab) {
 		appTab.remove(tab);
+
+		if(appTab.getTabCount() == 0) {
+			setGUIMode(GUIMode.noNet);
+		}
 	}
 
 	public TabContent createNewTabFromInputStreamAndAttach(InputStream file, String name) throws Exception {
@@ -2128,9 +2132,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			detachTabFromGuiFrame(tab);
 			CreateGui.removeTab(index);
 
-			if(appTab.getTabCount() == 0) {
-				setGUIMode(GUIMode.noNet);
-			}
+
 
 		}
 
