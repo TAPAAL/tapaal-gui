@@ -1407,30 +1407,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private boolean saveAs(int index) {
-		return saveAs(index, true);
-	}
-
-	private boolean saveAs(int index, boolean forceSaveAs) {
-		File modelFile = getTab(index).getFile();
 		boolean result;
-		if (!forceSaveAs && modelFile != null ) { // ordinary save
+		// save as
+		String path = appTab.getTitleAt(index);
+
+		String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
+		if (filename != null) {
+			File modelFile = new File(filename);
 			getTab(index).saveNet(modelFile);
 			result = true;
-		} else { // save as
-			String path = appTab.getTitleAt(index);
-
-			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
-			if (filename != null) {
-				modelFile = new File(filename);
-				getTab(index).saveNet(modelFile);
-				result = true;
-			}else{
-				result = false;
-			}
-			if (result) {
-				appTab.setTitleAt(index, getTab(index).getTabTitle());
-				if(index == appTab.getSelectedIndex()) setTitle(getTab(index).getTabTitle()); // Change the window title
-			}
+		}else{
+			result = false;
+		}
+		if (result) {
+			appTab.setTitleAt(index, getTab(index).getTabTitle());
+			if(index == appTab.getSelectedIndex()) setTitle(getTab(index).getTabTitle()); // Change the window title
 		}
 
 		// resize "header" of current tab immediately to fit the length of the
