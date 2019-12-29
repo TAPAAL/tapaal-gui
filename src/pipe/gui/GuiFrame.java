@@ -1473,15 +1473,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * @return true if handled, false if cancelled
 	 */
 	private boolean checkForSave() {
-		return checkForSave(appTab.getSelectedIndex());
-	}
-
-	private boolean checkForSave(int index) {
+		int index = appTab.getSelectedIndex();
 
 		if(index < 0) return false;
 
 		if (getTab(index).getNetChanged()) {
-			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
+			int result = JOptionPane.showConfirmDialog(this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
 					JOptionPane.YES_NO_CANCEL_OPTION,
