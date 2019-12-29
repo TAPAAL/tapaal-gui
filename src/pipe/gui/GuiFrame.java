@@ -1409,12 +1409,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			getTab(index).saveNet(modelFile);
 			result = true;
 		} else { // save as
-			String path;
-			if (modelFile != null) {
-				path = modelFile.getParent();
-			} else {
-				path = appTab.getTitleAt(index);
-			}
+			String path = appTab.getTitleAt(index);
+
 			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
 			if (filename != null) {
 				modelFile = new File(filename);
