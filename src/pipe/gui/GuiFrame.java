@@ -1391,11 +1391,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		save(appTab.getSelectedIndex());
 	}
 	private void saveAs(){
-		saveAs(appTab.getSelectedIndex(), true);
+		saveAs(appTab.getSelectedIndex());
 	}
 
 	private boolean save(int index) {
 		return saveAs(index, false);
+	}
+
+	private boolean saveAs(int index) {
+		return saveAs(index, true);
 	}
 
 	private boolean saveAs(int index, boolean forceSaveAs) {
