@@ -1395,7 +1395,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private boolean save(int index) {
-		return saveAs(index, false);
+		File modelFile = getTab(index).getFile();
+		boolean result;
+		if (modelFile != null ) { // ordinary save
+			getTab(index).saveNet(modelFile);
+			result = true;
+		} else {
+			result = saveAs(index);
+		}
+		return result;
 	}
 
 	private boolean saveAs(int index) {
