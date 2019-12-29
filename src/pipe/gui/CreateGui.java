@@ -78,6 +78,11 @@ public class CreateGui {
 	}
 
 	@Deprecated
+	public static void removeTab(TabContent tab) {
+		tabs.remove(tab);
+	}
+
+	@Deprecated
 	public static TabContent getTab(int index) {
 		if (index < 0) {
 			return null;

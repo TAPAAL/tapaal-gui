@@ -198,8 +198,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			public Component generator() {
 				return new TabComponent(this) {
                     @Override
-                    protected void closeTab(int index) {
-                        GuiFrame.this.closeTab(index);
+                    protected void closeTab(TabContent tab) {
+                        GuiFrame.this.closeTab(tab);
                     }
                 };
 			}
@@ -1787,7 +1787,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		fileMenu.add(closeAction = new GuiAction("Close", "Close the current tab",  KeyStroke.getKeyStroke('W', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 
-				int index = appTab.getSelectedIndex();
+				TabContent index = (TabContent) appTab.getSelectedComponent();
 				closeTab(index);
 
 			}
@@ -2126,18 +2126,19 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	//If needed, add boolean forceClose, where net is not checkedForSave and just closed
 	//XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
-	public void closeTab(int index) {
+	public void closeTab(TabContent tab) {
+		if(tab != null) {
+			boolean closeNet = true;
+			if (tab.getNetChanged()) {
+				changeToTab(tab);
+				closeNet = checkForSave();
+			}
 
-		if(appTab.getTabCount() > 0 && checkForSave(index)){
-
-			TabContent tab = (TabContent) appTab.getComponentAt(index);
-
-			//Close the gui part first, else we get an error bug #826578
-			detachTabFromGuiFrame(tab);
-			CreateGui.removeTab(index);
-
-
-
+			if (closeNet) {
+				//Close the gui part first, else we get an error bug #826578
+				detachTabFromGuiFrame(tab);
+				CreateGui.removeTab(tab);
+			}
 		}
 
 	}
