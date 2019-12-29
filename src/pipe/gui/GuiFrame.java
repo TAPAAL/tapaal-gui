@@ -1472,7 +1472,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 * 
 	 * @return true if handled, false if cancelled
 	 */
-	private boolean checkForSave() {
+	private boolean showSavePendingChangesDialog() {
 		int index = appTab.getSelectedIndex();
 
 		if(index < 0) return false;
@@ -1507,7 +1507,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		// Loop through all tabs and check if they have been saved
 		for (int counter = 0; counter < appTab.getTabCount(); counter++) {
 			appTab.setSelectedIndex(counter);
-			if (!(checkForSave())) {
+			if (!(showSavePendingChangesDialog())) {
 				return false;
 			}
 		}
@@ -2128,7 +2128,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			boolean closeNet = true;
 			if (tab.getNetChanged()) {
 				changeToTab(tab);
-				closeNet = checkForSave();
+				closeNet = showSavePendingChangesDialog();
 			}
 
 			if (closeNet) {
