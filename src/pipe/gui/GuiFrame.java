@@ -1388,7 +1388,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	}
 
 	private void save() {
-		saveAs(appTab.getSelectedIndex(), false);
+		save(appTab.getSelectedIndex());
 	}
 	private void saveAs(){
 		saveAs(appTab.getSelectedIndex(), true);
