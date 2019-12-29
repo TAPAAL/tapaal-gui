@@ -1505,10 +1505,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 */
 	private boolean showSavePendingChangesDialogForAllTabs() {
 		// Loop through all tabs and check if they have been saved
-		for (int counter = 0; counter < appTab.getTabCount(); counter++) {
-			appTab.setSelectedIndex(counter);
-			if (!(showSavePendingChangesDialog())) {
-				return false;
+		for (int i = 0; i < appTab.getTabCount(); i++) {
+			TabContent tab = (TabContent) appTab.getComponentAt(i) ;
+
+			if (tab.getNetChanged()) {
+				changeToTab(tab);
+				if (!(showSavePendingChangesDialog())) {
+					return false;
+				}
 			}
 		}
 		return true;
