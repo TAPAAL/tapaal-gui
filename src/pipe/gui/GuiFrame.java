@@ -1419,14 +1419,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}else{
 			result = false;
 		}
+
+		//Update the guiFrame
 		if (result) {
 			appTab.setTitleAt(index, getTab(index).getTabTitle());
+			// resize "header" of current tab immediately to fit the length of the model name (if it shorter)
+			appTab.getTabComponentAt(index).doLayout();
 			if(index == appTab.getSelectedIndex()) setTitle(getTab(index).getTabTitle()); // Change the window title
 		}
 
-		// resize "header" of current tab immediately to fit the length of the
-		// model name
-		appTab.getTabComponentAt(index).doLayout();
 		return result;
 	}
 
