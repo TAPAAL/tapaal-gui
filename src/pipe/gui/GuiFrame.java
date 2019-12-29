@@ -819,7 +819,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new GuiAction("Batch processing", "Batch verification of multiple nets and queries", KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(checkForSaveAll()){
+				if(showSavePendingChangesDialogForAllTabs()){
 					BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
 				}
 			}
@@ -1503,7 +1503,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	 *
 	 * @return true if handled, false if cancelled
 	 */
-	private boolean checkForSaveAll() {
+	private boolean showSavePendingChangesDialogForAllTabs() {
 		// Loop through all tabs and check if they have been saved
 		for (int counter = 0; counter < appTab.getTabCount(); counter++) {
 			appTab.setSelectedIndex(counter);
@@ -1713,7 +1713,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
         }
 
 	public void exit(){
-		if (checkForSaveAll()) {
+		if (showSavePendingChangesDialogForAllTabs()) {
 			dispose();
 			System.exit(0);
 		}
