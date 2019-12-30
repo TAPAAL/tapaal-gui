@@ -1387,20 +1387,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	}
 
 	private void save() {
-		save(appTab.getSelectedIndex());
+		save(getTab(appTab.getSelectedIndex()));
 	}
 	private void saveAs(){
 		saveAs(getTab(appTab.getSelectedIndex()));
 	}
 
-	private boolean save(int index) {
-		File modelFile = getTab(index).getFile();
+	private boolean save(TabContent tab) {
+		File modelFile = tab.getFile();
 		boolean result;
 		if (modelFile != null ) { // ordinary save
-			getTab(index).saveNet(modelFile);
+			tab.saveNet(modelFile);
 			result = true;
 		} else {
-			result = saveAs(getTab(index));
+			result = saveAs(tab);
 		}
 		return result;
 	}
@@ -1476,7 +1476,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 			switch (result) {
 			case JOptionPane.YES_OPTION:
-				boolean saved = save(index);
+				boolean saved = save(getTab(index));
 				if(!saved) return false;
 				break;
 			case JOptionPane.CLOSED_OPTION:
