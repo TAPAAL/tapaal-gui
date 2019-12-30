@@ -881,7 +881,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private void duplicateAndConvertUntimed() {
 		TabContent duplicate = ((TabContent) appTab.getSelectedComponent()).duplicateTab();
 		convertToUntimedTab(duplicate);
-		attachTabToGuiFrame(duplicate);
+		guiFrameController.ifPresent(o->o.openTab(duplicate));
 	}
 
 	private void showAdvancedWorkspace(boolean advanced){
@@ -1449,13 +1449,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		}
 	}
 
-	public TabContent createNewTabFromInputStreamAndAttach(InputStream file, String name) throws Exception {
-		TabContent tab = TabContent.createNewTabFromInputStream(file, name);
-		attachTabToGuiFrame(tab);
-		return tab;
-	}
-
-
 	private void convertToUntimedTab(TabContent tab){
 		TabTransformer.removeTimingInformation(tab);
 	}
@@ -1754,7 +1747,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			        protected void done() {
 					    try {
 			        		List<TabContent> tabs = get();
-			        		tabs.forEach(o->attachTabToGuiFrame(o));
+			        		guiFrameController.ifPresent(o->o.openTab(tabs));
 						} catch (Exception e) {
 					    	JOptionPane.showMessageDialog(GuiFrame.this,
 									e.getMessage(),
@@ -1840,7 +1833,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 			        protected void done() {
 			        	try {
 					    	List<TabContent> tabs = get();
-					    	tabs.forEach(o->attachTabToGuiFrame(o));
+							guiFrameController.ifPresent(o->o.openTab(tabs));
 
 			        	} catch (Exception e) {
 			        		JOptionPane.showMessageDialog(GuiFrame.this,
@@ -1979,7 +1972,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 							InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
 							try {
 								TabContent net = TabContent.createNewTabFromInputStream(file, netname);
-								attachTabToGuiFrame(net);
+								guiFrameController.ifPresent(o->o.openTab(net));
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

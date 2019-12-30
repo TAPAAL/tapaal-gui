@@ -97,7 +97,7 @@ public class NewTAPNPanel extends JPanel {
 
 		try {
 			TabContent tab = TabContent.createNewEmptyTab(name, type);
-			frame.attachTabToGuiFrame(tab);
+			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
 					.showMessageDialog(

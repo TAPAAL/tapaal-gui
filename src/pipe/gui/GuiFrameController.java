@@ -39,6 +39,12 @@ class GuiFrameController implements GuiFrameControllerActions{
     }
 
     final MutableReference<TabContentActions> currentTab = new MutableReference<>();
+
+    @Override
+    public void openTab(TabContent tab) {
+        guiFrame.attachTabToGuiFrame(tab);
+    }
+
     //TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
     //XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
     @Override
