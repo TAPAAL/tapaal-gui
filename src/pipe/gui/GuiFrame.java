@@ -54,7 +54,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
-public class GuiFrame extends JFrame implements GuiFrameActions  {
+public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions  {
 
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
@@ -155,7 +155,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 	private GuiAction delayFireAction;
 	private GuiAction prevcomponentAction;
 	private GuiAction nextcomponentAction;
-
 
 	public enum GUIMode {
 		draw, animation, noNet
@@ -1422,13 +1421,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		//Update the guiFrame
 		if (result) {
-			appTab.setTitleAt(index, getTab(index).getTabTitle());
-			// resize "header" of current tab immediately to fit the length of the model name (if it shorter)
-			appTab.getTabComponentAt(index).doLayout();
-			if(index == appTab.getSelectedIndex()) setTitle(getTab(index).getTabTitle()); // Change the window title
+			updatedTabName(getTab(index));
 		}
 
 		return result;
+	}
+
+	@Override
+	public void updatedTabName(TabContent tab) {
+		int index = appTab.indexOfComponent(tab);
+
+		appTab.setTitleAt(index, tab.getTabTitle());
+
+		// resize "header" of current tab immediately to fit the length of the model name (if it shorter)
+		appTab.getTabComponentAt(index).doLayout();
+
+		if(index > 0 && index == appTab.getSelectedIndex()) {
+			setTitle(tab.getTabTitle()); // Change the window title
+		}
 	}
 
 	@Override
