@@ -1390,7 +1390,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		save(appTab.getSelectedIndex());
 	}
 	private void saveAs(){
-		saveAs(appTab.getSelectedIndex());
+		saveAs(getTab(appTab.getSelectedIndex()));
 	}
 
 	private boolean save(int index) {
@@ -1400,20 +1400,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			getTab(index).saveNet(modelFile);
 			result = true;
 		} else {
-			result = saveAs(index);
+			result = saveAs(getTab(index));
 		}
 		return result;
 	}
 
-	private boolean saveAs(int index) {
+	private boolean saveAs(TabContent tab) {
 		boolean result;
 		// save as
-		String path = appTab.getTitleAt(index);
+		String path = tab.getTabTitle();
 
 		String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
 		if (filename != null) {
 			File modelFile = new File(filename);
-			getTab(index).saveNet(modelFile);
+			tab.saveNet(modelFile);
 			result = true;
 		}else{
 			result = false;
