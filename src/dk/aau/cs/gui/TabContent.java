@@ -22,6 +22,7 @@ import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.helpers.Reference.Reference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
@@ -413,6 +414,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			name = name + ".tapn";
 		}
 		this.initialName = name;
+
+		safeApp.ifPresent(tab -> tab.updatedTabName(this));
 	}
 	public String getTabTitle() {
 		if (getFile()!=null) {
@@ -427,7 +430,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void setFile(File file) {
-			appFile = file;
+		appFile = file;
+		safeApp.ifPresent(tab -> tab.updatedTabName(this));
 	}
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
@@ -1115,6 +1119,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	/* GUI Model / Actions */
 
 	Optional<GuiFrameActions>  app = Optional.empty();
+	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 	@Override
 	public void setApp(GuiFrameActions newApp) {
 		this.app = Optional.ofNullable(newApp);
@@ -1129,6 +1134,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
 		}
 
+	}
+
+	@Override
+	public void setSafeGuiFrameActions(SafeGuiFrameActions ref) {
+		safeApp.setReference(ref);
 	}
 
 	@Override

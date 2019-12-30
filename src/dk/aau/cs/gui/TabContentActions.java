@@ -2,6 +2,7 @@ package dk.aau.cs.gui;
 
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Pipe;
+import pipe.gui.SafeGuiFrameActions;
 
 import java.io.File;
 
@@ -14,6 +15,8 @@ public interface TabContentActions {
     //}
 
     void setApp(GuiFrameActions app);
+
+    void setSafeGuiFrameActions(SafeGuiFrameActions ref);
 
     void zoomOut();
 

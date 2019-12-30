@@ -1419,11 +1419,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			result = false;
 		}
 
-		//Update the guiFrame
-		if (result) {
-			updatedTabName(getTab(index));
-		}
-
 		return result;
 	}
 
@@ -1436,7 +1431,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		// resize "header" of current tab immediately to fit the length of the model name (if it shorter)
 		appTab.getTabComponentAt(index).doLayout();
 
-		if(index > 0 && index == appTab.getSelectedIndex()) {
+		if(index >= 0 && index == appTab.getSelectedIndex()) {
 			setTitle(tab.getTabTitle()); // Change the window title
 		}
 	}
@@ -2043,6 +2038,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			}
 
 			if (closeNet) {
+				tab.setSafeGuiFrameActions(null);
 				//Close the gui part first, else we get an error bug #826578
 				detachTabFromGuiFrame(tab);
 				CreateGui.removeTab(tab);

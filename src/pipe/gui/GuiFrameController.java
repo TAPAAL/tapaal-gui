@@ -48,6 +48,7 @@ class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void openTab(TabContent tab) {
         CreateGui.addTab(tab);
+        tab.setSafeGuiFrameActions(guiFrameDirectAccess);
 
         guiFrame.attachTabToGuiFrame(tab);
         guiFrame.changeToTab(tab);
