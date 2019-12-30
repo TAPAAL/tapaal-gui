@@ -1433,11 +1433,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 	@Override
 	public void attachTabToGuiFrame(TabContent tab) {
-		CreateGui.addTab(tab);
 		appTab.addTab(tab.getTabTitle(), tab);
-
-		//XXX: changeToTab should be in controller, but for now we keep the reference directly
-		guiFrameController.ifPresent(o->o.changeToTab(tab));
 	}
 
 	@Override

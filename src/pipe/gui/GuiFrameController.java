@@ -42,7 +42,11 @@ class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void openTab(TabContent tab) {
+        CreateGui.addTab(tab);
+
         guiFrame.attachTabToGuiFrame(tab);
+        guiFrame.changeToTab(tab);
+
     }
 
     //TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
