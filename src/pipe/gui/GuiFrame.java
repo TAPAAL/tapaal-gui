@@ -1765,52 +1765,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-				
-				//Show loading cursor
-				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				//Do loading of net
-			    SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
-			        @Override
-			        protected List<TabContent> doInBackground() throws InterruptedException, Exception {
-			        	List<TabContent> fileOpened = new ArrayList<>();
-			        	for(File f : files){
-							if(f.exists() && f.isFile() && f.canRead()){
-								FileBrowser.userPath = f.getParent();
-								fileOpened.add(TabContent.createNewTabFromPNMLFile(f));
-							}
-						}
-			        	return fileOpened;
-			        }
-			        @Override
-			        protected void done() {
-			        	try {
-					    	List<TabContent> tabs = get();
-							guiFrameController.ifPresent(o->o.openTab(tabs));
-
-			        	} catch (Exception e) {
-			        		JOptionPane.showMessageDialog(GuiFrame.this,
-									e.getMessage(),
-									"Error loading file",
-									JOptionPane.ERROR_MESSAGE);
-							return;
-						}finally {
-							CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-						}
-			        }
-			    };
-			    worker.execute();
-			    
-			    //Sleep redrawing thread (EDT) until worker is done
-			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    /*while(!worker.isDone()) {
-			    	try {
-			    		Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }*/
+				guiFrameController.ifPresent(GuiFrameControllerActions::importPNMLFile);
 			}
 		});
 		

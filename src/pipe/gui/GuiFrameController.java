@@ -243,6 +243,56 @@ class GuiFrameController implements GuiFrameControllerActions{
 			    }*/
     }
 
+    @Override
+    public void importPNMLFile() {
+        final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+
+        //Show loading cursor
+        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //Do loading of net
+        SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
+            @Override
+            protected List<TabContent> doInBackground() throws InterruptedException, Exception {
+                List<TabContent> fileOpened = new ArrayList<>();
+                for(File f : files){
+                    if(f.exists() && f.isFile() && f.canRead()){
+                        FileBrowser.userPath = f.getParent();
+                        fileOpened.add(TabContent.createNewTabFromPNMLFile(f));
+                    }
+                }
+                return fileOpened;
+            }
+            @Override
+            protected void done() {
+                try {
+                    List<TabContent> tabs = get();
+                    openTab(tabs);
+
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                            e.getMessage(),
+                            "Error loading file",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }finally {
+                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+        };
+        worker.execute();
+
+        //Sleep redrawing thread (EDT) until worker is done
+        //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
+			    /*while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }*/
+    }
+
     //XXX 2018-05-23 kyrke, moved from CreateGui, static method
     //Needs further refactoring to seperate conserns
     public void checkForUpdate(boolean forcecheck) {

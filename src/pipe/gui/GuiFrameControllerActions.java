@@ -29,4 +29,6 @@ public interface GuiFrameControllerActions {
     void exit();
 
     void openTAPNFile();
+
+    void importPNMLFile();
 }
