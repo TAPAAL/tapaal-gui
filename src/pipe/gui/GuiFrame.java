@@ -1723,50 +1723,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions  {
 
 		fileMenu.add(openAction = new GuiAction("Open", "Open",  KeyStroke.getKeyStroke('O', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-				final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
-				//show loading cursor
-				CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				//Do loading
-			    SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
-			        @Override
-			        protected List<TabContent> doInBackground() throws InterruptedException, Exception, FileNotFoundException {
-			        	List<TabContent> filesOpened = new ArrayList<>();
-			        	for(File f : files){
-							if(f.exists() && f.isFile() && f.canRead()){
-								FileBrowser.userPath = f.getParent();
-								filesOpened.add(TabContent.createNewTabFromFile(f));
-							}
-						}
-			        	return filesOpened;
-			        }
-			        @Override
-			        protected void done() {
-					    try {
-			        		List<TabContent> tabs = get();
-			        		guiFrameController.ifPresent(o->o.openTab(tabs));
-						} catch (Exception e) {
-					    	JOptionPane.showMessageDialog(GuiFrame.this,
-									e.getMessage(),
-									"Error loading file",
-									JOptionPane.ERROR_MESSAGE);
-							return;
-						}finally {
-							CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-						}
-			        }
-			    };
-			    worker.execute();
-			    
-			    //Sleep redrawing thread (EDT) until worker is done
-			    //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    /*while(!worker.isDone()) {
-			    	try {
-			    		Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }*/
+				guiFrameController.ifPresent(GuiFrameControllerActions::openTAPNFile);
 			}
 		});
 

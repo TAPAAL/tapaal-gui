@@ -14,13 +14,18 @@ import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 class GuiFrameController implements GuiFrameControllerActions{
 
@@ -188,6 +193,54 @@ class GuiFrameController implements GuiFrameControllerActions{
     public void exit() {
         //XXX TODO: uses direct exit for now, untill safe is moved to controller, temp while refactoring //kyrke 2019-11-10
         guiFrameDirectAccess.exit();
+    }
+
+    @Override
+    public void openTAPNFile() {
+        final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
+        //show loading cursor
+        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //Do loading
+        SwingWorker<java.util.List<TabContent>, Void> worker = new SwingWorker<java.util.List<TabContent>, Void>() {
+            @Override
+            protected java.util.List<TabContent> doInBackground() throws InterruptedException, Exception, FileNotFoundException {
+                java.util.List<TabContent> filesOpened = new ArrayList<>();
+                for(File f : files){
+                    if(f.exists() && f.isFile() && f.canRead()){
+                        FileBrowser.userPath = f.getParent();
+                        filesOpened.add(TabContent.createNewTabFromFile(f));
+                    }
+                }
+                return filesOpened;
+            }
+            @Override
+            protected void done() {
+                try {
+                    List<TabContent> tabs = get();
+                    openTab(tabs);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                            e.getMessage(),
+                            "Error loading file",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }finally {
+                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+        };
+        worker.execute();
+
+        //Sleep redrawing thread (EDT) until worker is done
+        //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
+			    /*while(!worker.isDone()) {
+			    	try {
+			    		Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }*/
     }
 
     //XXX 2018-05-23 kyrke, moved from CreateGui, static method

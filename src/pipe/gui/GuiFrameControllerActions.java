@@ -27,4 +27,6 @@ public interface GuiFrameControllerActions {
     void showAbout();
 
     void exit();
+
+    void openTAPNFile();
 }
