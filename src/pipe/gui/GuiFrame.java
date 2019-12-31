@@ -1479,6 +1479,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				boolean saved = save(getTab(index));
 				if(!saved) return false;
 				break;
+			case JOptionPane.NO_OPTION:
+					return true;
 			case JOptionPane.CLOSED_OPTION:
 			case JOptionPane.CANCEL_OPTION:
 				return false;
