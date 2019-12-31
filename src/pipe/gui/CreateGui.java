@@ -2,6 +2,8 @@ package pipe.gui;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
@@ -92,6 +94,11 @@ public class CreateGui {
 	}
 
 	@Deprecated
+	public static List<TabContent> getTabs() {
+		return tabs;
+	}
+
+	@Deprecated
 	public static TabContent getCurrentTab() {
 		return getTab(appGui.getSelectedTabIndex());
 	}
@@ -128,4 +135,5 @@ public class CreateGui {
 		appGuiController.openTab(tab);
 		return tab;
 	}
+
 }

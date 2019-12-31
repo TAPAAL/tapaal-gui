@@ -198,7 +198,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				return new TabComponent(this) {
                     @Override
                     protected void closeTab(TabContent tab) {
-                        GuiFrame.this.closeTab(tab);
+                        GuiFrame.this.guiFrameController.ifPresent(o->o.closeTab(tab));
                     }
                 };
 			}
@@ -818,9 +818,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new GuiAction("Batch processing", "Batch verification of multiple nets and queries", KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(showSavePendingChangesDialogForAllTabs()){
-					BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
-				}
+				guiFrameController.ifPresent(GuiFrameControllerActions::showBatchProcessingDialog);
 			}
 		});
 		batchProcessing.setMnemonic('b');
@@ -1386,42 +1384,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		showDelayEnabledTransitions(!showDelayEnabledTransitions);
 	}
 
-	private void save() {
-		save(getTab(appTab.getSelectedIndex()));
-	}
-	private void saveAs(){
-		saveAs(getTab(appTab.getSelectedIndex()));
-	}
-
-	private boolean save(TabContent tab) {
-		File modelFile = tab.getFile();
-		boolean result;
-		if (modelFile != null ) { // ordinary save
-			tab.saveNet(modelFile);
-			result = true;
-		} else {
-			result = saveAs(tab);
-		}
-		return result;
-	}
-
-	private boolean saveAs(TabContent tab) {
-		boolean result;
-		// save as
-		String path = tab.getTabTitle();
-
-		String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
-		if (filename != null) {
-			File modelFile = new File(filename);
-			tab.saveNet(modelFile);
-			result = true;
-		}else{
-			result = false;
-		}
-
-		return result;
-	}
-
 	@Override
 	public void updatedTabName(TabContent tab) {
 		int index = appTab.indexOfComponent(tab);
@@ -1453,61 +1415,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private void convertToUntimedTab(TabContent tab){
 		TabTransformer.removeTimingInformation(tab);
 	}
-
-
-
-	/**
-	 * If current net has modifications, asks if you want to save and does it if
-	 * you want.
-	 * 
-	 * @return true if handled, false if cancelled
-	 */
-	private boolean showSavePendingChangesDialog(TabContent tab) {
-		if(null == tab) return false;
-
-		if (tab.getNetChanged()) {
-			changeToTab(tab);
-
-			int result = JOptionPane.showConfirmDialog(this,
-					"The net has been modified. Save the current net?",
-					"Confirm Save Current File",
-					JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.WARNING_MESSAGE);
-
-			switch (result) {
-			case JOptionPane.YES_OPTION:
-				boolean saved = save(tab);
-				return saved;
-			case JOptionPane.NO_OPTION:
-					return true;
-			case JOptionPane.CLOSED_OPTION:
-			case JOptionPane.CANCEL_OPTION:
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * If current net has modifications, asks if you want to save and does it if
-	 * you want.
-	 *
-	 * @return true if handled, false if cancelled
-	 */
-	private boolean showSavePendingChangesDialogForAllTabs() {
-		// Loop through all tabs and check if they have been saved
-		for (int i = 0; i < appTab.getTabCount(); i++) {
-			TabContent tab = (TabContent) appTab.getComponentAt(i) ;
-
-			if (tab.getNetChanged()) {
-				if (!(showSavePendingChangesDialog(tab))) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 
 
 	/**
@@ -1706,15 +1613,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 return false;
         }
 
-	public void exit(){
-		if (showSavePendingChangesDialogForAllTabs()) {
-			dispose();
-			System.exit(0);
-		}
-	}
-
-	
-	
 	private JMenu buildMenuFiles(int shortcutkey) {
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic('F');
@@ -1736,7 +1634,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			public void actionPerformed(ActionEvent arg0) {
 
 				TabContent index = (TabContent) appTab.getSelectedComponent();
-				closeTab(index);
+				guiFrameController.ifPresent(o->o.closeTab(index));
 
 			}
 
@@ -1747,7 +1645,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		fileMenu.add(saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
 				 if (canNetBeSavedAndShowMessage()) {
-                     save();
+                     guiFrameController.ifPresent(GuiFrameControllerActions::save);
 				 }
 			}			
 		});
@@ -1756,7 +1654,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		fileMenu.add(saveAsAction = new GuiAction("Save as", "Save as...", KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK))) {
 			public void actionPerformed(ActionEvent arg0) {
 				if (canNetBeSavedAndShowMessage()) {
-                    saveAs();
+					guiFrameController.ifPresent(GuiFrameControllerActions::saveAs);
 				}	
 			}
 		});
@@ -1904,12 +1802,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		}
 
 
-
-
-
 		fileMenu.add(exitAction = new GuiAction("Exit", "Close the program", KeyStroke.getKeyStroke('Q', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				exit();
+				guiFrameController.ifPresent(GuiFrameControllerActions::exit);
 			}
 		});
 
@@ -2027,23 +1922,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	public TabContent getCurrentTab() { return CreateGui.getCurrentTab(); }
 	private TabContent getTab(int tabIndex) { return CreateGui.getTab(tabIndex); }
 
-	//If needed, add boolean forceClose, where net is not checkedForSave and just closed
-	//XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
-	public void closeTab(TabContent tab) {
-		if(tab != null) {
-			boolean closeNet = true;
-			if (tab.getNetChanged()) {
-				closeNet = showSavePendingChangesDialog(tab);
-			}
 
-			if (closeNet) {
-				tab.setSafeGuiFrameActions(null);
-				//Close the gui part first, else we get an error bug #826578
-				detachTabFromGuiFrame(tab);
-				CreateGui.removeTab(tab);
-			}
-		}
-
-	}
 
 }

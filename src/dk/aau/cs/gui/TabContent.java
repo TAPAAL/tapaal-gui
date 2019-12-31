@@ -425,6 +425,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
+	@Override
 	public File getFile() {
 		return appFile;
 	}
@@ -944,6 +945,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private boolean netChanged = false;
+	@Override
 	public boolean getNetChanged() {
 		return netChanged;
 	}

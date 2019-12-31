@@ -35,6 +35,8 @@ public interface TabContentActions {
 
     void delayAndFire();
 
+    boolean getNetChanged();
+
     void toggleAnimationMode();
 
     void setMode(Pipe.ElementType mode);
@@ -46,6 +48,8 @@ public interface TabContentActions {
     void importXMLQueries();
 
     void workflowAnalyse();
+
+    File getFile();
 
     void verifySelectedQuery();
 

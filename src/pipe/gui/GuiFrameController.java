@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
 import dk.aau.cs.io.ResourceManager;
@@ -52,6 +53,26 @@ class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.attachTabToGuiFrame(tab);
         guiFrame.changeToTab(tab);
+
+    }
+
+    //If needed, add boolean forceClose, where net is not checkedForSave and just closed
+    //XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
+    @Override
+    public void closeTab(TabContent tab) {
+        if(tab != null) {
+            boolean closeNet = true;
+            if (tab.getNetChanged()) {
+                closeNet = showSavePendingChangesDialog(tab);
+            }
+
+            if (closeNet) {
+                tab.setSafeGuiFrameActions(null);
+                //Close the gui part first, else we get an error bug #826578
+                guiFrame.detachTabFromGuiFrame(tab);
+                CreateGui.removeTab(tab);
+            }
+        }
 
     }
 
@@ -192,8 +213,10 @@ class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void exit() {
-        //XXX TODO: uses direct exit for now, untill safe is moved to controller, temp while refactoring //kyrke 2019-11-10
-        guiFrameDirectAccess.exit();
+        if (showSavePendingChangesDialogForAllTabs()) {
+            guiFrameDirectAccess.dispose();
+            System.exit(0);
+        }
     }
 
     @Override
@@ -383,5 +406,99 @@ class GuiFrameController implements GuiFrameControllerActions{
         }
     }
 
+    @Override
+    public void save() {
+        save(currentTab.get());
+    }
+    @Override
+    public void saveAs(){
+        saveAs(currentTab.get());
+    }
 
+    @Override
+    public void showBatchProcessingDialog() {
+        if (showSavePendingChangesDialogForAllTabs()) {
+            BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
+        }
+    }
+
+    private boolean save(TabContentActions tab) {
+        File modelFile = tab.getFile();
+        boolean result;
+        if (modelFile != null ) { // ordinary save
+            tab.saveNet(modelFile);
+            result = true;
+        } else {
+            result = saveAs(tab);
+        }
+        return result;
+    }
+
+    private boolean saveAs(TabContentActions tab) {
+        boolean result;
+        // save as
+        String path = tab.getTabTitle();
+
+        String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
+        if (filename != null) {
+            File modelFile = new File(filename);
+            tab.saveNet(modelFile);
+            result = true;
+        }else{
+            result = false;
+        }
+
+        return result;
+    }
+
+    /**
+     * If current net has modifications, asks if you want to save and does it if
+     * you want.
+     *
+     * @return true if handled, false if cancelled
+     */
+    private boolean showSavePendingChangesDialog(TabContentActions tab) {
+        if(null == tab) return false;
+
+        if (tab.getNetChanged()) {
+            //XXX: this cast should not be done, its a quick fix while refactoring //kyrke 2019-12-31
+            changeToTab((TabContent) tab);
+
+            int result = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+                    "The net has been modified. Save the current net?",
+                    "Confirm Save Current File",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            switch (result) {
+                case JOptionPane.YES_OPTION:
+                    boolean saved = save(tab);
+                    return saved;
+                case JOptionPane.NO_OPTION:
+                    return true;
+                case JOptionPane.CLOSED_OPTION:
+                case JOptionPane.CANCEL_OPTION:
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * If current net has modifications, asks if you want to save and does it if
+     * you want.
+     *
+     * @return true if handled, false if cancelled
+     */
+    private boolean showSavePendingChangesDialogForAllTabs() {
+        // Loop through all tabs and check if they have been saved
+        for (TabContent tab : CreateGui.getTabs()) {
+            if (tab.getNetChanged()) {
+                if (!(showSavePendingChangesDialog(tab))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
