@@ -1462,12 +1462,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	 * 
 	 * @return true if handled, false if cancelled
 	 */
-	private boolean showSavePendingChangesDialog() {
-		int index = appTab.getSelectedIndex();
+	private boolean showSavePendingChangesDialog(TabContent tab) {
+		if(null == tab) return false;
 
-		if(index < 0) return false;
+		if (tab.getNetChanged()) {
+			changeToTab(tab);
 
-		if (getTab(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
@@ -1476,9 +1476,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 			switch (result) {
 			case JOptionPane.YES_OPTION:
-				boolean saved = save(getTab(index));
-				if(!saved) return false;
-				break;
+				boolean saved = save(tab);
+				return saved;
 			case JOptionPane.NO_OPTION:
 					return true;
 			case JOptionPane.CLOSED_OPTION:
@@ -1501,8 +1500,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			TabContent tab = (TabContent) appTab.getComponentAt(i) ;
 
 			if (tab.getNetChanged()) {
-				changeToTab(tab);
-				if (!(showSavePendingChangesDialog())) {
+				if (!(showSavePendingChangesDialog(tab))) {
 					return false;
 				}
 			}
@@ -2035,8 +2033,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		if(tab != null) {
 			boolean closeNet = true;
 			if (tab.getNetChanged()) {
-				changeToTab(tab);
-				closeNet = showSavePendingChangesDialog();
+				closeNet = showSavePendingChangesDialog(tab);
 			}
 
 			if (closeNet) {
