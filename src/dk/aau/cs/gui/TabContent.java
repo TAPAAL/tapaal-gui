@@ -31,11 +31,11 @@ import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
+import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import net.tapaal.swinghelpers.JSplitPaneFix;
@@ -1354,6 +1354,48 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+    @Override
+    public void increaseSpacing() {
+		double factor = 1.25;
+		changeSpacing(factor);
+		getUndoManager().addNewEdit(new ChangeSpacingEdit(factor, this));
+    }
+
+	@Override
+	public void decreaseSpacing() {
+		double factor = 0.8;
+		changeSpacing(factor);
+		getUndoManager().addNewEdit(new ChangeSpacingEdit(factor, this));
+	}
+
+	public void changeSpacing(double factor){
+		for(PetriNetObject obj : this.currentTemplate().guiModel().getPetriNetObjects()){
+			if(obj instanceof PlaceTransitionObject){
+				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
+
+				if(obj instanceof Transition){
+					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+				}
+
+				((PlaceTransitionObject) obj).update(true);
+			}else{
+				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+			}
+		}
+
+		this.currentTemplate().guiModel().repaintAll(true);
+		drawingSurface().updatePreferredSize();
 	}
 
 	public TabContent duplicateTab() {

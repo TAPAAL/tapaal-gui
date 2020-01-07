@@ -66,4 +66,8 @@ public interface TabContentActions {
     String getTabTitle();
 
     void saveNet(File outFile);
+
+    void increaseSpacing();
+
+    void decreaseSpacing();
 }

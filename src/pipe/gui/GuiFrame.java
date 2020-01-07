@@ -528,18 +528,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.add(incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ",
 				KeyStroke.getKeyStroke('U', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
-				double factor = 1.25;
-				changeSpacing(factor);
-				getCurrentTab().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				currentTab.ifPresent(TabContentActions::increaseSpacing);
 			}
 		});
 
 		viewMenu.add(decSpacingAction = new GuiAction("Decrease node spacing", "Decrease spacing by 20% ",
 				KeyStroke.getKeyStroke("shift U")) {
 			public void actionPerformed(ActionEvent arg0) {
-				double factor = 0.8;
-				changeSpacing(factor);
-				getCurrentTab().getUndoManager().addNewEdit(new ChangeSpacingEdit(factor));
+				currentTab.ifPresent(TabContentActions::decreaseSpacing);
 			}
 		});
 		
@@ -1573,34 +1569,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
 	
-	public void changeSpacing(double factor){
-		TabContent tabContent = (TabContent) appTab.getSelectedComponent();			
-		for(PetriNetObject obj : tabContent.currentTemplate().guiModel().getPetriNetObjects()){
-			if(obj instanceof PlaceTransitionObject){
-				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
-				
-				if(obj instanceof Transition){
-					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
-						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
-						}
-					}
-					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
-						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
-						}
-					}
-				}
-				
-				((PlaceTransitionObject) obj).update(true);
-			}else{
-				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
-			}
-		}
-		
-		tabContent.currentTemplate().guiModel().repaintAll(true);
-		getCurrentTab().drawingSurface().updatePreferredSize();
-	}
+
         
         private boolean canNetBeSavedAndShowMessage() {
                 if (getCurrentTab().network().paintNet()) {
@@ -1726,7 +1695,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                             String message = "In the saved PNML all timing information will be lost\n" +
                                     	"and the components in the net will be merged into one big net.";
                             Object[] dialogContent = {message, showAgain};
-                            JOptionPane.showMessageDialog(null, dialogContent, 
+                            JOptionPane.showMessageDialog(null, dialogContent,
                                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                             Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
                     }
