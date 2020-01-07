@@ -349,11 +349,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			toggleShowTokenAge();
 		}
 
-		Dimension dimension = prefs.getWindowSize();
-		if(dimension != null){
-			this.setSize(dimension);
-		}
+		setWindowSize(prefs.getWindowSize());
 
+	}
+
+	@Override
+	public void setWindowSize(Dimension dimension) {
+		if (dimension == null) return;
+
+		this.setSize(dimension);
 	}
 
 	/**
