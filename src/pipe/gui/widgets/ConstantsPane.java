@@ -245,9 +245,12 @@ public class ConstantsPane extends JPanel {
 			for(int i = 0; i < model.getSize(); i++){
 				((Constant) model.getElementAt(i)).setFocused(false);
 			}
-			blinkConstant(c);
+			for(int i = 0; i < model.getSize(); i++){
+				((Constant) model.getElementAt(i)).setVisible(true);
+			}
 			c.setFocused(true);
 			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+			blinkConstant(c);
 		}
 	}
 	
@@ -264,16 +267,16 @@ public class ConstantsPane extends JPanel {
 	}
 	
 	private void blinkConstant(final Constant c) {
-		timer = new Timer(200, new ActionListener() {
+		timer = new Timer(300, new ActionListener() {
 			long startTime = System.currentTimeMillis();
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(System.currentTimeMillis() - startTime < 3000) {
-					if(!c.hasFocus()) {
-						c.setFocused(true);
+				if(System.currentTimeMillis() - startTime < 2100) {
+					if(!c.getVisible()) {
+						c.setVisible(true);
 						CreateGui.getCurrentTab().drawingSurface().repaintAll();
 					} else {
-						c.setFocused(false);
+						c.setVisible(false);
 						CreateGui.getCurrentTab().drawingSurface().repaintAll();
 					}
 				} else {
@@ -477,5 +480,4 @@ public class ConstantsPane extends JPanel {
 		constantsList.setSelectedIndex(0);
 
 	}
-
 }

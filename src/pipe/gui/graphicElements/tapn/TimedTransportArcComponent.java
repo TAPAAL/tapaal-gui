@@ -121,16 +121,19 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 				if(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()){
 					focusedConstant = true;
 				}
+				pnName.setVisible(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible());
 			}
 			if(underlyingTransportArc.interval().upperBound() instanceof ConstantBound){
 				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().hasFocus()){
 					focusedConstant = true;
 				}
+				pnName.setVisible(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible());
 			}
 			if(getWeight() instanceof ConstantWeight){
 				if(((ConstantWeight) getWeight()).constant().hasFocus()){
 					focusedConstant = true;
 				}
+				pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
 			}
 			if(focusedConstant){
 				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
