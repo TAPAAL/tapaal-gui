@@ -121,7 +121,7 @@ public class PNMLoader {
 		Template template = new Template(tapn, new DataLayer(), new Zoomer());
 	
 		parseTimedArcPetriNet(netNode, tapn, template);
-		CreateGui.getAppGui().setHasPositionalInfo(hasPositionalInfo);
+		template.setHasPositionalInfo(hasPositionalInfo);
 		
 		network.setPaintNet(isNetDrawable());
 		tapn.setCheckNames(true);
