@@ -68,6 +68,7 @@ public class ConstantsPane extends JPanel {
 	private final static String toolTipMoveUp = "Move the selected constant up";
 	private final static String toolTipMoveDown = "Move the selected constant down";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
+	Timer timer;
 
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
@@ -237,7 +238,9 @@ public class ConstantsPane extends JPanel {
 	private void highlightConstant(int index){
 		ListModel model = constantsList.getModel();
 		Constant c = (Constant) model.getElementAt(index);
-		
+		if(timer != null) {
+			timer.stop();
+		}
 		if(c != null && !c.hasFocus()){
 			for(int i = 0; i < model.getSize(); i++){
 				((Constant) model.getElementAt(i)).setFocused(false);
@@ -261,7 +264,7 @@ public class ConstantsPane extends JPanel {
 	}
 	
 	private void blinkConstant(final Constant c) {
-		Timer timer = new Timer(200, new ActionListener() {
+		timer = new Timer(200, new ActionListener() {
 			long startTime = System.currentTimeMillis();
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -280,7 +283,7 @@ public class ConstantsPane extends JPanel {
 		});
 		timer.setRepeats(true);
 	    timer.setCoalesce(true);
-		timer.start();
+		timer.restart();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
