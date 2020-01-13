@@ -11,7 +11,8 @@ public abstract class FileBrowser  {
     //Default value null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
 	//XXX 2018-05-23 moved from CreateGUI, refactor with regards to usage with lastPath local var in this class
     public static String userPath = null;
-    String lastPath = null;
+    String lastSavePath = null;
+    String lastOpenPath = null;
 
 	public static FileBrowser constructor(String filetype, final String ext) {
 		return constructor(filetype, ext, null);
@@ -24,16 +25,13 @@ public abstract class FileBrowser  {
 
 		if(JavaUtil.getJREMajorVersion() >= 7){
 			FileBrowser newObject = new NativeFileBrowser(filetype, ext, optionalExt, path);
-			if(path != null) {
-				newObject.lastPath = path;
-			}
 
 			return newObject;
 		}else{
 			FileBrowser newObject = new NativeFileBrowserFallback(filetype, ext, optionalExt, path);
-			if(path != null) {
+			/*if(path != null) {
 				newObject.lastPath = path;
-			}
+			}*/
 			return newObject;
 		}
 

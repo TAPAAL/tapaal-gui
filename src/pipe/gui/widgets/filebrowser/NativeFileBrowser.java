@@ -14,20 +14,22 @@ import pipe.gui.CreateGui;
 class NativeFileBrowser extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
+	private String path;
 	NativeFileBrowser(String filetype, final String ext, String path) {
 		this(filetype, ext, "", path);
 	}
 	
 	NativeFileBrowser(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
-
+		this.path = path;
+		
 		if (filetype == null) {
 			filetype = "file";
 		}
-		if(path == null) path = lastPath;
+		//if(path == null) path = lastPath;
 
 		this.ext = ext;
-		fc.setDirectory(path);
+		//fc.setDirectory(path);
 
 		// Setup filter if extension specified
 		if(!ext.equals("")){
@@ -52,29 +54,35 @@ class NativeFileBrowser extends FileBrowser {
 	
 
 	public File openFile() {
+		if(path == null) path = lastOpenPath;
+		fc.setDirectory(path);
 		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMode(FileDialog.LOAD);
 		fc.setMultipleMode(false);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
-		lastPath = selectedDir;
+		lastOpenPath = selectedDir;
 		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
 		return file;
 	}
 	
 	public File[] openFiles() {
+		if(path == null) path = lastOpenPath;
+		fc.setDirectory(path);
 		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMultipleMode(true);
 		fc.setMode(FileDialog.LOAD);
 		fc.setVisible(true);
 		File[] selectedFiles = fc.getFiles();
 		String selectedDir = fc.getDirectory();
-		lastPath = selectedDir;
+		lastOpenPath = selectedDir;
 		return selectedFiles;
 	}
 	
 	public String saveFile(String suggestedName) {
+		if(path == null) path = lastSavePath;
+		fc.setDirectory(path);
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
@@ -90,7 +98,7 @@ class NativeFileBrowser extends FileBrowser {
 		}
 
 		String file = fc.getFile() == null? null: fc.getDirectory() + fc.getFile();
-		lastPath = fc.getDirectory();
+		lastSavePath = fc.getDirectory();
 		
 		if(file == null){
 			return file;
