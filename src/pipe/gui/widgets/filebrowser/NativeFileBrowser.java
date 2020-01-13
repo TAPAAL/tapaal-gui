@@ -14,14 +14,14 @@ import pipe.gui.CreateGui;
 class NativeFileBrowser extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
-	private String path;
+	private String specifiedPath;
 	NativeFileBrowser(String filetype, final String ext, String path) {
 		this(filetype, ext, "", path);
 	}
 	
 	NativeFileBrowser(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
-		this.path = path;
+		this.specifiedPath = path;
 		
 		if (filetype == null) {
 			filetype = "file";
@@ -54,8 +54,8 @@ class NativeFileBrowser extends FileBrowser {
 	
 
 	public File openFile() {
-		if(path == null) path = lastOpenPath;
-		fc.setDirectory(path);
+		if(specifiedPath == null) specifiedPath = lastOpenPath;
+		fc.setDirectory(specifiedPath);
 		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMode(FileDialog.LOAD);
 		fc.setMultipleMode(false);
@@ -68,8 +68,8 @@ class NativeFileBrowser extends FileBrowser {
 	}
 	
 	public File[] openFiles() {
-		if(path == null) path = lastOpenPath;
-		fc.setDirectory(path);
+		if(specifiedPath == null) specifiedPath = lastOpenPath;
+		fc.setDirectory(specifiedPath);
 		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMultipleMode(true);
 		fc.setMode(FileDialog.LOAD);
@@ -81,8 +81,8 @@ class NativeFileBrowser extends FileBrowser {
 	}
 	
 	public String saveFile(String suggestedName) {
-		if(path == null) path = lastSavePath;
-		fc.setDirectory(path);
+		if(specifiedPath == null) specifiedPath = lastSavePath;
+		fc.setDirectory(specifiedPath);
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
