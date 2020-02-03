@@ -1638,7 +1638,6 @@ public class GuiFrame extends JFrame  {
 			}
 			
 			String suggestedName = appTab.getTitleAt(index);
-			System.out.println("save as" + path);
 			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(suggestedName);
 			if (filename != null) {
 				modelFile = new File(filename);
