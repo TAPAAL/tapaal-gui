@@ -2600,7 +2600,7 @@ public class GuiFrame extends JFrame  {
 						e.printStackTrace();
 					}
 			    }
-			    if(!CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+			    if(files.length != 0 && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
 				    int dialogResult = JOptionPane.showConfirmDialog (null, "We noticed you do not have any positional info. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
 				    if(dialogResult == JOptionPane.YES_OPTION) {
 				    	SmartDrawDialog.showSmartDrawDialog();
