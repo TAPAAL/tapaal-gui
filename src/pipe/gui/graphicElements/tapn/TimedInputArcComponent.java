@@ -138,29 +138,38 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 				
 				// Handle constant highlighting
 				boolean focusedConstant = false;
+				boolean isvisible = true;
 				if(inputArc.interval().lowerBound() instanceof ConstantBound){
 					if(((ConstantBound) inputArc.interval().lowerBound()).constant().hasFocus()){
 						focusedConstant = true;
 					}
-					pnName.setVisible(((ConstantBound) inputArc.interval().lowerBound()).constant().getVisible());
+					
+					if(!((ConstantBound) inputArc.interval().lowerBound()).constant().getVisible()) {
+						isvisible = false;
+					}
 				}
 				if(inputArc.interval().upperBound() instanceof ConstantBound){
 					if(((ConstantBound) inputArc.interval().upperBound()).constant().hasFocus()){
 						focusedConstant = true;
 					}
-					pnName.setVisible(((ConstantBound) inputArc.interval().upperBound()).constant().getVisible());
+					if(!((ConstantBound) inputArc.interval().upperBound()).constant().getVisible()){
+						isvisible = false;
+					}
 				}
 				if(getWeight() instanceof ConstantWeight){
 					if(((ConstantWeight) getWeight()).constant().hasFocus()){
 						focusedConstant = true;
 					}
-					pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
+					if(((ConstantWeight) getWeight()).constant().getVisible()){
+						isvisible = false;
+					}									
 				}
 				if(focusedConstant){
 					pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
 				}else{
 					pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 				}
+				pnName.setVisible(isvisible);
 				
 			}
 			this.setLabelPosition();

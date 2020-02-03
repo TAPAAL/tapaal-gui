@@ -117,29 +117,37 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			
 			// Handle constant highlighting
 			boolean focusedConstant = false;
+			boolean isvisible = true;
 			if(underlyingTransportArc.interval().lowerBound() instanceof ConstantBound){
 				if(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()){
 					focusedConstant = true;
 				}
-				pnName.setVisible(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible());
+				if(!((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible()){
+					focusedConstant = false;
+				}
 			}
 			if(underlyingTransportArc.interval().upperBound() instanceof ConstantBound){
-				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().hasFocus()){
+				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()){
 					focusedConstant = true;
 				}
-				pnName.setVisible(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible());
+				if(!((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()){
+					isvisible = false;
+				}
 			}
 			if(getWeight() instanceof ConstantWeight){
 				if(((ConstantWeight) getWeight()).constant().hasFocus()){
 					focusedConstant = true;
 				}
-				pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
+				if(!((ConstantWeight) getWeight()).constant().hasFocus()){
+					isvisible = false;
+				}
 			}
 			if(focusedConstant){
 				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
 			}else{
 				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
+			pnName.setVisible(isvisible);
 			
 		} else if (!isInPreSet) {
 			pnName.setText(" : " + String.valueOf(getGroup()));
