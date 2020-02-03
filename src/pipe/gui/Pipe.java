@@ -77,7 +77,7 @@ public class Pipe {
 	public static Color QUERY_NOT_SATISFIED_COLOR = new Color(204, 0, 0);
 	public static Color QUERY_INCONCLUSIVE_COLOR = new Color(255, 153, 0);
 
-	public static final int verifytaMinRev = 5648;
+	public static final String verifytaMinRev = "4.1.19";
 	public static final String verifytapnMinRev = "1.3.0";
 	public static final String verifydtapnMinRev = "3.3.0";
 	public static final String verifypnMinRev = "3.0.2";
