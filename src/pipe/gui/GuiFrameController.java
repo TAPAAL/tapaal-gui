@@ -5,6 +5,7 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
 import dk.aau.cs.io.ResourceManager;
+import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -23,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ class GuiFrameController implements GuiFrameControllerActions{
 
     GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     GuiFrameActions guiFrame;
+
+    final MutableReference<TabContentActions> currentTab = new MutableReference<>();
 
     GuiFrameController(GuiFrame appGui) {
         super();
@@ -44,7 +48,56 @@ class GuiFrameController implements GuiFrameControllerActions{
 
     }
 
-    final MutableReference<TabContentActions> currentTab = new MutableReference<>();
+    //XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
+    boolean showComponents = true;
+    boolean showConstants = true;
+    boolean showQueries = true;
+    boolean showEnabledTransitions = true;
+    boolean showDelayEnabledTransitions = true;
+    private boolean showToolTips = true;
+    private boolean showZeroToInfinityIntervals = true;
+    private boolean showTokenAge = true;
+
+    private void loadPrefrences() {
+        Preferences prefs = Preferences.getInstance();
+
+        QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
+        TabContent.setEditorModelRoot(prefs.getEditorModelRoot());
+        TabContent.setSimulatorModelRoot(prefs.getSimulatorModelRoot());
+
+        showComponents = prefs.getShowComponents();
+        guiFrame.setShowComponentsSelected(showComponents);
+
+        showQueries = prefs.getShowQueries();
+        guiFrame.setShowQueriesSelected(showQueries);
+
+        showConstants = prefs.getShowConstants();
+        guiFrame.setShowConstantsSelected(showConstants);
+
+        showEnabledTransitions = prefs.getShowEnabledTransitions();
+        guiFrame.setShowEnabledTransitionsSelected(showEnabledTransitions);
+
+        showDelayEnabledTransitions = prefs.getShowDelayEnabledTransitions();
+        guiFrame.setShowDelayEnabledTransitionsSelected(showDelayEnabledTransitions);
+
+        DelayEnabledTransitionControl.setDefaultDelayMode(prefs.getDelayEnabledTransitionDelayMode());
+        DelayEnabledTransitionControl.setDefaultGranularity(prefs.getDelayEnabledTransitionGranularity());
+        DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
+
+        showToolTips = prefs.getShowToolTips();
+        guiFrame.setShowToolTipsSelected(showToolTips);
+
+        showZeroToInfinityIntervals = prefs.getShowZeroInfIntervals();
+        guiFrame.setShowZeroToInfinityIntervalsSelected(showZeroToInfinityIntervals);
+
+        showTokenAge = prefs.getShowTokenAge();
+        guiFrame.setShowTokenAgeSelected(showTokenAge);
+
+        guiFrame.setWindowSize(prefs.getWindowSize());
+
+    }
+
+
 
     @Override
     public void openTab(TabContent tab) {
@@ -150,12 +203,12 @@ class GuiFrameController implements GuiFrameControllerActions{
         prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
         prefs.setWindowSize(guiFrameDirectAccess.getSize());
 
-        prefs.setShowComponents(guiFrameDirectAccess.showComponents);
-        prefs.setShowQueries(guiFrameDirectAccess.showQueries);
-        prefs.setShowConstants(guiFrameDirectAccess.showConstants);
+        prefs.setShowComponents(showComponents);
+        prefs.setShowQueries(showQueries);
+        prefs.setShowConstants(showConstants);
 
-        prefs.setShowEnabledTrasitions(guiFrameDirectAccess.showEnabledTransitions);
-        prefs.setShowDelayEnabledTransitions(guiFrameDirectAccess.showDelayEnabledTransitions);
+        prefs.setShowEnabledTrasitions(showEnabledTransitions);
+        prefs.setShowDelayEnabledTransitions(showDelayEnabledTransitions);
         prefs.setShowTokenAge(guiFrameDirectAccess.showTokenAge());
         prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
         prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
@@ -501,4 +554,150 @@ class GuiFrameController implements GuiFrameControllerActions{
         }
         return true;
     }
+
+    @Override
+    public void toggleQueries(){
+        setQueries(!showQueries);
+    }
+    public void setQueries(boolean b){
+        showQueries = b;
+
+        guiFrame.setShowQueriesSelected(showQueries);
+        //currentTab.ifPresent(o->o.showQueries(showQueries));
+        CreateGui.getTabs().forEach(o->o.showQueries(showQueries));
+
+    }
+
+    @Override
+    public void toggleConstants(){
+        setConstants(!showConstants);
+    }
+
+    public void setConstants(boolean b){
+        showConstants = b;
+
+        guiFrame.setShowConstantsSelected(showConstants);
+        //currentTab.ifPresent(o->o.showConstantsPanel(showConstants));
+        CreateGui.getTabs().forEach(o->o.showConstantsPanel(showConstants));
+
+    }
+
+    @Override
+    public void toggleTokenAge(){
+        setTokenAge(!showTokenAge);
+    }
+    public void setTokenAge(boolean b){
+        showTokenAge = b;
+
+        Preferences.getInstance().setShowTokenAge(showTokenAge);
+
+        guiFrame.setShowTokenAgeSelected(showTokenAge);
+        currentTab.ifPresent(o->o.repaintAll());
+
+    }
+
+    @Override
+    public void toggleZeroToInfinityIntervals() {
+        setZeroToInfinityIntervals(!showZeroToInfinityIntervals);
+    }
+    public void setZeroToInfinityIntervals(boolean b) {
+        showZeroToInfinityIntervals = b;
+
+        guiFrame.setShowZeroToInfinityIntervalsSelected(showZeroToInfinityIntervals);
+
+        Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals);
+        currentTab.ifPresent(o->o.repaintAll());
+    }
+
+    @Override
+    public void toggleComponents(){
+        setComponents(!showComponents);
+    }
+
+    public void setComponents(boolean b){
+        showComponents = b;
+
+        guiFrame.setShowComponentsSelected(showComponents);
+        //currentTab.ifPresent(o->o.showComponents(showComponents));
+        CreateGui.getTabs().forEach(o->o.showComponents(showComponents));
+
+    }
+
+    @Override
+    public void toggleEnabledTransitionsList(){
+        setEnabledTransitionsList(!showEnabledTransitions);
+
+    }
+    private void setEnabledTransitionsList(boolean b){
+        showEnabledTransitions = b;
+        guiFrame.setShowEnabledTransitionsSelected(b);
+        currentTab.ifPresent(o->o.showEnabledTransitionsList(b));
+    }
+
+    @Override
+    public void toggleDelayEnabledTransitions(){
+        setDelayEnabledTransitions(!showDelayEnabledTransitions);
+    }
+
+    private void setDelayEnabledTransitions(boolean b) {
+        showDelayEnabledTransitions = b;
+        guiFrame.setShowDelayEnabledTransitionsSelected(b);
+        currentTab.ifPresent(o->o.showDelayEnabledTransitions(b));
+    }
+
+    @Override
+    public void toggleDisplayToolTips() {
+        setDisplayToolTips(!showToolTips);
+
+    }
+
+    private void setDisplayToolTips(boolean b) {
+        guiFrame.setShowToolTipsSelected(b);
+
+        Preferences.getInstance().setShowToolTips(b);
+
+        ToolTipManager.sharedInstance().setEnabled(b);
+        ToolTipManager.sharedInstance().setInitialDelay(400);
+        ToolTipManager.sharedInstance().setReshowDelay(800);
+        ToolTipManager.sharedInstance().setDismissDelay(60000);
+    }
+
+    @Override
+    public void showAdvancedWorkspace() {
+        showAdvancedWorkspace(true);
+    }
+
+    @Override
+    public void showSimpleWorkspace() {
+        showAdvancedWorkspace(false);
+    }
+    private void showAdvancedWorkspace(boolean advanced){
+        QueryDialog.setAdvancedView(advanced);
+        setComponents(advanced);
+        setConstants(advanced);
+
+        //Queries and enabled transitions should always be shown
+        setQueries(true);
+        setEnabledTransitionsList(true);
+        setDisplayToolTips(true);
+
+        currentTab.ifPresent(o->o.setResizeingDefault());
+
+        if(advanced) {
+
+            setZeroToInfinityIntervals(true);
+            setTokenAge(true);
+
+        } else {
+            setZeroToInfinityIntervals(false);
+            setTokenAge(false);
+        }
+
+        //Delay-enabled Transitions
+        //showDelayEnabledTransitions(advanced);
+        DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
+        DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
+        DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
+    }
+
 }

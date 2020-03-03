@@ -824,7 +824,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
-	public void showConstantsPanel(boolean enable) {
+	//XXX not sure about this
+    @Override
+    public void repaintAll() {
+		drawingSurface().repaintAll();
+    }
+
+    public void showConstantsPanel(boolean enable) {
 		if (enable != constantsPanel.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
 					enable);
@@ -833,10 +839,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		if (transitionFireing != null && !(enable && transitionFireing.isVisible())) {
-			animatorSplitPane.getMultiSplitLayout().displayNode(
-					transitionFireingName, enable);
-		}
+		//if (transitionFireing != null && !(enable && transitionFireing.isVisible())) {
+			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFireingName, enable);
+		//}
 	}
 	
 	public void showDelayEnabledTransitions(boolean enable){

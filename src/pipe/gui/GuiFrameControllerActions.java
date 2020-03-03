@@ -41,4 +41,16 @@ public interface GuiFrameControllerActions {
     void saveAs();
 
     void showBatchProcessingDialog();
+    void toggleQueries();
+    void toggleConstants();
+    void toggleTokenAge();
+    void toggleZeroToInfinityIntervals();
+    void toggleComponents();
+    void toggleEnabledTransitionsList();
+    void toggleDelayEnabledTransitions();
+    void toggleDisplayToolTips();
+
+    void showAdvancedWorkspace();
+
+    void showSimpleWorkspace();
 }

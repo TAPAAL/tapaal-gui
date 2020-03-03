@@ -70,4 +70,18 @@ public interface TabContentActions {
     void increaseSpacing();
 
     void decreaseSpacing();
+
+    void showQueries(boolean showDelayEnabledTransitions);
+
+    void repaintAll();
+
+    void showConstantsPanel(boolean showDelayEnabledTransitions);
+
+    void showComponents(boolean showDelayEnabledTransitions);
+
+    void showEnabledTransitionsList(boolean showDelayEnabledTransitions);
+
+    void showDelayEnabledTransitions(boolean showDelayEnabledTransitions);
+
+    void setResizeingDefault();
 }

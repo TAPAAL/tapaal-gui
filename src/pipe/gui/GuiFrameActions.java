@@ -32,4 +32,15 @@ public interface GuiFrameActions {
     void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab);
 
     void changeToTab(TabContent tab);
+
+    //Actions for controller
+    void setShowComponentsSelected(boolean b);
+    void setShowConstantsSelected(boolean b);
+    void setShowQueriesSelected(boolean b);
+    void setShowEnabledTransitionsSelected(boolean b);
+    void setShowDelayEnabledTransitionsSelected(boolean b);
+    void setShowToolTipsSelected(boolean b);
+    void setShowZeroToInfinityIntervalsSelected(boolean b);
+    void setShowTokenAgeSelected(boolean b);
+
 }

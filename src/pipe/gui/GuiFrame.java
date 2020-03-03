@@ -163,15 +163,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
 	private JCheckBoxMenuItem showTokenAgeCheckBox;
 
-	//XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
-	boolean showComponents = true;
-	boolean showConstants = true;
-	boolean showQueries = true;
-	boolean showEnabledTransitions = true;
-	boolean showDelayEnabledTransitions = true;
-	private boolean showToolTips = true;
-	private boolean showZeroToInfinityIntervals = true;
-	private boolean showTokenAge = true;
+
 
 	private JMenu zoomMenu;
 
@@ -207,8 +199,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		setChangeListenerOnTab(); // sets Tab properties
 
 		Grid.enableGrid();
-
-		loadPrefrences();
 
 		buildMenus();
 
@@ -323,35 +313,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
 	}
 
-	private void loadPrefrences() {
-		Preferences prefs = Preferences.getInstance();
 
-		QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
-		TabContent.setEditorModelRoot(prefs.getEditorModelRoot());
-		TabContent.setSimulatorModelRoot(prefs.getSimulatorModelRoot());
-		showComponents = prefs.getShowComponents();
-		showQueries = prefs.getShowQueries();
-		showConstants = prefs.getShowConstants();
-
-		showEnabledTransitions = prefs.getShowEnabledTransitions();
-		showDelayEnabledTransitions = prefs.getShowDelayEnabledTransitions();
-		DelayEnabledTransitionControl.setDefaultDelayMode(prefs.getDelayEnabledTransitionDelayMode());
-		DelayEnabledTransitionControl.setDefaultGranularity(prefs.getDelayEnabledTransitionGranularity());
-		DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
-
-		showToolTips = prefs.getShowToolTips();
-
-		if(showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
-			toggleShowZeroToInfinityIntervals();
-		}
-
-		if(showTokenAge() != prefs.getShowTokenAge()){
-			toggleShowTokenAge();
-		}
-
-		setWindowSize(prefs.getWindowSize());
-
-	}
 
 	@Override
 	public void setWindowSize(Dimension dimension) {
@@ -571,54 +533,54 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				KeyStroke.getKeyStroke('1', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleComponents();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleComponents);
 			}
 		};
-		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction);
+		addCheckboxMenuItem(viewMenu, showComponentsAction);
 
 		showQueriesAction = new GuiAction("Display queries", "Show/hide verification queries.",
 				KeyStroke.getKeyStroke('2', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleQueries();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleQueries);
 			}
 		};
-		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction);
+		addCheckboxMenuItem(viewMenu, showQueriesAction);
 
 		showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.",
 				KeyStroke.getKeyStroke('3', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleConstants();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
 			}
 		};
-		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction);
+		addCheckboxMenuItem(viewMenu, showConstantsAction);
 
 		showEnabledTransitionsAction = new GuiAction("Display enabled transitions",
 				"Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleEnabledTransitionsList();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
 			}
 		};
-		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction);
+		addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction);
 
 		showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions",
 				"Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('5', shortcutkey),
 				true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleDelayEnabledTransitions();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleDelayEnabledTransitions);
 			}
 		};
-		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitions, showDelayEnabledTransitionsAction);
+		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitionsAction);
 
 		showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)",
 				"Show/hide intervals [0,inf) that do not restrict transition firing in any way.",
 				KeyStroke.getKeyStroke('6', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleZeroToInfinityIntervals();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
 			}
 		};
 		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervals(),
@@ -628,17 +590,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				KeyStroke.getKeyStroke('7', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				showToolTips(!showToolTips);
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
 			}
 		};
-		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction);
+		addCheckboxMenuItem(viewMenu, showToolTipsAction);
 
 		showTokenAgeAction = new GuiAction("Display token age",
 				"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)",
 				KeyStroke.getKeyStroke('8', shortcutkey), true) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				toggleTokenAge();
+				guiFrameController.ifPresent(GuiFrameControllerActions::toggleTokenAge);
 			}
 		};
 		showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, showTokenAge(), showTokenAgeAction);
@@ -648,13 +610,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.add( showSimpleWorkspaceAction = new GuiAction("Show simple workspace", "Show only the most important panels", false) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				showAdvancedWorkspace(false);
+				guiFrameController.ifPresent(GuiFrameControllerActions::showSimpleWorkspace);
 			}
 		});
 		viewMenu.add( showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				showAdvancedWorkspace(true);
+				guiFrameController.ifPresent(GuiFrameControllerActions::showAdvancedWorkspace);
 			}
 		});
 		viewMenu.add( saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
@@ -665,6 +627,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		});
 		return viewMenu;
 	}
+
+
 
 	private JMenu buildMenuAnimation() {
 		/* Simulator */
@@ -881,44 +845,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		guiFrameController.ifPresent(o->o.openTab(duplicate));
 	}
 
-	private void showAdvancedWorkspace(boolean advanced){
-		QueryDialog.setAdvancedView(advanced);
-		showComponents(advanced);
-		showConstants(advanced);
-		showConstantsAction.setSelected(advanced);
-		showComponentsAction.setSelected(advanced);
-		showQueriesAction.setSelected(true);
-		//Queries and enabled transitions should always be shown
-		showQueries(true);
-		showEnabledTransitionsList(true);
-		showToolTips(true);
 
-		getCurrentTab().setResizeingDefault();
-
-		if(advanced) {
-			
-			if(!showZeroToInfinityIntervals()){
-				showZeroToInfinityIntervalsCheckBox.doClick();
-			}
-			if(!showTokenAge()){
-				showTokenAgeCheckBox.doClick();
-			}
-			
-		} else {
-			if(showZeroToInfinityIntervals()) {
-				showZeroToInfinityIntervalsCheckBox.doClick();
-			}
-			if(showTokenAge()) {
-				showTokenAgeCheckBox.doClick();
-			}
-		}
-
-		//Delay-enabled Transitions
-		//showDelayEnabledTransitions(advanced);
-		DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
-		DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
-		DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
-	}
 
 	private void buildToolbar() {
 
@@ -1078,6 +1005,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		toolBar.add(zoomComboBox);
 	}
 
+	private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
+		return addCheckboxMenuItem(menu, true, action);
+	}
 	private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
 		
 		JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem();
@@ -1318,71 +1248,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	}
 
 
-	private void showQueries(boolean enable){
-		showQueries = enable;
-		getCurrentTab().showQueries(enable);
 
-	}
-	private void toggleQueries(){
-		showQueries(!showQueries);
-	}
-
-	private void showConstants(boolean enable){
-		showConstants = enable;
-		getCurrentTab().showConstantsPanel(enable);
-
-	}
-	private void toggleConstants(){
-		showConstants(!showConstants);
-	}
-
-	private void showToolTips(boolean enable){
-		showToolTips = enable;
-		Preferences.getInstance().setShowToolTips(showToolTips);
-
-		ToolTipManager.sharedInstance().setEnabled(enable);
-		ToolTipManager.sharedInstance().setInitialDelay(400);
-		ToolTipManager.sharedInstance().setReshowDelay(800);
-		ToolTipManager.sharedInstance().setDismissDelay(60000);
-	}
-
-	private void toggleTokenAge(){
-		toggleShowTokenAge();
-		Preferences.getInstance().setShowTokenAge(showTokenAge());
-		getCurrentTab().drawingSurface().repaintAll();
-	}
-
-	private void toggleZeroToInfinityIntervals() {
-		toggleShowZeroToInfinityIntervals();
-		Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals());
-		getCurrentTab().drawingSurface().repaintAll();
-	}
-
-	private void showComponents(boolean enable){
-		showComponents = enable;
-		getCurrentTab().showComponents(enable);
-
-	}
-	private void toggleComponents(){
-		showComponents(!showComponents);
-	}
-
-	private void showEnabledTransitionsList(boolean enable){
-		showEnabledTransitions = enable;
-		getCurrentTab().showEnabledTransitionsList(enable);
-
-	}
-	private void toggleEnabledTransitionsList(){
-		showEnabledTransitionsList(!showEnabledTransitions);
-	}
-
-	private void showDelayEnabledTransitions(boolean enable){
-		showDelayEnabledTransitions = enable;
-		getCurrentTab().showDelayEnabledTransitions(enable);
-	}
-	private void toggleDelayEnabledTransitions(){
-		showDelayEnabledTransitions(!showDelayEnabledTransitions);
-	}
 
 	@Override
 	public void updatedTabName(TabContent tab) {
@@ -1438,17 +1304,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			}
 
 			getCurrentTab().switchToEditorComponents();
-			showComponents(showComponents);
-			showQueries(showQueries);
-			showConstants(showConstants);
-			showToolTips(showToolTips);
 
 			break;
 		case animation:
 
-			getCurrentTab().switchToAnimationComponents(showEnabledTransitions);
-
-			showComponents(showComponents);
+			getCurrentTab().switchToAnimationComponents(true);
 
 			startAction.setSelected(true);
 
@@ -1536,6 +1396,46 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			// Throw exception if tab is not found
 			appTab.setSelectedComponent(tab);
 		}
+	}
+
+	@Override
+	public void setShowComponentsSelected(boolean b) {
+		showComponentsAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowConstantsSelected(boolean b) {
+		showConstantsAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowQueriesSelected(boolean b) {
+		showQueriesAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowEnabledTransitionsSelected(boolean b) {
+		showEnabledTransitionsAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowDelayEnabledTransitionsSelected(boolean b) {
+		showDelayEnabledTransitionsAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowToolTipsSelected(boolean b) {
+		showTokenAgeAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowZeroToInfinityIntervalsSelected(boolean b) {
+		showZeroToInfinityIntervalsAction.setSelected(b);
+	}
+
+	@Override
+	public void setShowTokenAgeSelected(boolean b) {
+		showTokenAgeAction.setSelected(b);
 	}
 
 	public Pipe.ElementType getMode() {
@@ -1871,24 +1771,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	}
 
 	public boolean isShowingDelayEnabledTransitions() {
-		return showDelayEnabledTransitions;
-	}
-
-	private void toggleShowZeroToInfinityIntervals() {
-		showZeroToInfinityIntervals = !showZeroToInfinityIntervals;
+		//XXX:
+		return true;
+		//return showDelayEnabledTransitions;
 	}
 
 	public boolean showZeroToInfinityIntervals() {
-		return showZeroToInfinityIntervals;
+		return Preferences.getInstance().getShowZeroInfIntervals();
 	}
 
 	public boolean showTokenAge(){
-		return showTokenAge;
+		return Preferences.getInstance().getShowTokenAge();
 	}
 
-	private void toggleShowTokenAge(){
-		showTokenAge = !showTokenAge;
-	}
+
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); }
 
