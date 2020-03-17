@@ -193,7 +193,6 @@ public class GuiFrame extends JFrame  {
 	private boolean showZeroToInfinityIntervals = true;
 	private boolean showTokenAge = true;
 
-
 	private JMenu importMenu, exportMenu, zoomMenu;
 
 	public GuiFrame(String title) {
@@ -2600,6 +2599,12 @@ public class GuiFrame extends JFrame  {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+			    }
+			    if(files.length != 0 && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+				    int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+				    if(dialogResult == JOptionPane.YES_OPTION) {
+				    	SmartDrawDialog.showSmartDrawDialog();
+				    }
 			    }
 			}
 		});
