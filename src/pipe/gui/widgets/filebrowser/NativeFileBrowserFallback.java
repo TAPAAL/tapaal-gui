@@ -4,6 +4,7 @@ import java.awt.FileDialog;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ import pipe.gui.CreateGui;
 class NativeFileBrowserFallback extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
+	private String specifiedPath;
 	private JFileChooser fileChooser;
 	/**
 		This show native open/save dialogs for all type of dialogs except multifile open,
@@ -26,14 +28,15 @@ class NativeFileBrowserFallback extends FileBrowser {
 	}
 	NativeFileBrowserFallback(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
-
+		
+		specifiedPath = path;
 		if (filetype == null) {
 			filetype = "file";
 		}
-		if(path == null) path = lastPath;
+		//if(path == null) path = lastPath;
 
 		this.ext = ext;
-		fc.setDirectory(path);
+		//fc.setDirectory(path);
 
 		/* Setup JFileChooser for multi file selection */
 		fileChooser = new JFileChooser();
@@ -71,39 +74,47 @@ class NativeFileBrowserFallback extends FileBrowser {
 	}
 
 	public File openFile() {
+		if(specifiedPath == null) specifiedPath = lastOpenPath;
+		fc.setDirectory(specifiedPath);
 		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMode(FileDialog.LOAD);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
-		lastPath = selectedDir;
+		lastOpenPath = selectedDir;
 		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
 		return file;
 	}
 
 	public File[] openFiles() {
-		if (lastPath != null) {
+		if(specifiedPath == null) specifiedPath = lastOpenPath;
+		if(new File(specifiedPath).exists()) fileChooser.setCurrentDirectory(new File(specifiedPath));
+		/*if (lastPath != null) {
 			File path = new File(lastPath);
 			if (path.exists()) {
 				fileChooser.setCurrentDirectory(path);
 			}
-		}
+		}*/
 		File[] filesArray = new File[0];
 		int result = fileChooser.showOpenDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			filesArray = fileChooser.getSelectedFiles();
 		}
+		//They should all come from the same directory so we just take one
+		lastOpenPath = filesArray[0].getAbsolutePath();
 		return filesArray;
 	}
 
 
 	public String saveFile(String suggestedName) {
+		if(specifiedPath == null) specifiedPath = lastSavePath;
+		fc.setDirectory(specifiedPath);
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
 
 		String file = fc.getFile() == null? null: fc.getDirectory() + fc.getFile();
-		lastPath = fc.getDirectory();
+		lastSavePath = fc.getDirectory();
 
 		if(file == null){
 			return file;
