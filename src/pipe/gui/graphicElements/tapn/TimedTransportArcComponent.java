@@ -117,19 +117,29 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			
 			// Handle constant highlighting
 			boolean focusedConstant = false;
+			boolean isvisible = true;
 			if(underlyingTransportArc.interval().lowerBound() instanceof ConstantBound){
 				if(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()){
 					focusedConstant = true;
 				}
+				if(!((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible()){
+					focusedConstant = false;
+				}
 			}
 			if(underlyingTransportArc.interval().upperBound() instanceof ConstantBound){
-				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().hasFocus()){
+				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()){
 					focusedConstant = true;
+				}
+				if(!((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()){
+					isvisible = false;
 				}
 			}
 			if(getWeight() instanceof ConstantWeight){
 				if(((ConstantWeight) getWeight()).constant().hasFocus()){
 					focusedConstant = true;
+				}
+				if(!((ConstantWeight) getWeight()).constant().hasFocus()){
+					isvisible = false;
 				}
 			}
 			if(focusedConstant){
@@ -137,6 +147,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			}else{
 				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
+			pnName.setVisible(isvisible);
 			
 		} else if (!isInPreSet) {
 			pnName.setText(" : " + String.valueOf(getGroup()));

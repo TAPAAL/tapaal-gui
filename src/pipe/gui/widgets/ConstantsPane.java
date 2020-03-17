@@ -30,6 +30,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -67,6 +68,7 @@ public class ConstantsPane extends JPanel {
 	private final static String toolTipMoveUp = "Move the selected constant up";
 	private final static String toolTipMoveDown = "Move the selected constant down";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
+	Timer timer;
 
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
@@ -236,13 +238,19 @@ public class ConstantsPane extends JPanel {
 	private void highlightConstant(int index){
 		ListModel model = constantsList.getModel();
 		Constant c = (Constant) model.getElementAt(index);
-		
+		if(timer != null) {
+			timer.stop();
+		}
 		if(c != null && !c.hasFocus()){
 			for(int i = 0; i < model.getSize(); i++){
 				((Constant) model.getElementAt(i)).setFocused(false);
 			}
+			for(int i = 0; i < model.getSize(); i++){
+				((Constant) model.getElementAt(i)).setVisible(true);
+			}
 			c.setFocused(true);
 			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+			blinkConstant(c);
 		}
 	}
 	
@@ -256,6 +264,29 @@ public class ConstantsPane extends JPanel {
 		}catch(Exception e){
 			// It is okay, the tab has just been closed
 		}
+	}
+	
+	private void blinkConstant(final Constant c) {
+		timer = new Timer(300, new ActionListener() {
+			long startTime = System.currentTimeMillis();
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(System.currentTimeMillis() - startTime < 2100) {
+					if(!c.getVisible()) {
+						c.setVisible(true);
+						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					} else {
+						c.setVisible(false);
+						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					}
+				} else {
+					((Timer) e.getSource()).stop();
+				}
+			}
+		});
+		timer.setRepeats(true);
+	    timer.setCoalesce(true);
+		timer.restart();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
@@ -449,5 +480,4 @@ public class ConstantsPane extends JPanel {
 		constantsList.setSelectedIndex(0);
 
 	}
-
 }
