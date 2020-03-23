@@ -34,6 +34,7 @@ class NativeFileBrowser extends FileBrowser {
 		//fc.setDirectory(path);
 
 		// Setup filter if extension specified
+                //This is needed for Linux and Mac
 		if(!ext.equals("")){
 			if(!optionalExt.equals("")) {
 				fc.setFilenameFilter(new FilenameFilter() {
@@ -58,6 +59,7 @@ class NativeFileBrowser extends FileBrowser {
 	public File openFile() {
             if(specifiedPath == null) specifiedPath = lastOpenPath;
             fc.setDirectory(specifiedPath);
+            //This is needed for Windows
             if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
             else fc.setFile(ext.equals("")? "":("*."+ext+";*."+optionalExt));
             fc.setMode(FileDialog.LOAD);
@@ -73,6 +75,7 @@ class NativeFileBrowser extends FileBrowser {
 	public File[] openFiles() {
             if(specifiedPath == null) specifiedPath = lastOpenPath;
             fc.setDirectory(specifiedPath);
+            //This is needed for Windows
             if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
             else fc.setFile(ext.equals("")? "":("*."+ext+";*."+optionalExt));
             fc.setMultipleMode(true);

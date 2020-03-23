@@ -46,6 +46,7 @@ class NativeFileBrowserFallback extends FileBrowser {
 		FileNameExtensionFilter filter;
 
 		// Setup filter if extension specified
+                //This is needed for Linux and Mac
 		if(!ext.equals("")){
 			if(!optionalExt.equals("")) {
 				fc.setFilenameFilter(new FilenameFilter() {
@@ -78,6 +79,7 @@ class NativeFileBrowserFallback extends FileBrowser {
 	public File openFile() {
 		if(specifiedPath == null) specifiedPath = lastOpenPath;
 		fc.setDirectory(specifiedPath);
+                //This is needed for windows
 		if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
                 else fc.setFile(ext.equals("")? "":("*."+ext+";*."+optionalExt));
 		fc.setMode(FileDialog.LOAD);
