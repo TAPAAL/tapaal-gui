@@ -97,4 +97,8 @@ public class CreateGui {
 	public static GuiFrame getAppGui() {
 		return appGui;
 	}
+        
+        public static int getTabsSize(){
+            return tabs.size();
+        }
 }
