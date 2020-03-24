@@ -33,9 +33,15 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 
 public class ApproximationWorker {
-	public VerificationResult<TAPNNetworkTrace> normalWorker(VerificationOptions options, ModelChecker modelChecker,
-			Tuple<TimedArcPetriNet, NameMapping> transformedModel, ITAPNComposer composer, TAPNQuery clonedQuery,
-			RunVerificationBase verificationBase, TimedArcPetriNetNetwork model) throws Exception {
+	public VerificationResult<TAPNNetworkTrace> normalWorker(
+			VerificationOptions options,
+			ModelChecker modelChecker,
+			Tuple<TimedArcPetriNet, NameMapping> transformedModel,
+			ITAPNComposer composer,
+			TAPNQuery clonedQuery,
+			RunVerificationBase verificationBase,
+			TimedArcPetriNetNetwork model
+	) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;
@@ -323,9 +329,16 @@ public class ApproximationWorker {
 		return value;
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> batchWorker(Tuple<TimedArcPetriNet, NameMapping> composedModel,
-			VerificationOptions options, pipe.dataLayer.TAPNQuery query, LoadedBatchProcessingModel model,
-			ModelChecker modelChecker, TAPNQuery queryToVerify, TAPNQuery clonedQuery, BatchProcessingWorker verificationBase) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> batchWorker(
+			Tuple<TimedArcPetriNet, NameMapping> composedModel,
+			VerificationOptions options,
+			pipe.dataLayer.TAPNQuery query,
+			LoadedBatchProcessingModel model,
+			ModelChecker modelChecker,
+			TAPNQuery queryToVerify,
+			TAPNQuery clonedQuery,
+			BatchProcessingWorker verificationBase
+	) throws Exception {
 		InclusionPlaces oldInclusionPlaces = null;
 		if (options instanceof VerifyTAPNOptions)
 			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();

@@ -1018,10 +1018,6 @@ public class WorkflowDialog extends JDialog {
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
-					public void run() {
-					}
-
-					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
 						if(result.isQuerySatisfied()){
 							
@@ -1125,10 +1121,6 @@ public class WorkflowDialog extends JDialog {
 								false, true, false, null, ExtrapolationOption.AUTOMATIC,
 								WorkflowMode.WORKFLOW_SOUNDNESS);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
-
-					@Override
-					public void run() {
-					}
 
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
@@ -1240,10 +1232,6 @@ public class WorkflowDialog extends JDialog {
 										ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 										true, true, null, ExtrapolationOption.AUTOMATIC);
 						Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
-
-							@Override
-							public void run() {
-							}
 
 							@Override
 							public void run(VerificationResult<TAPNNetworkTrace> result) {

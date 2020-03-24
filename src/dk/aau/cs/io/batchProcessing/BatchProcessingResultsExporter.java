@@ -29,10 +29,15 @@ public class BatchProcessingResultsExporter {
 	private static final String name_NONE_APPROXIMATION = "None";
 	private static final String name_OVER_APPROXIMATION = "Over-approximation";
 	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
-	private static final String DELIMITER = ";";	
-	
+	private static final String DELIMITER = ";";
+
 	public void exportToCSV(Iterable<BatchProcessingVerificationResult> results, File outputFile) throws Exception {
 		PrintStream writer = new PrintStream(outputFile);
+		exportToCSV(results, writer);
+	}
+
+	public void exportToCSV(Iterable<BatchProcessingVerificationResult> results, PrintStream outputStream) throws Exception {
+		PrintStream writer = outputStream;
 		
 		writer.println("Model" + DELIMITER + 
 				       "Query" + DELIMITER + 
@@ -54,9 +59,7 @@ public class BatchProcessingResultsExporter {
 			TAPNQuery query = result.query();
 			
 			StringBuilder s = new StringBuilder();
-			
-			
-			
+
 			s.append(result.modelFile());
 			s.append(DELIMITER);
 			s.append((query != null) ? query.getName() : "");

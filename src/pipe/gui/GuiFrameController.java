@@ -30,14 +30,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-class GuiFrameController implements GuiFrameControllerActions{
+public class GuiFrameController implements GuiFrameControllerActions{
 
     GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     GuiFrameActions guiFrame;
 
     final MutableReference<TabContentActions> currentTab = new MutableReference<>();
 
-    GuiFrameController(GuiFrame appGui) {
+    public GuiFrameController(GuiFrame appGui) {
         super();
 
         guiFrame = appGui;

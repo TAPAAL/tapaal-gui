@@ -133,11 +133,20 @@ public class Verifyta implements ModelChecker {
 			resetVerifyta();
 			return false;
 		} else {
-			int version = Integer.parseInt(versionAsString);
 
-			if (version < Pipe.verifytaMinRev) {
-				return false;
+			String[] version = getVersion().split("\\.");
+			String[] targetversion = Pipe.verifytaMinRev.split("\\.");
+
+			for (int i = 0; i < targetversion.length; i++) {
+				if (version.length < i + 1) version[i] = "0";
+				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+				if (diff > 0) {
+					break;
+				} else if (diff < 0) {
+					return false;
+				}
 			}
+
 		}
 
 		return true;
@@ -164,8 +173,8 @@ public class Verifyta implements ModelChecker {
 		} catch (IOException e) {
 			result = null;
 		}
-		
-		Pattern pattern = Pattern.compile("\\((?:rev. )?(\\d+)\\)");
+
+		Pattern pattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+)");
 		Matcher m = pattern.matcher(versioninfo);
 		m.find();
 		result = m.group(1);
