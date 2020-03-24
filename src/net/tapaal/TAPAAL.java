@@ -74,14 +74,13 @@ public class TAPAAL {
 			Logger.log("Debug logging is enabled by default in DEV branch");
 		}
 
-		if (!commandline.hasOption("batch")) {
+		if (commandline.hasOption("batch")) {
 
-			//String[] files = commandline.getArgs();
+			String[] files = commandline.getArgs();
 			//String [] files = new String[] {"C:\\kyrke\\tapaal\\3.6\\src\\resources\\Example nets"};
 
 			//String [] files = new String[] {"C:\\kyrke\\tapaal\\testmodels-tapaal"};
-			String [] files = new String[] {"C:\\tmp\\subset2"};
-
+			//String [] files = new String[] {"C:\\tmp\\subset2"};
 			File batchFolder = new File(files[0]);
 
 			batchProcessing(batchFolder);
