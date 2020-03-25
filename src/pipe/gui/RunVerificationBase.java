@@ -81,78 +81,80 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
 		}
 		
-		if(options.enabledStateequationsCheck() &&
-				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
-				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
-			VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
-			if(!verifypn.supportsModel(transformedModel.value1(), options)){
-				// Skip over-approximation if model is not supported.
-				// Prevents verification from displaying error.
-			}
+		if(options.enabledStateequationsCheck()) {
+			if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() && !(options instanceof VerifyPNOptions)) {
+
+				VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
+				if (!verifypn.supportsModel(transformedModel.value1(), options)) {
+					// Skip over-approximation if model is not supported.
+					// Prevents verification from displaying error.
+				}
 
 
-			if(!verifypn.setup()){
-				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
-			}else{
-				VerificationResult<TimedArcPetriNetTrace> overapprox_result = null;
-				if(dataLayerQuery != null) {
-					overapprox_result = verifypn.verify(
-							new VerifyPNOptions(
-									options.extraTokens(),
-									options.traceOption(),
-									SearchOption.OVERAPPROXIMATE,
-									true,
-									ModelReduction.AGGRESSIVE,
-									options.enabledOverApproximation(),
-									options.enabledUnderApproximation(),
-									options.approximationDenominator(),
-									dataLayerQuery.getCategory(),
-									dataLayerQuery.getAlgorithmOption(),
-									dataLayerQuery.isSiphontrapEnabled(),
-									dataLayerQuery.isQueryReductionEnabled(),
-									dataLayerQuery.isStubbornReductionEnabled()
-							),
-							transformedModel,
-							clonedQuery
-					);
+				if (!verifypn.setup()) {
+					messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 				} else {
-					overapprox_result = verifypn.verify(
-							new VerifyPNOptions(
-									options.extraTokens(),
-									options.traceOption(),
-									SearchOption.OVERAPPROXIMATE,
-									true,
-									ModelReduction.AGGRESSIVE,
-									options.enabledOverApproximation(),
-									options.enabledUnderApproximation(),
-									options.approximationDenominator(),
-									pipe.dataLayer.TAPNQuery.QueryCategory.Default,
-									pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
-									false,
-									true,
-									false
-							),
-							transformedModel,
-							clonedQuery
-					);
+					VerificationResult<TimedArcPetriNetTrace> overapprox_result = null;
+					if (dataLayerQuery != null) {
+						overapprox_result = verifypn.verify(
+								new VerifyPNOptions(
+										options.extraTokens(),
+										options.traceOption(),
+										SearchOption.OVERAPPROXIMATE,
+										true,
+										ModelReduction.AGGRESSIVE,
+										options.enabledOverApproximation(),
+										options.enabledUnderApproximation(),
+										options.approximationDenominator(),
+										dataLayerQuery.getCategory(),
+										dataLayerQuery.getAlgorithmOption(),
+										dataLayerQuery.isSiphontrapEnabled(),
+										dataLayerQuery.isQueryReductionEnabled(),
+										dataLayerQuery.isStubbornReductionEnabled()
+								),
+								transformedModel,
+								clonedQuery
+						);
+					} else {
+						overapprox_result = verifypn.verify(
+								new VerifyPNOptions(
+										options.extraTokens(),
+										options.traceOption(),
+										SearchOption.OVERAPPROXIMATE,
+										true,
+										ModelReduction.AGGRESSIVE,
+										options.enabledOverApproximation(),
+										options.enabledUnderApproximation(),
+										options.approximationDenominator(),
+										pipe.dataLayer.TAPNQuery.QueryCategory.Default,
+										pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
+										false,
+										true,
+										false
+								),
+								transformedModel,
+								clonedQuery
+						);
+					}
+
+					if (overapprox_result.getQueryResult() != null) {
+						if (!overapprox_result.error() && model.isUntimed() || (
+								(query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
+										(query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
+						) {
+							VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
+									overapprox_result.getQueryResult(),
+									decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()),
+									overapprox_result.verificationTime(),
+									overapprox_result.stats(),
+									true
+							);
+							value.setNameMapping(transformedModel.value2());
+							return value;
+						}
+					}
 				}
 
-				if(overapprox_result.getQueryResult() != null){
-				    if(!overapprox_result.error() && model.isUntimed() || (
-						    (query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
-						    (query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
-						    ){
-					    VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
-					    		overapprox_result.getQueryResult(),
-							    decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()),
-							    overapprox_result.verificationTime(), 
-							    overapprox_result.stats(),
-							    true
-						);
-					    value.setNameMapping(transformedModel.value2());
-					    return value;
-				    }
-				}
 			}
 		}
 		
