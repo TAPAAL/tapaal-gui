@@ -67,17 +67,13 @@ public class RunningVerificationDialog extends JDialog {
 		setLayout(new GridBagLayout());
 		
 		timer = new Timer(1000, new AbstractAction() {
-			private static final long serialVersionUID = 1327695063762640628L;
-
 			public void actionPerformed(ActionEvent e) {
-				timerLabel.setText((System.currentTimeMillis() - startTimeMs)
-						/1000 + " s");
-				usageLabel.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
+				timerLabel.setText((System.currentTimeMillis() - startTimeMs) / 1000 + " s");
+				usageLabel.setText(peakMemory >= 0 ? peakMemory + " MB" : "N/A");
 			}
 		});	
 		
 		memoryTimer = new Timer(50, new AbstractAction() {
-			private static final long serialVersionUID = 1327695063762640628L;
 
 			public void actionPerformed(ActionEvent e) {
 				if(MemoryMonitor.isAttached()){
