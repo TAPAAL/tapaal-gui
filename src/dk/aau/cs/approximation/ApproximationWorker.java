@@ -65,6 +65,7 @@ public class ApproximationWorker {
 		}
 		else if (options.enableOverApproximation()) {
 			// Over-approximation
+			//ApproximationDenominator should not be able to be 1, if its one its the same as an exact analyses. --kyrke 2020-03-25
 			if (options.approximationDenominator() == 1) {
 				// If r = 1
 				// No matter what it answered -> return that answer
@@ -194,7 +195,7 @@ public class ApproximationWorker {
 					}
 				}
 			}
-			
+			//ApproximationDenominator should not be able to be 1, if its one its the same as an exact analyses. --kyrke 2020-03-25
 			if (options.approximationDenominator() == 1) { 
 				// If r = 1
 				// No matter it answered -> return that answer
@@ -514,7 +515,8 @@ public class ApproximationWorker {
         					verificationResult.isOverApproximationResult());
                     value.setNameMapping(composedModel.value2());
 	                    
-				} else if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && verificationResult.getQueryResult().isQuerySatisfied()
+				}
+				else if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && verificationResult.getQueryResult().isQuerySatisfied()
 						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
 					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 	                    
@@ -593,7 +595,8 @@ public class ApproximationWorker {
 	                }
 	            }
 	        }
-	    } else {
+	    }
+	    else {
 	        value =  new VerificationResult<TimedArcPetriNetTrace>(
 	                verificationResult.getQueryResult(),
 	                verificationResult.getTrace(),
