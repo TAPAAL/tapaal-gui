@@ -11,18 +11,12 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;
 
-public class VerifyTAPNOptions implements VerificationOptions{
-	protected TraceOption traceOption;
-	protected SearchOption searchOption;
-	protected int extraTokens;
+public class VerifyTAPNOptions extends VerificationOptions{
+
 	protected int tokensInModel;
 	private boolean symmetry;
-	private boolean useOverApproximation;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
-	private boolean enableOverApproximation;
-	private boolean enableUnderApproximation;
-	private int approximationDenominator;
 	
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
@@ -137,42 +131,5 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		
 		this.inclusionPlaces = inclusionPlaces;
 	}
-	
-	public boolean enabledStateequationsCheck(){
-		return useOverApproximation;
-	}
 
-	@Override
-	public int extraTokens() {
-		return extraTokens;
-	}
-
-	@Override
-	public TraceOption traceOption() {
-		return traceOption;
-	}
-	
-	public void setTraceOption(TraceOption option) {
-		traceOption = option;
-	}
-
-	@Override
-	public SearchOption searchOption() {
-		return searchOption;
-	}
-
-	@Override
-	public boolean enabledOverApproximation() {
-		return enableOverApproximation;
-	}
-
-	@Override
-	public boolean enabledUnderApproximation() {
-		return enableUnderApproximation;
-	}
-
-	@Override
-	public int approximationDenominator() {
-		return approximationDenominator;
-	}
 }
