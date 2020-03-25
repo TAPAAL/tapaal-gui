@@ -44,8 +44,7 @@ public class KBoundAnalyzer {
 		VerifyTAPNOptions options = verificationOptions();
 
 		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
-		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
-		dialog.setupListeners(analyzer);
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
 		analyzer.execute(options, tapnNetwork, query, null);
 		dialog.setVisible(true);
