@@ -1,12 +1,10 @@
 package pipe.gui;
 
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -65,12 +63,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		ITAPNComposer composer = new TAPNComposer(messenger, false);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
-		if (options.enableOverApproximation())
+		if (options.enabledOverApproximation())
 		{
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(transformedModel.value1(), options.approximationDenominator());
 		}
-		else if (options.enableUnderApproximation())
+		else if (options.enabledUnderApproximation())
 		{
 			UnderApproximation underaprx = new UnderApproximation();
 			underaprx.modifyTAPN(transformedModel.value1(), options.approximationDenominator());
@@ -83,7 +81,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
 		}
 		
-		if(options.useOverApproximation() &&
+		if(options.enabledStateequationsCheck() &&
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
 				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
 			VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
@@ -105,8 +103,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 									SearchOption.OVERAPPROXIMATE,
 									true,
 									ModelReduction.AGGRESSIVE,
-									options.enableOverApproximation(),
-									options.enableUnderApproximation(),
+									options.enabledOverApproximation(),
+									options.enabledUnderApproximation(),
 									options.approximationDenominator(),
 									dataLayerQuery.getCategory(),
 									dataLayerQuery.getAlgorithmOption(),
@@ -125,8 +123,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 									SearchOption.OVERAPPROXIMATE,
 									true,
 									ModelReduction.AGGRESSIVE,
-									options.enableOverApproximation(),
-									options.enableUnderApproximation(),
+									options.enabledOverApproximation(),
+									options.enabledUnderApproximation(),
 									options.approximationDenominator(),
 									pipe.dataLayer.TAPNQuery.QueryCategory.Default,
 									pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,

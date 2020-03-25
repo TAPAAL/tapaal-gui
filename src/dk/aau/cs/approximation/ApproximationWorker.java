@@ -50,7 +50,7 @@ public class ApproximationWorker {
 		
 		// Enable SOME_TRACE if not already
 		TraceOption oldTraceOption = options.traceOption();
-		if ((options.enableOverApproximation() || options.enableUnderApproximation())) {
+		if ((options.enabledOverApproximation() || options.enabledUnderApproximation())) {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		
@@ -63,7 +63,7 @@ public class ApproximationWorker {
 			options.setTraceOption(oldTraceOption);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-		else if (options.enableOverApproximation()) {
+		else if (options.enabledOverApproximation()) {
 			// Over-approximation
 			//ApproximationDenominator should not be able to be 1, if its one its the same as an exact analyses. --kyrke 2020-03-25
 			if (options.approximationDenominator() == 1) {
@@ -180,7 +180,7 @@ public class ApproximationWorker {
 					}
 			}
 		} 
-		else if (options.enableUnderApproximation()) {
+		else if (options.enabledUnderApproximation()) {
 			// Under-approximation
 			
 			if (result.getTrace() != null) {

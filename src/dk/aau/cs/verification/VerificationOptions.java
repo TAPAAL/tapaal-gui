@@ -10,9 +10,9 @@ public interface VerificationOptions {
 	// String getOption(String option);
 
 	String toString();
-	boolean useOverApproximation();
-	boolean enableOverApproximation();
-	boolean enableUnderApproximation();
+	boolean enabledStateequationsCheck();
+	boolean enabledOverApproximation();
+	boolean enabledUnderApproximation();
 	int approximationDenominator();
 	int extraTokens();
 	TraceOption traceOption();

@@ -80,7 +80,7 @@ public class VerifytaOptions implements VerificationOptions {
 	}
 
 	@Override
-	public boolean useOverApproximation() {
+	public boolean enabledStateequationsCheck() {
 		return useOverApproximation;
 	}
 
@@ -105,12 +105,12 @@ public class VerifytaOptions implements VerificationOptions {
 	}
 	
 	@Override
-	public boolean enableOverApproximation() {
+	public boolean enabledOverApproximation() {
 		return enableOverApproximation;
 	}
 
 	@Override
-	public boolean enableUnderApproximation() {
+	public boolean enabledUnderApproximation() {
 		return enableUnderApproximation;
 	}
 
