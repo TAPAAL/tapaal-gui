@@ -67,15 +67,15 @@ public class RunningVerificationDialog extends JDialog {
 
 	private void initActions() {
 		okButton.addActionListener(evt -> {
-			worker.cancel(true);
 			closeWindow();
+			worker.cancel(true);
 		});
 
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				worker.cancel(true);
 				closeWindow();
+				worker.cancel(true);
 			}
 		});
 

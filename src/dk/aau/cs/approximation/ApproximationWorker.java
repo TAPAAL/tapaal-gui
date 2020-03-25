@@ -56,9 +56,7 @@ public class ApproximationWorker {
 		
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
-		if (verificationBase.isCancelled()) {
-			verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-		}
+
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
@@ -108,9 +106,7 @@ public class ApproximationWorker {
 						// run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
 						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
-						if (verificationBase.isCancelled()) {
-							verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-						}
+
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
 							// if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
@@ -254,9 +250,7 @@ public class ApproximationWorker {
 						//run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
 						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
-						if (verificationBase.isCancelled()) {
-							verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-						}
+
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
 							// if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
@@ -414,9 +408,7 @@ public class ApproximationWorker {
 	                //run model checker again for trace TAPN
 	                MemoryMonitor.cumulateMemory();
 	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
-	                if (verificationBase.isCancelled()) {
-	                	verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-	                }
+
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
 	                    return new VerificationResult<TimedArcPetriNetTrace>(
@@ -545,9 +537,7 @@ public class ApproximationWorker {
 	                    //run model checker again for trace TAPN
 	                    MemoryMonitor.cumulateMemory();
 	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
-	                    if (verificationBase.isCancelled()) {
-	                    	verificationBase.firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-	                    }
+
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);
 	        				return new VerificationResult<TimedArcPetriNetTrace>(
