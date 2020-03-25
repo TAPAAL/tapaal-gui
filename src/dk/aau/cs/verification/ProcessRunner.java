@@ -65,10 +65,9 @@ public class ProcessRunner {
 			return;
 		}
 
-		BufferDrain stdout = new BufferDrain(new BufferedReader(
-				new InputStreamReader(process.getInputStream())));
-		BufferDrain stderr = new BufferDrain(new BufferedReader(
-				new InputStreamReader(process.getErrorStream())));
+		//Wrapping in BufferDrain as windows has really small buffers.
+		BufferDrain stdout = new BufferDrain(new BufferedReader(new InputStreamReader(process.getInputStream())));
+		BufferDrain stderr = new BufferDrain(new BufferedReader(new InputStreamReader(process.getErrorStream())));
 
 		stdout.start();
 		stderr.start();
