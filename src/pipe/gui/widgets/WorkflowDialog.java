@@ -207,13 +207,10 @@ public class WorkflowDialog extends JDialog {
 	private boolean isConclusive = true;
 	private long m;
 	private int B;
-	private Constant c = null;
-	private TimedPlace done = null;
-	
-	private static int numErrorsShown = 5;
+
 	private static int maxStringLength = LABEL_UNUSED_TRANSITIONS.length();
 
-	private TimedArcPetriNetNetwork model = null;
+	private TimedArcPetriNetNetwork model;
 
 	private boolean isInTraceMode = false;
 
