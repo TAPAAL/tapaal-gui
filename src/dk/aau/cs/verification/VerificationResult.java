@@ -78,7 +78,7 @@ public class VerificationResult<TTrace> {
 		return returnList;
 	}
         
-        public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
+	public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
 		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
 		for (int i = 0; i < stats.placeBoundCount();i++) {
 			Tuple<String,Integer> element = stats.getPlaceBoundStats(i);
@@ -133,7 +133,6 @@ public class VerificationResult<TTrace> {
 	}
 
 	public long verificationTime() {
-
 		return verificationTime;
 	}
 
