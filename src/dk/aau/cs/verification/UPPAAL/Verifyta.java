@@ -345,8 +345,9 @@ public class Verifyta implements ModelChecker {
 
 	private String readOutput(BufferedReader reader) {
 		try {
-			if (!reader.ready())
+			if (!reader.ready()) {
 				return "";
+			}
 		} catch (IOException e1) {
 			return "";
 		}

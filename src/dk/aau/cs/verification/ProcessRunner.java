@@ -88,10 +88,8 @@ public class ProcessRunner {
 			return;
 		}
 
-		bufferedReaderStdout = new BufferedReader(new StringReader(stdout
-				.getString()));
-		bufferedReaderStderr = new BufferedReader(new StringReader(stderr
-				.getString()));
+		bufferedReaderStdout = new BufferedReader(new StringReader(stdout.getString()));
+		bufferedReaderStderr = new BufferedReader(new StringReader(stderr.getString()));
 
 		runningTime = endTimeMs - startTimeMs;
 	}

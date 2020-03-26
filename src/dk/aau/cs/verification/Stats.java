@@ -23,7 +23,7 @@ public class Stats {
 	private int maxExecutionTime;
 	private ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking;
 	private List<Tuple<String,Integer>> transitionStats;
-        private List<Tuple<String,Integer>> placeBoundStats;
+	private List<Tuple<String,Integer>> placeBoundStats;
 	private ReductionStats reductionStats;
 	
 	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, List<Tuple<String,Integer>> placeBoundStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking)
@@ -63,7 +63,7 @@ public class Stats {
 	public Stats(long configurations, long markings, long edges, long processedEdges, long processedNEdges, long exploredConfigurations){
         this.configurations = configurations;
         this.markings = markings;
-	this.discovered = markings;
+		this.discovered = markings;
         this.edges = edges;
         this.processedEdges = processedEdges;
         this.processedNEdges = processedNEdges;
@@ -73,8 +73,8 @@ public class Stats {
 	public Integer transitionsCount() {
 		return transitionStats.size();
 	}
-	
-        public Integer placeBoundCount() {
+
+	public Integer placeBoundCount() {
 		return placeBoundStats.size();
 	}
         
@@ -82,7 +82,7 @@ public class Stats {
 		return transitionStats.get(index);
 	}
 	
-        public Tuple<String,Integer> getPlaceBoundStats(int index) {
+	public Tuple<String,Integer> getPlaceBoundStats(int index) {
 		return placeBoundStats.get(index);
 	}
         
@@ -128,12 +128,6 @@ public class Stats {
     }
     public long getExploredConfigurations() {
         return exploredConfigurations;
-    }
-    
-    public void addStats(Stats stats) {
-    	explored += stats.exploredStates();
-    	discovered += stats.discoveredStates();
-    	stored += stats.storedStates();
     }
 
 	public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){
