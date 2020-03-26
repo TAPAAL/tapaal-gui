@@ -175,9 +175,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			verifydtapnpath = path;
 			Preferences.getInstance().setVerifydtapnLocation(path);
 			if(!isCorrectVersion()){
-				messenger
-				.displayErrorMessage(
-						"The specified version of the file verifydtapn is too old.", "Verifydtapn Error");
+				messenger.displayErrorMessage("The specified version of the file verifydtapn is too old.", "Verifydtapn Error");
 				verifydtapnpath = oldPath;
 				Preferences.getInstance().setVerifydtapnLocation(oldPath);
 			}
@@ -212,7 +210,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-				String verifydtapn = null;
+				String verifydtapn;
 
 				//If env is set, it overwrites the value
 				verifydtapn = System.getenv("verifydtapn");
@@ -223,7 +221,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 						if(v.isCorrectVersion()){
 							return true;
 						}else{
-							verifydtapn = null;
 							verifydtapnpath = null;
 						}
 					}
@@ -237,7 +234,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 					if(v.isCorrectVersion()){
 						return true;
 					}else{
-						verifydtapn = null;
 						verifydtapnpath = null;
 					}
 				}
@@ -256,7 +252,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 						if(v.isCorrectVersion()){
 							return true;
 						}else{
-							verifydtapn = null;
 							verifydtapnpath = null;
 						}
 
@@ -308,8 +303,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 						inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
 					}
 				}
-				else // shared place
+				else { // shared place
 					inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
+				}
 			}
 			
 			((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
