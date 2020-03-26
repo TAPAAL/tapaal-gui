@@ -2,8 +2,6 @@ package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
 
-import javax.swing.SwingWorker.StateValue;
-
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.RunVerificationBase;
 import pipe.gui.widgets.InclusionPlaces;
@@ -74,7 +72,7 @@ public class ApproximationWorker {
 						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 						result.verificationTime(),
 						result.stats(),
-						result.isOverApproximationResult());
+						result.isSolvedUsingStateEquation());
 				toReturn.setNameMapping(transformedModel.value2());
 			} else {
 				// If r > 1
@@ -90,7 +88,7 @@ public class ApproximationWorker {
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								approxResult.isOverApproximationResult());
+								approxResult.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 						
 						OverApproximation overaprx = new OverApproximation();
@@ -135,7 +133,7 @@ public class ApproximationWorker {
 								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime() + result.verificationTime(),
 								approxResult.stats(),
-								approxResult.isOverApproximationResult());
+								approxResult.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 					} 
 					else if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !result.getQueryResult().isQuerySatisfied())
@@ -155,7 +153,7 @@ public class ApproximationWorker {
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								approxResult.isOverApproximationResult());
+								approxResult.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 					} else {
 						// We cannot use the result directly, and did not get a trace.
@@ -170,7 +168,7 @@ public class ApproximationWorker {
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								approxResult.isOverApproximationResult());
+								approxResult.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 						
 					}
@@ -202,7 +200,7 @@ public class ApproximationWorker {
 						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 						result.verificationTime(),
 						result.stats(),
-						result.isOverApproximationResult());
+						result.isSolvedUsingStateEquation());
 				toReturn.setNameMapping(transformedModel.value2());
 			}
 			else {
@@ -218,7 +216,7 @@ public class ApproximationWorker {
 							decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 							result.verificationTime(),
 							result.stats(),
-							result.isOverApproximationResult());
+							result.isSolvedUsingStateEquation());
 					toReturn.setNameMapping(transformedModel.value2());
 				} else if ((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied()
 						|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && ! result.getQueryResult().isQuerySatisfied())) {
@@ -233,7 +231,7 @@ public class ApproximationWorker {
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								result.isOverApproximationResult());
+								result.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 						
 						OverApproximation overaprx = new OverApproximation();
@@ -282,7 +280,7 @@ public class ApproximationWorker {
 								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime() + result.verificationTime(),
 								approxResult.stats(),
-								approxResult.isOverApproximationResult());
+								approxResult.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 					}
 					else {
@@ -297,7 +295,7 @@ public class ApproximationWorker {
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								approxResult.isOverApproximationResult());
+								approxResult.isSolvedUsingStateEquation());
 						toReturn.setNameMapping(transformedModel.value2());
 					}
 				}
@@ -310,7 +308,7 @@ public class ApproximationWorker {
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 					result.verificationTime(),
 					result.stats(),
-					result.isOverApproximationResult());
+					result.isSolvedUsingStateEquation());
 			toReturn.setNameMapping(transformedModel.value2());
 		}
 		
@@ -377,7 +375,7 @@ public class ApproximationWorker {
 					verificationResult.getSecondaryTrace(),
 					verificationResult.verificationTime(),
 					verificationResult.stats(),
-					verificationResult.isOverApproximationResult());
+					verificationResult.isSolvedUsingStateEquation());
 				value.setNameMapping(composedModel.value2());
 	        } else {
 	            // If r > 1
@@ -392,7 +390,7 @@ public class ApproximationWorker {
 	                            decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2(), model.network()),
 	                            approxResult.verificationTime(),
 	                            approxResult.stats(),
-	        					verificationResult.isOverApproximationResult());
+	        					verificationResult.isSolvedUsingStateEquation());
 	                valueNetwork.setNameMapping(composedModel.value2());
 	                
 	                OverApproximation overaprx = new OverApproximation();
@@ -433,7 +431,7 @@ public class ApproximationWorker {
 	                        approxResult.getSecondaryTrace(),
 	                        approxResult.verificationTime() + verificationResult.verificationTime(),
 	                        approxResult.stats(),
-	    					verificationResult.isOverApproximationResult());
+	    					verificationResult.isSolvedUsingStateEquation());
 	                value.setNameMapping(composedModel.value2());
 	            }
 				else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
@@ -452,7 +450,7 @@ public class ApproximationWorker {
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats(),
-						verificationResult.isOverApproximationResult());
+						verificationResult.isSolvedUsingStateEquation());
 				    value.setNameMapping(composedModel.value2());
 	            }
 				else {
@@ -468,7 +466,7 @@ public class ApproximationWorker {
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats(),
-						verificationResult.isOverApproximationResult());
+						verificationResult.isSolvedUsingStateEquation());
 				    value.setNameMapping(composedModel.value2());
 					
 				}
@@ -487,7 +485,7 @@ public class ApproximationWorker {
                     verificationResult.getSecondaryTrace(),
                     verificationResult.verificationTime(),
                     verificationResult.stats(),
-					verificationResult.isOverApproximationResult());
+					verificationResult.isSolvedUsingStateEquation());
                 value.setNameMapping(composedModel.value2());
 	        }
 	        else {
@@ -504,7 +502,7 @@ public class ApproximationWorker {
                             verificationResult.getSecondaryTrace(),
                             verificationResult.verificationTime(),
                             verificationResult.stats(),
-        					verificationResult.isOverApproximationResult());
+        					verificationResult.isSolvedUsingStateEquation());
                     value.setNameMapping(composedModel.value2());
 	                    
 				}
@@ -522,7 +520,7 @@ public class ApproximationWorker {
 	                        decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2(), model.network()),
 	                        approxResult.verificationTime(),
 	                        approxResult.stats(),
-	                        approxResult.isOverApproximationResult());
+	                        approxResult.isSolvedUsingStateEquation());
 	                    valueNetwork.setNameMapping(composedModel.value2());
 	                    
 	                    OverApproximation overaprx = new OverApproximation();
@@ -566,7 +564,7 @@ public class ApproximationWorker {
 	                            verificationResult.getSecondaryTrace(),
 	                            verificationResult.verificationTime() + approxResult.verificationTime(),
 	                            verificationResult.stats(),
-	        					verificationResult.isOverApproximationResult());
+	        					verificationResult.isSolvedUsingStateEquation());
 	                    value.setNameMapping(composedModel.value2());
 	                }
 	                else {
@@ -580,7 +578,7 @@ public class ApproximationWorker {
 							verificationResult.getSecondaryTrace(),
 							verificationResult.verificationTime(),
 							verificationResult.stats(),
-							verificationResult.isOverApproximationResult());
+							verificationResult.isSolvedUsingStateEquation());
 					    value.setNameMapping(composedModel.value2());
 	                }
 	            }
@@ -593,7 +591,7 @@ public class ApproximationWorker {
 	                verificationResult.getSecondaryTrace(),
 	                verificationResult.verificationTime(),
 	                verificationResult.stats(),
-					verificationResult.isOverApproximationResult());
+					verificationResult.isSolvedUsingStateEquation());
 	        value.setNameMapping(composedModel.value2());
 	    }
 		

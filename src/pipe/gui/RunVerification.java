@@ -6,16 +6,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,10 +22,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
@@ -248,7 +242,7 @@ public class RunVerification extends RunVerificationBase {
 		// TODO remove this when the engine outputs statistics
 		Boolean isCTLQuery = result.getQueryResult().isCTL;
 
-		if(modelChecker.supportsStats() && !result.isOverApproximationResult() && !isCTLQuery){
+		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
@@ -295,7 +289,7 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
 			}
-		} else if (modelChecker.supportsStats() && !result.isOverApproximationResult() && isCTLQuery){
+		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
@@ -313,7 +307,7 @@ public class RunVerification extends RunVerificationBase {
 			panel.add(infoButton, gbc);
 		}
 		
-		if(result.isOverApproximationResult()){
+		if(result.isSolvedUsingStateEquation()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
