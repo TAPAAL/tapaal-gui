@@ -10,24 +10,24 @@ public abstract class VerificationOptions {
 	// String getOption(String option);
 	protected SearchOption searchOption;
 	protected TraceOption traceOption;
-	protected boolean enableOverApproximation;
-    protected boolean enableUnderApproximation;
+	protected boolean enabledOverApproximation;
+    protected boolean enabledUnderApproximation;
 	protected int approximationDenominator;
-	protected boolean useOverApproximation;
+	protected boolean useStateequationCheck;
 	protected int extraTokens;
 
 
 	public abstract String toString();
 
 	public boolean enabledStateequationsCheck() {
-		return useOverApproximation;
+		return useStateequationCheck;
 	}
 
 	public boolean enabledOverApproximation() {
-		return enableOverApproximation;
+		return enabledOverApproximation;
 	}
 	public boolean enabledUnderApproximation() {
-		return enableUnderApproximation;
+		return enabledUnderApproximation;
 	}
 	public int approximationDenominator() {
 		return approximationDenominator;

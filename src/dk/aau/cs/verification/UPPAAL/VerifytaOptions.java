@@ -19,15 +19,15 @@ public class VerifytaOptions extends VerificationOptions {
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifytaOptions(TraceOption trace, SearchOption search,
-			boolean untimedTrace, ReductionOption reduction, boolean symmetry, boolean useOverApproximation, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+			boolean untimedTrace, ReductionOption reduction, boolean symmetry, boolean useStateequationCheck, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		traceOption = trace;
 		searchOption = search;
 		this.untimedTrace = untimedTrace;
 		this.reduction = reduction;
 		this.symmetry = symmetry;
-		this.useOverApproximation = useOverApproximation;
-		this.enableOverApproximation = enableOverApproximation;
-		this.enableUnderApproximation = enableUnderApproximation;
+		this.useStateequationCheck = useStateequationCheck;
+		this.enabledOverApproximation = enableOverApproximation;
+		this.enabledUnderApproximation = enableUnderApproximation;
 		this.approximationDenominator = approximationDenominator;
 	}
 

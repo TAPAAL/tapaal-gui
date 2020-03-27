@@ -17,22 +17,42 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean useStubbornReduction = true;
 	
 	//Only used for boundedness analysis
-	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
-			SearchOption search, boolean symmetry, boolean timeDarts,
+	public VerifyDTAPNOptions(
+			boolean dontUseDeadPlaces,
+			int extraTokens,
+			TraceOption traceOption,
+			SearchOption search,
+			boolean symmetry,
+			boolean timeDarts,
 			boolean pTrie,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator,
-			boolean stubbornReduction) {
+			boolean enableOverApproximation,
+			boolean enableUnderApproximation,
+			int approximationDenominator,
+			boolean stubbornReduction
+	) {
 		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
-	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
-			SearchOption search, boolean symmetry, boolean gcd, boolean timeDarts,
-			boolean pTrie, boolean useOverApproximation, boolean discreteInclusion,
-			InclusionPlaces inclusionPlaces, WorkflowMode workflow, long workflowbound,
-			boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator,
-			boolean stubbornReduction) {
-		super(extraTokens, traceOption, search, symmetry, useOverApproximation, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
+	public VerifyDTAPNOptions(
+			int extraTokens,
+			TraceOption traceOption,
+			SearchOption search,
+			boolean symmetry,
+			boolean gcd,
+			boolean timeDarts,
+			boolean pTrie,
+			boolean useStateequationCheck,
+			boolean discreteInclusion,
+			InclusionPlaces inclusionPlaces,
+			WorkflowMode workflow,
+			long workflowbound,
+			boolean enableOverApproximation,
+			boolean enableUnderApproximation,
+			int approximationDenominator,
+			boolean stubbornReduction
+	) {
+		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;
 		this.workflow = workflow;
