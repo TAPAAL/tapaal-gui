@@ -11,7 +11,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean timeDarts;
 	private boolean pTrie;
 	private WorkflowMode workflow;
-        private long workflowbound;
+	private long workflowbound;
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 	private boolean useStubbornReduction = true;
@@ -78,15 +78,17 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(" -w 1");
 		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
 			result.append(" -w 2");
-                        result.append(" -b ");
-                        result.append(workflowbound);
-                }
+			result.append(" -b ");
+			result.append(workflowbound);
+		}
 		result.append(' ');
 		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');
-                if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
-                    result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
-                }
+
+		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
+			result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
+		}
+
 		return result.toString();
 	}
 
