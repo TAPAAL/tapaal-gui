@@ -419,13 +419,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		return true;
 	}
 
-	// JS: this is not used any more
-	//private boolean isQueryUpwardClosed(TAPNQuery query) {
-	//	UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
-	//	return visitor.isUpwardClosed(query.getProperty());
-	//}
-
-
 	public static void reset() {
 		//Clear value
 		verifydtapnpath = "";
