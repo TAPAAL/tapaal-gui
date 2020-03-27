@@ -17,6 +17,7 @@ import pipe.gui.CreateGui;
 class NativeFileBrowserFallback extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
+        private String optionalExt;
 	private String specifiedPath;
 	private JFileChooser fileChooser;
 	/**
@@ -36,6 +37,7 @@ class NativeFileBrowserFallback extends FileBrowser {
 		//if(path == null) path = lastPath;
 
 		this.ext = ext;
+                this.optionalExt = optionalExt;
 		//fc.setDirectory(path);
 
 		/* Setup JFileChooser for multi file selection */
@@ -44,6 +46,7 @@ class NativeFileBrowserFallback extends FileBrowser {
 		FileNameExtensionFilter filter;
 
 		// Setup filter if extension specified
+                //This is needed for Linux and Mac
 		if(!ext.equals("")){
 			if(!optionalExt.equals("")) {
 				fc.setFilenameFilter(new FilenameFilter() {
@@ -76,7 +79,9 @@ class NativeFileBrowserFallback extends FileBrowser {
 	public File openFile() {
 		if(specifiedPath == null) specifiedPath = lastOpenPath;
 		fc.setDirectory(specifiedPath);
-		fc.setFile(ext.equals("")? "":"*."+ext);
+                //This is needed for windows
+		if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
+                else fc.setFile(ext.equals("")? "":("*."+ext+";*."+optionalExt));
 		fc.setMode(FileDialog.LOAD);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();

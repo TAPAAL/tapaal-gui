@@ -14,6 +14,7 @@ import pipe.gui.CreateGui;
 class NativeFileBrowser extends FileBrowser {
 	private FileDialog fc;
 	private String ext;
+        private String optionalExt;
 	private String specifiedPath;
 	NativeFileBrowser(String filetype, final String ext, String path) {
 		this(filetype, ext, "", path);
@@ -29,9 +30,11 @@ class NativeFileBrowser extends FileBrowser {
 		//if(path == null) path = lastPath;
 
 		this.ext = ext;
+                this.optionalExt = optionalExt;
 		//fc.setDirectory(path);
 
 		// Setup filter if extension specified
+                //This is needed for Linux and Mac
 		if(!ext.equals("")){
 			if(!optionalExt.equals("")) {
 				fc.setFilenameFilter(new FilenameFilter() {
@@ -54,30 +57,34 @@ class NativeFileBrowser extends FileBrowser {
 	
 
 	public File openFile() {
-		if(specifiedPath == null) specifiedPath = lastOpenPath;
-		fc.setDirectory(specifiedPath);
-		fc.setFile(ext.equals("")? "":"*."+ext);
-		fc.setMode(FileDialog.LOAD);
-		fc.setMultipleMode(false);
-		fc.setVisible(true);
-		String selectedFile = fc.getFile();
-		String selectedDir = fc.getDirectory();
-		lastOpenPath = selectedDir;
-		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
-		return file;
+            if(specifiedPath == null) specifiedPath = lastOpenPath;
+            fc.setDirectory(specifiedPath);
+            //This is needed for Windows
+            if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
+            else fc.setFile(ext.equals("")? "":("*."+ext+";*."+optionalExt));
+            fc.setMode(FileDialog.LOAD);
+            fc.setMultipleMode(false);
+            fc.setVisible(true);
+            String selectedFile = fc.getFile();
+            String selectedDir = fc.getDirectory();
+            lastOpenPath = selectedDir;
+            File file = selectedFile == null? null:new File(selectedDir + selectedFile);
+            return file;
 	}
 	
 	public File[] openFiles() {
-		if(specifiedPath == null) specifiedPath = lastOpenPath;
-		fc.setDirectory(specifiedPath);
-		fc.setFile(ext.equals("")? "":"*."+ext);
-		fc.setMultipleMode(true);
-		fc.setMode(FileDialog.LOAD);
-		fc.setVisible(true);
-		File[] selectedFiles = fc.getFiles();
-		String selectedDir = fc.getDirectory();
-		lastOpenPath = selectedDir;
-		return selectedFiles;
+            if(specifiedPath == null) specifiedPath = lastOpenPath;
+            fc.setDirectory(specifiedPath);
+            //This is needed for Windows
+            if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
+            else fc.setFile(ext.equals("")? "":("*."+ext+";*."+optionalExt));
+            fc.setMultipleMode(true);
+            fc.setMode(FileDialog.LOAD);
+            fc.setVisible(true);
+            File[] selectedFiles = fc.getFiles();
+            String selectedDir = fc.getDirectory();
+            lastOpenPath = selectedDir;
+            return selectedFiles;
 	}
 	
 	public String saveFile(String suggestedName) {
