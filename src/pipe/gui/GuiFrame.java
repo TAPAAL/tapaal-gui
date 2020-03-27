@@ -1492,6 +1492,7 @@ public class GuiFrame extends JFrame  {
 
 	//XXX 2018-05-23 kyrke, implementation close to closeTab, needs refactoring
 	private void undoAddTab(int currentlySelected) {
+                if(appTab.getTabCount() == 1) { CreateGui.getApp().setGUIMode(GUIMode.noNet); }
 		CreateGui.removeTab(appTab.getSelectedIndex() );
 		appTab.removeTabAt(appTab.getSelectedIndex());
 		appTab.setSelectedIndex(currentlySelected);
@@ -2558,6 +2559,7 @@ public class GuiFrame extends JFrame  {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
+                                int currNumTabs = CreateGui.getTabsSize();
 				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
 				
 				//Show loading cursor
@@ -2600,7 +2602,8 @@ public class GuiFrame extends JFrame  {
 						e.printStackTrace();
 					}
 			    }
-			    if(files.length != 0 && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+                            //files.length != 0 makes sure a file has been selected, CreateGui.getTabsSize() > currNumTabs makes sure the new tab was added
+			    if(files.length != 0 && CreateGui.getTabsSize() > currNumTabs && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
 				    int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
 				    if(dialogResult == JOptionPane.YES_OPTION) {
 				    	SmartDrawDialog.showSmartDrawDialog();
