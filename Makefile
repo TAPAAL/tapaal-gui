@@ -40,7 +40,7 @@ JAVA_LIB  := $(JAVA_HOME)/lib
 DEPEND_DIR := libs
 DEPEND := $(DEPEND_DIR)/\*
 
-JFLAGS      := -source 1.6 -target 1.6 \
+JFLAGS      := -source 1.8 -target 1.8 \
               -sourcepath $(SOURCE_DIR) -cp $(DEPEND)
 # -bootclasspath /Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/jre/lib/rt.jar \
 #/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar -extdirs " " \
