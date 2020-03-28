@@ -193,7 +193,6 @@ public class GuiFrame extends JFrame  {
 	private boolean showZeroToInfinityIntervals = true;
 	private boolean showTokenAge = true;
 
-
 	private JMenu importMenu, exportMenu, zoomMenu;
 
 	public GuiFrame(String title) {
@@ -1481,6 +1480,7 @@ public class GuiFrame extends JFrame  {
 
 	//XXX 2018-05-23 kyrke, implementation close to closeTab, needs refactoring
 	private void undoAddTab(int currentlySelected) {
+                if(appTab.getTabCount() == 1) { CreateGui.getApp().setGUIMode(GUIMode.noNet); }
 		CreateGui.removeTab(appTab.getSelectedIndex() );
 		appTab.removeTabAt(appTab.getSelectedIndex());
 		appTab.setSelectedIndex(currentlySelected);
@@ -1613,13 +1613,13 @@ public class GuiFrame extends JFrame  {
 			saveNet(index, modelFile);
 			result = true;
 		} else { // save as
-			String path;
+			String path = null;
 			if (modelFile != null) {
 				path = modelFile.getParent();
-			} else {
-				path = appTab.getTitleAt(index);
 			}
-			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
+			
+			String suggestedName = appTab.getTitleAt(index);
+			String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(suggestedName);
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
@@ -2380,21 +2380,21 @@ public class GuiFrame extends JFrame  {
 		buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Graesboell, ");
 		buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
 		buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2019\n\n");
+		buffer.append("Aalborg University 2009-2020\n\n");
 		buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2019\n\n");
+		buffer.append("Aalborg University 2011-2020\n\n");
 		buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2019\n\n");
+                buffer.append("Aalborg University 2012-2020\n\n");
 		buffer.append("TAPAAL Untimed Engine (verifypn):\n");
                 buffer.append("Frederik Meyer Boenneland, Jakob Dyhr, Peter Fogh, ");
                 buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, ");
                 buffer.append("Tobias S. Jepsen, Mads Johannsen,\nIsabella Kaufmann, ");
                 buffer.append("Andreas H. Klostergaard, Soeren M. Nielsen,\nThomas S. Nielsen, Lars K. Oestergaard, ");
                 buffer.append("Samuel Pastva and Jiri Srba\n");
-                buffer.append("Aalborg University 2014-2019\n\n");
+                buffer.append("Aalborg University 2014-2020\n\n");
 
 
 		buffer.append("\n");
@@ -2535,6 +2535,7 @@ public class GuiFrame extends JFrame  {
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
+                                int currNumTabs = CreateGui.getTabsSize();
 				final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
 				
 				//Show loading cursor
@@ -2576,6 +2577,13 @@ public class GuiFrame extends JFrame  {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+			    }
+                            //files.length != 0 makes sure a file has been selected, CreateGui.getTabsSize() > currNumTabs makes sure the new tab was added
+			    if(files.length != 0 && CreateGui.getTabsSize() > currNumTabs && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+				    int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+				    if(dialogResult == JOptionPane.YES_OPTION) {
+				    	SmartDrawDialog.showSmartDrawDialog();
+				    }
 			    }
 			}
 		});

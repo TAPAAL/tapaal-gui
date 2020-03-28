@@ -13,6 +13,7 @@ public class Constant {
 	private int upperBound;
 	private boolean isUsed;
 	private boolean isFocused;
+	private boolean visible = true;
 
 	public Constant(String name, int value) {
 		setName(name);
@@ -49,6 +50,14 @@ public class Constant {
 	
 	public void setFocused(boolean focused){
 		isFocused = focused;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	public boolean getVisible() {
+		return visible;
 	}
 
 	public String name() {

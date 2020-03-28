@@ -155,6 +155,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void mousePressed(MouseEvent e) {
+		CreateGui.getCurrentTab().requestFocusInWindow();
 		CreateGui.getCurrentTab().removeConstantHighlights();
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
