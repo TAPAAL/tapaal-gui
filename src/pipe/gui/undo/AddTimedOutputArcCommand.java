@@ -1,7 +1,6 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 

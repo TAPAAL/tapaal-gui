@@ -28,8 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;

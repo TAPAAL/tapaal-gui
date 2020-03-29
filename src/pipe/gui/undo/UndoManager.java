@@ -4,7 +4,6 @@
 package pipe.gui.undo;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
@@ -19,7 +18,6 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
-import pipe.gui.handler.PetriNetObjectHandler;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**

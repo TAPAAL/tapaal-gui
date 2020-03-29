@@ -5,7 +5,6 @@ import java.awt.Polygon;
 import java.util.Hashtable;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TransportArcHandler;

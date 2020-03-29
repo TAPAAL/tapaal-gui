@@ -1,7 +1,6 @@
 package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Point;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

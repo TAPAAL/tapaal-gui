@@ -2,7 +2,6 @@ package pipe.gui.graphicElements;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -16,7 +15,6 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
-import pipe.gui.handler.PetriNetObjectHandler;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**

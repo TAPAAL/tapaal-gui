@@ -1,7 +1,6 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 

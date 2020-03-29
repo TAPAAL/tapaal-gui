@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;

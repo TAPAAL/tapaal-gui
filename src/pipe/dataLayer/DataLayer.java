@@ -2,7 +2,6 @@ package pipe.dataLayer;
 
 import java.util.*;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.util.RequireException;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;

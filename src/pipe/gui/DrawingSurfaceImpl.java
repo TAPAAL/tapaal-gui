@@ -6,14 +6,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.util.ArrayList;
 import javax.swing.JLayeredPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Template;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.AnnotationNote;

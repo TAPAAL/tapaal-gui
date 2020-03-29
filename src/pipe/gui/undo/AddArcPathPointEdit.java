@@ -10,8 +10,6 @@ import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.ArcPathPoint;
 import dk.aau.cs.gui.undo.Command;
 
-import javax.xml.crypto.Data;
-
 /**
  * 
  * @author Pere Bonet

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.ArcPathPointHandler;

@@ -13,7 +13,6 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomer;

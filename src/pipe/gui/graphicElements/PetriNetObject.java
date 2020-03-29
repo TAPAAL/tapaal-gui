@@ -1,7 +1,6 @@
 package pipe.gui.graphicElements;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
@@ -9,7 +8,6 @@ import java.awt.event.*;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 
-import dk.aau.cs.debug.Logger;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;

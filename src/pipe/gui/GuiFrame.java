@@ -18,8 +18,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+
 import com.apple.eawt.Application;
 import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.model.tapn.*;
