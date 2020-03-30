@@ -4,6 +4,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
@@ -344,6 +345,13 @@ class GuiFrameController implements GuiFrameControllerActions{
                 try {
                     List<TabContent> tabs = get();
                     openTab(tabs);
+
+                    if(files.length != 0 && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        if(dialogResult == JOptionPane.YES_OPTION) {
+                            SmartDrawDialog.showSmartDrawDialog();
+                        }
+                    }
 
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(CreateGui.getApp(),

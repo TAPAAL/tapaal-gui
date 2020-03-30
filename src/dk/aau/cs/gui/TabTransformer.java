@@ -8,7 +8,6 @@ import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 public class TabTransformer {

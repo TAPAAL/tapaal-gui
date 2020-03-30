@@ -1,20 +1,20 @@
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.util.RequireException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class TimeInvariantTests {
 	
-	@Test(expected=RequireException.class)
+	@Test
 	public void TimeInvariantConstructor(){
-		new TimeInvariant(true, Bound.Infinity);
+		assertThrows(RequireException.class, () -> new TimeInvariant(true, Bound.Infinity));
 	}
 	
 	@Test
@@ -27,31 +27,31 @@ public class TimeInvariantTests {
 		new TimeInvariant(true, new IntBound(4));
 	}
 	
-	@Test(expected=RequireException.class)
+	@Test
 	public void TimeInvariantConstructor_invalid_zero(){
-		new TimeInvariant(false, new IntBound(0));
+		assertThrows(RequireException.class, () -> new TimeInvariant(false, new IntBound(0)));
 	}
 	
 	@Test
 	public void isSatisfied_test1(){
 		TimeInvariant inv = new TimeInvariant(true, new IntBound(5));
-		assertTrue(inv.isSatisfied(new BigDecimal(4)));
-		assertTrue(inv.isSatisfied(new BigDecimal(5)));
-		assertFalse(inv.isSatisfied(new BigDecimal(6)));
+		Assertions.assertTrue(inv.isSatisfied(new BigDecimal(4)));
+		Assertions.assertTrue(inv.isSatisfied(new BigDecimal(5)));
+		Assertions.assertFalse(inv.isSatisfied(new BigDecimal(6)));
 	}
 	
 	@Test
 	public void isSatisfied_test2(){
 		TimeInvariant inv = new TimeInvariant(false, new IntBound(5));
-		assertTrue(inv.isSatisfied(new BigDecimal(4.999)));
-		assertFalse(inv.isSatisfied(new BigDecimal(5)));
-		assertFalse(inv.isSatisfied(new BigDecimal(6)));
+		Assertions.assertTrue(inv.isSatisfied(new BigDecimal(4.999)));
+		Assertions.assertFalse(inv.isSatisfied(new BigDecimal(5)));
+		Assertions.assertFalse(inv.isSatisfied(new BigDecimal(6)));
 	}
 	
 	@Test
 	public void isSatisfied_test3(){
 		TimeInvariant inv = new TimeInvariant(false, Bound.Infinity);
-		assertTrue(inv.isSatisfied(new BigDecimal(4)));
-		assertTrue(inv.isSatisfied(new BigDecimal(Integer.MAX_VALUE)));
+		Assertions.assertTrue(inv.isSatisfied(new BigDecimal(4)));
+		Assertions.assertTrue(inv.isSatisfied(new BigDecimal(Integer.MAX_VALUE)));
 	}
 }

@@ -1,13 +1,9 @@
 package dk.aau.cs.gui.undo;
 
 import java.awt.Point;
-import java.util.Iterator;
 
 import pipe.gui.CreateGui;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 
 public class MovePlaceTransitionObject extends Command {
 	

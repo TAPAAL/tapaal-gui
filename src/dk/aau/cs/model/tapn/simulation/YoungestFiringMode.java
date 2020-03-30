@@ -1,6 +1,5 @@
 package dk.aau.cs.model.tapn.simulation;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 

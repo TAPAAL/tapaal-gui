@@ -65,6 +65,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 			if(((ConstantWeight) getWeight()).constant().hasFocus()){
 				focusedConstant = true;
 			}
+			pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
 		}
 		if(focusedConstant){
 			getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);

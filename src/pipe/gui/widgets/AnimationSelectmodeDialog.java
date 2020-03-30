@@ -10,9 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import pipe.gui.widgets.ArcTokenSelector.ArcTokenSelectorListener;
-import pipe.gui.widgets.ArcTokenSelector.ArcTokenSelectorListenerEvent;
-
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
