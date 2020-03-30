@@ -70,7 +70,7 @@ public class TimedArcPetriNet {
 		Require.that(!checkNames || transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
 		Require.that(!checkNames || !inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
 
-		//This should be a check, but we uses this in the uppaal converter while generating model
+        //This should be a check, but we uses this in the uppaal converter while generating model
 		//Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
 		
 		arc.setModel(this);
@@ -84,7 +84,7 @@ public class TimedArcPetriNet {
 		Require.that(!checkNames || transitions.contains(arc.source()), "The source transition must be part of the petri net");
 		Require.that(!checkNames || !outputArcs.contains(arc),	"The specified arc is already a part of the petri net.");
 
-		//This should be a check, but we uses this in the uppaal converter while generating model
+        //This should be a check, but we uses this in the uppaal converter while generating model
 		//Require.that(!checkNames || !hasArcFromTransitionToPlace(arc.source(), arc.destination()), "Cannot have two arcs between the same transition and place");
 	
 		arc.setModel(this);
@@ -97,9 +97,7 @@ public class TimedArcPetriNet {
 		Require.that(!checkNames || places.contains(arc.source()),	"The source place must be part of the petri net.");
 		Require.that(!checkNames || transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
 		Require.that(!checkNames || !inhibitorArcs.contains(arc), "The specified arc is already a part of the petri net.");
-
-		//This should be a check, but we uses this in the uppaal converter while generating model
-		//Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
+        Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
 
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
@@ -112,10 +110,8 @@ public class TimedArcPetriNet {
 		Require.that(!checkNames || transitions.contains(arc.transition()), "The transition must be part of the petri net");
 		Require.that(!checkNames || places.contains(arc.destination()), "The destination place must be part of the petri net.");
 		Require.that(!checkNames || !inhibitorArcs.contains(arc), "The specified arc is already a part of the petri net.");
-
-		//This should be a check, but we uses this in the uppaal converter while generating model
-		//Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.transition()), "Cannot have two arcs between the same place and transition");
-		//Require.that(!checkNames || !hasArcFromTransitionToPlace(arc.transition(), arc.destination()),	"Cannot have two arcs between the same transition and place");
+		Require.that(!checkNames || !hasArcFromPlaceToTransition(arc.source(), arc.transition()), "Cannot have two arcs between the same place and transition");
+		Require.that(!checkNames || !hasArcFromTransitionToPlace(arc.transition(), arc.destination()),	"Cannot have two arcs between the same transition and place");
 
 		arc.setModel(this);
 		transportArcs.add(arc);

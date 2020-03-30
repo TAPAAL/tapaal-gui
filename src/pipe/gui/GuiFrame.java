@@ -232,46 +232,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			// Set the Look and Feel native for the system.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-			//XXX Bug made us select non-native L&F for Windows, bug seems to be no longer present.
-//			if(UIManager.getLookAndFeel().getName().equals("Windows")){
-//				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-//					if ("Nimbus".equals(info.getName())) {
-//						UIManager.setLookAndFeel(info.getClassName());
-//						UIManager.getLookAndFeelDefaults().put("List[Selected].textBackground", new Color(57, 105, 138));
-//						UIManager.getLookAndFeelDefaults().put("List[Selected].textForeground", new Color(255,255,255));
-//						UIManager.getLookAndFeelDefaults().put("List.background", new Color(255,255,255));
-//
-//						break;
-//					}
-//				}
-//			}
-
 			// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
-			UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
-					{
+			UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]{
 					"SPACE", "pressed",
 					"released SPACE", "released",
 					"ENTER", "pressed",
 					"released ENTER", "released"
-					}));
+					})
+            );
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
-                        UIManager.put("Slider.paintValue", false);
-
-			// 2010-05-07, Kenneth Yrke Joergensen:
-			// If the native look and feel is GTK replace the useless open
-			// dialog, with a java-reimplementation.
-
-			if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
-				try {
-					//Load class to see if its there
-					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
-				} catch (ClassNotFoundException exc){
-					Logger.log("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
-				}
-
-			}
-
+			UIManager.put("Slider.paintValue", false);
 
 		} catch (Exception exc) {
 			Logger.log("Error loading L&F: " + exc);
