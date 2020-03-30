@@ -165,6 +165,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				TimedOutputArcComponent outputArc = (TimedOutputArcComponent) timedArcToCreate;
 
 				try {
+                    // Should be check in model
+                    if(view.getModel().hasArcFromTransitionToPlace(((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(), ((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace())){
+                        throw new RequireException(ERROR_MSG_TWO_ARCS);
+                    }
 
 					TimedOutputArc timedOutputArc = new TimedOutputArc(
 							((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(),
@@ -200,6 +204,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				// Set underlying TimedInputArc
 				TimedInputArcComponent timedArc = (TimedInputArcComponent) timedArcToCreate;
 				try {
+
+				    // Should be check in model
+                    if(view.getModel().hasArcFromPlaceToTransition(((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(), ((TimedTransitionComponent) timedArc.getTarget()).underlyingTransition())){
+                        throw new RequireException("Cannot have two arcs between the same place and transition");
+                    }
 
 					TimedInputArc tia = new TimedInputArc(
 							((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(),
