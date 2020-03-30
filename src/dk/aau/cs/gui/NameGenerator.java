@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;

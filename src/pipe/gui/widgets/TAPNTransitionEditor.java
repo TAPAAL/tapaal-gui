@@ -455,7 +455,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
 
-		Integer rotationIndex = rotationComboBox.getSelectedIndex();
+		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
 			int angle = 0;
 			switch (rotationIndex) {

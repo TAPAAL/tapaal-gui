@@ -4,20 +4,11 @@
 package pipe.gui.undo;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Optional;
-
-import pipe.dataLayer.DataLayer;
-import pipe.gui.*;
-import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
-import pipe.gui.handler.PetriNetObjectHandler;
+import pipe.gui.CreateGui;
+import pipe.gui.GuiFrameActions;
+import pipe.gui.Pipe;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**

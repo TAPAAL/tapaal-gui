@@ -163,8 +163,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
 	private JCheckBoxMenuItem showTokenAgeCheckBox;
 
-
-
 	private JMenu zoomMenu;
 
 	public GuiFrame(String title) {
@@ -1247,22 +1245,19 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 	}
 
+    @Override
+    public void updatedTabName(TabContent tab) {
+        int index = appTab.indexOfComponent(tab);
 
+        appTab.setTitleAt(index, tab.getTabTitle());
 
+        // resize "header" of current tab immediately to fit the length of the model name (if it shorter)
+        appTab.getTabComponentAt(index).doLayout();
 
-	@Override
-	public void updatedTabName(TabContent tab) {
-		int index = appTab.indexOfComponent(tab);
-
-		appTab.setTitleAt(index, tab.getTabTitle());
-
-		// resize "header" of current tab immediately to fit the length of the model name (if it shorter)
-		appTab.getTabComponentAt(index).doLayout();
-
-		if(index >= 0 && index == appTab.getSelectedIndex()) {
-			setTitle(tab.getTabTitle()); // Change the window title
-		}
-	}
+        if(index >= 0 && index == appTab.getSelectedIndex()) {
+            setTitle(tab.getTabTitle()); // Change the window title
+        }
+    }
 
 	@Override
 	public void attachTabToGuiFrame(TabContent tab) {
@@ -1472,19 +1467,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
-	
 
-        
-        private boolean canNetBeSavedAndShowMessage() {
-                if (getCurrentTab().network().paintNet()) {
-                        return true;
-                } else {
-                        String message = "The net is too big and cannot be saved or exported.";
-                        Object[] dialogContent = {message};
-                        JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
-                }
-                return false;
+
+    private boolean canNetBeSavedAndShowMessage() {
+        if (getCurrentTab().network().paintNet()) {
+            return true;
+        } else {
+            String message = "The net is too big and cannot be saved or exported.";
+            Object[] dialogContent = {message};
+            JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
         }
+        return false;
+    }
 
 	private JMenu buildMenuFiles(int shortcutkey) {
 		JMenu fileMenu = new JMenu("File");

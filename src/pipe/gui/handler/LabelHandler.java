@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
