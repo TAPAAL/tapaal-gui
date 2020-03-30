@@ -478,12 +478,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createAnimatorSplitPane(NetType netType) {
-		if (animBox == null)
-			createAnimationHistory();
-		if (animControlerBox == null)
-			createAnimationController(netType);
-		if (transitionFireing == null)
-			createTransitionFireing();
+		if (animBox == null) {
+            createAnimationHistory();
+        }
+		if (animControlerBox == null) {
+            createAnimationController(netType);
+        }
+		if (transitionFireing == null) {
+            createTransitionFireing();
+        }
 		
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
@@ -495,8 +498,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			enabledTransitionsListLeaf.setWeight(0.25);
 			animControlLeaf.setWeight(0.5);
 
-			simulatorModelRoot = new Split(templateExplorerLeaf, new Divider(),
-					enabledTransitionsListLeaf, new Divider(), animControlLeaf);
+			simulatorModelRoot = new Split(
+			    templateExplorerLeaf,
+                new Divider(),
+                enabledTransitionsListLeaf,
+                new Divider(),
+                animControlLeaf
+            );
 			simulatorModelRoot.setRowLayout(false);
 			floatingDividers = true;
 		}
@@ -524,12 +532,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 
-		animationControlsPanel.setPreferredSize(new Dimension(
+		animationControlsPanel.setPreferredSize(
+		    new Dimension(
 				animationControlsPanel.getPreferredSize().width,
-				animationControlsPanel.getMinimumSize().height));
-		transitionFireing.setPreferredSize(new Dimension(
+				animationControlsPanel.getMinimumSize().height
+            )
+        );
+		transitionFireing.setPreferredSize(
+		    new Dimension(
 				transitionFireing.getPreferredSize().width,
-				transitionFireing.getMinimumSize().height));
+				transitionFireing.getMinimumSize().height
+            )
+        );
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
 		
@@ -602,15 +616,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animationControlsPanel.remove(animationHistoryScrollPane);
 		abstractAnimationPane = new AnimationHistoryComponent();
 
-		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(
-				abstractAnimationPane);
-		untimedAnimationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(
+		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
+		untimedAnimationHistoryScrollPane.setBorder(
+		    BorderFactory.createCompoundBorder(
 						BorderFactory.createTitledBorder("Untimed Trace"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)
+            )
+        );
 		animationHistorySplitter = new JSplitPaneFix(
-				JSplitPane.HORIZONTAL_SPLIT, animationHistoryScrollPane,
-				untimedAnimationHistoryScrollPane);
+		    JSplitPane.HORIZONTAL_SPLIT,
+            animationHistoryScrollPane,
+            untimedAnimationHistoryScrollPane
+        );
 
 		animationHistorySplitter.setContinuousLayout(true);
 		animationHistorySplitter.setOneTouchExpandable(true);
@@ -692,8 +709,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public int numberOfActiveTemplates() {
 		int count = 0;
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			if (net.isActive())
-				count++;
+			if (net.isActive()) {
+                count++;
+            }
 		}
 		return count;
 	}
@@ -753,8 +771,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		tapnNetwork.setConstants(constants);
 	}
 
-	public void setNetwork(TimedArcPetriNetNetwork network,
-			Collection<Template> templates) {
+	public void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
 		Require.that(network != null, "network cannot be null");
 		tapnNetwork = network;
 
@@ -803,10 +820,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	public void showComponents(boolean enable) {
 		if (enable != templateExplorer.isVisible()) {
-			editorSplitPane.getMultiSplitLayout().displayNode(
-					templateExplorerName, enable);
-			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName,
-					enable);
+
+			editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
+
 			if (animatorSplitPane != null) {
 				animatorSplitPane.getMultiSplitLayout().displayNode(
 						templateExplorerName, enable);
@@ -817,8 +834,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	public void showQueries(boolean enable) {
 		if (enable != queries.isVisible()) {
-			editorSplitPane.getMultiSplitLayout().displayNode(queriesName,
-					enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(queriesName, enable);
 			makeSureEditorPanelIsVisible(queries);
 			this.repaint();
 		}
@@ -832,8 +848,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public void showConstantsPanel(boolean enable) {
 		if (enable != constantsPanel.isVisible()) {
-			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
-					enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(constantsName, enable);
 			makeSureEditorPanelIsVisible(constantsPanel);
 		}		
 	}
