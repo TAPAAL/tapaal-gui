@@ -72,7 +72,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      *            Double value for name X-axis offset
      */
     public void setNameOffsetX(double nameOffsetXInput) {
-        nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
+        nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
     }
 
     /**
@@ -82,8 +82,18 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      *            Double value for name Y-axis offset
      */
     public void setNameOffsetY(double nameOffsetYInput) {
+        nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
+    }
+
+    public void updateNameOffsetX(double nameOffsetXInput) {
+        nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
+
+    }
+
+    public void updateNameOffsetY(double nameOffsetYInput) {
         nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
     }
+
     /**
      * Get X-axis offset for ...
      *

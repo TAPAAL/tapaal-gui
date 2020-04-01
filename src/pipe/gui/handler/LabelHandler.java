@@ -64,8 +64,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 			return;
 		}
 
-		Point p = javax.swing.SwingUtilities
-				.convertPoint(nl, e.getPoint(), obj);
+		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		// obj.setNameOffsetX((e.getXOnScreen() - dragInit.x)); //causes
 		// exception in Windows!
 		// obj.setNameOffsetY((e.getYOnScreen() - dragInit.y)); //causes
@@ -73,16 +72,15 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		// dragInit = e.getLocationOnScreen(); //causes exception in Windows!
 		
 		
-		obj.setNameOffsetX((p.x - dragInit.x));
-		obj.setNameOffsetY((p.y - dragInit.y));
+		obj.updateNameOffsetX((p.x - dragInit.x));
+		obj.updateNameOffsetY((p.y - dragInit.y));
 		dragInit = p;
 		obj.updateOnMoveOrZoom();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Point p = javax.swing.SwingUtilities
-				.convertPoint(nl, e.getPoint(), obj);
+		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		
 		CreateGui.getCurrentTab().getUndoManager().addNewEdit(new UpdateNameLabelOffsetCommand(obj.getNameOffsetXObject(), obj.getNameOffsetYObject(), originalOffsetX, originalOffsetY, obj));
 		

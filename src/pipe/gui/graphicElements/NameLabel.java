@@ -16,8 +16,7 @@ import pipe.gui.Zoomer;
  * @version 1.0
  * @author Camilla Clifford
  */
-public class NameLabel extends JTextArea implements Translatable,
-		Zoomable {
+public class NameLabel extends JTextArea implements Zoomable {
 
 	private static final long serialVersionUID = 5167510420195429773L;
 	private int positionX;
@@ -25,8 +24,7 @@ public class NameLabel extends JTextArea implements Translatable,
 	private String name = "";
 	private String text = "";
 
-	private Font font = new Font(Pipe.LABEL_FONT, Font.BOLD,
-			Pipe.LABEL_DEFAULT_FONT_SIZE);
+	private Font font = new Font(Pipe.LABEL_FONT, Font.BOLD, Pipe.LABEL_DEFAULT_FONT_SIZE);
 
 	public NameLabel(int zoom) {
 		this("");
@@ -61,17 +59,15 @@ public class NameLabel extends JTextArea implements Translatable,
 
 	private void updateSize() {
 		// To get round Java bug #4352983 I have to expand the size a bit
-		setSize((int) (getPreferredSize().width * 1.2),
-				(int) (getPreferredSize().height * 1.2));
+		setSize(
+		    (int) (getPreferredSize().width * 1.2),
+            (int) (getPreferredSize().height * 1.2)
+        );
 		updatePosition();
 	}
 
 	public void updatePosition() {
 		setLocation(positionX - getPreferredSize().width, positionY	- Pipe.NAMELABEL_OFFSET);
-	}
-
-	public void translate(int x, int y) {
-		setPosition(positionX + x, positionY + y);
 	}
 
 	public double getYPosition() {
