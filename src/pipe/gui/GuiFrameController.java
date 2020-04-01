@@ -44,6 +44,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame = appGui;
         guiFrameDirectAccess = appGui;
 
+        loadPrefrences();
         appGui.registerController(this, currentTab);
 
 
