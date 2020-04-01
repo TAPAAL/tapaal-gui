@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
@@ -23,7 +24,7 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 
 	public void add(TimedArcPetriNetStep step) {
 		if(nextIsLoop){
-			assert(loopToIndex == -1); //There can only be one step to loop to in a trace
+			Require.that(loopToIndex == -1, "There can only be one step to loop to in a trace");
 			loopToIndex = steps.size();
 			nextIsLoop = false;
 		}

@@ -19,7 +19,7 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
-	private boolean isOverApproximationResult = false;
+	private boolean isSolvedUsingStateEquation = false;
 	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -32,9 +32,9 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 	}
 	
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isOverApproximationResult){
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation){
 		this(queryResult, trace, verificationTime, stats);
-		this.isOverApproximationResult = isOverApproximationResult;
+		this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
 	}
 
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime) {
@@ -50,8 +50,8 @@ public class VerificationResult<TTrace> {
 			TTrace tapnTrace,
 			TTrace secondaryTrace2, long runningTime,
 			Stats value2,
-			boolean isOverApproximationResult) {
-		this(value1, tapnTrace, runningTime, value2, isOverApproximationResult);
+			boolean isSolvedUsingStateEquation) {
+		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation);
 		this.secondaryTrace = secondaryTrace2;
 	}
 
@@ -78,7 +78,7 @@ public class VerificationResult<TTrace> {
 		return returnList;
 	}
         
-        public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
+	public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
 		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
 		for (int i = 0; i < stats.placeBoundCount();i++) {
 			Tuple<String,Integer> element = stats.getPlaceBoundStats(i);
@@ -133,7 +133,6 @@ public class VerificationResult<TTrace> {
 	}
 
 	public long verificationTime() {
-
 		return verificationTime;
 	}
 
@@ -185,8 +184,8 @@ public class VerificationResult<TTrace> {
 		return m;
 	}
 	
-	public boolean isOverApproximationResult(){
-		return isOverApproximationResult;
+	public boolean isSolvedUsingStateEquation(){
+		return isSolvedUsingStateEquation;
 	}
 	
 	public void addTime(long timeToAdd) {

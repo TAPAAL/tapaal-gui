@@ -21,6 +21,7 @@ import dk.aau.cs.util.MemoryMonitor;
 
 public class RunningVerificationDialog extends JDialog {
 	private static final long serialVersionUID = -1943743974346875737L;
+	private final SwingWorker<?, ?> worker;
 	private JButton okButton;
 	private long startTimeMs = 0;
 	JLabel timerLabel;
@@ -53,28 +54,57 @@ public class RunningVerificationDialog extends JDialog {
 	
 	private Timer memoryTimer;
 	
-	public RunningVerificationDialog(JFrame owner) {
-		super(owner, "Verification in Progress", true);		
-		initComponents();			
+	public RunningVerificationDialog(JFrame owner, final SwingWorker<?, ?> worker) {
+		super(owner, "Verification in Progress", true);
+		this.worker = worker;
+		initComponents();
+		initActions();
 		pack();
 	}
-	
+
+	private void initActions() {
+		okButton.addActionListener(evt -> {
+			closeWindow();
+			worker.cancel(true);
+		});
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				closeWindow();
+				worker.cancel(true);
+			}
+		});
+
+		worker.addPropertyChangeListener(event -> {
+			if (event.getPropertyName().equals("state")) {
+				StateValue stateValue = (StateValue) event.getNewValue();
+				if (stateValue.equals(StateValue.DONE)) {
+					closeWindow();
+				}
+			}
+		});
+	}
+
+	private void closeWindow() {
+		setVisible(false);
+		timer.stop();
+		stopMemoryTimer();
+		dispose();
+	}
+
 	public void initComponents() {		
 		setLocationRelativeTo(null);
 		setLayout(new GridBagLayout());
 		
 		timer = new Timer(1000, new AbstractAction() {
-			private static final long serialVersionUID = 1327695063762640628L;
-
 			public void actionPerformed(ActionEvent e) {
-				timerLabel.setText((System.currentTimeMillis() - startTimeMs)
-						/1000 + " s");
-				usageLabel.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
+				timerLabel.setText((System.currentTimeMillis() - startTimeMs) / 1000 + " s");
+				usageLabel.setText(peakMemory >= 0 ? peakMemory + " MB" : "N/A");
 			}
 		});	
 		
 		memoryTimer = new Timer(50, new AbstractAction() {
-			private static final long serialVersionUID = 1327695063762640628L;
 
 			public void actionPerformed(ActionEvent e) {
 				if(MemoryMonitor.isAttached()){
@@ -171,26 +201,4 @@ public class RunningVerificationDialog extends JDialog {
 		memoryTimer.start();
 	}
 
-	public void setupListeners(final SwingWorker<?, ?> worker) {
-		okButton.addActionListener(evt -> worker.cancel(true));
-
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				worker.cancel(true);
-			}
-		});
-		
-		worker.addPropertyChangeListener(event -> {
-			if (event.getPropertyName().equals("state")) {
-				StateValue stateValue = (StateValue) event.getNewValue();
-				if (stateValue.equals(StateValue.DONE)) {
-					setVisible(false);
-					timer.stop();
-					stopMemoryTimer();
-					dispose();
-				}
-			}
-		});
-	}
 }

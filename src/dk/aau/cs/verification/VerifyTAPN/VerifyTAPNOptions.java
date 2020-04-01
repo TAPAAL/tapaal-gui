@@ -11,49 +11,33 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;
 
-public class VerifyTAPNOptions implements VerificationOptions{
-	protected TraceOption traceOption;
-	protected SearchOption searchOption;
-	protected int extraTokens;
+public class VerifyTAPNOptions extends VerificationOptions{
+
 	protected int tokensInModel;
 	private boolean symmetry;
-	private boolean useOverApproximation;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
-	private boolean enableOverApproximation;
-	private boolean enableUnderApproximation;
-	private int approximationDenominator;
 	
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
-
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
+	
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+		this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 	
-	//Only used for boundedness analysis
-	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
-		this.dontUseDeadPlaces = dontUseDeadPLaces;
-	}
-	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
-		this(extraTokens,traceOption, search, symmetry, useOverApproximation, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
-	}
-	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateEquationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		searchOption = search;
 		this.symmetry = symmetry;
 		this.discreteInclusion = discreteInclusion;
-		this.useOverApproximation = useOverApproximation;
+		this.useStateequationCheck = useStateEquationCheck;
 		this.inclusionPlaces = inclusionPlaces;
-		this.enableOverApproximation = enableOverApproximation;
-		this.enableUnderApproximation = enableUnderApproximation;
+		this.enabledOverApproximation = enableOverApproximation;
+		this.enabledUnderApproximation = enableUnderApproximation;
 		this.approximationDenominator = approximationDenominator;
 	}
 
@@ -137,42 +121,5 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		
 		this.inclusionPlaces = inclusionPlaces;
 	}
-	
-	public boolean useOverApproximation(){
-		return useOverApproximation;
-	}
 
-	@Override
-	public int extraTokens() {
-		return extraTokens;
-	}
-
-	@Override
-	public TraceOption traceOption() {
-		return traceOption;
-	}
-	
-	public void setTraceOption(TraceOption option) {
-		traceOption = option;
-	}
-
-	@Override
-	public SearchOption searchOption() {
-		return searchOption;
-	}
-
-	@Override
-	public boolean enableOverApproximation() {
-		return enableOverApproximation;
-	}
-
-	@Override
-	public boolean enableUnderApproximation() {
-		return enableUnderApproximation;
-	}
-
-	@Override
-	public int approximationDenominator() {
-		return approximationDenominator;
-	}
 }

@@ -106,10 +106,10 @@ public class TAPNComposer implements ITAPNComposer {
 		
 		return new Tuple<Integer, Integer>(x, y);		
 	}
-	
-        private boolean isComponentEmpty(DataLayer guiModel) {
-                return guiModel.getPlaces().length==0 && guiModel.getTransitions().length==0;
-        }
+
+	private boolean isComponentEmpty(DataLayer guiModel) {
+		return guiModel.getPlaces().length == 0 && guiModel.getTransitions().length == 0;
+	}
         
 	private PlaceTransitionObject getRightmostObject(DataLayer guiModel) {
 		PlaceTransitionObject returnObject = null;
@@ -253,9 +253,9 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-                                if (isComponentEmpty(currentGuiModel)) { 
-                                        continue;
-                                }
+				if (isComponentEmpty(currentGuiModel)) {
+					continue;
+				}
 			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
@@ -331,7 +331,7 @@ public class TAPNComposer implements ITAPNComposer {
 					point.getPoint().x + offsetX,
 					point.getPoint().y + offsetY,
 					point.getPointType()
-					);
+			);
 		}
 		
 		return newArcPath;
@@ -344,10 +344,11 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-                                if (isComponentEmpty(currentGuiModel)) { 
-                                        continue;
-                                }
-                        }
+
+				if (isComponentEmpty(currentGuiModel)) {
+					continue;
+				}
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedInputArc arc : tapn.inputArcs()) {
@@ -381,8 +382,8 @@ public class TAPNComposer implements ITAPNComposer {
 							guiTarget,
 							arc.getWeight().value(),
 							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
-							false
-							));
+							false)
+					);
 					
 					// Build ArcPath
 					Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());
@@ -406,9 +407,9 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-                                if (isComponentEmpty(currentGuiModel)) { 
-                                        continue;
-                                }
+				if (isComponentEmpty(currentGuiModel)) {
+					continue;
+				}
 			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
@@ -437,7 +438,7 @@ public class TAPNComposer implements ITAPNComposer {
 							arc.getWeight().value(),
 							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
 							false
-							);
+					);
 					
 					// Build ArcPath
 					Transition oldGuiSource = currentGuiModel.getTransitionByName(arc.source().name());
@@ -463,9 +464,9 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-                                if (isComponentEmpty(currentGuiModel)) { 
-                                        continue;
-                                }
+				if (isComponentEmpty(currentGuiModel)) {
+					continue;
+				}
 			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
@@ -505,10 +506,11 @@ public class TAPNComposer implements ITAPNComposer {
 								arc.getWeight().value(),
 								mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name()),
 								false
-								)), 
+								)
+							),
 							nextGroupNr, 
 							true
-							);
+					);
 					
 					// Build ArcPath
 					Place oldGuiSourceIn = currentGuiModel.getPlaceByName(arc.source().name());
@@ -547,11 +549,11 @@ public class TAPNComposer implements ITAPNComposer {
 								guiTargetOut,
 								1,
 								mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-								false
-								)), 
+								false)
+							),
 							nextGroupNr + 1, 
 							false
-							);
+					);
 					
 					// Build ArcPath
 					Transition oldGuiSourceOut = currentGuiModel.getTransitionByName(arc.transition().name());
@@ -578,10 +580,10 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-                                if (isComponentEmpty(currentGuiModel)) { 
-                                        continue;
-                                }
-                        }
+				if (isComponentEmpty(currentGuiModel)) {
+					continue;
+				}
+			}
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {

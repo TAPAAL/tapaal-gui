@@ -1012,21 +1012,21 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			private void exportResults() {
-				String filename = FileBrowser.constructor("CSV file", "csv", lastPath)
-						.saveFile("results");
+				String filename = FileBrowser.constructor("CSV file", "csv", lastPath).saveFile("results");
+
 				if (filename != null) {
 					File exportFile = new File(filename);
 					lastPath = exportFile.getParent();
 					BatchProcessingResultsExporter exporter = new BatchProcessingResultsExporter();
 					try {
-						exporter.exportToCSV(tableModel.getResults(),
-								exportFile);
+						exporter.exportToCSV(tableModel.getResults(), exportFile);
 					} catch (Exception e1) {
 						JOptionPane.showMessageDialog(
 								CreateGui.getApp(),
 								"An error occurred while trying to export the results. Please try again",
 								"Error Exporting Results",
-								JOptionPane.ERROR_MESSAGE);
+								JOptionPane.ERROR_MESSAGE
+						);
 						e1.printStackTrace();
 					}
 				}
@@ -1041,11 +1041,8 @@ public class BatchProcessingDialog extends JDialog {
 		
 		closeButton = new JButton("Close");
 		closeButton.setToolTipText(TOOL_TIP_CloseButton);
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		closeButton.addActionListener(e -> exit());
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -1075,12 +1072,9 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Verification Time").setCellRenderer(renderer);
 		table.getColumn("Memory Usage").setCellRenderer(renderer);
 
-		tableModel.addTableModelListener(new TableModelListener() {
-			public void tableChanged(TableModelEvent e) {
-				if (e.getType() == TableModelEvent.INSERT) {
-					table.scrollRectToVisible(table.getCellRect(e.getLastRow(),
-							e.getLastRow(), true));
-				}
+		tableModel.addTableModelListener(e -> {
+			if (e.getType() == TableModelEvent.INSERT) {
+				table.scrollRectToVisible(table.getCellRect(e.getLastRow(), e.getLastRow(), true));
 			}
 		});
 		
@@ -1094,10 +1088,8 @@ public class BatchProcessingDialog extends JDialog {
 		table.setRowSorter(sorter);
 
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		Dimension scrollPanePrefDims = new Dimension(850, 250);
 		//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the window
 		Dimension scrollPaneMinDims = new Dimension(850, 250-150);
@@ -1255,15 +1247,13 @@ public class BatchProcessingDialog extends JDialog {
 		cancelButton.setPreferredSize(new java.awt.Dimension(85, 25));
 		
 		cancelButton.setEnabled(false);
-		cancelButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				terminateBatchProcessing();
-				fileStatusLabel.setText("");
-				statusLabel.setText("Batch processing cancelled");
-				enableButtons();
-			}
+		cancelButton.addActionListener(e -> {
+			terminateBatchProcessing();
+			fileStatusLabel.setText("");
+			statusLabel.setText("Batch processing cancelled");
+			enableButtons();
 		});
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 4;
 		gbc.gridy = 2;
@@ -1278,12 +1268,8 @@ public class BatchProcessingDialog extends JDialog {
 		skipFileButton.setPreferredSize(new java.awt.Dimension(85, 25));
 		
 		skipFileButton.setEnabled(false);
-		skipFileButton.addActionListener(new ActionListener() {
+		skipFileButton.addActionListener(e -> skipCurrentFile());
 
-			public void actionPerformed(ActionEvent e) {
-				skipCurrentFile();
-			}
-		});
 		gbc = new GridBagConstraints();
 		gbc.gridx = 4;
 		gbc.gridy = 1;
@@ -1349,13 +1335,14 @@ public class BatchProcessingDialog extends JDialog {
 				startTimeMs = System.currentTimeMillis();
 			}
 
-			public void fireVerificationTaskComplete(
-					VerificationTaskCompleteEvent e) {
-				if (timer.isRunning())
+			public void fireVerificationTaskComplete(VerificationTaskCompleteEvent e) {
+				if (timer.isRunning()) {
 					timer.stop();
+				}
 				stopMemoryTimer();
-				if (timeoutTimer.isRunning())
+				if (timeoutTimer.isRunning()) {
 					timeoutTimer.stop();
+				}
 				int tasksCompleted = e.verificationTasksCompleted();
 				progressLabel.setText(e.verificationTasksCompleted()
 						+ " verification task"
@@ -1468,8 +1455,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	// Custom cell renderer for the Query Column of the result table display the
 	// property of the query
-	private class ResultTableCellRenderer extends JLabel implements
-			TableCellRenderer {
+	private class ResultTableCellRenderer extends JLabel implements TableCellRenderer {
 		private static final long serialVersionUID = 3054497986242852099L;
 		Border unselectedBorder = null;
 		Border selectedBorder = null;
@@ -1479,9 +1465,7 @@ public class BatchProcessingDialog extends JDialog {
 			this.isBordered = isBordered;
 		}
 
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus, int row,
-				int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			if (isBordered) {
 				if (isSelected) {
 					setBackground(table.getSelectionBackground());
@@ -1520,8 +1504,7 @@ public class BatchProcessingDialog extends JDialog {
 					}
 					setForeground(table.getForeground());
 					if (unselectedBorder == null) {
-						unselectedBorder = BorderFactory.createMatteBorder(2,
-								5, 2, 5, table.getBackground());
+						unselectedBorder = BorderFactory.createMatteBorder(2, 5, 2, 5, table.getBackground());
 					}
 					setBorder(unselectedBorder);
 				}
@@ -1537,8 +1520,7 @@ public class BatchProcessingDialog extends JDialog {
 
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
-				} else if (table.getColumnName(column).equals(
-						"Verification Time")
+				} else if (table.getColumnName(column).equals("Verification Time")
 						|| table.getColumnName(column).equals("Method")
 						|| table.getColumnName(column).equals("Memory Usage")) {
 					setText(value.toString());
@@ -1557,8 +1539,7 @@ public class BatchProcessingDialog extends JDialog {
 						setToolTipText(result != null ? generateMemoryToolTipText(result)
 								: value.toString());
 					else
-						setToolTipText(result != null ? generateReductionString(result
-								.query()) : value.toString());
+						setToolTipText(result != null ? generateReductionString(result.query()) : value.toString());
 				} else {
 					setToolTipText(value.toString());
 					setText(value.toString());
@@ -1571,8 +1552,7 @@ public class BatchProcessingDialog extends JDialog {
 			return this;
 		}
 
-		private String generateStatsToolTipText(
-				BatchProcessingVerificationResult result) {
+		private String generateStatsToolTipText(BatchProcessingVerificationResult result) {
 			StringBuilder s = new StringBuilder();
 			s.append("Verification Time: ");
 			s.append((result.verificationTimeInMs() / 1000.0));
@@ -1586,8 +1566,7 @@ public class BatchProcessingDialog extends JDialog {
 			return s.toString();
 		}
 		
-		private String generateMemoryToolTipText(
-				BatchProcessingVerificationResult result) {
+		private String generateMemoryToolTipText(BatchProcessingVerificationResult result) {
 			StringBuilder s = new StringBuilder();
 			s.append("Peak memory usage (estimate): ");
 			s.append(result.verificationMemory());
@@ -1737,11 +1716,9 @@ public class BatchProcessingDialog extends JDialog {
 			
 			chooseReductionOptions = new JButton(STATUS_TEXT_DONT_OVERRIDE);
 			chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
-			chooseReductionOptions.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					//reductionOptionDialog.setOverride(true);
-					reductionOptionDialog.setVisible(true);
-				}
+			chooseReductionOptions.addActionListener(arg0 -> {
+				//reductionOptionDialog.setOverride(true);
+				reductionOptionDialog.setVisible(true);
 			});
 			this.add(chooseReductionOptions);
 

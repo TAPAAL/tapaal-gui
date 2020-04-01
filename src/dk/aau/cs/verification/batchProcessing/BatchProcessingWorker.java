@@ -276,8 +276,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_SOUNDNESS) {
 			try {
 				verificationResult = verifyQuery(file, composedModel, queryToVerify);
-				if(verificationResult != null)
+				if(verificationResult != null) {
 					processVerificationResult(file, queryToVerify, verificationResult);
+				}
 			} catch (Exception e) {
 				publishResult(file.getName(), queryToVerify, "Skipped - model not supported by the verification method. Try running workflow analysis from the menu.", 0, new NullStats());
 			}
@@ -309,22 +310,19 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					Verifier.runVerifyTAPNVerification(model.network(), queryToVerify, new VerificationCallback() {
 						
 						@Override
-						public void run() {							
-						}
-						
-						@Override
 						public void run(VerificationResult<TAPNNetworkTrace> result) {
 							TraceType traceType = ((TimedTAPNNetworkTrace) result.getTrace()).getTraceType();
 							if(traceType == TraceType.EG_DELAY_FOREVER || traceType == TraceType.EG_LOOP) {
 								publishResult(file.getName(), queryToVerify, "Not Strongly Sound", result.verificationTime(), result.stats());
-							} else
+							} else {
 								publishResult(file.getName(), queryToVerify, "Strongly Sound", result.verificationTime(), result.stats());
+							}
 						}
 					});
 
-				} else
+				} else {
 					publishResult(file.getName(), queryToVerify, "Not Strongly Sound", resultOfSoundCheck.verificationTime(), resultOfSoundCheck.stats());
-				
+				}
 			} catch (Exception e) {
 				publishResult(file.getName(), queryToVerify, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", time, new NullStats());
 			}

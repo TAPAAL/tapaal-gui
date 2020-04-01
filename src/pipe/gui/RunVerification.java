@@ -6,16 +6,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,10 +22,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
@@ -43,14 +37,14 @@ import dk.aau.cs.verification.VerificationResult;
 public class RunVerification extends RunVerificationBase {	
 	private IconSelector iconSelector;
 	private VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-		super(modelChecker, messenger, guiModels);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
+		super(modelChecker, messenger);
 		iconSelector = selector;
 		this.callback = callback;
 	}
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null, null);
+		this(modelChecker, selector, messenger, null);
 	}
 
 	@Override
@@ -59,16 +53,15 @@ public class RunVerification extends RunVerificationBase {
 			if(callback != null){
 				callback.run(result);
 			}else{
-				JOptionPane.showMessageDialog(CreateGui.getApp(), 
+				JOptionPane.showMessageDialog(
+						CreateGui.getApp(),
 						createMessagePanel(result),
-						"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result));
+						"Verification Result",
+						JOptionPane.INFORMATION_MESSAGE,
+						iconSelector.getIconFor(result)
+				);
 	
 				if (result.getTrace() != null) {
-					// DataLayer model = CreateGui.getModel();
-					// TraceTransformer interpreter = model.isUsingColors() ? new
-					// ColoredTraceTransformer(model) : new TraceTransformer(model);
-					// TAPNTrace trace =
-					// interpreter.interpretTrace(result.getTrace());
 					CreateGui.getApp().setGUIMode(GUIMode.animation);
 	
 					CreateGui.getAnimator().SetTrace(result.getTrace());
@@ -109,8 +102,6 @@ public class RunVerification extends RunVerificationBase {
 
 		}
 	}
-	
-	JDialog d;
 
 	private String toHTML(String string){
 		StringBuilder buffer = new StringBuilder("<html>");
@@ -118,71 +109,66 @@ public class RunVerification extends RunVerificationBase {
 		buffer.append("</html>");
 		return buffer.toString();
 	}
-	
-	
-        private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
+
+
+	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
 		final JPanel fullPanel = new JPanel(new GridBagLayout());
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(15,0,15,15);
+		gbc.insets = new Insets(15, 0, 15, 15);
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.weightx = 2;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-                if (transitionPanel) {
-                    headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
-                } else {
-                    headLinePanel.add(new JLabel(toHTML("Maximum number of tokens per place achieved during the search.\n"), JLabel.LEFT), gbc);
-                }
-                    
+		if (transitionPanel) {
+			headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
+		} else {
+			headLinePanel.add(new JLabel(toHTML("Maximum number of tokens per place achieved during the search.\n"), JLabel.LEFT), gbc);
+		}
+
 		//Setup table
-                TableModel model;
-                
-                if (transitionPanel) {
-                    String[] columnNames = {"Count", "Transition"};
-                    Object[][] data = extractArrayFromTransitionStatistics(result);
-                    model = new NonEditableModel(data, columnNames);
-                } else {
-                    String[] columnNames = {"Max Tokens", "Place"};
-                    Object[][] data = extractArrayFromPlaceBoundStatistics(result);
-                    model = new NonEditableModel(data, columnNames);
-                }
-                JTable table = new JTable(model);
-                
-                Comparator<Object> comparator = new Comparator<Object>() {
-                @Override
-                public int compare(Object oo1, Object oo2) {
-                    boolean isFirstNumeric, isSecondNumeric;
-                    String o1 = oo1.toString(), o2 = oo2.toString();
-                    isFirstNumeric = o1.matches("\\d+");
-                    isSecondNumeric = o2.matches("\\d+");
-                    if (isFirstNumeric) {
-                        if (isSecondNumeric) {
-                            return Integer.valueOf(o2).compareTo(Integer.valueOf(o1));
-                        } else {
-                            return -1; // numbers always smaller than letters
-                        }
-                    } else {
-                        if (isSecondNumeric) {
-                            return 1; // numbers always smaller than letters
-                        }
-                    }
-                    return 0; // we do not compare strings (it is the same all the time) 
-                }
-                };
-		
+		TableModel model;
+
+		if (transitionPanel) {
+			String[] columnNames = {"Count", "Transition"};
+			Object[][] data = extractArrayFromTransitionStatistics(result);
+			model = new NonEditableModel(data, columnNames);
+		} else {
+			String[] columnNames = {"Max Tokens", "Place"};
+			Object[][] data = extractArrayFromPlaceBoundStatistics(result);
+			model = new NonEditableModel(data, columnNames);
+		}
+		JTable table = new JTable(model);
+
+		Comparator<Object> comparator = (oo1, oo2) -> {
+			boolean isFirstNumeric, isSecondNumeric;
+			String o1 = oo1.toString(), o2 = oo2.toString();
+			isFirstNumeric = o1.matches("\\d+");
+			isSecondNumeric = o2.matches("\\d+");
+			if (isFirstNumeric) {
+				if (isSecondNumeric) {
+					return Integer.valueOf(o2).compareTo(Integer.valueOf(o1));
+				} else {
+					return -1; // numbers always smaller than letters
+				}
+			} else {
+				if (isSecondNumeric) {
+					return 1; // numbers always smaller than letters
+				}
+			}
+			return 0; // we do not compare strings (it is the same all the time)
+		};
+
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
 		sorter.setComparator(0, comparator);
 		table.setRowSorter(sorter);
-				
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 0;
@@ -190,8 +176,8 @@ public class RunVerification extends RunVerificationBase {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		fullPanel.add(headLinePanel,gbc);
-		
+		fullPanel.add(headLinePanel, gbc);
+
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1;
@@ -199,34 +185,34 @@ public class RunVerification extends RunVerificationBase {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		fullPanel.add(scrollPane,gbc);
-		
+		fullPanel.add(scrollPane, gbc);
+
 		// Make window resizeable
 		fullPanel.addHierarchyListener(new HierarchyListener() {
-			 public void hierarchyChanged(HierarchyEvent e) {
-			  //when the hierarchy changes get the ancestor for the message
-			  Window window = SwingUtilities.getWindowAncestor(fullPanel);
-			  //check to see if the ancestor is an instance of Dialog and isn't resizable
-			  if (window instanceof Dialog) {
-			   Dialog dialog = (Dialog)window;
-			   if (!dialog.isResizable()) {
-			    //set resizable to true
-			    dialog.setResizable(true);
-				dialog.setMinimumSize(new Dimension(350, 300));
-				dialog.setPreferredSize(new Dimension(600, 400));
-			   }
-			  }
-			 }
-			}); 
-		
+			public void hierarchyChanged(HierarchyEvent e) {
+				//when the hierarchy changes get the ancestor for the message
+				Window window = SwingUtilities.getWindowAncestor(fullPanel);
+				//check to see if the ancestor is an instance of Dialog and isn't resizable
+				if (window instanceof Dialog) {
+					Dialog dialog = (Dialog) window;
+					if (!dialog.isResizable()) {
+						//set resizable to true
+						dialog.setResizable(true);
+						dialog.setMinimumSize(new Dimension(350, 300));
+						dialog.setPreferredSize(new Dimension(600, 400));
+					}
+				}
+			}
+		});
+
 		return fullPanel;
 	}
-	
-        private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
-		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
+
+	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+		List<Tuple<String, Integer>> transistionStats = result.getTransitionStatistics();
 		Object[][] out = new Object[transistionStats.size()][2];
-		for (int i=0;i<transistionStats.size();i++) {
-			Object[] line = {(transistionStats.get(i).value2()==-1 ? "unknown" : transistionStats.get(i).value2()) ,transistionStats.get(i).value1()};
+		for (int i = 0; i < transistionStats.size(); i++) {
+			Object[] line = {(transistionStats.get(i).value2() == -1 ? "unknown" : transistionStats.get(i).value2()), transistionStats.get(i).value1()};
 			out[i] = line;
 		}
 		return out;
@@ -256,7 +242,7 @@ public class RunVerification extends RunVerificationBase {
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
 
-		if(modelChecker.supportsStats() && !result.isOverApproximationResult() && !isCTLQuery){
+		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
@@ -265,11 +251,7 @@ public class RunVerification extends RunVerificationBase {
 			panel.add(new JLabel(toHTML(result.getStatsAsString())), gbc);
 			
 			JButton infoButton = new JButton("Explanation");
-			infoButton.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE);
-				}
-			});
+			infoButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE));
 			gbc = new GridBagConstraints();
 			gbc.gridx = 1;
 			gbc.gridy = 1;
@@ -279,11 +261,7 @@ public class RunVerification extends RunVerificationBase {
 			
 			if(!result.getTransitionStatistics().isEmpty()){
 				JButton transitionStatsButton = new JButton("Transition Statistics");
-				transitionStatsButton.addActionListener(new ActionListener(){
-					public void actionPerformed(ActionEvent arg0) {
-						JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
-					}
-				});
+				transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
 				gbc.gridy = 2;
@@ -291,13 +269,9 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
 			}
-                        if(!result.getPlaceBoundStatistics().isEmpty()){
+			if(!result.getPlaceBoundStatistics().isEmpty()){
 				JButton placeStatsButton = new JButton("Place-Bound Statistics");
-				placeStatsButton.addActionListener(new ActionListener(){
-					public void actionPerformed(ActionEvent arg0) {
-						JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE);
-					}
-				});
+				placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 1;
 				gbc.gridy = 2;
@@ -315,7 +289,7 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
 			}
-		} else if (modelChecker.supportsStats() && !result.isOverApproximationResult() && isCTLQuery){
+		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
@@ -324,11 +298,7 @@ public class RunVerification extends RunVerificationBase {
 
             panel.add(new JLabel(toHTML((result.getCTLStatsAsString()))),gbc);
 			JButton infoButton = new JButton("Explanation");
-			infoButton.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE);
-				}
-			});
+			infoButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE));
 			gbc = new GridBagConstraints();
 			gbc.gridx = 1;
 			gbc.gridy = 1;
@@ -337,7 +307,7 @@ public class RunVerification extends RunVerificationBase {
 			panel.add(infoButton, gbc);
 		}
 		
-		if(result.isOverApproximationResult()){
+		if(result.isSolvedUsingStateEquation()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
