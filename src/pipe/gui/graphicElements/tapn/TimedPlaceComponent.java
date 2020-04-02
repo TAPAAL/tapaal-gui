@@ -427,7 +427,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionX(), getPositionY(), id, getNameOffsetX(), getNameOffsetY());
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY());
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		return placeComponent;
