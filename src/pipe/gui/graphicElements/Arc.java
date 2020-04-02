@@ -218,8 +218,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
 				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
@@ -251,8 +250,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 		//Draw Arrow-head
 		//Jump to arc end
-		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
-				.getPoint(myPath.getEndIndex()).getY());
+		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath.getPoint(myPath.getEndIndex()).getY());
 
 		//Rotate to match arrowhead to arc angle
 		g2.rotate(myPath.getEndAngle() + Math.PI);
@@ -297,9 +295,12 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	@Override
 	public boolean contains(int x, int y) {
-		Point2D.Double point = new Point2D.Double(x + myPath.getBounds().getX()
-				- COMPONENT_DRAW_OFFSET - zoomGrow, y
-				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
+		Point2D.Double point = new Point2D.Double(
+		    x + myPath.getBounds().getX() - COMPONENT_DRAW_OFFSET - zoomGrow,
+            y
+				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
+        );
+
 		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
@@ -401,8 +402,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			if (aView.createArc == arcBeingDraw) {
 				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
 
-				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE)
-						|| (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
+				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE) || (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
 					CreateGui.getApp().endFastMode();
 				}
 				aView.repaint();
