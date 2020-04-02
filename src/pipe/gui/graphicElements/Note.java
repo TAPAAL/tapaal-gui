@@ -19,10 +19,6 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
 import dk.aau.cs.gui.undo.Command;
 
-/**
- * This abstract class is the base class for AnnotationNote class and for
- * Parameter class
- */
 public abstract class Note extends PetriNetObject {
 
 	private static final long serialVersionUID = 8965208519103066242L;
@@ -46,8 +42,7 @@ public abstract class Note extends PetriNetObject {
 
 		// Set minimum size the preferred size for an empty string:
 		note.setText("");
-		note.setFont(new Font(Pipe.ANNOTATION_DEFAULT_FONT, Font.PLAIN,
-				Pipe.ANNOTATION_DEFAULT_FONT_SIZE));
+		note.setFont(new Font(Pipe.ANNOTATION_DEFAULT_FONT, Font.PLAIN, Pipe.ANNOTATION_DEFAULT_FONT_SIZE));
 		note.setSize(
 				note.getPreferredSize().width,
 				note.getPreferredSize().height
@@ -173,7 +168,6 @@ public abstract class Note extends PetriNetObject {
 		if (CreateGui.getDrawingSurface() != null) {
 			setDeleted(false);
 			updateBounds();
-			// CreateGui.getDrawingSurface().setNetChanged(true);
 		}
 	}
 
