@@ -1,16 +1,11 @@
 package pipe.gui.handler;
 
-import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
@@ -41,8 +36,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 				&& !(myObject instanceof TimedInputArcComponent)
 				&& !(myObject instanceof TimedTransportArcComponent)) {
 			
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
-					.getPoint()));
+			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 
@@ -64,9 +58,12 @@ public class ArcHandler extends PetriNetObjectHandler {
 				if (e.isControlDown()) {
 					CreateGui.getCurrentTab().getUndoManager().addNewEdit(
 							arc.getArcPath().insertPoint(
-									new Point2D.Float(arc.getX() + e.getX(),
-											arc.getY() + e.getY()),
-									e.isAltDown()));
+									new Point2D.Float(
+									    arc.getX() + e.getX(),
+                                        arc.getY() + e.getY()),
+									e.isAltDown()
+                            )
+                    );
 				} else if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 					((TimedOutputArcComponent) myObject).showTimeIntervalEditor();
 				}
