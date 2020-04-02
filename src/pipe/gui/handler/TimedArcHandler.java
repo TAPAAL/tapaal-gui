@@ -26,20 +26,15 @@ public class TimedArcHandler extends ArcHandler {
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TimedInputArcComponent
-				&& !(myObject instanceof TimedTransportArcComponent)) {
-			if (!CreateGui.getModel().netType().equals(NetType.UNTIMED) && !(myObject instanceof TimedInhibitorArcComponent)) {
+		if (myObject instanceof TimedInputArcComponent && !(myObject instanceof TimedTransportArcComponent)) {
+
+		    if (!CreateGui.getModel().netType().equals(NetType.UNTIMED) && !(myObject instanceof TimedInhibitorArcComponent)) {
 				menuItem = new JMenuItem("Properties");
 				menuItem.addActionListener(e1 -> ((TimedInputArcComponent) myObject).showTimeIntervalEditor());
 				popup.insert(menuItem, popupIndex++);
 			}
-			/*
-			 * menuItem = new JMenuItem(new EditTimeIntervalAction(contentPane,
-			 * (Arc)myObject)); menuItem.setText("Edit Time Interval");
-			 * popup.insert(menuItem, popupIndex++);
-			 */
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
-					.getPoint()));
+
+			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 

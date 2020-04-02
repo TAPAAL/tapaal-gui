@@ -32,15 +32,14 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 			return;
 		}
 
-
 		int rotation = 0;
 		if (e.getWheelRotation() < 0) {
 			rotation = -e.getWheelRotation() * 135;
 		} else {
 			rotation = e.getWheelRotation() * 45;
 		}
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-				((Transition) myObject).rotate(rotation));
+
+		CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) myObject).rotate(rotation));
 
 	}
 
@@ -54,7 +53,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		JPopupMenu popup = super.getPopup(e);
 
 		JMenuItem menuItem = new JMenuItem("Edit Transition");
-		menuItem.addActionListener(e1 -> ((Transition) myObject).showEditor());
+		menuItem.addActionListener(o -> ((Transition) myObject).showEditor());
 		popup.insert(menuItem, index++);
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Transition) myObject));
@@ -84,28 +83,18 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
-					int x = Zoomer.getZoomedValue(((Transition) myObject)
-							.getNameOffsetXObject().intValue(), myObject
-							.getZoom());
-					int y = Zoomer.getZoomedValue(((Transition) myObject)
-							.getNameOffsetYObject().intValue(), myObject
-							.getZoom());
+					int x = Zoomer.getZoomedValue(
+					    ((Transition) myObject).getNameOffsetXObject().intValue(),
+                        myObject.getZoom()
+                    );
+					int y = Zoomer.getZoomedValue(
+					    ((Transition) myObject).getNameOffsetYObject().intValue(),
+                        myObject.getZoom()
+                    );
 					m.show(myObject, x, y);
 				}
 			}
 		}
 	}
 
-
-	public void mouseEngfstered(MouseEvent e) {
-		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-			if ((myObject instanceof pipe.gui.graphicElements.tapn.TimedTransitionComponent) && !isDragging) {// &&
-				if (CreateGui.getCurrentTab().isInAnimationMode()) {
-					((TimedTransitionComponent) myObject).updateToolTip(true);
-				} else {
-					((TimedTransitionComponent) myObject).updateToolTip(false);
-				}
-			}
-		}
-	}
 }

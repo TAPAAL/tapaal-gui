@@ -33,13 +33,11 @@ public class AnnotationNoteHandler extends NoteHandler {
 		int popupIndex = 0;
 		JPopupMenu popup = super.getPopup(e);
 
-		JMenuItem menuItem = new JMenuItem(new EditNoteAction(
-				(AnnotationNote) myObject));
+		JMenuItem menuItem = new JMenuItem(new EditNoteAction((AnnotationNote) myObject));
 		menuItem.setText("Edit text");
 		popup.insert(menuItem, popupIndex++);
 
-		menuItem = new JMenuItem(new EditAnnotationBorderAction(
-				(AnnotationNote) myObject));
+		menuItem = new JMenuItem(new EditAnnotationBorderAction((AnnotationNote) myObject));
 		if (((AnnotationNote) myObject).isShowingBorder()) {
 			menuItem.setText("Disable Border");
 		} else {
@@ -47,8 +45,8 @@ public class AnnotationNoteHandler extends NoteHandler {
 		}
 		popup.insert(menuItem, popupIndex++);
 
-		menuItem = new JMenuItem(new EditAnnotationBackgroundAction(
-				(AnnotationNote) myObject));
+		menuItem = new JMenuItem(new EditAnnotationBackgroundAction((AnnotationNote) myObject));
+
 		if (((AnnotationNote) myObject).isFilled()) {
 			menuItem.setText("Transparent");
 		} else {
@@ -64,8 +62,7 @@ public class AnnotationNoteHandler extends NoteHandler {
 	public void mouseClicked(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		
-		if ((e.getComponent() == myObject || !e.getComponent().isEnabled())
-				&& (SwingUtilities.isLeftMouseButton(e))) {
+		if ((e.getComponent() == myObject || !e.getComponent().isEnabled()) && (SwingUtilities.isLeftMouseButton(e))) {
 			if (e.getClickCount() == 2) {
 				((AnnotationNote) myObject).enableEditMode();
 			}
