@@ -57,7 +57,7 @@ public class Grid {
 	}
 
 	private static void setGridSpacing(double spacing) {
-		gridSpacing = (float) (spacing * Pipe.PLACE_TRANSITION_HEIGHT);
+		gridSpacing = (spacing * Pipe.PLACE_TRANSITION_HEIGHT);
 	}
 
 	public static void disableGrid() {

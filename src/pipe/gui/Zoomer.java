@@ -54,10 +54,6 @@ public class Zoomer {
 		return (int) (x * zoom * 0.01);
 	}
 
-	public static float getZoomedValue(float x, int zoom) {
-		return (float) (x * zoom * 0.01);
-	}
-
 	public static double getZoomedValue(double x, int zoom) {
 		return x * zoom * 0.01;
 	}

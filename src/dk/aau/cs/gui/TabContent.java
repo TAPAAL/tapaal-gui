@@ -1398,12 +1398,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				if(obj instanceof Transition){
 					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
 						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+							point.setPointLocation(Math.max(point.getPoint().x*factor, point.getWidth()), Math.max(point.getPoint().y*factor, point.getHeight()));
 						}
 					}
 					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
 						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+							point.setPointLocation(Math.max(point.getPoint().x*factor, point.getWidth()), Math.max(point.getPoint().y*factor, point.getHeight()));
 						}
 					}
 				}

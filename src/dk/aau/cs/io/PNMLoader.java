@@ -321,8 +321,8 @@ public class PNMLoader {
 						String arcTempX = position.getAttribute("x");
 						String arcTempY = position.getAttribute("y");
 
-						float arcPointX = Float.valueOf(arcTempX);
-						float arcPointY = Float.valueOf(arcTempY);
+						double arcPointX = Double.valueOf(arcTempX);
+                        double arcPointY = Double.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						
