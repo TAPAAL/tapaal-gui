@@ -598,13 +598,13 @@ public class TapnLegacyXmlLoader {
 		String targetInput = inputArcElement.getAttribute("target");
 		boolean taggedArc = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(inputArcElement, "tagged");
 		String inscriptionTempStorage = getChildNodesContentOfValueChildNodeAsString(inputArcElement, "inscription");
-		double nameOffsetXInput;
-		double nameOffsetYInput;
+		int nameOffsetXInput;
+		int nameOffsetYInput;
 		
 		//This check is done, as arcs in nets saved before this change do not have a nameOffset
 		if(inputArcElement.getAttribute("nameOffsetX") != "" && inputArcElement.getAttribute("nameOffsetY") != "") {
-			nameOffsetXInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
-			nameOffsetYInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
+			nameOffsetXInput = (int) Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
+			nameOffsetYInput = (int) Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
 		} else {
 			nameOffsetXInput = 0;
 			nameOffsetYInput = 0;

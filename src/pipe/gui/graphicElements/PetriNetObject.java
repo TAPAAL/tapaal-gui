@@ -276,27 +276,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public int getOriginalY() {
 		return originalY;
 	}
-    /**
-     * Get X-axis position, returns null if value not yet entered
-     *
-     * @return Double value for X-axis position
-	 * @deprecated use getOriginalX
-     */
-    @Deprecated
-    public Double getPositionXObject() {
-        return (double) originalX;
-    }
-
-    /**
-     * Get Y-axis position, returns null if value not yet entered
-     *
-     * @return Double value for Y-axis position
-	 * @deprecated use getOriginalY
-     */
-    @Deprecated
-    public Double getPositionYObject() {
-        return (double) originalY;
-    }
 
 	@Override
 	public void zoomUpdate(int zoom) {

@@ -90,8 +90,8 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 				if (m != null) {
 
 					if (myObject instanceof PetriNetObjectWithLabel) {
-						int x = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetXObject().intValue(), myObject.getZoom());
-						int y = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetYObject().intValue(), myObject.getZoom());
+						int x = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetX(), myObject.getZoom());
+						int y = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetY(), myObject.getZoom());
 						m.show(myObject, x, y);
 					}
 				}
