@@ -51,7 +51,7 @@ public class ArcPathPoint extends PetriNetObject {
 		setPointLocation(0, 0);
 	}
 
-	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a) {
+	public ArcPathPoint(double x, double y, boolean _pointType, ArcPath a) {
 		this();
 		myArcPath = a;
 		setPointLocation(x, y);
@@ -68,7 +68,7 @@ public class ArcPathPoint extends PetriNetObject {
 	/**
 	 * @author Nadeem
 	 */
-	public ArcPathPoint(Point2D.Float point, boolean _pointType, ArcPath a) {
+	public ArcPathPoint(Point2D.Double point, boolean _pointType, ArcPath a) {
 		this(point.x, point.y, _pointType, a);
 	}
 
@@ -76,7 +76,7 @@ public class ArcPathPoint extends PetriNetObject {
 		return point;
 	}
 
-	public void setPointLocation(float x, float y) {
+	public void setPointLocation(double x, double y) {
 		double realX = Zoomer.getUnzoomedValue(x, myArcPath.getArc().getZoom());
 		double realY = Zoomer.getUnzoomedValue(y, myArcPath.getArc().getZoom());
 		getRealPoint().setLocation(realX, realY);
@@ -186,9 +186,11 @@ public class ArcPathPoint extends PetriNetObject {
 		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
 	}
 
-	public Point2D.Float getMidPoint(ArcPathPoint target) {
-		return new Point2D.Float((target.point.x + point.x) / 2,
-				(target.point.y + point.y) / 2);
+	public Point2D.Double getMidPoint(ArcPathPoint target) {
+		return new Point2D.Double(
+		    (target.point.x + point.x) / 2,
+            (target.point.y + point.y) / 2
+        );
 	}
 
 	public boolean isDeleteable() {

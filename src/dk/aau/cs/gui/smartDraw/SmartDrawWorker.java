@@ -433,18 +433,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	 * could maybe be a for loop or something instead
 	 */
 	private void offsetArcPointsFromMiddlepoint(Arc arcOne, Arc arcTwo, Place place, Transition transition) {
-		Point.Float pointForArcOne = new Point.Float();
-		Point.Float pointForArcTwo = new Point.Float();
+		Point.Double pointForArcOne;
+		Point.Double pointForArcTwo;
 		if(transition.getPositionX() == place.getPositionX()) {
-			pointForArcOne = new Point.Float(arcOne.getArcPath().midPoint.x+30, (arcOne.getArcPath().midPoint.y));
-			pointForArcTwo = new Point.Float(arcTwo.getArcPath().midPoint.x-30, (arcTwo.getArcPath().midPoint.y));
+			pointForArcOne = new Point.Double(arcOne.getArcPath().midPoint.x+30, (arcOne.getArcPath().midPoint.y));
+			pointForArcTwo = new Point.Double(arcTwo.getArcPath().midPoint.x-30, (arcTwo.getArcPath().midPoint.y));
 		} 
 		else if(transition.getPositionY() == place.getPositionY()) {
-			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y+30);
-			pointForArcTwo = new Point.Float((arcTwo.getArcPath().midPoint.x), arcTwo.getArcPath().midPoint.y-30);
+			pointForArcOne = new Point.Double((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y+30);
+			pointForArcTwo = new Point.Double((arcTwo.getArcPath().midPoint.x), arcTwo.getArcPath().midPoint.y-30);
 		} else {
-			pointForArcOne = new Point.Float((arcOne.getArcPath().midPoint.x+15), arcOne.getArcPath().midPoint.y+15);
-			pointForArcTwo = new Point.Float((arcTwo.getArcPath().midPoint.x-15), arcTwo.getArcPath().midPoint.y-15);
+			pointForArcOne = new Point.Double((arcOne.getArcPath().midPoint.x+15), arcOne.getArcPath().midPoint.y+15);
+			pointForArcTwo = new Point.Double((arcTwo.getArcPath().midPoint.x-15), arcTwo.getArcPath().midPoint.y-15);
 		}
 		
 		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));

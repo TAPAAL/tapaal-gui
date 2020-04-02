@@ -42,7 +42,7 @@ public class ArcPath implements Shape {
 	private int transitionAngle;
 	private final static boolean showDebugCurvedControlPoints = false;
 
-	public Point2D.Float midPoint = new Point2D.Float();
+	public Point2D.Double midPoint = new Point2D.Double();
 
 	private ArcPath(Arc a, int transitionAngle) {
 		super();
@@ -688,7 +688,7 @@ public class ArcPath implements Shape {
 	 * resulting in the shortest distance then have an extra point added between
 	 * them at the midpoint effectively splitting that segment into two.
 	 */
-	public ArcPathPoint splitSegment(Point2D.Float mouseposition) {
+	public ArcPathPoint splitSegment(Point2D.Double mouseposition) {
 		int wantedpoint = findPoint(mouseposition);
 
 		// wantedpoint is now the index of the first point in the pair of arc
@@ -705,7 +705,7 @@ public class ArcPath implements Shape {
 		return newpoint;
 	}
 
-	public Command insertPoint(Point2D.Float mouseposition, boolean flag) {
+	public Command insertPoint(Point2D.Double mouseposition, boolean flag) {
 		int wantedpoint = findPoint(mouseposition);
 
 		// wantedpoint is now the index of the first point in the pair of arc
@@ -719,7 +719,7 @@ public class ArcPath implements Shape {
 		return new AddArcPathPointEdit(this.getArc(), newPoint, getArc().getGuiModel());
 	}
 
-	private int findPoint(final Point2D.Float mouseposition) {
+	private int findPoint(final Point2D.Double mouseposition) {
 		// An array to store all the distances from the midpoints
 		double[] distances = new double[pathPoints.size() - 1];
 
@@ -727,7 +727,7 @@ public class ArcPath implements Shape {
 		for (int index = 0; index < (pathPoints.size() - 1); index++) {
 			ArcPathPoint first = pathPoints.get(index);
 			ArcPathPoint second = pathPoints.get(index + 1);
-			Point2D.Float midpoint = first.getMidPoint(second);
+			Point2D.Double midpoint = first.getMidPoint(second);
 			distances[index] = midpoint.distance(mouseposition);
 		}
 
