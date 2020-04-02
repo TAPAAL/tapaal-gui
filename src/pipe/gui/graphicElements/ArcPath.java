@@ -217,10 +217,8 @@ public class ArcPath implements Shape {
 				Y = new Cubic[lengthOfCurve + 2];
 
 				for (k1 = 0; k1 <= (curveEndIndex - curveStartIndex); k1++) {
-					x[k1] = (int) (pathPoints.get(curveStartIndex + k1))
-							.getPoint().x;
-					y[k1] = (int) (pathPoints.get(curveStartIndex + k1))
-							.getPoint().y;
+					x[k1] = (int) (pathPoints.get(curveStartIndex + k1)).getPoint().x;
+					y[k1] = (int) (pathPoints.get(curveStartIndex + k1)).getPoint().y;
 				}
 				x[k1] = x[k1 - 1];
 				y[k1] = y[k1 - 1];
@@ -320,8 +318,7 @@ public class ArcPath implements Shape {
 
 			myPoint = pathPoints.get(getEndIndex());
 			myPoint.setControl2(getControlPoint(myPoint.getPoint(), myPoint.getControl1(), myPoint.getPoint(), myPoint.getControl1()));
-		} else if (target != null && source instanceof Place
-				&& (pathPoints.get(getEndIndex())).getPointType()) {
+		} else if (target != null && source instanceof Place && (pathPoints.get(getEndIndex())).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(getEndIndex());
 			ArcPathPoint myLastPoint = pathPoints.get(getEndIndex() - 1);
             double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint())
@@ -361,11 +358,7 @@ public class ArcPath implements Shape {
 		myArc.updateArcPosition();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(double, double)
-	 */
+    @Override
 	public boolean contains(double arg0, double arg1) {
 		return false;
 	}
@@ -382,14 +375,6 @@ public class ArcPath implements Shape {
 
 	public void setPointType(int index, boolean type) {
 		(pathPoints.get(index)).setPointType(type);
-	}
-
-	public void setFinalPointType(boolean type) {
-		(pathPoints.get(getEndIndex())).setPointType(type);
-	}
-
-	public void togglePointType(int index) {
-		(pathPoints.get(index)).togglePointType();
 	}
 
 	public boolean getPointType(int index) {
@@ -443,11 +428,6 @@ public class ArcPath implements Shape {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(java.awt.geom.Rectangle2D)
-	 */
 	public void setPointVisibilityLock(boolean lock) {
 		pointLock = lock;
 	}
@@ -468,108 +448,60 @@ public class ArcPath implements Shape {
 
 	public double getStartAngle() {
 		if (getEndIndex() > 0) {
-			return (pathPoints.get(0)).getAngle(((pathPoints.get(1)))
-					.getControl2());
+			return (pathPoints.get(0)).getAngle(((pathPoints.get(1))).getControl2());
 		}
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(double, double, double, double)
-	 */
+	@Override
 	public boolean contains(double arg0, double arg1, double arg2, double arg3) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(double, double, double, double)
-	 */
+    @Override
 	public boolean intersects(double arg0, double arg1, double arg2, double arg3) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getBounds()
-	 */
+    @Override
 	public Rectangle getBounds() {
 		return path.getBounds();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(java.awt.geom.Point2D)
-	 */
+    @Override
 	public boolean contains(Point2D p) {
 		return shape.contains(p);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(java.awt.geom.Point2D)
-	 */
 	public boolean proximityContains(Point2D p) {
 		return proximityShape.contains(p);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getBounds2D()
-	 */
+    @Override
 	public Rectangle2D getBounds2D() {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(java.awt.geom.Rectangle2D)
-	 */
+    @Override
 	public boolean contains(Rectangle2D arg0) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(java.awt.geom.Rectangle2D)
-	 */
+    @Override
 	public boolean intersects(Rectangle2D r) {
 		return shape.intersects(r);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(java.awt.geom.Rectangle2D)
-	 */
 	public boolean proximityIntersects(Rectangle2D r) {
 		return proximityShape.intersects(r);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform)
-	 */
+    @Override
 	public PathIterator getPathIterator(AffineTransform arg0) {
 		return path.getPathIterator(arg0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform,
-	 * double)
-	 */
+    @Override
 	public PathIterator getPathIterator(AffineTransform arg0, double arg1) {
 		return path.getPathIterator(arg0, arg1);
 	}
@@ -615,7 +547,6 @@ public class ArcPath implements Shape {
 	}
 
 	public void addPointsToGui(DataLayer model) {
-		ArcPathPointHandler pointHandler;
 
 		(pathPoints.get(0)).setDraggable(false);
 		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
@@ -673,30 +604,6 @@ public class ArcPath implements Shape {
 
 	}
 
-	/**
-	 * Goes through neighbouring pairs of ArcPathPoints
-	 * determining the midpoint between them. Then calculates the distance from
-	 * midpoint to the point passed as an argument. The pair of ArcPathPoints
-	 * resulting in the shortest distance then have an extra point added between
-	 * them at the midpoint effectively splitting that segment into two.
-	 */
-	public ArcPathPoint splitSegment(Point2D.Double mouseposition) {
-		int wantedpoint = findPoint(mouseposition);
-
-		// wantedpoint is now the index of the first point in the pair of arc
-		// points marking the segment to be split. So we have all we need to
-		// split the arc.
-		ArcPathPoint first = pathPoints.get(wantedpoint);
-		ArcPathPoint second = pathPoints.get(wantedpoint + 1);
-		ArcPathPoint newpoint = new ArcPathPoint(second.getMidPoint(first),
-				first.getPointType(), this);
-		insertPoint(wantedpoint + 1, newpoint);
-		createPath();
-		myArc.updateArcPosition();
-
-		return newpoint;
-	}
-
 	public Command insertPoint(Point2D.Double mouseposition, boolean flag) {
 		int wantedpoint = findPoint(mouseposition);
 
@@ -734,11 +641,6 @@ public class ArcPath implements Shape {
 		}
 		return wantedpoint;
 	}
-
-	public boolean isPointSelected(int j) {
-		return (pathPoints.get(j)).isSelected();
-	}
-
 }
 
 class Cubic {
