@@ -24,8 +24,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	protected static final int COMPONENT_DRAW_OFFSET= 5;
 	/** x/y position position on screen (zoomed) */
-	protected double positionX;
-	protected double positionY;
+	protected int positionX;
+	protected int positionY;
 
 	// The x/y coordinate of object at 100% zoom.
 	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
@@ -316,9 +316,9 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionXInput
 	 *            Double value for X-axis position
 	 */
-	public void setPositionX(double positionXInput) {
+	public void setPositionX(int positionXInput) {
 		positionX = positionXInput;
-		originalX = (int)Zoomer.getUnzoomedValue(positionX, getZoom());
+		originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
 	}
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
@@ -328,9 +328,9 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionYInput
 	 *            Double value for Y-axis position
 	 */
-	public void setPositionY(double positionYInput) {
+	public void setPositionY(int positionYInput) {
 		positionY = positionYInput;
-		originalY = (int)Zoomer.getUnzoomedValue(positionY, getZoom());
+		originalY = Zoomer.getUnzoomedValue(positionY, getZoom());
 	}
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
@@ -339,7 +339,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 *
 	 * @return Double value for X-axis position
 	 */
-	public double getPositionX() {
+	public int getPositionX() {
 		return positionX;
 	}
 
@@ -349,7 +349,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 *
 	 * @return Double value for Y-axis position
 	 */
-	public double getPositionY() {
+	public int getPositionY() {
 		return positionY;
 	}
 }

@@ -1,13 +1,12 @@
 package pipe.gui.graphicElements;
 
+import pipe.gui.Pipe;
+import pipe.gui.Zoomer;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
-import pipe.gui.handler.LabelHandler;
 
 /**
  * Petri-Net Place or Transition SuperClass
@@ -150,12 +149,13 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	/** Calculates the BoundsOffsets used for setBounds() method */
 	public void updateBounds() {
 		double scaleFactor = Zoomer.getScaleFactor(getZoom());
-		positionX = originalX * scaleFactor;
-		positionY = originalY * scaleFactor;
-		Rectangle bounds = new Rectangle();
-		bounds.setBounds((int) positionX, (int) positionY,
-				(int) (componentWidth * scaleFactor),
-				(int) (componentHeight * scaleFactor));
+		positionX = (int)Math.round(originalX * scaleFactor);
+		positionY = (int)Math.round(originalY * scaleFactor);
+
+		int width = (int) Math.round(componentWidth * scaleFactor);
+		int height = (int) Math.round(componentHeight * scaleFactor);
+
+		Rectangle bounds = new Rectangle(positionX, positionY, width, height);
 		bounds.grow(COMPONENT_DRAW_OFFSET, COMPONENT_DRAW_OFFSET);
 		setBounds(bounds);
 	}
@@ -199,9 +199,9 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	}
 
 	/** Sets the center of the component to position x, y */
-	public void setCentre(double x, double y) {
-		setPositionX(x - (getWidth() / 2.0));
-		setPositionY(y - (getHeight() / 2.0));
+	public void setCentre(int x, int y) {
+		setPositionX((int) Math.round(x - (getWidth() / 2.0)));
+		setPositionY((int) Math.round(y - (getHeight() / 2.0)));
 		update(true);
 	}
 

@@ -51,7 +51,7 @@ public class Zoomer {
 	}
 
 	public static int getZoomedValue(int x, int zoom) {
-		return (int) (x * zoom * 0.01);
+		return (int) Math.round((x * zoom * 0.01));
 	}
 
 	public static double getZoomedValue(double x, int zoom) {
@@ -67,7 +67,7 @@ public class Zoomer {
 	}
 
 	public static int getUnzoomedValue(int x, int zoom) {
-		return (int) (x / (zoom * 0.01));
+		return (int) Math.round((x / (zoom * 0.01)));
 	}
 
     /**

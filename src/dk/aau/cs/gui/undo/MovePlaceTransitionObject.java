@@ -7,19 +7,18 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class MovePlaceTransitionObject extends Command {
 	
-	private double newY;
-	private double newX;
+	private int newY;
+	private int newX;
 	private PlaceTransitionObject objectToBeMoved;
-	private double oldY;
-	private double oldX;
+	private int oldY;
+	private int oldX;
 	private boolean doUpdate = false;
 	
 	
 	public MovePlaceTransitionObject(PlaceTransitionObject object, Point point) {
 		objectToBeMoved = object;
-		this.newX = point.getX();
-		this.newY = point.getY();
-		
+		this.newX = point.x;
+		this.newY = point.y;
 	}
 
 	@Override
