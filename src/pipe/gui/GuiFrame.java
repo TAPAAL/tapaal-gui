@@ -8,10 +8,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.math.BigDecimal;
 import java.net.*;
 import java.util.*;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
@@ -30,25 +28,16 @@ import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.dataLayer.NetType;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.SpecialMacHandler;
-import pipe.gui.undo.ChangeSpacingEdit;
-import pipe.gui.widgets.filebrowser.FileBrowser;
-import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.ResourceManager;
-import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -58,8 +47,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
-	private final int[] zoomExamples = { 40, 60, 80, 100,
-			120, 140, 160, 180, 200, 300 };
+	private final int[] zoomLevels = { 40, 60, 80, 100, 120, 140, 160, 180, 200, 300 };
 	
 	private String frameTitle;
 
@@ -259,8 +247,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			Application app = Application.getApplication();
 			try {
 				Image appImage;
-				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
-					CreateGui.imgPath + "icon.png"));
+				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png"));
 				app.setDockIconImage(appImage);
 			} catch (IOException e) {
 				Logger.log("Error loading Image");
@@ -315,29 +302,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
-		editMenu.add( undoAction = new GuiAction("Undo",
-				"Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
-			@Override
+		editMenu.add( undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::undo);
 			}
 		});
 		
 		
-		editMenu.add( redoAction = new GuiAction("Redo",
-				"Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
-			@Override
+		editMenu.add( redoAction = new GuiAction("Redo", "Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
 			public void actionPerformed(ActionEvent e) {
-
 				currentTab.ifPresent(TabContentActions::redo);
-
 			}
 		});
 		editMenu.addSeparator();
 
 		editMenu.add( deleteAction = new GuiAction("Delete", "Delete selection", "DELETE") {
-
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				currentTab.ifPresent(TabContentActions::deleteSelection);
 			}
@@ -345,15 +324,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		});
 
 		// Bind delete to backspace also
-		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
+		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
 		editMenu.getActionMap().put("Delete", deleteAction);
 
 		editMenu.addSeparator();
 
 
 		editMenu.add(selectAllAction = new GuiAction("Select all", "Select all components",  KeyStroke.getKeyStroke('A', shortcutkey )) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::selectAll);
 			}
@@ -434,23 +411,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.setMnemonic('V');
 
 		zoomMenu = new JMenu("Zoom");
-		zoomMenu.setIcon(new ImageIcon(Thread.currentThread()
-				.getContextClassLoader().getResource(
-						CreateGui.imgPath + "Zoom.png")));
+		zoomMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Zoom.png")));
 		
 		addZoomMenuItems(zoomMenu);
 
-		viewMenu.add( zoomInAction = new GuiAction("Zoom in",
-				"Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
-			@Override
+		viewMenu.add( zoomInAction = new GuiAction("Zoom in", "Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
 			public void actionPerformed(ActionEvent e) {
                 currentTab.ifPresent(TabContentActions::zoomIn);
 			}
 		});
 
-		viewMenu.add( zoomOutAction = new GuiAction("Zoom out",
-				"Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
-			@Override
+		viewMenu.add( zoomOutAction = new GuiAction("Zoom out", "Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
 			public void actionPerformed(ActionEvent e) {
                 currentTab.ifPresent(TabContentActions::zoomOut);
 			}
@@ -459,15 +430,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		viewMenu.addSeparator();
 		
-		viewMenu.add(incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ",
-				KeyStroke.getKeyStroke('U', shortcutkey)) {
+		viewMenu.add(incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ", KeyStroke.getKeyStroke('U', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
 				currentTab.ifPresent(TabContentActions::increaseSpacing);
 			}
 		});
 
-		viewMenu.add(decSpacingAction = new GuiAction("Decrease node spacing", "Decrease spacing by 20% ",
-				KeyStroke.getKeyStroke("shift U")) {
+		viewMenu.add(decSpacingAction = new GuiAction("Decrease node spacing", "Decrease spacing by 20% ", KeyStroke.getKeyStroke("shift U")) {
 			public void actionPerformed(ActionEvent arg0) {
 				currentTab.ifPresent(TabContentActions::decreaseSpacing);
 			}
@@ -477,18 +446,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		
 		viewMenu.addSeparator();
 		
-		viewMenu.add( toggleGrid = new GuiAction("Cycle grid",
-				"Change the grid size", "G") {
+		viewMenu.add( toggleGrid = new GuiAction("Cycle grid", "Change the grid size", "G") {
 					public void actionPerformed(ActionEvent arg0) {
 						Grid.increment();
 						repaint();			
 					}		
 		});
 		
-		viewMenu.add(alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", 
-				KeyStroke.getKeyStroke("shift G")) {
-			
-			@Override
+		viewMenu.add(alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", KeyStroke.getKeyStroke("shift G")) {
 			public void actionPerformed(ActionEvent e) {
 				Grid.alignPNObjectsToGrid();
 			}
@@ -497,76 +462,56 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		viewMenu.addSeparator();
 
-		showComponentsAction = new GuiAction("Display components", "Show/hide the list of components.",
-				KeyStroke.getKeyStroke('1', shortcutkey), true) {
-			@Override
+		showComponentsAction = new GuiAction("Display components", "Show/hide the list of components.", KeyStroke.getKeyStroke('1', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleComponents);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showComponentsAction);
 
-		showQueriesAction = new GuiAction("Display queries", "Show/hide verification queries.",
-				KeyStroke.getKeyStroke('2', shortcutkey), true) {
-			@Override
+		showQueriesAction = new GuiAction("Display queries", "Show/hide verification queries.", KeyStroke.getKeyStroke('2', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleQueries);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showQueriesAction);
 
-		showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.",
-				KeyStroke.getKeyStroke('3', shortcutkey), true) {
-			@Override
+		showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('3', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showConstantsAction);
 
-		showEnabledTransitionsAction = new GuiAction("Display enabled transitions",
-				"Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true) {
-			@Override
+		showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction);
 
-		showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions",
-				"Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('5', shortcutkey),
-				true) {
-			@Override
+		showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('5', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleDelayEnabledTransitions);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitionsAction);
 
-		showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)",
-				"Show/hide intervals [0,inf) that do not restrict transition firing in any way.",
-				KeyStroke.getKeyStroke('6', shortcutkey), true) {
-			@Override
+		showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('6', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
 			}
 		};
-		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervals(),
-				showZeroToInfinityIntervalsAction);
+		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction);
 
-		showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element",
-				KeyStroke.getKeyStroke('7', shortcutkey), true) {
-			@Override
+		showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('7', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showToolTipsAction);
 
-		showTokenAgeAction = new GuiAction("Display token age",
-				"Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)",
-				KeyStroke.getKeyStroke('8', shortcutkey), true) {
-			@Override
+		showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('8', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleTokenAge);
 			}
@@ -576,19 +521,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.addSeparator();
 
 		viewMenu.add( showSimpleWorkspaceAction = new GuiAction("Show simple workspace", "Show only the most important panels", false) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::showSimpleWorkspace);
 			}
 		});
 		viewMenu.add( showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::showAdvancedWorkspace);
 			}
 		});
 		viewMenu.add( saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::saveWorkspace);
 			}
@@ -602,58 +544,43 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		/* Simulator */
 		JMenu animateMenu = new JMenu("Simulator");
 		animateMenu.setMnemonic('A');
-		animateMenu.add( startAction = new GuiAction(
-				"Simulation mode", "Toggle simulation mode (M)",
-				"M", true) {
-			@Override
+		animateMenu.add( startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::toggleAnimationMode);
 			}
 		});
 		
 		
-		animateMenu.add( stepbackwardAction = new GuiAction("Step backward",
-				"Step backward", "pressed LEFT") {
-			@Override
+		animateMenu.add( stepbackwardAction = new GuiAction("Step backward","Step backward", "pressed LEFT") {
 			public void actionPerformed(ActionEvent e) {
                 currentTab.ifPresent(TabContentActions::stepBackwards);
 			}
 		});
-		animateMenu.add(
-				stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
-					@Override
+		animateMenu.add(stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
 					public void actionPerformed(ActionEvent e) {
                         currentTab.ifPresent(TabContentActions::stepForward);
 					}
-				});
+		});
 
-		animateMenu.add( timeAction = new GuiAction("Delay one time unit",
-				"Let time pass one time unit", "W") {
-			@Override
+		animateMenu.add( timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::timeDelay);
 			}
 		});
 
-		animateMenu.add( delayFireAction = new GuiAction("Delay and fire",
-				"Delay and fire selected transition", "F") {
-			@Override
+		animateMenu.add( delayFireAction = new GuiAction("Delay and fire","Delay and fire selected transition", "F") {
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::delayAndFire);
 			}
 		});
 
-		animateMenu.add( prevcomponentAction = new GuiAction("Previous component",
-				"Previous component", "pressed UP") {
-			@Override
+		animateMenu.add( prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::previousComponent);
 			}
 		});
 
-		animateMenu.add( nextcomponentAction = new GuiAction("Next component",
-				"Next component", "pressed DOWN") {
-			@Override
+		animateMenu.add( nextcomponentAction = new GuiAction("Next component","Next component", "pressed DOWN") {
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::nextComponent);
 			}
@@ -661,14 +588,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		animateMenu.addSeparator();
 
-		animateMenu.add( exportTraceAction = new GuiAction("Export trace",
-				"Export the current trace","") {
-					public void actionPerformed(ActionEvent arg0) {
-						currentTab.ifPresent(TabContentActions::exportTrace);
-					}		
+		animateMenu.add( exportTraceAction = new GuiAction("Export trace","Export the current trace","") {
+		    public void actionPerformed(ActionEvent arg0) {
+		        currentTab.ifPresent(TabContentActions::exportTrace);
+		    }
 		});
-		animateMenu.add( importTraceAction = new GuiAction("Import trace",
-				"Import trace to simulator",""){
+		animateMenu.add( importTraceAction = new GuiAction("Import trace", "Import trace to simulator",""){
 			public void actionPerformed(ActionEvent arg0) {
 				currentTab.ifPresent(TabContentActions::importTrace);
 			}		
@@ -738,7 +663,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		toolsMenu.add(verifyAction).setMnemonic('m');
 
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::showStatistics);
 			}
@@ -748,7 +672,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
 		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new GuiAction("Batch processing", "Batch verification of multiple nets and queries", KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::showBatchProcessingDialog);
 			}
@@ -757,7 +680,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		toolsMenu.add(batchProcessing);
 
 		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentTab.ifPresent(TabContentActions::workflowAnalyse);
 			}
@@ -766,7 +688,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		toolsMenu.add(workflowDialog);
 		
 		JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction = new GuiAction("Automatic Net Layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				SmartDrawDialog.showSmartDrawDialog();
 			}
@@ -776,7 +697,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		
 		//Stip off timing information
 		JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				duplicateAndConvertUntimed();
 			}
@@ -787,17 +707,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		toolsMenu.addSeparator();
 
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::showEngineDialog);
 			}
 		});
 		toolsMenu.add(engineSelection);
 
-
-
 		JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction = new GuiAction("Clear all preferences", "Clear all custom preferences to default") {
-			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::clearPreferences);
 			}
@@ -853,7 +769,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		toolBar.addSeparator();
 		toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
 		addZoomComboBox(toolBar, zoomToAction = new GuiAction("Zoom", "Select zoom percentage ", "") {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				String selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
 				//parse selected zoom level, and strip of %.
@@ -925,11 +840,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	 *            - the menu to add the submenu to
 	 */
 	private void addZoomMenuItems(JMenu zoomMenu) {
-		for (int i = 0; i <= zoomExamples.length - 1; i++) {
+		for (int i = 0; i <= zoomLevels.length - 1; i++) {
 
-			final int zoomper = zoomExamples[i];
-			GuiAction newZoomAction = new GuiAction(zoomExamples[i] + "%", "Select zoom percentage", "") {
-				@Override
+			final int zoomper = zoomLevels[i];
+			GuiAction newZoomAction = new GuiAction(zoomLevels[i] + "%", "Select zoom percentage", "") {
 				public void actionPerformed(ActionEvent e) {
 					currentTab.ifPresent(o->o.zoomTo(zoomper));
 				}
@@ -955,16 +869,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private void addZoomComboBox(JToolBar toolBar, Action action) {
 		Dimension zoomComboBoxDimension = new Dimension(75, 28);
 
-		String[] zoomExamplesStrings = new String[zoomExamples.length];
+		String[] zoomExamplesStrings = new String[zoomLevels.length];
 		int i;
-		for (i=0; i < zoomExamples.length; i++) {
-			zoomExamplesStrings[i] = zoomExamples[i] + "%";
+		for (i=0; i < zoomLevels.length; i++) {
+			zoomExamplesStrings[i] = zoomLevels[i] + "%";
 		}
 
 		zoomComboBox = new JComboBox<String>(zoomExamplesStrings);
 		zoomComboBox.setEditable(true);
 		zoomComboBox.setSelectedItem("100%");
-		zoomComboBox.setMaximumRowCount(zoomExamples.length);
+		zoomComboBox.setMaximumRowCount(zoomLevels.length);
 		zoomComboBox.setMaximumSize(zoomComboBoxDimension);
 		zoomComboBox.setMinimumSize(zoomComboBoxDimension);
 		zoomComboBox.setPreferredSize(zoomComboBoxDimension);
@@ -1200,8 +1114,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
 	public void setChangeListenerOnTab() {
-
-
 		appTab.addChangeListener(e -> {
 					//This event will only fire if the tab index is changed, so it won't trigger if once
 					// also if code calls setSelectedIndex(index), thereby avoiding a loop.
@@ -1212,7 +1124,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 					}
 				}
 		);
-
 	}
 
     @Override
@@ -1272,11 +1183,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 			break;
 		case animation:
-
 			getCurrentTab().switchToAnimationComponents(true);
-
 			startAction.setSelected(true);
-
 
 			break;
 		case noNet:
@@ -1317,12 +1225,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	}
 
 	public void endFastMode(){
-		if(timedPlaceAction.isSelected())
-			mode=ElementType.TAPNPLACE;
-		else if(transAction.isSelected())
-			mode=ElementType.TAPNTRANS;
-		else
-			mode=ElementType.SELECT;
+		if(timedPlaceAction.isSelected()) {
+            mode=ElementType.TAPNPLACE;
+        } else if(transAction.isSelected()) {
+            mode=ElementType.TAPNTRANS;
+        } else {
+            mode=ElementType.SELECT;
+        }
 	}
 
 	//XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
@@ -1469,12 +1378,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		fileMenu.add(closeAction = new GuiAction("Close", "Close the current tab",  KeyStroke.getKeyStroke('W', shortcutkey )) {
 			public void actionPerformed(ActionEvent arg0) {
-
 				TabContent index = (TabContent) appTab.getSelectedComponent();
 				guiFrameController.ifPresent(o->o.closeTab(index));
-
 			}
-
 		});
 
 		fileMenu.addSeparator();
@@ -1499,9 +1405,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				
 		// Import menu
 		JMenu importMenu = new JMenu("Import");
-		importMenu.setIcon(new ImageIcon(
-				Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")
-		));
+		importMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1526,8 +1430,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		// Export menu
 		JMenu exportMenu = new JMenu("Export");
-		exportMenu.setIcon(new ImageIcon(
-				Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		exportMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
 		
 		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1747,8 +1650,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	public boolean showTokenAge(){
 		return Preferences.getInstance().getShowTokenAge();
 	}
-
-
 
 	public int getSelectedTabIndex() { return appTab.getSelectedIndex(); }
 
