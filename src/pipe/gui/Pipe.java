@@ -11,8 +11,6 @@ public class Pipe {
 		TAPNPLACE, TAPNTRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
 		//Others (might refactore)
 		ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
-		//Fast modes
-		FAST_TRANSITION, FAST_PLACE
 	}
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;

@@ -449,16 +449,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
             return pnObject;
         }
 
-		private void continueFastMode(MouseEvent e, PlaceTransitionObject pto, ElementType nextMode) {
-			// connect arc
-			CreateGui.getCurrentTab().setMode(ElementType.TAPNARC);
-			pto.getMouseHandler().mousePressed(e);
-			pto.getMouseHandler().mouseReleased(e);
-			CreateGui.getCurrentTab().setMode(nextMode);
-			// enter fast mode
-			pto.dispatchEvent(e);
-		}
-
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (managerRef!=null && managerRef.get() != null) {
@@ -484,22 +474,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				PlaceTransitionObject newpto; //declared here as switch is one big scope
 
 				switch (mode) {
-					case TAPNPLACE:
-						// create place
-						newpto = newTimedPlaceAddToModelView(clickPoint);
+					case TAPNPLACE: // create place
+						newTimedPlaceAddToModelView(clickPoint);
 
-						if (e.isControlDown()) {
-							continueFastMode(e, newpto, ElementType.FAST_TRANSITION);
-						}
 						break;
 
-					case TAPNTRANS:
-						// create transition
-						newpto = newTAPNTransitionAddToModelView(clickPoint);
+					case TAPNTRANS: // create transition
+						newTAPNTransitionAddToModelView(clickPoint);
 
-						if (e.isControlDown()) {
-							continueFastMode(e, newpto, ElementType.FAST_PLACE);
-						}
 						break;
 
 					case ANNOTATION:
@@ -510,33 +492,19 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 					case TAPNARC:
 					case INHIBARC:
 					case TRANSPORTARC:
-					case TAPNINHIBITOR_ARC:
-						// Add point to arc in creation
+					case TAPNINHIBITOR_ARC: // Add point to arc in creation
 						if (createArc != null) {
 							addArcPathPoint(createArc, e);
 						}
 						break;
 
-
 					case DRAG:
 						dragStart = new Point(clickPoint);
 						break;
 
-					case FAST_TRANSITION:
-						// create transition
-						newpto = newTAPNTransitionAddToModelView(e.getPoint());
-
-                        fastDrawAction(e, newpto, ElementType.FAST_PLACE);
-                        break;
-
-					case FAST_PLACE:
-						// create place
-						newpto = newTimedPlaceAddToModelView(e.getPoint());
-
-                        fastDrawAction(e, newpto, ElementType.FAST_TRANSITION);
-                        break;
 					case SELECT:
 						getSelectionObject().dispatchEvent(e);
+						break;
 
 					default:
 						break;
@@ -547,17 +515,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			}
 			updatePreferredSize();
 		}
-
-        private void fastDrawAction(MouseEvent e, PlaceTransitionObject newpto, ElementType fastTransition) {
-			CreateGui.getCurrentTab().setMode(ElementType.TAPNARC);
-            newpto.getMouseHandler().mouseReleased(e);
-
-            if (e.isControlDown()) {
-                continueFastMode(e, newpto, fastTransition);
-            } else {
-                app.endFastMode();
-            }
-        }
 
         private void addArcPathPoint(final Arc createArc, final MouseEvent e) {
 			int x = Grid.getModifiedX(e.getX());

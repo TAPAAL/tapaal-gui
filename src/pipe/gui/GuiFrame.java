@@ -1316,15 +1316,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		}
 	}
 
-	public void endFastMode(){
-		if(timedPlaceAction.isSelected())
-			mode=ElementType.TAPNPLACE;
-		else if(transAction.isSelected())
-			mode=ElementType.TAPNTRANS;
-		else
-			mode=ElementType.SELECT;
-	}
-
 	//XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
 	@Override
 	public void updateMode(Pipe.ElementType _mode) {
