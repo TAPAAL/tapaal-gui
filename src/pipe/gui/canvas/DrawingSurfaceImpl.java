@@ -441,11 +441,14 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         private AnnotationNote newAnnotationNoteAddToModelView(Point clickPoint) {
             Point p = adjustPointToGridAndZoom(clickPoint, view.getZoom());
 
-            AnnotationNote pnObject = new AnnotationNote(p.x, p.y, true);
-			guiModel.addPetriNetObject(pnObject);
+            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
 
-			tabContent.getUndoManager().addNewEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
-            pnObject.enableEditMode();
+			//enableEditMode open editor, retuns true of text added, else false
+            //If no text is added,dont add it to model
+            if (pnObject.enableEditMode(true)) {
+                guiModel.addPetriNetObject(pnObject);
+                tabContent.getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
+            };
             return pnObject;
         }
 
