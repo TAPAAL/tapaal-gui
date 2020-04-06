@@ -29,6 +29,7 @@ import org.apache.commons.cli.PosixParser;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.debug.Logger;
+import pipe.gui.GuiFrame;
 import pipe.gui.Verifier;
 
 /**
@@ -94,13 +95,14 @@ public class TAPAAL {
 
 		// Open files
 		String[] files = commandline.getArgs();
+		Logger.log("Opening #files: " + files.length);
 		for (String f : files) {
 			File file = new File(f);
 
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
 					try {
-						TabContent.createNewTabFromFile(file);
+                        CreateGui.getAppGuiController().openTab(TabContent.createNewTabFromFile(file));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
