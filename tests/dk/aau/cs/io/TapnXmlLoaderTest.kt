@@ -142,6 +142,22 @@ internal class TapnXmlLoaderTest {
                 tapnXmlLoader.load(net)
             }
         }
+
+        @Test
+        fun `if urgent not defined, default value is false`() {
+            val net = xmlNet("""
+                     <transition angle="0" displayName="true" id="T1" infiniteServer="false" name="T1" nameOffsetX="-5" nameOffsetY="35" positionX="360" positionY="300" priority="0"/>
+                """).asInpurtStream()
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
+                tapnXmlLoader.load(net)
+            })
+
+            Assertions.assertFalse( r.network().allTemplates().first().getTransitionByName("T1").isUrgent )
+
+
+        }
     }
 }
 
