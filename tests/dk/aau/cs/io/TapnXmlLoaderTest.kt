@@ -179,8 +179,43 @@ internal class TapnXmlLoaderTest {
             val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
                 tapnXmlLoader.load(net)
             })
+        }
 
+        @Test
+        fun `Parse Arc without arcpathpoints`() {
+            val net = xmlNet(
+                """
+                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
+                        <arc id="P0 to T0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="timed" weight="1">
+                        </arc>
+                """
+            ).asInpurtStream()
 
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
+                tapnXmlLoader.load(net)
+            })
+        }
+
+        @Test @Disabled
+        fun `Parse Arc with only one arcpathpoint should fail`() {
+            val net = xmlNet(
+                """
+                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
+                        <arc id="P0 to T0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="timed" weight="1">
+                            <arcpath arcPointType="false" id="0" xCoord="87" yCoord="72"/>
+                        </arc>
+                """
+            ).asInpurtStream()
+
+            val tapnXmlLoader = TapnXmlLoader()
+
+            Assertions.assertThrows(java.lang.Exception::class.java) {
+                tapnXmlLoader.load(net)
+            }
         }
     }
 
