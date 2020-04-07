@@ -40,6 +40,7 @@ public class CreateGui {
 
 	@Deprecated
 	public static DataLayer getModel() {
+	    if (appGui==null) return null;
 		return getModel(appGui.getSelectedTabIndex());
 	}
 
