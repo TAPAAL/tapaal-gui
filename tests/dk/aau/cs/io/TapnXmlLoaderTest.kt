@@ -236,6 +236,24 @@ internal class TapnXmlLoaderTest {
                 tapnXmlLoader.load(net)
             })
         }
+
+        @Test @Disabled
+        fun `Transport missing parter, gives error`() {
+            val net = xmlNet(
+                """
+                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <place displayName="true" id="P1" initialMarking="0" invariant="&lt; inf" name="P1" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
+                        <arc id="P0 to T0" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="transport" weight="1"></arc>
+                """
+            ).asInpurtStream()
+
+            val tapnXmlLoader = TapnXmlLoader()
+
+            Assertions.assertThrows(java.lang.Exception::class.java) {
+                tapnXmlLoader.load(net)
+            }
+        }
     }
 
     class ArcPathPoints {
