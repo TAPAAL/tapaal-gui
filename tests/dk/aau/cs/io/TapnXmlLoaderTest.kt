@@ -71,6 +71,16 @@ internal class TapnXmlLoaderTest {
 
         }
 
+        @Test
+        fun `Empty place`() {
+            val net = xmlNet("<place></place>").asInpurtStream()
+            val tapnXmlLoader = TapnXmlLoader()
+
+            Assertions.assertThrows(Exception::class.java){
+                tapnXmlLoader.load(net)
+            }
+        }
+
 
     }
 
@@ -121,6 +131,16 @@ internal class TapnXmlLoaderTest {
             Assertions.assertEquals(-5, transition.nameOffsetX)
             Assertions.assertEquals(35, transition.nameOffsetY)
 
+        }
+
+        @Test
+        fun `Empty Transition`() {
+            val net = xmlNet("<transition></transition>").asInpurtStream()
+            val tapnXmlLoader = TapnXmlLoader()
+
+            Assertions.assertThrows(Exception::class.java){
+                tapnXmlLoader.load(net)
+            }
         }
     }
 }
