@@ -177,7 +177,65 @@ internal class TapnXmlLoaderTest {
                 tapnXmlLoader.load(net)
             })
         }
+    }
 
+    class OutputArc {
+        @Test
+        fun `Parse Output Arc`() {
+            val net = xmlNet(
+                """
+                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
+                        <arc id="T0 to P0" inscription="1" nameOffsetX="0" nameOffsetY="0" source="T0" target="P0" type="normal" weight="1"></arc>
+                """
+            ).asInpurtStream()
+
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
+                tapnXmlLoader.load(net)
+            })
+        }
+    }
+
+    class InhibitorArc {
+        @Test
+        fun `Inhibitor Arc`() {
+            val net = xmlNet(
+                """
+                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
+                        <arc id="P0 to T0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="tapnInhibitor" weight="1"></arc>
+                """
+            ).asInpurtStream()
+
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
+                tapnXmlLoader.load(net)
+            })
+        }
+    }
+
+    class TransportArc {
+        @Test
+        fun `Transport Arc`() {
+            val net = xmlNet(
+                """
+                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <place displayName="true" id="P1" initialMarking="0" invariant="&lt; inf" name="P1" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
+                        <arc id="T0 to P1" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="T0" target="P1" type="transport" weight="1"></arc>
+                        <arc id="P0 to T0" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="transport" weight="1"></arc>
+                """
+            ).asInpurtStream()
+
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
+                tapnXmlLoader.load(net)
+            })
+        }
     }
 
     class ArcPathPoints {
