@@ -11,17 +11,13 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -35,17 +31,6 @@ import dk.aau.cs.util.Require;
 
 public class MakeTransitionNewSharedMultiCommand extends Command {
 	private final String newSharedName;
-	private final List<TimedArcPetriNet> tapns;
-	private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
-	//private final List<TimedToken> oldTokens;
-	private final TabContent currentTab;
-	private SharedPlacesAndTransitionsPanel sharedPanel;
-	private ArrayList<SharedPlace> sharedPlaces;
-	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
-	private String originalName;
-	private ArrayList<TimedPlace> timedPlaces = new ArrayList<TimedPlace>();
-	private NameGenerator nameGenerator;
-	private pipe.gui.undo.UndoManager undoManager;
 	private Context context;
 	private Transition transition;
 	private Command command;
@@ -60,14 +45,7 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 		
 		this.transition = transition;
 		this.context = context;
-		this.tapns = context.network().allTemplates();
 		this.newSharedName = newSharedName;
-		this.currentTab = context.tabContent();
-		this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
-		guiModels = context.tabContent().getGuiModels();
-		undoManager = currentTab.drawingSurface().getUndoManager();
-		//oldTokens = place.tokens();
-		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
 	
 	@Override
@@ -76,14 +54,14 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 		int i = 0;
 		for(Template template : context.tabContent().allTemplates()) {
 			TimedTransitionComponent component = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
-			//We make a new shared place with the first place
+			//We make a new shared transition with the first transition
 			if(component != null && i < 1) {
 				command = new MakeTransitionNewSharedCommand(template.model(), newSharedName, component.underlyingTransition(), context.tabContent(), true);
 				command.redo();
 				sharedTransition = component.underlyingTransition().sharedTransition();
 				commands.add(command);
 				i++;
-				//For the rest we make them shared with the recently made place
+				//For the rest we make them shared with the recently made transition
 			} else if (component != null && i >= 1){
 				command = new MakeTransitionSharedCommand(context.activeModel(), sharedTransition, component.underlyingTransition(), context.tabContent());
 				command.redo();
