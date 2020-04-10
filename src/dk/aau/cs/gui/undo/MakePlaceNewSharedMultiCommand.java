@@ -74,10 +74,20 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 		
 		@Override
 		public void redo() {
+			SharedPlace sharedPlace = null;
+			int i = 0;
 			for(Template template : context.tabContent().allTemplates()) {
 				TimedPlaceComponent component = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
-				if(component != null) {
+				//We make a new shared place with the first place
+				if(component != null && i < 1) {
 					command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
+					command.redo();
+					sharedPlace = (SharedPlace)component.underlyingPlace();
+					commands.add(command);
+					i++;
+				//For the rest we make them shared with the recently made place
+				} else if (component != null && i >= 1){
+					command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent());
 					command.redo();
 					commands.add(command);
 				}
