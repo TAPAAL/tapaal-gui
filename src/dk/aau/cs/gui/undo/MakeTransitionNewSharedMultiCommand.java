@@ -72,10 +72,20 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 	
 	@Override
 	public void redo() {
+		SharedTransition sharedTransition = null;
+		int i = 0;
 		for(Template template : context.tabContent().allTemplates()) {
 			TimedTransitionComponent component = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
-			if(component != null) {
+			//We make a new shared place with the first place
+			if(component != null && i < 1) {
 				command = new MakeTransitionNewSharedCommand(template.model(), newSharedName, component.underlyingTransition(), context.tabContent(), true);
+				command.redo();
+				sharedTransition = component.underlyingTransition().sharedTransition();
+				commands.add(command);
+				i++;
+				//For the rest we make them shared with the recently made place
+			} else if (component != null && i >= 1){
+				command = new MakeTransitionSharedCommand(context.activeModel(), sharedTransition, component.underlyingTransition(), context.tabContent());
 				command.redo();
 				commands.add(command);
 			}
