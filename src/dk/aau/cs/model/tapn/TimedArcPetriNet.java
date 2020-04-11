@@ -287,10 +287,14 @@ public class TimedArcPetriNet {
 		for(TimedPlace p : places) {
 			TimedPlace copy = p.copy();
 			tapn.add(copy);
-			if(!p.isShared()){
-				for(int i = 0; i < p.numberOfTokens(); i++) {
+			if(!p.isShared()) {
+				for (int i = 0; i < p.numberOfTokens(); i++) {
 					tapn.addToken(new TimedToken(copy));
 				}
+			}
+			if(p.isShared()){
+				tapn.remove(copy);
+				tapn.add(p);
 			}
 		}
 

@@ -35,17 +35,6 @@ import dk.aau.cs.util.Require;
 public class MakePlaceNewSharedMultiCommand extends Command {
 
 		private final String newSharedName;
-		private final List<TimedArcPetriNet> tapns;
-		private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
-		//private final List<TimedToken> oldTokens;
-		private final TabContent currentTab;
-		private SharedPlacesAndTransitionsPanel sharedPanel;
-		private ArrayList<SharedPlace> sharedPlaces;
-		private HashMap<TimedArcPetriNet, DataLayer> guiModels;
-		private String originalName;
-		private ArrayList<TimedPlace> timedPlaces = new ArrayList<TimedPlace>();
-		private NameGenerator nameGenerator;
-		private pipe.gui.undo.UndoManager undoManager;
 		private Context context;
 		private Place place;
 		private Command command;
@@ -60,24 +49,25 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 			
 			this.place = place;
 			this.context = context;
-			this.tapns = context.network().allTemplates();
 			this.newSharedName = newSharedName;
-			this.sharedPlaces = new ArrayList<SharedPlace>();
-			this.currentTab = context.tabContent();
-			this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
-			guiModels = context.tabContent().getGuiModels();
-			this.originalName = originalName;
-			undoManager = currentTab.drawingSurface().getUndoManager();
-			//oldTokens = place.tokens();
-			newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 		}
 		
 		@Override
 		public void redo() {
+			SharedPlace sharedPlace = null;
+			int i = 0;
 			for(Template template : context.tabContent().allTemplates()) {
 				TimedPlaceComponent component = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
-				if(component != null) {
+				//We make a new shared place with the first place
+				if(component != null && i < 1) {
 					command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
+					command.redo();
+					sharedPlace = (SharedPlace)component.underlyingPlace();
+					commands.add(command);
+					i++;
+				//For the rest we make them shared with the recently made place
+				} else if (component != null && i >= 1){
+					command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent());
 					command.redo();
 					commands.add(command);
 				}
