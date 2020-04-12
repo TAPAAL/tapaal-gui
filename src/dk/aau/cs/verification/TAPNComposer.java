@@ -325,6 +325,7 @@ public class TAPNComposer implements ITAPNComposer {
 		
 		// Build ArcPath
 		ArcPath newArcPath = new ArcPath(arc);
+		newArcPath.purgePathPoints();
 		for(int k = 0; k < arcPathPointsNum; k++) {
 			ArcPathPoint point = arcPath.getArcPathPoint(k);
 			newArcPath.addPoint(
