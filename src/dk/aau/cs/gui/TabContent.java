@@ -490,13 +490,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				CreateGui.getApp().requestFocus();
 			}
 		});
+
 		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(
+		animationHistoryScrollPane.setBorder(
+		    BorderFactory.createCompoundBorder(
 						BorderFactory.createTitledBorder("Simulation History"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)
+            )
+        );
 		//Add 10 pixel to the minimumsize of the scrollpane
-		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
+		animationHistoryScrollPane.setMinimumSize(
+		    new Dimension(
+		        animationHistoryScrollPane.getMinimumSize().width,
+                animationHistoryScrollPane.getMinimumSize().height + 20
+            )
+        );
 	}
 
 	private void createAnimatorSplitPane(NetType netType) {
@@ -700,11 +708,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return transitionFireing;
 	}
 
-	public JScrollPane drawingSurfaceScrollPane() {
-		return drawingSurfaceScroller;
-	}
-
-	public TimedArcPetriNetNetwork network() {
+    public TimedArcPetriNetNetwork network() {
 		return tapnNetwork;
 	}
 
@@ -847,8 +851,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
 
 			if (animatorSplitPane != null) {
-				animatorSplitPane.getMultiSplitLayout().displayNode(
-						templateExplorerName, enable);
+				animatorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
 			}
 			makeSureEditorPanelIsVisible(templateExplorer);
 		}
