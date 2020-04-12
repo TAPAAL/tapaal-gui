@@ -219,7 +219,6 @@ public class SmartDrawDialog extends JDialog {
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
 						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size());
-						
 					}
 					
 					@Override
@@ -695,8 +694,8 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
 		loadingDialogFrame.setType(Window.Type.POPUP);
-		ImageIcon loadingGIF = new ImageIcon(CreateGui.imgPath + "ajax-loader.gif");
-		
+		ImageIcon loadingGIF = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "ajax-loader.gif"));
+
 		JLabel workingLabel = new JLabel("<html><div style='text-align: center;'>Currently doing layout...<br/>This may take several minutes depending on the size of the net...</div></html>", SwingConstants.CENTER);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;

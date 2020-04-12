@@ -402,9 +402,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			if (aView.createArc == arcBeingDraw) {
 				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
 
-				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE) || (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
-					CreateGui.getApp().endFastMode();
-				}
 				aView.repaint();
 			}
 		}

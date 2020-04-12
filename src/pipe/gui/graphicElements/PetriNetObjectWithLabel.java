@@ -4,6 +4,7 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
+import javax.swing.*;
 
 public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
@@ -132,6 +133,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
     public void addLabelToContainer() {
         if (getParent() != null && pnName.getParent() == null) {
+            getParent().setLayer(pnName, JLayeredPane.DEFAULT_LAYER + pnName.getLayerOffset());
             getParent().add(pnName);
         }
     }

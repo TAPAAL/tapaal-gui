@@ -503,8 +503,7 @@ public class TapnLegacyXmlLoader {
 		} else {
 			borderInput = true;
 		}
-		AnnotationNote an = new AnnotationNote(text, positionXInput,
-				positionYInput, widthInput, heightInput, borderInput, false);
+		AnnotationNote an = new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 		guiModel.addPetriNetObject(an);
 	}
 
