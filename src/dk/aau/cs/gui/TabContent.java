@@ -279,25 +279,39 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 	
 	public void createEditorLeftPane() {
-		boolean enableAddButton = getModel() == null ? true : !getModel()
-				.netType().equals(NetType.UNTIMED);
+		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 
 		constantsPanel = new ConstantsPane(enableAddButton, this);
-		constantsPanel.setPreferredSize(new Dimension(constantsPanel
-				.getPreferredSize().width,
-				constantsPanel.getMinimumSize().height));
+		constantsPanel.setPreferredSize(
+				new Dimension(
+						constantsPanel.getPreferredSize().width,
+						constantsPanel.getMinimumSize().height
+				)
+		);
+
 		queries = new QueryPane(new ArrayList<TAPNQuery>(), this);
-		queries.setPreferredSize(new Dimension(
-				queries.getPreferredSize().width,
-				queries.getMinimumSize().height));
+		queries.setPreferredSize(
+				new Dimension(
+						queries.getPreferredSize().width,
+						queries.getMinimumSize().height
+				)
+		);
+
 		templateExplorer = new TemplateExplorer(this);
-		templateExplorer.setPreferredSize(new Dimension(templateExplorer
-				.getPreferredSize().width,
-				templateExplorer.getMinimumSize().height));
+		templateExplorer.setPreferredSize(
+				new Dimension(
+						templateExplorer.getPreferredSize().width,
+						templateExplorer.getMinimumSize().height
+				)
+		);
+
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
-		sharedPTPanel.setPreferredSize(new Dimension(sharedPTPanel
-				.getPreferredSize().width,
-				sharedPTPanel.getMinimumSize().height));
+		sharedPTPanel.setPreferredSize(
+				new Dimension(
+						sharedPTPanel.getPreferredSize().width,
+						sharedPTPanel.getMinimumSize().height
+				)
+		);
 		
 		boolean floatingDividers = false;
 		if(editorModelroot == null){
@@ -311,15 +325,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			templateExplorerLeaf.setWeight(0.25);
 			sharedPTLeaf.setWeight(0.25);
 
-			editorModelroot = new Split(templateExplorerLeaf, new Divider(),
-					sharedPTLeaf, new Divider(), queriesLeaf, new Divider(),
-					constantsLeaf);
+			editorModelroot = new Split(
+					templateExplorerLeaf,
+					new Divider(),
+					sharedPTLeaf,
+					new Divider(),
+					queriesLeaf,
+					new Divider(),
+					constantsLeaf
+			);
 			editorModelroot.setRowLayout(false);
 			// The modelroot needs to have a parent when we remove all its children
 			// (bug in the swingx package)
 			editorModelroot.setParent(new Split());
 			floatingDividers = true;
-		} 
+		}
+
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
 		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
@@ -349,7 +370,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroller.setMinimumSize(new Dimension(
 				panel.getMinimumSize().width,
-				panel.getMinimumSize().height));
+				panel.getMinimumSize().height
+		));
 		return scroller;
 	}
 
