@@ -21,7 +21,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
-import pipe.dataLayer.NetType;
 import pipe.gui.action.GuiAction;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;

@@ -835,11 +835,7 @@ public class DataLayer {
 		return null;
 	}
 
-	public NetType netType() {
-		return NetType.TAPN;
-	}
-
-	public void redrawVisibleTokenLists() {
+    public void redrawVisibleTokenLists() {
 		for (Place place : placesArray) {
 			if (place instanceof TimedPlaceComponent) {
 				TimedPlaceComponent tp = (TimedPlaceComponent) place;

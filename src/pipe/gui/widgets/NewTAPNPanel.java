@@ -14,7 +14,6 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import dk.aau.cs.gui.TabContent;
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 

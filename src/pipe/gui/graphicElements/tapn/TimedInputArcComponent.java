@@ -2,7 +2,6 @@ package pipe.gui.graphicElements.tapn;
 
 import java.util.Hashtable;
 
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;

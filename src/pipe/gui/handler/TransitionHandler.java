@@ -7,8 +7,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.NetType;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.Zoomer;
 import pipe.gui.Pipe.ElementType;
