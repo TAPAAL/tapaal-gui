@@ -279,9 +279,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 	
 	public void createEditorLeftPane() {
-		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 
-		constantsPanel = new ConstantsPane(enableAddButton, this);
+		constantsPanel = new ConstantsPane(this);
 		constantsPanel.setPreferredSize(
 				new Dimension(
 						constantsPanel.getPreferredSize().width,

@@ -65,7 +65,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 									e.isAltDown()
                             )
                     );
-				} else if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+				} else  {
 					((TimedOutputArcComponent) myObject).showTimeIntervalEditor();
 				}
 			} else {

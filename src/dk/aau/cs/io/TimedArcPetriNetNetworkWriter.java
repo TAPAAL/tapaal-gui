@@ -193,13 +193,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			NET.setAttributeNode(netAttrActive);
 
 			Attr netAttrType = document.createAttribute("type");
-			switch (guiModel.netType()) {
-			case UNTIMED:
-				netAttrType.setValue("Untimed P/T net");
-				break;
-			default:
-				netAttrType.setValue("P/T net");
-			}
+			netAttrType.setValue("P/T net");
+
 			NET.setAttributeNode(netAttrType);
 
 			appendAnnotationNotes(document, guiModel, NET);

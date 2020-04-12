@@ -44,9 +44,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 			if (CreateGui.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2) {
 					Arc arc = (Arc) obj;
-					if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-						((TimedOutputArcComponent) arc).showTimeIntervalEditor();
-					}
+					((TimedOutputArcComponent) arc).showTimeIntervalEditor();
 				}
 			}
 		}

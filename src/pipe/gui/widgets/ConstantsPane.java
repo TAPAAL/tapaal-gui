@@ -71,7 +71,7 @@ public class ConstantsPane extends JPanel {
 	Timer timer;
 
 
-	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
+	public ConstantsPane(TabContent currentTab) {
 		parent = currentTab;
 
 		constantsPanel = new JPanel(new GridBagLayout());
@@ -186,7 +186,7 @@ public class ConstantsPane extends JPanel {
 		});
 		
 		addConstantsComponents();
-		addConstantsButtons(enableAddButton);
+		addConstantsButtons();
 		
 		constantsList.addFocusListener(new FocusAdapter() {
 			@Override
@@ -289,7 +289,7 @@ public class ConstantsPane extends JPanel {
 		timer.restart();
 	}
 
-	private void addConstantsButtons(boolean enableAddButton) {
+	private void addConstantsButtons() {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditConstant);
@@ -316,7 +316,7 @@ public class ConstantsPane extends JPanel {
 
 		JButton addConstantButton = new JButton("New");
 		addConstantButton.setToolTipText(toolTipNewConstant);
-		addConstantButton.setEnabled(enableAddButton);
+		addConstantButton.setEnabled(true);
 		addConstantButton.addActionListener(e -> showEditConstantDialog(null));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
