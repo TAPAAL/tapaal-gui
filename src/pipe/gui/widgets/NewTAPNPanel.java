@@ -65,7 +65,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), NetType.TAPN));
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText()));
 
 		rootPane.setDefaultButton(okButton);
 		
@@ -83,7 +83,7 @@ public class NewTAPNPanel extends JPanel {
 		rootPane.getParent().setVisible(false);
 	}
 
-	protected void createNewTAPNBasedOnSelection(String name, NetType type) {
+	protected void createNewTAPNBasedOnSelection(String name) {
 		if (!name.endsWith(".tapn")) {
 			name = name + ".tapn";
 		}
@@ -96,7 +96,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			TabContent tab = TabContent.createNewEmptyTab(name, type);
+			TabContent tab = TabContent.createNewEmptyTab(name);
 			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane

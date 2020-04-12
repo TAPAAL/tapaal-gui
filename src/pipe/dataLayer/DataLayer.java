@@ -98,8 +98,6 @@ public class DataLayer {
         return result;
     }
 
-	private NetType type = NetType.TAPN;
-
 	/**
 	 * Create empty Petri-Net object
 	 */
@@ -838,11 +836,7 @@ public class DataLayer {
 	}
 
 	public NetType netType() {
-		return type;
-	}
-
-	public void setNetType(NetType type) {
-		this.type = type;
+		return NetType.TAPN;
 	}
 
 	public void redrawVisibleTokenLists() {
