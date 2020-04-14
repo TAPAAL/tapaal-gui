@@ -28,7 +28,11 @@ public class NameLabel extends JTextArea implements Zoomable {
 
 	public NameLabel(int zoom) {
 		this("");
-		setFont(getFont().deriveFont(Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, zoom)));
+
+        //Kind of important to know about deriveFont: --kyrke 2020-04-02
+        // deriveFont(int) - sets text style
+        // deriveFont(float) - sets text size
+		setFont(getFont().deriveFont((float)Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, zoom)));
 	}
 
 	public NameLabel(String nameInput) {
@@ -107,7 +111,11 @@ public class NameLabel extends JTextArea implements Zoomable {
 	}
 
 	public void zoomUpdate(int value) {
-		setFont(getFont().deriveFont(Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
+        //Kind of important to know about deriveFont: --kyrke 2020-04-02
+        // deriveFont(int) - sets text style
+        // deriveFont(float) - sets text size
+        setFont(getFont().deriveFont((float)Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
+
 		updateSize();
 	}
 	
