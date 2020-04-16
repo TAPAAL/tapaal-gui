@@ -54,6 +54,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
+
 	private UndoManager undoManager = new UndoManager();
 
 	/**
@@ -183,6 +184,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	//GUI
+
+	private HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+
 	private JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
@@ -230,6 +234,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
+			hasPositionalInfos.put(net, new Boolean(false));
 		}
 		
 		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
@@ -693,7 +698,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public Iterable<Template> allTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-			list.add(new Template(net, guiModels.get(net), zoomLevels.get(net)));
+			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
+			template.setHasPositionalInfo(hasPositionalInfos.get(net));
+			list.add(template);
 		}
 		return list;
 	}
@@ -701,7 +708,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public Iterable<Template> activeTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			list.add(new Template(net, guiModels.get(net), zoomLevels.get(net)));
+			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
+			template.setHasPositionalInfo(hasPositionalInfos.get(net));
+			list.add(template);
 		}
 		return list;
 	}
@@ -727,6 +736,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
 		zoomLevels.put(template.model(), template.zoomer());
+		hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 		if (updateTemplateExplorer) {
 			templateExplorer.updateTemplateList();
 		}
@@ -744,6 +754,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
 		zoomLevels.remove(template.model());
+		hasPositionalInfos.remove(template.model());
 		templateExplorer.updateTemplateList();
 	}
 
@@ -779,6 +790,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		for (Template template : templates) {
 			addGuiModel(template.model(), template.guiModel());
 			zoomLevels.put(template.model(), template.zoomer());
+			hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 		}
 
 		sharedPTPanel.setNetwork(network);
