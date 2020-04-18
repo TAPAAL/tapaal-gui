@@ -272,9 +272,7 @@ public class NetworkMarking implements TimedMarking {
 
 	public void removePlaceFromMarking(TimedPlace place) {
 		if(place.isShared()){
-			if(sharedPlacesTokens.containsKey(place)){
-				sharedPlacesTokens.remove(place);
-			}
+            sharedPlacesTokens.remove(place);
 		}else{
 			getMarkingFor(((LocalTimedPlace)place).model()).removePlaceFromMarking(place);	
 		}
