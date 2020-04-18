@@ -261,7 +261,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		}
 	}
 	
-	private class CheckBoxListItem {
+	private static class CheckBoxListItem {
 		private TimedPlace place;
 		private boolean isSelected;
 		

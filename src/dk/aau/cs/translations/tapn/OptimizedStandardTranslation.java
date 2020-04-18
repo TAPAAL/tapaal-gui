@@ -432,7 +432,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		return new OptimizedStandardNamingScheme();
 	}
 	
-	protected class OptimizedStandardNamingScheme implements TranslationNamingScheme {
+	protected static class OptimizedStandardNamingScheme implements TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_(?:1_in|single|deg2)$";
 		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);

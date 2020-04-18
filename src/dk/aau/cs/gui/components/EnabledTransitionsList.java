@@ -155,7 +155,7 @@ public class EnabledTransitionsList extends JPanel{
 
 	}
 
-	class TransitionListItem implements ListItem{
+	static class TransitionListItem implements ListItem{
 		private Transition transition;
 		private Template template;
 

@@ -708,7 +708,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		return new BroadcastNamingScheme();
 	}
 
-	protected class BroadcastNamingScheme implements TranslationNamingScheme {
+	protected static class BroadcastNamingScheme implements TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String TAU = "tau";
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(_test)?$";

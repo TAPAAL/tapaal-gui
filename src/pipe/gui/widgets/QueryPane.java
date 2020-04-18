@@ -430,7 +430,7 @@ public class QueryPane extends JPanel {
 		listModel.removeElement(queryToRemove);
 	}
 
-	private class QueryCellRenderer extends DefaultListCellRenderer {
+	private static class QueryCellRenderer extends DefaultListCellRenderer {
 
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

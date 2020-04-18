@@ -2768,7 +2768,7 @@ public class QueryDialog extends JPanel {
 		}
 	}
 
-	private class QueryConstructionUndoManager extends UndoManager {
+	private static class QueryConstructionUndoManager extends UndoManager {
 		public UndoableEdit GetNextEditToUndo() {
 			return editToBeUndone();
 		}

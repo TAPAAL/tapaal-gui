@@ -1471,7 +1471,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return null;
 	}
 
-	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
 		private final AnimationController animationController;

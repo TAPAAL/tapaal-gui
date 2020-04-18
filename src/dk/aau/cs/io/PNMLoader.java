@@ -370,7 +370,7 @@ public class PNMLoader {
 		return new Point(xd, yd);
 	}
 
-	private class Name{
+	private static class Name{
 		String name;
 		Point point;
 		
@@ -389,7 +389,7 @@ public class PNMLoader {
 		}
 	}
 	
-	private class InitialMarking{
+	private static class InitialMarking{
 		int marking;
 		Point point;
 		

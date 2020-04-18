@@ -348,7 +348,7 @@ public class RunVerification extends RunVerificationBase {
 		return panel;
 	}
 	
-	private class NonEditableModel extends DefaultTableModel {
+	private static class NonEditableModel extends DefaultTableModel {
 
 		NonEditableModel(Object[][] data, String[] columnNames) {
 	        super(data, columnNames);

@@ -539,7 +539,7 @@ public class ExportBatchDialog extends JDialog {
 		return renamedQueries;
 		
 	}
-	private class ExportResultTableCellRenderer extends JLabel implements
+	private static class ExportResultTableCellRenderer extends JLabel implements
 	TableCellRenderer {
 
 	Border unselectedBorder = null;

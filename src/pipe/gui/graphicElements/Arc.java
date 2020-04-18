@@ -386,7 +386,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		this.getActionMap().clear();
 	}
 
-	private class DeleteAction extends AbstractAction {
+	private static class DeleteAction extends AbstractAction {
 		Arc arcBeingDraw;
 
 		DeleteAction(Arc arc) {

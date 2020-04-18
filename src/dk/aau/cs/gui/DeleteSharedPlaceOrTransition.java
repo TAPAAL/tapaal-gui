@@ -320,7 +320,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}
 	}
 	
-	private class DeleteSharedResult{
+	private static class DeleteSharedResult{
 		public int choice;
 		public boolean deleteFromTemplates;
 		

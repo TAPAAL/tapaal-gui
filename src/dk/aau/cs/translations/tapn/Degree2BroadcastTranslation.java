@@ -740,7 +740,7 @@ public class Degree2BroadcastTranslation implements
 		return new Degree2BroadcastNamingScheme();
 	}
 
-	protected class Degree2BroadcastNamingScheme implements
+	protected static class Degree2BroadcastNamingScheme implements
 			TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+)_(?:test|single|deg2)$";
