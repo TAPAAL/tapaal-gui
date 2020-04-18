@@ -46,7 +46,7 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 		// Use reflection to prevent compile errors
 		try {
 	        Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
-	        Class params[] = new Class[]{Window.class, Boolean.TYPE};
+	        Class[] params = new Class[]{Window.class, Boolean.TYPE};
 	        Method method = util.getMethod("setWindowCanFullScreen", params);
 	        method.invoke(util, CreateGui.getAppGui(), true);
 	    } catch (Exception e) {
