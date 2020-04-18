@@ -72,7 +72,6 @@ public abstract class TabComponent extends JPanel {
 
 		// make JLabel read titles from JTabbedPane
 		JLabel label = new JLabel() {
-			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String getText() {

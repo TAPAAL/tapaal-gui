@@ -141,7 +141,6 @@ public class ExportBatchDialog extends JDialog {
 		
 		tableModel = new ExportBatchResultTableModel();
 		final JTable resultTable = new JTable(tableModel){
-			private static final long serialVersionUID = 8524549736351991872L;
 
 			public String getToolTipText(MouseEvent e) {
 				String tip= null;

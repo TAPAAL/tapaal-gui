@@ -85,8 +85,7 @@ public class CustomJSpinner extends JSpinner{
 			NumberFormat format = NumberFormat.getIntegerInstance();
 			format.setGroupingUsed(false);
 			textField.setFormatterFactory(new DefaultFormatterFactory(
-					new InternationalFormatter(format){             
-						private static final long serialVersionUID = 1L;
+					new InternationalFormatter(format){
 						@Override
 						protected DocumentFilter getDocumentFilter() {
 							return digitOnlyFilter;

@@ -35,10 +35,6 @@ public class EscapableDialog extends JDialog {
 		JRootPane rootPane = new JRootPane();
 		KeyStroke stroke = KeyStroke.getKeyStroke("ESCAPE");
 		Action actionListener = new AbstractAction() {
-			/**
-		 * 
-		 */
-			private static final long serialVersionUID = -7649362860682585358L;
 
 			public void actionPerformed(ActionEvent actionEvent) {
 				setVisible(false);
