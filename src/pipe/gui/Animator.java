@@ -88,7 +88,7 @@ public class Animator {
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
 		tab.addAbstractAnimationPane();
-		AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
+		AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 
 		for(TAPNNetworkTraceStep step : trace){
 			untimedAnimationHistory.addHistoryItem(step.toString());
@@ -244,7 +244,7 @@ public class Animator {
 		if (!actionHistory.isEmpty()){
 			TAPNNetworkTraceStep lastStep = actionHistory.get(currentAction);
 			if(isDisplayingUntimedTrace && lastStep instanceof TAPNNetworkTimedTransitionStep){
-				AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
+				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String previousInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex());
 				if(previousInUntimedTrace.equals(lastStep.toString())){
 					untimedAnimationHistory.stepBackwards();
@@ -286,7 +286,7 @@ public class Animator {
 		if (currentAction < actionHistory.size() - 1) {
 			TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
 			if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
-				AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
+				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String nextInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 				if(nextInUntimedTrace.equals(nextStep.toString())){
 					untimedAnimationHistory.stepForward();
@@ -380,7 +380,7 @@ public class Animator {
 		// cancelling the token selection dialogue above should not result in changes 
 		// to the untimed animation history
 		if (isDisplayingUntimedTrace){
-			AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
+			AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 			if(untimedAnimationHistory.isStepForwardAllowed()){
 				String nextFromUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 

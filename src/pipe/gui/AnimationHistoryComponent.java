@@ -13,7 +13,7 @@ import pipe.gui.graphicElements.Transition;
 
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
-public class AnimationHistoryComponent<E> extends JList<E> {
+public class AnimationHistoryComponent extends JList<String> {
 
 	private TraceType lastShown = TraceType.NOT_EG;
 

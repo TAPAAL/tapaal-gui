@@ -205,11 +205,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryComponent<String> animBox;
+	private AnimationHistoryComponent animBox;
 	private AnimationController animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent<String> abstractAnimationPane = null;
+	private AnimationHistoryComponent abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
 
@@ -630,7 +630,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent<String> getUntimedAnimationHistory() {
+	public AnimationHistoryComponent getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -696,7 +696,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animControlerBox.requestFocus(true);
 	}
 
-	public AnimationHistoryComponent<String> getAnimationHistory() {
+	public AnimationHistoryComponent getAnimationHistory() {
 		return animBox;
 	}
 
