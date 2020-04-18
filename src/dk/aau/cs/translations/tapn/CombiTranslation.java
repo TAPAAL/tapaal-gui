@@ -716,7 +716,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 				if(placeNameToTimed.get(inputArc.source().name())){
 					Location source = getLocationByName(inputArc.source().name());
 					String chan = t.name()+"!";
-					if((inputArc.source().name())==(PCAPACITY)){
+					if(inputArc.source().name().equals(PCAPACITY)){
 						source = getLocationByName(PCAPACITY2);
 					}
 
@@ -741,7 +741,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 				for(int i = 0 ;i<inputArc.getWeight().value();i++){
 					Location source = getLocationByName(inputArc.source().name());
 
-					if((inputArc.source().name())==(PCAPACITY)){
+					if(inputArc.source().name().equals(PCAPACITY)){
 						source = getLocationByName(PCAPACITY2);
 					}
 
@@ -992,7 +992,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 				String inputPlaceName = inputArc.source().name();
 				String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.name(), i);
 
-				if(inputPlaceName==PCAPACITY){
+				if(inputPlaceName.equals(PCAPACITY)){
 					locationName = String.format(TOKEN_INTERMEDIATE_PLACE, PCAPACITY2, t.name(), i);
 				}
 
@@ -1019,7 +1019,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 			String inputPlaceName = transArc.source().name();
 			String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.name(), i);
 
-			if(inputPlaceName==PCAPACITY){
+			if(inputPlaceName.equals(PCAPACITY)){
 				locationName = String.format(TOKEN_INTERMEDIATE_PLACE, PCAPACITY2, t.name(), i);
 			}
 
@@ -1060,7 +1060,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		String update = String.format(COUNTER_UPDATE, counter, "++");
 		Location source = getLocationByName(inputPlace.name());
 
-		if((inputPlace.name())==(PCAPACITY)){
+		if(inputPlace.name().equals(PCAPACITY)){
 			update = String.format(COUNTER_UPDATE, counter, "++") + ", " + CAPOUT_TOKENS + "--";
 			source = getLocationByName(PCAPACITY2);
 		}
@@ -1075,7 +1075,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 
 		update = isTransportArc ? "" : createResetExpressionForNormalArc();
 
-		if((OutputPlace.name())==(PCAPACITY)){
+		if(OutputPlace.name().equals(PCAPACITY)){
 			update = isTransportArc ? "" : createResetExpressionForNormalArc() + ", " + CAPIN_TOKENS + "++";
 		}	
 		if(placeNameToUrgent.get(OutputPlace.name())){
@@ -1097,7 +1097,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		update = String.format(COUNTER_UPDATE, counter, "--");
 		source = getLocationByName(inputPlace.name());
 
-		if((inputPlace.name())==(PCAPACITY)){
+		if(inputPlace.name().equals(PCAPACITY)){
 			update = String.format(COUNTER_UPDATE, counter, "--") + ", " + CAPOUT_TOKENS + "++";
 			source = getLocationByName(PCAPACITY2);
 		}		

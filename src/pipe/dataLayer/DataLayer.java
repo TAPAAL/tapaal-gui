@@ -935,7 +935,7 @@ public class DataLayer {
 	}
 	public PlaceTransitionObject getPlaceTransitionObjectByName(String name) {
 		for(PetriNetObject object : getPlaceTransitionObjects()) {
-			if(object.getName() == name) {
+			if(object.getName().equals(name)) {
 				return ((PlaceTransitionObject)object);
 			}
 		}

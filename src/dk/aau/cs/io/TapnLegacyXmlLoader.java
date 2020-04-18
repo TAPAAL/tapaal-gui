@@ -601,7 +601,7 @@ public class TapnLegacyXmlLoader {
 		double nameOffsetYInput;
 		
 		//This check is done, as arcs in nets saved before this change do not have a nameOffset
-		if(inputArcElement.getAttribute("nameOffsetX") != "" && inputArcElement.getAttribute("nameOffsetY") != "") {
+		if(!inputArcElement.getAttribute("nameOffsetX").equals("") && !inputArcElement.getAttribute("nameOffsetY").equals("")) {
 			nameOffsetXInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
 			nameOffsetYInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
 		} else {

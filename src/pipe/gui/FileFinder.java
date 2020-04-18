@@ -11,7 +11,7 @@ import java.io.File;
 public class FileFinder {
 
 	public File ShowFileBrowserDialog(String description, String extension, String path) {
-		if (path==null || path=="") {
+		if (path==null || path.equals("")) {
 			path= System.getProperty("user.home");
 		}
 

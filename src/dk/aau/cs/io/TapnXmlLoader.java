@@ -448,7 +448,7 @@ public class TapnXmlLoader {
 		double nameOffsetYInput;
 		
 		//This check is done, as arcs in nets saved before this change do not have a nameOffset
-		if(arc.getAttribute("nameOffsetX") != "" && arc.getAttribute("nameOffsetY") != "") {
+		if(!arc.getAttribute("nameOffsetX").equals("") && !arc.getAttribute("nameOffsetY").equals("")) {
 			nameOffsetXInput = Double.parseDouble(arc.getAttribute("nameOffsetX"));
 			nameOffsetYInput = Double.parseDouble(arc.getAttribute("nameOffsetY"));
 		} else {
@@ -513,7 +513,7 @@ public class TapnXmlLoader {
 			double _endx, double _endy, Template template, Weight weight) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				sourceIn, targetIn,	(inscriptionTempStorage!="" ? Integer.valueOf(inscriptionTempStorage) : 1), idInput, taggedArc);
+				sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.valueOf(inscriptionTempStorage) : 1), idInput, taggedArc);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());

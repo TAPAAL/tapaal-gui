@@ -120,7 +120,7 @@ public class TikZExporter {
 			out.append(" (");
 			out.append(arc.getTarget().getId());
 			out.append(") {};\n");
-			if(arcLabel != "")
+			if(!arcLabel.equals(""))
 				out.append("%% Label for arc between " + arc.getSource().getName() + " and " + arc.getTarget().getName() + "\n");
 			out.append(arcLabel);
 		}
@@ -236,7 +236,7 @@ public class TikZExporter {
 				out.append(place.getId());
 				out.append(".center) { };\n");
 			}
-			if (place.getAttributesVisible() || invariant != ""){
+			if (place.getAttributesVisible() || !invariant.equals("")){
 				out.append("%% label for place " + place.getName() + "\n");
 				out.append("\\draw (");
 				out.append(RoundCoordinate(place.getNameLabel().getXPosition()) + "," + (RoundCoordinate(place.getNameLabel().getYPosition()) * -1) + ")");
@@ -244,7 +244,7 @@ public class TikZExporter {
 				out.append("{");
 				if(place.getAttributesVisible())
 					out.append(exportMathName(place.getName()));					
-				if(invariant != "") {
+				if(!invariant.equals("")) {
 					if((place.getAttributesVisible()))
 						out.append("\\\\");
 					out.append(invariant);
