@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class MemoryMonitor {
 
-	static interface Kernel32 extends Library {
+	interface Kernel32 extends Library {
 
 		static Kernel32 INSTANCE = Native.loadLibrary("kernel32", Kernel32.class);
 
