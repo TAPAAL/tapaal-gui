@@ -65,7 +65,7 @@ public class VerifytaTraceInterpreter {
 				result.add(transitionStep);
 			}
 
-			if (action != null && action instanceof TimeDelayFiringAction) {
+			if (action instanceof TimeDelayFiringAction) {
 				BigDecimal delay = ((TimeDelayFiringAction) action).getDelay();
 				TimeDelayStep delayAction = new TimeDelayStep(delay);
 				result.add(delayAction);

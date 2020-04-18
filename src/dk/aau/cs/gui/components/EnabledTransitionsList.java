@@ -249,7 +249,7 @@ public class EnabledTransitionsList extends JPanel{
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
-			if(value != null && value instanceof SplitterListItem){
+			if(value instanceof SplitterListItem){
 				JLabel separator = new JLabel();
 				separator.setBorder(new DashBorder());
 				separator.setPreferredSize(new Dimension(1, 1));
