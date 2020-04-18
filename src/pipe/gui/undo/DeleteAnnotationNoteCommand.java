@@ -6,8 +6,8 @@ import pipe.gui.graphicElements.AnnotationNote;
 
 public class DeleteAnnotationNoteCommand extends Command {
 
-    private AnnotationNote note;
-    private DataLayer model;
+    private final AnnotationNote note;
+    private final DataLayer model;
 
     public DeleteAnnotationNoteCommand(AnnotationNote note, DataLayer model){
         this.note = note;

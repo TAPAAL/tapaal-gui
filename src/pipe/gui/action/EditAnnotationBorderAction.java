@@ -13,7 +13,7 @@ import pipe.gui.graphicElements.AnnotationNote;
 
 public class EditAnnotationBorderAction extends AbstractAction {
 
-	private AnnotationNote selected;
+	private final AnnotationNote selected;
 
 	public EditAnnotationBorderAction(AnnotationNote component) {
 		selected = component;

@@ -5,8 +5,8 @@ import dk.aau.cs.gui.undo.Command;
 
 public class ChangeSpacingEdit extends Command {
 
-	private double factor;
-	private TabContent tab;
+	private final double factor;
+	private final TabContent tab;
 
     public ChangeSpacingEdit(double factor, TabContent tabContent) {
         super();

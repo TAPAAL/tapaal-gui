@@ -6,8 +6,8 @@ import pipe.gui.graphicElements.AnnotationNote;
 
 public class AddAnnotationNoteCommand extends Command {
 
-    private AnnotationNote note;
-    private DataLayer guiModel;
+    private final AnnotationNote note;
+    private final DataLayer guiModel;
 
     public AddAnnotationNoteCommand(AnnotationNote note, DataLayer guiModel) {
         this.note = note;

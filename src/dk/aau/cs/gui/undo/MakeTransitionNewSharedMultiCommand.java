@@ -12,10 +12,10 @@ import java.util.List;
 
 public class MakeTransitionNewSharedMultiCommand extends Command {
 	private final String newSharedName;
-	private Context context;
-	private Transition transition;
+	private final Context context;
+	private final Transition transition;
 	private Command command;
-	private List<Command> commands = new ArrayList<Command>();
+	private final List<Command> commands = new ArrayList<Command>();
 
 
 	

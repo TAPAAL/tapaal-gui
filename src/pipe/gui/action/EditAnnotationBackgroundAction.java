@@ -13,7 +13,7 @@ import pipe.gui.graphicElements.AnnotationNote;
  */
 public class EditAnnotationBackgroundAction extends AbstractAction {
 
-	private AnnotationNote note;
+	private final AnnotationNote note;
 
 	public EditAnnotationBackgroundAction(AnnotationNote an) {
 		note = an;

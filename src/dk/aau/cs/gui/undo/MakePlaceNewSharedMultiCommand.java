@@ -13,10 +13,10 @@ import java.util.List;
 public class MakePlaceNewSharedMultiCommand extends Command {
 
 		private final String newSharedName;
-		private Context context;
-		private Place place;
+		private final Context context;
+		private final Place place;
 		private Command command;
-		private List<Command> commands = new ArrayList<Command>();
+		private final List<Command> commands = new ArrayList<Command>();
 
 
 		

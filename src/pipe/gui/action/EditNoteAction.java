@@ -11,7 +11,7 @@ import pipe.gui.graphicElements.Note;
 
 public class EditNoteAction extends AbstractAction {
 
-	private Note selected;
+	private final Note selected;
 
 	public EditNoteAction(Note component) {
 		selected = component;

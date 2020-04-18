@@ -44,8 +44,8 @@ public abstract class AbstractDrawingSurfaceManager {
 
     }
 
-    private Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
-    private AbstractDrawingSurfaceManager next = null;
+    private final Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
+    private final AbstractDrawingSurfaceManager next = null;
 
     public void registerManager(){}
     public void deregisterManager(){}

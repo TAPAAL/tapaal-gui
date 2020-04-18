@@ -6,9 +6,9 @@ import dk.aau.cs.gui.undo.Command;
 
 public class ToggleTemplateActivationCommand  extends Command{
 
-	private TemplateExplorer templateExplorer;
-	private Template template;
-	private boolean newStatus;
+	private final TemplateExplorer templateExplorer;
+	private final Template template;
+	private final boolean newStatus;
 	
 	public ToggleTemplateActivationCommand(TemplateExplorer templateExplorer, Template template, boolean newStatus) {
 		this.templateExplorer = templateExplorer;

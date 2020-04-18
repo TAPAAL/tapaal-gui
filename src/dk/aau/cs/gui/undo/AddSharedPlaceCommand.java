@@ -4,8 +4,8 @@ import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.model.tapn.SharedPlace;
 
 public class AddSharedPlaceCommand extends Command {
-	private SharedPlace place;
-	private SharedPlacesListModel listModel;
+	private final SharedPlace place;
+	private final SharedPlacesListModel listModel;
 	
 	public AddSharedPlaceCommand(SharedPlacesListModel listModel, SharedPlace place){
 		this.listModel = listModel;

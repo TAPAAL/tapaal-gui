@@ -12,9 +12,9 @@ import javax.swing.JOptionPane;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowser extends FileBrowser {
-	private FileDialog fc;
-	private String ext;
-        private String optionalExt;
+	private final FileDialog fc;
+	private final String ext;
+        private final String optionalExt;
 	private String specifiedPath;
 	NativeFileBrowser(String filetype, final String ext, String path) {
 		this(filetype, ext, "", path);
