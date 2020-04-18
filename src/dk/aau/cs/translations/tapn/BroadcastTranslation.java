@@ -133,7 +133,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 				TimedAutomaton tokenTemplate = createTokenTemplate(conservativeModel, new TimedToken(bottom));
 				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
-				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(conservativeModel.marking().size() + i));
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + (conservativeModel.marking().size() + i));
 			}
 		}
 

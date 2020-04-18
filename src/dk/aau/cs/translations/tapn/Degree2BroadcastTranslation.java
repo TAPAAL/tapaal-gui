@@ -146,7 +146,7 @@ public class Degree2BroadcastTranslation implements
 				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Model, conservativeModel, new TimedToken(bottom));
 				tokenTemplate.setInitLocation(getLocationByName(P_CAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
-				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Model.marking().size() - 1 + i));
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + (degree2Model.marking().size() - 1 + i));
 			}
 		}
 

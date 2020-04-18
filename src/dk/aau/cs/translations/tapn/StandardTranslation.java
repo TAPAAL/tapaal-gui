@@ -122,7 +122,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Model);
 				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
-				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Model.marking().size() - 1 + i));
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + (degree2Model.marking().size() - 1 + i));
 			}
 		}
 		
