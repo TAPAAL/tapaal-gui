@@ -622,12 +622,7 @@ public class TapnLegacyXmlLoader {
 		int aEndx = targetIn.getX() + targetIn.centreOffsetLeft();
 		int aEndy = targetIn.getY() + targetIn.centreOffsetTop();
 
-		double _startx = aStartx;
-		double _starty = aStarty;
-		double _endx = aEndx;
-		double _endy = aEndy;
-
-		Arc tempArc;
+        Arc tempArc;
 
 		String type = "normal";
 		type = ((Element) getFirstChildNodeByName(inputArcElement, "type")).getAttribute("value");
@@ -635,24 +630,24 @@ public class TapnLegacyXmlLoader {
 		if (type.equals("tapnInhibitor")) {
 
 			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
-					inscriptionTempStorage, sourceIn, targetIn, _startx,
-					_starty, _endx, _endy);
+					inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                aStarty, aEndx, aEndy);
 
 		} else {
 			if (type.equals("timed")) {
 				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
+						inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                    aStarty, aEndx, aEndy);
 
 			} else if (type.equals("transport")) {
 				tempArc = parseAndAddTransportArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
+						inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                    aStarty, aEndx, aEndy);
 
 			} else {
 				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
+						inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                    aStarty, aEndx, aEndy);
 			}
 
 		}

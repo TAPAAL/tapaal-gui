@@ -24,15 +24,13 @@ public abstract class FileBrowser  {
 	public static FileBrowser constructor(String filetype, final String ext, final String optionalExt, String path) {
 
 		if(JavaUtil.getJREMajorVersion() >= 7){
-			FileBrowser newObject = new NativeFileBrowser(filetype, ext, optionalExt, path);
 
-			return newObject;
+            return new NativeFileBrowser(filetype, ext, optionalExt, path);
 		}else{
-			FileBrowser newObject = new NativeFileBrowserFallback(filetype, ext, optionalExt, path);
 			/*if(path != null) {
 				newObject.lastPath = path;
 			}*/
-			return newObject;
+			return new NativeFileBrowserFallback(filetype, ext, optionalExt, path);
 		}
 
 

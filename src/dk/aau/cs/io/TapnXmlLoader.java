@@ -334,8 +334,7 @@ public class TapnXmlLoader {
 		} else {
 			borderInput = true;
 		}
-		AnnotationNote an = new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
-		return an;
+        return new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 	}
 
 	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {

@@ -378,9 +378,7 @@ public class AnnotationNote extends Note {
 	}
 	
 	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
-		
-		return annotation;
+        return new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
 	}
 
 }

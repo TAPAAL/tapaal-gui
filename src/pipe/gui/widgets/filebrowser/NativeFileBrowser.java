@@ -82,8 +82,7 @@ class NativeFileBrowser extends FileBrowser {
             fc.setMode(FileDialog.LOAD);
             fc.setVisible(true);
             File[] selectedFiles = fc.getFiles();
-            String selectedDir = fc.getDirectory();
-            lastOpenPath = selectedDir;
+        lastOpenPath = fc.getDirectory();
             return selectedFiles;
 	}
 	

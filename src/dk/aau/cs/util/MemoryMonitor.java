@@ -112,13 +112,11 @@ public class MemoryMonitor {
 			if (Platform.isWindows()) {
 				f = p.getClass().getDeclaredField("handle");
 				f.setAccessible(true);
-				int pid = Kernel32.INSTANCE.GetProcessId((Long) f.get(p));
-				return pid;
+                return Kernel32.INSTANCE.GetProcessId((Long) f.get(p));
 			} else {
 				f = p.getClass().getDeclaredField("pid");
 				f.setAccessible(true);
-				int pid = (Integer) f.get(p);
-				return pid;
+                return (int) (Integer) f.get(p);
 			}
 		}catch(Exception e){
 			return -1;
