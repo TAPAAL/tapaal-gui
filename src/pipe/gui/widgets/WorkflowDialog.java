@@ -7,7 +7,6 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -35,8 +34,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -246,7 +243,7 @@ public class WorkflowDialog extends JDialog {
 		isInTraceMode = true;
 		setVisible(false);
 		CreateGui.getApp().setGUIMode(GUIMode.animation);
-		CreateGui.getAnimator().SetTrace(trace);
+		CreateGui.getAnimator().setTrace(trace);
 	}
 
 	private WorkflowDialog(Frame frame, String title, boolean modal) {

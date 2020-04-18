@@ -70,7 +70,7 @@ public class Animator {
 		return markings.get(currentMarkingIndex);
 	}
 
-	public void SetTrace(TAPNNetworkTrace trace) {
+	public void setTrace(TAPNNetworkTrace trace) {
 		if (trace.isConcreteTrace()) {
 			this.trace = trace;
 			setTimedTrace(trace);
