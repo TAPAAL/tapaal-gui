@@ -71,6 +71,9 @@ public class Animator {
 	}
 
 	public void setTrace(TAPNNetworkTrace trace) {
+        reset(false);
+        storeModel();
+
 		if (trace.isConcreteTrace()) {
 			this.trace = trace;
 			setTimedTrace(trace);
