@@ -21,10 +21,6 @@ import pipe.gui.graphicElements.AnnotationNote;
  */
 public class AnnotationPanel extends javax.swing.JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5241113917349530815L;
 	private AnnotationNote annotation;
 
 	/**

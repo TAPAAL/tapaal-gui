@@ -83,7 +83,6 @@ import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
 
 public class BatchProcessingDialog extends JDialog {
-	private static final long serialVersionUID = -5682084589335908227L;
 
 	private static final String name_verifyTAPN = "TAPAAL Continuous Engine (verifytapn)";
 	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Continuous Engine w. Discrete Inclusion";
@@ -253,8 +252,6 @@ public class BatchProcessingDialog extends JDialog {
 	private BatchProcessingWorker currentWorker;
 	
 	private Timer timer = new Timer(1000, new AbstractAction() {
-		private static final long serialVersionUID = 1327695063762640628L;
-
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 					/ 1000 + " s");
@@ -285,9 +282,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private Timer memoryTimer = new Timer(50, new AbstractAction() {
-		private static final long serialVersionUID = 1327695063762640628L;
-
-		public void actionPerformed(ActionEvent e) {
+	    public void actionPerformed(ActionEvent e) {
 			if(MemoryMonitor.isAttached()){
 				MemoryMonitor.getUsage();
 				peakMemory = MemoryMonitor.getPeakMemoryValue();
@@ -1052,8 +1047,6 @@ public class BatchProcessingDialog extends JDialog {
 
 		tableModel = new BatchProcessingResultsTableModel();
 		final JTable table = new JTable(tableModel) {
-			private static final long serialVersionUID = -146530769055564619L;
-
 			public javax.swing.JToolTip createToolTip() {
 				ToolTipManager.sharedInstance().setDismissDelay(
 						Integer.MAX_VALUE); // disable tooltips disappearing
@@ -1456,7 +1449,7 @@ public class BatchProcessingDialog extends JDialog {
 	// Custom cell renderer for the Query Column of the result table display the
 	// property of the query
 	private class ResultTableCellRenderer extends JLabel implements TableCellRenderer {
-		private static final long serialVersionUID = 3054497986242852099L;
+
 		Border unselectedBorder = null;
 		Border selectedBorder = null;
 		boolean isBordered = true;
@@ -1698,8 +1691,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	public class ReductionOptionChooser extends JPanel{
-		private static final long serialVersionUID = 4423387072826316392L;
-		
+
 		private JButton chooseReductionOptions;
 		ReductionOptionDialog reductionOptionDialog;
 		
@@ -1757,7 +1749,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	public class ReductionOptionDialog extends EscapableDialog{
-		private static final long serialVersionUID = 5554793741619572092L;
+
 		private static final String TEXT_DONT_OVERRIDE = "Do not override the verification method";
 		private static final String TEXT_OVERRIDE = "Override the verification method";
 		

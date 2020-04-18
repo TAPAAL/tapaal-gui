@@ -13,7 +13,6 @@ import pipe.gui.graphicElements.AnnotationNote;
  */
 public class EditAnnotationBackgroundAction extends AbstractAction {
 
-	private static final long serialVersionUID = -1933803940576817894L;
 	private AnnotationNote note;
 
 	public EditAnnotationBackgroundAction(AnnotationNote an) {

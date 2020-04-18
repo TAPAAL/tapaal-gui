@@ -13,7 +13,6 @@ import javax.swing.ListModel;
 //it's not possible to use "instanceof" to do the test.
 //Therefore the toString of the keylistener is used.
 public class NonsearchableJList<E> extends JList<E>{
-	private static final long serialVersionUID = 2706313217985326989L;
 
 	public NonsearchableJList() {
 		super();

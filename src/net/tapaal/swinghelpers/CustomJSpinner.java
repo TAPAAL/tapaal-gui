@@ -16,9 +16,7 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
 
 public class CustomJSpinner extends JSpinner{
-	
-	private static final long serialVersionUID = 1L;
-	
+
 	@Override
 	public Object getValue() {
 		//this is a hack.

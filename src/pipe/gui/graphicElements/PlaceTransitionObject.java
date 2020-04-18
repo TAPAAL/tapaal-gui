@@ -15,8 +15,6 @@ import pipe.gui.handler.LabelHandler;
  */
 public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
-	private static final long serialVersionUID = -6629006415467929184L;
-
 	protected double componentWidth;
 	protected double componentHeight;
 

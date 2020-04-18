@@ -48,10 +48,6 @@ public class GuardDialogue extends JPanel /*
  * PropertyChangeListener
  */
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4582651236913407101L;
 	private JRootPane myRootPane;
 	private JPanel guardEditPanel;
 	private JPanel weightEditPanel;

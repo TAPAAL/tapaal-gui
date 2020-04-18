@@ -156,8 +156,6 @@ public class WorkflowDialog extends JDialog {
 	
 	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
 	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
-	
-	private static final long serialVersionUID = 5613743579411748200L;
 
 	private JPanel panel;
 

@@ -21,7 +21,6 @@ import dk.aau.cs.gui.undo.Command;
 
 public abstract class Note extends PetriNetObject {
 
-	private static final long serialVersionUID = 8965208519103066242L;
 	protected JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;
 	protected RectangularShape noteRect = new Rectangle();

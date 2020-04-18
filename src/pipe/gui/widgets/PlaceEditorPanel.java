@@ -52,7 +52,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
 public class PlaceEditorPanel extends javax.swing.JPanel {
-	private static final long serialVersionUID = -4163767112591119036L;
+
 	private JRootPane rootPane;
 	
 	private JCheckBox sharedCheckBox;

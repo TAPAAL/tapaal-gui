@@ -16,8 +16,6 @@ import pipe.gui.Zoomer;
  */
 public abstract class Place extends PlaceTransitionObject {
 
-	private static final long serialVersionUID = -5155964364065651381L;
-
 	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height

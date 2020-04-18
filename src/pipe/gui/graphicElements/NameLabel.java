@@ -18,7 +18,6 @@ import pipe.gui.Zoomer;
  */
 public class NameLabel extends JTextArea implements Zoomable {
 
-	private static final long serialVersionUID = 5167510420195429773L;
 	private int positionX;
 	private int positionY;
 	private String name = "";

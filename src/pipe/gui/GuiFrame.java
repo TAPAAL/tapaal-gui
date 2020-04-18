@@ -45,7 +45,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions  {
 
-	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
 	private final int[] zoomLevels = { 40, 60, 80, 100, 120, 140, 160, 180, 200, 300 };
 	

@@ -350,7 +350,6 @@ public class RunVerification extends RunVerificationBase {
 	
 	private class NonEditableModel extends DefaultTableModel {
 
-		private static final long serialVersionUID = -8992683250003224211L;
 		NonEditableModel(Object[][] data, String[] columnNames) {
 	        super(data, columnNames);
 	    }

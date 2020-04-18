@@ -20,7 +20,7 @@ import javax.swing.SwingWorker.StateValue;
 import dk.aau.cs.util.MemoryMonitor;
 
 public class RunningVerificationDialog extends JDialog {
-	private static final long serialVersionUID = -1943743974346875737L;
+
 	private final SwingWorker<?, ?> worker;
 	private JButton okButton;
 	private long startTimeMs = 0;

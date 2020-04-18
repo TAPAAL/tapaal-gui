@@ -40,7 +40,6 @@ import java.util.Hashtable;
 
 public class AnimationController extends JPanel {
 
-	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
 	private JSlider delaySlider;
 	private int delayScale = 10;

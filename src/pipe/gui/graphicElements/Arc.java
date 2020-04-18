@@ -22,8 +22,6 @@ import pipe.gui.handler.PlaceTransitionObjectHandler;
  */
 public abstract class Arc extends PetriNetObjectWithLabel {
 
-	private static final long serialVersionUID = 6527845538091358791L;
-
 	private Shape head = null;
 	private boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 

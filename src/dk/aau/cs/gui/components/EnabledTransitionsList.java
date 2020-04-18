@@ -32,8 +32,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
 public class EnabledTransitionsList extends JPanel{
 
-	private static final long serialVersionUID = -121639323606689256L;
-
 	public EnabledTransitionsList() {
 		super(new BorderLayout());
 		this.setPreferredSize(new Dimension(0, 300));
@@ -247,8 +245,6 @@ public class EnabledTransitionsList extends JPanel{
 
 	//This class creates the stippled line shown between the enabled transitions and the delay-enabled transitions
 	class EnabledTransitionListCellRenderer extends DefaultListCellRenderer{
-
-		private static final long serialVersionUID = -835675414373311136L;
 
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,

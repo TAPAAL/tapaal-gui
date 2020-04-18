@@ -29,8 +29,6 @@ import dk.aau.cs.model.tapn.TimedTransition;
 
 public class StatisticsPanel extends JPanel{
 
-	private static final long serialVersionUID = 5613743579411748200L;
-	
 	private final int topBottomMargin = 3;
 	private final int rightMargin = 10;
 	

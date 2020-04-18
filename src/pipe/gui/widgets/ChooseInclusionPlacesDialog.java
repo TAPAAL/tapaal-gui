@@ -42,7 +42,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class ChooseInclusionPlacesDialog extends JPanel {
-	private static final long serialVersionUID = 7543798264643578137L;
 	
 	private JRootPane rootPane;
 	
@@ -289,7 +288,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	}
 	
 	private class InclusionPlacesCellRenderer extends JPanel implements ListCellRenderer {
-		private static final long serialVersionUID = 1257272566670437973L;
+
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to exclude place from inclusion check.";
 		private static final String CHECK_TO_ACTIVATE = "Check to make place eligible for inclusion check.";
 		private JCheckBox activeCheckbox = new JCheckBox();

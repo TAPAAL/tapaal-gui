@@ -9,7 +9,6 @@ import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.MultiSplitLayout;
 
 public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
-	private static final long serialVersionUID = -1705954511667020833L;
 	
 	public BugHandledJXMultisplitPane() {
 		super();
@@ -18,7 +17,6 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 	}
 	
 	private class BugHandledMultiSplitLayout extends MultiSplitLayout{
-		private static final long serialVersionUID = 6869283686441692830L;
 		
 		public Component getComponentForName(String name){
 			return getComponentForNode(getNodeForName(name));

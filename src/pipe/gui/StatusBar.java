@@ -8,10 +8,6 @@ import javax.swing.JPanel;
 /* Status Bar to let users know what to do*/
 public class StatusBar extends JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8253246293753481390L;
 	/* Provides the appropriate text for the mode that the user is in */
 	public static final String textforNoNet = "Open a net to start editing";
 

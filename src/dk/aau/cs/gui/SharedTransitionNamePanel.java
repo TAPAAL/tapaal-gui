@@ -25,7 +25,6 @@ import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.RequireException;
 
 public class SharedTransitionNamePanel extends JPanel {
-	private static final long serialVersionUID = -8099814326394422263L;
 
 	private final JRootPane rootPane;
 	private final SharedTransitionsListModel listModel;

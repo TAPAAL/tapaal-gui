@@ -47,7 +47,6 @@ import dk.aau.cs.util.Require;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
-	private static final long serialVersionUID = -648006317150905097L;
 
 	//Model and state
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();

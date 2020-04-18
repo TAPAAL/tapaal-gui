@@ -14,8 +14,6 @@ import javax.swing.JComboBox;
 //Therefore the toString of the keylistener is used.
 public class NonsearchableJComboBox<E> extends JComboBox<E> {
 
-	private static final long serialVersionUID = -5796892375680580143L;
-
 	public NonsearchableJComboBox() {
 		super();
 		removeKeyListener();

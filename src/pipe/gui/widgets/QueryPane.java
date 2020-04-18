@@ -47,7 +47,7 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
 public class QueryPane extends JPanel {
-	private static final long serialVersionUID = 4062539545170994654L;
+
 	private JPanel queryCollectionPanel;
 	private JPanel buttonsPanel;
 	private DefaultListModel listModel;
@@ -431,7 +431,6 @@ public class QueryPane extends JPanel {
 	}
 
 	private class QueryCellRenderer extends DefaultListCellRenderer {
-		private static final long serialVersionUID = 3071924451912979500L;
 
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

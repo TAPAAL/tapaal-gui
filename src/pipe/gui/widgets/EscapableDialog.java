@@ -21,11 +21,6 @@ import javax.swing.KeyStroke;
  */
 public class EscapableDialog extends JDialog {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7859292606172447650L;
-
 	/** Creates a new instance of EscapableDialog */
 	public EscapableDialog(Frame frame, String string, boolean modal) {
 		super(frame, string, modal);

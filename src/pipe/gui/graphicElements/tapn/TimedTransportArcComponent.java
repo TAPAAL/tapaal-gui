@@ -17,7 +17,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.Weight;
 
 public class TimedTransportArcComponent extends TimedInputArcComponent {
-	private static final long serialVersionUID = 3728885532894319528L;
+
 	private int group;
 	private boolean isInPreSet;
 	private TimedTransportArcComponent connectedTo = null;

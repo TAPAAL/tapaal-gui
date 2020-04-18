@@ -18,7 +18,6 @@ import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 
 public class TransitionFireingComponent extends JPanel {
-	private static final long serialVersionUID = -1208007964368671066L;
 
 	private EnabledTransitionsList enabledTransitionsList;
 	private JButton fireButton;

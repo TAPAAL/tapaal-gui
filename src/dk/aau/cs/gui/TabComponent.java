@@ -59,10 +59,6 @@ import dk.aau.cs.util.Require;
  * 
  */
 public abstract class TabComponent extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2036995080253347710L;
 
 	private final JTabbedPane pane;
 
@@ -97,7 +93,6 @@ public abstract class TabComponent extends JPanel {
 	}
 
 	private class TabButton extends JButton {
-		private static final long serialVersionUID = 396272450859168050L;
 
 		public TabButton() {
 			int size = 17;

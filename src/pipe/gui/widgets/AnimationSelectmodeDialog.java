@@ -17,8 +17,6 @@ import dk.aau.cs.model.tapn.TransportArc;
 
 public class AnimationSelectmodeDialog extends JPanel {
 
-	private static final long serialVersionUID = 7852107237344005547L;
-
 	TimedTransition transition = null;
 
 	public ArrayList<ArcTokenSelector> arcTokenSelectors = new ArrayList<ArcTokenSelector>();
