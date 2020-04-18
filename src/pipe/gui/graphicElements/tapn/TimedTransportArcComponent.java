@@ -61,8 +61,8 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 
 	@Override
 	protected void setHead() {
-		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] { 0, -11, -18, -11 }, 4), true);;
-	}
+		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] { 0, -11, -18, -11 }, 4), true);
+    }
 
 	public void setGroupNr(int groupNr) {
 		setGroup(groupNr);

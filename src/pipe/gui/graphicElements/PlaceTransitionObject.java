@@ -309,9 +309,9 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	public void toggleAttributesVisible() {
 		attributesVisible = !attributesVisible;
 		update(true);
-	};
+	}
 
-	public void zoomUpdate(int value) {
+    public void zoomUpdate(int value) {
 		super.zoomUpdate(value);
 		update(true, false);
 	}

@@ -17,8 +17,8 @@ public class UpdateNameLabelOffsetCommand extends Command {
 
 	@Override
 	public void undo() {
-		obj.setNameOffsetX(oldXOffset);;
-		obj.setNameOffsetY(oldYOffset);
+		obj.setNameOffsetX(oldXOffset);
+        obj.setNameOffsetY(oldYOffset);
 		obj.updateOnMoveOrZoom();		
 	}
 

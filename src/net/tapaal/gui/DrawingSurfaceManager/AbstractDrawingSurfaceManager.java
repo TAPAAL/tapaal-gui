@@ -103,6 +103,6 @@ public abstract class AbstractDrawingSurfaceManager {
             next.triggerEvent(e);
         }
 
-    };
+    }
 
 }
