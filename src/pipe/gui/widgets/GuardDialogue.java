@@ -479,8 +479,7 @@ public class GuardDialogue extends JPanel /*
 		String timeInterval = arc.getGuardAsString();
 
 		String[] partedTimeInterval = timeInterval.split(",");
-		String firstNumber = partedTimeInterval[0].substring(1,
-				partedTimeInterval[0].length());
+		String firstNumber = partedTimeInterval[0].substring(1, partedTimeInterval[0].length());
 		String secondNumber = partedTimeInterval[1].substring(0,
 				partedTimeInterval[1].length() - 1);
 		int first = 0, second = 0;

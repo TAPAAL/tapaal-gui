@@ -233,7 +233,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
-			hasPositionalInfos.put(net, new Boolean(false));
+			hasPositionalInfos.put(net, Boolean.FALSE);
 		}
 		
 		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
