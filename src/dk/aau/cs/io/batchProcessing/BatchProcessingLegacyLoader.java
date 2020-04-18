@@ -496,7 +496,7 @@ ReductionOption reductionOption;
 	}
 
 	private String getContentOfValueChildNode(Element element) throws FormatException {
-		return ((Element) getFirstChildNodeByName(element, "value")).getTextContent();
+		return getFirstChildNodeByName(element, "value").getTextContent();
 	}
 
 	private String getChildNodesContentOfValueChildNodeAsString(Element element, String childNodeName) throws FormatException {

@@ -162,7 +162,7 @@ public class QueryPane extends JPanel {
 	}
 	
 	public void updateQueryButtons() {
-		TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
+		TAPNQuery query = queryList.getSelectedValue();
 		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
 			editQueryButton.setEnabled(false);
 			verifyButton.setEnabled(false);
@@ -354,7 +354,7 @@ public class QueryPane extends JPanel {
 	}
 	
 	private void removeQueries() {
-		undoManager.addNewEdit(new RemoveQueriesCommand((List<TAPNQuery>) queryList.getSelectedValuesList(), tabContent));
+		undoManager.addNewEdit(new RemoveQueriesCommand(queryList.getSelectedValuesList(), tabContent));
 		if(listModel.getSize() > 0 && isQueryPossible()){
 			for(Object o : queryList.getSelectedValuesList()) {
 				listModel.removeElement(o);
@@ -373,7 +373,7 @@ public class QueryPane extends JPanel {
 				"yes",
 				"no"};
 
-		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
+		TAPNQuery q = queryList.getSelectedValue();
 		TAPNQuery newQuery = null;
 
 		if(q.isActive()) {
@@ -464,7 +464,7 @@ public class QueryPane extends JPanel {
 	}
 
 	private void verifyQuery() {
-		TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
+		TAPNQuery query = queryList.getSelectedValue();
 		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
 		
 		

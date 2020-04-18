@@ -782,7 +782,7 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public Template selectedModel() {
-		return (Template) templateList.getSelectedValue();
+		return templateList.getSelectedValue();
 	}
 
 	public void updateTemplateList() {

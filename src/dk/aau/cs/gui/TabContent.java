@@ -483,7 +483,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 							}
 						}
 						
-						anim.blinkSelected((String)animBox.getSelectedValue());
+						anim.blinkSelected(animBox.getSelectedValue());
 					}
 				}
 				// Remove focus

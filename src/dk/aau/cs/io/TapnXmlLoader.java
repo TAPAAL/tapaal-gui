@@ -551,8 +551,8 @@ public class TapnXmlLoader {
 
 
 		if (isInPreSet) {
-			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+			if (postsetArcs.containsKey(targetIn)) {
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get(targetIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(sourceIn.getName());
 				TimedTransition trans = template.model().getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -570,14 +570,14 @@ public class TapnXmlLoader {
 				template.guiModel().addPetriNetObject(postsetTransportArc);
 				template.model().add(transArc);
 
-				postsetArcs.remove((TimedTransitionComponent) targetIn);
+				postsetArcs.remove(targetIn);
 			} else {
 				presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
 				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
-			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+			if (presetArcs.containsKey(sourceIn)) {
+				TimedTransportArcComponent presetTransportArc = presetArcs.get(sourceIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
@@ -595,7 +595,7 @@ public class TapnXmlLoader {
 				template.guiModel().addPetriNetObject(tempArc);
 				template.model().add(transArc);
 
-				presetArcs.remove((TimedTransitionComponent) sourceIn);
+				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
 				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);

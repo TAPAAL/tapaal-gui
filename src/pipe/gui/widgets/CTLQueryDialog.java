@@ -2420,7 +2420,7 @@ public class CTLQueryDialog extends JPanel {
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);
 					querySaved = true;	//Setting this to true will make sure that new values will be used.
-					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
+					templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();

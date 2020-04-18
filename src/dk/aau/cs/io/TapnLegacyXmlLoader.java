@@ -227,8 +227,8 @@ public class TapnLegacyXmlLoader {
 
 
 		if (isInPreSet) {
-			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+			if (postsetArcs.containsKey(targetIn)) {
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get(targetIn);
 				TimedPlace sourcePlace = tapn.getPlaceByName(sourceIn.getName());
 				TimedTransition trans = tapn.getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -246,14 +246,14 @@ public class TapnLegacyXmlLoader {
 				guiModel.addPetriNetObject(postsetTransportArc);
 				tapn.add(transArc);
 
-				postsetArcs.remove((TimedTransitionComponent) targetIn);
+				postsetArcs.remove(targetIn);
 			} else {
 				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
 				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
-			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+			if (presetArcs.containsKey(sourceIn)) {
+				TimedTransportArcComponent presetTransportArc = presetArcs.get(sourceIn);
 				TimedPlace sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = tapn.getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(targetIn.getName());
@@ -272,7 +272,7 @@ public class TapnLegacyXmlLoader {
 				guiModel.addPetriNetObject(tempArc);
 				tapn.add(transArc);
 
-				presetArcs.remove((TimedTransitionComponent) sourceIn);
+				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
 				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
@@ -780,7 +780,7 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private String getContentOfValueChildNode(Element element) throws FormatException {
-		return ((Element) getFirstChildNodeByName(element, "value")).getTextContent();
+		return getFirstChildNodeByName(element, "value").getTextContent();
 	}
 
 	private String getChildNodesContentOfValueChildNodeAsString(Element element, String childNodeName) throws FormatException {

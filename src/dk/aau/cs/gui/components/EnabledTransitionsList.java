@@ -128,7 +128,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void fireSelectedTransition(){
-		TransitionListItem item = (TransitionListItem)transitionsList.getSelectedValue();
+		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
 			CreateGui.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
@@ -192,7 +192,7 @@ public class EnabledTransitionsList extends JPanel{
 			if(!(obj instanceof TransitionListItem)){
 				return false;
 			} else {
-				return toString().equals(((TransitionListItem)obj).toString());
+				return toString().equals(obj.toString());
 			}
 		}
 

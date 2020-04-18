@@ -534,7 +534,7 @@ public class TAPNComposer implements ITAPNComposer {
 						}
 					}
 	
-					((TimedTransportArcComponent) newInArc).setGroupNr(nextGroupNr + 1);
+					newInArc.setGroupNr(nextGroupNr + 1);
 					
 					//Create output transport arc
 					Transition guiSourceOut = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
