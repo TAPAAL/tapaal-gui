@@ -241,7 +241,7 @@ public class WorkflowDialog extends JDialog {
 		isInTraceMode = true;
 		setVisible(false);
 		CreateGui.getApp().setGUIMode(GUIMode.animation);
-		CreateGui.getAnimator().SetTrace(trace);
+		CreateGui.getAnimator().setTrace(trace);
 	}
 
 	private WorkflowDialog(Frame frame, String title, boolean modal) {
