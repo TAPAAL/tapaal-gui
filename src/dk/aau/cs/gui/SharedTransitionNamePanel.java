@@ -80,7 +80,7 @@ public class SharedTransitionNamePanel extends JPanel {
 		
 		JLabel label = new JLabel("Enter a shared transition name:");
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(4, 4, 2, 4);
 		namePanel.add(label, gbc);
 		
