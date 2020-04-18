@@ -13,7 +13,6 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
@@ -48,8 +47,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
-	private Arc(int nameOffsetX, int nameOffsetY) {
-	    super(nameOffsetX, nameOffsetY);
+	private Arc() {
+	    super(0, 0);
 
         setHead();
     }
@@ -61,7 +60,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public Arc(
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		this(0,0);
+		this();
 
 		id = idInput;
 		setSource(sourceInput);
@@ -74,7 +73,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
-		this(0,0);
+		this();
 		isPrototype = true;
 
 		setSource(newSource);
