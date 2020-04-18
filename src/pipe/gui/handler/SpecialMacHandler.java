@@ -38,7 +38,7 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 	}
 
 	public void handleQuitRequestWith(QuitEvent arg0, QuitResponse arg1) {
-		guiFrameController.ifPresent(o->o.exit());
+		guiFrameController.ifPresent(GuiFrameControllerActions::exit);
 	}
 
 	public static void postprocess(){

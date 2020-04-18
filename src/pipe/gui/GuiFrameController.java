@@ -601,7 +601,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         Preferences.getInstance().setShowTokenAge(showTokenAge);
 
         guiFrame.setShowTokenAgeSelected(showTokenAge);
-        currentTab.ifPresent(o->o.repaintAll());
+        currentTab.ifPresent(TabContentActions::repaintAll);
 
     }
 
@@ -615,7 +615,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowZeroToInfinityIntervalsSelected(showZeroToInfinityIntervals);
 
         Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals);
-        currentTab.ifPresent(o->o.repaintAll());
+        currentTab.ifPresent(TabContentActions::repaintAll);
     }
 
     @Override
@@ -690,7 +690,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         setEnabledTransitionsList(true);
         setDisplayToolTips(true);
 
-        currentTab.ifPresent(o->o.setResizeingDefault());
+        currentTab.ifPresent(TabContentActions::setResizeingDefault);
 
         if(advanced) {
 
