@@ -617,9 +617,8 @@ public class ExportBatchDialog extends JDialog {
 		}
 		
 		private String generateDestinationTooltip(String[] result) {
-			String fullFilePath = result[1];
-			
-			return fullFilePath;
+
+            return result[1];
 		}
 	}
 }
