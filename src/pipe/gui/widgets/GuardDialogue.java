@@ -27,6 +27,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -34,14 +35,7 @@ import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.ConstantWeight;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.IntWeight;
-import dk.aau.cs.model.tapn.Weight;
 
 public class GuardDialogue extends JPanel /*
  * implements ActionListener,
@@ -131,7 +125,7 @@ public class GuardDialogue extends JPanel /*
 				// Check if target transition is urgent
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)
 						&& ((TimedInputArcComponent) objectToBeEdited).isUrgentTransition()){
-					if(!guard.equals(guard.ZERO_INF)){
+					if(!guard.equals(TimeInterval.ZERO_INF)){
 						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0,inf).", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}

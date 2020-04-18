@@ -68,12 +68,12 @@ public class TimedTransition extends TAPNElement {
 	
 	private boolean hasUntimedPreset(boolean cascade){
 		for(TimedInputArc arc : preset){
-			if(!arc.interval().equals(arc.interval().ZERO_INF)){
+			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}
 		for (TransportArc arc : transportArcsGoingThrough){
-			if(!arc.interval().equals(arc.interval().ZERO_INF)){
+			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}

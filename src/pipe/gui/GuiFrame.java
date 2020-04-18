@@ -957,7 +957,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				WorkflowDialog.showDialog();
 			}
 
-			statusBar.changeText(statusBar.textforDrawing);
+			statusBar.changeText(StatusBar.textforDrawing);
 			//Enable editor focus traversal policy
 			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 			fixBug812694GrayMenuAfterSimulationOnMac();
@@ -1006,7 +1006,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 			getCurrentTab().getAnimationController().requestFocusInWindow();
 
-			statusBar.changeText(statusBar.textforAnimation);
+			statusBar.changeText(StatusBar.textforAnimation);
 			//Enable simulator focus traversal policy
 			setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 
@@ -1047,7 +1047,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			enableAllActions(false);
 
 			// Disable All Actions
-			statusBar.changeText(statusBar.textforNoNet);
+			statusBar.changeText(StatusBar.textforNoNet);
 			setFocusTraversalPolicy(null);
 
 			break;
