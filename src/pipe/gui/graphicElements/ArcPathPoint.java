@@ -276,10 +276,7 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 	
 	public boolean isEndPoint() {
-		if(this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex()) {
-			return true;
-		} else
-			return false;
+        return this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex();
 	}
 
 }

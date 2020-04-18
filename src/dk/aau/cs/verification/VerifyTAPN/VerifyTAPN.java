@@ -382,22 +382,14 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
-		if(model.hasWeights() || model.hasUrgentTransitions()) {
-			return false;
-		}
-
-		return true;
-	}
+        return !model.hasWeights() && !model.hasUrgentTransitions();
+    }
 	
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-		if(query.getProperty() instanceof TCTLEGNode || 
-				query.getProperty() instanceof TCTLAFNode ||
-				query.hasDeadlock()) {
-			return false;
-		}
-		
-		return true;
-	}
+        return !(query.getProperty() instanceof TCTLEGNode) &&
+            !(query.getProperty() instanceof TCTLAFNode) &&
+            !query.hasDeadlock();
+    }
 	
 	// JS: this is not used any more
 	//private boolean isQueryUpwardClosed(TAPNQuery query) {
