@@ -49,7 +49,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import pipe.gui.CreateGui;
 import dk.aau.cs.util.Require;
 
 /**

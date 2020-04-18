@@ -29,7 +29,6 @@ import org.apache.commons.cli.PosixParser;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.debug.Logger;
-import pipe.gui.GuiFrame;
 import pipe.gui.Verifier;
 
 /**

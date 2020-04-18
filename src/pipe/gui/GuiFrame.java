@@ -34,8 +34,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.TabComponent;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;

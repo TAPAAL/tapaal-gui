@@ -1,6 +1,5 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 
 public class UpdateNameLabelOffsetCommand extends Command {

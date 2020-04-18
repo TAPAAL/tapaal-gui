@@ -6,7 +6,6 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
 import pipe.gui.Pipe;
-import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
 

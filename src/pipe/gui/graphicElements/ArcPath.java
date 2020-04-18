@@ -15,8 +15,6 @@ import java.util.List;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.handler.ArcPathPointHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 

@@ -7,7 +7,6 @@ import java.util.LinkedList;
 
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.LabelHandler;
 
 /**
  * Petri-Net Place or Transition SuperClass
