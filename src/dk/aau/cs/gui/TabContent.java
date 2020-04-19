@@ -1006,8 +1006,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     //Animation mode stuff, moved from view
 	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
-
 	private boolean animationmode = false;
+	public void setAnimationMode(boolean on) {
+	    if (animationmode != on) {
+	        toggleAnimationMode();
+        }
+    }
 	@Override
 	public void toggleAnimationMode() {
 
