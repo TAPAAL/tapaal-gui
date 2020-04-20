@@ -577,6 +577,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
+		animatorSplitPane.doLayout();
 
 	}
 
