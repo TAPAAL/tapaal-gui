@@ -18,7 +18,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.RequireException;
 
 public class MakePlaceNewSharedCommand extends Command {
 	private final String newSharedName;

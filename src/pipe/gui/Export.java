@@ -19,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -49,8 +48,7 @@ import dk.aau.cs.verification.TAPNComposer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.GuiFrame.GUIMode;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**
@@ -67,12 +65,12 @@ public class Export {
 	public static final int PNML = 6;
 	public static final int QUERY = 7;	
 
-	private static void toPnml(DrawingSurfaceImpl g, String filename) 
+	private static void toPnml(DrawingSurfaceImpl g, String filename)
 			throws NullPointerException, DOMException, TransformerConfigurationException, 
 			IOException, ParserConfigurationException, TransformerException {
 		TabContent currentTab = CreateGui.getCurrentTab();
 		NetworkMarking currentMarking = null;
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+		if(CreateGui.getCurrentTab().isInAnimationMode()){
 			currentMarking = currentTab.network().marking();
 			currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
 		}
@@ -84,7 +82,7 @@ public class Export {
 
 		tapnWriter.savePNML(new File(filename));
 
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+		if(CreateGui.getCurrentTab().isInAnimationMode()){
 			currentTab.network().setMarking(currentMarking);
 		}
 	}

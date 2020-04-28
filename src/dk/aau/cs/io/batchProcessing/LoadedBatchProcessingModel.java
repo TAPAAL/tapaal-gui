@@ -1,6 +1,3 @@
-/**
- * 
- */
 package dk.aau.cs.io.batchProcessing;
 
 import java.util.Collection;

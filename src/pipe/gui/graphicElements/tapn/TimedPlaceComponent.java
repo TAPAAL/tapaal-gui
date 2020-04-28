@@ -23,7 +23,6 @@ import java.util.Locale;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -61,14 +60,11 @@ public class TimedPlaceComponent extends Place {
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
 	}
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
-			String idInput, Double nameOffsetXInput,
-			Double nameOffsetYInput) {
+			String idInput, double nameOffsetXInput,
+			double nameOffsetYInput) {
 
 		super(positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput);
@@ -76,12 +72,10 @@ public class TimedPlaceComponent extends Place {
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new PlaceHandler(this);
@@ -112,8 +106,8 @@ public class TimedPlaceComponent extends Place {
 		return place.invariant();
 	}
 
-	public String getStringOfTokens() {
-		StringBuffer buffer = new StringBuffer("{");
+	private String getStringOfTokens() {
+		StringBuilder buffer = new StringBuilder("{");
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
@@ -259,13 +253,13 @@ public class TimedPlaceComponent extends Place {
                 default:
                     if (marking > 999) {
                         // XXX could be better...
-                        g.drawString("#" + String.valueOf(marking), x, y + 20);
+                        g.drawString("#" + marking, x, y + 20);
                     } else if (marking > 99) {
-                        g.drawString("#" + String.valueOf(marking), x, y + 20);
+                        g.drawString("#" + marking, x, y + 20);
                     } else if (marking > 9) {
-                        g.drawString("#" + String.valueOf(marking), x + 2, y + 20);
+                        g.drawString("#" + marking, x + 2, y + 20);
                     } else {
-                        g.drawString("#" + String.valueOf(marking), x + 6, y + 20);
+                        g.drawString("#" + marking, x + 6, y + 20);
                     }
                     break;
             }
@@ -355,12 +349,12 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
-			pnName.setName(place.name());
+			getNameLabel().setName(place.name());
 
 			if (!(place.invariant().upperBound() instanceof InfBound)) {
-				pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+				getNameLabel().setText("\nInv: " + place.invariant().toString(displayConstantNames));
 			}else{
-				pnName.setText("");
+				getNameLabel().setText("");
 			}
 			
 			// Handle constant highlighting
@@ -374,19 +368,17 @@ public class TimedPlaceComponent extends Place {
 				pnName.setVisible(constant.getVisible());
 			}
 			if(focusedConstant){
-				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+				getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
 			}else{
-				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+				getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 			}
-			
-			pnName.displayName(attributesVisible);
+
+			getNameLabel().displayName(attributesVisible);
 			
 		} else {
-			pnName.setName("");
-			pnName.setText("");
+			getNameLabel().setName("");
+			getNameLabel().setText("");
 		}
-		pnName.zoomUpdate(zoom);
-		updateOnMoveOrZoom();
 		repaint();
 	}
 
@@ -435,7 +427,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, getNameOffsetX(), getNameOffsetY());
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		return placeComponent;

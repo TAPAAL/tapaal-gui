@@ -10,16 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -54,7 +48,7 @@ import pipe.gui.undo.RenameTemplateCommand;
 import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.RequestFocusListener;
+import net.tapaal.swinghelpers.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
 import dk.aau.cs.gui.components.NonsearchableJList;
@@ -66,7 +60,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.util.Tuple;
 
 public class TemplateExplorer extends JPanel {
@@ -75,8 +68,8 @@ public class TemplateExplorer extends JPanel {
 	// Template explorer panel items
 	private JPanel templatePanel;
 	private JScrollPane scrollpane;
-	private JList templateList;
-	private DefaultListModel listModel;
+	private JList<Template> templateList;
+	private DefaultListModel<Template> listModel;
 
 	// Template button panel items
 	private JPanel buttonPanel;
@@ -109,7 +102,7 @@ public class TemplateExplorer extends JPanel {
 
 	public TemplateExplorer(TabContent parent, boolean hideButtons) {
 		this.parent = parent;
-		undoManager = parent.drawingSurface().getUndoManager();
+		undoManager = parent.getUndoManager();
 		init(hideButtons);
 	}
 	
@@ -199,7 +192,7 @@ public class TemplateExplorer extends JPanel {
 
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1) {
+				if (parent.numberOfActiveTemplates() > 1) {
 					removeTemplateButton.setEnabled(false);
 				} else {
 					removeTemplateButton.setEnabled(true);
@@ -253,7 +246,7 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index > 0) {
 					parent.swapTemplates(index, index-1);
-					Object o = listModel.getElementAt(index);
+					Template o = listModel.getElementAt(index);
                     listModel.setElementAt(listModel.getElementAt(index-1), index);
                     listModel.setElementAt(o, index-1);
                     templateList.ensureIndexIsVisible(index+1);
@@ -277,7 +270,7 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index < parent.network().allTemplates().size() - 1) {
 					parent.swapTemplates(index, index+1);
-					Object o = listModel.getElementAt(index);
+					Template o = listModel.getElementAt(index);
                     listModel.setElementAt(listModel.getElementAt(index+1), index);
                     listModel.setElementAt(o, index+1);
                     templateList.ensureIndexIsVisible(index+1);
@@ -296,12 +289,10 @@ public class TemplateExplorer extends JPanel {
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(false);
-		sortButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);
-				undoManager.addNewEdit(command);
-				command.redo();
-			}
+		sortButton.addActionListener(e -> {
+			Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);
+			undoManager.addNewEdit(command);
+			command.redo();
 		});
 		
 		gbc = new GridBagConstraints();
@@ -321,11 +312,7 @@ public class TemplateExplorer extends JPanel {
 		newTemplateButton.setPreferredSize(dimension);
 		newTemplateButton.setToolTipText(toolTipNewComponent);
 
-		newTemplateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				ShowNewTemplateDialog("");
-			}
-		});
+		newTemplateButton.addActionListener(arg0 -> ShowNewTemplateDialog(""));
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -543,14 +530,13 @@ public class TemplateExplorer extends JPanel {
 			}
 			else {
 				template = createNewTemplate(templateName);
+
+				int index = listModel.size();
+				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+				parent.addTemplate(template);
 			}
 		}
-		if (template != null) {
-			int index = listModel.size();
-			undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
-			parent.addTemplate(template);
-			parent.drawingSurface().setModel(template.guiModel(), template.model(), template.zoomer());
-		}
+
 		exit();
 	}
 	
@@ -569,13 +555,11 @@ public class TemplateExplorer extends JPanel {
 		nameTextField.setPreferredSize(size);
 		nameTextField.setText(nameToShow);	
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {			
-			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameTextField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -682,12 +666,9 @@ public class TemplateExplorer extends JPanel {
 		nameTextField.setPreferredSize(size);
 		nameTextField.setText(oldname);
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {			
-			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameTextField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -737,18 +718,9 @@ public class TemplateExplorer extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonContainer.add(cancelButton,gbc);		
 		
-		okButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				onOKRenameTemplate();
-			}
-		});
+		okButton.addActionListener(e -> onOKRenameTemplate());
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
 		gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 8, 5, 8);
@@ -804,10 +776,10 @@ public class TemplateExplorer extends JPanel {
 
 	public void openSelectedTemplate() {
 		Template tapn = selectedModel();
-		if (tapn != null) {
-			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
+		if (tapn != null && parent.isTabInFocus()) {
+			parent.changeToTemplate(tapn);
 		}
-		parent.drawingSurface().repaintAll();
+		//parent.drawingSurface().repaintAll();
 	}
 
 	public Template selectedModel() {
@@ -935,7 +907,7 @@ public class TemplateExplorer extends JPanel {
 			if (!selectedModel().isActive()){
 				removeTemplateButton.setEnabled(true);
 			}else {
-				if (CreateGui.getCurrentTab().numberOfActiveTemplates() <= 1) {
+				if (parent.numberOfActiveTemplates() <= 1) {
 					removeTemplateButton.setEnabled(false);
 				} else {
 					removeTemplateButton.setEnabled(true);
@@ -991,7 +963,7 @@ public class TemplateExplorer extends JPanel {
 					sortButton.setEnabled(false);
 				} else {
 					if (buttonPanel != null) {
-						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1){
+						if (parent.numberOfActiveTemplates() > 1){
 							removeTemplateButton.setEnabled(true);
 						}else{
 							if (selectedModel().isActive()){

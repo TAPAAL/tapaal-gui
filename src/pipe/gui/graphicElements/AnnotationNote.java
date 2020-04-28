@@ -11,13 +11,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
+import java.util.EnumMap;
 
 import javax.swing.JDialog;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
-import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.AnnotationNoteHandler;
@@ -31,65 +30,63 @@ public class AnnotationNote extends Note {
 
 	private boolean fillNote = true;
 
-	private ResizePoint[] dragPoints = new ResizePoint[8];
+	private EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
 
 	private AffineTransform prova = new AffineTransform();
-	
-	private boolean isNew;
 
-	public AnnotationNote(int x, int y, boolean isNew) {
+	public AnnotationNote(int x, int y) {
 		super(x, y);
 		setDragPoints();
-		this.isNew = isNew;
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
+        getNote().addMouseListener(getMouseHandler());
+        getNote().addMouseMotionListener(getMouseHandler());
 	}
 
-	public AnnotationNote(String text, int x, int y, int w, int h, boolean border, boolean isNew) {
+	public AnnotationNote(String text, int x, int y, int w, int h, boolean border) {
 		super(text, x, y, w, h, border);
-		this.isNew = isNew;
 		setDragPoints();
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
+        getNote().addMouseListener(getMouseHandler());
+        getNote().addMouseMotionListener(getMouseHandler());
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 
-		AnnotationNoteHandler h = new AnnotationNoteHandler(this);
-		mouseHandler = h;
-
-		getNote().addMouseListener(h);
-		getNote().addMouseMotionListener(h);
+        mouseHandler = new AnnotationNoteHandler(this);
 
 	}
 
 
 	private void setDragPoints() {
-		dragPoints[0] = new ResizePoint(this, ResizePoint.TOP
-				| ResizePoint.LEFT);
-		dragPoints[1] = new ResizePoint(this, ResizePoint.TOP);
-		dragPoints[2] = new ResizePoint(this, ResizePoint.TOP
-				| ResizePoint.RIGHT);
-		dragPoints[3] = new ResizePoint(this, ResizePoint.RIGHT);
-		dragPoints[4] = new ResizePoint(this, ResizePoint.BOTTOM
-				| ResizePoint.RIGHT);
-		dragPoints[5] = new ResizePoint(this, ResizePoint.BOTTOM);
-		dragPoints[6] = new ResizePoint(this, ResizePoint.BOTTOM
-				| ResizePoint.LEFT);
-		dragPoints[7] = new ResizePoint(this, ResizePoint.LEFT);
+		dragPoints.put(dragPoint.TOP_LEFT, new ResizePoint(this, ResizePoint.TOP | ResizePoint.LEFT));
+		dragPoints.put(dragPoint.TOP_MIDDLE, new ResizePoint(this, ResizePoint.TOP));
+		dragPoints.put(dragPoint.TOP_RIGHT, new ResizePoint(this, ResizePoint.TOP | ResizePoint.RIGHT));
+		dragPoints.put(dragPoint.MIDDLE_RIGHT, new ResizePoint(this, ResizePoint.RIGHT));
+		dragPoints.put(dragPoint.BOTTOM_RIGHT, new ResizePoint(this, ResizePoint.BOTTOM | ResizePoint.RIGHT));
+		dragPoints.put(dragPoint.BOTTOM_MIDDLE, new ResizePoint(this, ResizePoint.BOTTOM));
+		dragPoints.put(dragPoint.BOTTOM_LEFT, new ResizePoint(this, ResizePoint.BOTTOM | ResizePoint.LEFT));
+		dragPoints.put(dragPoint.MIDDLE_LEFT, new ResizePoint(this, ResizePoint.LEFT));
 
-		for (int i = 0; i < 8; i++) {
-			ResizePointHandler handler = new ResizePointHandler(dragPoints[i]);
-			dragPoints[i].addMouseListener(handler);
-			dragPoints[i].addMouseMotionListener(handler);
-			add(dragPoints[i]);
+		for (ResizePoint p : dragPoints.values()) {
+			ResizePointHandler handler = new ResizePointHandler(p);
+			p.addMouseListener(handler);
+			p.addMouseMotionListener(handler);
+			add(p);
 		}
+	}
+
+	enum dragPoint {
+		TOP_LEFT, // 0
+		TOP_MIDDLE, // 1
+		TOP_RIGHT, //2
+		MIDDLE_RIGHT, // 3
+		BOTTOM_RIGHT, //4
+		BOTTOM_MIDDLE, //5
+		BOTTOM_LEFT, //6
+		MIDDLE_LEFT, //7
 	}
 
 	@Override
@@ -97,39 +94,52 @@ public class AnnotationNote extends Note {
 		super.updateBounds();
 		if (dragPoints != null) {
 			// TOP-LEFT
-			dragPoints[0].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMinY(), zoom));
-			dragPoints[0].setZoom(zoom);
+			dragPoints.get(dragPoint.TOP_LEFT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
+			);
+
 			// TOP-MIDDLE
-			dragPoints[1].setLocation(Zoomer.getZoomedValue(noteRect
-					.getCenterX(), zoom), Zoomer.getZoomedValue(noteRect
-					.getMinY(), zoom));
-			dragPoints[1].setZoom(zoom);
+			dragPoints.get(dragPoint.TOP_MIDDLE).setLocation(
+					Zoomer.getZoomedValue(noteRect.getCenterX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
+			);
+
 			// TOP-RIGHT
-			dragPoints[2].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMinY(), zoom));
-			dragPoints[2].setZoom(zoom);
+			dragPoints.get(dragPoint.TOP_RIGHT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMinY(), getZoom())
+			);
+
 			// MIDDLE-RIGHT
-			dragPoints[3].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getCenterY(), zoom));
-			dragPoints[3].setZoom(zoom);
+			dragPoints.get(dragPoint.MIDDLE_RIGHT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom())
+			);
+
 			// BOTTOM-RIGHT
-			dragPoints[4].setLocation(Zoomer.getZoomedValue(noteRect.getMaxX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMaxY(), zoom));
-			dragPoints[4].setZoom(zoom);
+			dragPoints.get(dragPoint.BOTTOM_RIGHT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMaxX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
+			);
+
 			// BOTTOM-MIDDLE
-			dragPoints[5].setLocation(Zoomer.getZoomedValue(noteRect
-					.getCenterX(), zoom), Zoomer.getZoomedValue(noteRect
-					.getMaxY(), zoom));
-			dragPoints[5].setZoom(zoom);
+			dragPoints.get(dragPoint.BOTTOM_MIDDLE).setLocation(
+					Zoomer.getZoomedValue(noteRect.getCenterX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
+			);
+
 			// BOTTOM-LEFT
-			dragPoints[6].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getMaxY(), zoom));
-			dragPoints[6].setZoom(zoom);
+			dragPoints.get(dragPoint.BOTTOM_LEFT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getMaxY(), getZoom())
+			);
+
 			// MIDDLE-LEFT
-			dragPoints[7].setLocation(Zoomer.getZoomedValue(noteRect.getMinX(),
-					zoom), Zoomer.getZoomedValue(noteRect.getCenterY(), zoom));
-			dragPoints[7].setZoom(zoom);
+			dragPoints.get(dragPoint.MIDDLE_LEFT).setLocation(
+					Zoomer.getZoomedValue(noteRect.getMinX(), getZoom()),
+					Zoomer.getZoomedValue(noteRect.getCenterY(), getZoom())
+			);
 		}
 	}
 
@@ -137,9 +147,8 @@ public class AnnotationNote extends Note {
 	public boolean contains(int x, int y) {
 		boolean pointContains = false;
 
-		for (int i = 0; i < 8; i++) {
-			pointContains |= dragPoints[i].contains(x - dragPoints[i].getX(), y
-					- dragPoints[i].getY());
+		for (ResizePoint p : dragPoints.values()) {
+			pointContains |= p.contains(x - p.getX(), y - p.getY());
 		}
 
 		return super.contains(x, y) || pointContains;
@@ -147,19 +156,22 @@ public class AnnotationNote extends Note {
 
 	@Override
 	public void enableEditMode() {
+	    enableEditMode(false);
+    }
+    //Special order if its first edit, undo/redo
+    public boolean enableEditMode(boolean isFirstEdit) {
 		String oldText = note.getText();
 		JDialog.setDefaultLookAndFeelDecorated(true);
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Annotation", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Annotation", true);
 
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));
 		// Make window fit contents' preferred size
 		guiDialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				if(isNew()) {
-					delete();
+				if(isFirstEdit) {
+					getParent().getGuiModel().removePetriNetObject(AnnotationNote.this);
 				}
 			}
 		});
@@ -176,10 +188,14 @@ public class AnnotationNote extends Note {
 		String newText = note.getText();
 		if (oldText != null && !newText.equals(oldText)) {
 			// Text has been changed
-			CreateGui.getDrawingSurface().getUndoManager().addEdit(
-					new AnnotationTextEdit(this, oldText, newText));
+
+			CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+					new AnnotationTextEdit(this, oldText, newText)
+			);
 			updateBounds();
+			return true;
 		}
+		return false;
 	}
 
 	@Override
@@ -195,7 +211,7 @@ public class AnnotationNote extends Note {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
 				RenderingHints.VALUE_STROKE_NORMALIZE);
 
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 		if (selected) {
 			g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
 			g2.fill(noteRect);
@@ -213,11 +229,12 @@ public class AnnotationNote extends Note {
 				g2.draw(noteRect);
 			}
 		}
-		for (int i = 0; i < 8; i++) {
-			dragPoints[i].myPaintComponent(g);
-		}
+		dragPoints.forEach((dragPoint, resizePoint) -> resizePoint.myPaintComponent(g));
+		//for (int i = 0; i < 8; i++) {
+		//	dragPoints[i].myPaintComponent(g);
+		//}
 
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 	}
 
 	@Override
@@ -246,7 +263,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 			myPoint.myNote.setDraggable(false);
 			myPoint.isPressed = true;
 			myPoint.repaint();
@@ -255,7 +272,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid
 					.getModifiedY(e.getY() - start.y));
@@ -264,8 +281,8 @@ public class AnnotationNote extends Note {
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {			
-			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		public void mouseReleased(MouseEvent e) {
+			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.myNote.setDraggable(true);
 			myPoint.isPressed = false;
@@ -273,6 +290,14 @@ public class AnnotationNote extends Note {
 			myPoint.repaint();
 		}
 
+	}
+
+	@Override
+	public void zoomUpdate(int percent) {
+		super.zoomUpdate(percent);
+		for (ResizePoint p : dragPoints.values()) {
+			p.setZoom(percent);
+		}
 	}
 
 	public class ResizePoint extends javax.swing.JComponent {
@@ -304,18 +329,18 @@ public class AnnotationNote extends Note {
 
 		private void drag(int x, int y) {
 			if ((typeMask & TOP) == TOP) {
-				myNote.adjustTop(Zoomer.getUnzoomedValue(y, zoom));
+				myNote.adjustTop(Zoomer.getUnzoomedValue(y, getZoom()));
 			}
 			if ((typeMask & BOTTOM) == BOTTOM) {
-				myNote.adjustBottom(Zoomer.getUnzoomedValue(y, zoom));
+				myNote.adjustBottom(Zoomer.getUnzoomedValue(y, getZoom()));
 			}
 			if ((typeMask & LEFT) == LEFT) {
-				myNote.adjustLeft(Zoomer.getUnzoomedValue(x, zoom));
+				myNote.adjustLeft(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
 			if ((typeMask & RIGHT) == RIGHT) {
-				myNote.adjustRight(Zoomer.getUnzoomedValue(x, zoom));
+				myNote.adjustRight(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
-			CreateGui.getDrawingSurface().setNetChanged(true);
+			CreateGui.getCurrentTab().setNetChanged(true);
 		}
 
 		public void myPaintComponent(Graphics g) {
@@ -343,28 +368,22 @@ public class AnnotationNote extends Note {
 
 		// Change ResizePoint's size a little bit acording to the zoom percent
 		private void setZoom(int percent) {
-			if (zoom >= 220) {
+			if (getZoom() >= 220) {
 				SIZE = 5;
-			} else if (zoom >= 120) {
+			} else if (getZoom() >= 120) {
 				SIZE = 4;
-			} else if (zoom >= 60) {
+			} else if (getZoom() >= 60) {
 				SIZE = 3;
+			} else {
+				SIZE = 2;
 			}
 		}
 	}
 	
 	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder(), isNew);
+		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
 		
 		return annotation;
-	}
-	
-	public boolean isNew(){
-		if(isNew){
-			isNew = false;
-			return true;
-		}
-		return false;
 	}
 
 }

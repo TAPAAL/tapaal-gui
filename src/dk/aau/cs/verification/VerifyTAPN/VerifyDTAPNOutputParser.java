@@ -6,16 +6,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TAPNQuery;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
-import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 
 public class VerifyDTAPNOutputParser {
@@ -28,8 +22,8 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
-        private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
-        private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
+	private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
+    private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
         
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");

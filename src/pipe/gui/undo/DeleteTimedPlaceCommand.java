@@ -5,10 +5,7 @@ import java.util.ArrayList;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -19,8 +16,8 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private int numberOfTokens;
 	private ArrayList<TAPNQuery> queriesInclusion = new ArrayList<TAPNQuery>();
 
-	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel) {
+		super(tapn, guiModel);
 		this.timedPlaceComponent = timedPlaceComponent;
 		numberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
 		timedPlace = timedPlaceComponent.underlyingPlace();
@@ -43,13 +40,12 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		}
 
 		tapn.remove(timedPlace);
-		timedPlaceComponent.delete();
-		view.repaint();		
+		guiModel.removePetriNetObject(timedPlaceComponent);
 	}
 
 	@Override
 	public void undo() {
-		timedPlaceComponent.undelete(view);
+		guiModel.addPetriNetObject(timedPlaceComponent);
 		tapn.add(timedPlace);
 		
 		if(!timedPlace.isShared()){
@@ -62,7 +58,6 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 			q.inclusionPlaces().inclusionPlaces().add(timedPlace);
 		}
 
-		view.repaint();
 	}
 
 

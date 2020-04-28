@@ -1,6 +1,3 @@
-/**
- * 
- */
 package dk.aau.cs.model.NTA.trace;
 
 import java.util.HashMap;

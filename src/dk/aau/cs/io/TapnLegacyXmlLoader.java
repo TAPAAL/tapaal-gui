@@ -26,12 +26,10 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -112,27 +110,19 @@ public class TapnLegacyXmlLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
-	}
+    }
 	
 	private Document loadDocument(File file) {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
-	}
+    }
 
 	private LoadedModel parse(Document tapnDoc) throws FormatException { 
 		idResolver.clear();
@@ -214,8 +204,6 @@ public class TapnLegacyXmlLoader {
 		guiModel.addPetriNetObject(tempArc);
 		tapn.add(outputArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -237,8 +225,6 @@ public class TapnLegacyXmlLoader {
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
 						inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
@@ -319,8 +305,6 @@ public class TapnLegacyXmlLoader {
 		guiModel.addPetriNetObject(tempArc);
 		tapn.add(inputArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -349,8 +333,6 @@ public class TapnLegacyXmlLoader {
 		guiModel.addPetriNetObject(tempArc);
 		tapn.add(inhibArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -501,28 +483,27 @@ public class TapnLegacyXmlLoader {
 		String text = getFirstChildNodeByName(inputLabelElement, "text").getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
+			positionXInput = Integer.valueOf(positionXTempStorage) + 1;
 		}
 
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage).intValue() + 1;
+			positionYInput = Integer.valueOf(positionYTempStorage) + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp).intValue() + 1;
+			widthInput = Integer.valueOf(widthTemp) + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp).intValue() + 1;
+			heightInput = Integer.valueOf(heightTemp) + 1;
 		}
 
 		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp).booleanValue();
+			borderInput = Boolean.valueOf(borderTemp);
 		} else {
 			borderInput = true;
 		}
-		AnnotationNote an = new AnnotationNote(text, positionXInput,
-				positionYInput, widthInput, heightInput, borderInput, false);
+		AnnotationNote an = new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 		guiModel.addPetriNetObject(an);
 	}
 
@@ -675,8 +656,8 @@ public class TapnLegacyXmlLoader {
 			}
 
 		}
-		tempArc.updateNameOffsetX(nameOffsetXInput);
-		tempArc.updateNameOffsetY(nameOffsetYInput);
+		tempArc.setNameOffsetX(nameOffsetXInput);
+		tempArc.setNameOffsetY(nameOffsetYInput);
 
 		parseArcPathAsOldFormat(inputArcElement, tempArc);
 	}
@@ -693,11 +674,11 @@ public class TapnLegacyXmlLoader {
 						String arcTempX = element.getAttribute("x");
 						String arcTempY = element.getAttribute("y");
 						String arcTempType = element.getAttribute("curvePoint");
-						float arcPointX = Float.valueOf(arcTempX).floatValue();
-						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						float arcPointX = Float.valueOf(arcTempX);
+						float arcPointY = Float.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType).booleanValue();
+						boolean arcPointType = Boolean.valueOf(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
 				}
@@ -787,7 +768,7 @@ public class TapnLegacyXmlLoader {
 			Element graphics = ((Element) getFirstChildNodeByName(e, "graphics"));
 			String offsetCoordinate = ((Element) getFirstChildNodeByName(graphics, "offset")).getAttribute(coordinateName);
 			if (offsetCoordinate.length() > 0) {
-				return Double.valueOf(offsetCoordinate).doubleValue();
+				return Double.valueOf(offsetCoordinate);
 			}
 		}
 
@@ -827,7 +808,7 @@ public class TapnLegacyXmlLoader {
 
 			String posCoordinate = ((Element) getFirstChildNodeByName(e, "position")).getAttribute(coordinateName);
 			if (posCoordinate.length() > 0) {
-				return Double.valueOf(posCoordinate).doubleValue();
+				return Double.valueOf(posCoordinate);
 			}
 		}
 

@@ -1,16 +1,12 @@
 package pipe.gui;
 
-import java.util.HashMap;
-
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.verification.VerifyTAPN.*;
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.VerificationCallback;
@@ -33,7 +29,7 @@ public class Verifier {
 		verifyta.setup();
 		return verifyta;
 	}
-	
+
 	private static VerifyTAPN getVerifyTAPN() {
 		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 		verifytapn.setup();
@@ -52,7 +48,7 @@ public class Verifier {
 		return verifypn;
 	}
 
-	private static ModelChecker getModelChecker(TAPNQuery query) {
+	public static ModelChecker getModelChecker(TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
 			return getVerifyTAPN();
 		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
@@ -65,8 +61,7 @@ public class Verifier {
 		}
 	}
 
-	public static void analyzeKBound(
-			TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
+	public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
 		ModelChecker modelChecker;
 		
 		if(tapnNetwork.isUntimed()){
@@ -88,10 +83,6 @@ public class Verifier {
 
 
 	public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
-		runUppaalVerification(timedArcPetriNetNetwork, input, false);
-	}
-
-	private static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input,	boolean untimedTrace) {
 		Verifyta verifyta = getVerifyta();
 		if (!verifyta.isCorrectVersion()) {
 			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
@@ -104,7 +95,7 @@ public class Verifier {
 		VerifytaOptions verifytaOptions = new VerifytaOptions(
 				input.getTraceOption(),
 				input.getSearchOption(),
-				untimedTrace,
+				false,
 				input.getReductionOption(),
 				input.useSymmetry(),
 				input.useOverApproximation(),
@@ -119,8 +110,7 @@ public class Verifier {
 
 		if (timedArcPetriNetNetwork != null) {
 			RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
-			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
-			dialog.setupListeners(thread);
+			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(
 					verifytaOptions,
 					timedArcPetriNetNetwork,
@@ -134,22 +124,13 @@ public class Verifier {
 					"Conversion error", JOptionPane.ERROR_MESSAGE);
 		}
 
-		return;
-	}
-	
-	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
-		runVerifyTAPNVerification(tapnNetwork, query, null);		
-	}
-	
-	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
-		runVerifyTAPNVerification(tapnNetwork, query, callback, null);
 	}
 
 	public static void runVerifyTAPNVerification(
 			TimedArcPetriNetNetwork tapnNetwork,
 			TAPNQuery query,
-			VerificationCallback callback,
-			HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+			VerificationCallback callback
+	) {
 		ModelChecker verifytapn = getModelChecker(query);
 
 		if (!verifytapn.isCorrectVersion()) {
@@ -219,9 +200,8 @@ public class Verifier {
 		}
 		
 		if (tapnNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
-			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
-			dialog.setupListeners(thread);
+			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);
 		} else {

@@ -8,7 +8,6 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
@@ -18,10 +17,6 @@ import pipe.gui.Zoomer;
 public abstract class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
-
-
-	// Value of the capacity restriction; 0 means no capacity restriction 
-	protected Integer capacity = 0;
 
 	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
@@ -41,20 +36,32 @@ public abstract class Place extends PlaceTransitionObject {
 	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
-	public Place(double positionXInput, double positionYInput, String idInput,
-			Double nameOffsetXInput, Double nameOffsetYInput) {
+
+	public Place(
+			int positionXInput,
+			int positionYInput,
+			String idInput,
+			int nameOffsetXInput,
+			int nameOffsetYInput
+	){
 		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 		componentWidth = DIAMETER;
 		componentHeight = DIAMETER;
-		setCentre((int) positionX, (int) positionY);
 	}
 
-	
+	@Deprecated
+	public Place(double positionXInput, double positionYInput, String idInput,
+			double nameOffsetXInput, double nameOffsetYInput) {
+		this((int)positionXInput, (int)positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput);
+	}
+
+	@Deprecated
 	public Place(double positionXInput, double positionYInput) {
-		super(positionXInput, positionYInput);
-		componentWidth = DIAMETER;
-		componentHeight = DIAMETER;
-		setCentre((int) positionX, (int) positionY);
+		this((int)positionXInput, (int)positionYInput, null, 0,0);
+	}
+
+	public Place(int positionXInput, int positionYInput) {
+		this(positionXInput, positionYInput, null, 0,0);
 	}
 
 	@Override
@@ -89,32 +96,18 @@ public abstract class Place extends PlaceTransitionObject {
 	 * Returns the diameter of this Place at the current zoom
 	 */
 	private int getDiameter() {
-		return (Zoomer.getZoomedValue(DIAMETER, zoom));
+		return (Zoomer.getZoomedValue(DIAMETER, getZoom()));
 	}
 
 	@Override
 	public boolean contains(int x, int y) {
-		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, zoom);
-		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, zoom);
+		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, getZoom());
+		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, getZoom());
 
-		Arc someArc = CreateGui.getDrawingSurface().createArc;
-		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
-			if ((proximityPlace.contains((int) unZoomedX, (int) unZoomedY) || placeEllipse
-					.contains((int) unZoomedX, (int) unZoomedY))
-					&& areNotSameType(someArc.getSource())) {
-				// assume we are only snapping the target...
-				if (someArc.getTarget() != this) {
-					someArc.setTarget(this);
-				}
-				someArc.updateArcPosition();
-				return true;
-			} else {
-				if (someArc.getTarget() == this) {
-					someArc.setTarget(null);
-					updateConnected();
-				}
-				return false;
-			}
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+			return (proximityPlace.contains((int) unZoomedX, (int) unZoomedY) ||
+					placeEllipse.contains((int) unZoomedX, (int) unZoomedY));
 		} else {
 			return placeEllipse.contains((int) unZoomedX, (int) unZoomedY);
 		}
@@ -146,25 +139,12 @@ public abstract class Place extends PlaceTransitionObject {
 	}
 
 	@Override
-	public void toggleAttributesVisible() {
-		attributesVisible = !attributesVisible;
-		update(true);
-	}
-
-	@Override
-	public void addedToGui() {
-		super.addedToGui();
-		update(true);
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible) {
-			pnName.setText("");
+			getNameLabel().setText("");
 		} else {
-			pnName.setText("");
+			getNameLabel().setText("");
 		}
-		pnName.zoomUpdate(zoom);
 		super.update(displayConstantNames);
 		repaint();
 	}

@@ -27,7 +27,7 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer("Trace:\n");
+		StringBuilder buffer = new StringBuilder("Trace:\n");
 		for (int i = 0; i < states.size() - 1; i++) {
 			buffer.append(states.get(i).toString());
 			buffer.append("\n\n");

@@ -1,33 +1,14 @@
 package dk.aau.cs.gui.undo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map.Entry;
-import javax.swing.undo.UndoManager;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
+import dk.aau.cs.gui.Context;
+import dk.aau.cs.model.tapn.SharedTransition;
+import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.util.Require;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MakeTransitionNewSharedMultiCommand extends Command {
 	private final String newSharedName;
@@ -51,22 +32,23 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 	@Override
 	public void redo() {
 		SharedTransition sharedTransition = null;
-		int i = 0;
+		boolean first = true;
 		for(Template template : context.tabContent().allTemplates()) {
 			TimedTransitionComponent component = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
-			//We make a new shared transition with the first transition
-			if(component != null && i < 1) {
-				command = new MakeTransitionNewSharedCommand(template.model(), newSharedName, component.underlyingTransition(), context.tabContent(), true);
-				command.redo();
-				sharedTransition = component.underlyingTransition().sharedTransition();
-				commands.add(command);
-				i++;
-				//For the rest we make them shared with the recently made transition
-			} else if (component != null && i >= 1){
-				command = new MakeTransitionSharedCommand(context.activeModel(), sharedTransition, component.underlyingTransition(), context.tabContent());
-				command.redo();
-				commands.add(command);
-			}
+
+            if (component != null) { //We make a new shared transition with the first transition
+                if (first) {
+                    command = new MakeTransitionNewSharedCommand(template.model(), newSharedName, component.underlyingTransition(), context.tabContent(), true);
+                    command.redo();
+                    sharedTransition = component.underlyingTransition().sharedTransition();
+                    commands.add(command);
+                    first = false;
+                } else { //For the rest we make them shared with the recently made transition
+                    command = new MakeTransitionSharedCommand(context.activeModel(), sharedTransition, component.underlyingTransition(), context.tabContent());
+                    command.redo();
+                    commands.add(command);
+                }
+            }
 		}
 	}
 

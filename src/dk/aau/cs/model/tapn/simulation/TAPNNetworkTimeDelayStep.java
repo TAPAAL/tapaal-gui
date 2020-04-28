@@ -1,10 +1,7 @@
 package dk.aau.cs.model.tapn.simulation;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
-import pipe.gui.Pipe;
 import dk.aau.cs.model.tapn.NetworkMarking;
 
 public class TAPNNetworkTimeDelayStep extends TAPNNetworkTraceStep {

@@ -1,7 +1,6 @@
 package dk.aau.cs.model.tapn.simulation;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Random;
 
@@ -24,8 +23,8 @@ public class RandomDelayMode implements DelayMode{
 		return instance;
 	}
 	
-	private RandomDelayMode(){};
-	
+	private RandomDelayMode(){}
+
 	int numberOfDecimals = -1;
 
 	@Override

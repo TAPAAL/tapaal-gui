@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
@@ -15,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
@@ -66,19 +65,11 @@ public class NewTAPNPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				createNewTAPNBasedOnSelection(nameTextBox.getText(), NetType.TAPN);
-			}
-		});
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), NetType.TAPN));
 
 		rootPane.setDefaultButton(okButton);
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -105,7 +96,8 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			frame.createNewEmptyTab(name, type);
+			TabContent tab = TabContent.createNewEmptyTab(name, type);
+			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
 					.showMessageDialog(

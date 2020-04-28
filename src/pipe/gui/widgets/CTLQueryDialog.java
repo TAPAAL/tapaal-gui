@@ -23,8 +23,6 @@ import java.io.File;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -40,6 +38,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
@@ -1013,12 +1012,7 @@ public class CTLQueryDialog extends JPanel {
 		
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-		advancedButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				toggleAdvancedSimpleView(true);
-			}
-		});
+		advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
@@ -1046,7 +1040,7 @@ public class CTLQueryDialog extends JPanel {
 
 			private String getHelpMessage(){
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
-				StringBuffer buffer = new StringBuffer();
+				StringBuilder buffer = new StringBuilder();
 				buffer.append("<html>");
 				buffer.append("<b>Boundedness Options</b><br/>");
 				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
@@ -1141,12 +1135,7 @@ public class CTLQueryDialog extends JPanel {
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
 		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
-		kbounded.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
-			}
-
-		});
+		kbounded.addActionListener(evt -> Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet));
 		boundednessCheckPanel.add(kbounded);
 
 		GridBagConstraints gridBagConstraints;
@@ -1701,11 +1690,8 @@ public class CTLQueryDialog extends JPanel {
 								placeTransitionNames.add(transition.name());
 							}
 						}
-						Collections.sort(placeTransitionNames, new Comparator<String>() {
-							public int compare(String o1, String o2) {
-								return o1.compareToIgnoreCase(o2);
-							}
-						});
+						placeTransitionNames.sort(String::compareToIgnoreCase);
+
 						placesTransitionsBox.setModel(new DefaultComboBoxModel(placeTransitionNames));
 
 						currentlySelected = tapn;
@@ -1721,11 +1707,7 @@ public class CTLQueryDialog extends JPanel {
 					for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
 						placeTransitionNames.add(transition.name());
 					}
-					Collections.sort(placeTransitionNames, new Comparator<String>() {
-						public int compare(String o1, String o2) {
-							return o1.compareToIgnoreCase(o2);
-						}
-					});
+					placeTransitionNames.sort(String::compareToIgnoreCase);
 					placesTransitionsBox.setModel(new DefaultComboBoxModel(placeTransitionNames));
 
 					currentlySelected = SHARED;
@@ -1835,50 +1817,38 @@ public class CTLQueryDialog extends JPanel {
 			}
 		});
 
-		truePredicateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLTrueNode property = new TCTLTrueNode();
-				addPropertyToQuery(property);
-			}
+		truePredicateButton.addActionListener(e -> {
+			TCTLTrueNode property = new TCTLTrueNode();
+			addPropertyToQuery(property);
 		});
 
-		falsePredicateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLFalseNode property = new TCTLFalseNode();
-				addPropertyToQuery(property);
-			}
+		falsePredicateButton.addActionListener(e -> {
+			TCTLFalseNode property = new TCTLFalseNode();
+			addPropertyToQuery(property);
 		});
 
-		deadLockPredicateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLDeadlockNode property = new TCTLDeadlockNode();
-				addPropertyToQuery(property);
-			}
+		deadLockPredicateButton.addActionListener(e -> {
+			TCTLDeadlockNode property = new TCTLDeadlockNode();
+			addPropertyToQuery(property);
 		});
 
-		placesTransitionsBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
-				setEnablednessOfOperatorAndMarkingBoxes();
+		placesTransitionsBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
+			setEnablednessOfOperatorAndMarkingBoxes();
 		});
 
-		relationalOperatorBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
-
+		relationalOperatorBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
+
 		});
 
-		placeMarking.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
+		placeMarking.addChangeListener(arg0 -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
 		});
 
@@ -1897,7 +1867,7 @@ public class CTLQueryDialog extends JPanel {
                     }
 		}
 		if (!transitionSelected){
-                    sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName)!= null ? true : false;			
+                    sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName) != null;
 		}
 		return transitionSelected || sharedTransitionSelected;
 	}
@@ -1954,12 +1924,7 @@ public class CTLQueryDialog extends JPanel {
 		editingButtonPanel.add(editQueryButton, gbc);
 
 		// Add action Listeners
-		deleteButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				deleteSelection();
-			}
-		});
+		deleteButton.addActionListener(e -> deleteSelection());
 
 		resetButton.addActionListener(new ActionListener() {
 
@@ -2366,7 +2331,7 @@ public class CTLQueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getDrawingSurface().setNetChanged(true);
+						CreateGui.getCurrentTab().setNetChanged(true);
 						exit();
 					}
 				}
@@ -2376,22 +2341,17 @@ public class CTLQueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved and verified, the net is marked as modified
-						CreateGui.getDrawingSurface().setNetChanged(true);
+						CreateGui.getCurrentTab().setNetChanged(true);
 						exit();
 						TAPNQuery query = getQuery();
 
 						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels);
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null);
 						else
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 
 			saveUppaalXMLButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -2478,7 +2438,7 @@ public class CTLQueryDialog extends JPanel {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
 						composedName = composedName.replace(".tapn", "");
-						CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+						CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
 					} catch (Exception e1) {
 						System.console().printf(e1.getMessage());
@@ -2491,18 +2451,11 @@ public class CTLQueryDialog extends JPanel {
 			saveButton = new JButton("export");
 			cancelButton = new JButton("Cancel");
 
-			saveButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					querySaved = true;
-					exit();
-				}
+			saveButton.addActionListener(evt -> {
+				querySaved = true;
+				exit();
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 		}
 
 		if (option == QueryDialogueOption.Save) {

@@ -1,11 +1,6 @@
 package dk.aau.cs.model.tapn;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
@@ -260,15 +255,13 @@ public class ConstantStore {
 	
 	public Constant[] sortConstants() {
 		Constant[] oldOrder = constants.toArray(new Constant[0]);
-		Collections.sort(constants, new StringComparator());
+		constants.sort(new StringComparator());
 		return oldOrder;
 	}
 	
 	public void undoSort(Constant[] oldOrder) {
 		constants.clear();
-		for(Constant c: oldOrder){
-			constants.add(c);
-		}
+		constants.addAll(Arrays.asList(oldOrder));
 		
 	}
 

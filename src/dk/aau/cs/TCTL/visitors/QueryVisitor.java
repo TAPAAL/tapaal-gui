@@ -1,6 +1,5 @@
 package dk.aau.cs.TCTL.visitors;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.TCTL.AritmeticOperator;
@@ -16,10 +15,7 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLPlusListNode;
-import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;

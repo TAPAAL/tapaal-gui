@@ -23,12 +23,10 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -63,7 +61,7 @@ import dk.aau.cs.util.Require;
 
 public class TapnXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
-	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();;
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
@@ -96,11 +94,7 @@ public class TapnXmlLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}
@@ -109,11 +103,7 @@ public class TapnXmlLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}
@@ -324,28 +314,27 @@ public class TapnXmlLoader {
 		String text = annotation.getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
+			positionXInput = Integer.valueOf(positionXTempStorage) + 1;
 		}
 
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage).intValue() + 1;
+			positionYInput = Integer.valueOf(positionYTempStorage) + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp).intValue() + 1;
+			widthInput = Integer.valueOf(widthTemp) + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp).intValue() + 1;
+			heightInput = Integer.valueOf(heightTemp) + 1;
 		}
 
 		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp).booleanValue();
+			borderInput = Boolean.valueOf(borderTemp);
 		} else {
 			borderInput = true;
 		}
-		AnnotationNote an = new AnnotationNote(text, positionXInput,
-				positionYInput, widthInput, heightInput, borderInput, false);
+		AnnotationNote an = new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 		return an;
 	}
 
@@ -360,7 +349,7 @@ public class TapnXmlLoader {
 		
 		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
 		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
-		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
+		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
 		int angle = Integer.parseInt(transition.getAttribute("angle"));
 		int priority = Integer.parseInt(transition.getAttribute("priority"));
 		boolean displayName = transition.getAttribute("displayName").equals("false") ? false : true;
@@ -513,8 +502,8 @@ public class TapnXmlLoader {
 			}
 
 		}
-		tempArc.updateNameOffsetX(nameOffsetXInput);
-		tempArc.updateNameOffsetY(nameOffsetYInput);
+		tempArc.setNameOffsetX(nameOffsetXInput);
+		tempArc.setNameOffsetY(nameOffsetYInput);
 
 		parseArcPath(arc, tempArc);
 	}
@@ -540,8 +529,6 @@ public class TapnXmlLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(outputArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -563,8 +550,6 @@ public class TapnXmlLoader {
 				new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
 				inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
@@ -644,8 +629,6 @@ public class TapnXmlLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inputArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -673,8 +656,6 @@ public class TapnXmlLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inhibArc);
 
-		sourceIn.addConnectFrom(tempArc);
-		targetIn.addConnectTo(tempArc);
 		return tempArc;
 	}
 
@@ -693,11 +674,11 @@ public class TapnXmlLoader {
 						// Wierd naming convention in pipe: this represents if
 						// the arc point is a curve point or not
 						String arcTempType = element.getAttribute("arcPointType");
-						float arcPointX = Float.valueOf(arcTempX).floatValue();
-						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						float arcPointX = Float.valueOf(arcTempX);
+						float arcPointY = Float.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType).booleanValue();
+						boolean arcPointType = Boolean.valueOf(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
 				}

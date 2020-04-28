@@ -55,13 +55,14 @@ public class Animator {
 		return isUrgentTransitionEnabled;
 	}
 
-	public Animator() {
+	public Animator(TabContent tab) {
 		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
 		currentAction = -1;
 		markings = new ArrayList<NetworkMarking>();
+		setTabContent(tab);
 	}
 
-	public void setTabContent(TabContent tab) {
+	private void setTabContent(TabContent tab)  {
 		this.tab = tab;
 	}
 
@@ -69,7 +70,9 @@ public class Animator {
 		return markings.get(currentMarkingIndex);
 	}
 
-	public void SetTrace(TAPNNetworkTrace trace) {
+	public void setTrace(TAPNNetworkTrace trace) {
+        CreateGui.getCurrentTab().setAnimationMode(true);
+
 		if (trace.isConcreteTrace()) {
 			this.trace = trace;
 			setTimedTrace(trace);
@@ -80,20 +83,20 @@ public class Animator {
 		currentAction = -1;
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
-		CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(0);
-		CreateGui.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
+		tab.getAnimationHistory().setSelectedIndex(0);
+		tab.getAnimationController().setAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
 		tab.addAbstractAnimationPane();
-		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getCurrentTab().getUntimedAnimationHistory();
+		AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
 
 		for(TAPNNetworkTraceStep step : trace){
 			untimedAnimationHistory.addHistoryItem(step.toString());
 		}
 
-		CreateGui.getCurrentTab().getUntimedAnimationHistory().setSelectedIndex(0);
+		tab.getUntimedAnimationHistory().setSelectedIndex(0);
 		setFiringmode("Random");
 
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -113,7 +116,7 @@ public class Animator {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-			CreateGui.getCurrentTab().getAnimationHistory().setLastShown(getTrace().getTraceType());
+			tab.getAnimationHistory().setLastShown(getTrace().getTraceType());
 		}
 	}
 
@@ -154,7 +157,7 @@ public class Animator {
 	/**
 	 * Called during animation to unhighlight previously highlighted transitions
 	 */
-	public void unhighlightDisabledTransitions() {
+	private void unhighlightDisabledTransitions() {
 		DataLayer current = activeGuiModel();
 
 		Iterator<Transition> transitionIterator = current.returnTransitions();
@@ -167,11 +170,11 @@ public class Animator {
 	}
 
 	public void updateFireableTransitions(){
-		TransitionFireingComponent transFireComponent = CreateGui.getCurrentTab().getTransitionFireingComponent();
+		TransitionFireingComponent transFireComponent = tab.getTransitionFireingComponent();
 		transFireComponent.startReInit();
 		isUrgentTransitionEnabled = false;
 		
-		outer: for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+		outer: for( Template temp : tab.activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
@@ -182,7 +185,7 @@ public class Animator {
 			}
 		}
 		
-		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+		for( Template temp : tab.activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
@@ -226,9 +229,11 @@ public class Animator {
 	 * unhighlighted
 	 */
 	public void restoreModel() {
-		disableTransitions();
-		tab.network().setMarking(initialMarking);
-		currentAction = -1;
+		if (tab != null) {
+			disableTransitions();
+			tab.network().setMarking(initialMarking);
+			currentAction = -1;
+		}
 	}
 
 	/**
@@ -241,7 +246,7 @@ public class Animator {
 		if (!actionHistory.isEmpty()){
 			TAPNNetworkTraceStep lastStep = actionHistory.get(currentAction);
 			if(isDisplayingUntimedTrace && lastStep instanceof TAPNNetworkTimedTransitionStep){
-				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+				AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String previousInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex());
 				if(previousInUntimedTrace.equals(lastStep.toString())){
 					untimedAnimationHistory.stepBackwards();
@@ -264,7 +269,7 @@ public class Animator {
 
 	public void stepForward() {
 		if(currentAction == actionHistory.size()-1 && trace != null){
-			int selectedIndex = CreateGui.getCurrentTab().getAnimationHistory().getSelectedIndex();
+			int selectedIndex = tab.getAnimationHistory().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
 
@@ -275,7 +280,7 @@ public class Animator {
 				addToTimedTrace(getTrace().getLoopSteps());
 			}
 
-			CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(selectedIndex);
+			tab.getAnimationHistory().setSelectedIndex(selectedIndex);
 			currentAction = action;
 			currentMarkingIndex = markingIndex;
 		}
@@ -283,7 +288,7 @@ public class Animator {
 		if (currentAction < actionHistory.size() - 1) {
 			TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
 			if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
-				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+				AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String nextInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 				if(nextInUntimedTrace.equals(nextStep.toString())){
 					untimedAnimationHistory.stepForward();
@@ -326,7 +331,7 @@ public class Animator {
 		
 		TimeInterval dInterval = transition.getdInterval();
 		
-		BigDecimal delayGranularity = CreateGui.getCurrentTab().getDelayEnabledTransitionControl().getValue();
+		BigDecimal delayGranularity = tab.getDelayEnabledTransitionControl().getValue();
 		//Make sure the granularity is small enough
 		BigDecimal lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 		if(!dInterval.IsLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
@@ -338,7 +343,7 @@ public class Animator {
 		if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
 		} else {
-			BigDecimal delay = CreateGui.getCurrentTab().getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
+			BigDecimal delay = tab.getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
 			if(delay != null){
 				if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
 					if(!letTimePass(delay)){
@@ -377,7 +382,7 @@ public class Animator {
 		// cancelling the token selection dialogue above should not result in changes 
 		// to the untimed animation history
 		if (isDisplayingUntimedTrace){
-			AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+			AnimationHistoryComponent<String> untimedAnimationHistory = tab.getUntimedAnimationHistory();
 			if(untimedAnimationHistory.isStepForwardAllowed()){
 				String nextFromUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 
@@ -433,12 +438,12 @@ public class Animator {
 	public void reportBlockingPlaces(){
 
 		try{
-			BigDecimal delay = CreateGui.getCurrentTab().getAnimationController().getCurrentDelay();
+			BigDecimal delay = tab.getAnimationController().getCurrentDelay();
 		if(isUrgentTransitionEnabled && delay.compareTo(new BigDecimal(0))>0){
-			CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
+			tab.getAnimationController().getOkButton().setEnabled(false);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
-			for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+			for( Template temp : tab.activeTemplates()){
 				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 				while (transitionIterator.hasNext()) {
 					Transition tempTransition = transitionIterator.next();
@@ -448,17 +453,17 @@ public class Animator {
 				}
 			}
 			sb.append("</html>");
-			CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText(sb.toString());
+			tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
 			return;
 		}
 			if(delay.compareTo(new BigDecimal(0))<0){
-				CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
-				CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
+				tab.getAnimationController().getOkButton().setEnabled(false);
+				tab.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
 			} else {
 				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
 				if(blockingPlaces.size() == 0){
-					CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(true);
-					CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText("Press to add the delay");
+					tab.getAnimationController().getOkButton().setEnabled(true);
+					tab.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
 				} else {
 					StringBuilder sb = new StringBuilder();
 					sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
@@ -467,15 +472,15 @@ public class Animator {
 					}
 					//JOptionPane.showMessageDialog(null, sb.toString());
 					sb.append("</html>");
-					CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
-					CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText(sb.toString());
+					tab.getAnimationController().getOkButton().setEnabled(false);
+					tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
 				}
 			}
 		} catch (NumberFormatException e) {
 			// Do nothing, invalud number
 		} catch (ParseException e) {
-			CreateGui.getCurrentTab().getAnimationController().getOkButton().setEnabled(false);
-			CreateGui.getCurrentTab().getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
+			tab.getAnimationController().getOkButton().setEnabled(false);
+			tab.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
 		}
 	}
 
@@ -483,7 +488,7 @@ public class Animator {
 		return tab.currentTemplate().guiModel();
 	}
 
-	public void resethistory() {
+	private void resethistory() {
 		actionHistory.clear();
 		markings.clear();
 		currentAction = -1;
@@ -511,7 +516,7 @@ public class Animator {
 			removeStoredActions(currentAction + 1);
 
 		tab.network().setMarking(marking);
-		CreateGui.getCurrentTab().getAnimationHistory().addHistoryItem(action.toString());
+		tab.getAnimationHistory().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
 		currentAction++;
@@ -524,21 +529,27 @@ public class Animator {
 	}
 
 	public void setFiringmode(String t) {
-		if (t.equals("Random")) {
-			firingmode = new RandomFiringMode();
-		} else if (t.equals("Youngest")) {
-			firingmode = new YoungestFiringMode();
-		} else if (t.equals("Oldest")) {
-			firingmode = new OldestFiringMode();
-		} else if (t.equals("Manual")) {
-			firingmode = null;
-		} else {
-			System.err
-			.println("Illegal firing mode mode: " + t + " not found.");
+		switch (t) {
+			case "Random":
+				firingmode = new RandomFiringMode();
+				break;
+			case "Youngest":
+				firingmode = new YoungestFiringMode();
+				break;
+			case "Oldest":
+				firingmode = new OldestFiringMode();
+				break;
+			case "Manual":
+				firingmode = null;
+				break;
+			default:
+				System.err
+						.println("Illegal firing mode mode: " + t + " not found.");
+				break;
 		}
 
-		CreateGui.getCurrentTab().getAnimationController().updateFiringModeComboBox();
-		CreateGui.getCurrentTab().getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
+		tab.getAnimationController().updateFiringModeComboBox();
+		tab.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 
 	enum FillListStatus{
@@ -603,7 +614,7 @@ public class Animator {
 		}
 	}
 
-	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
+	private List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Select Tokens", true);
 
 		Container contentPane = guiDialog.getContentPane();
@@ -633,7 +644,7 @@ public class Animator {
 		}
 	}
 
-	public boolean removeSetTrace(boolean askUser){
+	private boolean removeSetTrace(boolean askUser){
 		if(askUser && isShowingTrace()){ //Warn about deleting trace
 			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
 					"You are about to remove the current trace.", 
@@ -641,7 +652,7 @@ public class Animator {
 			if(answer != JOptionPane.OK_OPTION) return false;
 		}
 		if(isDisplayingUntimedTrace){
-			CreateGui.getCurrentTab().removeAbstractAnimationPane();
+			tab.removeAbstractAnimationPane();
 		}
 		isDisplayingUntimedTrace = false;
 		trace = null;
@@ -658,17 +669,17 @@ public class Animator {
 			answer = removeSetTrace(true);
 		}
 		if(answer){
-			CreateGui.getCurrentTab().getAnimationHistory().clearStepsForward();
+			tab.getAnimationHistory().clearStepsForward();
 		}
 		return answer;
 	}
 
-	public boolean isShowingTrace(){
+	private boolean isShowingTrace(){
 		return isDisplayingUntimedTrace || trace != null;
 	}
         
-        public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
-            return actionHistory;
-        }   
+	public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
+		return actionHistory;
+	}
 	
 }

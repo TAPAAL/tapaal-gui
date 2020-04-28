@@ -11,8 +11,6 @@ public class Pipe {
 		TAPNPLACE, TAPNTRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
 		//Others (might refactore)
 		ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
-		//Fast modes
-		FAST_TRANSITION, FAST_PLACE
 	}
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;
@@ -37,6 +35,7 @@ public class Pipe {
 	public static final int PLACE_TRANSITION_PROXIMITY_RADIUS = 25;
 
 	// Object layer positions for GuiView:
+	public static final int PROTOTYPE_LAYER_OFFSET = 80;
 	public static final int ARC_POINT_LAYER_OFFSET = 50;
 	public static final int ARC_LAYER_OFFSET = 20;
 	public static final int PLACE_TRANSITION_LAYER_OFFSET = 30;

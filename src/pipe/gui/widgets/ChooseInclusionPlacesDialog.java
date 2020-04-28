@@ -15,8 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -216,11 +214,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 
 
 	private void sortPlacesByName(Vector<TimedPlace> tempPlaces) {
-		Collections.sort(tempPlaces, new Comparator<TimedPlace>() {
-			public int compare(TimedPlace o1, TimedPlace o2) {
-				return o1.name().compareToIgnoreCase(o2.name());
-			}
-		});
+		tempPlaces.sort((p1, p2) -> p1.name().compareToIgnoreCase(p2.name()));
 	}
 
 

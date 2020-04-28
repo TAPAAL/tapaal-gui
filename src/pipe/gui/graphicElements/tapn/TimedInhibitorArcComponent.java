@@ -1,17 +1,9 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.BasicStroke;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.util.Hashtable;
 
-import pipe.dataLayer.DataLayer;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -22,7 +14,6 @@ import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.Weight;
-import pipe.gui.CreateGui;
 
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
@@ -30,28 +21,19 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
-		//XXX: se note in funcation
-		addMouseHandler();
-		setHead();
 	}
 
+	@Deprecated
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard) {
-		super(arc, guard);
-		//XXX: se note in funcation
-		addMouseHandler();
-		setHead();
-
+		this(arc);
 	}
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
 		super(source);
-
-		//XXX: se note in funcation
-		addMouseHandler();
-		setHead();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new TimedArcHandler(this);
@@ -66,23 +48,16 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		return inhibitorArc;
 	}
 
-	protected void setHead() {
-		head = new Ellipse2D.Double(-4, -8, 8, 8);
-		fillHead = false;
-	}
-
 	@Override
-	public void delete() {
-		if (inhibitorArc != null)
-			inhibitorArc.delete();
-		super.delete();
+	protected void setHead() {
+		setHead(new Ellipse2D.Double(-4, -8, 8, 8), false);
 	}
 
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
-		pnName.setText("");
+		getNameLabel().setText("");
 		if(getWeight().value() > 1 || displayConstantNames){
-			pnName.setText(getWeight().toString(displayConstantNames));
+			getNameLabel().setText(getWeight().toString(displayConstantNames));
 		}
 		
 		boolean focusedConstant = false;
@@ -93,26 +68,13 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 			pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
 		}
 		if(focusedConstant){
-			pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+			getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
 		}else{
-			pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+			getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 		}
 		
 		this.setLabelPosition();
 	}
-
-	@Override
-        public String getGuardAsString() {
-		return getGuardAsString(true);
-	}
-
-        public String getGuardAsString(boolean showZeroToInfinityIntervals) {
-                if (!showZeroToInfinityIntervals) {
-                        return "";  // inhibitor arcs do not carry any intervals - [0,inf) by default
-                } 
-                return inhibitorArc.interval().toString();
-        }
-        
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
@@ -138,9 +100,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		TimedInhibitorArcComponent arc = new TimedInhibitorArcComponent(this);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
-		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
 		
 		arc.setUnderlyingArc(tapn.getInhibitorArcFromPlaceAndTransition(tapn.getPlaceByName(inhibitorArc.source().name()), tapn.getTransitionByName(inhibitorArc.destination().name())));
 		

@@ -158,7 +158,7 @@ public class ConstantsPane extends JPanel {
 							if (!(c.lowerBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()-1));
-								CreateGui.getDrawingSurface().getUndoManager().addNewEdit(edit);
+								CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						}
@@ -166,7 +166,7 @@ public class ConstantsPane extends JPanel {
 							if (!(c.upperBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()+1));
-								CreateGui.getDrawingSurface().getUndoManager().addNewEdit(edit);
+								CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						} 
@@ -293,11 +293,9 @@ public class ConstantsPane extends JPanel {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditConstant);
-		editBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Constant c = (Constant) constantsList.getSelectedValue();				
-				showEditConstantDialog(c,constantsList.getSelectedIndex());
-			}
+		editBtn.addActionListener(e -> {
+			Constant c = (Constant) constantsList.getSelectedValue();
+			showEditConstantDialog(c,constantsList.getSelectedIndex());
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -307,11 +305,9 @@ public class ConstantsPane extends JPanel {
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
 		removeBtn.setToolTipText(toolTipRemoveConstant);
-		removeBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String constName = ((Constant) constantsList.getSelectedValue()).name();
-				removeConstant(constName);
-			}
+		removeBtn.addActionListener(e -> {
+			String constName = ((Constant) constantsList.getSelectedValue()).name();
+			removeConstant(constName);
 		});
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -321,11 +317,7 @@ public class ConstantsPane extends JPanel {
 		JButton addConstantButton = new JButton("New");
 		addConstantButton.setToolTipText(toolTipNewConstant);
 		addConstantButton.setEnabled(enableAddButton);
-		addConstantButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showEditConstantDialog(null);
-			}
-		});
+		addConstantButton.addActionListener(e -> showEditConstantDialog(null));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.WEST;
@@ -357,15 +349,13 @@ public class ConstantsPane extends JPanel {
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
-		moveUpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = constantsList.getSelectedIndex();
+		moveUpButton.addActionListener(e -> {
+			int index = constantsList.getSelectedIndex();
 
-				if(index > 0) {
-					parent.swapConstants(index, index-1);
-					showConstants();
-					constantsList.setSelectedIndex(index-1);
-				}
+			if(index > 0) {
+				parent.swapConstants(index, index-1);
+				showConstants();
+				constantsList.setSelectedIndex(index-1);
 			}
 		});
 
@@ -378,15 +368,13 @@ public class ConstantsPane extends JPanel {
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
-		moveDownButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = constantsList.getSelectedIndex();
+		moveDownButton.addActionListener(e -> {
+			int index = constantsList.getSelectedIndex();
 
-				if(index < parent.network().constants().size() - 1) {
-					parent.swapConstants(index, index+1);
-					showConstants();
-					constantsList.setSelectedIndex(index+1);
-				}
+			if(index < parent.network().constants().size() - 1) {
+				parent.swapConstants(index, index+1);
+				showConstants();
+				constantsList.setSelectedIndex(index+1);
 			}
 		});
 
@@ -400,12 +388,10 @@ public class ConstantsPane extends JPanel {
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortConstants);
 		sortButton.setEnabled(false);
-		sortButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
-				CreateGui.getDrawingSurface().getUndoManager().addNewEdit(sortConstantsCommand);
-				sortConstantsCommand.redo();
-			}
+		sortButton.addActionListener(e -> {
+			Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
+			CreateGui.getCurrentTab().getUndoManager().addNewEdit(sortConstantsCommand);
+			sortConstantsCommand.redo();
 		});
 
 		gbc = new GridBagConstraints();
@@ -467,7 +453,7 @@ public class ConstantsPane extends JPanel {
 							+ "to the constant in the net and try again.",
 							"Constant in use", JOptionPane.ERROR_MESSAGE);
 		} else
-			parent.drawingSurface().getUndoManager().addNewEdit(edit);
+			parent.getUndoManager().addNewEdit(edit);
 
 		//showConstants();
 	}

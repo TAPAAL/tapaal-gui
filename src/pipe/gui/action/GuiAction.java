@@ -23,11 +23,6 @@ import pipe.gui.CreateGui;
  */
 public abstract class GuiAction extends AbstractAction {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2625265285612924719L;
-
 	public GuiAction(String name, String tooltip) {
 		this(name, tooltip, (KeyStroke)null);
 	}
@@ -101,7 +96,7 @@ public abstract class GuiAction extends AbstractAction {
 		Boolean b = (Boolean) getValue(SELECTED_KEY);
 
 		if (b != null) {
-			return b.booleanValue();
+			return b;
 		}
 		return false;
 	}

@@ -1,8 +1,5 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
@@ -34,11 +31,7 @@ public class TransportArcHandler extends TimedArcHandler {
 			// Only show properties if its the first arc
 			if (tarc.getSource() instanceof Place) {
 				menuItem = new JMenuItem("Properties");
-				menuItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						tarc.showTimeIntervalEditor();
-					}
-				});
+				menuItem.addActionListener(e1 -> tarc.showTimeIntervalEditor());
 				popup.insert(menuItem, popupIndex++);
 			}
 			

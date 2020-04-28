@@ -5,15 +5,10 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.util.Formatter.BigDecimalLayoutForm;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -45,8 +40,8 @@ public class ManualDelayMode implements DelayMode{
 		return instance;
 	}
 	
-	private ManualDelayMode(){};
-	
+	private ManualDelayMode(){}
+
 	TimeInterval dInterval; 
 	JButton okButton;
 	boolean okPressed = false;
@@ -104,11 +99,9 @@ public class ManualDelayMode implements DelayMode{
 
 			spinner = new JSpinner(model);
 			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner);
-			editor.getTextField().addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					okButton.requestFocus();
-					okButton.doClick();
-				}
+			editor.getTextField().addActionListener(arg0 -> {
+				okButton.requestFocus();
+				okButton.doClick();
 			});
 
 			editor.getTextField().setFormatterFactory(new AbstractFormatterFactory() {
@@ -156,24 +149,18 @@ public class ManualDelayMode implements DelayMode{
 			okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 			okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 			dialog.getRootPane().setDefaultButton(okButton);
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					okPressed = true;
-					dialog.setVisible(false);
-				}
+			okButton.addActionListener(arg0 -> {
+				okPressed = true;
+				dialog.setVisible(false);
 			});
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 			cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 			cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
-			cancelButton.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					okPressed = false;
-					dialog.setVisible(false);
-					
-				}
+			cancelButton.addActionListener(e -> {
+				okPressed = false;
+				dialog.setVisible(false);
+
 			});
 			
 			buttonPanel.add(cancelButton);

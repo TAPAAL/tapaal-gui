@@ -12,13 +12,8 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.UntimedTAPNNetworkTrace;
-import dk.aau.cs.util.Tuple;
 
 public class TraceConverter {
 	private final TAPNNetworkTrace trace;

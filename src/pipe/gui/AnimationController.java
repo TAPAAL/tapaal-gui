@@ -4,15 +4,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
@@ -20,31 +17,17 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.widgets.DecimalOnlyDocumentFilter;
+import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
-import java.awt.event.ActionListener;
 import java.util.Hashtable;
-import javax.swing.JButton;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * Implementes af class handling drawing of animation functions
@@ -67,7 +50,7 @@ public class AnimationController extends JPanel {
 	private GuiAction stepforwardAction, stepbackwardAction;
 
 	JTextField TimeDelayField = new JTextField();
-	JComboBox firermodebox = null;
+	JComboBox<String> firermodebox = null;
 	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
 	public AnimationController(NetType netType) {
@@ -84,15 +67,10 @@ public class AnimationController extends JPanel {
 		// Use the default FlowLayout.
 		// Create everything.
 
-		firermodebox = new NonsearchableJComboBox(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(FIRINGMODES);
 		updateFiringModeComboBox();
 
-		firermodebox.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				CreateGui.getAnimator().setFiringmode(
-						(String) firermodebox.getSelectedItem());
-			}
-		});
+		firermodebox.addActionListener(evt -> CreateGui.getAnimator().setFiringmode((String) firermodebox.getSelectedItem()));
 
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
@@ -139,11 +117,9 @@ public class AnimationController extends JPanel {
 		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
-		decrese.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDelayModeScale(delayScale / 2);
-				delaySlider.setValue(delaySlider.getValue() * 2);
-			}
+		decrese.addActionListener(e -> {
+			setDelayModeScale(delayScale / 2);
+			delaySlider.setValue(delaySlider.getValue() * 2);
 		});
 		sliderPanel.add(decrese);
 
@@ -153,13 +129,10 @@ public class AnimationController extends JPanel {
 		delaySlider.setMinorTickSpacing(0);
 		delaySlider.setPaintLabels(true);
 		delaySlider.setPaintTicks(true);
-		delaySlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-				CreateGui.getAnimator().reportBlockingPlaces();
+		delaySlider.addChangeListener(e -> {
+			TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
+			CreateGui.getAnimator().reportBlockingPlaces();
 
-			}
 		});
 
 		delaySlider.addKeyListener(new KeyListener() {
@@ -183,11 +156,9 @@ public class AnimationController extends JPanel {
 		sliderPanel.add(delaySlider);
 		JButton increse = new JButton("+");
 		increse.setPreferredSize(new Dimension(20, 30));
-		increse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDelayModeScale(delayScale * 2);
-				delaySlider.setValue(delaySlider.getValue() / 2);
-			}
+		increse.addActionListener(e -> {
+			setDelayModeScale(delayScale * 2);
+			delaySlider.setValue(delaySlider.getValue() / 2);
 		});
 		sliderPanel.add(increse);
 
@@ -216,17 +187,14 @@ public class AnimationController extends JPanel {
 
 		okButton.setText("Time delay");
 		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				addTimeDelayToHistory();
-			}
-		});
+		okButton.addActionListener(evt -> addTimeDelayToHistory());
 
 		//"Hack" to make sure the toolTip for this button is showed as long as possible
 		okButton.addMouseListener(new MouseAdapter() {
 			final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
 			final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
 			final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
+			final boolean isTooltipEnabled = ToolTipManager.sharedInstance().isEnabled();
 			final int dismissDelayMinutes = Integer.MAX_VALUE;
 
 			@Override
@@ -242,7 +210,7 @@ public class AnimationController extends JPanel {
 				ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
 				ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
 				ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
-				ToolTipManager.sharedInstance().setEnabled(CreateGui.getApp().isShowingToolTips());
+				ToolTipManager.sharedInstance().setEnabled(isTooltipEnabled);
 			}
 		});
 
@@ -267,11 +235,11 @@ public class AnimationController extends JPanel {
 		// Disable shortcuts when focused
 		TimeDelayField.addFocusListener(new FocusListener() {
 			public void focusLost(FocusEvent arg0) {
-				CreateGui.getApp().setStepShotcutEnabled(true);
+				setStepShotcutEnabled(true);
 			}
 
 			public void focusGained(FocusEvent arg0) {
-				CreateGui.getApp().setStepShotcutEnabled(false);
+				setStepShotcutEnabled(false);
 			}
 		});
 
@@ -288,8 +256,22 @@ public class AnimationController extends JPanel {
 		animationToolBar.add(timedelayPanel);
 	}
 
+	void setStepShotcutEnabled(boolean enabled){
+		if(enabled){
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
+		} else {
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
+		}
+	}
+
 	public void updateFiringModeComboBox() {
-		FiringMode currentFiringMode = CreateGui.getAnimator().getFiringmode();
+		Animator animator = CreateGui.getAnimator();
+		FiringMode currentFiringMode = null;
+		if (animator != null) {
+			currentFiringMode = animator.getFiringmode();
+		}
 		if (currentFiringMode == null) {
 			firermodebox.setSelectedItem("Manual");
 		} else {
@@ -370,12 +352,8 @@ public class AnimationController extends JPanel {
 																	// the
 																	// number
 																	// localised
-		// Try parse
-		BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
-				new MathContext(Pipe.AGE_PRECISION));
 
-
-		return timeDelayToSet;
+		return new BigDecimal(parseTime.toString(),	new MathContext(Pipe.AGE_PRECISION));
 	}
 
 	private void setEnabledStepbackwardAction(boolean b) {
@@ -394,8 +372,6 @@ public class AnimationController extends JPanel {
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
 
-		CreateGui.getAppGui().setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
-		CreateGui.getAppGui().setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
 	}
 	
 	private void initializeDocumentFilterForDelayInput() {

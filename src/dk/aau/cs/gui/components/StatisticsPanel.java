@@ -142,20 +142,21 @@ public class StatisticsPanel extends JPanel{
 				TabContent tab = CreateGui.getCurrentTab();
 				Iterable<Template> templates = tab.allTemplates();
 				
-				UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
+				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
 				boolean first = true;
 				for(Template template : templates){
 					List<TimedTransition> orphans = template.model().getOrphanTransitions();
 					for(TimedTransition trans : orphans){
 						TimedTransitionComponent t = (TimedTransitionComponent)template.guiModel().getTransitionByName(trans.name());
-						Command cmd = new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel(), tab.drawingSurface());
-						t.delete();
+						Command cmd = new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel());
+
 						if(first){
 							undoManager.addNewEdit(cmd);
 							first = false;
 						} else {
 							undoManager.addEdit(cmd);
 						}
+						cmd.redo();
 					}
 				}
 				

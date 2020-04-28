@@ -9,7 +9,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.GuiFrame.GUIMode;
@@ -68,7 +67,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
@@ -92,7 +91,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		// Have to check for popup here as well as on pressed for
 		// crossplatform!!
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
@@ -106,7 +105,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
-				CreateGui.getDrawingSurface().getUndoManager().translateSelection(
+				CreateGui.getDrawingSurface().translateSelection(
 						myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
 				totalX = 0;
 				totalY = 0;
@@ -157,6 +156,18 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {}
 
 	//Changes dispatches an event to the parent component, with the mouse location updated to the parent
 	//MouseLocation is relative to the component

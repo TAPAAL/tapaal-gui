@@ -1,6 +1,5 @@
 package dk.aau.cs.util;
 
-import java.math.MathContext;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

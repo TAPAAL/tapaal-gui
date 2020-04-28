@@ -1,22 +1,13 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.Container;
 import java.util.Hashtable;
 
-import javax.swing.BoxLayout;
-
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.GuardDialogue;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.ConstantWeight;
@@ -29,64 +20,34 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	
 	private static final long serialVersionUID = 8263782840119274756L;
 	private TimedInputArc inputArc;
-	protected String timeInterval;
 
 	public TimedInputArcComponent(PlaceTransitionObject source) {
 		super(source);
-		init();
-
-		//XXX: se note in funcation
-		addMouseHandler();
-
+		updateLabel(true);
 	}
 
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
-		init();
-
-		//XXX: se note in funcation
-		addMouseHandler();
-
+		updateLabel(true);
 	}
 
+	/** @deprecated */
+	@Deprecated
 	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
-		super(arc);
-		timeInterval = guard;
-		updateLabel(true);
-
-		//XXX: se note in funcation
-		addMouseHandler();
-
+		this(arc);
 	}
 
-	private void init() {
-		timeInterval = "[0,inf)";
-		updateLabel(true);
-	}
-
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new TimedArcHandler(this);
 	}
 
-	@Override
-	public void delete() {
-		if (inputArc != null)
-			inputArc.delete();
-		super.delete();
-	}
-
 	public String getGuardAsString() {
-		return getGuardAsString(true);
+		return getGuard().toString();
 	}
 
-        public String getGuardAsString(boolean showZeroToInfinityIntervals) {
-                if (!showZeroToInfinityIntervals && !CreateGui.getApp().showZeroToInfinityIntervals() && inputArc.interval().toString().equals("[0,inf)")) {
-                        return "";
-                } 
-                return inputArc.interval().toString();
-        }
         
 	public TimeInterval getGuard() {
 		return inputArc.interval();
@@ -120,21 +81,21 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		}
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if (inputArc == null)
-				pnName.setText("");
+				getNameLabel().setText("");
 			else {
 				if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
 					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
-						pnName.setText("");
+						getNameLabel().setText("");
 					}
 					else {
-						pnName.setText(inputArc.interval().toString(showConstantNames));
+						getNameLabel().setText(inputArc.interval().toString(showConstantNames));
 					}					
 				}
 				else {
-					pnName.setText(inputArc.interval().toString(showConstantNames));
+					getNameLabel().setText(inputArc.interval().toString(showConstantNames));
 				}
 
-				pnName.setText(getWeight().toString(showConstantNames)+" "+pnName.getText());
+				getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());
 				
 				// Handle constant highlighting
 				boolean focusedConstant = false;
@@ -165,26 +126,15 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 					}									
 				}
 				if(focusedConstant){
-					pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+					getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
 				}else{
-					pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+					getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
 				}
 				pnName.setVisible(isvisible);
 				
 			}
 			this.setLabelPosition();
 		}
-	}
-
-	@Override
-	public void setLabelPosition() {
-		/*label.setPosition((int) (myPath.midPoint.x + nameOffsetX)
-				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y + nameOffsetY)
-				- ((zoom / 55) * (zoom / 55)));*/
-
-		pnName.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))),
-						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
-
 	}
 
 	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {
@@ -202,9 +152,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
 		arc.setUnderlyingArc(tapn.getInputArcFromPlaceToTransition(tapn.getPlaceByName(inputArc.source().name()), tapn.getTransitionByName(inputArc.destination().name())));
-		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
 		
 		return arc;
 	}

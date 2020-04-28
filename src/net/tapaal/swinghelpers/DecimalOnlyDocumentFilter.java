@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package net.tapaal.swinghelpers;
 
 import java.text.DecimalFormatSymbols;
 import java.util.regex.Matcher;
@@ -28,7 +28,7 @@ public class DecimalOnlyDocumentFilter extends DocumentFilter{
 		@Override
 		public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {                 
 			String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-			StringBuffer newString = new StringBuffer(old);
+			StringBuilder newString = new StringBuilder(old);
 			newString.replace(offset, length+offset, "");
 			if (stringIsValidDecimal(newString.toString())) {
 				super.remove(fb, offset, length);
@@ -38,7 +38,7 @@ public class DecimalOnlyDocumentFilter extends DocumentFilter{
 		@Override
 		public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
 			String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-			StringBuffer newString = new StringBuffer(old);
+			StringBuilder newString = new StringBuilder(old);
 			newString.replace(offset, length+offset, text);            	 			
 			if (stringIsValidDecimal(newString.toString())) {                	
 				super.replace(fb, offset, length, text, attrs);

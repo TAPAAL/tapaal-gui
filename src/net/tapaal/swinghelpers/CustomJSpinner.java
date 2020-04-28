@@ -1,10 +1,7 @@
-package pipe.gui.widgets;
+package net.tapaal.swinghelpers;
 
 import java.awt.Dimension;
-import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 import java.util.regex.Pattern;
@@ -35,8 +32,7 @@ public class CustomJSpinner extends JSpinner{
 		else {
 			val = (Integer) originalValue;
 		}
-		Integer returnValue = new Integer(val);
-		return returnValue;
+		return new Integer(val);
 	}
 	
 	public CustomJSpinner(Integer value, final Integer minimumValue, final Integer maximumValue) {
@@ -52,7 +48,7 @@ public class CustomJSpinner extends JSpinner{
 				@Override
 				public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {                 
 					String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-					StringBuffer newString = new StringBuffer(old);
+					StringBuilder newString = new StringBuilder(old);
 					newString.replace(offset, length+offset, "");
 					if (stringIsValidInteger(newString.toString())) {
 						super.remove(fb, offset, length);
@@ -62,7 +58,7 @@ public class CustomJSpinner extends JSpinner{
 				@Override
 				public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
 					String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-					StringBuffer newString = new StringBuffer(old);
+					StringBuilder newString = new StringBuilder(old);
 					newString.replace(offset, length+offset, text);            	 			
 					if (stringIsValidInteger(newString.toString())) {                	
 						super.replace(fb, offset, length, text, attrs);
@@ -102,15 +98,13 @@ public class CustomJSpinner extends JSpinner{
 				this.setValue(value);
 			}
 			//this changelistener is added to listen for changes on account of the up and down arrows. 
-			this.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					//if currentValue is less than minValue of larger than maxValue then make it min or max.
-					if ((Integer)((JSpinner)e.getSource()).getValue() < minimumValue) {
-						((JSpinner)e.getSource()).setValue(new Integer(minimumValue));
-					}
-					else if ((Integer)((JSpinner)e.getSource()).getValue() > maximumValue) {
-						((JSpinner)e.getSource()).setValue(new Integer(maximumValue));
-					}
+			this.addChangeListener(e -> {
+				//if currentValue is less than minValue of larger than maxValue then make it min or max.
+				if ((Integer)((JSpinner)e.getSource()).getValue() < minimumValue) {
+					((JSpinner)e.getSource()).setValue(minimumValue);
+				}
+				else if ((Integer)((JSpinner)e.getSource()).getValue() > maximumValue) {
+					((JSpinner)e.getSource()).setValue(maximumValue);
 				}
 			});
 			this.setPreferredSize(new Dimension(100, 25));
@@ -119,19 +113,17 @@ public class CustomJSpinner extends JSpinner{
 			
 			final JSpinner spinner = this;
 
-			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher(){
-				public boolean dispatchKeyEvent(KeyEvent ke){
-					if(ke.getID()==KeyEvent.KEY_PRESSED && ke.getKeyCode() == KeyEvent.VK_ENTER &&
-							KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == textField)
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(ke -> {
+				if(ke.getID()==KeyEvent.KEY_PRESSED && ke.getKeyCode() == KeyEvent.VK_ENTER &&
+						KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == textField)
+				{
+					try
 					{
-						try
-						{
-							spinner.commitEdit();
-							KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(spinner, ke);
-						}catch(Exception e){}
-					}
-					return false;
+						spinner.commitEdit();
+						KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(spinner, ke);
+					}catch(Exception e){}
 				}
+				return false;
 			});
 	}
 	
@@ -143,10 +135,9 @@ public class CustomJSpinner extends JSpinner{
 			JFormattedTextField textField = jsEditor.getTextField();
 			//this actionlistener makes the okButtons click event fire 			
 			//when enter is pressed in the JSpinner. 
-			textField.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					okButton.requestFocusInWindow();
-					okButton.doClick();			}
+			textField.addActionListener(e -> {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
 			});
 		}
 	}

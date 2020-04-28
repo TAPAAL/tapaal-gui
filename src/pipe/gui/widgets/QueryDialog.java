@@ -22,8 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
@@ -48,8 +46,6 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -65,6 +61,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
@@ -1183,12 +1180,7 @@ public class QueryDialog extends JPanel {
 		});
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-		advancedButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				toggleAdvancedSimpleView(true);
-			}
-		});
+		advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
@@ -1216,7 +1208,7 @@ public class QueryDialog extends JPanel {
 
 			private String getHelpMessage(){
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
-				StringBuffer buffer = new StringBuffer();
+				StringBuilder buffer = new StringBuilder();
 				buffer.append("<html>");
 				buffer.append("<b>Boundedness Options</b><br/>");
 				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
@@ -1322,12 +1314,7 @@ public class QueryDialog extends JPanel {
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
 		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
-		kbounded.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
-			}
-
-		});
+		kbounded.addActionListener(evt -> Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet));
 		boundednessCheckPanel.add(kbounded);
 
 		GridBagConstraints gridBagConstraints;
@@ -1491,52 +1478,40 @@ public class QueryDialog extends JPanel {
 		queryPanel.add(quantificationPanel, gbc);
 
 		// Add action listeners to the query options
-		existsBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		existsBox.addActionListener(e -> {
+			TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 
-		existsDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		existsDiamond.addActionListener(e -> {
+			TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 
-		forAllBox.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		forAllBox.addActionListener(e -> {
+			TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 
-		forAllDiamond.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),	property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		forAllDiamond.addActionListener(e -> {
+			TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(),	property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 	}
 
@@ -1667,15 +1642,13 @@ public class QueryDialog extends JPanel {
 
 		});
 
-		negationButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(), property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+		negationButton.addActionListener(e -> {
+			TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
+			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+			newProperty = newProperty.replace(currentSelection.getObject(), property);
+			updateSelection(property);
+			undoSupport.postEdit(edit);
+			queryChanged();
 		});
 	}
 
@@ -1708,11 +1681,7 @@ public class QueryDialog extends JPanel {
 							}
 						}
 
-						Collections.sort(placeNames, new Comparator<String>() {
-							public int compare(String o1, String o2) {
-								return o1.compareToIgnoreCase(o2);
-							}
-						});
+						placeNames.sort(String::compareToIgnoreCase);
 						placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
 						currentlySelected = tapn;
@@ -1725,11 +1694,7 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 						placeNames.add(place.name());
 					}
-					Collections.sort(placeNames, new Comparator<String>() {
-						public int compare(String o1, String o2) {
-							return o1.compareToIgnoreCase(o2);
-						}
-					});
+					placeNames.sort(String::compareToIgnoreCase);
 					placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
 					currentlySelected = SHARED;
@@ -1878,28 +1843,22 @@ public class QueryDialog extends JPanel {
 			}
 		});
 
-		placesBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
+		placesBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
 		});
 
-		relationalOperatorBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
-
+		relationalOperatorBox.addActionListener(e -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
+
 		});
 
-		placeMarking.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if (userChangedAtomicPropSelection) {
-					updateQueryOnAtomicPropositionChange();
-				}
+		placeMarking.addChangeListener(arg0 -> {
+			if (userChangedAtomicPropSelection) {
+				updateQueryOnAtomicPropositionChange();
 			}
 		});
 
@@ -1953,12 +1912,7 @@ public class QueryDialog extends JPanel {
 		editingButtonPanel.add(editQueryButton, gbc);
 
 		// Add action Listeners
-		deleteButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				deleteSelection();
-			}
-		});
+		deleteButton.addActionListener(e -> deleteSelection());
 
 		resetButton.addActionListener(new ActionListener() {
 
@@ -2176,11 +2130,9 @@ public class QueryDialog extends JPanel {
 		
 		while(buttons.hasMoreElements()){
 			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					setEnabledReductionOptions();
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
+			button.addActionListener(e -> {
+				setEnabledReductionOptions();
+				setEnabledOptionsAccordingToCurrentReduction();
 			});
 		}
 
@@ -2241,12 +2193,7 @@ public class QueryDialog extends JPanel {
 		
 		while(buttons.hasMoreElements()){
 			AbstractButton button = buttons.nextElement(); 
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
-			});
+			button.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 		}
 		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -2287,11 +2234,7 @@ public class QueryDialog extends JPanel {
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
-		reductionOption.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setEnabledOptionsAccordingToCurrentReduction();
-			}
-		});
+		reductionOption.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -2352,11 +2295,7 @@ public class QueryDialog extends JPanel {
 		useTimeDarts = new JCheckBox("Use Time Darts");
 		useTimeDarts.setSelected(false);
 		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
-		useTimeDarts.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setEnabledOptionsAccordingToCurrentReduction();
-			}
-		});
+		useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
@@ -2491,16 +2430,16 @@ public class QueryDialog extends JPanel {
 		else if(reductionOption.getSelectedItem() == null){
 			symmetryReduction.setVisible(false);
 		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
+		else if(reductionOption.getSelectedItem().equals(name_DISCRETE) || reductionOption.getSelectedItem().equals(name_UNTIMED)) {
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(false);
 		}
-		else if((((String)reductionOption.getSelectedItem()).equals(name_COMBI) ||
-				((String)reductionOption.getSelectedItem()).equals(name_OPTIMIZEDSTANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_STANDARD) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCAST) ||
-				((String)reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)) &&
+		else if((reductionOption.getSelectedItem().equals(name_COMBI) ||
+				reductionOption.getSelectedItem().equals(name_OPTIMIZEDSTANDARD) ||
+				reductionOption.getSelectedItem().equals(name_STANDARD) ||
+				reductionOption.getSelectedItem().equals(name_BROADCAST) ||
+				reductionOption.getSelectedItem().equals(name_BROADCASTDEG2)) &&
 				(!noApproximationEnable.isSelected() ||
 				someTraceRadioButton.isSelected()) 
 				){
@@ -2549,7 +2488,7 @@ public class QueryDialog extends JPanel {
 			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
 		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+		else if(reductionOption.getSelectedItem().equals(name_DISCRETE)) {
 			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
 			useStubbornReduction.setVisible(true);
@@ -2637,7 +2576,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getDrawingSurface().setNetChanged(true);
+						CreateGui.getCurrentTab().setNetChanged(true);
 						exit();
 					}
 				}
@@ -2647,22 +2586,17 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved and verified, the net is marked as modified
-						CreateGui.getDrawingSurface().setNetChanged(true);
+						CreateGui.getCurrentTab().setNetChanged(true);
 						exit();
 						TAPNQuery query = getQuery();
 
 						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels);
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null);
 						else
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 
 			saveUppaalXMLButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -2750,9 +2684,9 @@ public class QueryDialog extends JPanel {
 					else if (underApproximationEnable.isSelected())
 					{
 						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), ((TAPNComposer) composer).getGuiModel());
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), composer.getGuiModel());
 					}
-					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
+					templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();
@@ -2768,7 +2702,7 @@ public class QueryDialog extends JPanel {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
 						composedName = composedName.replace(".tapn", "");
-						CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+						CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
 					} catch (Exception e1) {
 						System.console().printf(e1.getMessage());
@@ -2781,18 +2715,11 @@ public class QueryDialog extends JPanel {
 			saveButton = new JButton("export");
 			cancelButton = new JButton("Cancel");
 
-			saveButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					querySaved = true;
-					exit();
-				}
+			saveButton.addActionListener(evt -> {
+				querySaved = true;
+				exit();
 			});
-			cancelButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-
-					exit();
-				}
-			});
+			cancelButton.addActionListener(evt -> exit());
 		}
 
 		if (option == QueryDialogueOption.Save) {

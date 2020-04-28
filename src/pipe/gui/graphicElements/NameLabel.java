@@ -3,6 +3,8 @@ package pipe.gui.graphicElements;
 import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
+
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
@@ -14,8 +16,7 @@ import pipe.gui.Zoomer;
  * @version 1.0
  * @author Camilla Clifford
  */
-public class NameLabel extends JTextArea implements Translatable,
-		Zoomable {
+public class NameLabel extends JTextArea implements Zoomable {
 
 	private static final long serialVersionUID = 5167510420195429773L;
 	private int positionX;
@@ -23,8 +24,7 @@ public class NameLabel extends JTextArea implements Translatable,
 	private String name = "";
 	private String text = "";
 
-	private Font font = new Font(Pipe.LABEL_FONT, Font.BOLD,
-			Pipe.LABEL_DEFAULT_FONT_SIZE);
+	private Font font = new Font(Pipe.LABEL_FONT, Font.BOLD, Pipe.LABEL_DEFAULT_FONT_SIZE);
 
 	public NameLabel(int zoom) {
 		this("");
@@ -42,6 +42,13 @@ public class NameLabel extends JTextArea implements Translatable,
 		setBorder(BorderFactory.createEmptyBorder());
 		setBackground(Pipe.BACKGROUND_COLOR);
 
+		//When redrawing a textarea added to a scroll pane, default behaviour is to move scroll pane to the location
+        //of the lable. (https://docs.oracle.com/javase/7/docs/api/javax/swing/text/JTextComponent.html)
+        //Behaviour disabled to avoid jumping, see bug https://bugs.launchpad.net/tapaal/+bug/1828782
+		DefaultCaret c = new DefaultCaret();
+		c.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		setCaret(c);
+
 	}
 
 	public void setPosition(int x, int y) {
@@ -50,19 +57,17 @@ public class NameLabel extends JTextArea implements Translatable,
 		updatePosition();
 	}
 
-	public void updateSize() {
+	private void updateSize() {
 		// To get round Java bug #4352983 I have to expand the size a bit
-		setSize((int) (getPreferredSize().width * 1.2),
-				(int) (getPreferredSize().height * 1.2));
+		setSize(
+		    (int) (getPreferredSize().width * 1.2),
+            (int) (getPreferredSize().height * 1.2)
+        );
 		updatePosition();
 	}
 
 	public void updatePosition() {
 		setLocation(positionX - getPreferredSize().width, positionY	- Pipe.NAMELABEL_OFFSET);
-	}
-
-	public void translate(int x, int y) {
-		setPosition(positionX + x, positionY + y);
 	}
 
 	public double getYPosition() {

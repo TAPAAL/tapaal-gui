@@ -4,7 +4,6 @@ import java.util.List;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.io.XMLFormatter;
-import java.util.ArrayList;
 
 public class CTLQueryVisitor extends VisitorBase {
 	

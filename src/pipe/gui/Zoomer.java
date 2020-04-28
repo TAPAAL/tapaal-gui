@@ -74,6 +74,10 @@ public class Zoomer {
 		return (int) (x / (zoom * 0.01));
 	}
 
+    /**
+     * @deprecated use int getUnzoomedValue(int x, int zoom)
+     */
+	@Deprecated
 	public static double getUnzoomedValue(double x, int zoom) {
 		return x / (zoom * 0.01);
 	}

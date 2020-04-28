@@ -8,13 +8,11 @@ public class BatchProcessingModelLoader {
 	public LoadedBatchProcessingModel load(File file) throws Exception{
 		BatchProcessingLoader newFormatLoader = new BatchProcessingLoader();
 		try{
-			LoadedBatchProcessingModel loadedModel = newFormatLoader.load(file);
-			return loadedModel;
+			return newFormatLoader.load(file);
 		}catch(Exception e1){
 			try {
 				BatchProcessingLegacyLoader oldFormatLoader = new BatchProcessingLegacyLoader();
-				LoadedBatchProcessingModel loadedModel = oldFormatLoader.load(file);
-				return loadedModel;
+				return oldFormatLoader.load(file);
 			} catch(Exception e2) {
 				throw e2;
 			}

@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -17,6 +15,9 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+
+import net.tapaal.swinghelpers.CustomJSpinner;
+import net.tapaal.swinghelpers.RequestFocusListener;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
@@ -102,11 +103,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		nameTextField = new javax.swing.JTextField();	
 		nameTextField.setPreferredSize(size);
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();
-			}
+		nameTextField.addActionListener(e -> {
+			okButton.requestFocusInWindow();
+			okButton.doClick();
 		});
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -178,17 +177,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		container.add(valueSpinner,gbc);
 		
 		//add action listeners for buttons
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				onOK();
-			}
-		});
+		okButton.addActionListener(e -> onOK());
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
 		//add button container
 		gbc = new GridBagConstraints();
@@ -277,7 +268,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
-					CreateGui.getCurrentTab().drawingSurface().getUndoManager()
+					CreateGui.getCurrentTab().getUndoManager()
 					.addNewEdit(edit);
 					CreateGui.getCurrentTab().drawingSurface().repaintAll();
 					exit();
@@ -295,7 +286,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					nameTextField.requestFocusInWindow();
 					return;
 				} else
-					CreateGui.getDrawingSurface().getUndoManager().addNewEdit(edit);
+					CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
 				exit();
 			}
 			model.buildConstraints();

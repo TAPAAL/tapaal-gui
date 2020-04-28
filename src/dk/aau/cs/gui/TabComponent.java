@@ -38,8 +38,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -52,7 +50,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.util.Require;
 
 /**
@@ -61,7 +58,7 @@ import dk.aau.cs.util.Require;
  * button for closing the tab.
  * 
  */
-public class TabComponent extends JPanel {
+public abstract class TabComponent extends JPanel {
 	/**
 	 * 
 	 */
@@ -113,11 +110,9 @@ public class TabComponent extends JPanel {
 			setBorderPainted(false);
 			addMouseListener(buttonMouseListener);
 			setRolloverEnabled(true);
-			addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					int index = pane.indexOfTabComponent(TabComponent.this);
-					CreateGui.getApp().closeTab(index);
-				}
+			addActionListener(arg0 -> {
+				int index = pane.indexOfTabComponent(TabComponent.this);
+				closeTab((TabContent) pane.getComponentAt(index));
 			});
 		}
 
@@ -142,6 +137,8 @@ public class TabComponent extends JPanel {
 		}
 
 	}
+
+	protected abstract void closeTab(TabContent tab);
 
 	private static final MouseListener buttonMouseListener = new MouseAdapter() {
 		@Override

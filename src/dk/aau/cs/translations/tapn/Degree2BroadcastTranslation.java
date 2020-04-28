@@ -789,8 +789,7 @@ public class Degree2BroadcastTranslation implements
 			if (testTransitionPattern.matcher(startTransition).matches()) {
 				startIndex += 1; // ignores _test transition
 			}
-			TransitionTranslation transitionTranslation = new TransitionTranslation(startIndex, endIndex, originalTransitionName, seqInfo);
-			return transitionTranslation;
+			return new TransitionTranslation(startIndex, endIndex, originalTransitionName, seqInfo);
 		}
 
 		public String tokenClockName() {

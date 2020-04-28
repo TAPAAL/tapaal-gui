@@ -1,19 +1,13 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
-import java.util.EventListener;
-
 import javax.swing.JComponent;
-import javax.swing.JLayeredPane;
-
-import dk.aau.cs.debug.Logger;
+import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Grid;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
@@ -29,34 +23,29 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	private static final long serialVersionUID = 2693171860021066729L;
 
 	protected static final int COMPONENT_DRAW_OFFSET= 5;
-	/** X-axis Position on screen */
+	/** x/y position position on screen (zoomed) */
 	protected double positionX;
-	/** Y-axis Position on screen */
 	protected double positionY;
 
-	/** X-axis Position on screen */
-	protected double nameOffsetX;
-	/** Y-axis Position on screen */
-	protected double nameOffsetY;
-	
-	
+	// The x/y coordinate of object at 100% zoom.
+	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
+	protected int originalX;
+	protected int originalY;
+
 	protected String id = null;
 
-	/* Name Label for displaying name */
-	protected NameLabel pnName;
-	protected Color objectColour = Pipe.ELEMENT_LINE_COLOUR;
-	protected Color selectionBorderColour = Pipe.SELECTION_LINE_COLOUR;
+
 	protected boolean selected = false; // True if part of the current selection.
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
 
-	protected Rectangle bounds = new Rectangle();
-
-	protected boolean deleted = false;
+	private boolean deleted = false;
 
 	// Integer value which represents a zoom percentage
-	protected int zoom = Pipe.ZOOM_DEFAULT;
+	private int zoom = Pipe.ZOOM_DEFAULT;
+
 	private DataLayer guiModel;
+	private Reference<AbstractDrawingSurfaceManager> managerRef = null;
 
 	public PetriNetObjectHandler getMouseHandler() {
 		return mouseHandler;
@@ -65,10 +54,17 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	protected PetriNetObjectHandler mouseHandler;
 
 	PetriNetObject() {
+		super();
 
+		addMouseHandler();
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.clicked
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseClicked(e);
 				}
@@ -76,6 +72,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.pressed
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mousePressed(e);
 				}
@@ -83,6 +84,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.released
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseReleased(e);
 				}
@@ -90,6 +96,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.entered
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseEntered(e);
 				}
@@ -97,6 +108,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseExited(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.exited
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseExited(e);
 				}
@@ -106,6 +122,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.wheel
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseWheelMoved(e);
 				}
@@ -115,6 +136,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.dragged
+					));
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseDragged(e);
 				}
@@ -122,6 +148,11 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				/*if (managerRef!=null && managerRef.get()!=null) {
+					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.moved
+					));
+				}*/
 				if (mouseHandler != null) {
 					mouseHandler.mouseMoved(e);
 				}
@@ -130,78 +161,20 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	}
 
+	protected abstract void addMouseHandler();
+
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
 	}
+	//XXX: not sure if datalayer should be accessable, but needed for refactorings away from "public" view.
+	public DataLayer getGuiModel() { return this.guiModel;}
 
 	public void setId(String idInput) {
 		id = idInput;
 		setName(idInput);
 	}
-	
-	protected void updateLabelLocation() {
-		updateLabelLocation(true);
-	}
-	
-	protected void updateLabelLocation(boolean alignToGrid) {
-		if(alignToGrid) {
-			this.getNameLabel().setPosition(
-					Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-					Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
-			);
-		} else {
-			this.getNameLabel().setPosition(
-					((int)(positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
-					((int)(positionY + Zoomer.getZoomedValue(nameOffsetY, zoom))));
-		}
-	}
-	
-	public void updateOnMoveOrZoom() {
-		updateLabelLocation();
-	}
-	/**
-	 * Update X-axis offset for name position
-	 * 
-	 * @param nameOffsetXInput
-	 *            Double value for name X-axis offset
-	 */
-	public void updateNameOffsetX(double nameOffsetXInput) {
-		nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
-	}
 
-	/**
-	 * Update Y-axis offset for name position
-	 * 
-	 * @param nameOffsetYInput
-	 *            Double value for name Y-axis offset
-	 */
-	public void updateNameOffsetY(double nameOffsetYInput) {
-		nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
-	}
-	
-	public void setNameOffsetX(double nameOffsetXInput) {
-		nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, zoom);
-	}
-	public void setNameOffsetY(double nameOffsetYInput) {
-		nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, zoom);
-	}
-	/**
-	 * Get X-axis offset for ...
-	 * 
-	 * @return Double value for X-axis offset of ...
-	 */
-	public Double getNameOffsetXObject() {
-		return nameOffsetX;
-	}
-
-	/**
-	 * Moved to PetriNetObject Get Y-axis offset for ...
-	 * 
-	 * @return Double value for Y-axis offset of ...
-	 */
-	public Double getNameOffsetYObject() {
-		return nameOffsetY;
-	}
+	public void updateOnMoveOrZoom() {}
 
 	/**
 	 * Get id returns null if value not yet entered
@@ -210,23 +183,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 */
 	public String getId() {
 		return getName();
-	}
-
-	/**
-	 * Returns Name Label - is used by GuiView
-	 * 
-	 * @return PetriNetObject's Name Label (Model View Controller Design
-	 *         Pattern)
-	 */
-	public NameLabel getNameLabel() {
-		return pnName;
-	}
-
-	public void addLabelToContainer() {
-		if (getParent() != null && pnName.getParent() == null) {
-			getParent().add(pnName);
-			getParent().setLayer(pnName, JLayeredPane.DEFAULT_LAYER + pnName.getLayerOffset());
-		}
 	}
 
 	public boolean isSelected() {
@@ -241,10 +197,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		if (selectable && !selected) {
 			selected = true;
 
-			if (pnName != null) {
-				pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
-			}
-
 			if (shouldRepaint) {
 				repaint();
 			}
@@ -255,10 +207,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public void deselect() {
 		if (selected) {
 			selected = false;
-
-			if (pnName != null) {
-				pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
-			}
 
 			repaint();
 		}
@@ -280,41 +228,12 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		draggable = allow;
 	}
 
-	public void setObjectColour(Color c) {
-		objectColour = c;
-	}
-
-	public void setSelectionBorderColour(Color c) {
-		selectionBorderColour = c;
-	}
-
 	public abstract void addedToGui();
+	public abstract void removedFromGui();
 
-	public void delete() {
-		deleted = true;
-		if(guiModel != null) {
-			guiModel.removePetriNetObject(this);
-		}
-		removeFromContainer();
-		removeAll();
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
-
-	public void undelete(DrawingSurfaceImpl view) {
-		guiModel.addPetriNetObject(this);
-		if (view.isCurrentGuiModel(guiModel)) {
-			view.addNewPetriNetObject(this);
-		}
-	}
-
-	protected void removeFromContainer() {
-		Container c = getParent();
-
-		if (c != null) {
-			c.remove(this);
-		}
-	}
-
-
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -341,4 +260,96 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 
+	public Reference<AbstractDrawingSurfaceManager> getManagerRef() {
+		return managerRef;
+	}
+
+	public void setManagerRef(Reference<AbstractDrawingSurfaceManager> manager) {
+		this.managerRef = manager;
+	}
+
+
+	public int getOriginalX() {
+		return originalX;
+	}
+
+	public int getOriginalY() {
+		return originalY;
+	}
+    /**
+     * Get X-axis position, returns null if value not yet entered
+     *
+     * @return Double value for X-axis position
+	 * @deprecated use getOriginalX
+     */
+    @Deprecated
+    public Double getPositionXObject() {
+        return (double) originalX;
+    }
+
+    /**
+     * Get Y-axis position, returns null if value not yet entered
+     *
+     * @return Double value for Y-axis position
+	 * @deprecated use getOriginalY
+     */
+    @Deprecated
+    public Double getPositionYObject() {
+        return (double) originalY;
+    }
+
+	@Override
+	public void zoomUpdate(int zoom) {
+		this.zoom = zoom;
+		updateOnMoveOrZoom();
+	}
+
+	@Override
+	public void translate(int x, int y) {
+		//TODO
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Set X-axis position
+	 *
+	 * @param positionXInput
+	 *            Double value for X-axis position
+	 */
+	public void setPositionX(double positionXInput) {
+		positionX = positionXInput;
+		originalX = (int)Zoomer.getUnzoomedValue(positionX, getZoom());
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Set Y-axis position
+	 *
+	 * @param positionYInput
+	 *            Double value for Y-axis position
+	 */
+	public void setPositionY(double positionYInput) {
+		positionY = positionYInput;
+		originalY = (int)Zoomer.getUnzoomedValue(positionY, getZoom());
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Get X-axis position
+	 *
+	 * @return Double value for X-axis position
+	 */
+	public double getPositionX() {
+		return positionX;
+	}
+
+	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
+	/**
+	 * Get Y-axis position
+	 *
+	 * @return Double value for Y-axis position
+	 */
+	public double getPositionY() {
+		return positionY;
+	}
 }

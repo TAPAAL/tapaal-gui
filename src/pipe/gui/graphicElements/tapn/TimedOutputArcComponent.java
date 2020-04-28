@@ -1,25 +1,16 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.BasicStroke;
 import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
+
 import pipe.gui.Grid;
-import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
-import pipe.gui.graphicElements.NameLabel;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.ArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -30,18 +21,6 @@ import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.Weight;
 
-/**
- * <b>Arc</b> - Petri-Net Normal Arc Class
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- */
 public class TimedOutputArcComponent extends Arc {
 	/**
 	 * 
@@ -50,35 +29,18 @@ public class TimedOutputArcComponent extends Arc {
 
 	private dk.aau.cs.model.tapn.TimedOutputArc outputArc;
 
-	/**
-	 * Create Petri-Net Arc object
-	 * 
-	 * @param startPositionXInput
-	 *            Start X-axis Position
-	 * @param startPositionYInput
-	 *            Start Y-axis Position
-	 * @param endPositionXInput
-	 *            End X-axis Position
-	 * @param endPositionYInput
-	 *            End Y-axis Position
-	 * @param sourceInput
-	 *            Arc source
-	 * @param targetInput
-	 *            Arc target
-	 * @param idInput
-	 *            Arc id
-	 */
+	public TimedOutputArcComponent(PlaceTransitionObject sourceInput, PlaceTransitionObject targetInput, int weightInput, String idInput) {
+		super(sourceInput, targetInput, weightInput, idInput);
+	}
+
+	/** @deprecated */
+	@Deprecated
 	public TimedOutputArcComponent(double startPositionXInput,
 			double startPositionYInput, double endPositionXInput,
 			double endPositionYInput, PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput,
 			boolean taggedInput) {
-		super(startPositionXInput, startPositionYInput, endPositionXInput,
-				endPositionYInput, sourceInput, targetInput, weightInput,
-				idInput);
-
-		//XXX: se note in funcation
-		addMouseHandler();
+		this(sourceInput, targetInput, weightInput, idInput);
 	}
 
 	/**
@@ -86,34 +48,28 @@ public class TimedOutputArcComponent extends Arc {
 	 */
 	public TimedOutputArcComponent(PlaceTransitionObject newSource) {
 		super(newSource);
-
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
-		zoom = arc.zoom;
 
-		myPath = new ArcPath(this);
-		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
-			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i),zoom);
-		}
-		myPath.createPath();
+		super(arc.getSource(), arc.getTarget(), 0, null);
+
+		myPath = new ArcPath(this, arc.myPath);
+
 		this.updateBounds();
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
-		this.updateNameOffsetX(arc.getNameOffsetXObject());
-		this.updateNameOffsetY(arc.getNameOffsetYObject());
+		this.setNameOffsetX(arc.getNameOffsetXObject());
+		this.setNameOffsetY(arc.getNameOffsetYObject());
 		this.getNameLabel().setPosition(
-				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(this.nameOffsetX, zoom))), 
-				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(this.nameOffsetY, zoom))));
+				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
+				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))));
 
-		//XXX: se note in funcation
-		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new ArcHandler(this);
@@ -133,18 +89,11 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public void updateLabel(boolean displayConstantNames) {
-		pnName.setText("");
-		pnName.setText(getWeight().toString(displayConstantNames)+" " + pnName.getText());
+		getNameLabel().setText("");
+		getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
 		setLabelPosition();
 	}
 
-	@Override
-	public void delete() {
-		if (outputArc != null)
-			outputArc.delete();
-		super.delete();
-	}
-	
 	public void showTimeIntervalEditor() {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);
 
@@ -181,9 +130,6 @@ public class TimedOutputArcComponent extends Arc {
 		newCopyArc.setTarget(oldToNewMapping.get(this.getTarget()));
 		newCopyArc.setUnderlyingArc(tapn.getOutputArcFromTransitionAndPlace(tapn.getTransitionByName(outputArc.source().name()), tapn.getPlaceByName(outputArc.destination().name())));
 		
-		newCopyArc.getSource().addConnectFrom(newCopyArc);
-		newCopyArc.getTarget().addConnectTo(newCopyArc);
-		
 		return newCopyArc;
 	}
 
@@ -195,11 +141,6 @@ public class TimedOutputArcComponent extends Arc {
 	@Override
 	public Weight getWeight() {
 		return outputArc.getWeight();
-	}
-
-	public TimeInterval getGuard() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

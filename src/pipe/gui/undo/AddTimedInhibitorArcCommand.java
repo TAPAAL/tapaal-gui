@@ -1,30 +1,30 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class AddTimedInhibitorArcCommand extends TAPNElementCommand {
 	private final TimedInhibitorArcComponent inhibitorArc;
 
-	public AddTimedInhibitorArcCommand(TimedInhibitorArcComponent inhibitorArc,
-			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
-		super(tapn, guiModel, view);
+	public AddTimedInhibitorArcCommand(TimedInhibitorArcComponent inhibitorArc, TimedArcPetriNet tapn, DataLayer guiModel) {
+		super(tapn, guiModel);
 		this.inhibitorArc = inhibitorArc;
 	}
 
 	@Override
 	public void undo() {
-		inhibitorArc.delete();
-		view.repaint();
+		inhibitorArc.underlyingTimedInhibitorArc().delete();
+
+		guiModel.removePetriNetObject(inhibitorArc);
 	}
 
 	@Override
 	public void redo() {
-		inhibitorArc.undelete(view);
+		guiModel.addPetriNetObject(inhibitorArc);
+
+
 		tapn.add(inhibitorArc.underlyingTimedInhibitorArc());
-		view.repaint();
 	}
 
 }

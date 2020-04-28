@@ -1,25 +1,28 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
-import pipe.gui.action.GuiAction;
 import dk.aau.cs.gui.undo.Command;
 
 public class ChangeSpacingEdit extends Command {
 
 	private double factor;
+	private TabContent tab;
 
-	public ChangeSpacingEdit(double factor) {
-		this.factor = factor;
-	}
+    public ChangeSpacingEdit(double factor, TabContent tabContent) {
+        super();
+        this.factor = factor;
+        this.tab = tabContent;
+    }
 
-	@Override
+    @Override
 	public void redo() {
-		CreateGui.getApp().changeSpacing(factor);
+		tab.changeSpacing(factor);
 	}
 
 	@Override
 	public void undo() {
-		CreateGui.getApp().changeSpacing(1/factor);
+		tab.changeSpacing(1/factor);
 	}
 
 }

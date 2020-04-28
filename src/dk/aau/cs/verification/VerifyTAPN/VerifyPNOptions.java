@@ -40,7 +40,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 
 		result.append("-k ");
 		result.append(extraTokens+tokensInModel);

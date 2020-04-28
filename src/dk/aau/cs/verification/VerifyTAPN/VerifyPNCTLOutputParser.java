@@ -1,15 +1,12 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.ReductionStats;
 import dk.aau.cs.verification.Stats;
 
 public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
@@ -89,8 +86,7 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 			if(!foundResult) return null;
 
             BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-            Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(configurtations, markings, edges, processedEdges, processedNEdges, exploredConfigurations));
-			return value; 	
+            return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(configurtations, markings, edges, processedEdges, processedNEdges, exploredConfigurations));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

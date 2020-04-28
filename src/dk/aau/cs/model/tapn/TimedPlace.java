@@ -1,8 +1,6 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
@@ -44,10 +42,9 @@ public abstract class TimedPlace {
 	 */
 	public List<TimedToken> sortedTokens(){
 		List<TimedToken> copy = new ArrayList<TimedToken>(tokens());
-		Collections.sort(copy, new Comparator<TimedToken>() {
-			public int compare(TimedToken o1, TimedToken o2) {
-				return o1.age().compareTo(o2.age()) * -1;
-			}
+		copy.sort((o1, o2) -> {
+			//Order reverse
+			return o1.age().compareTo(o2.age()) * -1;
 		});
 		
 		return copy;

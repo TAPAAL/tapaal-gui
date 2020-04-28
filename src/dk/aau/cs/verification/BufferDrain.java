@@ -1,6 +1,3 @@
-/**
- * 
- */
 package dk.aau.cs.verification;
 
 import java.io.BufferedReader;

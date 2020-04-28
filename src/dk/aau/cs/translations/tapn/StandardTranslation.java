@@ -382,7 +382,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		private final String DEG1_START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1$";
 		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
 		private Pattern deg1StartPattern = Pattern.compile(DEG1_START_OF_SEQUENCE_PATTERN);
-		private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");;
+		private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
 		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {

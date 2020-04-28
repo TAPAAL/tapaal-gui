@@ -1,10 +1,6 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -34,11 +30,7 @@ public class TimedArcHandler extends ArcHandler {
 				&& !(myObject instanceof TimedTransportArcComponent)) {
 			if (!CreateGui.getModel().netType().equals(NetType.UNTIMED) && !(myObject instanceof TimedInhibitorArcComponent)) {
 				menuItem = new JMenuItem("Properties");
-				menuItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						((TimedInputArcComponent) myObject).showTimeIntervalEditor();
-					}
-				});
+				menuItem.addActionListener(e1 -> ((TimedInputArcComponent) myObject).showTimeIntervalEditor());
 				popup.insert(menuItem, popupIndex++);
 			}
 			/*

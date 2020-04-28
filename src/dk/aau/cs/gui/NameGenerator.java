@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -44,12 +43,6 @@ public class NameGenerator {
 
 	public String getNewTemplateName() {
 		return TEMPLATE_NAME_PREFIX + (++tapnId); 
-	}
-
-	public void setupNameGeneratorFromTemplates(Iterable<Template> templates) {
-		for(Template tapn : templates) {
-			setupTemplate(tapn.model());
-		}
 	}
 
 	private void setupTemplate(TimedArcPetriNet tapn) {

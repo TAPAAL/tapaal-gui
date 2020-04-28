@@ -7,7 +7,6 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -35,8 +34,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,8 +50,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+
+import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -67,7 +64,7 @@ public class WorkflowDialog extends JDialog {
 
 	private static String getHelpMessage(){ 
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("<html>");
 		buffer.append("<b>Workflow Net</b><br/>");
 		buffer.append("A workflow net must contain exactly one <em>input</em> place with no incoming arcs,\n");
@@ -207,13 +204,10 @@ public class WorkflowDialog extends JDialog {
 	private boolean isConclusive = true;
 	private long m;
 	private int B;
-	private Constant c = null;
-	private TimedPlace done = null;
-	
-	private static int numErrorsShown = 5;
+
 	private static int maxStringLength = LABEL_UNUSED_TRANSITIONS.length();
 
-	private TimedArcPetriNetNetwork model = null;
+	private TimedArcPetriNetNetwork model;
 
 	private boolean isInTraceMode = false;
 
@@ -249,7 +243,7 @@ public class WorkflowDialog extends JDialog {
 		isInTraceMode = true;
 		setVisible(false);
 		CreateGui.getApp().setGUIMode(GUIMode.animation);
-		CreateGui.getAnimator().SetTrace(trace);
+		CreateGui.getAnimator().setTrace(trace);
 	}
 
 	private WorkflowDialog(Frame frame, String title, boolean modal) {
@@ -292,8 +286,7 @@ public class WorkflowDialog extends JDialog {
 		netType = getWorkflowType();
 
 		JPanel informationPanel = new JPanel();
-		informationPanel.setBorder(BorderFactory
-				.createTitledBorder("About the Workflow"));
+		informationPanel.setBorder(BorderFactory.createTitledBorder("About the Workflow"));
 		informationPanel.setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -334,18 +327,19 @@ public class WorkflowDialog extends JDialog {
 			workflowTypeLabel.setVisible(false);
 			StringBuilder sb = new StringBuilder();
 			String sep = "<br>";
-			for (String e : errorMsgs)
+			for (String e : errorMsgs) {
 				sb.append(sep).append("- ").append(e);
-			workflowTypeError
-			.setText("<html>This net is not a workflow net for the following reason"+(errorMsgs.size() > 1?"s":"")+":"
+			}
+			workflowTypeError.setText("<html>This net is not a workflow net for the following reason"+(errorMsgs.size() > 1?"s":"")+":"
 					+ sb.toString() + "</html>");
 			workflowTypeError.setVisible(true);
 			break;
 		}
 
 		/* Initialize component to store settings */
-		if (soundness == null)
+		if (soundness == null) {
 			soundness = new JCheckBox("Check soundness.");
+		}
 
 		if (min == null){
 			min = new JCheckBox("Calculate minimum duration.");
@@ -353,11 +347,13 @@ public class WorkflowDialog extends JDialog {
 			min.setToolTipText(TOOLTIP_MIN);
 		}
 
-		if (strongSoundness == null)
+		if (strongSoundness == null) {
 			strongSoundness = new JCheckBox("Check strong soundness.");
+		}
 
-		if (max == null)
+		if (max == null) {
 			max = new JCheckBox("Calculate maximum duration.");
+		}
 
 
 		if (netType != TAWFNTypes.NOTTAWFN) {
@@ -403,26 +399,14 @@ public class WorkflowDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.NONE;
 		JButton help_button = new JButton("Help");
-		help_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		help_button.addActionListener(e -> JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
 
 		panel.add(help_button, gbc);
 
 		gbc.gridx = 1;
 		gbc.anchor = GridBagConstraints.EAST;
 		JButton close_button = new JButton("Close");
-		close_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+		close_button.addActionListener(e -> setVisible(false));
 
 		panel.add(close_button, gbc);
 	}
@@ -483,16 +467,12 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 2;
 		soundnessPanel.add(max, gbc);
 
-		strongSoundness.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				max.setEnabled(strongSoundness.isSelected());
-				if (!strongSoundness.isSelected()) {
-					max.setSelected(false);
-				}else{
-					max.setSelected(true);
-				}
+		strongSoundness.addActionListener(e -> {
+			max.setEnabled(strongSoundness.isSelected());
+			if (!strongSoundness.isSelected()) {
+				max.setSelected(false);
+			}else{
+				max.setSelected(true);
 			}
 		});
 
@@ -552,13 +532,7 @@ public class WorkflowDialog extends JDialog {
 			soundnessResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			soundnessResultTraceButton.setVisible(false);
-			soundnessResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(soundnessResultTrace);
-				}
-			});
+			soundnessResultTraceButton.addActionListener(e -> switchToTrace(soundnessResultTrace));
 			resultPanel.add(soundnessResultTraceButton, gbc);
 
 			// Min 
@@ -578,13 +552,7 @@ public class WorkflowDialog extends JDialog {
 			minResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			minResultTraceButton.setVisible(false);
-			minResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(minResultTrace);
-				}
-			});
+			minResultTraceButton.addActionListener(e -> switchToTrace(minResultTrace));
 			resultPanel.add(minResultTraceButton, gbc);
 
 			// Strong soundness
@@ -622,13 +590,7 @@ public class WorkflowDialog extends JDialog {
 			strongSoundnessResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			strongSoundnessResultTraceButton.setVisible(false);
-			strongSoundnessResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(strongSoundnessResultTrace);
-				}
-			});
+			strongSoundnessResultTraceButton.addActionListener(e -> switchToTrace(strongSoundnessResultTrace));
 			resultPanel.add(strongSoundnessResultTraceButton, gbc);
 
 			// Max 
@@ -649,13 +611,7 @@ public class WorkflowDialog extends JDialog {
 			maxResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			maxResultTraceButton.setVisible(false);
-			maxResultTraceButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					switchToTrace(maxResultTrace);
-				}
-			});
+			maxResultTraceButton.addActionListener(e -> switchToTrace(maxResultTrace));
 			resultPanel.add(maxResultTraceButton, gbc);
 			
 			unusedTransitionsLabel = new JLabel();
@@ -684,11 +640,11 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridwidth = 1;
 		panel.add(new JLabel(" Number of extra tokens:  "), gbc);
 
-		if (numberOfExtraTokensInNet == null)
-			numberOfExtraTokensInNet = new CustomJSpinner(model.getDefaultBound(), 0,
-					100000);	// Allow at most 100.000 extra tokens.
-		else
+		if (numberOfExtraTokensInNet == null) {
+			numberOfExtraTokensInNet = new CustomJSpinner(model.getDefaultBound(), 0, 100000);    // Allow at most 100.000 extra tokens.
+		} else {
 			numberOfExtraTokensInNet.setValue(model.getDefaultBound());
+		}
 		
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
@@ -697,14 +653,10 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 6;
 		panel.add(numberOfExtraTokensInNet, gbc);
 
-		numberOfExtraTokensInNet.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-				CreateGui.getCurrentTab().network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-				CreateGui.getDrawingSurface().setNetChanged(true);
-			}
+		numberOfExtraTokensInNet.addChangeListener(e -> {
+			model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+			CreateGui.getCurrentTab().network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+			CreateGui.getCurrentTab().setNetChanged(true);
 		});
 
 		gbc.gridwidth = 1;
@@ -713,23 +665,11 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 2;
 		panel.add(checkBound, gbc);
 
-		checkBound.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkBound();
-			}
-		});
+		checkBound.addActionListener(e -> checkBound());
 
 		JButton checkIfSound = new JButton("Analyse the workflow");
 		getRootPane().setDefaultButton(checkIfSound);
-		checkIfSound.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkProperties();
-			}
-		});
+		checkIfSound.addActionListener(e -> checkProperties());
 		gbc.gridx = 2;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.EAST;
@@ -1044,8 +984,7 @@ public class WorkflowDialog extends JDialog {
 
 				// Compute B
 				B = 0;
-				for (TimedArcPetriNet t : model
-						.activeTemplates()) {
+				for (TimedArcPetriNet t : model.activeTemplates()) {
 					for (TimedPlace p : t.places()) {
 						if (p.invariant().upperBound().equals(Bound.Infinity)) {
 							continue;
@@ -1058,63 +997,63 @@ public class WorkflowDialog extends JDialog {
 
 				/* Call engine */
 
-				final TAPNQuery q;
-                            q = new TAPNQuery(
-                                    "Workflow strong soundness checking",
-                                    numberOfExtraTokensInNet == null ? 0
-                                            : (Integer) numberOfExtraTokensInNet.getValue(),
-                                    new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
-                                    SearchOption.DEFAULT,
-                                    ReductionOption.VerifyTAPNdiscreteVerification, true, true,
-                                    false, true, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, c);
-				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+				final TAPNQuery q = new TAPNQuery(
+						"Workflow strong soundness checking",
+						numberOfExtraTokensInNet == null ? 0 : (Integer) numberOfExtraTokensInNet.getValue(),
+						new TCTLEGNode(new TCTLTrueNode()),
+						TraceOption.SOME,
+						SearchOption.DEFAULT,
+						ReductionOption.VerifyTAPNdiscreteVerification,
+						true,
+						true,
+						false,
+						true,
+						false,
+						null,
+						ExtrapolationOption.AUTOMATIC,
+						WorkflowMode.WORKFLOW_STRONG_SOUNDNESS,
+						c
+				);
+				Verifier.runVerifyTAPNVerification(model, q, result -> {
+					if(result.isQuerySatisfied()){
 
-					@Override
-					public void run() {
-					}
-
-					@Override
-					public void run(VerificationResult<TAPNNetworkTrace> result) {
-						if(result.isQuerySatisfied()){
-							
-							switch(((TimedTAPNNetworkTrace) result.getTrace()).getTraceType()){
-							case EG_LOOP:
-								setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
-								break;
-							case EG_DELAY_FOREVER:
-								setStrongSoundnessResult(false, RESULT_ERROR_TIME);
-								break;
-							default:
-								assert(false);
-								break;
-							}
-
-							strongSoundnessResultTrace = mapTraceToRealModel(result.getTrace());
-							strongSoundnessResultTraceButton.setVisible(true);
-
-							if(max.isSelected()){
-								maxResult.setText(RESULT_NOT_DEFINED);
-								maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
-								maxResult.setVisible(true);
-							}
-						}else{
-							setStrongSoundnessResult(true, null);
-							if(max.isSelected()){
-								setMaxResult(model, result.stats().maximumExecutionTime());
-								maxResultTrace = mapTraceToRealModel(result.getTrace());
-								maxResultTraceButton.setVisible(true);
-							}
+						switch(((TimedTAPNNetworkTrace) result.getTrace()).getTraceType()){
+						case EG_LOOP:
+							setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
+							break;
+						case EG_DELAY_FOREVER:
+							setStrongSoundnessResult(false, RESULT_ERROR_TIME);
+							break;
+						default:
+							assert(false);
+							break;
 						}
 
+						strongSoundnessResultTrace = mapTraceToRealModel(result.getTrace());
+						strongSoundnessResultTraceButton.setVisible(true);
 
-						strongSoundnessVerificationStats.setText(result
-								.getVerificationTimeString().replace("Estimated verification time", "Est. time")
-								+ ", memory: "
-								+ MemoryMonitor.getPeakMemory());
-						strongSoundnessVerificationStats.setVisible(true);
-
-						pack();
+						if(max.isSelected()){
+							maxResult.setText(RESULT_NOT_DEFINED);
+							maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+							maxResult.setVisible(true);
+						}
+					}else{
+						setStrongSoundnessResult(true, null);
+						if(max.isSelected()){
+							setMaxResult(model, result.stats().maximumExecutionTime());
+							maxResultTrace = mapTraceToRealModel(result.getTrace());
+							maxResultTraceButton.setVisible(true);
+						}
 					}
+
+
+					strongSoundnessVerificationStats.setText(result
+							.getVerificationTimeString().replace("Estimated verification time", "Est. time")
+							+ ", memory: "
+							+ MemoryMonitor.getPeakMemory());
+					strongSoundnessVerificationStats.setVisible(true);
+
+					pack();
 				});
 			}
 		};
@@ -1163,200 +1102,191 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private Runnable getSoundnessRunnable() {
-		Runnable r = new Runnable() {
+		Runnable r = () -> {
+			final TAPNQuery q = new TAPNQuery(
+					"Workflow soundness checking",
+					numberOfExtraTokensInNet == null ? 0 : (Integer) numberOfExtraTokensInNet.getValue(),
+					new TCTLEFNode(new TCTLTrueNode()),
+					TraceOption.SOME,
+					SearchOption.DEFAULT,
+					ReductionOption.VerifyTAPNdiscreteVerification,
+					true,
+					true,
+					false,
+					true,
+					false,
+					null,
+					ExtrapolationOption.AUTOMATIC,
+					WorkflowMode.WORKFLOW_SOUNDNESS
+			);
+			Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
-			@Override
-			public void run() {
-				final TAPNQuery q = new TAPNQuery(
-						"Workflow soundness checking",
-						numberOfExtraTokensInNet == null ? 0
-								: (Integer) numberOfExtraTokensInNet.getValue(),
-								new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
-								SearchOption.DEFAULT,
-								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
-								false, true, false, null, ExtrapolationOption.AUTOMATIC,
-								WorkflowMode.WORKFLOW_SOUNDNESS);
-				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+				@Override
+				public void run(VerificationResult<TAPNNetworkTrace> result) {
+					if (result.isQuerySatisfied()) {
+						soundnessResult.setText(RESULT_STRING_SATISFIED);
+						soundnessResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 
-					@Override
-					public void run() {
-					}
+						if(model.hasUrgentTransitions() || model.hasInvariants()){
+							soundnessResultExplanation.setText(DISCRETE_SEMANTICS_WARNING);
+							soundnessResultExplanation.setVisible(true);
+						}
+						isSound = true;
 
-					@Override
-					public void run(VerificationResult<TAPNNetworkTrace> result) {
-						if (result.isQuerySatisfied()) {
-							soundnessResult
-							.setText(RESULT_STRING_SATISFIED);
-							soundnessResult
-							.setForeground(Pipe.QUERY_SATISFIED_COLOR);
-							if(model.hasUrgentTransitions() || model.hasInvariants()){
-								soundnessResultExplanation.setText(DISCRETE_SEMANTICS_WARNING);
-								soundnessResultExplanation.setVisible(true);
-							}
-							isSound = true;
-							
-							// Detect unused transitions
-							boolean hasUnusedTransitions = false;
-							StringBuilder sb = new StringBuilder();
-							int lineLength = 0;
-							sb.append("<html>");
-							for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
-								if(stat.value2() == 0){
-									if(!hasUnusedTransitions){
-										hasUnusedTransitions = true;
-									}else{
-										sb.append(", ");
-										lineLength += 2;
-										if(lineLength > maxStringLength - stat.value1().length()){
-											sb.append("<br />");
-											lineLength = 0;
-										}
+						// Detect unused transitions
+						boolean hasUnusedTransitions = false;
+						StringBuilder sb = new StringBuilder();
+						int lineLength = 0;
+						sb.append("<html>");
+						for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
+							if(stat.value2() == 0){
+								if(!hasUnusedTransitions){
+									hasUnusedTransitions = true;
+								}else{
+									sb.append(", ");
+									lineLength += 2;
+									if(lineLength > maxStringLength - stat.value1().length()){
+										sb.append("<br />");
+										lineLength = 0;
 									}
-									sb.append(stat.value1());
-									lineLength += stat.value1().length();
 								}
-							}
-							sb.append("</html>");
-							if(hasUnusedTransitions){
-								unusedTransitionsLabel.setVisible(true);
-								unusedTransitions.setText(sb.toString());
-								unusedTransitions.setVisible(true);
-							}
-						} else if (netType == TAWFNTypes.ETAWFN && !result.isBounded()) {
-							soundnessResult
-							.setText(RESULT_STRING_INCONCLUSIVE);
-							soundnessResult
-							.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
-							isConclusive = false;
-							soundnessResultExplanation.setText(ERROR_INCREASE_BOUND);
-							soundnessResultExplanation.setVisible(true);
-						} else {
-							soundnessResult
-							.setText(RESULT_STRING_NOT_SATISFIED);
-							soundnessResult
-							.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
-							soundnessResultTrace = mapTraceToRealModel(result.getTrace());
-							soundnessResultTraceButton.setVisible(true);
-							soundnessResultExplanation.setText(determineSoundnessError(result.getTrace()));
-							soundnessResultExplanation.setVisible(true);
-
-							NetworkMarking coveredMarking = result.getCoveredMarking(model);
-							if(coveredMarking != null){
-								completeSoundnessTrace(result, coveredMarking);
+								sb.append(stat.value1());
+								lineLength += stat.value1().length();
 							}
 						}
-						soundnessResult.setVisible(true);
-						soundnessResultLabel.setVisible(true);
-
-						if (min.isSelected()) {
-							if(result.isQuerySatisfied()){
-								minResult.setText(result.stats()
-										.minimumExecutionTime()
-										+ " time units.");
-								minResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
-								minResultTrace = mapTraceToRealModel(result.getTrace());
-								minResultTraceButton.setVisible(true);
-							}else{
-								minResult.setText(RESULT_NOT_DEFINED);
-								minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
-							}
-							minResultLabel.setVisible(true);
-							minResult.setVisible(true);
+						sb.append("</html>");
+						if(hasUnusedTransitions){
+							unusedTransitionsLabel.setVisible(true);
+							unusedTransitions.setText(sb.toString());
+							unusedTransitions.setVisible(true);
 						}
+					} else if (netType == TAWFNTypes.ETAWFN && !result.isBounded()) {
+						soundnessResult.setText(RESULT_STRING_INCONCLUSIVE);
+						soundnessResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+						isConclusive = false;
+						soundnessResultExplanation.setText(ERROR_INCREASE_BOUND);
+						soundnessResultExplanation.setVisible(true);
+					} else {
+						soundnessResult.setText(RESULT_STRING_NOT_SATISFIED);
+						soundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+						soundnessResultTrace = mapTraceToRealModel(result.getTrace());
+						soundnessResultTraceButton.setVisible(true);
+						soundnessResultExplanation.setText(determineSoundnessError(result.getTrace()));
+						soundnessResultExplanation.setVisible(true);
 
-						soundnessVerificationStats.setText(result
-								.getVerificationTimeString().replace("Estimated verification time", "Est. time")
-								+ ", memory: "
-								+ MemoryMonitor.getPeakMemory());
-						soundnessVerificationStats.setVisible(true);
+						NetworkMarking coveredMarking = result.getCoveredMarking(model);
+						if(coveredMarking != null){
+							completeSoundnessTrace(result, coveredMarking);
+						}
+					}
+					soundnessResult.setVisible(true);
+					soundnessResultLabel.setVisible(true);
 
-						m = result.stats().exploredStates();
-
-						pack();
+					if (min.isSelected()) {
+						if(result.isQuerySatisfied()){
+							minResult.setText(result.stats().minimumExecutionTime() + " time units.");
+							minResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+							minResultTrace = mapTraceToRealModel(result.getTrace());
+							minResultTraceButton.setVisible(true);
+						}else{
+							minResult.setText(RESULT_NOT_DEFINED);
+							minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+						}
+						minResultLabel.setVisible(true);
+						minResult.setVisible(true);
 					}
 
-					private void completeSoundnessTrace(final VerificationResult<TAPNNetworkTrace> soundnessResult, final NetworkMarking coveredMarking) {
-						final String explanationText = soundnessResultExplanation.getText();
-						soundnessResultExplanation.setText(explanationText + " Computing trace.");
-						soundnessResultTraceButton.setVisible(false);
+					soundnessVerificationStats.setText(
+							result.getVerificationTimeString().replace("Estimated verification time", "Est. time")
+							+ ", memory: " + MemoryMonitor.getPeakMemory()
+					);
+					soundnessVerificationStats.setVisible(true);
 
-						final NetworkMarking oldMarking = model.marking();
-						model.setMarking(coveredMarking);
+					m = result.stats().exploredStates();
 
-						final TAPNQuery q = new TAPNQuery(
-								"Workflow computing trace",
-								numberOfExtraTokensInNet == null ? 0
-										: (Integer) numberOfExtraTokensInNet.getValue(),
-										new TCTLEFNode(new TCTLAtomicPropositionNode(new TCTLPlaceNode(out.isShared()?"":out_template.name(), out.name()), ">=",new TCTLConstNode(1))), TraceOption.SOME,
-										SearchOption.DEFAULT,
-										ReductionOption.VerifyTAPNdiscreteVerification, true, true,
-										true, true, null, ExtrapolationOption.AUTOMATIC);
-						Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+					pack();
+				}
 
-							@Override
-							public void run() {
-							}
+				private void completeSoundnessTrace(final VerificationResult<TAPNNetworkTrace> soundnessResult, final NetworkMarking coveredMarking) {
+					final String explanationText = soundnessResultExplanation.getText();
+					soundnessResultExplanation.setText(explanationText + " Computing trace.");
+					soundnessResultTraceButton.setVisible(false);
 
-							@Override
-							public void run(VerificationResult<TAPNNetworkTrace> result) {
-								model.setMarking(oldMarking);
-								soundnessResultExplanation.setText(explanationText);
-								if(result.isQuerySatisfied()){
-									appendTrace(mapTraceToRealModel(result.getTrace()));
-									soundnessResultExplanation.setText(RESULT_ERROR_NONFINAL_REACHED);
+					final NetworkMarking oldMarking = model.marking();
+					model.setMarking(coveredMarking);
+
+					final TAPNQuery q = new TAPNQuery(
+							"Workflow computing trace",
+							numberOfExtraTokensInNet == null ? 0 : (Integer) numberOfExtraTokensInNet.getValue(),
+							new TCTLEFNode(new TCTLAtomicPropositionNode(new TCTLPlaceNode(out.isShared()?"":out_template.name(), out.name()), ">=",new TCTLConstNode(1))),
+							TraceOption.SOME,
+							SearchOption.DEFAULT,
+							ReductionOption.VerifyTAPNdiscreteVerification,
+							true,
+							true,
+							true,
+							true,
+							null,
+							ExtrapolationOption.AUTOMATIC
+					);
+					Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+
+						@Override
+						public void run(VerificationResult<TAPNNetworkTrace> result) {
+							model.setMarking(oldMarking);
+							soundnessResultExplanation.setText(explanationText);
+							if(result.isQuerySatisfied()){
+								appendTrace(mapTraceToRealModel(result.getTrace()));
+								soundnessResultExplanation.setText(RESULT_ERROR_NONFINAL_REACHED);
+								soundnessResultTraceButton.setVisible(true);
+							}else{
+								if(result.isBounded()){
+									// Compute trace to covered marking
+									soundnessResultTrace = mapTraceToRealModel(soundnessResult.getSecondaryTrace());
 									soundnessResultTraceButton.setVisible(true);
 								}else{
-									if(result.isBounded()){
-										// Compute trace to covered marking
-										soundnessResultTrace = mapTraceToRealModel(soundnessResult.getSecondaryTrace());
-										soundnessResultTraceButton.setVisible(true);
-									}else{
-										soundnessResultExplanation.setText("<html>The monotonic workflow net has a reachable marking covering another one.<br/>Try to increase the number of extra tokens so that a trace can be generated.</html>");
-									}
-								}
-							}
-
-							private void appendTrace(TAPNNetworkTrace trace) {
-								for(TAPNNetworkTraceStep step : trace){
-									((TimedTAPNNetworkTrace) soundnessResultTrace).add(step);
-								}
-							}
-						});
-
-					}
-
-					private String determineSoundnessError(
-							TAPNNetworkTrace trace) {
-
-						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
-						NetworkMarking final_marking = model.marking().clone(); 
-						while(iter.hasNext()) final_marking = iter.next().performStepFrom(final_marking);
-
-						int out_size = final_marking.getTokensFor(out).size();
-						if(out_size > 0 && final_marking.size() != 1){
-							return RESULT_ERROR_NONFINAL_REACHED;
-						}
-
-						// Detect if any transition is dEnabled from last marking (not deadlock)
-						String output = "A deadlock marking is reachable.";
-						NetworkMarking oldMarking = model.marking();
-						model.setMarking(final_marking);
-						outer: for( TimedArcPetriNet temp : model.activeTemplates()){
-							Iterator<TimedTransition> transitionIterator = temp.transitions().iterator();
-							while (transitionIterator.hasNext()) {
-								TimedTransition tempTransition = transitionIterator.next();
-								if (tempTransition.isDEnabled()){
-									output = RESULT_ERROR_NO_TRACE_TO_FINAL;
-									break outer;
+									soundnessResultExplanation.setText("<html>The monotonic workflow net has a reachable marking covering another one.<br/>Try to increase the number of extra tokens so that a trace can be generated.</html>");
 								}
 							}
 						}
-						model.setMarking(oldMarking);
 
-						return output;
+						private void appendTrace(TAPNNetworkTrace trace) {
+							for(TAPNNetworkTraceStep step : trace){
+								((TimedTAPNNetworkTrace) soundnessResultTrace).add(step);
+							}
+						}
+					});
+
+				}
+
+				private String determineSoundnessError(TAPNNetworkTrace trace) {
+
+					Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
+					NetworkMarking final_marking = model.marking().clone();
+					while(iter.hasNext()) final_marking = iter.next().performStepFrom(final_marking);
+
+					int out_size = final_marking.getTokensFor(out).size();
+					if(out_size > 0 && final_marking.size() != 1){
+						return RESULT_ERROR_NONFINAL_REACHED;
 					}
-				});
-			}
+
+					// Detect if any transition is dEnabled from last marking (not deadlock)
+					String output = "A deadlock marking is reachable.";
+					NetworkMarking oldMarking = model.marking();
+					model.setMarking(final_marking);
+					outer: for( TimedArcPetriNet temp : model.activeTemplates()){
+						for (TimedTransition tempTransition : temp.transitions()) {
+							if (tempTransition.isDEnabled()) {
+								output = RESULT_ERROR_NO_TRACE_TO_FINAL;
+								break outer;
+							}
+						}
+					}
+					model.setMarking(oldMarking);
+
+					return output;
+				}
+			});
 		};
 		return r;
 	}

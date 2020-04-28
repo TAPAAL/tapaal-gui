@@ -10,9 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import pipe.gui.widgets.ArcTokenSelector.ArcTokenSelectorListener;
-import pipe.gui.widgets.ArcTokenSelector.ArcTokenSelectorListenerEvent;
-
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -74,11 +71,9 @@ public class AnimationSelectmodeDialog extends JPanel {
 		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cancelled = false;
-				exit();
-			}
+		okButton.addActionListener(evt -> {
+			cancelled = false;
+			exit();
 		});
 
 		updateOkButton();
@@ -99,12 +94,7 @@ public class AnimationSelectmodeDialog extends JPanel {
 
 	private JPanel createDropDownForArc(String placeName, List<TimedToken> elligibleTokens, int weight) {
 		ArcTokenSelector tokenSelector = new ArcTokenSelector(placeName, elligibleTokens, weight);
-		tokenSelector.addArcTokenSelectorListener(new ArcTokenSelectorListener() {
-
-			public void arcTokenSelectorActionPreformed(ArcTokenSelectorListenerEvent e) {
-				updateOkButton();
-			}
-		});
+		tokenSelector.addArcTokenSelectorListener(e -> updateOkButton());
 		
 		arcTokenSelectors.add(tokenSelector);
 		return tokenSelector;

@@ -1,59 +1,192 @@
 package dk.aau.cs.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.io.*;
+import dk.aau.cs.io.queries.SUMOQueryLoader;
+import dk.aau.cs.io.queries.XMLQueryLoader;
+import dk.aau.cs.model.tapn.*;
+import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.helpers.Reference.Reference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
+import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.Template;
-import pipe.gui.AnimationController;
-import pipe.gui.AnimationHistoryComponent;
-import pipe.gui.Animator;
-import pipe.gui.DelayEnabledTransitionControl;
-import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Zoomer;
+import pipe.gui.*;
+import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
+import pipe.gui.undo.ChangeSpacingEdit;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.widgets.JSplitPaneFix;
+import net.tapaal.swinghelpers.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
-public class TabContent extends JSplitPane {
+public class TabContent extends JSplitPane implements TabContentActions{
 	private static final long serialVersionUID = -648006317150905097L;
 
+	//Model and state
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+
+
+	private UndoManager undoManager = new UndoManager();
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception
+	 */
+	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
+		TabContent tab = new TabContent(NetType.TAPN);
+		tab.setInitialName(name);
+
+		try {
+			ModelLoader loader = new ModelLoader();
+			LoadedModel loadedModel = loader.load(file);
+
+			tab.setNetwork(loadedModel.network(), loadedModel.templates());
+			tab.setQueries(loadedModel.queries());
+			tab.setConstants(loadedModel.network().constants());
+
+			tab.selectFirstElements();
+
+			tab.setFile(null);
+		} catch (Exception e) {
+			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+		}
+
+		return tab;
+	}
+
+	public static TabContent createNewEmptyTab(String name, NetType netType){
+		TabContent tab = new TabContent(NetType.TAPN);
+		tab.setInitialName(name);
+
+		//Set Default Template
+		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
+		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
+		tab.addTemplate(template, false);
+
+		return tab;
+	}
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws Exception
+	 */
+
+	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
+		TabContent tab = new TabContent(NetType.TAPN);
+
+		String name = null;
+
+		if (file != null) {
+			name = file.getName().replaceAll(".pnml", ".tapn");
+		}
+		tab.setInitialName(name);
+
+		if (file != null) {
+			try {
+
+				LoadedModel loadedModel;
+
+				PNMLoader loader = new PNMLoader();
+				loadedModel = loader.load(file);
+
+
+				tab.setNetwork(loadedModel.network(), loadedModel.templates());
+				tab.setQueries(loadedModel.queries());
+				tab.setConstants(loadedModel.network().constants());
+
+				tab.selectFirstElements();
+
+				tab.setMode(Pipe.ElementType.SELECT);
+
+
+			} catch (Exception e) {
+				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
+			}
+		}
+
+		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
+		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
+		return tab;
+	}
+
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * @throws FileNotFoundException
+	 */
+	//XXX should properly be in controller?
+	public static TabContent createNewTabFromFile(File file) throws Exception {
+		try {
+			String name = file.getName();
+			boolean showFileEndingChangedMessage = false;
+
+			if(name.toLowerCase().endsWith(".xml")){
+				name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
+				showFileEndingChangedMessage = true;
+			}
+
+			InputStream stream = new FileInputStream(file);
+			TabContent tab = createNewTabFromInputStream(stream, name);
+			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
+
+			showFileEndingChangedMessage(showFileEndingChangedMessage);
+
+			return tab;
+		}catch (FileNotFoundException e) {
+			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
+		}
+	}
+
+	private static void showFileEndingChangedMessage(boolean showMessage) {
+		if(showMessage) {
+			//We thread this so it does not block the EDT
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+				}
+			}).start();
+		}
+	}
+
+	public UndoManager getUndoManager() {
+		return undoManager;
+	}
+
+	//GUI
+
 	private HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+
 	private JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
@@ -77,11 +210,11 @@ public class TabContent extends JSplitPane {
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryComponent animBox;
+	private AnimationHistoryComponent<String> animBox;
 	private AnimationController animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent abstractAnimationPane = null;
+	private AnimationHistoryComponent<String> abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
 
@@ -104,7 +237,7 @@ public class TabContent extends JSplitPane {
 			hasPositionalInfos.put(net, new Boolean(false));
 		}
 		
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer());
+		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -137,7 +270,9 @@ public class TabContent extends JSplitPane {
 		this.setContinuousLayout(true);
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
-		this.setDividerSize(8);	
+		this.setDividerSize(8);
+		//XXX must be after the animationcontroller is created
+		animationModeController = new CanvasAnimationController(getAnimator(), getAnimationController());
 	}
 	
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -272,12 +407,37 @@ public class TabContent extends JSplitPane {
 		this.drawingSurface = drawingSurface;
 	}
 
+
+	//XXX this is a temp solution while refactoring
+	// to keep the name of the net when the when a file is not set.
+	String initialName;
+	public void setInitialName(String name) {
+		if (name == null || name.isEmpty()) {
+			name = "New Petri net " + (CreateGui.getApp().getNameCounter()) + ".tapn";
+			CreateGui.getApp().incrementNameCounter();
+		} else if (!name.toLowerCase().endsWith(".tapn")){
+			name = name + ".tapn";
+		}
+		this.initialName = name;
+
+		safeApp.ifPresent(tab -> tab.updatedTabName(this));
+	}
+	public String getTabTitle() {
+		if (getFile()!=null) {
+			return getFile().getName();
+		} else {
+			return initialName;
+		}
+	}
+
+	@Override
 	public File getFile() {
 		return appFile;
 	}
 
 	public void setFile(File file) {
 		appFile = file;
+		safeApp.ifPresent(tab -> tab.updatedTabName(this));
 	}
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
@@ -296,15 +456,13 @@ public class TabContent extends JSplitPane {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepBackwards();
 								anim.stepBack();
-								CreateGui.getCurrentTab().getAnimationController()
-								.setAnimationButtonsEnabled();
+								getAnimationController().setAnimationButtonsEnabled();
 							}
 						} else {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepForward();
 								anim.stepForward();
-								CreateGui.getCurrentTab().getAnimationController()
-								.setAnimationButtonsEnabled();
+								getAnimationController().setAnimationButtonsEnabled();
 							}
 						}
 						
@@ -325,12 +483,15 @@ public class TabContent extends JSplitPane {
 	}
 
 	private void createAnimatorSplitPane(NetType netType) {
-		if (animBox == null)
-			createAnimationHistory();
-		if (animControlerBox == null)
-			createAnimationController(netType);
-		if (transitionFireing == null)
-			createTransitionFireing();
+		if (animBox == null) {
+            createAnimationHistory();
+        }
+		if (animControlerBox == null) {
+            createAnimationController(netType);
+        }
+		if (transitionFireing == null) {
+            createTransitionFireing();
+        }
 		
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
@@ -342,14 +503,20 @@ public class TabContent extends JSplitPane {
 			enabledTransitionsListLeaf.setWeight(0.25);
 			animControlLeaf.setWeight(0.5);
 
-			simulatorModelRoot = new Split(templateExplorerLeaf, new Divider(),
-					enabledTransitionsListLeaf, new Divider(), animControlLeaf);
+			simulatorModelRoot = new Split(
+			    templateExplorerLeaf,
+                new Divider(),
+                enabledTransitionsListLeaf,
+                new Divider(),
+                animControlLeaf
+            );
 			simulatorModelRoot.setRowLayout(false);
 			floatingDividers = true;
 		}
 		animatorSplitPane = new BugHandledJXMultisplitPane();
-		
 		animatorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+        animatorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
+
 		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
 		
 		animatorSplitPane.getMultiSplitLayout().setModel(simulatorModelRoot);
@@ -371,16 +538,29 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 
-		animationControlsPanel.setPreferredSize(new Dimension(
+		animationControlsPanel.setPreferredSize(
+		    new Dimension(
 				animationControlsPanel.getPreferredSize().width,
-				animationControlsPanel.getMinimumSize().height));
-		transitionFireing.setPreferredSize(new Dimension(
+				animationControlsPanel.getMinimumSize().height
+            )
+        );
+		transitionFireing.setPreferredSize(
+		    new Dimension(
 				transitionFireing.getPreferredSize().width,
-				transitionFireing.getMinimumSize().height));
+				transitionFireing.getMinimumSize().height
+            )
+        );
+
+        JButton dummy = new JButton("AnimatorDummy");
+        dummy.setMinimumSize(templateExplorer.getMinimumSize());
+        dummy.setPreferredSize(templateExplorer.getPreferredSize());
+        animatorSplitPane.add(new JPanel(), templateExplorerName);
+
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
 		
 		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
+		animatorSplitPane.repaint();
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
@@ -390,7 +570,7 @@ public class TabContent extends JSplitPane {
 		if(dummy != null){
 			animatorSplitPane.remove(dummy);
 		}
-		
+
 		//Add the templateExplorer
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
@@ -425,15 +605,15 @@ public class TabContent extends JSplitPane {
 			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
-			animatorSplitPane.add(new JPanel(), templateExplorerName);
+			animatorSplitPane.add(dummy, templateExplorerName);
 		}
 
 		templateExplorer.switchToEditorMode();
 		this.setLeftComponent(editorSplitPaneScroller);
-		drawingSurface.repaintAll();
+		//drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent getUntimedAnimationHistory() {
+	public AnimationHistoryComponent<String> getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -449,15 +629,18 @@ public class TabContent extends JSplitPane {
 		animationControlsPanel.remove(animationHistoryScrollPane);
 		abstractAnimationPane = new AnimationHistoryComponent();
 
-		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(
-				abstractAnimationPane);
-		untimedAnimationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(
+		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
+		untimedAnimationHistoryScrollPane.setBorder(
+		    BorderFactory.createCompoundBorder(
 						BorderFactory.createTitledBorder("Untimed Trace"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)
+            )
+        );
 		animationHistorySplitter = new JSplitPaneFix(
-				JSplitPane.HORIZONTAL_SPLIT, animationHistoryScrollPane,
-				untimedAnimationHistoryScrollPane);
+		    JSplitPane.HORIZONTAL_SPLIT,
+            animationHistoryScrollPane,
+            untimedAnimationHistoryScrollPane
+        );
 
 		animationHistorySplitter.setContinuousLayout(true);
 		animationHistorySplitter.setOneTouchExpandable(true);
@@ -496,7 +679,7 @@ public class TabContent extends JSplitPane {
 		animControlerBox.requestFocus(true);
 	}
 
-	public AnimationHistoryComponent getAnimationHistory() {
+	public AnimationHistoryComponent<String> getAnimationHistory() {
 		return animBox;
 	}
 
@@ -543,8 +726,9 @@ public class TabContent extends JSplitPane {
 	public int numberOfActiveTemplates() {
 		int count = 0;
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			if (net.isActive())
-				count++;
+			if (net.isActive()) {
+                count++;
+            }
 		}
 		return count;
 	}
@@ -586,11 +770,6 @@ public class TabContent extends JSplitPane {
 		return templateExplorer.selectedModel();
 	}
 
-	public void setCurrentTemplate(Template template) {
-		drawingSurface.setModel(template.guiModel(), template.model(),
-				template.zoomer());
-	}
-
 	public Iterable<TAPNQuery> queries() {
 		return queries.getQueries();
 	}
@@ -611,12 +790,7 @@ public class TabContent extends JSplitPane {
 		tapnNetwork.setConstants(constants);
 	}
 
-	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
-		drawingSurface.setupNameGeneratorsFromTemplates(templates);
-	}
-
-	public void setNetwork(TimedArcPetriNetNetwork network,
-			Collection<Template> templates) {
+	public void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
 		Require.that(network != null, "network cannot be null");
 		tapnNetwork = network;
 
@@ -666,10 +840,10 @@ public class TabContent extends JSplitPane {
 
 	public void showComponents(boolean enable) {
 		if (enable != templateExplorer.isVisible()) {
-			editorSplitPane.getMultiSplitLayout().displayNode(
-					templateExplorerName, enable);
-			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName,
-					enable);
+
+			editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
+
 			if (animatorSplitPane != null) {
 				animatorSplitPane.getMultiSplitLayout().displayNode(
 						templateExplorerName, enable);
@@ -680,25 +854,30 @@ public class TabContent extends JSplitPane {
 
 	public void showQueries(boolean enable) {
 		if (enable != queries.isVisible()) {
-			editorSplitPane.getMultiSplitLayout().displayNode(queriesName,
-					enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(queriesName, enable);
 			makeSureEditorPanelIsVisible(queries);
 			this.repaint();
 		}
 	}
 
-	public void showConstantsPanel(boolean enable) {
+	//XXX not sure about this
+    @Override
+    public void repaintAll() {
+		drawingSurface().repaintAll();
+    }
+
+    public void showConstantsPanel(boolean enable) {
 		if (enable != constantsPanel.isVisible()) {
-			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
-					enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(constantsName, enable);
 			makeSureEditorPanelIsVisible(constantsPanel);
 		}		
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		if (transitionFireing != null && !(enable && transitionFireing.isVisible())) {
-			animatorSplitPane.getMultiSplitLayout().displayNode(
-					transitionFireingName, enable);
+	    //displayNode fires and relayout, so we check of value is changed
+        // else elements will be set to default size.
+		if (transitionFireing.isVisible() != enable) {
+			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFireingName, enable);
 		}
 	}
 	
@@ -718,11 +897,41 @@ public class TabContent extends JSplitPane {
 	public boolean isQueryPossible() {
 		return queries.isQueryPossible();
 	}
-	
+
+	@Override
 	public void verifySelectedQuery() {
 		queries.verifySelectedQuery();
 	}
-	
+
+	@Override
+	public void previousComponent() {
+		getTemplateExplorer().selectPrevious();
+	}
+
+	@Override
+	public void nextComponent() {
+		getTemplateExplorer().selectNext();
+	}
+
+	@Override
+	public void exportTrace() {
+		TraceImportExport.exportTrace();
+	}
+
+	@Override
+	public void importTrace() {
+		TraceImportExport.importTrace();
+	}
+
+	@Override
+	public void zoomTo(int newZoomLevel) {
+		boolean didZoom = drawingSurface().getZoomController().setZoom(newZoomLevel);
+		if (didZoom) {
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			drawingSurface().zoomToMidPoint(); //Do Zoom
+		}
+	}
+
 	public void editSelectedQuery(){
 		queries.showEditDialog();
 	}
@@ -775,5 +984,551 @@ public class TabContent extends JSplitPane {
 	
 	public void setWorkflowDialog(WorkflowDialog dialog) {
 		this.workflowDialog = dialog;
+	}
+
+	private boolean netChanged = false;
+	@Override
+	public boolean getNetChanged() {
+		return netChanged;
+	}
+
+	public void setNetChanged(boolean _netChanged) {
+		netChanged = _netChanged;
+	}
+
+    public void changeToTemplate(Template tapn) {
+		Require.notNull(tapn, "Can't change to a Template that is null");
+
+		drawingSurface.setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
+
+		//If the template is currently selected
+		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
+		if (CreateGui.getCurrentTab() == this) {
+
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+
+			//XXX: moved from drawingsurface, temp while refactoring, there is a better way
+			drawingSurface.getSelectionObject().clearSelection();
+
+		}
+    }
+
+
+    //Animation mode stuff, moved from view
+	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
+	private boolean animationmode = false;
+	public void setAnimationMode(boolean on) {
+	    if (animationmode != on) {
+	        toggleAnimationMode();
+        }
+    }
+	@Override
+	public void toggleAnimationMode() {
+
+		if (!animationmode) {
+			if (numberOfActiveTemplates() > 0) {
+				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+
+				setManager(animationModeController);
+
+				drawingSurface().repaintAll();
+
+				rememberSelectedTemplate();
+				if (currentTemplate().isActive()){
+					setSelectedTemplateWasActive();
+				}
+
+				getAnimator().reset(false);
+				getAnimator().storeModel();
+				getAnimator().highlightEnabledTransitions();
+				getAnimator().reportBlockingPlaces();
+				getAnimator().setFiringmode("Random");
+
+				// Set a light blue backgound color for animation mode
+				drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+				getAnimationController().requestFocusInWindow();
+
+				if (templateWasActiveBeforeSimulationMode()) {
+					restoreSelectedTemplate();
+					resetSelectedTemplateWasActive();
+				}
+				else {
+					selectFirstActiveTemplate();
+				}
+				drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
+			} else {
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"You need at least one active template to enter simulation mode",
+						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
+				animationmode = false;
+				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+			}
+		} else {
+			drawingSurface().getSelectionObject().clearSelection();
+			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+			setManager(notingManager);
+
+			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
+			setMode(Pipe.ElementType.SELECT);
+
+			restoreSelectedTemplate();
+
+			// Undo/Redo is enabled based on undo/redo manager
+			getUndoManager().setUndoRedoStatus();
+			animationmode = false;
+		}
+		animControlerBox.setAnimationButtonsEnabled(); //Update stepBack/Forward
+	}
+
+	//XXX temp while refactoring, kyrke - 2019-07-25
+	@Override
+	public void setMode(Pipe.ElementType mode) {
+
+		app.ifPresent(o->o.updateMode(mode));
+
+		//Disable selection and deselect current selection
+		drawingSurface().getSelectionObject().clearSelection();
+
+		//If pending arc draw, remove it
+		if (drawingSurface().createArc != null) {
+			PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+		}
+
+		if (mode == Pipe.ElementType.SELECT) {
+			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		} else if (mode == Pipe.ElementType.DRAG) {
+			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		} else {
+			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+		}
+	}
+
+	@Override
+	public void showStatistics() {
+		StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
+	}
+
+	@Override
+	public void importSUMOQueries() {
+		File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
+		for(File f : files){
+			if(f.exists() && f.isFile() && f.canRead()){
+				FileBrowser.userPath = f.getParent();
+				SUMOQueryLoader.importQueries(f, network());
+			}
+		}
+	}
+
+	@Override
+	public void importXMLQueries() {
+		File[] files = FileBrowser.constructor("Import XML queries", "xml", FileBrowser.userPath).openFiles();
+		for(File f : files){
+			if(f.exists() && f.isFile() && f.canRead()){
+				FileBrowser.userPath = f.getParent();
+				XMLQueryLoader.importQueries(f, network());
+			}
+		}
+	}
+
+	@Override
+	public void workflowAnalyse() {
+		//XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
+		WorkflowDialog.showDialog();
+	}
+
+	public boolean isInAnimationMode() {
+		return animationmode;
+	}
+
+	public Animator getAnimator() {
+		return animator;
+	}
+
+	private Animator animator = new Animator(this);
+
+	/* GUI Model / Actions helpers */
+	//XXX: Should be moved to animationController or similar
+	/**
+	 * Updates the mouseOver label showing token ages in animationmode
+	 * when a "animation" action is happening. "live updates" any mouseOver label
+	 */
+	private void updateMouseOverInformation() {
+		// update mouseOverView
+		for (pipe.gui.graphicElements.Place p : getModel().getPlaces()) {
+			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
+				((TimedPlaceComponent) p).showAgeOfTokens(true);
+			}
+		}
+
+	}
+
+	/* GUI Model / Actions */
+
+	Optional<GuiFrameActions>  app = Optional.empty();
+	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
+	@Override
+	public void setApp(GuiFrameActions newApp) {
+		this.app = Optional.ofNullable(newApp);
+		undoManager.setApp(newApp);
+
+		//XXX
+		if (isInAnimationMode()) {
+			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
+			animControlerBox.setAnimationButtonsEnabled(); //Update stepBack/Forward
+		} else {
+			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
+			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
+		}
+
+	}
+
+	@Override
+	public void setSafeGuiFrameActions(SafeGuiFrameActions ref) {
+		safeApp.setReference(ref);
+	}
+
+	@Override
+	public void zoomOut() {
+		boolean didZoom = drawingSurface().getZoomController().zoomOut();
+		if (didZoom) {
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			drawingSurface().zoomToMidPoint(); //Do Zoom
+		}
+	}
+
+	@Override
+	public void zoomIn() {
+		boolean didZoom = drawingSurface().getZoomController().zoomIn();
+		if (didZoom) {
+			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			drawingSurface().zoomToMidPoint(); //Do Zoom
+		}
+	}
+
+    @Override
+    public void selectAll() {
+        drawingSurface().getSelectionObject().selectAll();
+    }
+
+	@Override
+	public void deleteSelection() {
+		// check if queries need to be removed
+		ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+		Iterable<TAPNQuery> queries = queries();
+		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+
+		boolean queriesAffected = false;
+		for (PetriNetObject pn : selection) {
+			if (pn instanceof TimedPlaceComponent) {
+				TimedPlaceComponent place = (TimedPlaceComponent)pn;
+				if(!place.underlyingPlace().isShared()){
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
+					}
+				}
+			} else if (pn instanceof TimedTransitionComponent){
+				TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+				if(!transition.underlyingTransition().isShared()){
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
+					}
+				}
+			}
+		}
+		StringBuilder s = new StringBuilder();
+		s.append("The following queries are associated with the currently selected objects:\n\n");
+		for (TAPNQuery q : queriesToDelete) {
+			s.append(q.getName());
+			s.append('\n');
+		}
+		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+
+		int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+				CreateGui.getApp(), s.toString(), "Warning",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+				: JOptionPane.YES_OPTION;
+
+		if (choice == JOptionPane.YES_OPTION) {
+			getUndoManager().newEdit(); // new "transaction""
+			if (queriesAffected) {
+				TabContent currentTab = this;
+				for (TAPNQuery q : queriesToDelete) {
+					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+					cmd.redo();
+					getUndoManager().addEdit(cmd);
+				}
+			}
+
+			drawingSurface().deleteSelection(drawingSurface().getSelectionObject().getSelection());
+			//getCurrentTab().drawingSurface().repaint();
+			network().buildConstraints();
+		}
+
+
+	}
+
+	@Override
+	public void stepBackwards() {
+		getAnimationHistory().stepBackwards();
+		getAnimator().stepBack();
+		updateMouseOverInformation();
+		getAnimationController().setAnimationButtonsEnabled();
+	}
+
+	@Override
+	public void stepForward() {
+		getAnimationHistory().stepForward();
+		getAnimator().stepForward();
+		updateMouseOverInformation();
+		getAnimationController().setAnimationButtonsEnabled();
+	}
+
+	@Override
+	public void timeDelay() {
+		getAnimator().letTimePass(BigDecimal.ONE);
+		getAnimationController().setAnimationButtonsEnabled();
+		updateMouseOverInformation();
+	}
+
+	@Override
+	public void delayAndFire() {
+		getTransitionFireingComponent().fireSelectedTransition();
+		getAnimationController().setAnimationButtonsEnabled();
+		updateMouseOverInformation();
+	}
+
+	@Override
+	public void undo() {
+
+		if (!isInAnimationMode()) {
+
+			//If arc is being drawn delete it
+
+			if (drawingSurface().createArc == null) {
+				getUndoManager().undo();
+				network().buildConstraints();
+
+			} else {
+
+				PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+
+			}
+		}
+
+
+	}
+
+	@Override
+	public void redo() {
+
+			if (!isInAnimationMode()) {
+
+				//If arc is being drawn delete it
+
+				if (drawingSurface().createArc == null) {
+					getUndoManager().redo();
+					network().buildConstraints();
+
+				} else {
+
+					PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+
+				}
+			}
+	}
+
+    final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
+        @Override
+        public void registerEvents() {
+            //No-thing manager
+        }
+    };
+	final AbstractDrawingSurfaceManager animationModeController;
+
+	//Writes a tapaal net to a file, with the posibility to overwrite the quires
+	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite) {
+		try {
+			NetworkMarking currentMarking = null;
+			if(isInAnimationMode()){
+				currentMarking = network().marking();
+				network().setMarking(getAnimator().getInitialMarking());
+			}
+
+			NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+					network(),
+					allTemplates(),
+					queriesOverwrite,
+					network().constants()
+			);
+
+			tapnWriter.savePNML(outFile);
+
+			if(isInAnimationMode()){
+				network().setMarking(currentMarking);
+			}
+		} catch (Exception e) {
+			Logger.log(e);
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(),
+					"File Output Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public void writeNetToFile(File outFile) {
+		writeNetToFile(outFile, (List<TAPNQuery>) queries());
+	}
+
+	@Override
+	public void saveNet(File outFile) {
+		try {
+			writeNetToFile(outFile);
+
+			setFile(outFile);
+
+			setNetChanged(false);
+			getUndoManager().clear();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+    @Override
+    public void increaseSpacing() {
+		double factor = 1.25;
+		changeSpacing(factor);
+		getUndoManager().addNewEdit(new ChangeSpacingEdit(factor, this));
+    }
+
+	@Override
+	public void decreaseSpacing() {
+		double factor = 0.8;
+		changeSpacing(factor);
+		getUndoManager().addNewEdit(new ChangeSpacingEdit(factor, this));
+	}
+
+	public void changeSpacing(double factor){
+		for(PetriNetObject obj : this.currentTemplate().guiModel().getPetriNetObjects()){
+			if(obj instanceof PlaceTransitionObject){
+				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
+
+				if(obj instanceof Transition){
+					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
+						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
+							point.setPointLocation((float) Math.max(point.getPoint().x*factor, point.getWidth()), (float) Math.max(point.getPoint().y*factor, point.getHeight()));
+						}
+					}
+				}
+
+				((PlaceTransitionObject) obj).update(true);
+			}else{
+				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+			}
+		}
+
+		this.currentTemplate().guiModel().repaintAll(true);
+		drawingSurface().updatePreferredSize();
+	}
+
+	public TabContent duplicateTab() {
+		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+				network(),
+				allTemplates(),
+				queries(),
+				network().constants()
+		);
+
+		try {
+			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+			String composedName = getTabTitle();
+			composedName = composedName.replace(".tapn", "");
+			composedName += "-untimed";
+			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			System.console().printf(e1.getMessage());
+		}
+		return null;
+	}
+
+	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+
+		private final Animator animator;
+		private final AnimationController animationController;
+
+		public CanvasAnimationController(Animator animator, AnimationController animationController) {
+			this.animator = animator;
+			this.animationController = animationController;
+		}
+
+		@Override
+		public void registerEvents() {
+			registerEvent(
+					e -> e.a == MouseAction.clicked && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
+					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
+			);
+			registerEvent(
+					e->e.a == MouseAction.entered && e.pno instanceof PlaceTransitionObject,
+					e->mouseEnterPTO((PlaceTransitionObject)e.pno)
+			);
+			registerEvent(
+					e->e.a == MouseAction.exited && e.pno instanceof PlaceTransitionObject,
+					e->mouseExitPTO((PlaceTransitionObject)e.pno)
+			);
+		}
+
+		void transitionLeftClicked(TimedTransitionComponent t) {
+			TimedTransition transition = t.underlyingTransition();
+
+			if (transition.isDEnabled()) {
+				animator.dFireTransition(transition);
+				animationController.setAnimationButtonsEnabled();
+			}
+		}
+
+		void mouseEnterPTO(PlaceTransitionObject pto) {
+			if (pto instanceof TimedPlaceComponent) {
+				((TimedPlaceComponent) pto).showAgeOfTokens(true);
+			} else if (pto instanceof TimedTransitionComponent) {
+				((TimedTransitionComponent) pto).showDInterval(true);
+			}
+		}
+		void mouseExitPTO(PlaceTransitionObject pto) {
+			if (pto instanceof TimedPlaceComponent) {
+				((TimedPlaceComponent) pto).showAgeOfTokens(false);
+			} else if (pto instanceof TimedTransitionComponent) {
+				((TimedTransitionComponent) pto).showDInterval(false);
+			}
+		}
+	}
+
+
+    MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
+    private void setManager(AbstractDrawingSurfaceManager newManager) {
+        //De-register old manager
+		managerRef.get().deregisterManager();
+        managerRef.setReference(newManager);
+		managerRef.get().registerManager();
+    }
+
+    //XXX: A quick function made while refactoring to test if the tab is currently
+	// the tab selected, and is allowed to change gui the gui. Should be controlled an other way
+	// /kyrke 2019-11-10
+	public boolean isTabInFocus(){
+		return app.isPresent();
 	}
 }

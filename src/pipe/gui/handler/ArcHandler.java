@@ -1,6 +1,5 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -11,7 +10,6 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
@@ -64,7 +62,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 			if (e.getClickCount() == 2) {
 				Arc arc = (Arc) myObject;
 				if (e.isControlDown()) {
-					CreateGui.getDrawingSurface().getUndoManager().addNewEdit(
+					CreateGui.getCurrentTab().getUndoManager().addNewEdit(
 							arc.getArcPath().insertPoint(
 									new Point2D.Float(arc.getX() + e.getX(),
 											arc.getY() + e.getY()),
@@ -77,36 +75,6 @@ public class ArcHandler extends PetriNetObjectHandler {
 				super.mousePressed(e);
 			}
 		}
-	}
-
-	
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		switch (CreateGui.getApp().getMode()) {
-		case SELECT:
-			if (!isDragging) {
-				break;
-			}
-			Arc currentObject = (Arc) myObject;
-			Point oldLocation = currentObject.getLocation();
-			// Calculate translation in mouse
-			int transX = (Grid.getModifiedX(e.getX() - dragInit.x));
-			int transY = (Grid.getModifiedY(e.getY() - dragInit.y));
-			myObject.getParent().getSelectionObject()
-					.translateSelection(transX, transY);
-			dragInit.translate(
-					-(currentObject.getLocation().x - oldLocation.x - transX),
-					-(currentObject.getLocation().y - oldLocation.y - transY));
-		}
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-
-		if (!(CreateGui.getApp().isEditionAllowed())) {
-			return;
-		}
-		
 	}
 
 }

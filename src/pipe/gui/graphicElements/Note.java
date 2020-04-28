@@ -13,7 +13,6 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomer;
@@ -24,18 +23,18 @@ import dk.aau.cs.gui.undo.Command;
  * This abstract class is the base class for AnnotationNote class and for
  * Parameter class
  */
-public abstract class Note extends PetriNetObject implements Translatable {
+public abstract class Note extends PetriNetObject {
 
 	private static final long serialVersionUID = 8965208519103066242L;
 	protected JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;
 	protected RectangularShape noteRect = new Rectangle();
-	private int originalX;
-	private int originalY;
 
 	public Note(int x, int y) {
-		originalX = Zoomer.getUnzoomedValue(x, zoom);
-		originalY = Zoomer.getUnzoomedValue(y, zoom);
+		super();
+
+		originalX = x;
+		originalY = y;
 
 		note.setAlignmentX(Component.CENTER_ALIGNMENT);
 		note.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -58,17 +57,8 @@ public abstract class Note extends PetriNetObject implements Translatable {
 		note.setDisabledTextColor(Pipe.NOTE_DISABLED_COLOUR);
 		note.setForeground(Pipe.NOTE_EDITING_COLOUR);
 		add(note);
-		setLocation(x - Pipe.RESERVED_BORDER / 2, y - Pipe.RESERVED_BORDER / 2);
 	}
 
-	public Note(String id, String text, int x, int y) {
-		this(x, y);
-		this.id = id;
-		note.setText(text);
-		note.setSize(note.getPreferredSize().width,
-				note.getPreferredSize().height);
-		updateBounds();
-	}
 
 	public Note(String text, int x, int y, int w, int h, boolean border) {
 		this(x, y);
@@ -82,29 +72,28 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	public void updateBounds() {
 		int newHeight = note.getPreferredSize().height;
 
-		if ((note.getHeight() < newHeight)
-				&& (newHeight >= note.getMinimumSize().height)) {
+		if ((note.getHeight() < newHeight) && (newHeight >= note.getMinimumSize().height)) {
 			note.setSize(note.getWidth(), newHeight);
 		}
 
 		int rectWidth = note.getWidth() + Pipe.RESERVED_BORDER;
 		int rectHeight = note.getHeight() + Pipe.RESERVED_BORDER;
 
-		noteRect.setFrame(Pipe.RESERVED_BORDER / 2, Pipe.RESERVED_BORDER / 2,
-				rectWidth, rectHeight);
-		setSize(rectWidth + Pipe.ANNOTATION_SIZE_OFFSET, rectHeight
-				+ Pipe.ANNOTATION_SIZE_OFFSET);
+		noteRect.setFrame(Pipe.RESERVED_BORDER / 2, Pipe.RESERVED_BORDER / 2, rectWidth, rectHeight);
+		setSize(rectWidth + Pipe.ANNOTATION_SIZE_OFFSET, rectHeight + Pipe.ANNOTATION_SIZE_OFFSET);
 
-		note.setLocation((int) noteRect.getX() + (rectWidth - note.getWidth())
-				/ 2, (int) noteRect.getY() + (rectHeight - note.getHeight())
-				/ 2);
+		note.setLocation(
+				(int) noteRect.getX() + (rectWidth - note.getWidth()) / 2,
+				(int) noteRect.getY() + (rectHeight - note.getHeight()) / 2
+		);
 
-		bounds.setBounds(Zoomer.getZoomedValue(originalX, zoom), Zoomer
-				.getZoomedValue(originalY, zoom), (int) ((rectWidth
-				+ Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer
-				.getScaleFactor(zoom)), (int) ((rectHeight
-				+ Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer
-				.getScaleFactor(zoom)));
+		Rectangle bounds = new Rectangle();
+		bounds.setBounds(
+				Zoomer.getZoomedValue(originalX, getZoom()),
+				Zoomer.getZoomedValue(originalY, getZoom()),
+				(int) ((rectWidth + Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom())),
+				(int) ((rectHeight + Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom()))
+		);
 		setBounds(bounds);
 	}
 
@@ -139,8 +128,8 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	/** Translates the component by x,y */
 	public void translate(int x, int y) {
 		setLocation(getX() + x, getY() + y);
-		originalX += Zoomer.getUnzoomedValue(x, zoom);
-		originalY += Zoomer.getUnzoomedValue(y, zoom);
+		originalX += Zoomer.getUnzoomedValue(x, getZoom());
+		originalY += Zoomer.getUnzoomedValue(y, getZoom());
 		updateBounds();
 	}
 
@@ -174,18 +163,23 @@ public abstract class Note extends PetriNetObject implements Translatable {
 
 	@Override
 	public boolean contains(int x, int y) {
-		return noteRect.contains(x / Zoomer.getScaleFactor(zoom), y
-				/ Zoomer.getScaleFactor(zoom));
+		return noteRect.contains(x / Zoomer.getScaleFactor(getZoom()), y
+				/ Zoomer.getScaleFactor(getZoom()));
 	}
 
 	// 
 	@Override
 	public void addedToGui() {
 		if (CreateGui.getDrawingSurface() != null) {
-			deleted = false;
+			setDeleted(false);
 			updateBounds();
 			// CreateGui.getDrawingSurface().setNetChanged(true);
 		}
+	}
+
+	@Override
+	public void removedFromGui() {
+
 	}
 
 	public void setText(String text) {
@@ -196,28 +190,14 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	public String getText() {
 		return note.getText();
 	}
-	
-	@Override
-	public void undelete(DrawingSurfaceImpl view) {
-		add(note);
-		super.undelete(view);
-	}
 
 	@Override
 	public int getLayerOffset() {
 		return Pipe.NOTE_LAYER_OFFSET;
 	}
 
-	public int getOriginalX() {
-		return originalX;
-	}
-
-	public int getOriginalY() {
-		return originalY;
-	}
-
 	public void zoomUpdate(int percent) {
-		zoom = percent;
+		super.zoomUpdate(percent);
 		updateBounds();
 	}
 

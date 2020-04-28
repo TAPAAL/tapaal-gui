@@ -1,36 +1,16 @@
 package dk.aau.cs.gui.undo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.swing.undo.UndoManager;
-
-import pipe.dataLayer.DataLayer;
+import dk.aau.cs.gui.Context;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.util.Require;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import dk.aau.cs.TCTL.visitors.BooleanResult;
-import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.util.Require;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 public class MakePlaceNewSharedMultiCommand extends Command {
 
@@ -55,22 +35,23 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 		@Override
 		public void redo() {
 			SharedPlace sharedPlace = null;
-			int i = 0;
+			boolean first = true;
 			for(Template template : context.tabContent().allTemplates()) {
 				TimedPlaceComponent component = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
-				//We make a new shared place with the first place
-				if(component != null && i < 1) {
-					command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
-					command.redo();
-					sharedPlace = (SharedPlace)component.underlyingPlace();
-					commands.add(command);
-					i++;
-				//For the rest we make them shared with the recently made place
-				} else if (component != null && i >= 1){
-					command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
-					command.redo();
-					commands.add(command);
-				}
+
+                if (component != null) {
+                    if (first) { //We make a new shared place with the first place
+                        command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
+                        command.redo();
+                        sharedPlace = (SharedPlace) component.underlyingPlace();
+                        commands.add(command);
+                        first = false;
+                    } else { //For the rest we make them shared with the recently made place
+                        command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
+                        command.redo();
+                        commands.add(command);
+                    }
+                }
 			}
 		}
 

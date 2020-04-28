@@ -7,11 +7,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -32,15 +30,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.widgets.CustomJSpinner;
 
 public class SmartDrawDialog extends JDialog {
 	private static final long serialVersionUID = 6116530047981607501L;
@@ -221,8 +218,7 @@ public class SmartDrawDialog extends JDialog {
 					
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
-						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getPlaceTransitionObjects().size());
-						
+						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size());
 					}
 					
 					@Override
@@ -688,7 +684,7 @@ public class SmartDrawDialog extends JDialog {
 	
 	static private String[] getObjectNames() {
 		ArrayList<String> names = new ArrayList<String>();
-		for(PetriNetObject object : CreateGui.getDrawingSurface().getPlaceTransitionObjects()) {
+		for(PetriNetObject object : CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects()) {
 			names.add(object.getName());
 		}
 		return Arrays.copyOf(names.toArray(), names.toArray().length, String[].class);
@@ -698,8 +694,8 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
 		loadingDialogFrame.setType(Window.Type.POPUP);
-		ImageIcon loadingGIF = new ImageIcon(CreateGui.imgPath + "ajax-loader.gif");
-		
+		ImageIcon loadingGIF = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "ajax-loader.gif"));
+
 		JLabel workingLabel = new JLabel("<html><div style='text-align: center;'>Currently doing layout...<br/>This may take several minutes depending on the size of the net...</div></html>", SwingConstants.CENTER);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -746,7 +742,7 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cancelWorker();
-				CreateGui.getDrawingSurface().getUndoManager().undo();
+				CreateGui.getCurrentTab().getUndoManager().undo();
 				CreateGui.getDrawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
 				//smartDrawDialog.setVisible(true);
@@ -889,7 +885,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	private void enableButtons() {
-		if(CreateGui.getDrawingSurface().getPlaceTransitionObjects().size() > 0) {
+		if(CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size() > 0) {
 			drawButton.setEnabled(true);
 			drawButton.setToolTipText("Smart draw with the current options");
 			if(!(randomStartObjectCheckBox.isSelected()))

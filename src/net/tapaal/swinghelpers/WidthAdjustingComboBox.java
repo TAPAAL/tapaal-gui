@@ -1,9 +1,8 @@
-package pipe.gui.widgets;
+package net.tapaal.swinghelpers;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JPopupMenu;
@@ -11,7 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-public class WidthAdjustingComboBox extends JComboBox{
+public class WidthAdjustingComboBox<E> extends JComboBox<E>{
 
 	private static final long serialVersionUID = 1L;
 	

@@ -45,7 +45,7 @@ public class TimeInterval {
 		boolean equalBounds = !upperIsInfinity
 				&& IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) == 0;
 		boolean lowerIsNotInfinity = lower != Bound.Infinity;
-		boolean lowerSmallerThanUpper = IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) < 0;;
+		boolean lowerSmallerThanUpper = IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) < 0;
 
 		return lowerIsNotInfinity
 				&& ((upperIsInfinity && !isUpperIncluded)
@@ -54,17 +54,11 @@ public class TimeInterval {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(isLowerIncluded ? "[" : "(");
-		buffer.append(lower);
-		buffer.append(',');
-		buffer.append(upper);
-		buffer.append(isUpperIncluded ? "]" : ")");
-		return buffer.toString();
+		return toString(true);
 	}
 
 	public String toString(boolean displayConstantNames) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append(isLowerIncluded ? "[" : "(");
 		buffer.append(displayConstantNames ? lower : lower.value());
 		buffer.append(',');
@@ -158,8 +152,8 @@ public class TimeInterval {
 			}
 		}
 
-		return new TimeInterval(leftBracket.equals("[") ? true : false,
-				lowerBound, upperBound, rightBracket.equals("]") ? true : false);
+		return new TimeInterval(leftBracket.equals("["),
+				lowerBound, upperBound, rightBracket.equals("]"));
 	}
 
 	public TimeInterval copy() {

@@ -11,8 +11,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -240,12 +238,10 @@ public class ExportBatchDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 10, 0, 0);
 		JButton destinationPathSelector = new JButton("Select destination folder");
-		destinationPathSelector.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectDestinationPath();
-				destinationPathField.setText(destinationFile.getParent());
-				enableButtons();
-			}
+		destinationPathSelector.addActionListener(e -> {
+			selectDestinationPath();
+			destinationPathField.setText(destinationFile.getParent());
+			enableButtons();
 		});
 		chooserPanel.add(destinationPathSelector, gbc);
 		
@@ -263,12 +259,10 @@ public class ExportBatchDialog extends JDialog {
 		exportFilesButton = new JButton("Export All Nets and Queries");
 		exportFilesButton.setToolTipText(TOOL_TIP_ExportFilesButton);
 		exportFilesButton.setEnabled(false);
-		exportFilesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				tableModel.clear();
-				exportFiles();
-				enableButtons();
-			}
+		exportFilesButton.addActionListener(e -> {
+			tableModel.clear();
+			exportFiles();
+			enableButtons();
 		});
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -328,11 +322,9 @@ public class ExportBatchDialog extends JDialog {
 		
 		addFilesButton = new JButton("Add models");
 		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
-		addFilesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				addFiles();
-				enableButtons();
-			}
+		addFilesButton.addActionListener(arg0 -> {
+			addFiles();
+			enableButtons();
 		});
 
 		gbc = new GridBagConstraints();
@@ -346,12 +338,9 @@ public class ExportBatchDialog extends JDialog {
 		removeFileButton = new JButton("Remove models");
 		removeFileButton.setToolTipText(TOOL_TIP_RemoveFilesButton);
 		removeFileButton.setEnabled(false);
-		removeFileButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				removeSelectedFiles();
-				enableButtons();
-			}
+		removeFileButton.addActionListener(arg0 -> {
+			removeSelectedFiles();
+			enableButtons();
 		});
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -363,12 +352,9 @@ public class ExportBatchDialog extends JDialog {
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setToolTipText(TOOL_TIP_ClearFilesButton);
 		clearFilesButton.setEnabled(false);
-		clearFilesButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				clearFiles();
-				enableButtons();
-			}
+		clearFilesButton.addActionListener(e -> {
+			clearFiles();
+			enableButtons();
 		});
 		
 		gbc = new GridBagConstraints();
@@ -489,7 +475,7 @@ public class ExportBatchDialog extends JDialog {
 			    	if(!(Files.exists(path))) {
 		    			Files.createDirectories(path);
 		    			exportModel(file, path);
-		    			tableModel.addResult(noOrphanTransitions == false ? new String[]{file.getName(), path.toString(), NAME_SuccesString} 
+		    			tableModel.addResult(!noOrphanTransitions ? new String[]{file.getName(), path.toString(), NAME_SuccesString}
 		    			: new String[]{file.getName(), path.toString(), NAME_SuccesStringOrphanTransitionsRemoved});
 			    	}
 			    	else {

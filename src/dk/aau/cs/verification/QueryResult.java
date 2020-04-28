@@ -40,7 +40,7 @@ public class QueryResult {
 	
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		if(approximationInconclusive)
 			buffer.append(getInconclusiveString());
 		else {
@@ -72,7 +72,7 @@ public class QueryResult {
 	}
 	
 	protected String getInconclusiveString(){
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("The result of the approximation was inconclusive.");
 		return buffer.toString();
 	}
@@ -84,8 +84,5 @@ public class QueryResult {
 	public BoundednessAnalysisResult boundednessAnalysis() {
 		return boundednessAnalysis;
 	}
-	
-	public void flipResult() {
-		this.satisfied = !this.satisfied;
-	}
+
 }

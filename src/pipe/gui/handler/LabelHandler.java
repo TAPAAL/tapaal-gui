@@ -5,27 +5,25 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.NameLabel;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
 
-	private PetriNetObject obj;
+	private PetriNetObjectWithLabel obj;
 
 	private NameLabel nl;
 
 	protected Point dragInit = new Point();
-	
 	private double originalOffsetX, originalOffsetY;
-	
-	public LabelHandler(NameLabel _nl, PetriNetObject _obj) {
+
+	public LabelHandler(NameLabel _nl, PetriNetObjectWithLabel _obj) {
 		obj = _obj;
 		nl = _nl;
 	}
@@ -62,12 +60,11 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// 
-		if (!SwingUtilities.isLeftMouseButton(e) || CreateGui.getDrawingSurface().isInAnimationMode()) {
+		if (!SwingUtilities.isLeftMouseButton(e) || CreateGui.getCurrentTab().isInAnimationMode()) {
 			return;
 		}
 
-		Point p = javax.swing.SwingUtilities
-				.convertPoint(nl, e.getPoint(), obj);
+		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		// obj.setNameOffsetX((e.getXOnScreen() - dragInit.x)); //causes
 		// exception in Windows!
 		// obj.setNameOffsetY((e.getYOnScreen() - dragInit.y)); //causes
@@ -83,10 +80,9 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Point p = javax.swing.SwingUtilities
-				.convertPoint(nl, e.getPoint(), obj);
+		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		
-		CreateGui.getDrawingSurface().getUndoManager().addNewEdit(new UpdateNameLabelOffsetCommand(obj.getNameOffsetXObject(), obj.getNameOffsetYObject(), originalOffsetX, originalOffsetY, obj));
+		CreateGui.getCurrentTab().getUndoManager().addNewEdit(new UpdateNameLabelOffsetCommand(obj.getNameOffsetXObject(), obj.getNameOffsetYObject(), originalOffsetX, originalOffsetY, obj));
 		
 	}
 

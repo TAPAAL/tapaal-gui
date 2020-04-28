@@ -2,19 +2,13 @@ package dk.aau.cs.verification;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 
 public class VerificationResult<TTrace> {
@@ -25,7 +19,7 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
-	private boolean isOverApproximationResult = false;
+	private boolean isSolvedUsingStateEquation = false;
 	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -38,9 +32,9 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 	}
 	
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isOverApproximationResult){
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation){
 		this(queryResult, trace, verificationTime, stats);
-		this.isOverApproximationResult = isOverApproximationResult;
+		this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
 	}
 
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime) {
@@ -56,8 +50,8 @@ public class VerificationResult<TTrace> {
 			TTrace tapnTrace,
 			TTrace secondaryTrace2, long runningTime,
 			Stats value2,
-			boolean isOverApproximationResult) {
-		this(value1, tapnTrace, runningTime, value2, isOverApproximationResult);
+			boolean isSolvedUsingStateEquation) {
+		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation);
 		this.secondaryTrace = secondaryTrace2;
 	}
 
@@ -80,11 +74,11 @@ public class VerificationResult<TTrace> {
 			Integer transitionFired = element.value2();
 			returnList.add(new Tuple<String, Integer>(transitionName, transitionFired));
 		}
-		Collections.sort(returnList,new transitionTupleComparator());
+		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
         
-        public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
+	public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
 		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
 		for (int i = 0; i < stats.placeBoundCount();i++) {
 			Tuple<String,Integer> element = stats.getPlaceBoundStats(i);
@@ -95,7 +89,7 @@ public class VerificationResult<TTrace> {
 			Integer placeBound = element.value2();
 			returnList.add(new Tuple<String, Integer>(placeName, placeBound));
 		}
-		Collections.sort(returnList,new transitionTupleComparator());
+		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
 	
@@ -139,7 +133,6 @@ public class VerificationResult<TTrace> {
 	}
 
 	public long verificationTime() {
-
 		return verificationTime;
 	}
 
@@ -191,8 +184,8 @@ public class VerificationResult<TTrace> {
 		return m;
 	}
 	
-	public boolean isOverApproximationResult(){
-		return isOverApproximationResult;
+	public boolean isSolvedUsingStateEquation(){
+		return isSolvedUsingStateEquation;
 	}
 	
 	public void addTime(long timeToAdd) {
@@ -200,7 +193,7 @@ public class VerificationResult<TTrace> {
 	}
 
 	public String getCTLStatsAsString(){
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("Explored configurations: ");
 		buffer.append(stats.getConfigurations());
 		buffer.append(System.getProperty("line.separator"));

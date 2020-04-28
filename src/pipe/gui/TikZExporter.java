@@ -143,7 +143,7 @@ public class TikZExporter {
                 if (arc.getWeight().value() > 1) {
                         arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
                 }
-				arcLabel += "$\\mathrm{" + replaceWithMathLatex(((TimedInputArcComponent) arc).getGuardAsString(false)) + "}$";
+				arcLabel += "$\\mathrm{" + replaceWithMathLatex(getGuardAsStringIfNotHidden((TimedInputArcComponent) arc)) + "}$";
 				if (arc instanceof TimedTransportArcComponent)
 					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
 				arcLabel += "};\n";
@@ -162,12 +162,20 @@ public class TikZExporter {
 		return arcLabel;
 	}
 
+	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
+        if (!CreateGui.getApp().showZeroToInfinityIntervals() &&  arc.getGuardAsString().equals("[0,inf)")){
+			return "";
+		} else {
+			return arc.getGuardAsString();
+		}
+	}
+
 	private StringBuffer exportTransitions(Transition[] transitions) {
 		StringBuffer out = new StringBuffer();
 		for (Transition trans : transitions) {
 			String angle = "";
 			if (trans.getAngle() != 0)
-				angle = ",rotate=" + String.valueOf(trans.getAngle() + 90);
+				angle = ",rotate=" + (trans.getAngle() + 90);
 
 			out.append("\\node[transition");
 			out.append(angle);		
@@ -275,10 +283,11 @@ public class TikZExporter {
 	}
 
 	private String exportMultipleTokens(List<TimedToken> tokens) {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 
 		out.append(", structured tokens={\\#");
-		out.append(String.valueOf(tokens.size()));
+		out.append(tokens.size());
+
 		out.append("},");
 		if (!net.netType().equals(NetType.UNTIMED)) {
 			out.append("pin=above:{\\{");
@@ -321,7 +330,7 @@ public class TikZExporter {
 	}
 
 	private String exportMathName(String name) {
-		StringBuffer out = new StringBuffer("$\\mathrm{");
+		StringBuilder out = new StringBuilder("$\\mathrm{");
 		int subscripts = 0;
 		for (int i = 0; i < name.length() - 1; i++) {
 			char c = name.charAt(i);

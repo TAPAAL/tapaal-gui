@@ -10,8 +10,8 @@ public class BatchProcessingVerificationOptions {
 	
 	public enum QueryPropertyOption {
 		KeepQueryOption, SearchWholeStateSpace, ExistDeadlock, Soundness, StrongSoundness
-	};
-	
+	}
+
 	public enum SymmetryOption {
 		KeepQueryOption, Yes, No
 	};

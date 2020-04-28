@@ -6,27 +6,19 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.handler.AnimationHandler;
-import pipe.gui.handler.LabelHandler;
-import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
@@ -52,9 +44,6 @@ public class TimedTransitionComponent extends Transition {
 		transition.addTimedTransitionListener(listener);
 		attributesVisible = true;
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
 	}
 
 	public TimedTransitionComponent(double positionXInput,
@@ -68,17 +57,13 @@ public class TimedTransitionComponent extends Transition {
 		listener = timedTransitionListener();
 		attributesVisible = true;
 
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		addMouseHandler();
 	}
 
-
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TAPNTransitionHandler(this);
-		addMouseListener(new AnimationHandler());
+		mouseHandler = new TransitionHandler(this);
 	}
 
 	private TimedTransitionListener timedTransitionListener(){
@@ -90,14 +75,6 @@ public class TimedTransitionComponent extends Transition {
 
 			public void sharedStateChanged(TimedTransitionEvent e) { repaint(); }
 		};
-	}
-
-	@Override
-	public void delete() {
-		if (transition != null) {
-			transition.delete();
-		}
-		super.delete();
 	}
 
 	@Override
@@ -177,12 +154,11 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(transition != null) {
-			pnName.setName(transition.name());
-			pnName.setVisible(attributesVisible);
-			pnName.zoomUpdate(zoom);
+			getNameLabel().setName(transition.name());
+			getNameLabel().setVisible(attributesVisible);
 		}
 		else {
-			pnName.setText("");
+			getNameLabel().setText("");
 		}
 		super.update(displayConstantNames);
 		repaint();
@@ -226,7 +202,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;

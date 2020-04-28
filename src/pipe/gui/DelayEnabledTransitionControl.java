@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Hashtable;
@@ -36,7 +34,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 	private JLabel precitionLabel;
 	private JSlider delayEnabledPrecision;
 	private JLabel delayModeLabel;
-	private JComboBox delayMode;
+	private JComboBox<DelayMode> delayMode;
 	JCheckBox randomMode;
 	
 	private DelayEnabledTransitionControl() {
@@ -175,12 +173,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		closeDialogButton = new JButton("Close");
-		closeDialogButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}
-		});
+		closeDialogButton.addActionListener(arg0 -> dialog.setVisible(false));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;

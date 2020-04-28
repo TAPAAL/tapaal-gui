@@ -14,11 +14,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.ArcPathPointHandler;
-import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -34,8 +32,7 @@ public class ArcPathPoint extends PetriNetObject {
 	// The offset in x for the new point resulting from splitting a point
 	private final int DELTA = 10;
 
-	private static RectangularShape shape;
-	private ArcPath myArcPath;
+    private ArcPath myArcPath;
 	private Point2D.Float point = new Point2D.Float();
 	private Point2D.Float realPoint = new Point2D.Float();
 
@@ -45,19 +42,13 @@ public class ArcPathPoint extends PetriNetObject {
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
-		zoom = Pipe.ZOOM_DEFAULT;
-
-		//XXX: see note in function
-		addMouseHandler();
+	    super();
 	}
 
 	public ArcPathPoint(ArcPath a) {
 		this();
 		myArcPath = a;
 		setPointLocation(0, 0);
-
-		//XXX: see note in function
-		addMouseHandler();
 	}
 
 	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a) {
@@ -65,20 +56,10 @@ public class ArcPathPoint extends PetriNetObject {
 		myArcPath = a;
 		setPointLocation(x, y);
 		pointType = _pointType;
-
-		//XXX: see note in function
-		addMouseHandler();
-	}
-	
-	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a, int zoomLevel) {
-		this(x,y,_pointType,a);
-		zoom = zoomLevel;
-
-		//XXX: see note in function
-		addMouseHandler();
 	}
 
-	private void addMouseHandler() {
+	@Override
+	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
 		mouseHandler = new ArcPathPointHandler(this);
@@ -158,7 +139,8 @@ public class ArcPathPoint extends PetriNetObject {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
 				RenderingHints.VALUE_STROKE_NORMALIZE);
 
-		if (pointType == CURVED) {
+        RectangularShape shape;
+        if (pointType == CURVED) {
 			shape = new Ellipse2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
 		} else {
 			shape = new Rectangle2D.Double(0, 0, 2 * SIZE, 2 * SIZE);
@@ -201,7 +183,7 @@ public class ArcPathPoint extends PetriNetObject {
 				pointType, myArcPath);
 		myArcPath.insertPoint(i + 1, newPoint);
 		myArcPath.getArc().updateArcPosition();
-		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint);
+		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
 	}
 
 	public Point2D.Float getMidPoint(ArcPathPoint target) {
@@ -212,23 +194,6 @@ public class ArcPathPoint extends PetriNetObject {
 	public boolean isDeleteable() {
 		int i = getIndex();
 		return (i > 0 && i != myArcPath.getNumPoints() - 1);
-	}
-
-	@Override
-	public void delete() {// Won't delete if only two points left. General delete.
-		if (isDeleteable()) {
-			if (getArcPath().getArc().isSelected()) {
-				return;
-			}
-			kill();
-			myArcPath.updateArc();
-		}
-	}
-
-	public void kill() { // delete without the safety check :)
-		super.removeFromContainer(); // called internally by ArcPoint and parent
-										// ArcPath
-		myArcPath.deletePoint(this);
 	}
 
 	public Point2D.Float getControl1() {
@@ -264,12 +229,9 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void addedToGui() {
-	}
-
-	void hidePoint() {
-		super.removeFromContainer();
-	}
+	public void addedToGui() {}
+	@Override
+	public void removedFromGui() {}
 
 	@Override
 	public int getLayerOffset() {
@@ -282,17 +244,13 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void undelete(DrawingSurfaceImpl view) {
-	}
-
-	@Override
 	public String getName() {
 		return this.getArcPath().getArc().getName() + " - Point "
 				+ this.getIndex();
 	}
 
 	public void zoomUpdate(int zoom) {
-		this.zoom = zoom;
+		super.zoomUpdate(zoom);
 		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed out
 		if (zoom > 213) {
 			SIZE = 5;

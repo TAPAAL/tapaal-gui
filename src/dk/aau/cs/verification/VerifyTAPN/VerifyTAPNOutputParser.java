@@ -9,7 +9,6 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 
 public class VerifyTAPNOutputParser {
@@ -86,8 +85,7 @@ public class VerifyTAPNOutputParser {
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored, transitionStats, placeBoundStats));
-			return value; 
+			return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored, transitionStats, placeBoundStats));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

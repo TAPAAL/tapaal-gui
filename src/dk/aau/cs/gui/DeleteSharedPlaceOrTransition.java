@@ -33,7 +33,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
@@ -68,7 +68,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		this.list = list;
 		this.sharedPlacesAndTransitionsPanel = sharedPlacesAndTransitionsPanel;
 		this.tab = tab;
-		undoManager = tab.drawingSurface().getUndoManager();
+		undoManager = tab.getUndoManager();
 		this.sharedPlacesListModel = sharedPlacesListModel;
 		this.sharedTransitionsListModel = sharedTransitionsListModel;
 		this.nameGenerator = nameGenerator;
@@ -139,9 +139,9 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove, Collection<TAPNQuery> affectedQueries) {
 		SharedPlace sharedPlace = placeToRemove;
-		if(affectedQueries.size() > 0 && messageShown == false){
+		if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
-			StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
+			StringBuilder buffer = new StringBuilder("The following queries contains the shared place and will also be deleted:");
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append(System.getProperty("line.separator"));
 			
@@ -170,7 +170,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 						deleteArc(arc, template);
 					}
 
-					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel(), tab.drawingSurface());
+					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel());
 					cmd.redo();
 					undoManager.addEdit(cmd);
 				}
@@ -240,14 +240,14 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 
 	private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {
 		if(arc instanceof TimedInhibitorArcComponent){
-			return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel());
 		}else if(arc instanceof TimedTransportArcComponent){
 			TimedTransportArcComponent component = (TimedTransportArcComponent)arc;
-			return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel());
 		}else if(arc instanceof TimedInputArcComponent){
-			return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel());
 		}else{
-			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+			return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel());
 		}
 	}
 	
@@ -261,7 +261,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		SharedTransition sharedTransition = transitionToBeRemoved;
 		if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
-	        StringBuffer buffer = new StringBuffer("The following queries contains the shared transition and will also be deleted:");
+	        StringBuilder buffer = new StringBuilder("The following queries contains the shared transition and will also be deleted:");
 	        buffer.append(System.getProperty("line.separator"));
 	        buffer.append(System.getProperty("line.separator"));
 	
@@ -290,8 +290,9 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 						deleteArc(arc, template);
 					}
 
-					undoManager.addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
-					transition.delete();
+					Command c = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel());
+					undoManager.addEdit(c);
+					c.redo();
 				}
 			}
 			tab.drawingSurface().repaint();

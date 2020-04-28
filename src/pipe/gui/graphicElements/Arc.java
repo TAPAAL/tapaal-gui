@@ -2,7 +2,6 @@ package pipe.gui.graphicElements;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -10,29 +9,23 @@ import java.awt.geom.Point2D;
 import javax.swing.*;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
-import pipe.gui.undo.AddArcPathPointEdit;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Weight;
+import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
    Implementation of Element for drawing an arc
  */
-public abstract class Arc extends PetriNetObject {
+public abstract class Arc extends PetriNetObjectWithLabel {
 
 	private static final long serialVersionUID = 6527845538091358791L;
 
-	protected Shape head = new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {
-			0, -10, -7, -10 }, 4);
-	protected boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
-
-	//protected NameLabel label;
-
-	private static Point2D.Double point;
+	private Shape head = null;
+	private boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
 
 	/** References to the objects this arc connects */
 	private PlaceTransitionObject source = null;
@@ -43,6 +36,7 @@ public abstract class Arc extends PetriNetObject {
 	//Indicated wither the arc is being drawed (true), used to dispatch mouse events to parent
 	//Set to true, when using constructor for creating new arc when drawing
 	protected boolean isPrototype = false;
+	private static final boolean debugShowArcPathPoints = false;
 
 	public boolean isPrototype() {
 		return isPrototype;
@@ -56,27 +50,25 @@ public abstract class Arc extends PetriNetObject {
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
+	private Arc(int nameOffsetX, int nameOffsetY) {
+	    super(nameOffsetX, nameOffsetY);
+
+        setHead();
+    }
+
 	/**
 	 * Create Petri-Net Arc object
 	 * 
 	 */
-	public Arc(double startPositionXInput, double startPositionYInput,
-			double endPositionXInput, double endPositionYInput,
+	public Arc(
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		pnName = new NameLabel(zoom);
-		myPath.addPoint((float) startPositionXInput,
-				(float) startPositionYInput, ArcPathPoint.STRAIGHT);
-		myPath.addPoint((float) endPositionXInput, (float) endPositionYInput,
-				ArcPathPoint.STRAIGHT);
-		myPath.createPath();
-		updateBounds();
+		this(0,0);
+
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
 
-		//XXX see comment in function
-		setLableHandler();
 	}
 
 
@@ -84,47 +76,15 @@ public abstract class Arc extends PetriNetObject {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
+		this(0,0);
 		isPrototype = true;
-		pnName = new NameLabel(zoom);
-		source = newSource;
-		myPath.addPoint();
-		myPath.addPoint();
-		myPath.createPath();
 
-		//XXX see comment in function
-		setLableHandler();
-	}
-
-	public Arc() {
-		super();
-
-		pnName = new NameLabel(zoom);
-		//XXX see comment in function
-		setLableHandler();
-	}
-
-
-	private void setLableHandler() {
-
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		LabelHandler labelHandler = new LabelHandler(this.getNameLabel(), this);
-
-		getNameLabel().addMouseListener(labelHandler);
-		getNameLabel().addMouseMotionListener(labelHandler);
-		getNameLabel().addMouseWheelListener(labelHandler);
+		setSource(newSource);
 
 	}
 
 	abstract public void setWeight(Weight weight);
 	abstract public Weight getWeight();
-	
-	public double getNameOffsetX() {
-		return nameOffsetX;
-	}
-	public double getNameOffsetY() {
-		return nameOffsetY;
-	}
 
 	/**
 	 * Set source
@@ -146,13 +106,16 @@ public abstract class Arc extends PetriNetObject {
 		target = targetInput;
 	}
 
-	public void setLabelPosition() {
+	protected void setLabelPosition() {
 
-		pnName.setPosition(Grid.getModifiedX((double) (myPath.midPoint.x + Zoomer.getZoomedValue(nameOffsetX, zoom))),
-						  Grid.getModifiedY((double) (myPath.midPoint.y + Zoomer.getZoomedValue(nameOffsetY, zoom))));
+		getNameLabel().setPosition(
+				Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(getNameOffsetX(), getZoom())),
+				Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))
+		);
+
 	}
 	@Override
-	public void updateLabelLocation() {
+	public void updateLabelLocation(boolean alignToGrid) {
 		setLabelPosition();
 	}
 
@@ -177,11 +140,6 @@ public abstract class Arc extends PetriNetObject {
 	public String getName() {
 		return getId();
 	}
-	
-	@Override 
-	public NameLabel getNameLabel() {
-		return pnName;
-	}
 
 	/**
 	 * Get source returns null if value not yet entered
@@ -201,23 +159,6 @@ public abstract class Arc extends PetriNetObject {
 		return target;
 	}
 
-	/**
-	 * Get X-axis value of start position
-	 * 
-	 * @return Double value for X-axis of start position
-	 */
-	public double getStartPositionX() {
-		return myPath.getPoint(0).getX();
-	}
-
-	/**
-	 * Get Y-axis value of start position
-	 * 
-	 * @return Double value for Y-axis of start position
-	 */
-	public double getStartPositionY() {
-		return myPath.getPoint(0).getY();
-	}
 	/**
 	 * Updates the start position of the arc, resets the arrowhead and updates
 	 * the bounds
@@ -258,7 +199,7 @@ public abstract class Arc extends PetriNetObject {
 
 	/** Updates the bounding box of the arc component based on the arcs bounds */
 	public void updateBounds() {
-		bounds = myPath.getBounds();
+        Rectangle bounds = myPath.getBounds();
 		bounds.grow(COMPONENT_DRAW_OFFSET + zoomGrow, COMPONENT_DRAW_OFFSET
 				+ zoomGrow);
 		setBounds(bounds);
@@ -295,8 +236,18 @@ public abstract class Arc extends PetriNetObject {
 			//this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
-		g2.setStroke(new BasicStroke(0.01f * zoom));
+		g2.setStroke(new BasicStroke(0.01f * getZoom()));
 		g2.draw(myPath);
+
+		if (debugShowArcPathPoints) {
+			Color c = g2.getColor();
+			for (ArcPathPoint p : getArcPath().getArcPathPoints()) {
+				drawCenteredCircle(g2, p.getPoint().x, p.getPoint().y, new Color(255, 0, 0, 80));
+				drawCenteredCircle(g2, p.getControl1().x, p.getControl1().y, new Color(0, 255, 0, 80));
+				drawCenteredCircle(g2, p.getControl2().x, p.getControl2().y, new Color(0, 0, 255, 80));
+			}
+			g2.setColor(c);
+		}
 
 		//Draw Arrow-head
 		//Jump to arc end
@@ -307,7 +258,7 @@ public abstract class Arc extends PetriNetObject {
 		g2.rotate(myPath.getEndAngle() + Math.PI);
 		g2.setColor(java.awt.Color.WHITE);
 
-		g2.transform(Zoomer.getTransform(zoom));
+		g2.transform(Zoomer.getTransform(getZoom()));
 		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
 
 		if (selected) {
@@ -336,12 +287,20 @@ public abstract class Arc extends PetriNetObject {
 		g2.transform(reset);
 	}
 
+	private void drawCenteredCircle(Graphics2D g, double x, double y, Color c) {
+		int r = 10;
+		x = x-(r/2);
+		y = y-(r/2);
+		g.setColor(c);
+		g.fillOval((int)x,(int)y,r,r);
+	}
+
 	@Override
 	public boolean contains(int x, int y) {
-		point = new Point2D.Double(x + myPath.getBounds().getX()
+		Point2D.Double point = new Point2D.Double(x + myPath.getBounds().getX()
 				- COMPONENT_DRAW_OFFSET - zoomGrow, y
 				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
-		if (!CreateGui.getDrawingSurface().isInAnimationMode()) {
+		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
 				myPath.showPoints();
@@ -355,77 +314,43 @@ public abstract class Arc extends PetriNetObject {
 	@Override
 	public void addedToGui() {
 		// called by GuiView / State viewer when adding component.
-		deleted = false;
+		setDeleted(false);
 
-		myPath.addPointsToGui((DrawingSurfaceImpl) getParent());
+		myPath.addPointsToGui(getGuiModel());
 
 		updateArcPosition();
-		if (getParent() != null && pnName.getParent() == null) {
-			getParent().setLayer(pnName, JLayeredPane.DEFAULT_LAYER + pnName.getLayerOffset());
-			getParent().add(pnName);
-		}
+		updateLabel(true);
+
+
+		super.addedToGui();
 	}
 
 	@Override
-	public void delete() {
-		if (!deleted) {
-			if (getParent() != null) {
-				getParent().remove(pnName);
-			}
-			if(source != null) source.removeFromArc(this);
-			if(target != null) target.removeToArc(this);
-			myPath.forceHidePoints();
-			super.delete();
-			deleted = true;
+	public void removedFromGui() {
+
+		super.removedFromGui();
+
+		//Remove arcpathpoints
+		for (ArcPathPoint p : myPath.getArcPathPoints()){
+			getGuiModel().removePetriNetObject(p);
 		}
+
 	}
 
 	public void setPathToTransitionAngle(int angle) {
 		myPath.setTransitionAngle(angle);
 	}
-
-	public Command split(Point2D.Float mouseposition) {
-		ArcPathPoint newPoint = myPath.splitSegment(mouseposition);
-		return new AddArcPathPointEdit(this, newPoint);
-	}
-
-	public Transition getTransition() {
-		if (getTarget() instanceof Transition) {
-			return (Transition) getTarget();
-		} else {
-			return (Transition) getSource();
-		}
-	}
-
-	public void removeFromView() {
-		if (getParent() != null) {
-			getParent().remove(pnName);
-		}
-		myPath.forceHidePoints();
-		removeFromContainer();
-	}
-
-	public boolean getsSelected(Rectangle selectionRectangle) {
-		if (selectable) {
-			ArcPath arcPath = getArcPath();
-			if (arcPath.proximityIntersects(selectionRectangle)) {
-				arcPath.showPoints();
-			} else {
-				arcPath.hidePoints();
-			}
-			if (arcPath.intersects(selectionRectangle)) {
-				select();
-				return true;
-			}
-		}
-		return false;
-	}
 	
-	public void selectPath(){
+	private void selectPath(){
 		if (selectable) {
 			myPath.selectAllPoints();
 		}
 	}
+
+    public void select() {
+	    super.select();
+	    selectPath();
+    }
 
 	@Override
 	public int getLayerOffset() {
@@ -437,27 +362,9 @@ public abstract class Arc extends PetriNetObject {
 	}
 
 	public void zoomUpdate(int percent) {
-		zoom = percent;
+		super.zoomUpdate(percent);
 		this.updateArcPosition();
-		this.updateOnMoveOrZoom();
-		pnName.zoomUpdate(percent);
-		pnName.updateSize();
 	}
-
-	public void setZoom(int percent) {
-		zoom = percent;
-	}
-
-	@Override
-	public void undelete(DrawingSurfaceImpl view) {
-		if (this.isDeleted()) {
-			super.undelete(view);
-			getSource().addConnectFrom(this);
-			getTarget().addConnectTo(this);
-			deleted = false;
-		}
-	}
-
 
 	/**
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
@@ -492,15 +399,22 @@ public abstract class Arc extends PetriNetObject {
 		public void actionPerformed(ActionEvent e) {
 			DrawingSurfaceImpl aView = CreateGui.getDrawingSurface();
 			if (aView.createArc == arcBeingDraw) {
-				aView.createArc = null;
-				delete();
+				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
 
-				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE)
-						|| (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
-					CreateGui.getApp().endFastMode();
-				}
 				aView.repaint();
 			}
 		}
+	}
+
+	protected final void setHead(Shape head, Boolean fillHead) {
+		this.head = head;
+		this.fillHead = fillHead;
+	}
+
+	/**
+	 * This method should be overwritten in any class that wishes to set an other arc head.
+	 */
+	protected void setHead() {
+		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {0, -10, -7, -10 }, 4), true) ;
 	}
 }

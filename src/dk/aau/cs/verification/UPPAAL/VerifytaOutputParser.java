@@ -3,7 +3,6 @@ package dk.aau.cs.verification.UPPAAL;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.verification.InconclusiveBoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 
 public class VerifytaOutputParser {
 	private static final String PROPERTY_IS_NOT_SATISFIED_STRING = "is NOT satisfied".toLowerCase();

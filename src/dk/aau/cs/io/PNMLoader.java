@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -41,12 +40,9 @@ import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
@@ -92,11 +88,7 @@ public class PNMLoader {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(file);
-		} catch (ParserConfigurationException e) {
-			return null;
-		} catch (SAXException e) {
-			return null;
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			return null;
 		}
 	}
@@ -329,8 +321,8 @@ public class PNMLoader {
 						String arcTempX = position.getAttribute("x");
 						String arcTempY = position.getAttribute("y");
 
-						float arcPointX = Float.valueOf(arcTempX).floatValue();
-						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						float arcPointX = Float.valueOf(arcTempX);
+						float arcPointY = Float.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						
@@ -372,8 +364,8 @@ public class PNMLoader {
 		String x = offset.getAttribute("x");
 		String y = offset.getAttribute("y");
 		
-                int xd = Math.round(Float.valueOf(x).floatValue());
-                int yd = Math.round(Float.valueOf(y).floatValue());
+                int xd = Math.round(Float.valueOf(x));
+                int yd = Math.round(Float.valueOf(y));
                
 		return new Point(xd, yd);
 	}
@@ -438,9 +430,6 @@ public class PNMLoader {
 			arc.setUnderlyingArc(inputArc);
 
 			template.guiModel().addPetriNetObject(arc);
-
-			source.addConnectFrom(arc);
-			target.addConnectTo(arc);
 		}
 		
 		template.model().add(inputArc);
@@ -471,8 +460,6 @@ public class PNMLoader {
 
 			template.guiModel().addPetriNetObject(arc);
 
-			source.addConnectFrom(arc);
-			target.addConnectTo(arc);
 		}
 		
 		template.model().add(outputArc);
@@ -494,8 +481,6 @@ public class PNMLoader {
 		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inhibArc);
 
-		source.addConnectFrom(tempArc);
-		target.addConnectTo(tempArc);
 		return tempArc;
 	}
 	

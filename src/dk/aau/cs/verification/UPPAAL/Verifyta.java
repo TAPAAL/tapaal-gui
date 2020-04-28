@@ -109,10 +109,9 @@ public class Verifyta implements ModelChecker {
 					result = readVersionNumberFrom(stream);
 				}
 				child.waitFor();
-			} catch (IOException e) {
-			} catch (InterruptedException e) {
+			} catch (IOException | InterruptedException e) {
 			}
-		}
+        }
 
 		return result;
 	}
@@ -221,7 +220,7 @@ public class Verifyta implements ModelChecker {
 	}
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-		StringBuffer buffer = new StringBuffer(options.toString());
+		StringBuilder buffer = new StringBuilder(options.toString());
 		buffer.append(' ');
 		buffer.append(modelFile);
 		buffer.append(' ');
@@ -295,7 +294,7 @@ public class Verifyta implements ModelChecker {
 				}
 		}
 		
-		if (((VerifytaOptions) options).traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry() == true) {
+		if (options.traceOption() == TraceOption.SOME && ((VerifytaOptions) options).symmetry()) {
 			return false;
 		}
 		
@@ -346,12 +345,13 @@ public class Verifyta implements ModelChecker {
 
 	private String readOutput(BufferedReader reader) {
 		try {
-			if (!reader.ready())
+			if (!reader.ready()) {
 				return "";
+			}
 		} catch (IOException e1) {
 			return "";
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		String line = null;
 		try {
 			while ((line = reader.readLine()) != null) {
@@ -366,8 +366,7 @@ public class Verifyta implements ModelChecker {
 
 	private QueryResult parseQueryResult(String output, TAPNQuery query) {
 		VerifytaOutputParser outputParser = new VerifytaOutputParser(query);
-		QueryResult queryResult = outputParser.parseOutput(output);
-		return queryResult;
+		return outputParser.parseOutput(output);
 	}
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query, QueryResult queryResult) {
@@ -377,7 +376,7 @@ public class Verifyta implements ModelChecker {
 		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)), (VerifytaOptions) options);
 
 		if (trace == null) {
-			if (((VerifytaOptions) options).traceOption() != TraceOption.NONE) {
+			if (options.traceOption() != TraceOption.NONE) {
 				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
 				   (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied()))
 					return null;

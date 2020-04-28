@@ -13,7 +13,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
-import dk.aau.cs.TCTL.XMLParsing.XMLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
@@ -73,15 +72,7 @@ public class XMLQueryLoader extends QueryLoader{
             
         try{
             doc = db.parse(file);
-        } catch (SAXException e){
-            Logger.log(e);
-            createDialogBox(e.getMessage(), "Parse Exception");
-            return queries;
-        } catch (IOException e){
-            Logger.log(e);
-            createDialogBox(e.getMessage(), "Parse Exception");
-            return queries;
-        } catch (IllegalArgumentException e){
+        } catch (SAXException | IllegalArgumentException | IOException e){
             Logger.log(e);
             createDialogBox(e.getMessage(), "Parse Exception");
             return queries;

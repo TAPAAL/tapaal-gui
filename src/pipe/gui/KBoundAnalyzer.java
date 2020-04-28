@@ -44,8 +44,7 @@ public class KBoundAnalyzer {
 		VerifyTAPNOptions options = verificationOptions();
 
 		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
-		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
-		dialog.setupListeners(analyzer);
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
 		analyzer.execute(options, tapnNetwork, query, null);
 		dialog.setVisible(true);
@@ -57,7 +56,7 @@ public class KBoundAnalyzer {
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, tapnNetwork.hasUrgentTransitions()?false:true, true, false, false, 1, false);
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false);
 		}
 		return null;
 	}

@@ -1,8 +1,6 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -112,6 +110,7 @@ public class LocalTimedPlace  extends TimedPlace {
 		return tokens().size();
 	}
 
+	@Override
 	public void addToken(TimedToken timedToken) {
 		Require.that(timedToken != null, "timedToken cannot be null");
 		Require.that(timedToken.place().equals(this), "token is located in a different place");
@@ -119,7 +118,8 @@ public class LocalTimedPlace  extends TimedPlace {
 		currentMarking.add(timedToken);
 		fireMarkingChanged();
 	}
-	
+
+	@Override
 	public void addTokens(Iterable<TimedToken> tokens) {
 		Require.that(tokens != null, "tokens cannot be null");
 		
@@ -129,12 +129,14 @@ public class LocalTimedPlace  extends TimedPlace {
 		fireMarkingChanged();
 	}
 
+	@Override
 	public void removeToken(TimedToken timedToken) {
 		Require.that(timedToken != null, "timedToken cannot be null");
 		currentMarking.remove(timedToken);
 		fireMarkingChanged();
 	}
 
+	@Override
 	public void removeToken() {
 		if (numberOfTokens() > 0) {
 			currentMarking.remove(tokens().get(0));

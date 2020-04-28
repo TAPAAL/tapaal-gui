@@ -21,7 +21,7 @@ public class IntWeight extends Weight{
 	@Override
 	public String toString() {
 		if(value > 1){
-			return Integer.toString(value) + "x";
+			return value + "x";
 		} else {
 			return "";
 		}

@@ -1,12 +1,10 @@
 package pipe.gui.graphicElements;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
@@ -15,7 +13,7 @@ import pipe.gui.handler.LabelHandler;
  * Petri-Net Place or Transition SuperClass
  * 
  */
-public abstract class PlaceTransitionObject extends PetriNetObject {
+public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
 	private static final long serialVersionUID = -6629006415467929184L;
 
@@ -27,82 +25,43 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	protected boolean attributesVisible = false;
 
-	// The "real" x/y coordinate of this place or transition in the net.
-	// i.e. the x position at 100% zoom.
-	private double locationX;
-	private double locationY;
-
-	/**
-	 * Create Petri-Net Object
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 * @param idInput
-	 *            Place id
-	 * @param nameOffsetXInput
-	 *            Name X-axis Position
-	 * @param nameOffsetYInput
-	 *            Name Y-axis Position
-	 */
-	public PlaceTransitionObject(double positionXInput, double positionYInput,
-			String idInput, double nameOffsetXInput,
-			double nameOffsetYInput) {
-		this(positionXInput, positionYInput);
-		id = idInput;
-		nameOffsetX = nameOffsetXInput;
-		nameOffsetY = nameOffsetYInput;
-		pnName.setPosition((int) nameOffsetX, (int) nameOffsetY);
-		// setName(nameInput);
-	}
-
-	/**
-	 * Create Petri-Net Object This constructor does all the work, the others
-	 * just call it.
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 */
-	public PlaceTransitionObject(double positionXInput, double positionYInput) {
+	public PlaceTransitionObject(
+			int positionXInput,
+			int positionYInput,
+			String idInput,
+			int nameOffsetXInput,
+			int nameOffsetYInput
+	){
+		super(nameOffsetXInput, nameOffsetYInput);
 
 		setPositionX(positionXInput);
 		setPositionY(positionYInput);
 
-		nameOffsetX = Pipe.DEFAULT_OFFSET_X;
-		nameOffsetY = Pipe.DEFAULT_OFFSET_Y;
+		id = idInput;
 
-		// sets up Namelabel for each PN object
-		pnName = new NameLabel(zoom);
-		LabelHandler labelHandler = new LabelHandler(pnName, this);
-		getNameLabel().addMouseListener(labelHandler);
-		getNameLabel().addMouseMotionListener(labelHandler);
-		getNameLabel().addMouseWheelListener(labelHandler);
 	}
 
-	/**
-	 * Set X-axis position
-	 * 
-	 * @param positionXInput
-	 *            Double value for X-axis position
-	 */
-	public void setPositionX(double positionXInput) {
-		positionX = positionXInput;
-		locationX = Zoomer.getUnzoomedValue(positionX, zoom);
+	public PlaceTransitionObject(int positionXInput, int positionYInput) {
+		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
 	}
 
-	/**
-	 * Set Y-axis position
-	 * 
-	 * @param positionYInput
-	 *            Double value for Y-axis position
-	 */
-	public void setPositionY(double positionYInput) {
-		positionY = positionYInput;
-		locationY = Zoomer.getUnzoomedValue(positionY, zoom);
+	@Deprecated
+	public PlaceTransitionObject(
+			double positionXInput,
+			double positionYInput,
+			String idInput,
+			double nameOffsetXInput,
+			double nameOffsetYInput
+	) {
+		this((int)positionXInput, (int) positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput);
 	}
+
+	@Deprecated
+	public PlaceTransitionObject(double positionXInput, double positionYInput) {
+		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
+	}
+
+
 
 	/**
 	 * Set name
@@ -114,25 +73,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	public void setName(String nameInput) {
 		// sets the text within the label
 		// System.out.println("setting name to: " + nameInput);
-		pnName.setName(nameInput);
-	}
-
-	/**
-	 * Get X-axis position
-	 * 
-	 * @return Double value for X-axis position
-	 */
-	public double getPositionX() {
-		return positionX;
-	}
-
-	/**
-	 * Get Y-axis position
-	 * 
-	 * @return Double value for Y-axis position
-	 */
-	public double getPositionY() {
-		return positionY;
+		getNameLabel().setName(nameInput);
 	}
 
 	/**
@@ -164,36 +105,12 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 */
 	@Override
 	public String getName() {
-		return (pnName != null) ? pnName.getName() : "";
+		return (getNameLabel() != null) ? getNameLabel().getName() : "";
 	}
 
-	public double getNameOffsetX() {
-		return nameOffsetX;
-	}
 
-	public double getNameOffsetY() {
-		return nameOffsetY;
-	}
 
-	/**
-	 * Get X-axis position, returns null if value not yet entered
-	 * 
-	 * @return Double value for X-axis position
-	 */
-	public Double getPositionXObject() {
-		return new Double(locationX);
-		// return new Double(positionX);
-	}
 
-	/**
-	 * Get Y-axis position, returns null if value not yet entered
-	 * 
-	 * @return Double value for Y-axis position
-	 */
-	public Double getPositionYObject() {
-		return new Double(locationY);
-		// return new Double(positionY);
-	}
 
 	/**
 	 * Implemented in subclasses as involves some tailoring according to the
@@ -205,11 +122,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 		Graphics2D g2 = (Graphics2D) g;
 		g2.translate(COMPONENT_DRAW_OFFSET, COMPONENT_DRAW_OFFSET);
-		g2.transform(Zoomer.getTransform(zoom));
-	}
-
-	public Point2D getIntersectOffset(Point2D start) {
-		return new Point2D.Double();
+		g2.transform(Zoomer.getTransform(getZoom()));
 	}
 
 	/**
@@ -220,7 +133,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 * @return Top offset of Place
 	 */
 	public int centreOffsetTop() {
-		return (int) (Zoomer.getZoomedValue(componentHeight / 2.0, zoom));
+		return (int) (Zoomer.getZoomedValue(componentHeight / 2.0, getZoom()));
 	}
 
 	/**
@@ -231,14 +144,15 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 	 * @return Left offset of Place
 	 */
 	public int centreOffsetLeft() {
-		return (int) (Zoomer.getZoomedValue(componentWidth / 2.0, zoom));
+		return (int) (Zoomer.getZoomedValue(componentWidth / 2.0, getZoom()));
 	}
 
 	/** Calculates the BoundsOffsets used for setBounds() method */
 	public void updateBounds() {
-		double scaleFactor = Zoomer.getScaleFactor(zoom);
-		positionX = locationX * scaleFactor;
-		positionY = locationY * scaleFactor;
+		double scaleFactor = Zoomer.getScaleFactor(getZoom());
+		positionX = originalX * scaleFactor;
+		positionY = originalY * scaleFactor;
+		Rectangle bounds = new Rectangle();
 		bounds.setBounds((int) positionX, (int) positionY,
 				(int) (componentWidth * scaleFactor),
 				(int) (componentHeight * scaleFactor));
@@ -266,18 +180,12 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	/** Updates location of any attached arcs */
 	public void updateConnected() {
-		Iterator<Arc> arcsFrom = connectFrom.iterator();
-
-		Arc someArc;
-		while (arcsFrom.hasNext()) {
-			someArc = (arcsFrom.next());
+		for (Arc someArc : connectFrom) {
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
 		}
 
-		Iterator<Arc> arcsTo = connectTo.iterator();
-		while (arcsTo.hasNext()) {
-			someArc = (arcsTo.next());
+		for (Arc someArc : connectTo) {
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
 		}
@@ -296,7 +204,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		setPositionY(y - (getHeight() / 2.0));
 		update(true);
 	}
-	
+
 	public void update(boolean displayConstantNames) {
 		update(displayConstantNames, true);
 	}
@@ -310,29 +218,20 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 				+ getHeight() / 2.0);
 	}
 
-	@Override
-	public void delete() {
-		if (getParent() != null) {
-			getParent().remove(pnName);
-		}
-		super.delete();
-	}
-
 	/** Handles selection for Place/Transitions */
 	@Override
 	public void select() {
 		if (selectable && !selected) {
 			selected = true;
 
-			if (pnName != null) {
-				pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
+			if (getNameLabel() != null) {
+				getNameLabel().setForeground(Pipe.SELECTION_LINE_COLOUR);
 			}
 
 			// Select arcs that are connected from this object to another selected object.
 			for (Arc arc : getPostset()) {
 				if(arc.getTarget().isSelected()){
 					arc.select();
-					arc.selectPath();
 				}
 			}
 
@@ -340,7 +239,6 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 			for (Arc arc : getPreset()) {
 				if(arc.getSource().isSelected()){
 					arc.select();
-					arc.selectPath();
 				}
 			}
 			repaint();
@@ -349,12 +247,14 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 
 	@Override
 	public void addedToGui() {
-		deleted = false;
-		addLabelToContainer();
+		setDeleted(false);
+		super.addedToGui();
 		update(true);
 		updateOnMoveOrZoom();
 	}
-	
+
+    // TODO: Find a better name for this
+
 	@Override
 	public void updateOnMoveOrZoom() {
 		updateOnMoveOrZoom(true);
@@ -407,10 +307,14 @@ public abstract class PlaceTransitionObject extends PetriNetObject {
 		return Pipe.PLACE_TRANSITION_LAYER_OFFSET;
 	}
 
-	public abstract void toggleAttributesVisible();
+
+	public void toggleAttributesVisible() {
+		attributesVisible = !attributesVisible;
+		update(true);
+	};
 
 	public void zoomUpdate(int value) {
-		zoom = value;
+		super.zoomUpdate(value);
 		update(true, false);
 	}
 

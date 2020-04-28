@@ -5,8 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -59,12 +57,25 @@ public abstract class Transition extends PlaceTransitionObject {
 			String idInput, double nameOffsetXInput,
 			double nameOffsetYInput,
 			boolean infServer, int angleInput, int priority) {
+		this((int)positionXInput, (int)positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput, angleInput);
+	}
+
+	/**
+	 * Create Petri-Net Transition object
+	 */
+	public Transition(
+			int positionXInput,
+			int positionYInput,
+			String idInput,
+			int nameOffsetXInput,
+			int nameOffsetYInput,
+			int angleInput
+	){
 		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; // sets width
 		componentHeight = TRANSITION_HEIGHT;// sets height
 		constructTransition();
 		angle = 0;
-		setCentre((int) positionX, (int) positionY);
 		rotate(angleInput);
 		updateBounds();
 	}
@@ -78,13 +89,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	 *            Y-axis Position
 	 */
 	public Transition(double positionXInput, double positionYInput) {
-		super(positionXInput, positionYInput);
-		componentWidth = TRANSITION_HEIGHT; // sets width
-		componentHeight = TRANSITION_HEIGHT;// sets height
-		constructTransition();
-		setCentre((int) positionX, (int) positionY);
-		updateBounds();
-		this.updateEndPoints();
+		this((int)positionXInput, (int)positionYInput,null, 0,0, 0);
 	}
 
 	@Override
@@ -127,9 +132,8 @@ public abstract class Transition extends PlaceTransitionObject {
 				.toRadians(angleInc), componentWidth / 2, componentHeight / 2));
 		outlineTransition();
 
-		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
-		while (arcIterator.hasNext()) {
-			(arcIterator.next()).calcAngle();
+		for (ArcAngleCompare arcAngleCompare : arcAngleList) {
+			arcAngleCompare.calcAngle();
 		}
 		Collections.sort(arcAngleList);
 
@@ -199,8 +203,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	
 	/**
 	 * Sets whether Transition is enabled
-	 * 
-	 * @return enabled if True
 	 */
 	@Override
 	public void setEnabled(boolean status) {
@@ -227,33 +229,15 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	@Override
 	public boolean contains(int x, int y) {
-		int zoomPercentage = zoom;
+		int zoomPercentage = getZoom();
 
-		double unZoomedX = (x - COMPONENT_DRAW_OFFSET)
-				/ (zoomPercentage / 100.0);
-		double unZoomedY = (y - COMPONENT_DRAW_OFFSET)
-				/ (zoomPercentage / 100.0);
+		double unZoomedX = (x - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
+		double unZoomedY = (y - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 
-		Arc someArc = CreateGui.getDrawingSurface().createArc;
-		if (someArc != null) { // Must be drawing a new Arc if non-NULL.
-			if ((proximityTransition.contains((int) unZoomedX, (int) unZoomedY) || transition
-					.contains((int) unZoomedX, (int) unZoomedY))
-					&& areNotSameType(someArc.getSource())) {
-				// assume we are only snapping the target...
-				if (someArc.getTarget() != this) {
-					someArc.setTarget(this);
-				}
-				someArc.updateArcPosition();
-				return true;
-			} else {
-				if (someArc.getTarget() == this) {
-
-					someArc.setTarget(null);
-					removeArcCompareObject(someArc);
-					updateConnected();
-				}
-				return false;
-			}
+		Arc createArc = CreateGui.getDrawingSurface().createArc;
+		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+			return (proximityTransition.contains((int) unZoomedX, (int) unZoomedY) ||
+					transition.contains((int) unZoomedX, (int) unZoomedY));
 		} else {
 			return transition.contains((int) unZoomedX, (int) unZoomedY);
 		}
@@ -279,6 +263,7 @@ public abstract class Transition extends PlaceTransitionObject {
 				arcIterator.remove();
 				continue;
 			}
+
 			if (thisArc.arc == arc) {
 				thisArc.calcAngle();
 				match = true;
@@ -323,7 +308,7 @@ public abstract class Transition extends PlaceTransitionObject {
 				.toRadians(angle + Math.PI));
 		Point2D.Double transformed = new Point2D.Double();
 
-		transform.concatenate(Zoomer.getTransform(zoom));
+		transform.concatenate(Zoomer.getTransform(getZoom()));
 
 		arcIterator = top.iterator();
 		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT),
@@ -396,32 +381,14 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 	}
 
-	@Override
-	public void addedToGui() {
-		super.addedToGui();
-		update(true);
-	}
-
 	private String getText() {
 		return "";
 	}
 
 	@Override
-	public void setCentre(double x, double y) {
-		super.setCentre(x, y);
-		update(true);
-	}
-
-	@Override
-	public void toggleAttributesVisible() {
-		attributesVisible = !attributesVisible;
-		update(true);
-	}
-
-	@Override
 	public void update(boolean displayConstantNames) {
-		pnName.setText(getText());
-		pnName.zoomUpdate(zoom);
+		getNameLabel().setText(getText());
+
 		super.update(displayConstantNames);
 		this.repaint();
 	}
@@ -441,9 +408,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		public int compareTo(ArcAngleCompare arg0) {
-			double angle2 = arg0.angle;
-
-			return (angle < angle2 ? -1 : (angle == angle2 ? 0 : 1));
+			return (Double.compare(this.angle, arg0.angle));
 		}
 
 		private void calcAngle() {
@@ -487,16 +452,14 @@ public abstract class Transition extends PlaceTransitionObject {
 	 }
 	 
 	 private void initBlinkTimer(){
-		 blinkTimer = new Timer(150, new ActionListener() {			 
-		      public void actionPerformed(ActionEvent evt) {		    	  		    	  
-		    	  if(blinkCount <= 2 ){
-		    		  setVisible(!isVisible());
-		    		  blinkCount++;		    	  
-		    	  } else {
-		    		  setVisible(true); // Ensures that transition is always visible after last blink
-		    		  blinkTimer.stop();
-		    	  }
-		      }
+		 blinkTimer = new Timer(150, evt -> {
+			 if(blinkCount <= 2 ){
+				 setVisible(!isVisible());
+				 blinkCount++;
+			 } else {
+				 setVisible(true); // Ensures that transition is always visible after last blink
+				 blinkTimer.stop();
+			 }
 		 });
 	 }
 }

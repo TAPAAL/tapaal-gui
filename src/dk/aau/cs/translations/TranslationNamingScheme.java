@@ -20,7 +20,7 @@ public interface TranslationNamingScheme {
 
 		public enum SequenceInfo {
 			WHOLE, END
-		};
+		}
 
 		public TransitionTranslation(int startsAt, int endsAt,
 				String originalTransitionName, SequenceInfo sequenceInfo) {
