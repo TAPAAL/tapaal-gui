@@ -133,8 +133,6 @@ public class QueryDialog extends JPanel {
 	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
 	private static final String SHARED = "Shared";
 
-	private static final long serialVersionUID = 7852107237344005546L;
-
 	public enum QueryDialogueOption {
 		VerifyNow, Save, Export
 	}
@@ -2770,9 +2768,7 @@ public class QueryDialog extends JPanel {
 		}
 	}
 
-	private class QueryConstructionUndoManager extends UndoManager {
-		private static final long serialVersionUID = 1L;
-
+	private static class QueryConstructionUndoManager extends UndoManager {
 		public UndoableEdit GetNextEditToUndo() {
 			return editToBeUndone();
 		}
@@ -2783,8 +2779,6 @@ public class QueryDialog extends JPanel {
 	}
 
 	public class QueryConstructionEdit extends AbstractUndoableEdit {
-		private static final long serialVersionUID = 1L;
-
 		private TCTLAbstractProperty original;
 		private TCTLAbstractProperty replacement;
 

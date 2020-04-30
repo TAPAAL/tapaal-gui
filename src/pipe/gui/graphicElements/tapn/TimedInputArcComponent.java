@@ -16,8 +16,7 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.Weight;
 
 public class TimedInputArcComponent extends TimedOutputArcComponent {
-	
-	private static final long serialVersionUID = 8263782840119274756L;
+
 	private TimedInputArc inputArc;
 
 	public TimedInputArcComponent(PlaceTransitionObject source) {

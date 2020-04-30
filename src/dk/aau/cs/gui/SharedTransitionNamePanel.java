@@ -25,7 +25,6 @@ import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.RequireException;
 
 public class SharedTransitionNamePanel extends JPanel {
-	private static final long serialVersionUID = -8099814326394422263L;
 
 	private final JRootPane rootPane;
 	private final SharedTransitionsListModel listModel;
@@ -81,7 +80,7 @@ public class SharedTransitionNamePanel extends JPanel {
 		
 		JLabel label = new JLabel("Enter a shared transition name:");
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(4, 4, 2, 4);
 		namePanel.add(label, gbc);
 		

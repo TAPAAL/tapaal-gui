@@ -122,7 +122,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Model);
 				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
-				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Model.marking().size() - 1 + i));
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + (degree2Model.marking().size() - 1 + i));
 			}
 		}
 		
@@ -376,7 +376,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		return new StandardNamingScheme();
 	}
 	
-	protected class StandardNamingScheme implements TranslationNamingScheme {
+	protected static class StandardNamingScheme implements TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1_in$";
 		private final String DEG1_START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1$";

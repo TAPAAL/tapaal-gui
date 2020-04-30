@@ -11,7 +11,7 @@ public class RenameSharedTransitionCommand extends Command {
 	private final String oldName;
 	private final String newName;
         private final TabContent tab;
-	private SharedTransitionsListModel listModel;
+	private final SharedTransitionsListModel listModel;
 
 	public RenameSharedTransitionCommand(SharedTransition transition, TabContent tab, String oldName, String name, SharedTransitionsListModel listModel) {
 		this.transition = transition;

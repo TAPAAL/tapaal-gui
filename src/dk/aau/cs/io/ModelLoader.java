@@ -42,15 +42,13 @@ public class ModelLoader {
 		}
 		try{
 
-			LoadedModel loadedModel = newFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
-			return loadedModel;
+            return newFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
 		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
 
-				LoadedModel loadedModel = oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
-				return loadedModel;
+                return oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
 			} catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());

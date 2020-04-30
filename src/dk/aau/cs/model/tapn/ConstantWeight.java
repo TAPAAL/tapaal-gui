@@ -36,7 +36,7 @@ public class ConstantWeight extends Weight{
 		if(displayConstantNames){
 			return constant.name() + " x";
 		} else if(constant.value() > 1){
-			return Integer.toString(constant.value()) + "x";
+			return constant.value() + "x";
 		} else {
 			return "";
 		}

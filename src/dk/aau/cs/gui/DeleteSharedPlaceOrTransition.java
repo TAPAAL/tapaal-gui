@@ -138,8 +138,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	}
 
 	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove, Collection<TAPNQuery> affectedQueries) {
-		SharedPlace sharedPlace = placeToRemove;
-		if(affectedQueries.size() > 0 && !messageShown){
+        if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
 			StringBuilder buffer = new StringBuilder("The following queries contains the shared place and will also be deleted:");
 			buffer.append(System.getProperty("line.separator"));
@@ -160,7 +159,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
-				TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
+				TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(placeToRemove.name());
 				if(place != null){
 					for(Arc arc : place.getPreset()){
 						deleteArc(arc, template);
@@ -176,29 +175,29 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 				}
 			}
 			tab.drawingSurface().repaint();
-			sharedPlacesListModel.removeElement(sharedPlace);
-			undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
+			sharedPlacesListModel.removeElement(placeToRemove);
+			undoManager.addEdit(new DeleteSharedPlaceCommand(placeToRemove, sharedPlacesListModel));
 		}else{
 			Hashtable<LocalTimedPlace, String> createdPlaces = new Hashtable<LocalTimedPlace, String>();
 			for(Template template : tab.allTemplates()){
-				TimedPlace place = template.model().getPlaceByName(sharedPlace.name());
-				TimedPlaceComponent component = (TimedPlaceComponent) template.guiModel().getPlaceByName(sharedPlace.name());
+				TimedPlace place = template.model().getPlaceByName(placeToRemove.name());
+				TimedPlaceComponent component = (TimedPlaceComponent) template.guiModel().getPlaceByName(placeToRemove.name());
 				if(place != null){
 					String name = nameGenerator.getNewPlaceName(template.model());
 					LocalTimedPlace localPlace = new LocalTimedPlace(name);
 					createdPlaces.put(localPlace, name);
-					Command cmd = new UnsharePlaceCommand(template.model(), sharedPlace, localPlace, component);
+					Command cmd = new UnsharePlaceCommand(template.model(), placeToRemove, localPlace, component);
 					cmd.redo();
 					undoManager.addEdit(cmd);
 				}
 			}
-			Command deleteCmd = new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel);
+			Command deleteCmd = new DeleteSharedPlaceCommand(placeToRemove, sharedPlacesListModel);
 			deleteCmd.redo();
 			undoManager.addEdit(deleteCmd);
 			
 			// We introduced temporary name before, to avoid exceptions, so we rename the places to the correct names here
 			for(Entry<LocalTimedPlace, String> entry : createdPlaces.entrySet()){
-				Command renameCmd = new RenameTimedPlaceCommand(tab, entry.getKey(), entry.getValue(), sharedPlace.name());
+				Command renameCmd = new RenameTimedPlaceCommand(tab, entry.getKey(), entry.getValue(), placeToRemove.name());
 				renameCmd.redo();
 				undoManager.addEdit(renameCmd);
 			}
@@ -258,8 +257,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	}
 	
 	private void deleteSharedTransition(boolean deleteFromTemplates, SharedTransition transitionToBeRemoved, Collection<TAPNQuery> affectedQueries) {
-		SharedTransition sharedTransition = transitionToBeRemoved;
-		if(affectedQueries.size() > 0 && !messageShown){
+        if(affectedQueries.size() > 0 && !messageShown){
 			messageShown = true;
 	        StringBuilder buffer = new StringBuilder("The following queries contains the shared transition and will also be deleted:");
 	        buffer.append(System.getProperty("line.separator"));
@@ -280,7 +278,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
-				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(sharedTransition.name());
+				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transitionToBeRemoved.name());
 				if(transition != null){
 					for(Arc arc : transition.getPreset()){
 						deleteArc(arc, template);
@@ -296,22 +294,22 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 				}
 			}
 			tab.drawingSurface().repaint();
-			sharedTransitionsListModel.removeElement(sharedTransition);
-			undoManager.addEdit(new DeleteSharedTransitionCommand(sharedTransition, sharedTransitionsListModel));
+			sharedTransitionsListModel.removeElement(transitionToBeRemoved);
+			undoManager.addEdit(new DeleteSharedTransitionCommand(transitionToBeRemoved, sharedTransitionsListModel));
 		}else{
 			
 			ArrayList<TimedTransition> transitions = new ArrayList<TimedTransition> ();
 			for(Template template : tab.allTemplates()) {
-				TimedTransition timedTransition = template.model().getTransitionByName(sharedTransition.name());
+				TimedTransition timedTransition = template.model().getTransitionByName(transitionToBeRemoved.name());
 				if(timedTransition != null)
 					transitions.add(timedTransition);
 			}
 			for(TimedTransition transition : transitions){
 				transition.unshare();
-				undoManager.addEdit(new UnshareTransitionCommand(sharedTransition, transition));
+				undoManager.addEdit(new UnshareTransitionCommand(transitionToBeRemoved, transition));
 			}
-			sharedTransitionsListModel.removeElement(sharedTransition);
-			undoManager.addEdit(new DeleteSharedTransitionCommand(sharedTransition, sharedTransitionsListModel));
+			sharedTransitionsListModel.removeElement(transitionToBeRemoved);
+			undoManager.addEdit(new DeleteSharedTransitionCommand(transitionToBeRemoved, sharedTransitionsListModel));
 			for(TimedTransition transition : transitions){
 				String name = nameGenerator.getNewTransitionName(transition.model());
 				// We add this invisible transition renaming to avoid problems with undo
@@ -322,7 +320,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		}
 	}
 	
-	private class DeleteSharedResult{
+	private static class DeleteSharedResult{
 		public int choice;
 		public boolean deleteFromTemplates;
 		

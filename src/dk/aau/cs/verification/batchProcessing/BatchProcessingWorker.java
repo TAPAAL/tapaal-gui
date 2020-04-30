@@ -475,8 +475,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			public void displayWrappedErrorMessage(String message, String title) {}
 			
 		}, false);
-		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
-		return composedModel;
+        return composer.transformModel(model.network());
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {

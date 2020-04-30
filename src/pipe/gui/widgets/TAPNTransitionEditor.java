@@ -36,7 +36,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
 public class TAPNTransitionEditor extends javax.swing.JPanel {
-	private static final long serialVersionUID = 1744651413834659994L;
+
 	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,inf).";
 	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
 	private TimedTransitionComponent transition;

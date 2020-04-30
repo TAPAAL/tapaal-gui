@@ -77,8 +77,8 @@ public class TAPNComposer implements ITAPNComposer {
                                 if (isComponentEmpty(this.guiModels.get(tapn1))) { 
                                         continue;
                                 }
-				greatestWidth = greatestWidth >= getRightmostObject(guiModels.get(tapn1)).getPositionX() ? greatestWidth : getRightmostObject(guiModels.get(tapn1)).getPositionX();
-				greatestHeight = greatestHeight >= getLowestObject(guiModels.get(tapn1)).getPositionY() ? greatestHeight : getLowestObject(guiModels.get(tapn1)).getPositionY();
+				greatestWidth = Math.max(greatestWidth, getRightmostObject(guiModels.get(tapn1)).getPositionX());
+				greatestHeight = Math.max(greatestHeight, getLowestObject(guiModels.get(tapn1)).getPositionY());
 			}
 		}
 		
@@ -534,7 +534,7 @@ public class TAPNComposer implements ITAPNComposer {
 						}
 					}
 	
-					((TimedTransportArcComponent) newInArc).setGroupNr(nextGroupNr + 1);
+					newInArc.setGroupNr(nextGroupNr + 1);
 					
 					//Create output transport arc
 					Transition guiSourceOut = guiModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));

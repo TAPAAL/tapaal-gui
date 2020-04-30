@@ -33,8 +33,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.TabComponent;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
@@ -44,7 +42,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions  {
 
-	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
 	private final int[] zoomLevels = { 40, 60, 80, 100, 120, 140, 160, 180, 200, 300 };
 	
@@ -953,7 +950,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				WorkflowDialog.showDialog();
 			}
 
-			statusBar.changeText(statusBar.textforDrawing);
+			statusBar.changeText(StatusBar.textforDrawing);
 			//Enable editor focus traversal policy
 			setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 			fixBug812694GrayMenuAfterSimulationOnMac();
@@ -974,6 +971,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			selectAllAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
+
+            alignToGrid.setEnabled(false);
 
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
@@ -1000,7 +999,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 			getCurrentTab().getAnimationController().requestFocusInWindow();
 
-			statusBar.changeText(statusBar.textforAnimation);
+			statusBar.changeText(StatusBar.textforAnimation);
 			//Enable simulator focus traversal policy
 			setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 
@@ -1041,7 +1040,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			enableAllActions(false);
 
 			// Disable All Actions
-			statusBar.changeText(statusBar.textforNoNet);
+			statusBar.changeText(StatusBar.textforNoNet);
 			setFocusTraversalPolicy(null);
 
 			break;
@@ -1076,7 +1075,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		zoomOutAction.setEnabled(enable);
 		zoomComboBox.setEnabled(enable);
 		zoomMenu.setEnabled(enable);
-		
+
 		decSpacingAction.setEnabled(enable);
 		incSpacingAction.setEnabled(enable);
 

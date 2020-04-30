@@ -4,7 +4,6 @@ import java.util.*;
 
 import dk.aau.cs.util.RequireException;
 import pipe.gui.canvas.Canvas;
-import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
@@ -926,7 +925,7 @@ public class DataLayer {
 	}
 	public PlaceTransitionObject getPlaceTransitionObjectByName(String name) {
 		for(PetriNetObject object : getPlaceTransitionObjects()) {
-			if(object.getName() == name) {
+			if(object.getName().equals(name)) {
 				return ((PlaceTransitionObject)object);
 			}
 		}

@@ -8,7 +8,7 @@ import pipe.gui.Pipe;
 import dk.aau.cs.util.Require;
 
 public class RatBound implements Bound {
-	private BigDecimal bound;
+	private final BigDecimal bound;
 
 	public RatBound(BigDecimal bound) {
 		Require.that(bound.compareTo(new BigDecimal(-1, new MathContext(Pipe.AGE_PRECISION))) >= 0, "Rational bounds must be non-negative or -1.");

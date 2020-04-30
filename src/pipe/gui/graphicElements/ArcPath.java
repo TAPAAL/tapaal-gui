@@ -15,8 +15,6 @@ import java.util.List;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.handler.ArcPathPointHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 
@@ -305,7 +303,7 @@ public class ArcPath implements Shape {
 
 		if (getEndIndex() <= 0) {
 			return;
-		} else if (source != null && source instanceof Transition && (pathPoints.get(1)).getPointType()) {
+		} else if (source instanceof Transition && (pathPoints.get(1)).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(1);
 			ArcPathPoint myLastPoint = pathPoints.get(0);
 			double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint())

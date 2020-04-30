@@ -29,7 +29,6 @@ import org.apache.commons.cli.PosixParser;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.debug.Logger;
-import pipe.gui.GuiFrame;
 import pipe.gui.Verifier;
 
 /**
@@ -70,7 +69,7 @@ public class TAPAAL {
 			Logger.enableLogging(true);
 		}
 
-		if (TAPAAL.VERSION == "DEV"){
+		if (TAPAAL.VERSION.equals("DEV")){
 			Logger.enableLogging(true);
 			Logger.log("Debug logging is enabled by default in DEV branch");
 		}

@@ -18,7 +18,7 @@ public class AddArcPathPointEdit extends Command {
 
 	ArcPath arcPath;
 	ArcPathPoint point;
-	private DataLayer guiModel;
+	private final DataLayer guiModel;
 	Integer index;
 
 	/** Creates a new instance of AddArcPathPointEdit */

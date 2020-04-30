@@ -1,7 +1,5 @@
 package net.tapaal.helpers.Reference;
 
-import dk.aau.cs.util.Require;
-
 /**
  * Represents an reference to an object, what can be updated
  * Never pass the mutablereference to an other object, pass read only Reference

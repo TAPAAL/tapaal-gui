@@ -1,6 +1,5 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.gui.CreateGui;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class ToggleTransitionUrgent extends Command {

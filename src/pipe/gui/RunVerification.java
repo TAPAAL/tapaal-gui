@@ -64,7 +64,7 @@ public class RunVerification extends RunVerificationBase {
 				if (result.getTrace() != null) {
 					CreateGui.getApp().setGUIMode(GUIMode.animation);
 	
-					CreateGui.getAnimator().SetTrace(result.getTrace());
+					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}
 
@@ -348,9 +348,8 @@ public class RunVerification extends RunVerificationBase {
 		return panel;
 	}
 	
-	private class NonEditableModel extends DefaultTableModel {
+	private static class NonEditableModel extends DefaultTableModel {
 
-		private static final long serialVersionUID = -8992683250003224211L;
 		NonEditableModel(Object[][] data, String[] columnNames) {
 	        super(data, columnNames);
 	    }

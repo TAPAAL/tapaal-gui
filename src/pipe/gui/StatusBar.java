@@ -8,10 +8,6 @@ import javax.swing.JPanel;
 /* Status Bar to let users know what to do*/
 public class StatusBar extends JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8253246293753481390L;
 	/* Provides the appropriate text for the mode that the user is in */
 	public static final String textforNoNet = "Open a net to start editing";
 
@@ -55,66 +51,67 @@ public class StatusBar extends JPanel {
 		label.setText(newText);
 	}
 
-	public void changeText(Pipe.ElementType type) {
-		switch (type) {
-		case PLACE:
-			changeText(textforPlace);
-			break;
-		case TAPNPLACE:
-			changeText(textforTAPNPlace);
-			break;
-		case IMMTRANS:
-			changeText(textforTrans);
-			break;
+    public void changeText(Pipe.ElementType type) {
+        switch (type) {
+            case PLACE:
+                changeText(textforPlace);
+                break;
 
-		case TIMEDTRANS:
-			changeText(textforTimedTrans);
-			break;
-		case TAPNTRANS:
-			changeText(textforTrans);
-			break;
-		case ARC:
-			changeText(textforArc);
-			break;
-		case TAPNARC:
-			changeText(textforArc);
-			break;
-		case TRANSPORTARC:
-			changeText(textforTransportArc);
-			break;
-		case TAPNINHIBITOR_ARC:
-		case INHIBARC:
-			changeText(textforInhibArc);
-			break;
+            case TAPNPLACE:
+                changeText(textforTAPNPlace);
+                break;
 
-		case ADDTOKEN:
-			changeText(textforAddtoken);
-			break;
+            case IMMTRANS:
+            case TAPNTRANS:
+                changeText(textforTrans);
+                break;
 
-		case DELTOKEN:
-			changeText(textforDeltoken);
-			break;
+            case TIMEDTRANS:
+                changeText(textforTimedTrans);
+                break;
 
-		case SELECT:
-			changeText(textforMove);
-			break;
+            case ARC:
+            case TAPNARC:
+                changeText(textforArc);
+                break;
 
-		case DRAW:
-			changeText(textforDrawing);
-			break;
+            case TRANSPORTARC:
+                changeText(textforTransportArc);
+                break;
 
-		case ANNOTATION:
-			changeText(textforAnnotation);
-			break;
+            case TAPNINHIBITOR_ARC:
+            case INHIBARC:
+                changeText(textforInhibArc);
+                break;
 
-		case DRAG:
-			changeText(textforDrag);
-			break;
+            case ADDTOKEN:
+                changeText(textforAddtoken);
+                break;
 
-		default:
-			changeText("To-do (textfor" + type);
-			break;
-		}
-	}
+            case DELTOKEN:
+                changeText(textforDeltoken);
+                break;
+
+            case SELECT:
+                changeText(textforMove);
+                break;
+
+            case DRAW:
+                changeText(textforDrawing);
+                break;
+
+            case ANNOTATION:
+                changeText(textforAnnotation);
+                break;
+
+            case DRAG:
+                changeText(textforDrag);
+                break;
+
+            default:
+                changeText("To-do (textfor" + type);
+                break;
+        }
+    }
 
 }

@@ -9,7 +9,6 @@ import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 
 public class ConstantsListModel extends AbstractListModel {
-	private static final long serialVersionUID = 1L;
 	
 	private TimedArcPetriNetNetwork network;
 

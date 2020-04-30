@@ -109,7 +109,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			reservePoint(rootPoint);
 			objectsPlaced.add(startingObject);
 
-			if(searchOption == "DFS") {
+			if(searchOption.equals("DFS")) {
 				unfinishedObjects = new ArrayList<PlaceTransitionObject>();
 				unfinishedObjects.add(startingObject);
 					while(!(unfinishedObjects.isEmpty())) {

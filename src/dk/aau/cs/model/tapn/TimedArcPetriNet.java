@@ -584,13 +584,13 @@ public class TimedArcPetriNet {
 	
 	public boolean isUntimed() {
 		for(TimedInputArc t : inputArcs){
-			if(!t.interval().equals(t.interval().ZERO_INF)){
+			if(!t.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}
 		
 		for(TransportArc t : transportArcs){
-			if(!t.interval().equals(t.interval().ZERO_INF)){
+			if(!t.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}

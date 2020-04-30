@@ -176,7 +176,7 @@ public class TraceImportExport {
             TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
 
             CreateGui.getApp().setGUIMode(pipe.gui.GuiFrame.GUIMode.animation);
-            CreateGui.getAnimator().SetTrace(decomposer.decompose());
+            CreateGui.getAnimator().setTrace(decomposer.decompose());
 
         } catch (FileNotFoundException e) {
             // Will never happen

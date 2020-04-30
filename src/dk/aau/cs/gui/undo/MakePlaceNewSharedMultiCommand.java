@@ -3,22 +3,20 @@ package dk.aau.cs.gui.undo;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.Require;
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 public class MakePlaceNewSharedMultiCommand extends Command {
 
 		private final String newSharedName;
-		private Context context;
-		private Place place;
+		private final Context context;
+		private final Place place;
 		private Command command;
-		private List<Command> commands = new ArrayList<Command>();
+		private final List<Command> commands = new ArrayList<Command>();
 
 
 		
@@ -47,7 +45,7 @@ public class MakePlaceNewSharedMultiCommand extends Command {
                         commands.add(command);
                         first = false;
                     } else { //For the rest we make them shared with the recently made place
-                        command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent());
+                        command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
                         command.redo();
                         commands.add(command);
                     }

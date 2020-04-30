@@ -19,8 +19,6 @@ import javax.swing.Timer;
 import pipe.gui.widgets.EscapableDialog;
 
 public class SimulationControl extends JPanel {
-
-	private static final long serialVersionUID = -441614107249259116L;
 	
 	JSlider simulationSpeed;
 	JCheckBox randomSimulation;

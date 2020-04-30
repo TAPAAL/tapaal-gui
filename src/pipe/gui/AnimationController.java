@@ -39,14 +39,14 @@ import java.util.Hashtable;
 
 public class AnimationController extends JPanel {
 
-	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
 	private JSlider delaySlider;
 	private int delayScale = 10;
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
-	private GuiAction stepforwardAction, stepbackwardAction;
+	private final GuiAction stepforwardAction;
+    private final GuiAction stepbackwardAction;
 
 	JTextField TimeDelayField = new JTextField();
 	JComboBox<String> firermodebox = null;

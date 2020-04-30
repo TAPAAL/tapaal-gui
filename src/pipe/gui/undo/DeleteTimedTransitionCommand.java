@@ -7,7 +7,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	private final TimedTransitionComponent transition;
-	private SharedTransition sharedTransition;
+	private final SharedTransition sharedTransition;
 
 	public DeleteTimedTransitionCommand(TimedTransitionComponent transition, TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);

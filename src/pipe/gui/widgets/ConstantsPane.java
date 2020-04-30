@@ -46,7 +46,7 @@ import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.components.NonsearchableJList;
 
 public class ConstantsPane extends JPanel {
-	private static final long serialVersionUID = -7883351020889779067L;
+
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
 	private JPanel buttonsPanel;

@@ -11,10 +11,10 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 
 public class DeleteTimedPlaceCommand extends TAPNElementCommand {
-	private TimedPlaceComponent timedPlaceComponent;
-	private TimedPlace timedPlace;
-	private int numberOfTokens;
-	private ArrayList<TAPNQuery> queriesInclusion = new ArrayList<TAPNQuery>();
+	private final TimedPlaceComponent timedPlaceComponent;
+	private final TimedPlace timedPlace;
+	private final int numberOfTokens;
+	private final ArrayList<TAPNQuery> queriesInclusion = new ArrayList<TAPNQuery>();
 
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);

@@ -14,11 +14,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowserFallback extends FileBrowser {
-	private FileDialog fc;
-	private String ext;
-        private String optionalExt;
+	private final FileDialog fc;
+	private final String ext;
+        private final String optionalExt;
 	private String specifiedPath;
-	private JFileChooser fileChooser;
+	private final JFileChooser fileChooser;
 	/**
 		This show native open/save dialogs for all type of dialogs except multifile open,
 	 	Java before 7, have problems with multiselect for native dialogs.

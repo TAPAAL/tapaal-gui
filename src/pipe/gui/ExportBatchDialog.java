@@ -59,8 +59,6 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
 
-	private static final long serialVersionUID = 8346966786414688380L;
-
 	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch export";
 	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently selected nets";
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
@@ -143,7 +141,6 @@ public class ExportBatchDialog extends JDialog {
 		
 		tableModel = new ExportBatchResultTableModel();
 		final JTable resultTable = new JTable(tableModel){
-			private static final long serialVersionUID = 8524549736351991872L;
 
 			public String getToolTipText(MouseEvent e) {
 				String tip= null;
@@ -542,9 +539,9 @@ public class ExportBatchDialog extends JDialog {
 		return renamedQueries;
 		
 	}
-	private class ExportResultTableCellRenderer extends JLabel implements
+	private static class ExportResultTableCellRenderer extends JLabel implements
 	TableCellRenderer {
-	private static final long serialVersionUID = -1054925029991763163L;
+
 	Border unselectedBorder = null;
 	Border selectedBorder = null;
 	boolean isBordered = true;
@@ -620,9 +617,8 @@ public class ExportBatchDialog extends JDialog {
 		}
 		
 		private String generateDestinationTooltip(String[] result) {
-			String fullFilePath = result[1];
-			
-			return fullFilePath;
+
+            return result[1];
 		}
 	}
 }
