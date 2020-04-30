@@ -6,7 +6,6 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
 import pipe.gui.Pipe;
-import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
 
@@ -18,7 +17,6 @@ import pipe.gui.Zoomer;
  */
 public class NameLabel extends JTextArea implements Zoomable {
 
-	private static final long serialVersionUID = 5167510420195429773L;
 	private int positionX;
 	private int positionY;
 	private String name = "";
@@ -28,7 +26,11 @@ public class NameLabel extends JTextArea implements Zoomable {
 
 	public NameLabel(int zoom) {
 		this("");
-		setFont(getFont().deriveFont(Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE, zoom)));
+
+        //Kind of important to know about deriveFont: --kyrke 2020-04-02
+        // deriveFont(int) - sets text style
+        // deriveFont(float) - sets text size
+		setFont(getFont().deriveFont((float)Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, zoom)));
 	}
 
 	public NameLabel(String nameInput) {
@@ -107,7 +109,11 @@ public class NameLabel extends JTextArea implements Zoomable {
 	}
 
 	public void zoomUpdate(int value) {
-		setFont(getFont().deriveFont(Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
+        //Kind of important to know about deriveFont: --kyrke 2020-04-02
+        // deriveFont(int) - sets text style
+        // deriveFont(float) - sets text size
+        setFont(getFont().deriveFont((float)Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
+
 		updateSize();
 	}
 	

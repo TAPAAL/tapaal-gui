@@ -118,8 +118,6 @@ public class CTLQueryDialog extends JPanel {
 	
 	private static final String SHARED = "Shared";
 
-	private static final long serialVersionUID = 7852107237344005546L;
-
 	public enum QueryDialogueOption {
 		VerifyNow, Save, Export
 	}
@@ -2422,7 +2420,7 @@ public class CTLQueryDialog extends JPanel {
 					
 					ArrayList<Template> templates = new ArrayList<Template>(1);
 					querySaved = true;	//Setting this to true will make sure that new values will be used.
-					templates.add(new Template(transformedModel.value1(), ((TAPNComposer) composer).getGuiModel(), new Zoomer()));
+					templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 					
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();
@@ -2506,9 +2504,7 @@ public class CTLQueryDialog extends JPanel {
 		}
 	}
 
-	private class QueryConstructionUndoManager extends UndoManager {
-		private static final long serialVersionUID = 1L;
-
+	private static class QueryConstructionUndoManager extends UndoManager {
 		public UndoableEdit GetNextEditToUndo() {
 			return editToBeUndone();
 		}
@@ -2533,7 +2529,6 @@ public class CTLQueryDialog extends JPanel {
 	}
 	
 	public class QueryConstructionEdit extends AbstractUndoableEdit {
-		private static final long serialVersionUID = 1L;
 
 		private TCTLAbstractProperty original;
 		private TCTLAbstractProperty replacement;

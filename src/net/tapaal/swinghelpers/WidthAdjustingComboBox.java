@@ -11,8 +11,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 public class WidthAdjustingComboBox<E> extends JComboBox<E>{
-
-	private static final long serialVersionUID = 1L;
 	
 	public WidthAdjustingComboBox(int maxNumberOfPlacesToShowAtOnce) {
 		this.addPopupMenuListener(new PopupMenuListener() {

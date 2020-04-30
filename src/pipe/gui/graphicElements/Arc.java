@@ -13,7 +13,6 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
@@ -21,8 +20,6 @@ import pipe.gui.handler.PlaceTransitionObjectHandler;
    Implementation of Element for drawing an arc
  */
 public abstract class Arc extends PetriNetObjectWithLabel {
-
-	private static final long serialVersionUID = 6527845538091358791L;
 
 	private Shape head = null;
 	private boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
@@ -50,8 +47,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
-	private Arc(int nameOffsetX, int nameOffsetY) {
-	    super(nameOffsetX, nameOffsetY);
+	private Arc() {
+	    super(0, 0);
 
         setHead();
     }
@@ -63,7 +60,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public Arc(
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		this(0,0);
+		this();
 
 		id = idInput;
 		setSource(sourceInput);
@@ -76,7 +73,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
-		this(0,0);
+		this();
 		isPrototype = true;
 
 		setSource(newSource);
@@ -218,8 +215,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
 				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
@@ -251,8 +247,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 		//Draw Arrow-head
 		//Jump to arc end
-		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
-				.getPoint(myPath.getEndIndex()).getY());
+		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath.getPoint(myPath.getEndIndex()).getY());
 
 		//Rotate to match arrowhead to arc angle
 		g2.rotate(myPath.getEndAngle() + Math.PI);
@@ -297,9 +292,12 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	@Override
 	public boolean contains(int x, int y) {
-		Point2D.Double point = new Point2D.Double(x + myPath.getBounds().getX()
-				- COMPONENT_DRAW_OFFSET - zoomGrow, y
-				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
+		Point2D.Double point = new Point2D.Double(
+		    x + myPath.getBounds().getX() - COMPONENT_DRAW_OFFSET - zoomGrow,
+            y
+				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
+        );
+
 		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
@@ -388,7 +386,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		this.getActionMap().clear();
 	}
 
-	private class DeleteAction extends AbstractAction {
+	private static class DeleteAction extends AbstractAction {
 		Arc arcBeingDraw;
 
 		DeleteAction(Arc arc) {

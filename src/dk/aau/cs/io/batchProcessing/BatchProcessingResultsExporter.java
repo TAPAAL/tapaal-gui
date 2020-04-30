@@ -37,9 +37,8 @@ public class BatchProcessingResultsExporter {
 	}
 
 	public void exportToCSV(Iterable<BatchProcessingVerificationResult> results, PrintStream outputStream) throws Exception {
-		PrintStream writer = outputStream;
-		
-		writer.println("Model" + DELIMITER + 
+
+        outputStream.println("Model" + DELIMITER +
 				       "Query" + DELIMITER + 
 				       "Result" + DELIMITER + 
 				       "Verification Time" + DELIMITER +
@@ -90,7 +89,7 @@ public class BatchProcessingResultsExporter {
 			s.append(DELIMITER);
 			s.append((query != null) ? query.approximationDenominator() : "");
 			
-			writer.println(s.toString());
+			outputStream.println(s.toString());
 		}
 	}
 

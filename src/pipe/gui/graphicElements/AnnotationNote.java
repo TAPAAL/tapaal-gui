@@ -26,8 +26,6 @@ import pipe.gui.widgets.EscapableDialog;
 
 public class AnnotationNote extends Note {
 
-	private static final long serialVersionUID = 3503959956765396720L;
-
 	private boolean fillNote = true;
 
 	private EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
@@ -302,7 +300,6 @@ public class AnnotationNote extends Note {
 
 	public class ResizePoint extends javax.swing.JComponent {
 
-		private static final long serialVersionUID = -1615544376708838434L;
 		private int SIZE = 3;
 		private static final int TOP = 1;
 		private static final int BOTTOM = 2;
@@ -381,9 +378,7 @@ public class AnnotationNote extends Note {
 	}
 	
 	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
-		
-		return annotation;
+        return new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
 	}
 
 }

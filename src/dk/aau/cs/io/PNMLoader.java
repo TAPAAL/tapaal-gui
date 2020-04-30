@@ -121,7 +121,7 @@ public class PNMLoader {
 	}
 
 	private String getTAPNName(Node netNode) {
-		if(netNode == null || !(netNode instanceof Element)){
+		if(!(netNode instanceof Element)){
 			return nameGenerator.getNewTemplateName();
 		}
 		String result = null;
@@ -173,7 +173,7 @@ public class PNMLoader {
 	}
 
 	private void parsePlace(Node node, TimedArcPetriNet tapn, Template template) {
-		if(node == null || !(node instanceof Element)){
+		if(!(node instanceof Element)){
 			return;
 		}
 		
@@ -205,7 +205,7 @@ public class PNMLoader {
 	}
 	
 	private InitialMarking parseMarking(Node node) {
-		if(node == null || !(node instanceof Element)){
+		if(!(node instanceof Element)){
 			return new InitialMarking();
 		}
 		
@@ -217,7 +217,7 @@ public class PNMLoader {
 	}
 
 	private void parseTransition(Node node, TimedArcPetriNet tapn, Template template) {
-		if(node == null || !(node instanceof Element)){
+		if(!(node instanceof Element)){
 			return;
 		}
 		
@@ -245,7 +245,7 @@ public class PNMLoader {
 	}
 	
 	private void parseArc(Node node, Template template) throws FormatException {
-		if(node == null || !(node instanceof Element)){
+		if(!(node instanceof Element)){
 			return;
 		}
 		
@@ -321,8 +321,8 @@ public class PNMLoader {
 						String arcTempX = position.getAttribute("x");
 						String arcTempY = position.getAttribute("y");
 
-						float arcPointX = Float.valueOf(arcTempX);
-						float arcPointY = Float.valueOf(arcTempY);
+						double arcPointX = Double.valueOf(arcTempX);
+                        double arcPointY = Double.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						
@@ -336,7 +336,7 @@ public class PNMLoader {
 	}
 
 	private Name parseName(Node node){
-		if(node == null || !(node instanceof Element)){
+		if(!(node instanceof Element)){
 			return null;
 		}
 		Point offset = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Offset);
@@ -351,7 +351,7 @@ public class PNMLoader {
 	}
 	
 	private Point parseGraphics(Node node, GraphicsType type){
-		if(node == null || !(node instanceof Element)){
+		if(!(node instanceof Element)){
 			if(type == GraphicsType.Offset)
 				return new Point(0, -10);
 			else 
@@ -370,7 +370,7 @@ public class PNMLoader {
 		return new Point(xd, yd);
 	}
 
-	private class Name{
+	private static class Name{
 		String name;
 		Point point;
 		
@@ -389,7 +389,7 @@ public class PNMLoader {
 		}
 	}
 	
-	private class InitialMarking{
+	private static class InitialMarking{
 		int marking;
 		Point point;
 		

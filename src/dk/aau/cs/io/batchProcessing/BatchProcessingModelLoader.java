@@ -1,21 +1,19 @@
 package dk.aau.cs.io.batchProcessing;
 
+import dk.aau.cs.util.FormatException;
+
 import java.io.File;
 
 public class BatchProcessingModelLoader {	
 	public BatchProcessingModelLoader(){ }
 	
-	public LoadedBatchProcessingModel load(File file) throws Exception{
+	public LoadedBatchProcessingModel load(File file) throws FormatException {
 		BatchProcessingLoader newFormatLoader = new BatchProcessingLoader();
 		try{
 			return newFormatLoader.load(file);
 		}catch(Exception e1){
-			try {
-				BatchProcessingLegacyLoader oldFormatLoader = new BatchProcessingLegacyLoader();
-				return oldFormatLoader.load(file);
-			} catch(Exception e2) {
-				throw e2;
-			}
-		}
+            BatchProcessingLegacyLoader oldFormatLoader = new BatchProcessingLegacyLoader();
+            return oldFormatLoader.load(file);
+        }
 	}
 }

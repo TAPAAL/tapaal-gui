@@ -20,8 +20,6 @@ import pipe.gui.handler.PetriNetObjectHandler;
  */
 public abstract class PetriNetObject extends JComponent implements Zoomable, Translatable {
 
-	private static final long serialVersionUID = 2693171860021066729L;
-
 	protected static final int COMPONENT_DRAW_OFFSET= 5;
 	/** x/y position position on screen (zoomed) */
 	protected double positionX;

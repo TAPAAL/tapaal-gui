@@ -227,8 +227,8 @@ public class TapnLegacyXmlLoader {
 
 
 		if (isInPreSet) {
-			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+			if (postsetArcs.containsKey(targetIn)) {
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get(targetIn);
 				TimedPlace sourcePlace = tapn.getPlaceByName(sourceIn.getName());
 				TimedTransition trans = tapn.getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -246,14 +246,14 @@ public class TapnLegacyXmlLoader {
 				guiModel.addPetriNetObject(postsetTransportArc);
 				tapn.add(transArc);
 
-				postsetArcs.remove((TimedTransitionComponent) targetIn);
+				postsetArcs.remove(targetIn);
 			} else {
 				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
 				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
-			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+			if (presetArcs.containsKey(sourceIn)) {
+				TimedTransportArcComponent presetTransportArc = presetArcs.get(sourceIn);
 				TimedPlace sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = tapn.getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(targetIn.getName());
@@ -272,7 +272,7 @@ public class TapnLegacyXmlLoader {
 				guiModel.addPetriNetObject(tempArc);
 				tapn.add(transArc);
 
-				presetArcs.remove((TimedTransitionComponent) sourceIn);
+				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
 				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
@@ -601,7 +601,7 @@ public class TapnLegacyXmlLoader {
 		double nameOffsetYInput;
 		
 		//This check is done, as arcs in nets saved before this change do not have a nameOffset
-		if(inputArcElement.getAttribute("nameOffsetX") != "" && inputArcElement.getAttribute("nameOffsetY") != "") {
+		if(!inputArcElement.getAttribute("nameOffsetX").equals("") && !inputArcElement.getAttribute("nameOffsetY").equals("")) {
 			nameOffsetXInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
 			nameOffsetYInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
 		} else {
@@ -622,12 +622,7 @@ public class TapnLegacyXmlLoader {
 		int aEndx = targetIn.getX() + targetIn.centreOffsetLeft();
 		int aEndy = targetIn.getY() + targetIn.centreOffsetTop();
 
-		double _startx = aStartx;
-		double _starty = aStarty;
-		double _endx = aEndx;
-		double _endy = aEndy;
-
-		Arc tempArc;
+        Arc tempArc;
 
 		String type = "normal";
 		type = ((Element) getFirstChildNodeByName(inputArcElement, "type")).getAttribute("value");
@@ -635,24 +630,24 @@ public class TapnLegacyXmlLoader {
 		if (type.equals("tapnInhibitor")) {
 
 			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
-					inscriptionTempStorage, sourceIn, targetIn, _startx,
-					_starty, _endx, _endy);
+					inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                aStarty, aEndx, aEndy);
 
 		} else {
 			if (type.equals("timed")) {
 				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
+						inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                    aStarty, aEndx, aEndy);
 
 			} else if (type.equals("transport")) {
 				tempArc = parseAndAddTransportArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
+						inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                    aStarty, aEndx, aEndy);
 
 			} else {
 				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
+						inscriptionTempStorage, sourceIn, targetIn, aStartx,
+                    aStarty, aEndx, aEndy);
 			}
 
 		}
@@ -674,8 +669,8 @@ public class TapnLegacyXmlLoader {
 						String arcTempX = element.getAttribute("x");
 						String arcTempY = element.getAttribute("y");
 						String arcTempType = element.getAttribute("curvePoint");
-						float arcPointX = Float.valueOf(arcTempX);
-						float arcPointY = Float.valueOf(arcTempY);
+						double arcPointX = Double.valueOf(arcTempX);
+						double arcPointY = Double.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						boolean arcPointType = Boolean.valueOf(arcTempType);
@@ -785,7 +780,7 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private String getContentOfValueChildNode(Element element) throws FormatException {
-		return ((Element) getFirstChildNodeByName(element, "value")).getTextContent();
+		return getFirstChildNodeByName(element, "value").getTextContent();
 	}
 
 	private String getChildNodesContentOfValueChildNodeAsString(Element element, String childNodeName) throws FormatException {

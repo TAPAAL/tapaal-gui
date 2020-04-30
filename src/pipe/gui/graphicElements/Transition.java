@@ -26,8 +26,6 @@ import dk.aau.cs.model.tapn.TimeInterval;
  * Petri-Net Transition Class for Drawing Transitions
  */
 public abstract class Transition extends PlaceTransitionObject {
-
-	private static final long serialVersionUID = 942116302162925121L;
 	
 	//Transition is of Rectangle2D.Double
 	private GeneralPath transition;

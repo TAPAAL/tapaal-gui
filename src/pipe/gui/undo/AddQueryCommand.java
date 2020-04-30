@@ -5,8 +5,8 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 
 public class AddQueryCommand extends Command {
-	private TAPNQuery query;
-	private TabContent tabContent;
+	private final TAPNQuery query;
+	private final TabContent tabContent;
 	
 	public AddQueryCommand(TAPNQuery query, TabContent tabContent) {
 		this.query = query;

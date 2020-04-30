@@ -7,15 +7,12 @@ import java.util.LinkedList;
 
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.LabelHandler;
 
 /**
  * Petri-Net Place or Transition SuperClass
  * 
  */
 public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
-
-	private static final long serialVersionUID = -6629006415467929184L;
 
 	protected double componentWidth;
 	protected double componentHeight;
@@ -311,9 +308,9 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	public void toggleAttributesVisible() {
 		attributesVisible = !attributesVisible;
 		update(true);
-	};
+	}
 
-	public void zoomUpdate(int value) {
+    public void zoomUpdate(int value) {
 		super.zoomUpdate(value);
 		update(true, false);
 	}

@@ -6,7 +6,6 @@ import dk.aau.cs.util.Tuple;
 
 public interface ITAPNComposer {
 
-	public abstract Tuple<TimedArcPetriNet, NameMapping> transformModel(
-			TimedArcPetriNetNetwork model);
+	Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model);
 
 }

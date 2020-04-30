@@ -19,7 +19,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 
 public class NewTAPNPanel extends JPanel {
-	private static final long serialVersionUID = -4598172555484557945L;
+
 	private JRootPane rootPane;
 	private GuiFrame frame;
 	private JTextField nameTextBox;

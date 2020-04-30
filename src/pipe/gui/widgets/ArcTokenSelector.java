@@ -111,7 +111,7 @@ public class ArcTokenSelector extends JPanel{
 		void arcTokenSelectorActionPreformed(ArcTokenSelectorListenerEvent e);
 	}
 	
-	public class ArcTokenSelectorListenerEvent{
+	public static class ArcTokenSelectorListenerEvent{
 		private ArcTokenSelector source;
 		public ArcTokenSelectorListenerEvent(ArcTokenSelector source){
 			this.source = source;

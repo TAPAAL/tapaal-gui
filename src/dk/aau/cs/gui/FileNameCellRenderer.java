@@ -9,9 +9,7 @@ import javax.swing.ListCellRenderer;
 
 public class FileNameCellRenderer extends JLabel implements ListCellRenderer  {
 	// Custom cell renderer for the file list to only display the name of the
-	// file	
-	// instead of the whole path.{
-	private static final long serialVersionUID = 3071924451912979500L;
+	// file	instead of the whole path.{
 	
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {

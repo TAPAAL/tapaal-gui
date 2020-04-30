@@ -9,10 +9,10 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class RenameTemplateCommand extends Command {
-	private TemplateExplorer templateExplorer;
-	private TimedArcPetriNet tapn;
-	private String oldName;
-	private String newName;
+	private final TemplateExplorer templateExplorer;
+	private final TimedArcPetriNet tapn;
+	private final String oldName;
+	private final String newName;
 	private final TabContent tab;
 
 	public RenameTemplateCommand(TemplateExplorer templateExplorer, TabContent tab,

@@ -438,11 +438,11 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			if (inputArc instanceof TimedInputArcComponent) {
 				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
-				arcElement.setAttribute("weight", ((TimedInputArcComponent)inputArc).getWeight().nameForSaving(true)+"");
+				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 			} else {
 				arcElement.setAttribute("type", "normal");
 				arcElement.setAttribute("inscription", "1");
-				arcElement.setAttribute("weight", ((TimedOutputArcComponent)inputArc).getWeight().nameForSaving(true)+"");
+				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 			}
 		} 
 		return arcElement;

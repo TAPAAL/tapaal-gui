@@ -1,7 +1,5 @@
 package net.tapaal.helpers.Reference;
 
-import dk.aau.cs.util.Require;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;

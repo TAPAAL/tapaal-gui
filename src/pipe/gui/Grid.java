@@ -18,7 +18,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
  */
 public class Grid {
 
-	private static float gridSpacing = Pipe.PLACE_TRANSITION_HEIGHT / 2;
+	private static double gridSpacing = Pipe.PLACE_TRANSITION_HEIGHT / 2;
 	private static final Color gridColor = new Color(240, 240, 255);
 	private static GeneralPath gridDisplay;
 	private static boolean enabled;
@@ -28,11 +28,11 @@ public class Grid {
 	private static void createGrid() {
 		gridDisplay = new GeneralPath();
 
-		for (float i = gridSpacing; i <= gridWidth; i += gridSpacing) {
+		for (double i = gridSpacing; i <= gridWidth; i += gridSpacing) {
 			gridDisplay.moveTo(i, 2);
 			gridDisplay.lineTo(i, gridHeight);
 		}
-		for (float i = gridSpacing; i <= gridHeight; i += gridSpacing) {
+		for (double i = gridSpacing; i <= gridHeight; i += gridSpacing) {
 			gridDisplay.moveTo(2, i);
 			gridDisplay.lineTo(gridWidth, i);
 		}
@@ -57,7 +57,7 @@ public class Grid {
 	}
 
 	private static void setGridSpacing(double spacing) {
-		gridSpacing = (float) (spacing * Pipe.PLACE_TRANSITION_HEIGHT);
+		gridSpacing = (spacing * Pipe.PLACE_TRANSITION_HEIGHT);
 	}
 
 	public static void disableGrid() {

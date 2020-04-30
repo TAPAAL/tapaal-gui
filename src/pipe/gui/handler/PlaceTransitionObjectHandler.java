@@ -1,11 +1,9 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.debug.Logger;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
@@ -225,7 +223,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 					TimedOutputArc timedOutputArc = new TimedOutputArc(
 							((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(),
-							((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace());
+							((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace()
+                    );
+
 					view.getModel().add(timedOutputArc);
 					outputArc.setUnderlyingArc(timedOutputArc);
 
@@ -236,7 +236,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									"There was an error drawing the arc. Possible problems:\n"
 											+ " - There is already an arc between the selected place and transition\n"
 											+ " - You are attempting to draw an arc between a shared transition and a shared place",
-									"Error", JOptionPane.ERROR_MESSAGE);
+									"Error", JOptionPane.ERROR_MESSAGE
+                    );
 					return;
 				}
 
@@ -266,19 +267,21 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					TimedInputArc tia = new TimedInputArc(
 							((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(),
 							((TimedTransitionComponent) timedArc.getTarget()).underlyingTransition(),
-							TimeInterval.ZERO_INF);
+							TimeInterval.ZERO_INF
+                    );
+
 					view.getModel().add(tia);
 					timedArc.setUnderlyingArc(tia);
 
 				} catch (RequireException ex) {
 					cleanupArc(timedArcToCreate, view);
-					JOptionPane
-							.showMessageDialog(
+					JOptionPane.showMessageDialog(
 									CreateGui.getApp(),
 									"There was an error drawing the arc. Possible problems:\n"
 											+ " - There is already an arc between the selected place and transition\n"
 											+ " - You are attempting to draw an arc between a shared transition and a shared place",
-									"Error", JOptionPane.ERROR_MESSAGE);
+									"Error", JOptionPane.ERROR_MESSAGE
+                    );
 					return;
 				}
 
@@ -335,7 +338,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								CreateGui.getApp(),
 								ERROR_MSG_TWO_ARCS,
 								"Error",
-								JOptionPane.ERROR_MESSAGE);
+								JOptionPane.ERROR_MESSAGE
+                        );
 					}
 				}
 				if (existsArc) {
@@ -372,7 +376,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							((TimedPlaceComponent) arc1.getSource()).underlyingPlace(),
 							((TimedTransitionComponent) arc2.getSource()).underlyingTransition(),
 							((TimedPlaceComponent) arc2.getTarget()).underlyingPlace(),
-							TimeInterval.ZERO_INF);
+							TimeInterval.ZERO_INF
+                    );
 					view.getModel().add(ta);
 					((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 					arc1.setUnderlyingArc(ta);
@@ -387,7 +392,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									+ " - There is already an arc between the source place and transition\n"
 									+ " - There is already an arc between the transtion and the target place\n"
 									+ " - You are attempting to draw an arc between a shared transition and a shared place",
-							"Error", JOptionPane.ERROR_MESSAGE);
+							"Error", JOptionPane.ERROR_MESSAGE
+                    );
 					return;
 				}
 
@@ -433,21 +439,23 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			try {
 				TimedInhibitorArc tia = new TimedInhibitorArc(
-						((TimedPlaceComponent) createTAPNInhibitorArc
-								.getSource()).underlyingPlace(),
-						((TimedTransitionComponent) createTAPNInhibitorArc
-								.getTarget()).underlyingTransition(),
-						TimeInterval.ZERO_INF);
+						((TimedPlaceComponent) createTAPNInhibitorArc.getSource()).underlyingPlace(),
+						((TimedTransitionComponent) createTAPNInhibitorArc.getTarget()).underlyingTransition(),
+						TimeInterval.ZERO_INF
+                );
+
 				view.getModel().add(tia);
 				createTAPNInhibitorArc.setUnderlyingArc(tia);
 
 			} catch (RequireException ex) {
 				cleanupArc(createTAPNInhibitorArc, view);
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
-								"There was an error drawing the arc. Possible problems:\n"
-										+ " - There is already an arc between the selected place and transition\n"
-										+ " - You are attempting to draw an arc between a shared transition and a shared place",
-								"Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
 				return;
 			}
 

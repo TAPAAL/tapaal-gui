@@ -15,8 +15,6 @@ import java.util.List;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.handler.ArcPathPointHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 
@@ -34,15 +32,13 @@ public class ArcPath implements Shape {
 	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
 	private Arc myArc;
 	private boolean pointLock = false;
-	private static Stroke proximityStroke = new BasicStroke(
-			Pipe.ARC_PATH_PROXIMITY_WIDTH);
-	private static Stroke stroke = new BasicStroke(
-			Pipe.ARC_PATH_SELECTION_WIDTH);
+	private static Stroke proximityStroke = new BasicStroke(Pipe.ARC_PATH_PROXIMITY_WIDTH);
+	private static Stroke stroke = new BasicStroke(Pipe.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
 	private int transitionAngle;
 	private final static boolean showDebugCurvedControlPoints = false;
 
-	public Point2D.Float midPoint = new Point2D.Float();
+	public Point2D.Double midPoint = new Point2D.Double();
 
 	private ArcPath(Arc a, int transitionAngle) {
 		super();
@@ -118,9 +114,8 @@ public class ArcPath implements Shape {
 
 		//Calculate the arc mid-point for lable placement
 		if (getEndIndex() < 2) {
-			midPoint.x = (float) (((pathPoints.get(0)).getPoint().x + (pathPoints
-					.get(1)).getPoint().x) * 0.5);
-			midPoint.y = (float) (((pathPoints.get(0)).getPoint().y + (pathPoints
+			midPoint.x = (((pathPoints.get(0)).getPoint().x + (pathPoints.get(1)).getPoint().x) * 0.5);
+			midPoint.y = (((pathPoints.get(0)).getPoint().y + (pathPoints
 					.get(1)).getPoint().y) * 0.5);
 		} else {
 			double acc = 0;
@@ -129,8 +124,7 @@ public class ArcPath implements Shape {
 				ArcPathPoint previousPoint = currentPoint;
 				currentPoint = pathPoints.get(c);
 
-				double inc = getMod(currentPoint.getPoint(), previousPoint
-						.getPoint());
+				double inc = getMod(currentPoint.getPoint(), previousPoint.getPoint());
 				if ((acc + inc > length)) {
 					percent = (length - acc) / inc;
 					break;
@@ -139,12 +133,9 @@ public class ArcPath implements Shape {
 			}
 
 			ArcPathPoint previousPoint = pathPoints.get(c - 1);
-			midPoint.x = previousPoint.getPoint().x
-					+ (float) ((currentPoint.getPoint().x - previousPoint
-							.getPoint().x) * percent);
+			midPoint.x = previousPoint.getPoint().x + ((currentPoint.getPoint().x - previousPoint.getPoint().x) * percent);
 			midPoint.y = previousPoint.getPoint().y
-					+ (float) ((currentPoint.getPoint().y - previousPoint
-							.getPoint().y) * percent);
+					+ ((currentPoint.getPoint().y - previousPoint.getPoint().y) * percent);
 		}
 
 		shape = stroke.createStrokedShape(this);
@@ -159,9 +150,13 @@ public class ArcPath implements Shape {
 	}
 
 	/* returns a control point for curve CD with incoming vector AB */
-	private Point2D.Float getControlPoint(Point2D.Float A, Point2D.Float B,
-			Point2D.Float C, Point2D.Float D) {
-		Point2D.Float p = new Point2D.Float(0, 0);
+	private Point2D.Double getControlPoint(
+	    Point2D.Double A,
+        Point2D.Double B,
+        Point2D.Double C,
+        Point2D.Double D
+    ) {
+		Point2D.Double p = new Point2D.Double(0, 0);
 
 		double modAB = getMod(A, B);
 		double modCD = getMod(C, D);
@@ -172,15 +167,15 @@ public class ArcPath implements Shape {
 		if (modAB < 7) {
 			// hack, stops division by zero, modAB can only be this low if the
 			// points are virtually superimposed anyway
-			p = (Point2D.Float) C.clone();
+			p = (Point2D.Double) C.clone();
 		} else {
-			p.x = C.x + (float) (ABx * modCD / Pipe.ARC_CONTROL_POINT_CONSTANT);
-			p.y = C.y + (float) (ABy * modCD / Pipe.ARC_CONTROL_POINT_CONSTANT);
+			p.x = C.x + (ABx * modCD / Pipe.ARC_CONTROL_POINT_CONSTANT);
+			p.y = C.y + (ABy * modCD / Pipe.ARC_CONTROL_POINT_CONSTANT);
 		}
 		return p;
 	}
 
-	private double getMod(Point2D.Float A, Point2D.Float B) {
+	private double getMod(Point2D.Double A, Point2D.Double B) {
 		double ABx = A.x - B.x;
 		double ABy = A.y - B.y;
 
@@ -220,10 +215,8 @@ public class ArcPath implements Shape {
 				Y = new Cubic[lengthOfCurve + 2];
 
 				for (k1 = 0; k1 <= (curveEndIndex - curveStartIndex); k1++) {
-					x[k1] = (int) (pathPoints.get(curveStartIndex + k1))
-							.getPoint().x;
-					y[k1] = (int) (pathPoints.get(curveStartIndex + k1))
-							.getPoint().y;
+					x[k1] = (int) (pathPoints.get(curveStartIndex + k1)).getPoint().x;
+					y[k1] = (int) (pathPoints.get(curveStartIndex + k1)).getPoint().y;
 				}
 				x[k1] = x[k1 - 1];
 				y[k1] = y[k1 - 1];
@@ -233,10 +226,8 @@ public class ArcPath implements Shape {
 
 				for (int k2 = 1; k2 <= lengthOfCurve; k2++) {
 					myCurrentPoint = pathPoints.get(k2 + curveStartIndex);
-					myCurrentPoint.setControl1(X[k2 - 1].getX1(), Y[k2 - 1]
-							.getX1());
-					myCurrentPoint.setControl2(X[k2 - 1].getX2(), Y[k2 - 1]
-							.getX2());
+					myCurrentPoint.setControl1(X[k2 - 1].getX1(), Y[k2 - 1].getX1());
+					myCurrentPoint.setControl2(X[k2 - 1].getX2(), Y[k2 - 1].getX2());
 				}
 			} else {
 				c++;
@@ -312,48 +303,44 @@ public class ArcPath implements Shape {
 
 		if (getEndIndex() <= 0) {
 			return;
-		} else if (source != null && source instanceof Transition
-				&& (pathPoints.get(1)).getPointType()) {
+		} else if (source instanceof Transition && (pathPoints.get(1)).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(1);
 			ArcPathPoint myLastPoint = pathPoints.get(0);
-			float distance = (float) getMod(myPoint.getPoint(), myLastPoint
-					.getPoint())
+			double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint())
 					/ Pipe.ARC_CONTROL_POINT_CONSTANT;
-			myPoint.setControl1((float) (myLastPoint.getPoint().x + Math
+			myPoint.setControl1((myLastPoint.getPoint().x + Math
 					.cos(anAngle)
-					* distance), (float) (myLastPoint.getPoint().y + Math
+					* distance), (myLastPoint.getPoint().y + Math
 					.sin(anAngle)
 					* distance));
 
 			myPoint = pathPoints.get(getEndIndex());
-			myPoint.setControl2(getControlPoint(myPoint.getPoint(), myPoint
-					.getControl1(), myPoint.getPoint(), myPoint.getControl1()));
-		} else if (target != null && source instanceof Place
-				&& (pathPoints.get(getEndIndex())).getPointType()) {
+			myPoint.setControl2(getControlPoint(myPoint.getPoint(), myPoint.getControl1(), myPoint.getPoint(), myPoint.getControl1()));
+		} else if (target != null && source instanceof Place && (pathPoints.get(getEndIndex())).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(getEndIndex());
 			ArcPathPoint myLastPoint = pathPoints.get(getEndIndex() - 1);
-			float distance = (float) getMod(myPoint.getPoint(), myLastPoint
-					.getPoint())
+            double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint())
 					/ Pipe.ARC_CONTROL_POINT_CONSTANT;
-			myPoint.setControl2((float) (myPoint.getPoint().x + Math
+			myPoint.setControl2((myPoint.getPoint().x + Math
 					.cos(anAngle)
-					* distance), (float) (myPoint.getPoint().y + Math
+					* distance), (myPoint.getPoint().y + Math
 					.sin(anAngle)
 					* distance));
 
 			myPoint = pathPoints.get(1);
-			myPoint.setControl1(getControlPoint((pathPoints.get(0)).getPoint(),
-					myPoint.getControl2(), (pathPoints.get(0)).getPoint(),
-					myPoint.getControl2()));
+			myPoint.setControl1(getControlPoint(
+			    (pathPoints.get(0)).getPoint(),myPoint.getControl2(),
+                (pathPoints.get(0)).getPoint(), myPoint.getControl2())
+            );
 		}
 	}
 	
 	public void addPoint(int index, double x, double y, boolean type) {
-		pathPoints.add(index, new ArcPathPoint((float) x, (float) y, type, this));
+		pathPoints.add(index, new ArcPathPoint(x, y, type, this));
 	}
 
 	public void addPoint(double x, double y, boolean type) {
-		pathPoints.add(new ArcPathPoint((float) x, (float) y, type, this));
+		pathPoints.add(new ArcPathPoint(x, y, type, this));
 	}
 	
 
@@ -369,11 +356,7 @@ public class ArcPath implements Shape {
 		myArc.updateArcPosition();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(double, double)
-	 */
+    @Override
 	public boolean contains(double arg0, double arg1) {
 		return false;
 	}
@@ -384,20 +367,12 @@ public class ArcPath implements Shape {
 
 	public void setPointLocation(int index, double x, double y) {
 		if (index < pathPoints.size() && index >= 0) {
-			(pathPoints.get(index)).setPointLocation((float) x, (float) y);
+			(pathPoints.get(index)).setPointLocation(x, y);
 		}
 	}
 
 	public void setPointType(int index, boolean type) {
 		(pathPoints.get(index)).setPointType(type);
-	}
-
-	public void setFinalPointType(boolean type) {
-		(pathPoints.get(getEndIndex())).setPointType(type);
-	}
-
-	public void togglePointType(int index) {
-		(pathPoints.get(index)).togglePointType();
 	}
 
 	public boolean getPointType(int index) {
@@ -418,10 +393,10 @@ public class ArcPath implements Shape {
 		return pathPoints.size();
 	}
 
-	public Point2D.Float getPoint(int index) {
+	public Point2D.Double getPoint(int index) {
 		return (pathPoints.get(index)).getPoint();
 	}
-    public Point2D.Float getRealPoint(int index) {
+    public Point2D.Double getRealPoint(int index) {
         return (pathPoints.get(index)).getRealPoint();
     }
 
@@ -451,11 +426,6 @@ public class ArcPath implements Shape {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(java.awt.geom.Rectangle2D)
-	 */
 	public void setPointVisibilityLock(boolean lock) {
 		pointLock = lock;
 	}
@@ -476,116 +446,68 @@ public class ArcPath implements Shape {
 
 	public double getStartAngle() {
 		if (getEndIndex() > 0) {
-			return (pathPoints.get(0)).getAngle(((pathPoints.get(1)))
-					.getControl2());
+			return (pathPoints.get(0)).getAngle(((pathPoints.get(1))).getControl2());
 		}
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(double, double, double, double)
-	 */
+	@Override
 	public boolean contains(double arg0, double arg1, double arg2, double arg3) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(double, double, double, double)
-	 */
+    @Override
 	public boolean intersects(double arg0, double arg1, double arg2, double arg3) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getBounds()
-	 */
+    @Override
 	public Rectangle getBounds() {
 		return path.getBounds();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(java.awt.geom.Point2D)
-	 */
+    @Override
 	public boolean contains(Point2D p) {
 		return shape.contains(p);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(java.awt.geom.Point2D)
-	 */
 	public boolean proximityContains(Point2D p) {
 		return proximityShape.contains(p);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getBounds2D()
-	 */
+    @Override
 	public Rectangle2D getBounds2D() {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#contains(java.awt.geom.Rectangle2D)
-	 */
+    @Override
 	public boolean contains(Rectangle2D arg0) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(java.awt.geom.Rectangle2D)
-	 */
+    @Override
 	public boolean intersects(Rectangle2D r) {
 		return shape.intersects(r);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#intersects(java.awt.geom.Rectangle2D)
-	 */
 	public boolean proximityIntersects(Rectangle2D r) {
 		return proximityShape.intersects(r);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform)
-	 */
+    @Override
 	public PathIterator getPathIterator(AffineTransform arg0) {
 		return path.getPathIterator(arg0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Shape#getPathIterator(java.awt.geom.AffineTransform,
-	 * double)
-	 */
+    @Override
 	public PathIterator getPathIterator(AffineTransform arg0, double arg1) {
 		return path.getPathIterator(arg0, arg1);
 	}
 
 	private Cubic[] calcNaturalCubic(int n, int[] x) {
-		float[] gamma = new float[n + 1];
-		float[] delta = new float[n + 1];
-		float[] D = new float[n + 1];
+        double[] gamma = new double[n + 1];
+        double[] delta = new double[n + 1];
+        double[] D = new double[n + 1];
 
 		/*
 		 * We solve the equation [2 1 ] [D[0]] [3(x[1] - x[0]) ] |1 4 1 | |D[1]|
@@ -623,7 +545,6 @@ public class ArcPath implements Shape {
 	}
 
 	public void addPointsToGui(DataLayer model) {
-		ArcPathPointHandler pointHandler;
 
 		(pathPoints.get(0)).setDraggable(false);
 		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
@@ -681,31 +602,7 @@ public class ArcPath implements Shape {
 
 	}
 
-	/**
-	 * Goes through neighbouring pairs of ArcPathPoints
-	 * determining the midpoint between them. Then calculates the distance from
-	 * midpoint to the point passed as an argument. The pair of ArcPathPoints
-	 * resulting in the shortest distance then have an extra point added between
-	 * them at the midpoint effectively splitting that segment into two.
-	 */
-	public ArcPathPoint splitSegment(Point2D.Float mouseposition) {
-		int wantedpoint = findPoint(mouseposition);
-
-		// wantedpoint is now the index of the first point in the pair of arc
-		// points marking the segment to be split. So we have all we need to
-		// split the arc.
-		ArcPathPoint first = pathPoints.get(wantedpoint);
-		ArcPathPoint second = pathPoints.get(wantedpoint + 1);
-		ArcPathPoint newpoint = new ArcPathPoint(second.getMidPoint(first),
-				first.getPointType(), this);
-		insertPoint(wantedpoint + 1, newpoint);
-		createPath();
-		myArc.updateArcPosition();
-
-		return newpoint;
-	}
-
-	public Command insertPoint(Point2D.Float mouseposition, boolean flag) {
+	public Command insertPoint(Point2D.Double mouseposition, boolean flag) {
 		int wantedpoint = findPoint(mouseposition);
 
 		// wantedpoint is now the index of the first point in the pair of arc
@@ -719,7 +616,7 @@ public class ArcPath implements Shape {
 		return new AddArcPathPointEdit(this.getArc(), newPoint, getArc().getGuiModel());
 	}
 
-	private int findPoint(final Point2D.Float mouseposition) {
+	private int findPoint(final Point2D.Double mouseposition) {
 		// An array to store all the distances from the midpoints
 		double[] distances = new double[pathPoints.size() - 1];
 
@@ -727,7 +624,7 @@ public class ArcPath implements Shape {
 		for (int index = 0; index < (pathPoints.size() - 1); index++) {
 			ArcPathPoint first = pathPoints.get(index);
 			ArcPathPoint second = pathPoints.get(index + 1);
-			Point2D.Float midpoint = first.getMidPoint(second);
+			Point2D.Double midpoint = first.getMidPoint(second);
 			distances[index] = midpoint.distance(mouseposition);
 		}
 
@@ -742,18 +639,13 @@ public class ArcPath implements Shape {
 		}
 		return wantedpoint;
 	}
-
-	public boolean isPointSelected(int j) {
-		return (pathPoints.get(j)).isSelected();
-	}
-
 }
 
 class Cubic {
 
-	float a, b, c, d; /* a + b*u + c*u^2 + d*u^3 */
+	double a, b, c, d; /* a + b*u + c*u^2 + d*u^3 */
 
-	public Cubic(float _a, float _b, float _c, float _d) {
+	public Cubic(double _a, double _b, double _c, double _d) {
 		a = _a;
 		b = _b;
 		c = _c;
@@ -761,17 +653,17 @@ class Cubic {
 	}
 
 	// Return first control point coordinate (calculated from coefficients)
-	public float getX1() {
+	public double getX1() {
 		return ((b + 3 * a) / 3);
 	}
 
 	// Return second control point coordinate (calculated from coefficients)
-	public float getX2() {
+	public double getX2() {
 		return ((c + 2 * b + 3 * a) / 3);
 	}
 
 	/** evaluate cubic */
-	public float eval(float u) {
+	public double eval(double u) {
 		return (((d * u) + c) * u + b) * u + a;
 	}
 

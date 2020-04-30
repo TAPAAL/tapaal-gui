@@ -448,7 +448,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
             if (pnObject.enableEditMode(true)) {
                 guiModel.addPetriNetObject(pnObject);
                 tabContent.getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
-            };
+            }
             return pnObject;
         }
 

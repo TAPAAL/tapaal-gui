@@ -266,7 +266,6 @@ public class Export {
 				}
 				break;
 			}
-		} catch (NullPointerException e) {
 		} catch (Exception e) {
 			// There was some problem with the action
 			JOptionPane.showMessageDialog(CreateGui.getApp(),

@@ -23,7 +23,6 @@ import dk.aau.cs.gui.undo.Command;
 
 public class ArcPathPoint extends PetriNetObject {
 
-	private static final long serialVersionUID = 7584441718171173604L;
 	public static final boolean STRAIGHT = false;
 	public static final boolean CURVED = true;
 	private static int SIZE = 3;
@@ -33,11 +32,11 @@ public class ArcPathPoint extends PetriNetObject {
 	private final int DELTA = 10;
 
     private ArcPath myArcPath;
-	private Point2D.Float point = new Point2D.Float();
-	private Point2D.Float realPoint = new Point2D.Float();
+	private Point2D.Double point = new Point2D.Double();
+	private Point2D.Double realPoint = new Point2D.Double();
 
-	private Point2D.Float control1 = new Point2D.Float();
-	private Point2D.Float control2 = new Point2D.Float();
+	private Point2D.Double control1 = new Point2D.Double();
+	private Point2D.Double control2 = new Point2D.Double();
 
 	private boolean pointType; // STRAIGHT or CURVED
 
@@ -51,7 +50,7 @@ public class ArcPathPoint extends PetriNetObject {
 		setPointLocation(0, 0);
 	}
 
-	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a) {
+	public ArcPathPoint(double x, double y, boolean _pointType, ArcPath a) {
 		this();
 		myArcPath = a;
 		setPointLocation(x, y);
@@ -68,15 +67,15 @@ public class ArcPathPoint extends PetriNetObject {
 	/**
 	 * @author Nadeem
 	 */
-	public ArcPathPoint(Point2D.Float point, boolean _pointType, ArcPath a) {
+	public ArcPathPoint(Point2D.Double point, boolean _pointType, ArcPath a) {
 		this(point.x, point.y, _pointType, a);
 	}
 
-	public Point2D.Float getPoint() {
+	public Point2D.Double getPoint() {
 		return point;
 	}
 
-	public void setPointLocation(float x, float y) {
+	public void setPointLocation(double x, double y) {
 		double realX = Zoomer.getUnzoomedValue(x, myArcPath.getArc().getZoom());
 		double realY = Zoomer.getUnzoomedValue(y, myArcPath.getArc().getZoom());
 		getRealPoint().setLocation(realX, realY);
@@ -112,7 +111,7 @@ public class ArcPathPoint extends PetriNetObject {
 		myArcPath.setPointVisibilityLock(lock);
 	}
 
-	public double getAngle(Point2D.Float p2) {
+	public double getAngle(Point2D.Double p2) {
 		double angle;
 
 		if (point.y <= p2.y) {
@@ -186,9 +185,11 @@ public class ArcPathPoint extends PetriNetObject {
 		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
 	}
 
-	public Point2D.Float getMidPoint(ArcPathPoint target) {
-		return new Point2D.Float((target.point.x + point.x) / 2,
-				(target.point.y + point.y) / 2);
+	public Point2D.Double getMidPoint(ArcPathPoint target) {
+		return new Point2D.Double(
+		    (target.point.x + point.x) / 2,
+            (target.point.y + point.y) / 2
+        );
 	}
 
 	public boolean isDeleteable() {
@@ -196,30 +197,30 @@ public class ArcPathPoint extends PetriNetObject {
 		return (i > 0 && i != myArcPath.getNumPoints() - 1);
 	}
 
-	public Point2D.Float getControl1() {
+	public Point2D.Double getControl1() {
 		return control1;
 	}
 
-	public Point2D.Float getControl2() {
+	public Point2D.Double getControl2() {
 		return control2;
 	}
 
-	public void setControl1(float _x, float _y) {
+	public void setControl1(double _x, double _y) {
 		control1.x = _x;
 		control1.y = _y;
 	}
 
-	public void setControl2(float _x, float _y) {
+	public void setControl2(double _x, double _y) {
 		control2.x = _x;
 		control2.y = _y;
 	}
 
-	public void setControl1(Point2D.Float p) {
+	public void setControl1(Point2D.Double p) {
 		control1.x = p.x;
 		control1.y = p.y;
 	}
 
-	public void setControl2(Point2D.Float p) {
+	public void setControl2(Point2D.Double p) {
 		control2.x = p.x;
 		control2.y = p.y;
 	}
@@ -259,26 +260,23 @@ public class ArcPathPoint extends PetriNetObject {
 		} else {
 			SIZE = 3;
 		}
-		float x = Zoomer.getZoomedValue(getRealPoint().x, zoom);
-		float y = Zoomer.getZoomedValue(getRealPoint().y, zoom);
+		double x = Zoomer.getZoomedValue(getRealPoint().x, zoom);
+		double y = Zoomer.getZoomedValue(getRealPoint().y, zoom);
 		point.setLocation(x, y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
 	}
 
-	public Point2D.Float getRealPoint() {
+	public Point2D.Double getRealPoint() {
 		return realPoint;
 	}
 
-	public void setRealPoint(Point2D.Float realPoint) {
+	public void setRealPoint(Point2D.Double realPoint) {
 		this.realPoint = realPoint;
 	}
 	
 	public boolean isEndPoint() {
-		if(this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex()) {
-			return true;
-		} else
-			return false;
+        return this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex();
 	}
 
 }

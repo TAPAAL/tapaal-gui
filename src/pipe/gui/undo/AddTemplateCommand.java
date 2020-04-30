@@ -7,7 +7,7 @@ import dk.aau.cs.gui.undo.Command;
 public class AddTemplateCommand extends Command {
 	protected Template template;
 	protected final TemplateExplorer templateExplorer;
-	private int listIndex;
+	private final int listIndex;
 
 	public AddTemplateCommand(TemplateExplorer templateExplorer, Template template, int listIndex) {
 		this.templateExplorer = templateExplorer;

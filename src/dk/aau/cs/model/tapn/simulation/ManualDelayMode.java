@@ -80,8 +80,6 @@ public class ManualDelayMode implements DelayMode{
 	}
 
 	private class ChooseDelayPanel extends JPanel{
-		private static final long serialVersionUID = -1564890407314003743L;
-
 		private JSpinner spinner;
 
 		public ChooseDelayPanel(TimedTransition transition, 

@@ -40,8 +40,8 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 		if (((ArcPathPoint) myObject).getIndex() == 0) {
 			return null;
 		} else {
-			JMenuItem menuItem = new JMenuItem(new ToggleArcPointAction(
-					(ArcPathPoint) myObject));
+			JMenuItem menuItem = new JMenuItem(new ToggleArcPointAction((ArcPathPoint) myObject));
+
 			if (((ArcPathPoint) myObject).getPointType() == ArcPathPoint.STRAIGHT) {
 				menuItem.setText("Change to Curved");
 			} else {
@@ -49,19 +49,10 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 			}
 			popup.insert(menuItem, 0);
 
-			menuItem = new JMenuItem(new SplitArcPointAction(
-					(ArcPathPoint) myObject));
+			menuItem = new JMenuItem(new SplitArcPointAction((ArcPathPoint) myObject));
 			menuItem.setText("Split Point");
 			popup.add(menuItem, 1);
 
-			// The following commented out code can be used for
-			// debugging arc issues - Nadeem 18/07/2005
-			/*
-			 * menuItem = new JMenuItem(new
-			 * GetIndexAction((ArcPathPoint)myObject, e.getPoint()));
-			 * menuItem.setText("Point Index"); menuItem.setEnabled(false);
-			 * popup.add(menuItem);
-			 */
 		}
 		return popup;
 	}
@@ -84,8 +75,9 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (e.isShiftDown()) {
-			CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-					((ArcPathPoint) myObject).togglePointType());
+		    CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+			    ((ArcPathPoint) myObject).togglePointType()
+            );
 		}
 	}
 

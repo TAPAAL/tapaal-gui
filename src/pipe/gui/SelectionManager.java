@@ -25,7 +25,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 		java.awt.event.MouseListener, java.awt.event.MouseWheelListener,
 		java.awt.event.MouseMotionListener {
 
-	private static final long serialVersionUID = 9057152447545103393L;
 	private Point startPoint;
 
 	private Point upperLeftCorner = new Point(0,0);

@@ -27,11 +27,7 @@ public class Zoomer {
 	}
 
 	private boolean validZoom(int newPercent){
-		if(newPercent > Pipe.ZOOM_MAX || newPercent < Pipe.ZOOM_MIN){
-			return false;
-		} else {
-			return true;
-		}
+        return newPercent <= Pipe.ZOOM_MAX && newPercent >= Pipe.ZOOM_MIN;
 		
 	}
 	public int getPercent() {
@@ -52,10 +48,6 @@ public class Zoomer {
 
 	public static int getZoomedValue(int x, int zoom) {
 		return (int) (x * zoom * 0.01);
-	}
-
-	public static float getZoomedValue(float x, int zoom) {
-		return (float) (x * zoom * 0.01);
 	}
 
 	public static double getZoomedValue(double x, int zoom) {

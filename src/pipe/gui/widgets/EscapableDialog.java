@@ -21,11 +21,6 @@ import javax.swing.KeyStroke;
  */
 public class EscapableDialog extends JDialog {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7859292606172447650L;
-
 	/** Creates a new instance of EscapableDialog */
 	public EscapableDialog(Frame frame, String string, boolean modal) {
 		super(frame, string, modal);
@@ -40,10 +35,6 @@ public class EscapableDialog extends JDialog {
 		JRootPane rootPane = new JRootPane();
 		KeyStroke stroke = KeyStroke.getKeyStroke("ESCAPE");
 		Action actionListener = new AbstractAction() {
-			/**
-		 * 
-		 */
-			private static final long serialVersionUID = -7649362860682585358L;
 
 			public void actionPerformed(ActionEvent actionEvent) {
 				setVisible(false);

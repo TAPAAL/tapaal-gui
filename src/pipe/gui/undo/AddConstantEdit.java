@@ -6,8 +6,8 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 
 public class AddConstantEdit extends Command {
-	private Constant constant;
-	private ConstantStore store;
+	private final Constant constant;
+	private final ConstantStore store;
 
 	public AddConstantEdit(Constant constant, ConstantStore store) {
 		this.constant = constant;

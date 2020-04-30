@@ -40,9 +40,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
 
 public class SmartDrawDialog extends JDialog {
-	private static final long serialVersionUID = 6116530047981607501L;
-	
-	
+
 	private static String getHelpMessage(){ 
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 		StringBuffer buffer = new StringBuffer();
@@ -124,8 +122,6 @@ public class SmartDrawDialog extends JDialog {
 	int minimumIterations = 3;
 	
 	private Timer timer = new Timer(1000, new AbstractAction() {
-		private static final long serialVersionUID = 2126744033604698592L;
-
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText("Time elapsed: " + (System.currentTimeMillis() - startTimeMs) / 1000 + " s");
 		}

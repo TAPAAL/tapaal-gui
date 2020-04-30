@@ -19,7 +19,7 @@ public class DeleteArcPathPointEdit extends Command {
 	ArcPath arcPath;
 	ArcPathPoint point;
 	Integer index;
-	private DataLayer guiModel;
+	private final DataLayer guiModel;
 
 	/** Creates a new instance of placeWeightEdit */
 	public DeleteArcPathPointEdit(Arc _arc, ArcPathPoint _point, Integer _index, DataLayer guiModel) {

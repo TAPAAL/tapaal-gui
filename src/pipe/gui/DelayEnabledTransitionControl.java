@@ -26,7 +26,6 @@ import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 
 public class DelayEnabledTransitionControl extends JPanel{
 
-	private static final long serialVersionUID = -5735674907635981304L;
 	private static DelayMode defaultDelayMode = ShortestDelayMode.getInstance();
 	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
 	private static boolean defaultIsRandomTrasition;

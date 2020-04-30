@@ -334,8 +334,7 @@ public class TapnXmlLoader {
 		} else {
 			borderInput = true;
 		}
-		AnnotationNote an = new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
-		return an;
+        return new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 	}
 
 	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
@@ -449,7 +448,7 @@ public class TapnXmlLoader {
 		double nameOffsetYInput;
 		
 		//This check is done, as arcs in nets saved before this change do not have a nameOffset
-		if(arc.getAttribute("nameOffsetX") != "" && arc.getAttribute("nameOffsetY") != "") {
+		if(!arc.getAttribute("nameOffsetX").equals("") && !arc.getAttribute("nameOffsetY").equals("")) {
 			nameOffsetXInput = Double.parseDouble(arc.getAttribute("nameOffsetX"));
 			nameOffsetYInput = Double.parseDouble(arc.getAttribute("nameOffsetY"));
 		} else {
@@ -514,7 +513,7 @@ public class TapnXmlLoader {
 			double _endx, double _endy, Template template, Weight weight) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				sourceIn, targetIn,	(inscriptionTempStorage!="" ? Integer.valueOf(inscriptionTempStorage) : 1), idInput, taggedArc);
+				sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.valueOf(inscriptionTempStorage) : 1), idInput, taggedArc);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());
@@ -552,8 +551,8 @@ public class TapnXmlLoader {
 
 
 		if (isInPreSet) {
-			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+			if (postsetArcs.containsKey(targetIn)) {
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get(targetIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(sourceIn.getName());
 				TimedTransition trans = template.model().getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -571,14 +570,14 @@ public class TapnXmlLoader {
 				template.guiModel().addPetriNetObject(postsetTransportArc);
 				template.model().add(transArc);
 
-				postsetArcs.remove((TimedTransitionComponent) targetIn);
+				postsetArcs.remove(targetIn);
 			} else {
 				presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
 				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
-			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+			if (presetArcs.containsKey(sourceIn)) {
+				TimedTransportArcComponent presetTransportArc = presetArcs.get(sourceIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
@@ -596,7 +595,7 @@ public class TapnXmlLoader {
 				template.guiModel().addPetriNetObject(tempArc);
 				template.model().add(transArc);
 
-				presetArcs.remove((TimedTransitionComponent) sourceIn);
+				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
 				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);
@@ -674,8 +673,8 @@ public class TapnXmlLoader {
 						// Wierd naming convention in pipe: this represents if
 						// the arc point is a curve point or not
 						String arcTempType = element.getAttribute("arcPointType");
-						float arcPointX = Float.valueOf(arcTempX);
-						float arcPointY = Float.valueOf(arcTempY);
+						double arcPointX = Double.valueOf(arcTempX);
+						double arcPointY = Double.valueOf(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						boolean arcPointType = Boolean.valueOf(arcTempType);

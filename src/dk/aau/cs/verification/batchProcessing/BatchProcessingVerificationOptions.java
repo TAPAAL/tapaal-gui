@@ -14,13 +14,13 @@ public class BatchProcessingVerificationOptions {
 
 	public enum SymmetryOption {
 		KeepQueryOption, Yes, No
-	};
-    
-	public enum StubbornReductionOption{
+	}
+
+    public enum StubbornReductionOption{
 		KeepQueryOption, Yes, No
-	};
-	
-	public enum ApproximationMethodOption {
+	}
+
+    public enum ApproximationMethodOption {
 		KeepQueryOption, None, OverApproximation, UnderApproximation
 	}
 	

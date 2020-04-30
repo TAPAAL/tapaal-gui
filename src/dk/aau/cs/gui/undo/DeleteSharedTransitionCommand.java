@@ -4,8 +4,8 @@ import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.model.tapn.SharedTransition;
 
 public class DeleteSharedTransitionCommand extends Command {
-	private SharedTransition transition;
-	private SharedTransitionsListModel listModel;
+	private final SharedTransition transition;
+	private final SharedTransitionsListModel listModel;
 	
 	public DeleteSharedTransitionCommand(SharedTransition transition, SharedTransitionsListModel listModel){
 		this.transition = transition;

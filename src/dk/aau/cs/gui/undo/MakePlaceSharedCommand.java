@@ -25,9 +25,9 @@ public class MakePlaceSharedCommand extends Command {
 	private final TimedPlaceComponent placeComponent;
 	private final boolean multishare;
 	
-	private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
+	private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
 	private final List<TimedToken> oldTokens;
-	private TabContent currentTab;
+	private final TabContent currentTab;
 
 	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multishare){
 		Require.that(tapn != null, "tapn cannot be null");

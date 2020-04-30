@@ -4,8 +4,8 @@ import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.model.tapn.SharedPlace;
 
 public class DeleteSharedPlaceCommand extends Command {
-	private SharedPlace place;
-	private SharedPlacesListModel listModel;
+	private final SharedPlace place;
+	private final SharedPlacesListModel listModel;
 	
 	public DeleteSharedPlaceCommand(SharedPlace place, SharedPlacesListModel listModel){
 		this.place = place;

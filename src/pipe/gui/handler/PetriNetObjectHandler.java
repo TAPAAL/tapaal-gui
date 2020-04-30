@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
-import pipe.gui.GuiFrame.GUIMode;
 
 import pipe.gui.graphicElements.PetriNetObject;
 
@@ -92,8 +91,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
-		// Have to check for popup here as well as on pressed for
-		// crossplatform!!
+		// Have to check for popup here as well as on pressed for crossplatform!!
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
 			checkForPopup(e);
 		}
