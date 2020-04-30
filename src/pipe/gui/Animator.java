@@ -71,7 +71,7 @@ public class Animator {
 	}
 
 	public void setTrace(TAPNNetworkTrace trace) {
-        CreateGui.getCurrentTab().toggleAnimationMode();
+        CreateGui.getCurrentTab().setAnimationMode(true);
 
 		if (trace.isConcreteTrace()) {
 			this.trace = trace;

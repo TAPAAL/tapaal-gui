@@ -539,8 +539,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			floatingDividers = true;
 		}
 		animatorSplitPane = new BugHandledJXMultisplitPane();
-		
 		animatorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+        animatorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
+
 		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
 		
 		animatorSplitPane.getMultiSplitLayout().setModel(simulatorModelRoot);
@@ -574,10 +575,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				transitionFireing.getMinimumSize().height
             )
         );
+
+        JButton dummy = new JButton("AnimatorDummy");
+        dummy.setMinimumSize(templateExplorer.getMinimumSize());
+        dummy.setPreferredSize(templateExplorer.getPreferredSize());
+        animatorSplitPane.add(new JPanel(), templateExplorerName);
+
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
 		
 		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
+		animatorSplitPane.repaint();
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
@@ -587,7 +595,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if(dummy != null){
 			animatorSplitPane.remove(dummy);
 		}
-		
+
 		//Add the templateExplorer
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
@@ -622,7 +630,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
-			animatorSplitPane.add(new JPanel(), templateExplorerName);
+			animatorSplitPane.add(dummy, templateExplorerName);
 		}
 
 		templateExplorer.switchToEditorMode();
@@ -886,9 +894,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		//if (transitionFireing != null && !(enable && transitionFireing.isVisible())) {
+	    //displayNode fires and relayout, so we check of value is changed
+        // else elements will be set to default size.
+		if (transitionFireing.isVisible() != enable) {
 			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFireingName, enable);
-		//}
+		}
 	}
 	
 	public void showDelayEnabledTransitions(boolean enable){
@@ -1026,8 +1036,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     //Animation mode stuff, moved from view
 	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
-
 	private boolean animationmode = false;
+	public void setAnimationMode(boolean on) {
+	    if (animationmode != on) {
+	        toggleAnimationMode();
+        }
+    }
 	@Override
 	public void toggleAnimationMode() {
 

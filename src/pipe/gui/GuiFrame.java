@@ -977,6 +977,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
 
+            alignToGrid.setEnabled(false);
+
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
 
@@ -1080,7 +1082,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		zoomOutAction.setEnabled(enable);
 		zoomComboBox.setEnabled(enable);
 		zoomMenu.setEnabled(enable);
-		
+
 		decSpacingAction.setEnabled(enable);
 		incSpacingAction.setEnabled(enable);
 
