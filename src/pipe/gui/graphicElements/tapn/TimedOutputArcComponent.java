@@ -22,10 +22,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.Weight;
 
 public class TimedOutputArcComponent extends Arc {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5588142404135607382L;
 
 	private dk.aau.cs.model.tapn.TimedOutputArc outputArc;
 

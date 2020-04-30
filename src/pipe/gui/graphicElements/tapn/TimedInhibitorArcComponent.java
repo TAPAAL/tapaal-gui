@@ -16,7 +16,7 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.Weight;
 
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
-	private static final long serialVersionUID = 5492180277264669192L;
+
 	private TimedInhibitorArc inhibitorArc;
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc) {

@@ -24,7 +24,6 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.RequireException;
 
 public class SharedPlaceNamePanel extends JPanel {
-	private static final long serialVersionUID = -8099814326394422263L;
 
 	private final JRootPane rootPane;
 	private final SharedPlacesListModel listModel;
@@ -75,7 +74,7 @@ public class SharedPlaceNamePanel extends JPanel {
 		
 		JLabel label = new JLabel("Enter a shared place name:");
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(4, 4, 2, 4);
 		namePanel.add(label, gbc);
 		

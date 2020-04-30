@@ -49,7 +49,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import pipe.gui.CreateGui;
 import dk.aau.cs.util.Require;
 
 /**
@@ -59,10 +58,6 @@ import dk.aau.cs.util.Require;
  * 
  */
 public abstract class TabComponent extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2036995080253347710L;
 
 	private final JTabbedPane pane;
 
@@ -76,7 +71,6 @@ public abstract class TabComponent extends JPanel {
 
 		// make JLabel read titles from JTabbedPane
 		JLabel label = new JLabel() {
-			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String getText() {
@@ -97,7 +91,6 @@ public abstract class TabComponent extends JPanel {
 	}
 
 	private class TabButton extends JButton {
-		private static final long serialVersionUID = 396272450859168050L;
 
 		public TabButton() {
 			int size = 17;

@@ -26,28 +26,22 @@ import pipe.gui.widgets.EscapableDialog;
 
 public class AnnotationNote extends Note {
 
-	private static final long serialVersionUID = 3503959956765396720L;
-
 	private boolean fillNote = true;
 
 	private EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
 
 	private AffineTransform prova = new AffineTransform();
-	
-	private boolean isNew;
 
-	public AnnotationNote(int x, int y, boolean isNew) {
+	public AnnotationNote(int x, int y) {
 		super(x, y);
 		setDragPoints();
-		this.isNew = isNew;
 
         getNote().addMouseListener(getMouseHandler());
         getNote().addMouseMotionListener(getMouseHandler());
 	}
 
-	public AnnotationNote(String text, int x, int y, int w, int h, boolean border, boolean isNew) {
+	public AnnotationNote(String text, int x, int y, int w, int h, boolean border) {
 		super(text, x, y, w, h, border);
-		this.isNew = isNew;
 		setDragPoints();
 
         getNote().addMouseListener(getMouseHandler());
@@ -160,18 +154,21 @@ public class AnnotationNote extends Note {
 
 	@Override
 	public void enableEditMode() {
+	    enableEditMode(false);
+    }
+    //Special order if its first edit, undo/redo
+    public boolean enableEditMode(boolean isFirstEdit) {
 		String oldText = note.getText();
 		JDialog.setDefaultLookAndFeelDecorated(true);
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Annotation", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Annotation", true);
 
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));
 		// Make window fit contents' preferred size
 		guiDialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				if(isNew()) {
+				if(isFirstEdit) {
 					getParent().getGuiModel().removePetriNetObject(AnnotationNote.this);
 				}
 			}
@@ -194,7 +191,9 @@ public class AnnotationNote extends Note {
 					new AnnotationTextEdit(this, oldText, newText)
 			);
 			updateBounds();
+			return true;
 		}
+		return false;
 	}
 
 	@Override
@@ -301,7 +300,6 @@ public class AnnotationNote extends Note {
 
 	public class ResizePoint extends javax.swing.JComponent {
 
-		private static final long serialVersionUID = -1615544376708838434L;
 		private int SIZE = 3;
 		private static final int TOP = 1;
 		private static final int BOTTOM = 2;
@@ -380,17 +378,7 @@ public class AnnotationNote extends Note {
 	}
 	
 	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder(), isNew);
-		
-		return annotation;
-	}
-	
-	public boolean isNew(){
-		if(isNew){
-			isNew = false;
-			return true;
-		}
-		return false;
+        return new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
 	}
 
 }

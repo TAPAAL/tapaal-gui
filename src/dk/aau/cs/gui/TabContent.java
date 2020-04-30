@@ -22,7 +22,6 @@ import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
-import net.tapaal.helpers.Reference.Reference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
@@ -47,18 +46,17 @@ import dk.aau.cs.util.Require;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
-	private static final long serialVersionUID = -648006317150905097L;
 
 	//Model and state
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
+
 	private UndoManager undoManager = new UndoManager();
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws Exception
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
 		TabContent tab = new TabContent(NetType.TAPN);
@@ -96,7 +94,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws Exception
 	 */
 
 	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
@@ -139,7 +136,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
-	 * @throws FileNotFoundException
 	 */
 	//XXX should properly be in controller?
 	public static TabContent createNewTabFromFile(File file) throws Exception {
@@ -183,6 +179,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	//GUI
+
+	private HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+
 	private JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
@@ -206,11 +205,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryComponent<String> animBox;
+	private AnimationHistoryComponent animBox;
 	private AnimationController animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent<String> abstractAnimationPane = null;
+	private AnimationHistoryComponent abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
 
@@ -230,6 +229,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
+			hasPositionalInfos.put(net, Boolean.FALSE);
 		}
 		
 		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
@@ -279,25 +279,39 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 	
 	public void createEditorLeftPane() {
-		boolean enableAddButton = getModel() == null ? true : !getModel()
-				.netType().equals(NetType.UNTIMED);
+		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 
 		constantsPanel = new ConstantsPane(enableAddButton, this);
-		constantsPanel.setPreferredSize(new Dimension(constantsPanel
-				.getPreferredSize().width,
-				constantsPanel.getMinimumSize().height));
+		constantsPanel.setPreferredSize(
+				new Dimension(
+						constantsPanel.getPreferredSize().width,
+						constantsPanel.getMinimumSize().height
+				)
+		);
+
 		queries = new QueryPane(new ArrayList<TAPNQuery>(), this);
-		queries.setPreferredSize(new Dimension(
-				queries.getPreferredSize().width,
-				queries.getMinimumSize().height));
+		queries.setPreferredSize(
+				new Dimension(
+						queries.getPreferredSize().width,
+						queries.getMinimumSize().height
+				)
+		);
+
 		templateExplorer = new TemplateExplorer(this);
-		templateExplorer.setPreferredSize(new Dimension(templateExplorer
-				.getPreferredSize().width,
-				templateExplorer.getMinimumSize().height));
+		templateExplorer.setPreferredSize(
+				new Dimension(
+						templateExplorer.getPreferredSize().width,
+						templateExplorer.getMinimumSize().height
+				)
+		);
+
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
-		sharedPTPanel.setPreferredSize(new Dimension(sharedPTPanel
-				.getPreferredSize().width,
-				sharedPTPanel.getMinimumSize().height));
+		sharedPTPanel.setPreferredSize(
+				new Dimension(
+						sharedPTPanel.getPreferredSize().width,
+						sharedPTPanel.getMinimumSize().height
+				)
+		);
 		
 		boolean floatingDividers = false;
 		if(editorModelroot == null){
@@ -311,15 +325,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			templateExplorerLeaf.setWeight(0.25);
 			sharedPTLeaf.setWeight(0.25);
 
-			editorModelroot = new Split(templateExplorerLeaf, new Divider(),
-					sharedPTLeaf, new Divider(), queriesLeaf, new Divider(),
-					constantsLeaf);
+			editorModelroot = new Split(
+					templateExplorerLeaf,
+					new Divider(),
+					sharedPTLeaf,
+					new Divider(),
+					queriesLeaf,
+					new Divider(),
+					constantsLeaf
+			);
 			editorModelroot.setRowLayout(false);
 			// The modelroot needs to have a parent when we remove all its children
 			// (bug in the swingx package)
 			editorModelroot.setParent(new Split());
 			floatingDividers = true;
-		} 
+		}
+
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
 		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
@@ -349,7 +370,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroller.setMinimumSize(new Dimension(
 				panel.getMinimumSize().width,
-				panel.getMinimumSize().height));
+				panel.getMinimumSize().height
+		));
 		return scroller;
 	}
 
@@ -461,20 +483,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
 							}
 						}
 						
-						anim.blinkSelected((String)animBox.getSelectedValue());
+						anim.blinkSelected(animBox.getSelectedValue());
 					}
 				}
 				// Remove focus
 				CreateGui.getApp().requestFocus();
 			}
 		});
+
 		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(
+		animationHistoryScrollPane.setBorder(
+		    BorderFactory.createCompoundBorder(
 						BorderFactory.createTitledBorder("Simulation History"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)
+            )
+        );
 		//Add 10 pixel to the minimumsize of the scrollpane
-		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
+		animationHistoryScrollPane.setMinimumSize(
+		    new Dimension(
+		        animationHistoryScrollPane.getMinimumSize().width,
+                animationHistoryScrollPane.getMinimumSize().height + 20
+            )
+        );
 	}
 
 	private void createAnimatorSplitPane(NetType netType) {
@@ -509,8 +539,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			floatingDividers = true;
 		}
 		animatorSplitPane = new BugHandledJXMultisplitPane();
-		
 		animatorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+        animatorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
+
 		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
 		
 		animatorSplitPane.getMultiSplitLayout().setModel(simulatorModelRoot);
@@ -544,10 +575,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				transitionFireing.getMinimumSize().height
             )
         );
+
+        JButton dummy = new JButton("AnimatorDummy");
+        dummy.setMinimumSize(templateExplorer.getMinimumSize());
+        dummy.setPreferredSize(templateExplorer.getPreferredSize());
+        animatorSplitPane.add(new JPanel(), templateExplorerName);
+
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
 		
 		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
+		animatorSplitPane.repaint();
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
@@ -557,7 +595,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if(dummy != null){
 			animatorSplitPane.remove(dummy);
 		}
-		
+
 		//Add the templateExplorer
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
@@ -592,7 +630,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
-			animatorSplitPane.add(new JPanel(), templateExplorerName);
+			animatorSplitPane.add(dummy, templateExplorerName);
 		}
 
 		templateExplorer.switchToEditorMode();
@@ -600,7 +638,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent<String> getUntimedAnimationHistory() {
+	public AnimationHistoryComponent getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -666,7 +704,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animControlerBox.requestFocus(true);
 	}
 
-	public AnimationHistoryComponent<String> getAnimationHistory() {
+	public AnimationHistoryComponent getAnimationHistory() {
 		return animBox;
 	}
 
@@ -678,11 +716,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return transitionFireing;
 	}
 
-	public JScrollPane drawingSurfaceScrollPane() {
-		return drawingSurfaceScroller;
-	}
-
-	public TimedArcPetriNetNetwork network() {
+    public TimedArcPetriNetNetwork network() {
 		return tapnNetwork;
 	}
 
@@ -693,7 +727,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public Iterable<Template> allTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-			list.add(new Template(net, guiModels.get(net), zoomLevels.get(net)));
+			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
+			template.setHasPositionalInfo(hasPositionalInfos.get(net));
+			list.add(template);
 		}
 		return list;
 	}
@@ -701,7 +737,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public Iterable<Template> activeTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			list.add(new Template(net, guiModels.get(net), zoomLevels.get(net)));
+			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
+			template.setHasPositionalInfo(hasPositionalInfos.get(net));
+			list.add(template);
 		}
 		return list;
 	}
@@ -727,6 +765,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
 		zoomLevels.put(template.model(), template.zoomer());
+		hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 		if (updateTemplateExplorer) {
 			templateExplorer.updateTemplateList();
 		}
@@ -744,6 +783,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
 		zoomLevels.remove(template.model());
+		hasPositionalInfos.remove(template.model());
 		templateExplorer.updateTemplateList();
 	}
 
@@ -779,6 +819,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		for (Template template : templates) {
 			addGuiModel(template.model(), template.guiModel());
 			zoomLevels.put(template.model(), template.zoomer());
+			hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 		}
 
 		sharedPTPanel.setNetwork(network);
@@ -825,8 +866,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
 
 			if (animatorSplitPane != null) {
-				animatorSplitPane.getMultiSplitLayout().displayNode(
-						templateExplorerName, enable);
+				animatorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
 			}
 			makeSureEditorPanelIsVisible(templateExplorer);
 		}
@@ -854,9 +894,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		//if (transitionFireing != null && !(enable && transitionFireing.isVisible())) {
+	    //displayNode fires and relayout, so we check of value is changed
+        // else elements will be set to default size.
+		if (transitionFireing.isVisible() != enable) {
 			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFireingName, enable);
-		//}
+		}
 	}
 	
 	public void showDelayEnabledTransitions(boolean enable){
@@ -994,8 +1036,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     //Animation mode stuff, moved from view
 	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
-
 	private boolean animationmode = false;
+	public void setAnimationMode(boolean on) {
+	    if (animationmode != on) {
+	        toggleAnimationMode();
+        }
+    }
 	@Override
 	public void toggleAnimationMode() {
 
@@ -1439,7 +1485,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return null;
 	}
 
-	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
 		private final AnimationController animationController;

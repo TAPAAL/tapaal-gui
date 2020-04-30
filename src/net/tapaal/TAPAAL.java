@@ -69,7 +69,7 @@ public class TAPAAL {
 			Logger.enableLogging(true);
 		}
 
-		if (TAPAAL.VERSION == "DEV"){
+		if (TAPAAL.VERSION.equals("DEV")){
 			Logger.enableLogging(true);
 			Logger.log("Debug logging is enabled by default in DEV branch");
 		}
@@ -94,13 +94,14 @@ public class TAPAAL {
 
 		// Open files
 		String[] files = commandline.getArgs();
+		Logger.log("Opening #files: " + files.length);
 		for (String f : files) {
 			File file = new File(f);
 
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
 					try {
-						TabContent.createNewTabFromFile(file);
+                        CreateGui.getAppGuiController().openTab(TabContent.createNewTabFromFile(file));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

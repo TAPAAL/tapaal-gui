@@ -32,8 +32,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
 public class EnabledTransitionsList extends JPanel{
 
-	private static final long serialVersionUID = -121639323606689256L;
-
 	public EnabledTransitionsList() {
 		super(new BorderLayout());
 		this.setPreferredSize(new Dimension(0, 300));
@@ -130,7 +128,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void fireSelectedTransition(){
-		TransitionListItem item = (TransitionListItem)transitionsList.getSelectedValue();
+		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
 			CreateGui.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
@@ -157,7 +155,7 @@ public class EnabledTransitionsList extends JPanel{
 
 	}
 
-	class TransitionListItem implements ListItem{
+	static class TransitionListItem implements ListItem{
 		private Transition transition;
 		private Template template;
 
@@ -194,7 +192,7 @@ public class EnabledTransitionsList extends JPanel{
 			if(!(obj instanceof TransitionListItem)){
 				return false;
 			} else {
-				return toString().equals(((TransitionListItem)obj).toString());
+				return toString().equals(obj.toString());
 			}
 		}
 
@@ -248,12 +246,10 @@ public class EnabledTransitionsList extends JPanel{
 	//This class creates the stippled line shown between the enabled transitions and the delay-enabled transitions
 	class EnabledTransitionListCellRenderer extends DefaultListCellRenderer{
 
-		private static final long serialVersionUID = -835675414373311136L;
-
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
-			if(value != null && value instanceof SplitterListItem){
+			if(value instanceof SplitterListItem){
 				JLabel separator = new JLabel();
 				separator.setBorder(new DashBorder());
 				separator.setPreferredSize(new Dimension(1, 1));

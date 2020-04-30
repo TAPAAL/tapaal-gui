@@ -15,8 +15,8 @@ public class MakeTransitionSharedCommand extends Command {
 	private final SharedTransition sharedTransition;
 	private final TimedTransition timedTransition;
 	private final String oldName;
-        private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
-        private TabContent currentTab;
+        private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
+        private final TabContent currentTab;
 	
 	public MakeTransitionSharedCommand(TimedArcPetriNet tapn, SharedTransition sharedTransition, TimedTransition timedTransition, TabContent currentTab){
                 Require.that(tapn != null, "tapn cannot be null");

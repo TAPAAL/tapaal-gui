@@ -21,10 +21,6 @@ import pipe.gui.graphicElements.AnnotationNote;
  */
 public class AnnotationPanel extends javax.swing.JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5241113917349530815L;
 	private AnnotationNote annotation;
 
 	/**
@@ -113,20 +109,17 @@ public class AnnotationPanel extends javax.swing.JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		container.add(buttonPanel,gbc);
 
-		add(container);		this.setPreferredSize(new Dimension(400, 300));
+		add(container);
+		this.setPreferredSize(new Dimension(400, 300));
 	}
 
 	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		if(annotation.isNew()){
-			 annotation.getGuiModel().removePetriNetObject(annotation);
-		}
 		exit();
 	}
 
 	private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		annotation.setText(textArea.getText());
 		annotation.repaint();
-		annotation.isNew();
 		exit();
 	}
 

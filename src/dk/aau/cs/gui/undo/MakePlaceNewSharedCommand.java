@@ -24,12 +24,12 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final TimedPlace place;
 	private final TimedArcPetriNet tapn;
 	private final TimedPlaceComponent placeComponent;
-	private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
+	private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
 	private final List<TimedToken> oldTokens;
 	private final TabContent currentTab;
-	private SharedPlacesAndTransitionsPanel sharedPanel;
+	private final SharedPlacesAndTransitionsPanel sharedPanel;
 	private SharedPlace sharedPlace;
-	private boolean multiShare;
+	private final boolean multiShare;
 	
 	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multiShare){
 		Require.that(tapn != null, "tapn cannot be null");

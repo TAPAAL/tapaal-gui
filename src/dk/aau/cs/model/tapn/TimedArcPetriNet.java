@@ -286,12 +286,15 @@ public class TimedArcPetriNet {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 
 		for(TimedPlace p : places) {
-			TimedPlace copy = p.copy();
-			tapn.add(copy);
-			if(!p.isShared()){
-				for(int i = 0; i < p.numberOfTokens(); i++) {
+
+			if(!p.isShared()) {
+				TimedPlace copy = p.copy();
+				tapn.add(copy);
+				for (int i = 0; i < p.numberOfTokens(); i++) {
 					tapn.addToken(new TimedToken(copy));
 				}
+			} else {
+				tapn.add(p);
 			}
 		}
 
@@ -581,13 +584,13 @@ public class TimedArcPetriNet {
 	
 	public boolean isUntimed() {
 		for(TimedInputArc t : inputArcs){
-			if(!t.interval().equals(t.interval().ZERO_INF)){
+			if(!t.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}
 		
 		for(TransportArc t : transportArcs){
-			if(!t.interval().equals(t.interval().ZERO_INF)){
+			if(!t.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}

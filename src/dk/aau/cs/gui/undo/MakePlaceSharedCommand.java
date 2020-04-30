@@ -23,25 +23,30 @@ public class MakePlaceSharedCommand extends Command {
 	private final TimedPlace place;
 	private final TimedArcPetriNet tapn;
 	private final TimedPlaceComponent placeComponent;
+	private final boolean multishare;
 	
-	private Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
+	private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
 	private final List<TimedToken> oldTokens;
-	private TabContent currentTab;
-	
-	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab){
+	private final TabContent currentTab;
+
+	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multishare){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(sharedPlace != null, "sharedPlace cannot be null");
 		Require.that(place != null, "timedPlace cannot be null");
 		Require.that(placeComponent != null, "placeComponent cannot be null");
 		Require.that(currentTab != null, "currentTab cannot be null");
-		
+
 		this.tapn = tapn;
 		this.sharedPlace = sharedPlace;
 		this.place = place;
 		this.placeComponent = placeComponent;
+		this.multishare = multishare;
 		oldTokens = place.tokens();
 		this.currentTab = currentTab;
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
+	}
+	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab){
+		this(tapn, sharedPlace, place, placeComponent, currentTab, false);
 	}
 	
 	@Override
@@ -49,7 +54,7 @@ public class MakePlaceSharedCommand extends Command {
 		updateArcs(place, sharedPlace);
 		
 		tapn.remove(place);
-		tapn.add(sharedPlace);
+		tapn.add(sharedPlace, multishare);
 		placeComponent.setUnderlyingPlace(sharedPlace);
 		
 		updateQueries(place, sharedPlace);
@@ -59,7 +64,7 @@ public class MakePlaceSharedCommand extends Command {
 	public void undo() {
 		updateArcs(sharedPlace, place);
 		tapn.remove(sharedPlace);
-		tapn.add(place);
+		tapn.add(place, multishare);
 		place.addTokens(oldTokens);
 		placeComponent.setUnderlyingPlace(place);
 		

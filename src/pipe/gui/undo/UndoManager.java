@@ -51,7 +51,6 @@ public class UndoManager {
 
 		if (undoneEdits > 0) {
 			checkArcBeingDrawn();
-			checkMode();
 
 			// The currentEdit to redo
 			for (Command command : edits.get(indexOfNextAdd)) {
@@ -81,7 +80,6 @@ public class UndoManager {
 
 		if (sizeOfBuffer > 0) {
 			checkArcBeingDrawn();
-			checkMode();
 
 			if (--indexOfNextAdd < 0) {
 				indexOfNextAdd += UNDO_BUFFER_CAPACITY;
@@ -159,13 +157,4 @@ public class UndoManager {
 			PlaceTransitionObjectHandler.cleanupArc(CreateGui.getDrawingSurface().createArc, CreateGui.getDrawingSurface());
 		}
 	}
-
-	private void checkMode() {
-		Pipe.ElementType mode = CreateGui.getApp().getMode();
-		if ((mode == Pipe.ElementType.FAST_PLACE) || (mode == Pipe.ElementType.FAST_TRANSITION)) {
-			CreateGui.getApp().endFastMode();
-		}
-	}
-
-
 }

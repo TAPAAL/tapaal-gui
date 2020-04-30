@@ -14,14 +14,12 @@ import javax.swing.text.DefaultHighlighter;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
-import pipe.gui.Translatable;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
 import dk.aau.cs.gui.undo.Command;
 
 public abstract class Note extends PetriNetObject {
 
-	private static final long serialVersionUID = 8965208519103066242L;
 	protected JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;
 	protected RectangularShape noteRect = new Rectangle();

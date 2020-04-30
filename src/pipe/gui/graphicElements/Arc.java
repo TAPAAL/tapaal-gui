@@ -13,7 +13,6 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.LabelHandler;
 import dk.aau.cs.model.tapn.Weight;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 
@@ -21,8 +20,6 @@ import pipe.gui.handler.PlaceTransitionObjectHandler;
    Implementation of Element for drawing an arc
  */
 public abstract class Arc extends PetriNetObjectWithLabel {
-
-	private static final long serialVersionUID = 6527845538091358791L;
 
 	private Shape head = null;
 	private boolean fillHead = true; //If true, fill the shape when drawing, if false, fill with bg color.
@@ -50,8 +47,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
-	private Arc(int nameOffsetX, int nameOffsetY) {
-	    super(nameOffsetX, nameOffsetY);
+	private Arc() {
+	    super(0, 0);
 
         setHead();
     }
@@ -63,7 +60,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public Arc(
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		this(0,0);
+		this();
 
 		id = idInput;
 		setSource(sourceInput);
@@ -76,7 +73,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
-		this(0,0);
+		this();
 		isPrototype = true;
 
 		setSource(newSource);
@@ -389,7 +386,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		this.getActionMap().clear();
 	}
 
-	private class DeleteAction extends AbstractAction {
+	private static class DeleteAction extends AbstractAction {
 		Arc arcBeingDraw;
 
 		DeleteAction(Arc arc) {
@@ -402,9 +399,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 			if (aView.createArc == arcBeingDraw) {
 				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
 
-				if ((CreateGui.getApp().getMode() == Pipe.ElementType.FAST_PLACE) || (CreateGui.getApp().getMode() == Pipe.ElementType.FAST_TRANSITION)) {
-					CreateGui.getApp().endFastMode();
-				}
 				aView.repaint();
 			}
 		}

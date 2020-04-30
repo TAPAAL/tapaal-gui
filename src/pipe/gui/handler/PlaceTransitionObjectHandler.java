@@ -1,11 +1,9 @@
 package pipe.gui.handler;
 
-import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.debug.Logger;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;

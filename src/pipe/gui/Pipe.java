@@ -5,14 +5,12 @@ import java.awt.Color;
 public class Pipe {
 
 	//Enum for all actions and types of elements
-	public static enum ElementType {
+	public enum ElementType {
 		PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC, 
 		//TAPN Elements
 		TAPNPLACE, TAPNTRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
 		//Others (might refactore)
 		ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
-		//Fast modes
-		FAST_TRANSITION, FAST_PLACE
 	}
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;

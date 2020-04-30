@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
-import pipe.gui.GuiFrame.GUIMode;
 
 import pipe.gui.graphicElements.PetriNetObject;
 

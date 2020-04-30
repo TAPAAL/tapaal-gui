@@ -8,8 +8,8 @@ import pipe.dataLayer.TAPNQuery;
 
 public class RemoveQueriesCommand extends Command {
 	
-	private List<TAPNQuery> queriesToRemove;
-	private TabContent tabContent;
+	private final List<TAPNQuery> queriesToRemove;
+	private final TabContent tabContent;
 
 
 	public RemoveQueriesCommand(List<TAPNQuery> QueriesToRemove, TabContent TabContent) {

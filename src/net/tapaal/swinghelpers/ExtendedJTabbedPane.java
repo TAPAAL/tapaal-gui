@@ -1,8 +1,5 @@
 package net.tapaal.swinghelpers;
 
-import dk.aau.cs.gui.TabComponent;
-import dk.aau.cs.gui.TabContent;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.Iterator;

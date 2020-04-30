@@ -31,7 +31,7 @@ import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 
 public class TimedTransitionComponent extends Transition {
-	private static final long serialVersionUID = -2280012053262288174L;
+
 	private dk.aau.cs.model.tapn.TimedTransition transition;
 	private dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;

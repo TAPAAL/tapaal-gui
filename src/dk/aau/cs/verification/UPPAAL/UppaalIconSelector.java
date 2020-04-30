@@ -22,8 +22,9 @@ public class UppaalIconSelector extends IconSelector {
 		case AG:
 			if(!result.isQuerySatisfied()) return notSatisfiedIcon;
 			break;
-		case AF: return inconclusiveIcon;
-		case EG: return inconclusiveIcon;
+		case AF:
+		case EG:
+		    return inconclusiveIcon;
 		default:
 			return null;
 		}

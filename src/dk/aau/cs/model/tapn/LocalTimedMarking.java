@@ -71,9 +71,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		if(place.isShared()){
 			parent.removePlaceFromMarking(place);
 		}else{
-			if(placesToTokensMap.containsKey(place)){
-				placesToTokensMap.remove(place);
-			}
+            placesToTokensMap.remove(place);
 		}
 	}
 

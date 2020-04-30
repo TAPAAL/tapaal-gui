@@ -44,7 +44,7 @@ import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 
 public class TimedPlaceComponent extends Place {
-	private static final long serialVersionUID = 1L;
+
 	private dk.aau.cs.model.tapn.TimedPlace place;
 	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
 

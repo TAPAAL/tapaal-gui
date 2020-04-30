@@ -34,10 +34,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
  * @author Morten Jacobsen
  */
 public class ConstantsDialogPanel extends javax.swing.JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6734583459331431789L;
+
 	private JRootPane rootPane;
 	private TimedArcPetriNetNetwork model;
 	private int lowerBound;

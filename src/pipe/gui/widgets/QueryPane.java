@@ -47,7 +47,7 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
 public class QueryPane extends JPanel {
-	private static final long serialVersionUID = 4062539545170994654L;
+
 	private JPanel queryCollectionPanel;
 	private JPanel buttonsPanel;
 	private DefaultListModel listModel;
@@ -162,7 +162,7 @@ public class QueryPane extends JPanel {
 	}
 	
 	public void updateQueryButtons() {
-		TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
+		TAPNQuery query = queryList.getSelectedValue();
 		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
 			editQueryButton.setEnabled(false);
 			verifyButton.setEnabled(false);
@@ -354,7 +354,7 @@ public class QueryPane extends JPanel {
 	}
 	
 	private void removeQueries() {
-		undoManager.addNewEdit(new RemoveQueriesCommand((List<TAPNQuery>) queryList.getSelectedValuesList(), tabContent));
+		undoManager.addNewEdit(new RemoveQueriesCommand(queryList.getSelectedValuesList(), tabContent));
 		if(listModel.getSize() > 0 && isQueryPossible()){
 			for(Object o : queryList.getSelectedValuesList()) {
 				listModel.removeElement(o);
@@ -373,7 +373,7 @@ public class QueryPane extends JPanel {
 				"yes",
 				"no"};
 
-		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
+		TAPNQuery q = queryList.getSelectedValue();
 		TAPNQuery newQuery = null;
 
 		if(q.isActive()) {
@@ -430,8 +430,7 @@ public class QueryPane extends JPanel {
 		listModel.removeElement(queryToRemove);
 	}
 
-	private class QueryCellRenderer extends DefaultListCellRenderer {
-		private static final long serialVersionUID = 3071924451912979500L;
+	private static class QueryCellRenderer extends DefaultListCellRenderer {
 
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -465,7 +464,7 @@ public class QueryPane extends JPanel {
 	}
 
 	private void verifyQuery() {
-		TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
+		TAPNQuery query = queryList.getSelectedValue();
 		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
 		
 		

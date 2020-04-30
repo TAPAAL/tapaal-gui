@@ -23,7 +23,6 @@ import dk.aau.cs.gui.undo.Command;
 
 public class ArcPathPoint extends PetriNetObject {
 
-	private static final long serialVersionUID = 7584441718171173604L;
 	public static final boolean STRAIGHT = false;
 	public static final boolean CURVED = true;
 	private static int SIZE = 3;
@@ -267,10 +266,8 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public boolean isEndPoint() {
-		if(this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex()) {
-			return true;
-		} else
-			return false;
-	    }
+        return this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex();
+	}
+
 
 }

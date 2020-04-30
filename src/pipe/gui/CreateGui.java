@@ -7,7 +7,6 @@ import java.util.List;
 import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
@@ -16,7 +15,7 @@ import dk.aau.cs.gui.TabContent;
 public class CreateGui {
 
 	private static GuiFrame appGui;
-	private static GuiFrameController appGuiController;
+    private static GuiFrameController appGuiController;
 
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
@@ -136,5 +135,11 @@ public class CreateGui {
 		appGuiController.openTab(tab);
 		return tab;
 	}
+
+    @Deprecated
+    public static GuiFrameController getAppGuiController() {
+        return appGuiController;
+    }
+
 
 }
