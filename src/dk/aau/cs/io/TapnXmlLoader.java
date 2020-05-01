@@ -338,16 +338,16 @@ public class TapnXmlLoader {
 	}
 
 	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
-		double positionXInput = Double.parseDouble(transition.getAttribute("positionX"));
-		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
+		int positionXInput = (int)Double.parseDouble(transition.getAttribute("positionX"));
+		int positionYInput = (int)Double.parseDouble(transition.getAttribute("positionY"));
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
 		
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
-		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
-		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
+		int nameOffsetXInput = (int)Double.parseDouble(transition.getAttribute("nameOffsetX"));
+		int nameOffsetYInput = (int)Double.parseDouble(transition.getAttribute("nameOffsetY"));
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
 		int angle = Integer.parseInt(transition.getAttribute("angle"));
 		int priority = Integer.parseInt(transition.getAttribute("priority"));

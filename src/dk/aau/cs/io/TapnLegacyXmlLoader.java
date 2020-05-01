@@ -508,12 +508,12 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private void parseAndAddTransitionAsOldFormat(Element element) throws FormatException {
-		double positionXInput = getPositionAttribute(element, "x");
-		double positionYInput = getPositionAttribute(element, "y");
+		int positionXInput = (int)getPositionAttribute(element, "x");
+		int positionYInput = (int)getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
-		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
-		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
+		int nameOffsetXInput = (int)getNameOffsetAttribute(element, "x");
+		int nameOffsetYInput = (int)getNameOffsetAttribute(element, "y");
 		boolean timedTransition = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "timed");
 		boolean infiniteServer = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "infiniteServer");
 		int angle = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"orientation");
