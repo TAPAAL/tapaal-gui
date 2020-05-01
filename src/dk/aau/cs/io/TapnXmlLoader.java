@@ -386,12 +386,12 @@ public class TapnXmlLoader {
 	}
 
 	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
-		double positionXInput = Double.parseDouble(place.getAttribute("positionX"));
-		double positionYInput = Double.parseDouble(place.getAttribute("positionY"));
+		int positionXInput = (int)Double.parseDouble(place.getAttribute("positionX"));
+		int positionYInput = (int)Double.parseDouble(place.getAttribute("positionY"));
 		String idInput = place.getAttribute("id");
 		String nameInput = place.getAttribute("name");
-		double nameOffsetXInput = Double.parseDouble(place.getAttribute("nameOffsetX"));
-		double nameOffsetYInput = Double.parseDouble(place.getAttribute("nameOffsetY"));
+		int nameOffsetXInput = (int)Double.parseDouble(place.getAttribute("nameOffsetX"));
+		int nameOffsetYInput = (int)Double.parseDouble(place.getAttribute("nameOffsetY"));
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;

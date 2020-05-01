@@ -541,12 +541,12 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
-		double positionXInput = getPositionAttribute(element, "x");
-		double positionYInput = getPositionAttribute(element, "y");
+		int positionXInput = (int)getPositionAttribute(element, "x");
+		int positionYInput = (int)getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
-		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
-		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
+		int nameOffsetXInput = (int)getNameOffsetAttribute(element, "x");
+		int nameOffsetYInput = (int)getNameOffsetAttribute(element, "y");
 		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
 		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
 		
@@ -576,8 +576,7 @@ public class TapnLegacyXmlLoader {
 //					markingOffsetYInput, capacityInput);
 //
 //		} else {
-			place = new TimedPlaceComponent(positionXInput, positionYInput,
-					idInput, nameOffsetXInput, nameOffsetYInput);
+			place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 			
 			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
