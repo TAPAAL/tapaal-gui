@@ -30,13 +30,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	/** @deprecated */
-	@Deprecated
-	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
-		this(arc);
-	}
-
-	@Override
+    @Override
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.

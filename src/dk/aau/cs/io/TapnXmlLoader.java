@@ -545,9 +545,7 @@ public class TapnXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(
-				new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
-				inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
+		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
 
 		if (isInPreSet) {
@@ -610,9 +608,8 @@ public class TapnXmlLoader {
 			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
 		Arc tempArc;
 		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
-				taggedArc),
-				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
+                        _startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
+                        taggedArc));
 
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());

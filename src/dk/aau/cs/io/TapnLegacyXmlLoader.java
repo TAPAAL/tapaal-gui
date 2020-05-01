@@ -221,9 +221,7 @@ public class TapnLegacyXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(
-						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
-						inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
+		tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
 
 		if (isInPreSet) {
@@ -287,9 +285,8 @@ public class TapnLegacyXmlLoader {
 			double _endx, double _endy) throws FormatException {
 		Arc tempArc;
 		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
-				taggedArc),
-				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
+                        _startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
+                        taggedArc));
 
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
