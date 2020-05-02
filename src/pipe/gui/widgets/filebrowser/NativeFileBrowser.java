@@ -154,6 +154,7 @@ class NativeFileBrowser extends FileBrowser {
             System.out.println("this is specified path" + specifiedPath);
             JFileChooser c = new JFileChooser(specifiedPath);
             c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            c.setDialogTitle("Choose target directory for export");
             int rVal = c.showSaveDialog(c);
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 selectedDir = c.getSelectedFile();
@@ -162,7 +163,14 @@ class NativeFileBrowser extends FileBrowser {
 
             return selectedDir;
         }
-	    else return new File(saveFile(""));
+	    else{
+	        String selection = saveFile("Choose Directory");
+	        if(selection != null) {
+                return new File(fc.getDirectory());
+            } else{
+	            return null;
+            }
+        }
 
     }
 }
