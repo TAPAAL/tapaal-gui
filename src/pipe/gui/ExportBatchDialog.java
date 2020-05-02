@@ -237,7 +237,9 @@ public class ExportBatchDialog extends JDialog {
 		JButton destinationPathSelector = new JButton("Select destination folder");
 		destinationPathSelector.addActionListener(e -> {
 			selectDestinationPath();
-			destinationPathField.setText(destinationFile.getParent());
+			if(destinationFile != null) {
+                destinationPathField.setText(lastExportPath);
+            }
 			enableButtons();
 		});
 		chooserPanel.add(destinationPathSelector, gbc);
@@ -450,10 +452,10 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private void selectDestinationPath() {
-		String chosenFile = FileBrowser.constructor("Select an export folder", ".", lastExportPath).saveFile("Export");
+		File chosenFile = FileBrowser.constructor("Select an export folder", ".", lastExportPath).saveFileToDir();
 		if(chosenFile != null) {
-			destinationFile = new File(chosenFile);
-			lastExportPath = chosenFile;
+			destinationFile = chosenFile;
+			lastExportPath = chosenFile.getAbsolutePath();
 		}
 		else return;
 	}
@@ -463,7 +465,7 @@ public class ExportBatchDialog extends JDialog {
 		initProgressBar();
 		
 		if(destinationFile != null && destinationFile.exists()) {
-    		String destPath = destinationFile.isFile() ? destinationFile.getParent() : destinationFile.getAbsolutePath();
+    		String destPath = destinationFile.isDirectory() ? destinationFile.getAbsolutePath(): destinationFile.getParent();
 			lastExportPath = destPath;
 			progressBarThread.start();
     		for(File file : files) {

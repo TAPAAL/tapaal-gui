@@ -11,6 +11,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import javafx.stage.DirectoryChooser;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowserFallback extends FileBrowser {
@@ -159,4 +160,18 @@ class NativeFileBrowserFallback extends FileBrowser {
 		}
 		return file;
 	}
+    public File saveFileToDir(){
+        File selectedDir = null;
+
+        if(specifiedPath == null) specifiedPath = lastSavePath;
+        System.out.println("this is specified path" + specifiedPath);
+        JFileChooser c = new JFileChooser(specifiedPath);
+        c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int rVal = c.showSaveDialog(c);
+        if (rVal == JFileChooser.APPROVE_OPTION) {
+            selectedDir = c.getSelectedFile();
+            lastSavePath = selectedDir.getPath();
+        }
+        return selectedDir;
+    }
 }

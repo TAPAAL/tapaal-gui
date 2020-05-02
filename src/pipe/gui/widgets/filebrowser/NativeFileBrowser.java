@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowser extends FileBrowser {
@@ -23,7 +26,7 @@ class NativeFileBrowser extends FileBrowser {
 	NativeFileBrowser(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
 		this.specifiedPath = path;
-		
+
 		if (filetype == null) {
 			filetype = "file";
 		}
@@ -146,5 +149,20 @@ class NativeFileBrowser extends FileBrowser {
 
 		return file;
 	}
+    public File saveFileToDir(){
+	    File selectedDir = null;
 
+        if(specifiedPath == null) specifiedPath = lastSavePath;
+        System.out.println("this is specified path" + specifiedPath);
+        JFileChooser c = new JFileChooser(specifiedPath);
+        c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int rVal = c.showSaveDialog(c);
+        if (rVal == JFileChooser.APPROVE_OPTION) {
+            selectedDir = c.getSelectedFile();
+            lastSavePath = selectedDir.getPath();
+        }
+
+        return selectedDir;
+
+    }
 }
