@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import javafx.stage.DirectoryChooser;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowserFallback extends FileBrowser {
