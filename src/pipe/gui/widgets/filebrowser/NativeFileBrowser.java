@@ -84,7 +84,7 @@ class NativeFileBrowser extends FileBrowser {
         lastOpenPath = fc.getDirectory();
             return selectedFiles;
 	}
-	
+
 	public String saveFile(String suggestedName) {
 		if(specifiedPath == null) specifiedPath = lastSavePath;
 		fc.setDirectory(specifiedPath);
@@ -146,19 +146,23 @@ class NativeFileBrowser extends FileBrowser {
 		return file;
 	}
     public File saveFileToDir(){
-	    File selectedDir = null;
+	    if(System.getProperty("os.name").startsWith("Windows")) {
 
-        if(specifiedPath == null) specifiedPath = lastSavePath;
-        System.out.println("this is specified path" + specifiedPath);
-        JFileChooser c = new JFileChooser(specifiedPath);
-        c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int rVal = c.showSaveDialog(c);
-        if (rVal == JFileChooser.APPROVE_OPTION) {
-            selectedDir = c.getSelectedFile();
-            lastSavePath = selectedDir.getPath();
+            File selectedDir = null;
+
+            if (specifiedPath == null) specifiedPath = lastSavePath;
+            System.out.println("this is specified path" + specifiedPath);
+            JFileChooser c = new JFileChooser(specifiedPath);
+            c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int rVal = c.showSaveDialog(c);
+            if (rVal == JFileChooser.APPROVE_OPTION) {
+                selectedDir = c.getSelectedFile();
+                lastSavePath = selectedDir.getPath();
+            }
+
+            return selectedDir;
         }
-
-        return selectedDir;
+	    else return new File(saveFile(""));
 
     }
 }

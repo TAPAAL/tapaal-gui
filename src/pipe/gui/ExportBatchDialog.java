@@ -455,7 +455,7 @@ public class ExportBatchDialog extends JDialog {
 		File chosenFile = FileBrowser.constructor("Select an export folder", ".", lastExportPath).saveFileToDir();
 		if(chosenFile != null) {
 			destinationFile = chosenFile;
-			lastExportPath = chosenFile.getAbsolutePath();
+			lastExportPath = destinationFile.getAbsolutePath();
 		}
 		else return;
 	}
