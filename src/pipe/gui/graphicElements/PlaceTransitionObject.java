@@ -42,24 +42,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
 	}
 
-	@Deprecated
-	public PlaceTransitionObject(
-			double positionXInput,
-			double positionYInput,
-			String idInput,
-			double nameOffsetXInput,
-			double nameOffsetYInput
-	) {
-		this((int)positionXInput, (int) positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput);
-	}
-
-	@Deprecated
-	public PlaceTransitionObject(double positionXInput, double positionYInput) {
-		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
-	}
-
-
-
 	/**
 	 * Set name
 	 * 
