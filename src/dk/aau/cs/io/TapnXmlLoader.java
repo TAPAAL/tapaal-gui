@@ -480,24 +480,24 @@ public class TapnXmlLoader {
 		if (type.equals("tapnInhibitor")) {
 
 			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
-					inscriptionTempStorage, sourceIn, targetIn, _startx,
-					_starty, _endx, _endy,template, constants, weight);
+					inscriptionTempStorage, sourceIn, targetIn,
+                _endx, _endy,template, constants, weight);
 
 		} else {
 			if (type.equals("timed")) {
 				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy, template, constants, weight);
+						inscriptionTempStorage, sourceIn, targetIn,
+                    _endx, _endy, template, constants, weight);
 
 			} else if (type.equals("transport")) {
 				tempArc = parseAndAddTransportArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy, template, constants, weight);
+						inscriptionTempStorage, sourceIn, targetIn,
+                    _endx, _endy, template, constants, weight);
 
 			} else {
 				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy, template, weight);
+						inscriptionTempStorage, sourceIn, targetIn,
+                    _endx, _endy, template, weight);
 			}
 
 		}
@@ -508,12 +508,12 @@ public class TapnXmlLoader {
 	}
 
 	private TimedOutputArcComponent parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, Weight weight) throws FormatException {
+                                                              String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                                              PlaceTransitionObject targetIn,
+                                                              int _endx, int _endy, Template template, Weight weight) throws FormatException {
 
-		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.valueOf(inscriptionTempStorage) : 1), idInput, taggedArc);
+		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(
+            sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.valueOf(inscriptionTempStorage) : 1), idInput);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());
@@ -532,9 +532,9 @@ public class TapnXmlLoader {
 	}
 
 	private TimedTransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) {
+                                                               String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                                               PlaceTransitionObject targetIn,
+                                                               int _endx, int _endy, Template template, ConstantStore constants, Weight weight) {
 
 		
 		String[] inscriptionSplit = {};
@@ -545,7 +545,7 @@ public class TapnXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
+		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
 
 		if (isInPreSet) {
@@ -603,13 +603,11 @@ public class TapnXmlLoader {
 	}
 
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
+                                         String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                         PlaceTransitionObject targetIn,
+                                         int _endx, int _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
 		Arc tempArc;
-		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-                        _startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
-                        taggedArc));
+		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
 
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
@@ -629,12 +627,12 @@ public class TapnXmlLoader {
 	}
 
 	private Arc parseAndAddTimedInhibitorArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) {
+                                             String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                             PlaceTransitionObject targetIn,
+                                             int _endx, int _endy, Template template, ConstantStore constants, Weight weight) {
 		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
 				new TimedInputArcComponent(
-						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
+						new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)
 				),
 				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());

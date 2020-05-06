@@ -29,16 +29,6 @@ public class TimedOutputArcComponent extends Arc {
 		super(sourceInput, targetInput, weightInput, idInput);
 	}
 
-	/** @deprecated */
-	@Deprecated
-	public TimedOutputArcComponent(double startPositionXInput,
-			double startPositionYInput, double endPositionXInput,
-			double endPositionYInput, PlaceTransitionObject sourceInput,
-			PlaceTransitionObject targetInput, int weightInput, String idInput,
-			boolean taggedInput) {
-		this(sourceInput, targetInput, weightInput, idInput);
-	}
-
 	/**
 	 * Create Petri-Net Arc object
 	 */

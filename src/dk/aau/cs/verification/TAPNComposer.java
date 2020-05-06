@@ -375,15 +375,11 @@ public class TAPNComposer implements ITAPNComposer {
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 					
 					Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiSource,
+                        guiSource,
 							guiTarget,
 							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
-							false)
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name())
+                    )
 					);
 					
 					// Build ArcPath
@@ -430,16 +426,11 @@ public class TAPNComposer implements ITAPNComposer {
 					Place guiTarget = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 					
 					TimedOutputArcComponent newArc = new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
+                        guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
 							guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name())),
 							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-							false
-					);
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name())
+                    );
 					
 					// Build ArcPath
 					Transition oldGuiSource = currentGuiModel.getTransitionByName(arc.source().name());
@@ -498,16 +489,11 @@ public class TAPNComposer implements ITAPNComposer {
 									
 					TimedTransportArcComponent newInArc = new TimedTransportArcComponent(
 							new TimedInputArcComponent(new TimedOutputArcComponent(
-								0d,
-								0d,
-								0d,
-								0d,
-								guiSourceIn,
+                                guiSourceIn,
 								guiTargetIn,
 								arc.getWeight().value(),
-								mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name()),
-								false
-								)
+								mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name())
+                            )
 							),
 							nextGroupNr, 
 							true
@@ -542,15 +528,11 @@ public class TAPNComposer implements ITAPNComposer {
 					
 					TimedTransportArcComponent newOutArc = new TimedTransportArcComponent(
 							new TimedInputArcComponent(new TimedOutputArcComponent(
-								0d,
-								0d,
-								0d,
-								0d,
-								guiSourceOut,
+                                guiSourceOut,
 								guiTargetOut,
 								1,
-								mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-								false)
+								mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name())
+                            )
 							),
 							nextGroupNr + 1, 
 							false
@@ -609,16 +591,11 @@ public class TAPNComposer implements ITAPNComposer {
 					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
 					Arc newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiSource,
+                        guiSource,
 							guiTarget,
 							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-							false
-							), "");
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name())
+                    ), "");
 					
 					// Build ArcPath
 					Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());
