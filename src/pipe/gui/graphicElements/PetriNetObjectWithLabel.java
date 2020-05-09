@@ -73,8 +73,15 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      * @param nameOffsetXInput
      *            Double value for name X-axis offset
      */
+    public void setNameOffsetX(int nameOffsetXInput, boolean useCurrentZoom) {
+        if(useCurrentZoom){
+            nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
+        } else{
+            nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, Pipe.ZOOM_DEFAULT);
+        }
+    }
     public void setNameOffsetX(int nameOffsetXInput) {
-        nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
+        setNameOffsetX(nameOffsetXInput, true);
     }
 
     /**
@@ -83,8 +90,15 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      * @param nameOffsetYInput
      *            Double value for name Y-axis offset
      */
+    public void setNameOffsetY(int nameOffsetYInput, boolean useCurrentZoom) {
+        if(useCurrentZoom){
+            nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
+        } else{
+            nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, Pipe.ZOOM_DEFAULT);
+        }
+    }
     public void setNameOffsetY(int nameOffsetYInput) {
-        nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
+        setNameOffsetY(nameOffsetYInput, true);
     }
 
     public void updateNameOffsetX(int nameOffsetXInput) {

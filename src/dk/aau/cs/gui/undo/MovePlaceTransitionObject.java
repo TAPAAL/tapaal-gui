@@ -23,8 +23,8 @@ public class MovePlaceTransitionObject extends Command {
 
 	@Override
 	public void undo() {
-		objectToBeMoved.setPositionX(oldX);
-		objectToBeMoved.setPositionY(oldY);
+		objectToBeMoved.setPositionX(oldX, false);
+		objectToBeMoved.setPositionY(oldY, false);
 		
 		
 		objectToBeMoved.updateOnMoveOrZoom();
@@ -37,8 +37,8 @@ public class MovePlaceTransitionObject extends Command {
 		oldY = objectToBeMoved.getPositionY();
 		oldX = objectToBeMoved.getPositionX();
 		
-		objectToBeMoved.setPositionX(newX);
-		objectToBeMoved.setPositionY(newY);
+		objectToBeMoved.setPositionX(newX, false);
+		objectToBeMoved.setPositionY(newY, false);
 		
 		if(doUpdate) {
 			objectToBeMoved.updateOnMoveOrZoom();
