@@ -1,15 +1,6 @@
 package dk.aau.cs.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -23,28 +14,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.SwingWorker.StateValue;
-import javax.swing.Timer;
-import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -53,10 +24,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import dk.aau.cs.gui.undo.AddFileBatchProcessingCommand;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.RemoveFileBatchProcessingCommand;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
 import net.tapaal.swinghelpers.CustomJSpinner;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 import pipe.gui.widgets.QueryPane;
@@ -249,6 +224,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
+	private UndoManager undoManager = new UndoManager();
 	
 	private Timer timer = new Timer(1000, new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
@@ -345,6 +321,7 @@ public class BatchProcessingDialog extends JDialog {
 		this.ListOfQueries = ListOfQueries;
 
 		initComponents();
+		makeShortcuts();
 		//Runs the BatchProcessing if it is called from the QueryPane
 		if(!(isQueryListEmpty())) {
 			process();
@@ -486,30 +463,28 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void addFiles() {
 		FileBrowser browser = FileBrowser.constructor("Timed-Arc Petri Nets","tapn", "xml", lastPath);
-		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
-			for (File file : filesArray) {
+            undoManager.newEdit();
+            for (File file : filesArray) {
 				lastPath = file.getParent();
 				if (!files.contains(file)) {
-					files.add(file);
-					listModel.addElement(file);
+                    Command c = new AddFileBatchProcessingCommand(listModel,file, files, this );
+                    c.redo();
+                    undoManager.addEdit(c);
 				}
 			}
-
-			enableButtons();
-
 		}
 	}
 
 	private void removeSelectedFiles() {
+	    undoManager.newEdit();
 		for (Object o : fileList.getSelectedValuesList()) {
 			File file = (File) o;
-			files.remove(file);
-			listModel.removeElement(file);
+            Command c = new RemoveFileBatchProcessingCommand(listModel,file, files, this );
+            c.redo();
+            undoManager.addEdit(c);
 		}
-
-		enableButtons();
 	}
 	
 	private void initVerificationOptionsPanel() {
@@ -1408,8 +1383,14 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void clearFiles() {
-		files.clear();
-		listModel.removeAllElements();
+        undoManager.newEdit();
+
+        for (Object o : listModel.toArray()) {
+            File file = (File)o;
+            Command c = new RemoveFileBatchProcessingCommand(listModel,file, files, this );
+            c.redo();
+            undoManager.addEdit(c);
+        }
 	}
 
 	private void disableButtonsDuringProcessing() {
@@ -1423,7 +1404,7 @@ public class BatchProcessingDialog extends JDialog {
 		disableVerificationOptionsButtons();
 	}
 
-	private void enableButtons() {
+	public void enableButtons() {
 		fileList.setEnabled(true);
 		addFilesButton.setEnabled(true);
 
@@ -2137,6 +2118,25 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		}
 	}
+	private void makeShortcuts(){
+        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        ActionMap am = splitpane.getActionMap();
+        am.put("undo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoManager.undo();
+            }
+        });
+        am.put("redo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoManager.redo();
+            }
+        });
+        InputMap im = splitpane.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
+        im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
+    }
 }
 
 
