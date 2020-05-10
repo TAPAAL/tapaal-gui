@@ -208,19 +208,6 @@ public class TimedTransitionComponent extends Transition {
 		return transitionComponent;
 	}
 	
-	public void updateToolTip(boolean show){
-		if(show){ 
-			TimeInterval dInterval = underlyingTransition().getdInterval();
-			if(dInterval == null){
-				this.setToolTipText(null);
-			} else {
-				this.setToolTipText(dInterval.toString());
-			}
-		} else {
-			this.setToolTipText(null);
-		}
-	}
-	
 	Window dIntervalWindow = null;
 	
 	public void showDInterval(boolean show) {
