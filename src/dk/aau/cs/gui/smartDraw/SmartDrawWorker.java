@@ -13,6 +13,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
 import pipe.gui.CreateGui;
+import pipe.gui.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.undo.DeleteArcPathPointEdit;
@@ -426,7 +427,13 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			}
 		}
 	}
-	
+
+
+    //XXX: out bad handeling of zoom bleads over we need to adjust point relative to zoom
+    // midpoint is at current zoom level, but when creaing a new point its coords is at 100% zoom
+	private double unzoom(double pos) {
+	    return Zoomer.getUnzoomedValue(pos,(int)CreateGui.getDrawingSurface().getZoom());
+    }
 	/*
 	 * Add arcPathPoints for arcs where
 	 * A---> B --> A so they do not overlap
@@ -435,16 +442,17 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	private void offsetArcPointsFromMiddlepoint(Arc arcOne, Arc arcTwo, Place place, Transition transition) {
 		Point.Double pointForArcOne;
 		Point.Double pointForArcTwo;
+
 		if(transition.getPositionX() == place.getPositionX()) {
-			pointForArcOne = new Point.Double(arcOne.getArcPath().midPoint.x+30, (arcOne.getArcPath().midPoint.y));
-			pointForArcTwo = new Point.Double(arcTwo.getArcPath().midPoint.x-30, (arcTwo.getArcPath().midPoint.y));
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x+30), unzoom((arcOne.getArcPath().midPoint.y)));
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x-30), unzoom((arcTwo.getArcPath().midPoint.y)));
 		} 
 		else if(transition.getPositionY() == place.getPositionY()) {
-			pointForArcOne = new Point.Double((arcOne.getArcPath().midPoint.x), arcOne.getArcPath().midPoint.y+30);
-			pointForArcTwo = new Point.Double((arcTwo.getArcPath().midPoint.x), arcTwo.getArcPath().midPoint.y-30);
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x), unzoom(arcOne.getArcPath().midPoint.y+30));
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x), unzoom(arcTwo.getArcPath().midPoint.y-30));
 		} else {
-			pointForArcOne = new Point.Double((arcOne.getArcPath().midPoint.x+15), arcOne.getArcPath().midPoint.y+15);
-			pointForArcTwo = new Point.Double((arcTwo.getArcPath().midPoint.x-15), arcTwo.getArcPath().midPoint.y-15);
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x+15), unzoom(arcOne.getArcPath().midPoint.y+15));
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x-15), unzoom(arcTwo.getArcPath().midPoint.y-15));
 		}
 		
 		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));
