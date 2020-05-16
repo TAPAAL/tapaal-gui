@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
+import javax.swing.*;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowser extends FileBrowser {
@@ -23,7 +22,7 @@ class NativeFileBrowser extends FileBrowser {
 	NativeFileBrowser(String filetype, final String ext, final String optionalExt, String path) {
 		fc = new FileDialog(CreateGui.getAppGui(), filetype);
 		this.specifiedPath = path;
-		
+
 		if (filetype == null) {
 			filetype = "file";
 		}
@@ -85,7 +84,7 @@ class NativeFileBrowser extends FileBrowser {
         lastOpenPath = fc.getDirectory();
             return selectedFiles;
 	}
-	
+
 	public String saveFile(String suggestedName) {
 		if(specifiedPath == null) specifiedPath = lastSavePath;
 		fc.setDirectory(specifiedPath);
@@ -146,5 +145,34 @@ class NativeFileBrowser extends FileBrowser {
 
 		return file;
 	}
+    public File saveFileToDir(){
+	    //In Windows the native FileDialog only works with files
+        //So we make a JFileChooser in which we can control it
+	    if(System.getProperty("os.name").startsWith("Windows")) {
+            File selectedDir = null;
+            if (specifiedPath == null) specifiedPath = lastSavePath;
+            JFileChooser c = new JFileChooser(specifiedPath);
+            c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            c.setDialogTitle("Choose target directory for export");
+            int rVal = c.showSaveDialog(c);
+            if (rVal == JFileChooser.APPROVE_OPTION) {
+                selectedDir = c.getSelectedFile();
+                lastSavePath = selectedDir.getPath();
+            }
 
+            return selectedDir;
+        } else{
+	        //For Mac we can set Directories only
+            //For linux a save dialog only shows directories
+            System.setProperty("apple.awt.fileDialogForDirectories", "true");
+            String selection = saveFile("Choose Directory");
+            System.setProperty("apple.awt.fileDialogForDirectories", "false");
+            if(selection != null) {
+                return new File(fc.getDirectory());
+            } else{
+                return null;
+            }
+        }
+
+    }
 }
