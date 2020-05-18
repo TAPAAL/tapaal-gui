@@ -57,21 +57,6 @@ public class DelayEnabledTransitionControl extends JPanel{
 		delayEnabledPrecision.setPaintTrack(false);
 		delayEnabledPrecision.setPreferredSize(new Dimension(340, delayEnabledPrecision.getPreferredSize().height));
 		setValue(defaultGranularity);
-		//UIManager.put("Slider.paintValue", false);
-		//UIManager.getLookAndFeelDefaults().put("Slider.paintValue", false);
-		
-		//TODO is this good? it's the only soloution I've found
-		//It makes sure the value of the slider is NOT written 
-		//above the knob.
-		/*Class<?> sliderUIClass;
-		try {
-			sliderUIClass = Class.forName("javax.swing.plaf.synth.SynthSliderUI");
-			Field paintValue = sliderUIClass.getDeclaredField("paintValue");
-	        paintValue.setAccessible(true);
-	        paintValue.set(delayEnabledPrecision.getUI(), false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 		
 		DelayMode[] items = {ShortestDelayMode.getInstance(), RandomDelayMode.getInstance(), ManualDelayMode.getInstance()};
 		delayMode = new JComboBox(items);
