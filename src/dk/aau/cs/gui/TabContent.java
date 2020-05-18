@@ -472,13 +472,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepBackwards();
 								anim.stepBack();
-								getAnimationController().setAnimationButtonsEnabled();
 							}
 						} else {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepForward();
 								anim.stepForward();
-								getAnimationController().setAnimationButtonsEnabled();
 							}
 						}
 						
@@ -1098,7 +1096,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
 		}
-		animControlerBox.setAnimationButtonsEnabled(); //Update stepBack/Forward
+		animator.setAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
 
 	//XXX temp while refactoring, kyrke - 2019-07-25
@@ -1195,7 +1193,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
-			animControlerBox.setAnimationButtonsEnabled(); //Update stepBack/Forward
+			animator.setAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
@@ -1299,7 +1297,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		getAnimationHistory().stepBackwards();
 		getAnimator().stepBack();
 		updateMouseOverInformation();
-		getAnimationController().setAnimationButtonsEnabled();
 	}
 
 	@Override
@@ -1307,21 +1304,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		getAnimationHistory().stepForward();
 		getAnimator().stepForward();
 		updateMouseOverInformation();
-		getAnimationController().setAnimationButtonsEnabled();
 	}
 
 	@Override
 	public void timeDelay() {
 		getAnimator().letTimePass(BigDecimal.ONE);
-		getAnimationController().setAnimationButtonsEnabled();
 		updateMouseOverInformation();
 	}
 
 	@Override
 	public void delayAndFire() {
 		getTransitionFireingComponent().fireSelectedTransition();
-		getAnimationController().setAnimationButtonsEnabled();
 		updateMouseOverInformation();
+		animator.setAnimationButtonsEnabled();
 	}
 
 	@Override
@@ -1515,7 +1510,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 			if (transition.isDEnabled()) {
 				animator.dFireTransition(transition);
-				animationController.setAnimationButtonsEnabled();
 			}
 		}
 

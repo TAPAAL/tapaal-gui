@@ -48,8 +48,7 @@ public class AnimationController extends JPanel {
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
-	private final GuiAction stepforwardAction;
-    private final GuiAction stepbackwardAction;
+
 
 	JTextField TimeDelayField = new JTextField();
 	JComboBox<String> firermodebox = null;
@@ -59,12 +58,6 @@ public class AnimationController extends JPanel {
         Require.notNull(animator, "Animator can't be null");
 
         this.animator = animator;
-
-        stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
-		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
-
-		stepbackwardAction.setEnabled(false);
-		stepforwardAction.setEnabled(false);
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -80,8 +73,8 @@ public class AnimationController extends JPanel {
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
 		animationToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
-		animationToolBar.add(stepbackwardAction);
-		animationToolBar.add(stepforwardAction);
+		animationToolBar.add(animator.stepbackwardAction);
+		animationToolBar.add(animator.stepforwardAction);
 
 		animationToolBar.setVisible(true);
 
@@ -262,11 +255,11 @@ public class AnimationController extends JPanel {
 
 	void setStepShotcutEnabled(boolean enabled){
 		if(enabled){
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
+			animator.stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+            animator.stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
 		} else {
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
+            animator.stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
+            animator.stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
 		}
 	}
 
@@ -318,7 +311,7 @@ public class AnimationController extends JPanel {
 			//e.printStackTrace();
 		}
 
-		setAnimationButtonsEnabled();
+		animator.setAnimationButtonsEnabled();
 	}
 	
 	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
@@ -348,23 +341,7 @@ public class AnimationController extends JPanel {
 		return new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
 	}
 
-	private void setEnabledStepbackwardAction(boolean b) {
-		stepbackwardAction.setEnabled(b);
 
-	}
-
-	private void setEnabledStepforwardAction(boolean b) {
-		stepforwardAction.setEnabled(b);
-
-	}
-
-	public void setAnimationButtonsEnabled() {
-		AnimationHistoryComponent animationHistory = CreateGui.getCurrentTab().getAnimationHistory();
-
-		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
-		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
-
-	}
 	
 	private void initializeDocumentFilterForDelayInput() {
 		javax.swing.text.Document doc = TimeDelayField.getDocument();

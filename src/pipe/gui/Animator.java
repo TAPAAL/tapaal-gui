@@ -11,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
@@ -82,7 +83,7 @@ public class Animator {
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
 		tab.getAnimationHistory().setSelectedIndex(0);
-		tab.getAnimationController().setAnimationButtonsEnabled();
+		setAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
 
@@ -259,6 +260,7 @@ public class Animator {
 			highlightEnabledTransitions();
 			currentAction--;
 			currentMarkingIndex--;
+            setAnimationButtonsEnabled();
 			reportBlockingPlaces();
 		}
 	}
@@ -302,6 +304,7 @@ public class Animator {
 			currentAction++;
 			currentMarkingIndex++;
 			activeGuiModel().redrawVisibleTokenLists();
+            setAnimationButtonsEnabled();
 			reportBlockingPlaces();
 
 		}
@@ -352,6 +355,7 @@ public class Animator {
 				}
 			
 				fireTransition(transition);
+                setAnimationButtonsEnabled();
 			}
 		}
 	}
@@ -409,7 +413,8 @@ public class Animator {
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
-		
+
+		setAnimationButtonsEnabled();
 		reportBlockingPlaces();
 
 	}
@@ -432,6 +437,7 @@ public class Animator {
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
 		reportBlockingPlaces();
+		setAnimationButtonsEnabled();
 		return result;
 	}
 
@@ -682,5 +688,25 @@ public class Animator {
 	public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
 		return actionHistory;
 	}
-	
+
+
+    private void setEnabledStepbackwardAction(boolean b) {
+        stepbackwardAction.setEnabled(b);
+
+    }
+
+    private void setEnabledStepforwardAction(boolean b) {
+        stepforwardAction.setEnabled(b);
+
+    }
+    public final GuiAction stepforwardAction = CreateGui.getAppGui().stepforwardAction;
+    public final GuiAction stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
+
+    public void setAnimationButtonsEnabled() {
+        AnimationHistoryComponent animationHistory = CreateGui.getCurrentTab().getAnimationHistory();
+
+        setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
+        setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
+
+    }
 }
