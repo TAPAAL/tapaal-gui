@@ -293,16 +293,13 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionXInput
 	 *            Double value for X-axis position
 	 */
-	public void setPositionX(int positionXInput, boolean useCurrentZoom) {
+	public void setOriginalX(int positionXInput) {
 		positionX = positionXInput;
-		if(useCurrentZoom){
-            originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
-        } else{
-		    originalX = Zoomer.getUnzoomedValue(positionX, Pipe.ZOOM_DEFAULT);
-        }
+		originalX = Zoomer.getUnzoomedValue(positionX, Pipe.ZOOM_DEFAULT);
 	}
     public void setPositionX(int positionXInput) {
-        setPositionX(positionXInput, true);
+        positionX = positionXInput;
+        originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
     }
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
@@ -312,16 +309,13 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionYInput
 	 *            Double value for Y-axis position
 	 */
-	public void setPositionY(int positionYInput, boolean useCurrentZoom) {
-		positionY = positionYInput;
-        if(useCurrentZoom){
-            originalY = Zoomer.getUnzoomedValue(positionY, getZoom());
-        } else{
-            originalY = Zoomer.getUnzoomedValue(positionY, Pipe.ZOOM_DEFAULT);
-        }
+	public void setOriginalY(int positionYInput) {
+        positionY = positionYInput;
+        originalY = Zoomer.getUnzoomedValue(positionYInput, Pipe.ZOOM_DEFAULT);
 	}
     public void setPositionY(int positionYInput) {
-        setPositionY(positionYInput, true);
+        positionY = positionYInput;
+        originalY = Zoomer.getUnzoomedValue(positionY, getZoom());
     }
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
