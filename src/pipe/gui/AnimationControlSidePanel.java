@@ -51,8 +51,8 @@ public class AnimationControlSidePanel extends JPanel {
 
 
 	JTextField TimeDelayField = new JTextField();
-	JComboBox<String> firermodebox = null;
-	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+	JComboBox<String> firermodebox;
+
 
 	public AnimationControlSidePanel(Animator animator) {
         Require.notNull(animator, "Animator can't be null");
@@ -62,10 +62,7 @@ public class AnimationControlSidePanel extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		// Use the default FlowLayout.
-		// Create everything.
-
-		firermodebox = new NonsearchableJComboBox<>(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(animator.FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));

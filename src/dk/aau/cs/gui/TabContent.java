@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -466,7 +465,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	    createAnimationHistory();
 
 		if (animControlerBox == null) {
-            createAnimationController();
+            createAnimationControlSidePanel();
         }
 		if (transitionFireing == null) {
             createTransitionFireing();
@@ -650,15 +649,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animatorSplitPane.validate();
 	}
 
-	private void createAnimationController() {
+	private void createAnimationControlSidePanel() {
 		animControlerBox = new AnimationControlSidePanel(animator);
-
-		animationControllerScrollPane = new JScrollPane(animControlerBox);
-		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-		animControlerBox.requestFocus(true);
 	}
 
-	public AnimationHistoryList getAnimationHistory() {
+	public AnimationHistoryList getAnimationHistorySidePanel() {
 		return animationHistorySidePanel.getAnimationHistoryList();
 	}
 
@@ -1120,23 +1115,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return animator;
 	}
 
-	private Animator animator = new Animator(this);
+	private final Animator animator = new Animator(this);
 
-	/* GUI Model / Actions helpers */
-	//XXX: Should be moved to animationController or similar
-	/**
-	 * Updates the mouseOver label showing token ages in animationmode
-	 * when a "animation" action is happening. "live updates" any mouseOver label
-	 */
-	private void updateMouseOverInformation() {
-		// update mouseOverView
-		for (pipe.gui.graphicElements.Place p : getModel().getPlaces()) {
-			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
-				((TimedPlaceComponent) p).showAgeOfTokens(true);
-			}
-		}
-
-	}
 
 	/* GUI Model / Actions */
 
@@ -1251,29 +1231,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void stepBackwards() {
-		getAnimationHistory().stepBackwards();
 		getAnimator().stepBack();
-		updateMouseOverInformation();
 	}
 
 	@Override
 	public void stepForward() {
-		getAnimationHistory().stepForward();
 		getAnimator().stepForward();
-		updateMouseOverInformation();
 	}
 
 	@Override
 	public void timeDelay() {
 		getAnimator().letTimePass(BigDecimal.ONE);
-		updateMouseOverInformation();
 	}
 
 	@Override
 	public void delayAndFire() {
 		getTransitionFireingComponent().fireSelectedTransition();
-		updateMouseOverInformation();
-		animator.setAnimationButtonsEnabled();
 	}
 
 	@Override

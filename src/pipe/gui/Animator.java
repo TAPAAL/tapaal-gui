@@ -13,6 +13,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
@@ -82,7 +83,7 @@ public class Animator {
 		currentAction = -1;
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
-		tab.getAnimationHistory().setSelectedIndex(0);
+		tab.getAnimationHistorySidePanel().setSelectedIndex(0);
 		setAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
@@ -115,7 +116,7 @@ public class Animator {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-			tab.getAnimationHistory().setLastShown(getTrace().getTraceType());
+			tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
 		}
 	}
 
@@ -244,6 +245,7 @@ public class Animator {
 	 */
 
 	public void stepBack() {
+        tab.getAnimationHistorySidePanel().stepBackwards();
 		if (!actionHistory.isEmpty()){
 			TAPNNetworkTraceStep lastStep = actionHistory.get(currentAction);
 			if(isDisplayingUntimedTrace && lastStep instanceof TAPNNetworkTimedTransitionStep){
@@ -260,7 +262,9 @@ public class Animator {
 			highlightEnabledTransitions();
 			currentAction--;
 			currentMarkingIndex--;
+
             setAnimationButtonsEnabled();
+            updateMouseOverInformation();
 			reportBlockingPlaces();
 		}
 	}
@@ -270,8 +274,9 @@ public class Animator {
 	 */
 
 	public void stepForward() {
+        tab.getAnimationHistorySidePanel().stepForward();
 		if(currentAction == actionHistory.size()-1 && trace != null){
-			int selectedIndex = tab.getAnimationHistory().getSelectedIndex();
+			int selectedIndex = tab.getAnimationHistorySidePanel().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
 
@@ -282,7 +287,7 @@ public class Animator {
 				addToTimedTrace(getTrace().getLoopSteps());
 			}
 
-			tab.getAnimationHistory().setSelectedIndex(selectedIndex);
+			tab.getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
 			currentAction = action;
 			currentMarkingIndex = markingIndex;
 		}
@@ -304,7 +309,9 @@ public class Animator {
 			currentAction++;
 			currentMarkingIndex++;
 			activeGuiModel().redrawVisibleTokenLists();
+
             setAnimationButtonsEnabled();
+            updateMouseOverInformation();
 			reportBlockingPlaces();
 
 		}
@@ -355,7 +362,7 @@ public class Animator {
 				}
 			
 				fireTransition(transition);
-                setAnimationButtonsEnabled();
+
 			}
 		}
 	}
@@ -415,6 +422,7 @@ public class Animator {
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
 
 		setAnimationButtonsEnabled();
+        updateMouseOverInformation();
 		reportBlockingPlaces();
 
 	}
@@ -436,8 +444,11 @@ public class Animator {
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+
+        setAnimationButtonsEnabled();
+        updateMouseOverInformation();
 		reportBlockingPlaces();
-		setAnimationButtonsEnabled();
+
 		return result;
 	}
 
@@ -499,7 +510,7 @@ public class Animator {
 		markings.clear();
 		currentAction = -1;
 		currentMarkingIndex = 0;
-		tab.getAnimationHistory().reset();
+		tab.getAnimationHistorySidePanel().reset();
 		if(tab.getUntimedAnimationHistory() != null){
 			tab.getUntimedAnimationHistory().reset();
 		}
@@ -523,7 +534,7 @@ public class Animator {
         }
 
 		tab.network().setMarking(marking);
-		tab.getAnimationHistory().addHistoryItem(action.toString());
+		tab.getAnimationHistorySidePanel().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
 		currentAction++;
@@ -535,6 +546,8 @@ public class Animator {
 		markings.remove(markings.size() - 1);
 	}
 
+	//XXX: should be enum?
+    public static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 	public void setFiringmode(String t) {
 		switch (t) {
 			case "Random":
@@ -676,7 +689,7 @@ public class Animator {
 			answer = removeSetTrace(true);
 		}
 		if(answer){
-			tab.getAnimationHistory().clearStepsForward();
+			tab.getAnimationHistorySidePanel().clearStepsForward();
 		}
 		return answer;
 	}
@@ -703,10 +716,26 @@ public class Animator {
     public final GuiAction stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
 
     public void setAnimationButtonsEnabled() {
-        AnimationHistoryList animationHistory = CreateGui.getCurrentTab().getAnimationHistory();
+        AnimationHistoryList animationHistory = CreateGui.getCurrentTab().getAnimationHistorySidePanel();
 
         setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
         setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
+
+    }
+
+    /* GUI Model / Actions helpers */
+    //XXX: Should be moved to animationController or similar
+    /**
+     * Updates the mouseOver label showing token ages in animationmode
+     * when a "animation" action is happening. "live updates" any mouseOver label
+     */
+    private void updateMouseOverInformation() {
+        // update mouseOverView
+        for (pipe.gui.graphicElements.Place p : CreateGui.getCurrentTab().getModel().getPlaces()) {
+            if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
+                ((TimedPlaceComponent) p).showAgeOfTokens(true);
+            }
+        }
 
     }
 }
