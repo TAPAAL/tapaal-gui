@@ -43,12 +43,7 @@ public class AnimationSettingsDialog {
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		JButton closeDialogButton = new JButton("Close");
-		closeDialogButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}
-		});
+		closeDialogButton.addActionListener(o -> dialog.setVisible(false));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
