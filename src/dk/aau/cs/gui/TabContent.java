@@ -205,11 +205,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryComponent animBox;
+	private AnimationHistoryList animBox;
 	private AnimationControlSidePanel animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent abstractAnimationPane = null;
+	private AnimationHistoryList abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
 
@@ -458,7 +458,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	private void createAnimationHistory() {
-		animBox = new AnimationHistoryComponent();
+		animBox = new AnimationHistoryList();
 		animBox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -635,7 +635,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent getUntimedAnimationHistory() {
+	public AnimationHistoryList getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -649,7 +649,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	public void addAbstractAnimationPane() {
 		animationControlsPanel.remove(animationHistoryScrollPane);
-		abstractAnimationPane = new AnimationHistoryComponent();
+		abstractAnimationPane = new AnimationHistoryList();
 
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
 		untimedAnimationHistoryScrollPane.setBorder(
@@ -701,7 +701,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animControlerBox.requestFocus(true);
 	}
 
-	public AnimationHistoryComponent getAnimationHistory() {
+	public AnimationHistoryList getAnimationHistory() {
 		return animBox;
 	}
 

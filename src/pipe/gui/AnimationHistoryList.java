@@ -13,11 +13,11 @@ import pipe.gui.graphicElements.Transition;
 
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
-public class AnimationHistoryComponent extends JList<String> {
+public class AnimationHistoryList extends JList<String> {
 
 	private TraceType lastShown = TraceType.NOT_EG;
 
-	public AnimationHistoryComponent() {
+	public AnimationHistoryList() {
 		super();
 		setModel(new DefaultListModel());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
