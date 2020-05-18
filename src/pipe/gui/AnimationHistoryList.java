@@ -19,7 +19,7 @@ public class AnimationHistoryList extends JList<String> {
 
 	public AnimationHistoryList() {
 		super();
-		setModel(new DefaultListModel());
+		setModel(new DefaultListModel<>());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		for (MouseListener listener : getMouseListeners()) {
@@ -46,17 +46,8 @@ public class AnimationHistoryList extends JList<String> {
 		updateAccordingToDeadlock();
 	}
 
-	public void addHistoryItemDontChange(String transitionName) {
-		if(lastShown == TraceType.NOT_EG){
-			getListModel().addElement(transitionName);
-		} else {
-			getListModel().add(getListModel().size()-1, transitionName);
-		}
-		updateAccordingToDeadlock();
-	}
-
 	public void clearStepsForward() {
-		DefaultListModel listModel = getListModel();
+		DefaultListModel<String> listModel = getListModel();
 		int lastIndex = listModel.size() - 1;
 
 		if (listModel.size() > 1 && getSelectedIndex() < lastIndex) {
@@ -82,7 +73,7 @@ public class AnimationHistoryList extends JList<String> {
 	}
 
 	public boolean isStepForwardAllowed() {
-                layoutAdjustment();
+	    layoutAdjustment();
 		if(lastShown != TraceType.EG_DEADLOCK){
 			return getSelectedIndex() < getListModel().size() - 1;
 		} else {
@@ -99,11 +90,11 @@ public class AnimationHistoryList extends JList<String> {
 	}
 
 	public String getElement(int i) {
-		return (String) getListModel().get(i);
+		return getListModel().get(i);
 	}
 
-	public DefaultListModel getListModel() {
-		return (DefaultListModel) getModel();
+	public DefaultListModel<String> getListModel() {
+		return (DefaultListModel<String>) getModel();
 	}
 
 	@Override
