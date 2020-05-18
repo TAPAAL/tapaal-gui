@@ -62,7 +62,7 @@ public class AnimationHistoryList extends JList<String> {
 			int nextIndex = getSelectedIndex() + 1;
 			setSelectedIndex(nextIndex);
 		}
-                layoutAdjustment();
+		layoutAdjustment();
 	}
 
 	public void stepBackwards() {
@@ -133,17 +133,17 @@ public class AnimationHistoryList extends JList<String> {
 		case NOT_EG:
 			break;
 		}
-                layoutAdjustment();
+		layoutAdjustment();
 	}
-        
-        private void layoutAdjustment() { 
-            // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
-            int selectedIndex = CreateGui.getCurrentTab().getAnimationHistorySidePanel().getSelectedIndex();
-            if (selectedIndex == CreateGui.getCurrentTab().getAnimationHistorySidePanel().getListModel().getSize()-2) {
-                CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex+1);
-                CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
-            }
+
+    private void layoutAdjustment() {
+        // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
+        int selectedIndex = CreateGui.getCurrentTab().getAnimationHistorySidePanel().getSelectedIndex();
+        if (selectedIndex == CreateGui.getCurrentTab().getAnimationHistorySidePanel().getListModel().getSize() - 2) {
+            CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex + 1);
+            CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
         }
+    }
 	
 	private void updateAccordingToDeadlock() {
 		
