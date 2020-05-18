@@ -165,35 +165,6 @@ public class DelayEnabledTransitionControl extends JPanel{
 	}
 	
 	private static DelayEnabledTransitionControl instance;
-	private static JButton closeDialogButton;
-	private static JDialog dialog;
-	
-	public static void showDelayEnabledTransitionDialog(){
-		JPanel contentPane = new JPanel(new GridBagLayout());
-		
-		closeDialogButton = new JButton("Close");
-		closeDialogButton.addActionListener(arg0 -> dialog.setVisible(false));
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(0, 3, 0, 3);
-		gbc.fill = GridBagConstraints.BOTH;
-		contentPane.add(getInstance(), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(3, 3, 0, 3);
-		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		contentPane.add(closeDialogButton, gbc);
-		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Delay controller", true);
-		dialog.setContentPane(contentPane);
-		dialog.pack();
-		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(CreateGui.getApp());
-		dialog.setVisible(true);
-	}
 	
 	public static DelayEnabledTransitionControl getInstance(){
 		if(instance == null){
