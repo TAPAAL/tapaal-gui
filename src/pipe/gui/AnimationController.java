@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
+import dk.aau.cs.util.Require;
 import pipe.gui.action.GuiAction;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
@@ -39,7 +40,9 @@ import java.util.Hashtable;
 
 public class AnimationController extends JPanel {
 
-	private javax.swing.JButton okButton;
+    private final Animator animator;
+
+    private javax.swing.JButton okButton;
 	private JSlider delaySlider;
 	private int delayScale = 10;
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
@@ -52,9 +55,12 @@ public class AnimationController extends JPanel {
 	JComboBox<String> firermodebox = null;
 	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
-	public AnimationController() {
+	public AnimationController(Animator animator) {
+        Require.notNull(animator, "Animator can't be null");
 
-		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
+        this.animator = animator;
+
+        stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
 		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
 
 		stepbackwardAction.setEnabled(false);
@@ -69,7 +75,7 @@ public class AnimationController extends JPanel {
 		firermodebox = new NonsearchableJComboBox<>(FIRINGMODES);
 		updateFiringModeComboBox();
 
-		firermodebox.addActionListener(evt -> CreateGui.getAnimator().setFiringmode((String) firermodebox.getSelectedItem()));
+		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));
 
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
@@ -111,7 +117,7 @@ public class AnimationController extends JPanel {
 		initializeDocumentFilterForDelayInput();
 	}
 
-	private void initDelaySlider() {
+    private void initDelaySlider() {
 		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
@@ -129,7 +135,7 @@ public class AnimationController extends JPanel {
 		delaySlider.setPaintTicks(true);
 		delaySlider.addChangeListener(e -> {
 			TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-			CreateGui.getAnimator().reportBlockingPlaces();
+			animator.reportBlockingPlaces();
 
 		});
 
@@ -141,7 +147,7 @@ public class AnimationController extends JPanel {
 			}
 
 			public void keyReleased(KeyEvent e) {
-				CreateGui.getAnimator().reportBlockingPlaces();
+				animator.reportBlockingPlaces();
 			}
 
 			public void keyTyped(KeyEvent e) {
@@ -221,7 +227,7 @@ public class AnimationController extends JPanel {
 			}
 
 			public void keyReleased(KeyEvent e) {
-				CreateGui.getAnimator().reportBlockingPlaces();
+				animator.reportBlockingPlaces();
 			}
 
 			public void keyTyped(KeyEvent e) {
@@ -265,11 +271,9 @@ public class AnimationController extends JPanel {
 	}
 
 	public void updateFiringModeComboBox() {
-		Animator animator = CreateGui.getAnimator();
-		FiringMode currentFiringMode = null;
-		if (animator != null) {
-			currentFiringMode = animator.getFiringmode();
-		}
+
+        FiringMode currentFiringMode = animator.getFiringmode();
+
 		if (currentFiringMode == null) {
 			firermodebox.setSelectedItem("Manual");
 		} else {
@@ -283,7 +287,7 @@ public class AnimationController extends JPanel {
 	}
 
 	private void addTimeDelayToHistory() {
-		AnimationHistoryComponent animBox = CreateGui.getCurrentTab().getAnimationHistory();
+
 		try {
 
 			// Hack to allow usage of localised numbes
@@ -305,7 +309,7 @@ public class AnimationController extends JPanel {
 				// Nothing to do, illegal value
 				System.err.println("Illegal value");
 			} else {
-				CreateGui.getAnimator().letTimePass(timeDelayToSet);
+				animator.letTimePass(timeDelayToSet);
 			}
 		} catch (NumberFormatException e) {
 			// Do nothing, invalud number

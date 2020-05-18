@@ -696,7 +696,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createAnimationController() {
-		animControlerBox = new AnimationController();
+		animControlerBox = new AnimationController(animator);
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
 		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
