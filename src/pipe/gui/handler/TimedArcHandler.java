@@ -5,8 +5,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.NetType;
-import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -28,7 +26,7 @@ public class TimedArcHandler extends ArcHandler {
 
 		if (myObject instanceof TimedInputArcComponent && !(myObject instanceof TimedTransportArcComponent)) {
 
-		    if (!CreateGui.getModel().netType().equals(NetType.UNTIMED) && !(myObject instanceof TimedInhibitorArcComponent)) {
+		    if (!(myObject instanceof TimedInhibitorArcComponent)) {
 				menuItem = new JMenuItem("Properties");
 				menuItem.addActionListener(e1 -> ((TimedInputArcComponent) myObject).showTimeIntervalEditor());
 				popup.insert(menuItem, popupIndex++);

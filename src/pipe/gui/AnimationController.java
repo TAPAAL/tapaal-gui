@@ -21,7 +21,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
-import pipe.dataLayer.NetType;
 import pipe.gui.action.GuiAction;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
@@ -53,7 +52,7 @@ public class AnimationController extends JPanel {
 	JComboBox<String> firermodebox = null;
 	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
-	public AnimationController(NetType netType) {
+	public AnimationController() {
 
 		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
 		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
@@ -86,23 +85,22 @@ public class AnimationController extends JPanel {
 		c.gridy = 2;
 		add(animationToolBar, c);
 
-		if (!netType.equals(NetType.UNTIMED)) {
-			JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-			JLabel label = new JLabel("Token selection: ");
+        JLabel label = new JLabel("Token selection: ");
 
-			firemode.add(label);
-			firemode.add(firermodebox);
+        firemode.add(label);
+        firemode.add(firermodebox);
 
-			c.weightx = 0.5;
-			c.gridx = 0;
-			c.gridy = 0;
-			add(firemode, c);
+        c.weightx = 0.5;
+        c.gridx = 0;
+        c.gridy = 0;
+        add(firemode, c);
 
-			initDelayTimePanel(animationToolBar);
+        initDelayTimePanel(animationToolBar);
 
-			initDelaySlider();
-		}
+        initDelaySlider();
+
                 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Simulation Control"), BorderFactory
