@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
@@ -20,6 +22,9 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
@@ -1184,7 +1189,36 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-	/* GUI Model / Actions */
+    @Override
+    public void openComposedNet() {
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
+
+        ArrayList<Template> templates = new ArrayList<Template>(1);
+
+        templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
+
+        // Create a constant store
+        ConstantStore newConstantStore = new ConstantStore();
+
+
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(newConstantStore);
+
+        network.add(transformedModel.value1());
+
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
+
+        try {
+            ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+            String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
+            composedName = composedName.replace(".tapn", "");
+            CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+        } catch (Exception e1) {
+            System.console().printf(e1.getMessage());
+        }
+    }
+
+    /* GUI Model / Actions */
 
 	Optional<GuiFrameActions>  app = Optional.empty();
 	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();

@@ -49,6 +49,8 @@ public interface TabContentActions {
 
     void workflowAnalyse();
 
+    void openComposedNet();
+
     File getFile();
 
     void verifySelectedQuery();

@@ -91,6 +91,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
 	private GuiAction smartDrawAction;
+	private GuiAction openComposedDialogAction;
 	private GuiAction stripTimeDialogAction;
 
 	private GuiAction zoomOutAction;
@@ -701,6 +702,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		stripTimeDialog.setMnemonic('e');
 		toolsMenu.add(stripTimeDialog);
 
+        JMenuItem openComposedDialog = new JMenuItem(openComposedDialogAction = new GuiAction("Open composed net", "Export an xml file of composed net and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
+            public void actionPerformed(ActionEvent e) {
+                currentTab.ifPresent(TabContentActions::openComposedNet);
+            }
+        });
+        openComposedDialog.setMnemonic('c');
+        toolsMenu.add(openComposedDialog);
+
 		toolsMenu.addSeparator();
 
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
@@ -947,7 +956,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
 			smartDrawAction.setEnabled(true);
-
+            openComposedDialogAction.setEnabled(true);
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
 
@@ -998,6 +1007,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			verifyAction.setEnabled(false);
 			
 			smartDrawAction.setEnabled(false);
+            openComposedDialogAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1041,6 +1051,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			nextcomponentAction.setEnabled(false);
 			
 			smartDrawAction.setEnabled(false);
+            openComposedDialogAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
