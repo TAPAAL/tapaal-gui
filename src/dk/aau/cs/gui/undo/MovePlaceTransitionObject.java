@@ -34,8 +34,8 @@ public class MovePlaceTransitionObject extends Command {
 
 	@Override
 	public void redo() {
-		oldY = objectToBeMoved.getPositionY();
-		oldX = objectToBeMoved.getPositionX();
+		oldY = objectToBeMoved.getOriginalY();
+		oldX = objectToBeMoved.getOriginalX();
 		
 		objectToBeMoved.setOriginalX(newX);
 		objectToBeMoved.setOriginalY(newY);
