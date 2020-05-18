@@ -724,6 +724,5 @@ public class Animator {
                 ((TimedPlaceComponent) p).showAgeOfTokens(true);
             }
         }
-
     }
 }

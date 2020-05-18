@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import pipe.gui.widgets.EscapableDialog;
 
-public class AnimationSettings{
+public class AnimationSettingsDialog {
 
 	private static JDialog dialog;
 	private static DelayEnabledTransitionControl delayEnabled;

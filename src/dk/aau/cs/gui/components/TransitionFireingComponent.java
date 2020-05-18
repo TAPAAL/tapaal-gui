@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import pipe.dataLayer.Template;
-import pipe.gui.AnimationSettings;
+import pipe.gui.AnimationSettingsDialog;
 import pipe.gui.DelayEnabledTransitionControl;
 import pipe.gui.CreateGui;
 import pipe.gui.SimulationControl;
@@ -39,7 +39,7 @@ public class TransitionFireingComponent extends JPanel {
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
-		settingsButton.addActionListener(e -> AnimationSettings.showAnimationSettings());
+		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings());
 
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
