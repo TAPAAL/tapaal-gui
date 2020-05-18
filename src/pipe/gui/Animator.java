@@ -145,13 +145,11 @@ public class Animator {
 		updateFireableTransitions();
 		DataLayer current = activeGuiModel();
 
-		Iterator<Transition> transitionIterator = current.returnTransitions();
-		while (transitionIterator.hasNext()) {
-			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
-				tempTransition.repaint();
-			}
-		}
+        for (Transition tempTransition : current.transitions()) {
+            if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
+                tempTransition.repaint();
+            }
+        }
 	}
 
 	/**
@@ -160,13 +158,11 @@ public class Animator {
 	private void unhighlightDisabledTransitions() {
 		DataLayer current = activeGuiModel();
 
-		Iterator<Transition> transitionIterator = current.returnTransitions();
-		while (transitionIterator.hasNext()) {
-			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true)) || !tempTransition.isDelayEnabledTransition(true) || (tempTransition.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
-				tempTransition.repaint();
-			}
-		}
+        for (Transition t : current.transitions()) {
+            if (!(t.isEnabled(true)) || !t.isDelayEnabledTransition(true) || (t.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
+                t.repaint();
+            }
+        }
 	}
 
 	public void updateFireableTransitions(){
@@ -175,24 +171,20 @@ public class Animator {
 		isUrgentTransitionEnabled = false;
 		
 		outer: for( Template temp : tab.activeTemplates()){
-			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
-			while (transitionIterator.hasNext()) {
-				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
-					isUrgentTransitionEnabled = true;
-					break outer;
-				}
-			}
+            for (Transition tempTransition : temp.guiModel().transitions()) {
+                if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                    isUrgentTransitionEnabled = true;
+                    break outer;
+                }
+            }
 		}
 		
 		for( Template temp : tab.activeTemplates()){
-			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
-			while (transitionIterator.hasNext()) {
-				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
-					transFireComponent.addTransition(temp, tempTransition);
-				}
-			}
+            for (Transition tempTransition : temp.guiModel().transitions()) {
+                if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
+                    transFireComponent.addTransition(temp, tempTransition);
+                }
+            }
 		}
 
 		transFireComponent.reInitDone();
@@ -205,13 +197,11 @@ public class Animator {
 	private void disableTransitions() {
 		for(Template template : tab.allTemplates())
 		{
-			Iterator<Transition> transitionIterator = template.guiModel().returnTransitions();
-			while (transitionIterator.hasNext()) {
-				Transition tempTransition = transitionIterator.next();
-				tempTransition.setEnabledFalse();
-				tempTransition.setDelayEnabledTransitionFalse();
-				tempTransition.repaint();
-			}
+            for (Transition tempTransition : template.guiModel().transitions()) {
+                tempTransition.setEnabledFalse();
+                tempTransition.setDelayEnabledTransitionFalse();
+                tempTransition.repaint();
+            }
 		}
 	}
 
@@ -461,13 +451,11 @@ public class Animator {
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
 			for( Template temp : tab.activeTemplates()){
-				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
-				while (transitionIterator.hasNext()) {
-					Transition tempTransition = transitionIterator.next();
-					if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
-						sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
-					}
-				}
+                for (Transition tempTransition : temp.guiModel().transitions()) {
+                    if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                        sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
+                    }
+                }
 			}
 			sb.append("</html>");
 			tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
