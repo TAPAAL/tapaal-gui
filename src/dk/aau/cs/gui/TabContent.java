@@ -55,7 +55,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private UndoManager undoManager = new UndoManager();
 
-	/**
+    /**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
@@ -205,9 +205,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryList animBox;
 	private AnimationControlSidePanel animControlerBox;
-	private JScrollPane animationHistoryScrollPane;
+    private AnimationHistorySidePanel animationHistorySidePanel;
+
 	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryList abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
@@ -458,56 +458,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	private void createAnimationHistory() {
-		animBox = new AnimationHistoryList();
-		animBox.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (SwingUtilities.isLeftMouseButton(e)) {
-					int selected = animBox.getSelectedIndex();
-					int clicked = animBox.locationToIndex(e.getPoint());
-					if (clicked != -1) {
-						int steps = clicked - selected;
-						Animator anim = CreateGui.getAnimator();
-						if (steps < 0) {
-							for (int i = 0; i < Math.abs(steps); i++) {
-								animBox.stepBackwards();
-								anim.stepBack();
-							}
-						} else {
-							for (int i = 0; i < Math.abs(steps); i++) {
-								animBox.stepForward();
-								anim.stepForward();
-							}
-						}
-						
-						anim.blinkSelected(animBox.getSelectedValue());
-					}
-				}
-				// Remove focus
-				CreateGui.getApp().requestFocus();
-			}
-		});
-
-		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(
-		    BorderFactory.createCompoundBorder(
-						BorderFactory.createTitledBorder("Simulation History"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)
-            )
-        );
-		//Add 10 pixel to the minimumsize of the scrollpane
-		animationHistoryScrollPane.setMinimumSize(
-		    new Dimension(
-		        animationHistoryScrollPane.getMinimumSize().width,
-                animationHistoryScrollPane.getMinimumSize().height + 20
-            )
-        );
+        animationHistorySidePanel = new AnimationHistorySidePanel();
 	}
 
 	private void createAnimatorSplitPane() {
-		if (animBox == null) {
-            createAnimationHistory();
-        }
+
+	    createAnimationHistory();
+
 		if (animControlerBox == null) {
             createAnimationController();
         }
@@ -558,7 +515,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		animationControlsPanel.add(animationHistorySidePanel, gbc);
 
 		animationControlsPanel.setPreferredSize(
 		    new Dimension(
@@ -648,7 +605,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void addAbstractAnimationPane() {
-		animationControlsPanel.remove(animationHistoryScrollPane);
+		animationControlsPanel.remove(animationHistorySidePanel);
 		abstractAnimationPane = new AnimationHistoryList();
 
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
@@ -660,7 +617,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         );
 		animationHistorySplitter = new JSplitPaneFix(
 		    JSplitPane.HORIZONTAL_SPLIT,
-            animationHistoryScrollPane,
+            animationHistorySidePanel,
             untimedAnimationHistoryScrollPane
         );
 
@@ -689,7 +646,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		animationControlsPanel.add(animationHistorySidePanel, gbc);
 		animatorSplitPane.validate();
 	}
 
@@ -702,7 +659,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public AnimationHistoryList getAnimationHistory() {
-		return animBox;
+		return animationHistorySidePanel.getAnimationHistoryList();
 	}
 
 	private void createTransitionFireing() {
