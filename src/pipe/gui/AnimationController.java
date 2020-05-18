@@ -298,18 +298,11 @@ public class AnimationController extends JPanel {
 			parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-			Number parseTime = parser.parse(TimeDelayField.getText()); // Parse
-																		// the
-																		// number
-																		// localised
+			Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
 			// Try parse
 
-			BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
-					new MathContext(Pipe.AGE_PRECISION));
+			BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
 
-			// BigDecimal timeDelayToSet = new
-			// BigDecimal(TimeDelayField.getText(), new
-			// MathContext(Pipe.AGE_PRECISION));
 			if (timeDelayToSet.compareTo(new BigDecimal(0L)) < 0) {
 				// Nothing to do, illegal value
 				System.err.println("Illegal value");
@@ -348,12 +341,9 @@ public class AnimationController extends JPanel {
 		parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse
-																	// the
-																	// number
-																	// localised
+		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
 
-		return new BigDecimal(parseTime.toString(),	new MathContext(Pipe.AGE_PRECISION));
+		return new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
 	}
 
 	private void setEnabledStepbackwardAction(boolean b) {
