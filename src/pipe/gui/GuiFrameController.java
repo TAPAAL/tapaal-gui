@@ -52,6 +52,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     //XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
     boolean showComponents = true;
+    boolean showSharedPT = true;
     boolean showConstants = true;
     boolean showQueries = true;
     boolean showEnabledTransitions = true;
@@ -240,7 +241,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         buffer.append("TAPAAL GUI and Translations:\n");
             buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Graesboell, ");
             buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-            buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Niels N. Samuelsen,\nJiri Srba, Mathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
+            buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Lena Said, \nNiels N. Samuelsen, Jiri Srba, Mathias G. Soerensen, Jakob H. Taankvist and Peter H. Taankvist\n");
             buffer.append("Aalborg University 2008-2020\n\n");
 
         buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
@@ -629,13 +630,24 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowComponentsSelected(showComponents);
         //currentTab.ifPresent(o->o.showComponents(showComponents));
         CreateGui.getTabs().forEach(o->o.showComponents(showComponents));
+    }
 
+    @Override
+    public void toggleSharedPT(){
+        setSharedPT(!showSharedPT);
+    }
+
+    public void setSharedPT(boolean b){
+        showSharedPT = b;
+
+        guiFrame.setShowSharedPTSelected(showSharedPT);
+        CreateGui.getTabs().forEach(o->o.showSharedPT(showSharedPT));
+        currentTab.ifPresent(o->o.showSharedPT(showSharedPT));
     }
 
     @Override
     public void toggleEnabledTransitionsList(){
         setEnabledTransitionsList(!showEnabledTransitions);
-
     }
     private void setEnabledTransitionsList(boolean b){
         showEnabledTransitions = b;
@@ -657,7 +669,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void toggleDisplayToolTips() {
         setDisplayToolTips(!showToolTips);
-
     }
 
     private void setDisplayToolTips(boolean b) {
@@ -683,6 +694,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     private void showAdvancedWorkspace(boolean advanced){
         QueryDialog.setAdvancedView(advanced);
         setComponents(advanced);
+        setSharedPT(advanced);
         setConstants(advanced);
 
         //Queries and enabled transitions should always be shown
@@ -692,7 +704,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         currentTab.ifPresent(TabContentActions::setResizeingDefault);
 
-        if(advanced) {
+        if (advanced) {
 
             setZeroToInfinityIntervals(true);
             setTokenAge(true);

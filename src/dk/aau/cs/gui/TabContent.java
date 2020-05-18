@@ -872,6 +872,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
+	public void showSharedPT(boolean enable) {
+	    if (enable != sharedPTPanel.isVisible()) {
+            editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
+            makeSureEditorPanelIsVisible(sharedPTPanel);
+        }
+    }
+
 	public void showQueries(boolean enable) {
 		if (enable != queries.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName, enable);
