@@ -37,6 +37,8 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.gui.undo.MoveElementDownCommand;
+import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -61,8 +63,9 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
+import pipe.gui.widgets.SidePane;
 
-public class TemplateExplorer extends JPanel {
+public class TemplateExplorer extends JPanel implements SidePane {
 
 	// Template explorer panel items
 	private JPanel templatePanel;
@@ -81,8 +84,8 @@ public class TemplateExplorer extends JPanel {
 	private UndoManager undoManager;
 	private boolean isInAnimationMode;
 
-	private JButton moveUpButton;
-	private JButton moveDownButton;
+	public JButton moveUpButton;
+	public JButton moveDownButton;
 	private JButton sortButton;
 	
 	private static final String toolTipNewComponent ="Create a new component";
@@ -244,10 +247,9 @@ public class TemplateExplorer extends JPanel {
 				int index = templateList.getSelectedIndex();
 				
 				if(index > 0) {
-					parent.swapTemplates(index, index-1);
-					Template o = listModel.getElementAt(index);
-                    listModel.setElementAt(listModel.getElementAt(index-1), index);
-                    listModel.setElementAt(o, index-1);
+				    Command c = new MoveElementUpCommand(TemplateExplorer.this, index, index-1);
+				    undoManager.addNewEdit(c);
+				    c.redo();
                     templateList.ensureIndexIsVisible(index+1);
 					templateList.setSelectedIndex(index-1);
 				}
@@ -268,10 +270,9 @@ public class TemplateExplorer extends JPanel {
 				int index = templateList.getSelectedIndex();
 				
 				if(index < parent.network().allTemplates().size() - 1) {
-					parent.swapTemplates(index, index+1);
-					Template o = listModel.getElementAt(index);
-                    listModel.setElementAt(listModel.getElementAt(index+1), index);
-                    listModel.setElementAt(o, index+1);
+                    Command c = new MoveElementDownCommand(TemplateExplorer.this, index, index+1);
+                    undoManager.addNewEdit(c);
+                    c.redo();
                     templateList.ensureIndexIsVisible(index+1);
 					templateList.setSelectedIndex(index+1);
 				}
@@ -833,8 +834,28 @@ public class TemplateExplorer extends JPanel {
 		isInAnimationMode = false;
 		updateTemplateList();
 	}
-	
-	private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
+
+    @Override
+    public void moveUp(int index) {
+        parent.swapTemplates(index, index-1);
+        Template o = listModel.getElementAt(index);
+        listModel.setElementAt(listModel.getElementAt(index-1), index);
+        listModel.setElementAt(o, index-1);
+    }
+
+    @Override
+    public void moveDown(int index) {
+        parent.swapTemplates(index, index+1);
+        Template o = listModel.getElementAt(index);
+        listModel.setElementAt(listModel.getElementAt(index+1), index);
+        listModel.setElementAt(o, index+1);
+    }
+    @Override
+    public JList getJList(){
+	    return templateList;
+    }
+
+    private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
 		private static final String CHECK_TO_ACTIVATE = "Check to active the component";

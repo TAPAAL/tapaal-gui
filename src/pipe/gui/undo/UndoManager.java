@@ -118,7 +118,9 @@ public class UndoManager {
 		undoneEdits = 0;
 		app.ifPresent(a -> a.setUndoActionEnabled(true));
 		app.ifPresent(a -> a.setRedoActionEnabled(false));
-		CreateGui.getCurrentTab().setNetChanged(true);
+		if(CreateGui.getCurrentTab() != null) {
+            CreateGui.getCurrentTab().setNetChanged(true);
+        }
 
 		ArrayList<Command> compoundEdit = new ArrayList<Command>();
 		edits.set(indexOfNextAdd, compoundEdit);
@@ -152,9 +154,10 @@ public class UndoManager {
 
 	// removes the arc currently being drawn if any
 	private void checkArcBeingDrawn() {
-
-		if (CreateGui.getDrawingSurface().createArc != null) {
-			PlaceTransitionObjectHandler.cleanupArc(CreateGui.getDrawingSurface().createArc, CreateGui.getDrawingSurface());
-		}
+        if(CreateGui.getDrawingSurface() != null) {
+            if (CreateGui.getDrawingSurface().createArc != null) {
+                PlaceTransitionObjectHandler.cleanupArc(CreateGui.getDrawingSurface().createArc, CreateGui.getDrawingSurface());
+            }
+        }
 	}
 }

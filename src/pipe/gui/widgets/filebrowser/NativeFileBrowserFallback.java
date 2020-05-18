@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import pipe.gui.CreateGui;
 
 class NativeFileBrowserFallback extends FileBrowser {
@@ -159,4 +158,34 @@ class NativeFileBrowserFallback extends FileBrowser {
 		}
 		return file;
 	}
+    public File saveFileToDir(){
+        //In Windows the native FileDialog only works with files
+        //So we make a JFileChooser in which we can control it
+        if(System.getProperty("os.name").startsWith("Windows")) {
+            File selectedDir = null;
+            if (specifiedPath == null) specifiedPath = lastSavePath;
+            JFileChooser c = new JFileChooser(specifiedPath);
+            c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            c.setDialogTitle("Choose target directory for export");
+            int rVal = c.showSaveDialog(c);
+            if (rVal == JFileChooser.APPROVE_OPTION) {
+                selectedDir = c.getSelectedFile();
+                lastSavePath = selectedDir.getPath();
+            }
+
+            return selectedDir;
+        } else{
+            //For Mac we can set Directories only
+            //For linux a save dialog only shows directories
+            System.setProperty("apple.awt.fileDialogForDirectories", "true");
+            String selection = saveFile("Choose Directory");
+            System.setProperty("apple.awt.fileDialogForDirectories", "false");
+            if(selection != null) {
+                return new File(fc.getDirectory());
+            } else{
+                return null;
+            }
+        }
+
+    }
 }

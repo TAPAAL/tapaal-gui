@@ -24,20 +24,20 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.gui.undo.*;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
+import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
 
 import dk.aau.cs.gui.components.NonsearchableJList;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.SortSharedPlacesCommand;
-import dk.aau.cs.gui.undo.SortSharedTransitionsCommand;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
+import pipe.gui.widgets.SidePane;
 
-public class SharedPlacesAndTransitionsPanel extends JPanel {
+public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane {
 	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
 	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place is used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
 
@@ -196,10 +196,9 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			int index = list.getSelectedIndex();
 
 			if(index > 0) {
-				if(isDisplayingTransitions())
-					sharedTransitionsListModel.swap(index, index-1);
-				else
-					sharedPlacesListModel.swap(index, index-1);
+                Command c = new MoveElementUpCommand(SharedPlacesAndTransitionsPanel.this, index, index-1);
+                undoManager.addNewEdit(c);
+                c.redo();
 				list.setSelectedIndex(index-1);
 				list.ensureIndexIsVisible(index-1);
 			}
@@ -217,20 +216,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		moveDownButton.addActionListener(e -> {
 			int index = list.getSelectedIndex();
 
-			if(isDisplayingTransitions()) {
-				if(index < sharedTransitionsListModel.getSize() - 1) {
-					sharedTransitionsListModel.swap(index, index+1);
-					list.setSelectedIndex(index+1);
-					list.ensureIndexIsVisible(index+1);
-
-				}
-			} else {
-				if(index < sharedPlacesListModel.getSize() - 1) {
-					sharedPlacesListModel.swap(index, index+1);
-					list.setSelectedIndex(index+1);
-					list.ensureIndexIsVisible(index+1);
-				}
-			}
+            Command c = new MoveElementDownCommand(SharedPlacesAndTransitionsPanel.this, index, index+1);
+            undoManager.addNewEdit(c);
+            c.redo();
+            list.setSelectedIndex(index+1);
+            list.ensureIndexIsVisible(index+1);
 		});
 		
 		gbc = new GridBagConstraints();
@@ -444,7 +434,33 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		sharedTransitionsListModel.addElement(transition, multiAdd);
 	}
 
-	public class SharedPlacesListModel extends AbstractListModel {
+    @Override
+    public void moveUp(int index) {
+        if(isDisplayingTransitions())
+            sharedTransitionsListModel.swap(index, index-1);
+        else
+            sharedPlacesListModel.swap(index, index-1);
+    }
+
+    @Override
+    public void moveDown(int index) {
+        if(isDisplayingTransitions()) {
+            if(index < sharedTransitionsListModel.getSize() - 1) {
+                sharedTransitionsListModel.swap(index, index+1);
+            }
+        } else {
+            if(index < sharedPlacesListModel.getSize() - 1) {
+                sharedPlacesListModel.swap(index, index+1);
+            }
+        }
+    }
+
+    @Override
+    public JList getJList() {
+        return list;
+    }
+
+    public class SharedPlacesListModel extends AbstractListModel {
 		private TimedArcPetriNetNetwork network;
 
 		public SharedPlacesListModel(TimedArcPetriNetNetwork network){
