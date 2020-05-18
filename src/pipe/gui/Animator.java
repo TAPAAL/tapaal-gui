@@ -38,9 +38,9 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class Animator {
-	private ArrayList<TAPNNetworkTraceStep> actionHistory;
+	private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
 	private int currentAction;
-	private ArrayList<NetworkMarking> markings;
+	private final ArrayList<NetworkMarking> markings = new ArrayList<NetworkMarking>();
 	private int currentMarkingIndex = 0;
 	private TAPNNetworkTrace trace = null;
 
@@ -56,10 +56,8 @@ public class Animator {
 	}
 
 	public Animator(TabContent tab) {
-		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
-		currentAction = -1;
-		markings = new ArrayList<NetworkMarking>();
-		setTabContent(tab);
+        currentAction = -1;
+        setTabContent(tab);
 	}
 
 	private void setTabContent(TabContent tab)  {
@@ -231,7 +229,9 @@ public class Animator {
 	public void restoreModel() {
 		if (tab != null) {
 			disableTransitions();
-			tab.network().setMarking(initialMarking);
+			if (initialMarking != null) {
+                tab.network().setMarking(initialMarking);
+            }
 			currentAction = -1;
 		}
 	}
