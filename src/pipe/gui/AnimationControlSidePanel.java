@@ -38,7 +38,7 @@ import java.util.Hashtable;
  * Licensed under the Open Software License version 3.0
  */
 
-public class AnimationController extends JPanel {
+public class AnimationControlSidePanel extends JPanel {
 
     private final Animator animator;
 
@@ -54,7 +54,7 @@ public class AnimationController extends JPanel {
 	JComboBox<String> firermodebox = null;
 	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 
-	public AnimationController(Animator animator) {
+	public AnimationControlSidePanel(Animator animator) {
         Require.notNull(animator, "Animator can't be null");
 
         this.animator = animator;

@@ -206,7 +206,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	// / Animation
 	private AnimationHistoryComponent animBox;
-	private AnimationController animControlerBox;
+	private AnimationControlSidePanel animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryComponent abstractAnimationPane = null;
@@ -639,7 +639,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return abstractAnimationPane;
 	}
 
-	public AnimationController getAnimationController() {
+	public AnimationControlSidePanel getAnimationController() {
 		return animControlerBox;
 	}
 	
@@ -694,7 +694,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createAnimationController() {
-		animControlerBox = new AnimationController(animator);
+		animControlerBox = new AnimationControlSidePanel(animator);
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
 		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -1482,11 +1482,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
-		private final AnimationController animationController;
+		private final AnimationControlSidePanel animationControlSidePanel;
 
-		public CanvasAnimationController(Animator animator, AnimationController animationController) {
+		public CanvasAnimationController(Animator animator, AnimationControlSidePanel animationControlSidePanel) {
 			this.animator = animator;
-			this.animationController = animationController;
+			this.animationControlSidePanel = animationControlSidePanel;
 		}
 
 		@Override
