@@ -467,7 +467,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		};
 		addCheckboxMenuItem(viewMenu, showComponentsAction);
 
-		showSharedPTAction = new GuiAction("Display components", "Show/hide the list of components.", KeyStroke.getKeyStroke('2', shortcutkey), true) {
+		showSharedPTAction = new GuiAction("Display shared places/transitions", "Show/hide the list of shared places/transitions.", KeyStroke.getKeyStroke('2', shortcutkey), true) {
             public void actionPerformed(ActionEvent e) {
                 guiFrameController.ifPresent(GuiFrameControllerActions::toggleSharedPT);
             }
