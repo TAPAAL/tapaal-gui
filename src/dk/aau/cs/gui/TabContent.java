@@ -863,7 +863,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (enable != templateExplorer.isVisible()) {
 
 			editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
-			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
 
 			if (animatorSplitPane != null) {
 				animatorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
