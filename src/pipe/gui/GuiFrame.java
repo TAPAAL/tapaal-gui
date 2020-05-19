@@ -1098,6 +1098,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		alignToGrid.setEnabled(enable);
 
 		showComponentsAction.setEnabled(enable);
+		showSharedPTAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
@@ -1108,7 +1109,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		showAdvancedWorkspaceAction.setEnabled(enable);
 		showSimpleWorkspaceAction.setEnabled(enable);
 		saveWorkSpaceAction.setEnabled(enable);
-
 
 		// Simulator
 		startAction.setEnabled(enable);

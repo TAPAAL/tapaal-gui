@@ -642,7 +642,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowSharedPTSelected(showSharedPT);
         CreateGui.getTabs().forEach(o->o.showSharedPT(showSharedPT));
-        currentTab.ifPresent(o->o.showSharedPT(showSharedPT));
     }
 
     @Override
