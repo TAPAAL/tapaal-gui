@@ -1198,11 +1198,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 
-        // Create a constant store
-        ConstantStore newConstantStore = new ConstantStore();
-
-
-        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(newConstantStore);
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 
         network.add(transformedModel.value1());
 
