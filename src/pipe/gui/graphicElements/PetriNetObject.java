@@ -293,10 +293,10 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionXInput
 	 *            Double value for X-axis position
 	 */
-	public void setOriginalX(int positionXInput) {
-		positionX = positionXInput;
-		originalX = Zoomer.getUnzoomedValue(positionX, Pipe.ZOOM_DEFAULT);
-	}
+    public void setOriginalX(int positionXInput) {
+        originalX = positionXInput;
+        positionX = Zoomer.getZoomedValue(positionXInput, getZoom());
+    }
     public void setPositionX(int positionXInput) {
         positionX = positionXInput;
         originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
@@ -310,8 +310,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 *            Double value for Y-axis position
 	 */
 	public void setOriginalY(int positionYInput) {
-        positionY = positionYInput;
-        originalY = Zoomer.getUnzoomedValue(positionYInput, Pipe.ZOOM_DEFAULT);
+        originalY = positionYInput;
+        positionY = Zoomer.getZoomedValue(positionYInput, getZoom());
 	}
     public void setPositionY(int positionYInput) {
         positionY = positionYInput;
