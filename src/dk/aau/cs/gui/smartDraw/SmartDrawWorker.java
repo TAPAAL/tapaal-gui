@@ -444,15 +444,15 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		Point.Double pointForArcTwo;
 
 		if(transition.getOriginalX() == place.getOriginalX()) {
-			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x+30), unzoom((arcOne.getArcPath().midPoint.y)));
-			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x-30), unzoom((arcTwo.getArcPath().midPoint.y)));
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x)+30, unzoom((arcOne.getArcPath().midPoint.y)));
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x)-30, unzoom((arcTwo.getArcPath().midPoint.y)));
 		} 
 		else if(transition.getOriginalY() == place.getOriginalY()) {
-			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x), unzoom(arcOne.getArcPath().midPoint.y+30));
-			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x), unzoom(arcTwo.getArcPath().midPoint.y-30));
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x), unzoom(arcOne.getArcPath().midPoint.y)+30);
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x), unzoom(arcTwo.getArcPath().midPoint.y)-30);
 		} else {
-			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x+15), unzoom(arcOne.getArcPath().midPoint.y+15));
-			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x-15), unzoom(arcTwo.getArcPath().midPoint.y-15));
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x)+15, unzoom(arcOne.getArcPath().midPoint.y)+15);
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x)-15, unzoom(arcTwo.getArcPath().midPoint.y)-15);
 		}
 		
 		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));
@@ -472,7 +472,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	public void resetLabelsToDefault() {
 		for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
-				Command cmd = new UpdateNameLabelOffsetCommand(pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y, ((PlaceTransitionObject) pNetObject).getNameOffsetX(), 
+				Command cmd = new UpdateNameLabelOffsetCommand(pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y, ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
 																((PlaceTransitionObject) pNetObject).getNameOffsetY(), (PetriNetObjectWithLabel) pNetObject);
 				cmd.redo();
 				undoManager.addEdit(cmd);
