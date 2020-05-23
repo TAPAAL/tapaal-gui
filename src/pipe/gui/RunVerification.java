@@ -248,23 +248,35 @@ public class RunVerification extends RunVerificationBase {
 			gbc.gridy = 1;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel(toHTML(result.getStatsAsString())), gbc);
-			
-			JButton infoButton = new JButton("Explanation");
-			infoButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE));
-			gbc = new GridBagConstraints();
-			gbc.gridx = 1;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.EAST;
-			panel.add(infoButton, gbc);
+			String[] statsStrings = result.getStatsAsString().split(System.getProperty("line.separator"));
+			JLabel discoveredMarkings = new JLabel(statsStrings[0]);
+			discoveredMarkings.setToolTipText("The number of found markings (each time a successor is calculated, this number is incremented)");
+			panel.add(discoveredMarkings, gbc);
+
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.insets = new Insets(0,0,15,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            JLabel exploredMarkings = new JLabel(statsStrings[1]);
+            exploredMarkings.setToolTipText("The number of markings taken out of the waiting list during the search.");
+            panel.add(exploredMarkings, gbc);
+
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.insets = new Insets(0,0,15,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            JLabel storedMarkings = new JLabel(statsStrings[2]);
+            storedMarkings.setToolTipText("The number of markings found in the passed/waiting list at the end of verification.");
+            panel.add(storedMarkings, gbc);
 			
 			if(!result.getTransitionStatistics().isEmpty()){
 				JButton transitionStatsButton = new JButton("Transition Statistics");
 				transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 2;
+				gbc.gridy = 4;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
@@ -274,7 +286,7 @@ public class RunVerification extends RunVerificationBase {
 				placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 1;
-				gbc.gridy = 2;
+				gbc.gridy = 4;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(placeStatsButton, gbc);
@@ -284,7 +296,7 @@ public class RunVerification extends RunVerificationBase {
 				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 3;
+				gbc.gridy = 5;
 				gbc.insets = new Insets(0,0,20,-90);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
@@ -295,16 +307,34 @@ public class RunVerification extends RunVerificationBase {
 			gbc.gridy = 1;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
+            String[] statsStrings = result.getCTLStatsAsString().split(System.getProperty("line.separator"));
+            JLabel exploredConfigurations = new JLabel(statsStrings[0]);
+            exploredConfigurations.setToolTipText("The number of configurations explored during\n" +
+                "the on-the-fly generation of the dependency graph for the given net and\n" +
+                "query before a conclusive answer was reached.");
+            panel.add(exploredConfigurations, gbc);
 
-            panel.add(new JLabel(toHTML((result.getCTLStatsAsString()))),gbc);
-			JButton infoButton = new JButton("Explanation");
-			infoButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE));
-			gbc = new GridBagConstraints();
-			gbc.gridx = 1;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.EAST;
-			panel.add(infoButton, gbc);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.insets = new Insets(0,0,15,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            JLabel exploredMarkings = new JLabel(statsStrings[1]);
+            exploredMarkings.setToolTipText("The number of markings explored during\n" +
+                "the on-the-fly generation of the dependency graph for the given net and\n" +
+                "query before a conclusive answer was reached.");
+            panel.add(exploredMarkings, gbc);
+
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.insets = new Insets(0,0,15,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            JLabel exploredHyperEdges = new JLabel(statsStrings[2]);
+            exploredHyperEdges.setToolTipText("The number of hyper-edges explored during\n" +
+                "the on-the-fly generation of the dependency graph for the given net and\n" +
+                "query before a conclusive answer was reached.");
+            panel.add(exploredHyperEdges, gbc);
 		}
 		
 		if(result.isSolvedUsingStateEquation()){

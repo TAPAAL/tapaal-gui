@@ -255,10 +255,6 @@ public class Verifyta implements ModelChecker {
 		return false;
 	}
 	
-	public String getStatsExplanation(){
-		return "";
-	}
-	
 	@Override
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		//The combi translation supports all models.
