@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -14,7 +13,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.widgets.AnimationSelectmodeDialog;
+import pipe.gui.widgets.AnimationTokenSelectDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
@@ -628,8 +627,8 @@ public class Animator {
 
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-		AnimationSelectmodeDialog animationSelectmodeDialog = new AnimationSelectmodeDialog(transition);
-		contentPane.add(animationSelectmodeDialog);
+		AnimationTokenSelectDialog animationTokenSelectDialog = new AnimationTokenSelectDialog(transition);
+		contentPane.add(animationTokenSelectDialog);
 		guiDialog.setResizable(true);
 
 		// Make window fit contents' preferred size
@@ -639,7 +638,7 @@ public class Animator {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 
-		return animationSelectmodeDialog.getTokens();
+		return animationTokenSelectDialog.getTokens();
 	}
 
 	public void reset(boolean keepInitial){
