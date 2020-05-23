@@ -434,6 +434,10 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	private double unzoom(double pos) {
 	    return Zoomer.getUnzoomedValue(pos, CreateGui.getDrawingSurface().getZoom());
     }
+    //XXX: when setting nameoffset the position is unzoomed, so we zoom it first so it gets the value we want
+    private double zoom(double pos){
+	    return Zoomer.getZoomedValue(pos, CreateGui.getDrawingSurface().getZoom());
+    }
 	/*
 	 * Add arcPathPoints for arcs where
 	 * A---> B --> A so they do not overlap
@@ -472,7 +476,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	public void resetLabelsToDefault() {
 		for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
-				Command cmd = new UpdateNameLabelOffsetCommand(pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y, ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
+				Command cmd = new UpdateNameLabelOffsetCommand((int)zoom(pipe.gui.Pipe.DEFAULT_OFFSET_X), (int)zoom(pipe.gui.Pipe.DEFAULT_OFFSET_Y), ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
 																((PlaceTransitionObject) pNetObject).getNameOffsetY(), (PetriNetObjectWithLabel) pNetObject);
 				cmd.redo();
 				undoManager.addEdit(cmd);
