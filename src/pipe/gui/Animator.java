@@ -365,7 +365,8 @@ public class Animator {
 		}
 
 		Tuple<NetworkMarking, List<TimedToken>> next = null;
-                List<TimedToken> tokensToConsume = null;
+		List<TimedToken> tokensToConsume = null;
+
 		try{
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
