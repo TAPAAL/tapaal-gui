@@ -21,7 +21,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	private NameLabel nl;
 
 	protected Point dragInit = new Point();
-	private double originalOffsetX, originalOffsetY;
+	private int originalOffsetX, originalOffsetY;
 
 	public LabelHandler(NameLabel _nl, PetriNetObjectWithLabel _obj) {
 		obj = _obj;
@@ -53,8 +53,8 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		dragInit = e.getPoint(); //
 
 		dragInit = javax.swing.SwingUtilities.convertPoint(nl, dragInit, obj);
-		originalOffsetX = obj.getNameOffsetXObject();
-		originalOffsetY = obj.getNameOffsetYObject();
+		originalOffsetX = obj.getNameOffsetX();
+		originalOffsetY = obj.getNameOffsetY();
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		
 		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-		    new UpdateNameLabelOffsetCommand(obj.getNameOffsetXObject(), obj.getNameOffsetYObject(), originalOffsetX, originalOffsetY, obj)
+		    new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
         );
 		
 	}

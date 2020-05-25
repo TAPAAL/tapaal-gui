@@ -32,8 +32,6 @@ public class ArcPathPoint extends PetriNetObject {
 	private final int DELTA = 10;
 
     private ArcPath myArcPath;
-	private Point2D.Double point = new Point2D.Double();
-	private Point2D.Double realPoint = new Point2D.Double();
 
 	private Point2D.Double control1 = new Point2D.Double();
 	private Point2D.Double control2 = new Point2D.Double();
@@ -53,7 +51,8 @@ public class ArcPathPoint extends PetriNetObject {
 	public ArcPathPoint(double x, double y, boolean _pointType, ArcPath a) {
 		this();
 		myArcPath = a;
-		setPointLocation(x, y);
+		setPositionX((int)x);
+		setPositionY((int)y);
 		pointType = _pointType;
 	}
 
@@ -72,14 +71,12 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public Point2D.Double getPoint() {
-		return point;
+		return new Point2D.Double(getPositionX(), getPositionY());
 	}
 
-	public void setPointLocation(double x, double y) {
-		double realX = Zoomer.getUnzoomedValue(x, myArcPath.getArc().getZoom());
-		double realY = Zoomer.getUnzoomedValue(y, myArcPath.getArc().getZoom());
-		getRealPoint().setLocation(realX, realY);
-		point.setLocation(x, y);
+	public void setPointLocation(int x, int y) {
+		setPositionX(x);
+		setPositionY(y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
 	}
@@ -89,7 +86,8 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public void updatePointLocation() {
-		setPointLocation(point.x, point.y);
+	    //XXX
+		//setPointLocation(point.x, point.y);
 	}
 
 	public void setPointType(boolean type) {
@@ -114,16 +112,12 @@ public class ArcPathPoint extends PetriNetObject {
 	public double getAngle(Point2D.Double p2) {
 		double angle;
 
-		if (point.y <= p2.y) {
-			angle = Math.atan((point.x - p2.x) / (p2.y - point.y));
+		if (getPositionY() <= p2.y) {
+			angle = Math.atan((getPositionX() - p2.x) / (p2.y - getPositionY()));
 		} else {
-			angle = Math.atan((point.x - p2.x) / (p2.y - point.y)) + Math.PI;
+			angle = Math.atan((getPositionX() - p2.x) / (p2.y - getPositionY())) + Math.PI;
 		}
 
-		// Needed to eliminate an exception on Windows
-		if (point.equals(p2)) {
-			angle = 0;
-		}
 		return angle;
 	}
 
@@ -178,8 +172,7 @@ public class ArcPathPoint extends PetriNetObject {
 	public Command splitPoint() {
 		int i = getIndex(); // Get the index of this point
 
-		ArcPathPoint newPoint = new ArcPathPoint(point.x + DELTA, point.y,
-				pointType, myArcPath);
+		ArcPathPoint newPoint = new ArcPathPoint(getPositionX() + DELTA, getPositionY(), pointType, myArcPath);
 		myArcPath.insertPoint(i + 1, newPoint);
 		myArcPath.getArc().updateArcPosition();
 		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
@@ -187,8 +180,8 @@ public class ArcPathPoint extends PetriNetObject {
 
 	public Point2D.Double getMidPoint(ArcPathPoint target) {
 		return new Point2D.Double(
-		    (target.point.x + point.x) / 2,
-            (target.point.y + point.y) / 2
+		    (target.getPositionX() + getPositionX()) / 2,
+            (target.getPositionY() + getPositionY()) / 2
         );
 	}
 
@@ -240,7 +233,7 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public void translate(int x, int y) {
-		this.setPointLocation(point.x + x, point.y + y);
+		this.setPointLocation(getPositionX() + x, getPositionY() + y);
 		myArcPath.updateArc();
 	}
 
@@ -260,23 +253,21 @@ public class ArcPathPoint extends PetriNetObject {
 		} else {
 			SIZE = 3;
 		}
-		double x = Zoomer.getZoomedValue(getRealPoint().x, zoom);
-		double y = Zoomer.getZoomedValue(getRealPoint().y, zoom);
-		point.setLocation(x, y);
+		int x = (int)Zoomer.getZoomedValue(getRealPoint().x, zoom);
+		int y = (int)Zoomer.getZoomedValue(getRealPoint().y, zoom);
+		setPositionX(x);
+		setPositionY(y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
 	}
 
 	public Point2D.Double getRealPoint() {
-		return realPoint;
+		return new Point2D.Double(getOriginalX(), getOriginalY());
 	}
 
-	public void setRealPoint(Point2D.Double realPoint) {
-		this.realPoint = realPoint;
-	}
-	
 	public boolean isEndPoint() {
         return this.getIndex() == 0 || this.getIndex() == myArcPath.getEndIndex();
 	}
+
 
 }

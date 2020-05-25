@@ -46,32 +46,36 @@ public class Zoomer {
 		return setPercent(newPercent);
 	}
 
+    public static AffineTransform getTransform(int zoom) {
+        return AffineTransform.getScaleInstance(zoom * 0.01, zoom * 0.01);
+    }
+
+    public static double getScaleFactor(int zoom) {
+        return zoom * 0.01;
+    }
+
 	public static int getZoomedValue(int x, int zoom) {
-		return (int) (x * zoom * 0.01);
+		return (int) Math.round((x * zoom * 0.01));
 	}
 
-	public static double getZoomedValue(double x, int zoom) {
-		return x * zoom * 0.01;
-	}
-
-	public static AffineTransform getTransform(int zoom) {
-		return AffineTransform.getScaleInstance(zoom * 0.01, zoom * 0.01);
-	}
-
-	public static double getScaleFactor(int zoom) {
-		return zoom * 0.01;
+    /**
+     * @deprecated use int getUnzoomedValue(int x, int zoom)
+     */
+    @Deprecated
+	public static int getZoomedValue(double x, int zoom) {
+        return (int) Math.round((x * zoom * 0.01));
 	}
 
 	public static int getUnzoomedValue(int x, int zoom) {
-		return (int) (x / (zoom * 0.01));
+		return (int) Math.round((x / (zoom * 0.01)));
 	}
 
     /**
      * @deprecated use int getUnzoomedValue(int x, int zoom)
      */
 	@Deprecated
-	public static double getUnzoomedValue(double x, int zoom) {
-		return x / (zoom * 0.01);
+	public static int getUnzoomedValue(double x, int zoom) {
+		return (int) Math.round(x / (zoom * 0.01));
 	}
 
 }

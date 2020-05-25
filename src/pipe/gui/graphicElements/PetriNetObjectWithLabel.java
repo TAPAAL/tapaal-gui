@@ -10,10 +10,10 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
 
     /* Name Label for displaying name */
-    protected NameLabel pnName = new NameLabel(Pipe.ZOOM_DEFAULT);
+    protected NameLabel pnName = new NameLabel();
     /** X/Y-axis Position on screen */
-    private double nameOffsetX;
-    private double nameOffsetY;
+    private int nameOffsetX;
+    private int nameOffsetY;
 
     PetriNetObjectWithLabel(int nameOffsetX, int nameOffsetY) {
         super();
@@ -42,13 +42,14 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
     protected void updateLabelLocation(boolean alignToGrid) {
         if(alignToGrid) {
             this.getNameLabel().setPosition(
-                    Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
-                    Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom())))
+                    Grid.getModifiedX(positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom())),
+                    Grid.getModifiedY(positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom()))
             );
         } else {
             this.getNameLabel().setPosition(
-                    ((int)(positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()))),
-                    ((int)(positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom()))));
+                positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()),
+                positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom())
+            );
         }
     }
 
@@ -72,7 +73,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      * @param nameOffsetXInput
      *            Double value for name X-axis offset
      */
-    public void setNameOffsetX(double nameOffsetXInput) {
+    public void setNameOffsetX(int nameOffsetXInput) {
         nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
     }
 
@@ -82,42 +83,24 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
      * @param nameOffsetYInput
      *            Double value for name Y-axis offset
      */
-    public void setNameOffsetY(double nameOffsetYInput) {
+    public void setNameOffsetY(int nameOffsetYInput) {
         nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
     }
 
-    public void updateNameOffsetX(double nameOffsetXInput) {
+    public void updateNameOffsetX(int nameOffsetXInput) {
         nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
 
     }
 
-    public void updateNameOffsetY(double nameOffsetYInput) {
+    public void updateNameOffsetY(int nameOffsetYInput) {
         nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
     }
 
-    /**
-     * Get X-axis offset for ...
-     *
-     * @return Double value for X-axis offset of ...
-     */
-    public Double getNameOffsetXObject() {
-        return nameOffsetX;
-    }
-
-    /**
-     * Moved to PetriNetObject Get Y-axis offset for ...
-     *
-     * @return Double value for Y-axis offset of ...
-     */
-    public Double getNameOffsetYObject() {
-        return nameOffsetY;
-    }
-
     //XXX pushed up from PlaceTransitionObject while refactorings, dublicates getNameOffsetXObject? //kyrke 2019-09-17
-    public double getNameOffsetX() {
+    public int getNameOffsetX() {
         return nameOffsetX;
     }
-    public double getNameOffsetY() {
+    public int getNameOffsetY() {
         return nameOffsetY;
     }
 

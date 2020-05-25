@@ -51,11 +51,11 @@ public abstract class Transition extends PlaceTransitionObject {
 	/**
 	 * Create Petri-Net Transition object
 	 */
-	public Transition(double positionXInput, double positionYInput,
-			String idInput, double nameOffsetXInput,
-			double nameOffsetYInput,
+	public Transition(int positionXInput, int positionYInput,
+			String idInput, int nameOffsetXInput,
+			int nameOffsetYInput,
 			boolean infServer, int angleInput, int priority) {
-		this((int)positionXInput, (int)positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput, angleInput);
+		this(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, angleInput);
 	}
 
 	/**
@@ -86,8 +86,8 @@ public abstract class Transition extends PlaceTransitionObject {
 	 * @param positionYInput
 	 *            Y-axis Position
 	 */
-	public Transition(double positionXInput, double positionYInput) {
-		this((int)positionXInput, (int)positionYInput,null, 0,0, 0);
+	public Transition(int positionXInput, int positionYInput) {
+		this(positionXInput, positionYInput,null, 0,0, 0);
 	}
 
 	@Override
