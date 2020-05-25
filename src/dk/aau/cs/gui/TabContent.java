@@ -1048,7 +1048,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
 		}
-		animator.setAnimationButtonsEnabled(); //Update stepBack/Forward
+		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
 
 	//XXX temp while refactoring, kyrke - 2019-07-25
@@ -1130,7 +1130,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
-			animator.setAnimationButtonsEnabled(); //Update stepBack/Forward
+			animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));

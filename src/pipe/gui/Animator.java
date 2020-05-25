@@ -83,7 +83,7 @@ public class Animator {
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
 		tab.getAnimationHistorySidePanel().setSelectedIndex(0);
-		setAnimationButtonsEnabled();
+		updateAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
 
@@ -244,7 +244,7 @@ public class Animator {
 			currentAction--;
 			currentMarkingIndex--;
 
-            setAnimationButtonsEnabled();
+            updateAnimationButtonsEnabled();
             updateMouseOverInformation();
 			reportBlockingPlaces();
 		}
@@ -291,7 +291,7 @@ public class Animator {
 			currentMarkingIndex++;
 			activeGuiModel().redrawVisibleTokenLists();
 
-            setAnimationButtonsEnabled();
+            updateAnimationButtonsEnabled();
             updateMouseOverInformation();
 			reportBlockingPlaces();
 
@@ -403,7 +403,7 @@ public class Animator {
 		unhighlightDisabledTransitions();
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
 
-		setAnimationButtonsEnabled();
+		updateAnimationButtonsEnabled();
         updateMouseOverInformation();
 		reportBlockingPlaces();
 
@@ -427,7 +427,7 @@ public class Animator {
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
 
-        setAnimationButtonsEnabled();
+        updateAnimationButtonsEnabled();
         updateMouseOverInformation();
 		reportBlockingPlaces();
 
@@ -695,7 +695,7 @@ public class Animator {
     public final GuiAction stepforwardAction = CreateGui.getAppGui().stepforwardAction;
     public final GuiAction stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
 
-    public void setAnimationButtonsEnabled() {
+    public void updateAnimationButtonsEnabled() {
         AnimationHistoryList animationHistory = CreateGui.getCurrentTab().getAnimationHistorySidePanel();
 
         setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());

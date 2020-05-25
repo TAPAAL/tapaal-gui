@@ -22,7 +22,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
 import dk.aau.cs.util.Require;
-import pipe.gui.action.GuiAction;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -308,7 +307,7 @@ public class AnimationControlSidePanel extends JPanel {
 			//e.printStackTrace();
 		}
 
-		animator.setAnimationButtonsEnabled();
+		animator.updateAnimationButtonsEnabled();
 	}
 	
 	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
