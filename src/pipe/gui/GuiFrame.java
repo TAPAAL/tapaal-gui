@@ -987,6 +987,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             alignToGrid.setEnabled(false);
 
+            showSharedPTAction.setEnabled(false);
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
 
