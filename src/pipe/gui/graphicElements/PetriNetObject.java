@@ -293,10 +293,14 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionXInput
 	 *            Double value for X-axis position
 	 */
-	public void setPositionX(int positionXInput) {
-		positionX = positionXInput;
-		originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
-	}
+    public void setOriginalX(int positionXInput) {
+        originalX = positionXInput;
+        positionX = Zoomer.getZoomedValue(positionXInput, getZoom());
+    }
+    public void setPositionX(int positionXInput) {
+        positionX = positionXInput;
+        originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
+    }
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
 	/**
@@ -305,10 +309,14 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	 * @param positionYInput
 	 *            Double value for Y-axis position
 	 */
-	public void setPositionY(int positionYInput) {
-		positionY = positionYInput;
-		originalY = Zoomer.getUnzoomedValue(positionY, getZoom());
+	public void setOriginalY(int positionYInput) {
+        originalY = positionYInput;
+        positionY = Zoomer.getZoomedValue(positionYInput, getZoom());
 	}
+    public void setPositionY(int positionYInput) {
+        positionY = positionYInput;
+        originalY = Zoomer.getUnzoomedValue(positionY, getZoom());
+    }
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
 	/**

@@ -141,7 +141,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
-		Point parentPoint = new Point((int)parentObject.getPositionX(), (int)parentObject.getPositionY());
+		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
 		
 		outerloop: for(Arc arc : arcsForObject) {
 			if(!(arcsVisited.contains(arc))) {
@@ -227,7 +227,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
-		Point parentPoint = new Point((int)parentObject.getPositionX(), (int)parentObject.getPositionY());
+		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
 		for(Arc arc : arcsForObject) {
 			if(arc.getTarget() != parentObject) {objectToPlace = arc.getTarget();} 
 			else {objectToPlace = arc.getSource();}
@@ -338,7 +338,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	public Point getObjectPositionAsPoint(PlaceTransitionObject object) {
-		return new Point((int) object.getPositionX(), (int)object.getPositionY());
+		return new Point(object.getOriginalX(), object.getOriginalY());
 	}
 	
 	private void checkIfObjectIsNowRightmost(Point newPoint) {
@@ -358,25 +358,25 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		int lowestY = 50;
 		int lowestX = 50;
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-			if(ptObject.getPositionX() < lowestX) {
-				lowestX = (int) ptObject.getPositionX();
+			if(ptObject.getOriginalX() < lowestX) {
+				lowestX = ptObject.getOriginalX();
 			}
-			if(ptObject.getPositionY() < lowestY) {
-				lowestY = (int) ptObject.getPositionY();
+			if(ptObject.getOriginalY() < lowestY) {
+				lowestY = ptObject.getOriginalY();
 			}
 		}
 		if(lowestX < 50) {
 			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-				int newX = (int) (ptObject.getPositionX() + Math.abs(lowestX) + 50);
-				Point newPosition = new Point(newX, (int) ptObject.getPositionY());
+				int newX = ptObject.getOriginalX() + Math.abs(lowestX) + 50;
+				Point newPosition = new Point(newX, ptObject.getOriginalY());
 				moveObject(ptObject, newPosition);
 				
 			}
 		}
 		if(lowestY < 50) {
 			for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-				int newY = (int) (ptObject.getPositionY() + Math.abs(lowestY) + 50);
-				Point newPosition = new Point((int) ptObject.getPositionX(), newY);
+				int newY = ptObject.getOriginalY() + Math.abs(lowestY) + 50;
+				Point newPosition = new Point(ptObject.getOriginalX(), newY);
 				moveObject(ptObject, newPosition);
 			}
 		}
@@ -432,7 +432,11 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
     //XXX: out bad handeling of zoom bleads over we need to adjust point relative to zoom
     // midpoint is at current zoom level, but when creaing a new point its coords is at 100% zoom
 	private double unzoom(double pos) {
-	    return Zoomer.getUnzoomedValue(pos,(int)CreateGui.getDrawingSurface().getZoom());
+	    return Zoomer.getUnzoomedValue(pos, CreateGui.getDrawingSurface().getZoom());
+    }
+    //XXX: when setting nameoffset the position is unzoomed, so we zoom it first so it gets the value we want
+    private double zoom(double pos){
+	    return Zoomer.getZoomedValue(pos, CreateGui.getDrawingSurface().getZoom());
     }
 	/*
 	 * Add arcPathPoints for arcs where
@@ -443,16 +447,16 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		Point.Double pointForArcOne;
 		Point.Double pointForArcTwo;
 
-		if(transition.getPositionX() == place.getPositionX()) {
-			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x+30), unzoom((arcOne.getArcPath().midPoint.y)));
-			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x-30), unzoom((arcTwo.getArcPath().midPoint.y)));
+		if(transition.getOriginalX() == place.getOriginalX()) {
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x)+30, unzoom((arcOne.getArcPath().midPoint.y)));
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x)-30, unzoom((arcTwo.getArcPath().midPoint.y)));
 		} 
-		else if(transition.getPositionY() == place.getPositionY()) {
-			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x), unzoom(arcOne.getArcPath().midPoint.y+30));
-			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x), unzoom(arcTwo.getArcPath().midPoint.y-30));
+		else if(transition.getOriginalY() == place.getOriginalY()) {
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x), unzoom(arcOne.getArcPath().midPoint.y)+30);
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x), unzoom(arcTwo.getArcPath().midPoint.y)-30);
 		} else {
-			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x+15), unzoom(arcOne.getArcPath().midPoint.y+15));
-			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x-15), unzoom(arcTwo.getArcPath().midPoint.y-15));
+			pointForArcOne = new Point.Double(unzoom(arcOne.getArcPath().midPoint.x)+15, unzoom(arcOne.getArcPath().midPoint.y)+15);
+			pointForArcTwo = new Point.Double(unzoom(arcTwo.getArcPath().midPoint.x)-15, unzoom(arcTwo.getArcPath().midPoint.y)-15);
 		}
 		
 		undoManager.addEdit(arcOne.getArcPath().insertPoint(pointForArcOne, false));
@@ -472,7 +476,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	public void resetLabelsToDefault() {
 		for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
-				Command cmd = new UpdateNameLabelOffsetCommand(pipe.gui.Pipe.DEFAULT_OFFSET_X, pipe.gui.Pipe.DEFAULT_OFFSET_Y, ((PlaceTransitionObject) pNetObject).getNameOffsetX(), 
+				Command cmd = new UpdateNameLabelOffsetCommand((int)zoom(pipe.gui.Pipe.DEFAULT_OFFSET_X), (int)zoom(pipe.gui.Pipe.DEFAULT_OFFSET_Y), ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
 																((PlaceTransitionObject) pNetObject).getNameOffsetY(), (PetriNetObjectWithLabel) pNetObject);
 				cmd.redo();
 				undoManager.addEdit(cmd);
@@ -531,7 +535,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	//For debugging
 	private void printPTObjectsAndPositions() {
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
-			System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getPositionX() + " Y: " + ptObject.getPositionY());
+			System.out.println("Name: " + ptObject.getName() + " X: " + ptObject.getOriginalX() + " Y: " + ptObject.getOriginalY());
 		}
 	}
 }
