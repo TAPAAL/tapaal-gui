@@ -73,7 +73,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	Timer timer;
 
 
-	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
+	public ConstantsPane(TabContent currentTab) {
 		parent = currentTab;
 
 		constantsPanel = new JPanel(new GridBagLayout());
@@ -188,7 +188,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		});
 		
 		addConstantsComponents();
-		addConstantsButtons(enableAddButton);
+		addConstantsButtons();
 		
 		constantsList.addFocusListener(new FocusAdapter() {
 			@Override
@@ -291,7 +291,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		timer.restart();
 	}
 
-	private void addConstantsButtons(boolean enableAddButton) {
+	private void addConstantsButtons() {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditConstant);
@@ -318,7 +318,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		JButton addConstantButton = new JButton("New");
 		addConstantButton.setToolTipText(toolTipNewConstant);
-		addConstantButton.setEnabled(enableAddButton);
+		addConstantButton.setEnabled(true);
 		addConstantButton.addActionListener(e -> showEditConstantDialog(null));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;

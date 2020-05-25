@@ -25,7 +25,6 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
-import pipe.dataLayer.NetType;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -919,11 +918,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
-			if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-				transportArcAction.setEnabled(true);
-			} else {
-				transportArcAction.setEnabled(false);
-			}
+			transportArcAction.setEnabled(true);
 
 			annotationAction.setEnabled(true);
 			transAction.setEnabled(true);
@@ -982,10 +977,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
 
-			// Only enable this if it is not an untimed net.
-			if (CreateGui.getModel().netType() != NetType.UNTIMED) {
-				timeAction.setEnabled(true);
-			}
+			timeAction.setEnabled(true);
+
 			delayFireAction.setEnabled(true);
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);

@@ -6,7 +6,6 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 
 import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.NameLabel;
@@ -44,9 +43,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 			if (CreateGui.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2) {
 					Arc arc = (Arc) obj;
-					if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-						((TimedOutputArcComponent) arc).showTimeIntervalEditor();
-					}
+					((TimedOutputArcComponent) arc).showTimeIntervalEditor();
 				}
 			}
 		}

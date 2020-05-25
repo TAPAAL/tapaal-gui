@@ -59,7 +59,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
-		TabContent tab = new TabContent(NetType.TAPN);
+		TabContent tab = new TabContent();
 		tab.setInitialName(name);
 
 		try {
@@ -80,8 +80,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return tab;
 	}
 
-	public static TabContent createNewEmptyTab(String name, NetType netType){
-		TabContent tab = new TabContent(NetType.TAPN);
+	public static TabContent createNewEmptyTab(String name){
+		TabContent tab = new TabContent();
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -97,7 +97,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 */
 
 	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
-		TabContent tab = new TabContent(NetType.TAPN);
+		TabContent tab = new TabContent();
 
 		String name = null;
 
@@ -225,7 +225,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
-	public TabContent(NetType netType) {
+	public TabContent() {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
@@ -256,7 +256,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
 		
 		createEditorLeftPane();
-		createAnimatorSplitPane(netType);
+		createAnimatorSplitPane();
 
 		this.setOrientation(HORIZONTAL_SPLIT);
 		this.setLeftComponent(editorSplitPaneScroller);
@@ -279,9 +279,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 	
 	public void createEditorLeftPane() {
-		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 
-		constantsPanel = new ConstantsPane(enableAddButton, this);
+		constantsPanel = new ConstantsPane(this);
 		constantsPanel.setPreferredSize(
 				new Dimension(
 						constantsPanel.getPreferredSize().width,
@@ -507,12 +506,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
         );
 	}
 
-	private void createAnimatorSplitPane(NetType netType) {
+	private void createAnimatorSplitPane() {
 		if (animBox == null) {
             createAnimationHistory();
         }
 		if (animControlerBox == null) {
-            createAnimationController(netType);
+            createAnimationController();
         }
 		if (transitionFireing == null) {
             createTransitionFireing();
@@ -696,8 +695,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animatorSplitPane.validate();
 	}
 
-	private void createAnimationController(NetType netType) {
-		animControlerBox = new AnimationController(netType);
+	private void createAnimationController() {
+		animControlerBox = new AnimationController();
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
 		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
