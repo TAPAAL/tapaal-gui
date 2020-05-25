@@ -67,15 +67,9 @@ public class VerifyPN implements ModelChecker{
         public String[] getStatsExplanations(){
             String[] explanations = new String[3];
             if(ctlOutput){
-                explanations[0] = "The number of configurations explored during\n" +
-                    "the on-the-fly generation of the dependency graph for the given net and\n" +
-                    "query before a conclusive answer was reached.";
-                explanations[1] = "The number of markings explored during\n" +
-                    "the on-the-fly generation of the dependency graph for the given net and\n" +
-                    "query before a conclusive answer was reached.";
-                explanations[2] = "The number of hyper-edges explored during\n" +
-                    "the on-the-fly generation of the dependency graph for the given net and\n" +
-                    "query before a conclusive answer was reached.";
+                explanations[0] = "The number of configurations explored during the on-the-fly generation of the dependency graph for the given net and query before a conclusive answer was reached.";
+                explanations[1] = "The number of markings explored during the on-the-fly generation of the dependency graph for the given net and query before a conclusive answer was reached.";
+                explanations[2] = "The number of hyper-edges explored during the on-the-fly generation of the dependency graph for the given net and query before a conclusive answer was reached.";
             } else {
                 explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
                 explanations[1] = "The number of markings taken out of the waiting list during the search.";
