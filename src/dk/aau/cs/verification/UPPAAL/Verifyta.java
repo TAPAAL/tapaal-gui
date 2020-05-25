@@ -42,6 +42,8 @@ public class Verifyta implements ModelChecker {
 			+ "normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n"
 			+ "depending on the operating system used.";
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
 	private static String verifytapath = ""; // MJ -- Should be part of a
 												// configuration file that can
 												// be accessed
@@ -254,7 +256,11 @@ public class Verifyta implements ModelChecker {
 	public boolean supportsStats(){
 		return false;
 	}
-	
+
+    public String[] getStatsExplanations(){
+                return EMPTY_STRING_ARRAY;
+       }
+
 	@Override
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		//The combi translation supports all models.

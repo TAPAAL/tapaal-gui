@@ -110,6 +110,21 @@ public class RunVerification extends RunVerificationBase {
 		return buffer.toString();
 	}
 
+	private void displayStats(JPanel panel, String stats, String[] explanations){
+        String[] statsStrings = stats.split(System.getProperty("line.separator"));
+        for (int i = 0; i < statsStrings.length; i++) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = i + 1;
+            gbc.insets = new Insets(0,0,15,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            JLabel statLabel = new JLabel(statsStrings[i]);
+            statLabel.setToolTipText(explanations[i]);
+            panel.add(statLabel, gbc);
+        }
+
+    }
+
 
 	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
@@ -243,33 +258,8 @@ public class RunVerification extends RunVerificationBase {
 		boolean isCTLQuery = result.getQueryResult().isCTL;
 
 		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.WEST;
-			String[] statsStrings = result.getStatsAsString().split(System.getProperty("line.separator"));
-			JLabel discoveredMarkings = new JLabel(statsStrings[0]);
-			discoveredMarkings.setToolTipText("The number of found markings (each time a successor is calculated, this number is incremented)");
-			panel.add(discoveredMarkings, gbc);
 
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 2;
-            gbc.insets = new Insets(0,0,15,0);
-            gbc.anchor = GridBagConstraints.WEST;
-            JLabel exploredMarkings = new JLabel(statsStrings[1]);
-            exploredMarkings.setToolTipText("The number of markings taken out of the waiting list during the search.");
-            panel.add(exploredMarkings, gbc);
-
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 3;
-            gbc.insets = new Insets(0,0,15,0);
-            gbc.anchor = GridBagConstraints.WEST;
-            JLabel storedMarkings = new JLabel(statsStrings[2]);
-            storedMarkings.setToolTipText("The number of markings found in the passed/waiting list at the end of verification.");
-            panel.add(storedMarkings, gbc);
+            displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations());
 			
 			if(!result.getTransitionStatistics().isEmpty()){
 				JButton transitionStatsButton = new JButton("Transition Statistics");
@@ -302,45 +292,14 @@ public class RunVerification extends RunVerificationBase {
 				panel.add(reductionStatsLabet, gbc);
 			}
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.WEST;
-            String[] statsStrings = result.getCTLStatsAsString().split(System.getProperty("line.separator"));
-            JLabel exploredConfigurations = new JLabel(statsStrings[0]);
-            exploredConfigurations.setToolTipText("The number of configurations explored during\n" +
-                "the on-the-fly generation of the dependency graph for the given net and\n" +
-                "query before a conclusive answer was reached.");
-            panel.add(exploredConfigurations, gbc);
+            displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
 
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 2;
-            gbc.insets = new Insets(0,0,15,0);
-            gbc.anchor = GridBagConstraints.WEST;
-            JLabel exploredMarkings = new JLabel(statsStrings[1]);
-            exploredMarkings.setToolTipText("The number of markings explored during\n" +
-                "the on-the-fly generation of the dependency graph for the given net and\n" +
-                "query before a conclusive answer was reached.");
-            panel.add(exploredMarkings, gbc);
-
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 3;
-            gbc.insets = new Insets(0,0,15,0);
-            gbc.anchor = GridBagConstraints.WEST;
-            JLabel exploredHyperEdges = new JLabel(statsStrings[2]);
-            exploredHyperEdges.setToolTipText("The number of hyper-edges explored during\n" +
-                "the on-the-fly generation of the dependency graph for the given net and\n" +
-                "query before a conclusive answer was reached.");
-            panel.add(exploredHyperEdges, gbc);
 		}
-		
+
 		if(result.isSolvedUsingStateEquation()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 4;
+			gbc.gridy = 5;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
@@ -348,14 +307,14 @@ public class RunVerification extends RunVerificationBase {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 5;
+		gbc.gridy = 6;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
@@ -369,7 +328,7 @@ public class RunVerification extends RunVerificationBase {
 				&& modelChecker.useDiscreteSemantics()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 10;
+			gbc.gridy = 11;
 			gbc.gridwidth = 2;
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);

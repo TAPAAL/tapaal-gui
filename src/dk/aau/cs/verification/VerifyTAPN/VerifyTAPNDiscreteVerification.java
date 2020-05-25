@@ -63,6 +63,14 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		return true;
 	}
 
+    public String[] getStatsExplanations(){
+        String[] explanations = new String[3];
+        explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
+        explanations[1] = "The number of markings taken out of the waiting list during the search.";
+        explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+        return explanations;
+    }
+
 	public String getPath() {
 		return verifydtapnpath;
 	}
