@@ -15,9 +15,9 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
 
-	private PetriNetObjectWithLabel obj;
+	private final PetriNetObjectWithLabel obj;
 
-	private NameLabel nl;
+	private final NameLabel nl;
 
 	protected Point dragInit = new Point();
 	private int originalOffsetX, originalOffsetY;
