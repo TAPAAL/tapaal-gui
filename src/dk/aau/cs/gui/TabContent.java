@@ -1286,8 +1286,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				}
 			}
 
-			drawingSurface().deleteSelection(drawingSurface().getSelectionObject().getSelection());
-			//getCurrentTab().drawingSurface().repaint();
+			drawingSurface().deleteSelection(selection);
 			network().buildConstraints();
 		}
 
