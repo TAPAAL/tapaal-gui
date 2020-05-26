@@ -63,8 +63,8 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 
 		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		
-		obj.updateNameOffsetX((p.x - dragInit.x));
-		obj.updateNameOffsetY((p.y - dragInit.y));
+		obj.translateNameOffsetX((p.x - dragInit.x));
+		obj.translateNameOffsetY((p.y - dragInit.y));
 		dragInit = p;
 		obj.updateOnMoveOrZoom();
 	}

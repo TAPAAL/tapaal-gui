@@ -74,12 +74,12 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
     }
 
-    public void updateNameOffsetX(int nameOffsetXInput) {
+    public void translateNameOffsetX(int nameOffsetXInput) {
         nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
 
     }
 
-    public void updateNameOffsetY(int nameOffsetYInput) {
+    public void translateNameOffsetY(int nameOffsetYInput) {
         nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
     }
 
