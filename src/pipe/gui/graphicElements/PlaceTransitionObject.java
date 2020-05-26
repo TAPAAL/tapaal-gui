@@ -29,13 +29,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			int nameOffsetXInput,
 			int nameOffsetYInput
 	){
-		super(nameOffsetXInput, nameOffsetYInput);
-
-		setPositionX(positionXInput);
-		setPositionY(positionYInput);
-
-		id = idInput;
-
+		super(idInput, positionXInput, positionYInput, nameOffsetXInput, nameOffsetYInput);
 	}
 
 	public PlaceTransitionObject(int positionXInput, int positionYInput) {

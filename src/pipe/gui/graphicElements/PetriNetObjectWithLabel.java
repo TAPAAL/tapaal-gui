@@ -15,8 +15,8 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
     private int nameOffsetX;
     private int nameOffsetY;
 
-    PetriNetObjectWithLabel(int nameOffsetX, int nameOffsetY) {
-        super();
+    PetriNetObjectWithLabel(String idInput, int positionXInput, int positionYInput, int nameOffsetX, int nameOffsetY) {
+        super(idInput, positionXInput, positionYInput);
 
         this.nameOffsetX = nameOffsetX;
         this.nameOffsetY = nameOffsetY;

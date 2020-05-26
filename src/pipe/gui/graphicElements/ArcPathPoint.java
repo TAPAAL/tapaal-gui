@@ -39,7 +39,7 @@ public class ArcPathPoint extends PetriNetObject {
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
-	    super();
+	    super("", 0, 0);
 	}
 
 	public ArcPathPoint(ArcPath a) {

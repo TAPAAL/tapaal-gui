@@ -51,8 +51,12 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 	protected PetriNetObjectHandler mouseHandler;
 
-	PetriNetObject() {
+	PetriNetObject(String idInput, int positionXInput, int positionYInput) {
 		super();
+
+        id = idInput;
+        setOriginalX(positionXInput);
+        setOriginalY(positionYInput);
 
 		addMouseHandler();
 		addMouseListener(new MouseListener() {
