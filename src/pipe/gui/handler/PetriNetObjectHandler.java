@@ -19,10 +19,9 @@ import pipe.gui.graphicElements.PetriNetObject;
  * 
  * @author unknown
  */
-public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
-		implements java.awt.event.MouseWheelListener {
+public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter implements java.awt.event.MouseWheelListener {
 
-	protected PetriNetObject myObject = null;
+	protected final PetriNetObject myObject;
 
 	// justSelected: set to true on press, and false on release;
 	protected static boolean justSelected = false;
