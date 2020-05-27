@@ -35,6 +35,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -83,7 +84,7 @@ public class SmartDrawDialog extends JDialog {
 		buffer.append("<br/><br/>");
 			buffer.append("<b>Example:</b><br/>");
 		buffer.append("<br/><br/>");
-			buffer.append("<img src=\"" + Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "SmartDrawExampleWithLayers.png") +"\" />");
+			buffer.append("<img src=\"" + Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "SmartDrawExampleWithLayers.png") +"\" />");
 		buffer.append("<br/><br/>");
 		buffer.append("This layout was created with the default values.\n");
 		buffer.append("On the figure the numbers and boxes describe the layer. Furthermore, the effect of the <em>Overlapping arc penalty</em> can be seen\n");
@@ -690,7 +691,7 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
 		loadingDialogFrame.setType(Window.Type.POPUP);
-		ImageIcon loadingGIF = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "ajax-loader.gif"));
+		ImageIcon loadingGIF = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "ajax-loader.gif"));
 
 		JLabel workingLabel = new JLabel("<html><div style='text-align: center;'>Currently doing layout...<br/>This may take several minutes depending on the size of the net...</div></html>", SwingConstants.CENTER);
 		GridBagConstraints gbc = new GridBagConstraints();

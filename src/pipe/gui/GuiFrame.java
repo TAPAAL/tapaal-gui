@@ -243,7 +243,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			Application app = Application.getApplication();
 			try {
 				Image appImage;
-				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png"));
+				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png"));
 				app.setDockIconImage(appImage);
 			} catch (IOException e) {
 				Logger.log("Error loading Image");
@@ -261,7 +261,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		}
 
-		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
+		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png")).getImage());
 	}
 
 
@@ -407,7 +407,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.setMnemonic('V');
 
 		zoomMenu = new JMenu("Zoom");
-		zoomMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Zoom.png")));
+		zoomMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "Zoom.png")));
 		
 		addZoomMenuItems(zoomMenu);
 
@@ -1387,7 +1387,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				
 		// Import menu
 		JMenu importMenu = new JMenu("Import");
-		importMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		importMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "Export.png")));
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1412,7 +1412,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		// Export menu
 		JMenu exportMenu = new JMenu("Export");
-		exportMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		exportMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "Export.png")));
 		
 		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1493,7 +1493,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		// is ignored
 		if (nets != null && nets.length > 0) {
 			JMenu exampleMenu = new JMenu("Example nets");
-			exampleMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Example.png")));
+			exampleMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "Example.png")));
 			
 			for (String filename : nets) {
 				if (filename.toLowerCase().endsWith(".tapn")) {
@@ -1514,7 +1514,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 					};
 					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
 							.getContextClassLoader().getResource(
-									CreateGui.imgPath + "Net.png")));
+                            ResourceManager.imgPath + "Net.png")));
 					exampleMenu.add(tmp);
 				}
 			}

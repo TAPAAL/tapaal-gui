@@ -2,6 +2,8 @@ package net.tapaal.resourcemanager;
 
 import java.awt.Image;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -9,6 +11,8 @@ import javax.swing.ImageIcon;
 import pipe.gui.CreateGui;
 
 public class ResourceManager {
+    public static final String imgPath = "resources/Images/";
+
 	private static ImageIcon satisfiedIcon = loadIcon("satisfied.png");
 	private static ImageIcon notSatisfiedIcon = loadIcon("notsatisfied.png");
 	private static ImageIcon inconclusiveIcon = loadIcon("maybe1.png");
@@ -18,12 +22,23 @@ public class ResourceManager {
 	
 	private static ImageIcon loadIcon(String name) {
 		try {
-			return new ImageIcon(ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name)).getScaledInstance(52, 52, Image.SCALE_SMOOTH));
+			return new ImageIcon(ImageIO.read(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(imgPath + name))).getScaledInstance(52, 52, Image.SCALE_SMOOTH));
 		} catch (IOException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
         return null;
 	}
+
+    public static ImageIcon getIcon(String name) {
+                return Objects.requireNonNull(getIconIfExists(name), "Icon " + name + " not found");
+            }
+
+         public static ImageIcon getIconIfExists(String name) {
+              URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + name);
+                if (resourceURL == null) return null;
+
+                return new ImageIcon(resourceURL);
+                }
 	
 	public static ImageIcon satisfiedIcon(){
 		return satisfiedIcon;
