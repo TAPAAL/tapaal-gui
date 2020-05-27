@@ -32,6 +32,7 @@ import javax.swing.event.ListDataListener;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
@@ -208,7 +209,7 @@ public class QueryPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		queryCollectionPanel.add(queryScroller, gbc);
 
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -232,7 +233,7 @@ public class QueryPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.SOUTH;
 		queryCollectionPanel.add(moveUpButton,gbc);
 
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -258,7 +259,7 @@ public class QueryPane extends JPanel implements SidePane {
 		queryCollectionPanel.add(moveDownButton,gbc);
 
 		//Sort button
-		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
 		sortButton.setToolTipText(toolTipSortQueries);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {

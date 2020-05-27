@@ -691,7 +691,7 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
 		loadingDialogFrame.setType(Window.Type.POPUP);
-		ImageIcon loadingGIF = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "ajax-loader.gif"));
+		ImageIcon loadingGIF = ResourceManager.getIcon("ajax-loader.gif");
 
 		JLabel workingLabel = new JLabel("<html><div style='text-align: center;'>Currently doing layout...<br/>This may take several minutes depending on the size of the net...</div></html>", SwingConstants.CENTER);
 		GridBagConstraints gbc = new GridBagConstraints();
