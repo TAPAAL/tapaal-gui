@@ -30,15 +30,15 @@ public class ResourceManager {
 	}
 
     public static ImageIcon getIcon(String name) {
-                return Objects.requireNonNull(getIconIfExists(name), "Icon " + name + " not found");
-            }
+        return Objects.requireNonNull(getIconIfExists(name), "Icon " + name + " not found");
+    }
 
-         public static ImageIcon getIconIfExists(String name) {
-              URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + name);
-                if (resourceURL == null) return null;
+    public static ImageIcon getIconIfExists(String name) {
+        URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + name);
+        if (resourceURL == null) return null;
 
-                return new ImageIcon(resourceURL);
-                }
+        return new ImageIcon(resourceURL);
+    }
 	
 	public static ImageIcon satisfiedIcon(){
 		return satisfiedIcon;
