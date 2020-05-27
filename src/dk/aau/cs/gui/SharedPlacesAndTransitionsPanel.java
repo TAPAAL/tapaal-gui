@@ -1,9 +1,6 @@
 package dk.aau.cs.gui;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -191,6 +188,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		listPanel.add(scrollPane, gbc);
 		
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
+		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(e -> {
@@ -212,6 +210,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		listPanel.add(moveUpButton,gbc);
 		
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
+		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(e -> {
@@ -232,6 +231,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		
 		//Sort button
 		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
+		sortButton.setMargin(new Insets(2,2,2,2));
 		sortButton.setToolTipText(toolTipSortPlaces);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {

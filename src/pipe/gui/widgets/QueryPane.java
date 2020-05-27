@@ -1,10 +1,6 @@
 package pipe.gui.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -210,6 +206,7 @@ public class QueryPane extends JPanel implements SidePane {
 		queryCollectionPanel.add(queryScroller, gbc);
 
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
+		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -234,6 +231,7 @@ public class QueryPane extends JPanel implements SidePane {
 		queryCollectionPanel.add(moveUpButton,gbc);
 
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
+		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -260,6 +258,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 		//Sort button
 		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
+		sortButton.setMargin(new Insets(2,2,2,2));
 		sortButton.setToolTipText(toolTipSortQueries);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {
