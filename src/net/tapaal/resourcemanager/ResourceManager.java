@@ -1,4 +1,4 @@
-package dk.aau.cs.io;
+package net.tapaal.resourcemanager;
 
 import java.awt.Image;
 import java.io.IOException;
