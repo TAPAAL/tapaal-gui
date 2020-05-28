@@ -1,7 +1,6 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import java.util.Iterator;
 import javax.swing.JOptionPane;
 
 import pipe.gui.CreateGui;
@@ -322,26 +321,24 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					return;
 				}
 
-				Iterator<Arc> arcsFrom = transportArcToCreate.getSource().getConnectFromIterator();
-				// search for pre-existent arcs from transportArcToCreate's source to
+                // search for pre-existent arcs from transportArcToCreate's source to
 				// transportArcToCreate's target
-				while (arcsFrom.hasNext()) {
-					Arc someArc = (arcsFrom.next());
-					if (someArc == transportArcToCreate) {
-						break;
-					} else if (someArc.getSource() == transportArcToCreate.getSource() && someArc.getTarget() == currentObject) {
-						existsArc = true;
+                for (Arc someArc : transportArcToCreate.getSource().getPreset()) {
+                    if (someArc == transportArcToCreate) {
+                        break;
+                    } else if (someArc.getSource() == transportArcToCreate.getSource() && someArc.getTarget() == currentObject) {
+                        existsArc = true;
 
-						// There already is a arc between this place and transition
-						cleanupArc(transportArcToCreate, view);
-						JOptionPane.showMessageDialog(
-								CreateGui.getApp(),
-								ERROR_MSG_TWO_ARCS,
-								"Error",
-								JOptionPane.ERROR_MESSAGE
+                        // There already is a arc between this place and transition
+                        cleanupArc(transportArcToCreate, view);
+                        JOptionPane.showMessageDialog(
+                            CreateGui.getApp(),
+                            ERROR_MSG_TWO_ARCS,
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
                         );
-					}
-				}
+                    }
+                }
 				if (existsArc) {
 					cleanupArc(transportArcToCreate, view);
 					return;

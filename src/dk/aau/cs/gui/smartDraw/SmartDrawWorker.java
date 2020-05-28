@@ -2,7 +2,6 @@ package dk.aau.cs.gui.smartDraw;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -199,19 +198,16 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		}
 	}
 	
-	private ArrayList<Arc> getAllArcsFromObject(PlaceTransitionObject object) {
+	private ArrayList<Arc> getAllArcsFromObject(PlaceTransitionObject pno) {
 		ArrayList<Arc> arcsForObject = new ArrayList<Arc>();
-		Iterator<Arc> fromIterator = object.getConnectFromIterator();
-		Iterator<Arc> toIterator = object.getConnectToIterator();
-		Arc arc;
-		while(fromIterator.hasNext()) {
-			arc = fromIterator.next();
-			arcsForObject.add(arc);
-		}
-		while(toIterator.hasNext()) {
-			arc = toIterator.next();
-			arcsForObject.add(arc);
-		}
+
+        for (Arc a : pno.getPreset()) {
+            arcsForObject.add(a);
+        }
+        for (Arc a : pno.getPostset()) {
+            arcsForObject.add(a);
+        }
+
 		return arcsForObject;
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
