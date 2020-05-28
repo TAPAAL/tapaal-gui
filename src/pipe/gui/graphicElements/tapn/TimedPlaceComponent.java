@@ -110,11 +110,12 @@ public class TimedPlaceComponent extends Place {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-		Iterable<TimedToken> tokens = place.tokens();
+
 		boolean first = true;
-		for (TimedToken token : tokens) {
-			if (!first)
-				buffer.append(", ");
+		for (TimedToken token : place.tokens()) {
+			if (!first) {
+                buffer.append(", ");
+            }
 			buffer.append(df.format(token.age()));
 
 			first = false;
