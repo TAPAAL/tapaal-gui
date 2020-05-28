@@ -17,8 +17,8 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	protected double componentWidth;
 	protected double componentHeight;
 
-	private LinkedList<Arc> connectTo = new LinkedList<Arc>();
-	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
+	private final LinkedList<Arc> connectTo = new LinkedList<Arc>();
+	private final LinkedList<Arc> connectFrom = new LinkedList<Arc>();
 
 	protected boolean attributesVisible = false;
 
