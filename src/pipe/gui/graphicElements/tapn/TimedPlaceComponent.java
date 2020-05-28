@@ -46,21 +46,19 @@ import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 public class TimedPlaceComponent extends Place {
 
 	private dk.aau.cs.model.tapn.TimedPlace place;
-	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
+	private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-	private Window ageOfTokensWindow;
-	private Shape dashedOutline = createDashedOutline();
+	private Window ageOfTokensWindow = new Window(new Frame());
+	private final Shape dashedOutline = createDashedOutline();
 
 	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
-		listener = timedPlaceListener();		
-		this.place.addTimedPlaceListener(listener);
+        this.place.addTimedPlaceListener(listener);
 
 		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
 
-	}
+    }
 
 	public TimedPlaceComponent(
 	    int positionXInput,
@@ -71,11 +69,9 @@ public class TimedPlaceComponent extends Place {
     ) {
 
 		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
-		listener = timedPlaceListener();
-		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
+        attributesVisible = true;
 
-	}
+    }
 
 	@Override
 	protected void addMouseHandler() {
