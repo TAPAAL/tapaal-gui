@@ -42,9 +42,7 @@ public abstract class Place extends PlaceTransitionObject {
 			int nameOffsetXInput,
 			int nameOffsetYInput
 	){
-		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
-		componentWidth = DIAMETER;
-		componentHeight = DIAMETER;
+		super(DIAMETER, DIAMETER, positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 	}
 
 	public Place(int positionXInput, int positionYInput) {

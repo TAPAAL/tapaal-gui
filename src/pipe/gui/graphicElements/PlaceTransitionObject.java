@@ -14,8 +14,8 @@ import java.util.LinkedList;
  */
 public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
-	protected double componentWidth;
-	protected double componentHeight;
+	protected final double componentWidth;
+	protected final double componentHeight;
 
 	private final LinkedList<Arc> connectTo = new LinkedList<Arc>();
 	private final LinkedList<Arc> connectFrom = new LinkedList<Arc>();
@@ -23,6 +23,8 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	protected boolean attributesVisible = false;
 
 	public PlaceTransitionObject(
+	        double componentWidth,
+			double componentHeight,
 			int positionXInput,
 			int positionYInput,
 			String idInput,
@@ -30,6 +32,8 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			int nameOffsetYInput
 	){
 		super(idInput, positionXInput, positionYInput, nameOffsetXInput, nameOffsetYInput);
+		this.componentWidth = componentWidth;
+		this.componentHeight = componentHeight;
 	}
 
 

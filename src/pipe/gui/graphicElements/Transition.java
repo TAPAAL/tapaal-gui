@@ -69,9 +69,8 @@ public abstract class Transition extends PlaceTransitionObject {
 			int nameOffsetYInput,
 			int angleInput
 	){
-		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
-		componentWidth = TRANSITION_HEIGHT; // sets width
-		componentHeight = TRANSITION_HEIGHT;// sets height
+		super(TRANSITION_HEIGHT, TRANSITION_HEIGHT, positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+
 		constructTransition();
 		angle = 0;
 		rotate(angleInput);
