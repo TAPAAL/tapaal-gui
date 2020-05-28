@@ -51,16 +51,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	/**
 	 * Create Petri-Net Transition object
 	 */
-	public Transition(int positionXInput, int positionYInput,
-			String idInput, int nameOffsetXInput,
-			int nameOffsetYInput,
-			boolean infServer, int angleInput, int priority) {
-		this(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, angleInput);
-	}
-
-	/**
-	 * Create Petri-Net Transition object
-	 */
 	public Transition(
 			int positionXInput,
 			int positionYInput,
