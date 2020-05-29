@@ -134,13 +134,9 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	/**
-	 * Determines whether Transition is enabled
-	 * 
-	 * @param animationStatus
-	 *            Anamation status
-	 * @return True if enabled
+	 * Hightlights a transtion as enabled
 	 */
-	public boolean isEnabled(boolean animationStatus) {
+	public boolean markTransitionEnabled(boolean animationStatus) {
 		if (animationStatus) {
 			if (isTransitionEnabled()) {
 				highlightedEnabled = true;
@@ -152,7 +148,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		return false;
 	}
 
-	public boolean isDelayEnabledTransition(boolean animationStatus){
+	public boolean markTransitionDelayEnabled(boolean animationStatus){
 		if(animationStatus){
 			highlightedDelayEnabled = isDelayEnabled();
 			return highlightedDelayEnabled;

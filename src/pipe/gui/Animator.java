@@ -148,7 +148,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
+			if (tempTransition.markTransitionEnabled(true) || (tempTransition.markTransitionDelayEnabled(true) && !isUrgentTransitionEnabled)) {
 				tempTransition.repaint();
 			}
 		}
@@ -163,7 +163,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true)) || !tempTransition.isDelayEnabledTransition(true) || (tempTransition.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
+			if (!(tempTransition.markTransitionEnabled(true)) || !tempTransition.markTransitionDelayEnabled(true) || (tempTransition.markTransitionDelayEnabled(true) && isUrgentTransitionEnabled)) {
 				tempTransition.repaint();
 			}
 		}
@@ -178,7 +178,7 @@ public class Animator {
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
+				if (tempTransition.markTransitionEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
 					isUrgentTransitionEnabled = true;
 					break outer;
 				}
@@ -189,7 +189,7 @@ public class Animator {
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
+				if (tempTransition.markTransitionEnabled(true) || (tempTransition.markTransitionDelayEnabled(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
 					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
@@ -447,7 +447,7 @@ public class Animator {
 				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 				while (transitionIterator.hasNext()) {
 					Transition tempTransition = transitionIterator.next();
-					if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
+					if (tempTransition.markTransitionEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
 						sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
 					}
 				}
