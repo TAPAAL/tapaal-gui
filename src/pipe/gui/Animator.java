@@ -37,14 +37,14 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class Animator {
-	private ArrayList<TAPNNetworkTraceStep> actionHistory;
-	private int currentAction;
-	private ArrayList<NetworkMarking> markings;
+	private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
+	private int currentAction = -1;
+	private final ArrayList<NetworkMarking> markings = new ArrayList<NetworkMarking>();
 	private int currentMarkingIndex = 0;
 	private TAPNNetworkTrace trace = null;
 
 	public FiringMode firingmode = new RandomFiringMode();
-	private TabContent tab;
+	private final TabContent tab;
 	private NetworkMarking initialMarking;
 
 	private boolean isDisplayingUntimedTrace = false;
@@ -55,17 +55,12 @@ public class Animator {
 	}
 
 	public Animator(TabContent tab) {
-		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
-		currentAction = -1;
-		markings = new ArrayList<NetworkMarking>();
-		setTabContent(tab);
-	}
+	    super();
 
-	private void setTabContent(TabContent tab)  {
-		this.tab = tab;
-	}
+        this.tab = tab;
+    }
 
-	private NetworkMarking currentMarking() {
+    private NetworkMarking currentMarking() {
 		return markings.get(currentMarkingIndex);
 	}
 
