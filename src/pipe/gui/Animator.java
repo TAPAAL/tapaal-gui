@@ -129,26 +129,13 @@ public class Animator {
 	 */
 	public void highlightEnabledTransitions() {
 		updateFireableTransitions();
-		DataLayer current = activeGuiModel();
-
-        for (Transition tempTransition : current.transitions()) {
-            if (tempTransition.markTransitionEnabled() || (tempTransition.markTransitionDelayEnabled() && !isUrgentTransitionEnabled)) {
-                tempTransition.repaint();
-            }
-        }
 	}
 
 	/**
 	 * Called during animation to unhighlight previously highlighted transitions
 	 */
 	private void unhighlightDisabledTransitions() {
-		DataLayer current = activeGuiModel();
-
-        for (Transition tempTransition : current.transitions()) {
-            if (!(tempTransition.markTransitionEnabled()) || !tempTransition.markTransitionDelayEnabled() || (tempTransition.markTransitionDelayEnabled() && isUrgentTransitionEnabled)) {
-                tempTransition.repaint();
-            }
-        }
+		disableTransitions();
 	}
 
 	public void updateFireableTransitions(){
@@ -167,9 +154,16 @@ public class Animator {
 		
 		for( Template template : tab.activeTemplates()){
             for (Transition t : template.guiModel().transitions()) {
-                if (t.markTransitionEnabled() || (t.markTransitionDelayEnabled() && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
-                    transFireComponent.addTransition(template, t);
+                if (t.isTransitionEnabled()) {
+                    t.markTransitionEnabled(true);
+                    //transFireComponent.addTransition(template, t);
+                } else if (CreateGui.getApp().isShowingDelayEnabledTransitions() &&
+                    t.isDelayEnabled() && !isUrgentTransitionEnabled
+                ) {
+                    t.markTransitionDelayEnabled(true);
+                    //transFireComponent.addTransition(template, t);
                 }
+
             }
 		}
 
@@ -382,8 +376,9 @@ public class Animator {
 		tab.network().setMarking(next.value1());
 		
 		activeGuiModel().repaintPlaces();
+        unhighlightDisabledTransitions();
 		highlightEnabledTransitions();
-		unhighlightDisabledTransitions();
+
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
 		
 		reportBlockingPlaces();
@@ -405,8 +400,9 @@ public class Animator {
 		}
 
 		activeGuiModel().repaintPlaces();
+        unhighlightDisabledTransitions();
 		highlightEnabledTransitions();
-		unhighlightDisabledTransitions();
+
 		reportBlockingPlaces();
 		return result;
 	}
@@ -421,7 +417,7 @@ public class Animator {
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
 			for( Template temp : tab.activeTemplates()){
                 for (Transition tempTransition : temp.guiModel().transitions()) {
-                    if (tempTransition.markTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                    if (tempTransition.isTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
                         sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
                     }
                 }
