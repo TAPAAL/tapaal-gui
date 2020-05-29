@@ -46,7 +46,6 @@ public class EnabledTransitionsList extends JPanel{
 	public void initPanel(){
 		transitions = new DefaultListModel<>();
 		transitionsList = new JList<>(transitions);
-		transitionsList.setCellRenderer(new EnabledTransitionListCellRenderer());
 
 		transitionsList.addMouseListener(new MouseAdapter() {
 			@Override
@@ -136,23 +135,7 @@ public class EnabledTransitionsList extends JPanel{
 
 	interface ListItem extends Comparable<ListItem>{}
 
-	class SplitterListItem implements ListItem{
 
-		@Override
-		public int compareTo(ListItem o) {
-			if(o instanceof TransitionListItem){
-				return o.compareTo(this);
-			} else {
-				return 0;
-			}
-		}
-
-		@Override
-		public String toString() {
-			return "_";
-		}
-
-	}
 
 	static class TransitionListItem implements ListItem{
 		private Transition transition;
@@ -165,8 +148,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null || !showIntervals ? 
-					"" : transition.getDInterval().toString() + " ";
+			String interval = transition.getDInterval() == null || !showIntervals ? "" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 
 			if(isShared()){
@@ -239,51 +221,6 @@ public class EnabledTransitionsList extends JPanel{
 			}
 			
 			return result;
-		}
-	}
-
-	//This class creates the stippled line shown between the enabled transitions and the delay-enabled transitions
-	class EnabledTransitionListCellRenderer extends DefaultListCellRenderer{
-
-		@Override
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			if(value instanceof SplitterListItem){
-				JLabel separator = new JLabel();
-				separator.setBorder(new DashBorder());
-				separator.setPreferredSize(new Dimension(1, 1));
-				return separator;
-			} else {
-				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			}
-		}
-
-		class DashBorder implements Border {
-			private final Insets	insets	= new Insets(1, 1, 1, 1);
-			private final int	 length	= 5;
-			private final int	 space	= 3;
-			public boolean isBorderOpaque() {
-				return false;
-			}
-			public void paintBorder(Component c, Graphics g, int x, int y,
-					int width, int height) {
-				g.setColor(Color.BLACK);
-				// --- draw horizontal ---
-				for (int i = 0; i < width; i += length) {
-					g.drawLine(i, y, i + length, y);
-					g.drawLine(i, height - 1, i + length, height - 1);
-					i += space;
-				}
-				// --- draw vertical ---
-				for (int i = 0; i < height; i += length) {
-					g.drawLine(0, i, 0, i + length);
-					g.drawLine(width - 1, i, width - 1, i + length);
-					i += space;
-				}
-			}
-			public Insets getBorderInsets(Component c) {
-				return insets;
-			}
 		}
 	}
 
