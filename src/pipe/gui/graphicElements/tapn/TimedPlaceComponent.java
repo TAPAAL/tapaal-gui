@@ -266,13 +266,10 @@ public class TimedPlaceComponent extends Place {
         }
 	}
 
-	public Command setInvariant(TimeInvariant inv) {
-		TimeInvariant old = place.invariant();
+	public void setInvariant(TimeInvariant inv) {
 		place.setInvariant(inv);
 
 		update(true);
-
-		return new TimedPlaceInvariantEdit(this, old, inv);
 	}
 
 	public void showAgeOfTokens(boolean show) {
