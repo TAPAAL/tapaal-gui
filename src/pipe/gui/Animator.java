@@ -451,9 +451,7 @@ public class Animator {
                     tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
                 }
             }
-        } catch (NumberFormatException e) {
-            // Do nothing, invalud number
-        } catch (ParseException e) {
+        } catch (ParseException | NumberFormatException e) {
             tab.getAnimationController().getOkButton().setEnabled(false);
             tab.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
         }
