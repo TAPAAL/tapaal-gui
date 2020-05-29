@@ -45,7 +45,7 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
-	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
+	private final ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
 
 	/**
 	 * Create Petri-Net Transition object
@@ -180,9 +180,15 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	protected void constructTransition() {
 		transition = new GeneralPath();
-		transition.append(new Rectangle2D.Double(
-				(componentWidth - TRANSITION_WIDTH) / 2, 0, TRANSITION_WIDTH,
-				TRANSITION_HEIGHT), false);
+		transition.append(
+		    new Rectangle2D.Double(
+		        (componentWidth - TRANSITION_WIDTH) / 2,
+                0,
+                TRANSITION_WIDTH,
+                TRANSITION_HEIGHT
+            ),
+            false
+        );
 		outlineTransition();
 	}
 
@@ -265,10 +271,10 @@ public abstract class Transition extends PlaceTransitionObject {
 		transform.concatenate(Zoomer.getTransform(getZoom()));
 
 		arcIterator = top.iterator();
-		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT),
-				transformed); // +1 due to rounding making it off by 1
+		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT), transformed); // +1 due to rounding making it off by 1
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
+
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -281,10 +287,10 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		arcIterator = bottom.iterator();
-		transform.transform(new Point2D.Double(0, -0.5 * TRANSITION_HEIGHT),
-				transformed);
+		transform.transform(new Point2D.Double(0, -0.5 * TRANSITION_HEIGHT), transformed);
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
+
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -301,9 +307,9 @@ public abstract class Transition extends PlaceTransitionObject {
 		double current = TRANSITION_HEIGHT / 2d - inc;
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			transform.transform(new Point2D.Double(-0.5 * TRANSITION_WIDTH,
-					current + 1), transformed); // +1 due to rounding making it off by 1
-			if (thisArc.sourceOrTarget()) {
+			transform.transform(new Point2D.Double(-0.5 * TRANSITION_WIDTH, current + 1), transformed); // +1 due to rounding making it off by 1
+
+            if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
 						+ transformed.y);
@@ -320,8 +326,8 @@ public abstract class Transition extends PlaceTransitionObject {
 		arcIterator = right.iterator();
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			transform.transform(new Point2D.Double(+0.5 * TRANSITION_WIDTH,
-					current), transformed);
+			transform.transform(new Point2D.Double(+0.5 * TRANSITION_WIDTH, current), transformed);
+
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -366,12 +372,10 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		private void calcAngle() {
-			int index = sourceOrTarget() ? arc.getArcPath().getEndIndex() - 1
-					: 1;
+			int index = sourceOrTarget() ? arc.getArcPath().getEndIndex() - 1 : 1;
 			Point2D.Double p1 = new Point2D.Double(positionX
 					+ centreOffsetLeft(), positionY + centreOffsetTop());
-			Point2D.Double p2 = new Point2D.Double(arc.getArcPath().getPoint(
-					index).x, arc.getArcPath().getPoint(index).y);
+			Point2D.Double p2 = new Point2D.Double(arc.getArcPath().getPoint(index).x, arc.getArcPath().getPoint(index).y);
 
 			if (p1.y <= p2.y) {
 				angle = Math.atan((p1.x - p2.x) / (p2.y - p1.y));
