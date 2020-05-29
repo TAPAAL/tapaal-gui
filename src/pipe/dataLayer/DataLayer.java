@@ -214,14 +214,11 @@ public class DataLayer {
 						for (Object o : tmp.getTarget().getPostset()) {
 
 							if (o instanceof TimedTransportArcComponent) {
-								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o)
-										.getGroupNr()) {
+								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o).getGroupNr()) {
 									// Found partner
 
-									tmp
-											.setConnectedTo(((TimedTransportArcComponent) o));
-									((TimedTransportArcComponent) o)
-											.setConnectedTo(tmp);
+									tmp.setConnectedTo(((TimedTransportArcComponent) o));
+									((TimedTransportArcComponent) o).setConnectedTo(tmp);
 
 									break;
 								}
@@ -236,14 +233,11 @@ public class DataLayer {
 						for (Object o : tmp.getSource().getPreset()) {
 
 							if (o instanceof TimedTransportArcComponent) {
-								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o)
-										.getGroupNr()) {
+								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o).getGroupNr()) {
 									// Found partner
 
-									tmp
-											.setConnectedTo(((TimedTransportArcComponent) o));
-									((TimedTransportArcComponent) o)
-											.setConnectedTo(tmp);
+									tmp.setConnectedTo(((TimedTransportArcComponent) o));
+									((TimedTransportArcComponent) o).setConnectedTo(tmp);
 
 									break;
 								}
