@@ -130,9 +130,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	private void outlineTransition() {
-		proximityTransition = (new BasicStroke(
-				Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS))
-				.createStrokedShape(transition);
+		proximityTransition = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(transition);
 	}
 
 	/**
