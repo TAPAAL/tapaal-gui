@@ -136,25 +136,13 @@ public abstract class Transition extends PlaceTransitionObject {
 	/**
 	 * Hightlights a transtion as enabled
 	 */
-	public boolean markTransitionEnabled(boolean animationStatus) {
-		if (animationStatus) {
-			if (isTransitionEnabled()) {
-				highlightedEnabled = true;
-				return true;
-			} else {
-				highlightedEnabled = false;
-			}
-		}
-		return false;
-	}
+	public boolean markTransitionEnabled() {
+        return highlightedEnabled = isTransitionEnabled();
+    }
 
-	public boolean markTransitionDelayEnabled(boolean animationStatus){
-		if(animationStatus){
-			highlightedDelayEnabled = isDelayEnabled();
-			return highlightedDelayEnabled;
-		}
-		return false;
-	}
+	public boolean markTransitionDelayEnabled(){
+        return highlightedDelayEnabled = isDelayEnabled();
+    }
 
 	//Named with prefix Transition due to JComponent have isEnabled
 	public abstract boolean isTransitionEnabled();

@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -146,7 +145,7 @@ public class Animator {
 		DataLayer current = activeGuiModel();
 
         for (Transition tempTransition : current.returnTransitions()) {
-            if (tempTransition.markTransitionEnabled(true) || (tempTransition.markTransitionDelayEnabled(true) && !isUrgentTransitionEnabled)) {
+            if (tempTransition.markTransitionEnabled() || (tempTransition.markTransitionDelayEnabled() && !isUrgentTransitionEnabled)) {
                 tempTransition.repaint();
             }
         }
@@ -159,7 +158,7 @@ public class Animator {
 		DataLayer current = activeGuiModel();
 
         for (Transition tempTransition : current.returnTransitions()) {
-            if (!(tempTransition.markTransitionEnabled(true)) || !tempTransition.markTransitionDelayEnabled(true) || (tempTransition.markTransitionDelayEnabled(true) && isUrgentTransitionEnabled)) {
+            if (!(tempTransition.markTransitionEnabled()) || !tempTransition.markTransitionDelayEnabled() || (tempTransition.markTransitionDelayEnabled() && isUrgentTransitionEnabled)) {
                 tempTransition.repaint();
             }
         }
@@ -172,7 +171,7 @@ public class Animator {
 		
 		outer: for( Template temp : tab.activeTemplates()){
             for (Transition tempTransition : temp.guiModel().returnTransitions()) {
-                if (tempTransition.markTransitionEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                if (tempTransition.markTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
                     isUrgentTransitionEnabled = true;
                     break outer;
                 }
@@ -181,7 +180,7 @@ public class Animator {
 		
 		for( Template temp : tab.activeTemplates()){
             for (Transition tempTransition : temp.guiModel().returnTransitions()) {
-                if (tempTransition.markTransitionEnabled(true) || (tempTransition.markTransitionDelayEnabled(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
+                if (tempTransition.markTransitionEnabled() || (tempTransition.markTransitionDelayEnabled() && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
                     transFireComponent.addTransition(temp, tempTransition);
                 }
             }
@@ -435,7 +434,7 @@ public class Animator {
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
 			for( Template temp : tab.activeTemplates()){
                 for (Transition tempTransition : temp.guiModel().returnTransitions()) {
-                    if (tempTransition.markTransitionEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                    if (tempTransition.markTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
                         sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
                     }
                 }
