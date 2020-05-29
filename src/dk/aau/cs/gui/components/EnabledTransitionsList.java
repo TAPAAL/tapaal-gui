@@ -116,7 +116,6 @@ public class EnabledTransitionsList extends JPanel{
 	public void addTransition(Template template, Transition transition){
 		TransitionListItem item = new TransitionListItem(transition, template);
 
-		transition.isDelayEnabled();
 		if(!transitions.contains(item)){
 			transitions.addElement(item);
 		}
