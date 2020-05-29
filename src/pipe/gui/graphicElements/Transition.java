@@ -203,12 +203,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	public void removeArcCompareObject(Arc a) {
-		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
-		while (arcIterator.hasNext()) {
-			if ((arcIterator.next()).arc == a) {
-				arcIterator.remove();
-			}
-		}
+        arcAngleList.removeIf(arcAngleCompare -> (arcAngleCompare).arc == a);
 	}
 
 	@Override
