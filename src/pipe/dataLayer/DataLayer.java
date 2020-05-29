@@ -592,8 +592,8 @@ public class DataLayer {
 	 * Returns an iterator for the transitions array. Used by Animator.class to
 	 * set all enabled transitions to highlighted
 	 */
-	public Iterator<Transition> returnTransitions() {
-		return transitionsArray.iterator();
+	public Iterable<Transition> returnTransitions() {
+		return transitionsArray;
 	}
 
 	/**
