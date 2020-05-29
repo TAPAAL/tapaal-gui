@@ -248,11 +248,11 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
 	/* KYRKE - added functions for getting pre and post set af lists */
 	public Iterable<Arc> getPreset() {
-		return connectFrom;
+		return connectTo;
 	}
 
 	public Iterable<Arc> getPostset() {
-		return connectTo;
+		return connectFrom;
 	}
 
     public abstract void updateEndPoint(Arc arc);
