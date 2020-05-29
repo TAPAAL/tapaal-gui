@@ -28,14 +28,19 @@ public class TransitionFireingComponent extends JPanel {
 
 		enabledTransitionsList = new EnabledTransitionsList();
 
-		this.setBorder(BorderFactory.createCompoundBorder(
+		this.setBorder(
+		    BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Enabled Transitions"),
-				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		this
-		.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
-		enabledTransitionsList.setPreferredSize(new Dimension(
+				BorderFactory.createEmptyBorder(3, 3, 3, 3)
+            )
+        );
+		this.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
+		enabledTransitionsList.setPreferredSize(
+		    new Dimension(
 				enabledTransitionsList.getPreferredSize().width,
-				enabledTransitionsList.getMinimumSize().height));
+				enabledTransitionsList.getMinimumSize().height
+            )
+        );
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
@@ -50,6 +55,7 @@ public class TransitionFireingComponent extends JPanel {
 				fireSelectedTransition();
 			}
 		});
+
 		fireButton.addKeyListener(new KeyAdapter() {			
 			@Override
 			public void keyPressed(KeyEvent e) {
