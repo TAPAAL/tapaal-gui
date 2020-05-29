@@ -156,19 +156,19 @@ public class Animator {
 		transFireComponent.startReInit();
 		isUrgentTransitionEnabled = false;
 		
-		outer: for( Template temp : tab.activeTemplates()){
-            for (Transition tempTransition : temp.guiModel().returnTransitions()) {
-                if (tempTransition.markTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+		outer: for( Template template : tab.activeTemplates()){
+            for (TimedTransition t : template.model().transitions()) {
+                if (t.isUrgent() && t.isEnabled()) {
                     isUrgentTransitionEnabled = true;
                     break outer;
                 }
             }
 		}
 		
-		for( Template temp : tab.activeTemplates()){
-            for (Transition tempTransition : temp.guiModel().returnTransitions()) {
-                if (tempTransition.markTransitionEnabled() || (tempTransition.markTransitionDelayEnabled() && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
-                    transFireComponent.addTransition(temp, tempTransition);
+		for( Template template : tab.activeTemplates()){
+            for (Transition t : template.guiModel().returnTransitions()) {
+                if (t.markTransitionEnabled() || (t.markTransitionDelayEnabled() && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
+                    transFireComponent.addTransition(template, t);
                 }
             }
 		}
