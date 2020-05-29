@@ -131,7 +131,7 @@ public class Animator {
 		updateFireableTransitions();
 		DataLayer current = activeGuiModel();
 
-        for (Transition tempTransition : current.returnTransitions()) {
+        for (Transition tempTransition : current.transitions()) {
             if (tempTransition.markTransitionEnabled() || (tempTransition.markTransitionDelayEnabled() && !isUrgentTransitionEnabled)) {
                 tempTransition.repaint();
             }
@@ -144,7 +144,7 @@ public class Animator {
 	private void unhighlightDisabledTransitions() {
 		DataLayer current = activeGuiModel();
 
-        for (Transition tempTransition : current.returnTransitions()) {
+        for (Transition tempTransition : current.transitions()) {
             if (!(tempTransition.markTransitionEnabled()) || !tempTransition.markTransitionDelayEnabled() || (tempTransition.markTransitionDelayEnabled() && isUrgentTransitionEnabled)) {
                 tempTransition.repaint();
             }
@@ -166,7 +166,7 @@ public class Animator {
 		}
 		
 		for( Template template : tab.activeTemplates()){
-            for (Transition t : template.guiModel().returnTransitions()) {
+            for (Transition t : template.guiModel().transitions()) {
                 if (t.markTransitionEnabled() || (t.markTransitionDelayEnabled() && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
                     transFireComponent.addTransition(template, t);
                 }
@@ -183,7 +183,7 @@ public class Animator {
 	private void disableTransitions() {
 		for(Template template : tab.allTemplates())
 		{
-            for (Transition tempTransition : template.guiModel().returnTransitions()) {
+            for (Transition tempTransition : template.guiModel().transitions()) {
                 tempTransition.disableHightligh();
 
                 tempTransition.repaint();
@@ -420,7 +420,7 @@ public class Animator {
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
 			for( Template temp : tab.activeTemplates()){
-                for (Transition tempTransition : temp.guiModel().returnTransitions()) {
+                for (Transition tempTransition : temp.guiModel().transitions()) {
                     if (tempTransition.markTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
                         sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
                     }
