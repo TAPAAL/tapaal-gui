@@ -142,7 +142,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	 */
 	public boolean isEnabled(boolean animationStatus) {
 		if (animationStatus) {
-			if (isEnabled()) {
+			if (isTransitionEnabled()) {
 				highlightedEnabled = true;
 				return true;
 			} else {
@@ -160,6 +160,8 @@ public abstract class Transition extends PlaceTransitionObject {
 		return false;
 	}
 
+	//Named with prefix Transition due to JComponent have isEnabled
+	public abstract boolean isTransitionEnabled();
 	public abstract boolean isDelayEnabled();
 	public abstract TimeInterval getDInterval();
 

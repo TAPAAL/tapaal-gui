@@ -112,7 +112,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	@Override
-	public boolean isEnabled() {
+	public boolean isTransitionEnabled() {
 		return transition.isEnabled();
 	}
 
