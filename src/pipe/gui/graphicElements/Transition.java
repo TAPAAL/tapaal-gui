@@ -154,18 +154,13 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	public boolean isDelayEnabledTransition(boolean animationStatus){
 		if(animationStatus){
-			highlightedDelayEnabled = isHighlightedDelayEnabled();
+			highlightedDelayEnabled = isDelayEnabled();
 			return highlightedDelayEnabled;
 		}
 		return false;
 	}
-	
-	//Dummy is overridden
-	public boolean isHighlightedDelayEnabled(){
-		return highlightedDelayEnabled;
-	}
-	
-	//Dummy is overridden
+
+	public abstract boolean isDelayEnabled();
 	public abstract TimeInterval getDInterval();
 
     /* Called at the end of animation to reset Transitions to false */

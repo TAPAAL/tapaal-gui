@@ -117,7 +117,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	@Override
-	public boolean isHighlightedDelayEnabled() {
+	public boolean isDelayEnabled() {
 		return transition.isDEnabled();
 	}
 	
