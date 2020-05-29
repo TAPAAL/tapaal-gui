@@ -38,8 +38,8 @@ public abstract class Transition extends PlaceTransitionObject {
 	protected int angle;
 	
 	// Animation Suff
-	protected boolean delayEnabled = false;
-	protected boolean highlighted = false;
+	protected boolean highlightedDelayEnabled = false;
+	protected boolean highlightedEnabled = false;
 	private Timer blinkTimer;
 	private int blinkCount;
 
@@ -94,9 +94,9 @@ public abstract class Transition extends PlaceTransitionObject {
 			//pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
-		if (highlighted) {
+		if (highlightedEnabled) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		} else if (delayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
+		} else if (highlightedDelayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
 			g2.setPaint(Pipe.YELLOW_TRANSITION_COLOR);
 		} else if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
@@ -143,10 +143,10 @@ public abstract class Transition extends PlaceTransitionObject {
 	public boolean isEnabled(boolean animationStatus) {
 		if (animationStatus) {
 			if (isEnabled()) {
-				highlighted = true;
+				highlightedEnabled = true;
 				return true;
 			} else {
-				highlighted = false;
+				highlightedEnabled = false;
 			}
 		}
 		return false;
@@ -154,15 +154,15 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	public boolean isDelayEnabledTransition(boolean animationStatus){
 		if(animationStatus){
-			delayEnabled = isDelayEnabled();
-			return delayEnabled;
+			highlightedDelayEnabled = isHighlightedDelayEnabled();
+			return highlightedDelayEnabled;
 		}
 		return false;
 	}
 	
 	//Dummy is overridden
-	public boolean isDelayEnabled(){
-		return delayEnabled;
+	public boolean isHighlightedDelayEnabled(){
+		return highlightedDelayEnabled;
 	}
 	
 	//Dummy is overridden
@@ -170,8 +170,8 @@ public abstract class Transition extends PlaceTransitionObject {
 
     /* Called at the end of animation to reset Transitions to false */
 	public void disableHightligh() {
-		highlighted = false;
-        delayEnabled = false;
+		highlightedEnabled = false;
+        highlightedDelayEnabled = false;
 	}
 
 	public int getAngle() {
