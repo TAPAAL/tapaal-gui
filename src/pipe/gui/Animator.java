@@ -407,52 +407,57 @@ public class Animator {
 		return result;
 	}
 
-	public void reportBlockingPlaces(){
+    public void reportBlockingPlaces() {
 
-		try{
-			BigDecimal delay = tab.getAnimationController().getCurrentDelay();
-		if(isUrgentTransitionEnabled && delay.compareTo(new BigDecimal(0))>0){
-			tab.getAnimationController().getOkButton().setEnabled(false);
-			StringBuilder sb = new StringBuilder();
-			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
-			for( Template temp : tab.activeTemplates()){
-                for (Transition tempTransition : temp.guiModel().transitions()) {
-                    if (tempTransition.isTransitionEnabled() && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
-                        sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
+        try {
+            BigDecimal delay = tab.getAnimationController().getCurrentDelay();
+
+            if (isUrgentTransitionEnabled && !delay.equals(BigDecimal.ZERO) ) {
+                tab.getAnimationController().getOkButton().setEnabled(false);
+
+                StringBuilder sb = new StringBuilder();
+                sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
+                for (Template template : tab.activeTemplates()) {
+                    for (Transition t : template.guiModel().transitions()) {
+                        if (t.isTransitionEnabled() && template.model().getTransitionByName(t.getName()).isUrgent()) {
+                            sb.append(template.toString() + "." + t.getName() + "<br />");
+                        }
                     }
                 }
-			}
-			sb.append("</html>");
-			tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
-			return;
-		}
-			if(delay.compareTo(new BigDecimal(0))<0){
-				tab.getAnimationController().getOkButton().setEnabled(false);
-				tab.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
-			} else {
-				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
-				if(blockingPlaces.size() == 0){
-					tab.getAnimationController().getOkButton().setEnabled(true);
-					tab.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
-				} else {
-					StringBuilder sb = new StringBuilder();
-					sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
-					for (TimedPlace t :blockingPlaces){
-						sb.append(t.toString() + "<br />");
-					}
-					//JOptionPane.showMessageDialog(null, sb.toString());
-					sb.append("</html>");
-					tab.getAnimationController().getOkButton().setEnabled(false);
-					tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
-				}
-			}
-		} catch (NumberFormatException e) {
-			// Do nothing, invalud number
-		} catch (ParseException e) {
-			tab.getAnimationController().getOkButton().setEnabled(false);
-			tab.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
-		}
-	}
+                sb.append("</html>");
+
+                tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
+
+                return;
+            }
+
+            if (delay.compareTo(new BigDecimal(0)) < 0) {
+                tab.getAnimationController().getOkButton().setEnabled(false);
+                tab.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
+            } else {
+                List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
+                if (blockingPlaces.size() == 0) {
+                    tab.getAnimationController().getOkButton().setEnabled(true);
+                    tab.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
+                    for (TimedPlace t : blockingPlaces) {
+                        sb.append(t.toString() + "<br />");
+                    }
+                    //JOptionPane.showMessageDialog(null, sb.toString());
+                    sb.append("</html>");
+                    tab.getAnimationController().getOkButton().setEnabled(false);
+                    tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
+                }
+            }
+        } catch (NumberFormatException e) {
+            // Do nothing, invalud number
+        } catch (ParseException e) {
+            tab.getAnimationController().getOkButton().setEnabled(false);
+            tab.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
+        }
+    }
 
 	private DataLayer activeGuiModel() {
 		return tab.currentTemplate().guiModel();
