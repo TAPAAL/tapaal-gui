@@ -208,9 +208,9 @@ public class Animator {
 			Iterator<Transition> transitionIterator = template.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				tempTransition.setEnabledFalse();
-				tempTransition.setDelayEnabledTransitionFalse();
-				tempTransition.repaint();
+				tempTransition.disableHightligh();
+
+                tempTransition.repaint();
 			}
 		}
 	}

@@ -38,7 +38,6 @@ public abstract class Transition extends PlaceTransitionObject {
 	protected int angle;
 	
 	// Animation Suff
-	protected boolean enabled = false;
 	protected boolean delayEnabled = false;
 	protected boolean highlighted = false;
 	private Timer blinkTimer;
@@ -155,16 +154,6 @@ public abstract class Transition extends PlaceTransitionObject {
 		return false;
 	}
 
-	/**
-	 * Determines whether Transition is enabled
-	 * 
-	 * @return True if enabled
-	 */
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
-
 	public boolean isDelayEnabledTransition(boolean animationStatus){
 		if(animationStatus){
 			delayEnabled = isDelayEnabled();
@@ -182,24 +171,11 @@ public abstract class Transition extends PlaceTransitionObject {
 	public TimeInterval getDInterval(){
 		return null;
 	}
-	
-	/* Called at the end of animation to reset Transitions to false */
-	public void setDelayEnabledTransitionFalse(){
-		delayEnabled = false;
-	}
-	
-	/**
-	 * Sets whether Transition is enabled
-	 */
-	@Override
-	public void setEnabled(boolean status) {
-		enabled = status;
-	}
 
-	/* Called at the end of animation to reset Transitions to false */
-	public void setEnabledFalse() {
-		enabled = false;
+    /* Called at the end of animation to reset Transitions to false */
+	public void disableHightligh() {
 		highlighted = false;
+        delayEnabled = false;
 	}
 
 	public int getAngle() {
