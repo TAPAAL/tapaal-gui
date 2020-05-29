@@ -168,9 +168,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 	
 	//Dummy is overridden
-	public TimeInterval getDInterval(){
-		return null;
-	}
+	public abstract TimeInterval getDInterval();
 
     /* Called at the end of animation to reset Transitions to false */
 	public void disableHightligh() {
