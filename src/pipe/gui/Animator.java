@@ -156,12 +156,12 @@ public class Animator {
             for (Transition t : template.guiModel().transitions()) {
                 if (t.isTransitionEnabled()) {
                     t.markTransitionEnabled(true);
-                    //transFireComponent.addTransition(template, t);
+                    transFireComponent.addTransition(template, t);
                 } else if (CreateGui.getApp().isShowingDelayEnabledTransitions() &&
                     t.isDelayEnabled() && !isUrgentTransitionEnabled
                 ) {
                     t.markTransitionDelayEnabled(true);
-                    //transFireComponent.addTransition(template, t);
+                    transFireComponent.addTransition(template, t);
                 }
 
             }
