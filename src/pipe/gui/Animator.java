@@ -123,14 +123,6 @@ public class Animator {
 	public NetworkMarking getInitialMarking(){
 		return initialMarking;
 	}
-
-	public NetworkMarking getLastMarking(){
-		return markings.get(markings.size()-1);
-	}
-	
-	public NetworkMarking getCurrentMarking(){
-		return markings.get(currentMarkingIndex);
-	}
 	
 	/**
 	 * Highlights enabled transitions
