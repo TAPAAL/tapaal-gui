@@ -17,8 +17,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import pipe.gui.*;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.undo.DeleteTimedPlaceCommand;
 import pipe.gui.undo.DeleteTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.*;
@@ -33,7 +37,9 @@ public class StatisticsPanel extends JPanel{
 	private final int rightMargin = 10;
 	
 	private JButton removeOrphans;
+    private JButton removeOrphanPlaces;
     private static final String REMOVE_ORPHANS_TOOL_TIP = "<html>Remove all orphan transitions<br /> (transitions with no arcs attached)<br /> in all components</html>";
+    private static final String REMOVE_ORPHANS_PLACES_TOOL_TIP = "<html>Remove all orphan places<br /> (transitions with no arcs attached)<br /> in all components</html>";
     private static final String DIALOG_TITLE = "Statistics";
 	
 	String[] headLines = {"", "Shown component", "Active components", "All components"};
@@ -86,8 +92,8 @@ public class StatisticsPanel extends JPanel{
 		
 		//If any orphan transitions - add them
 		boolean orphanTransitions = false;
-		for(int i = 1; i< contents[contents.length-1].length; i++){
-			if(!contents[contents.length-1][i].toString().equals("0")){
+		for (int i = 1; i< contents[contents.length - 2].length; i++) {
+			if (!contents[contents.length - 2][i].toString().equals("0")) {
 				orphanTransitions = true;
 			}
 		}
@@ -104,6 +110,29 @@ public class StatisticsPanel extends JPanel{
 			this.add(jSep, gbc);
 			addButtons(headLines.length, contents.length*2);
 		}
+
+        //If any orphan places - add them
+        boolean orphanPlaces = false;
+        for (int i = 1; i< contents[contents.length - 1].length; i++) {
+            if (!contents[contents.length - 1][i].toString().equals("0")) {
+                orphanPlaces = true;
+                break;
+            }
+        }
+
+        if (orphanPlaces) {
+            jSep = new JSeparator();
+            jSep.setPreferredSize(new Dimension(1, 3));
+            gbc.gridy = contents.length * 2 - 1;
+            this.add(jSep, gbc);
+            addRow(contents[contents.length - 1], contents.length * 2, false);
+            jSep = new JSeparator();
+            jSep.setPreferredSize(new Dimension(1, 3));
+            gbc.gridy = contents.length*2+1;
+            this.add(jSep, gbc);
+            addOrphanPlacesButton(headLines.length - 2, contents.length * 2);
+        }
+
 		return null;
 	}
 	
@@ -185,4 +214,58 @@ public class StatisticsPanel extends JPanel{
 		gbc.gridwidth = gridWidth;
 		this.add(buttonsPanel, gbc);
 	}
+
+	private void addOrphanPlacesButton(int gridWidth, int gridHeight) {
+        removeOrphanPlaces = new JButton("Remove orphan places");
+        removeOrphanPlaces.setToolTipText(REMOVE_ORPHANS_PLACES_TOOL_TIP);
+        final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        removeOrphanPlaces.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TabContent tab = CreateGui.getCurrentTab();
+                Iterable<Template> templates = tab.allTemplates();
+
+                UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+                boolean first = true;
+                for (Template template : templates) {
+                    List<TimedPlace> orphans = template.model().getOrphanPlaces();
+                    for (TimedPlace place : orphans) {
+                        TimedPlaceComponent timedPlace = (TimedPlaceComponent) template.guiModel().getPlaceByName(place.name());
+                        Command cmd = new DeleteTimedPlaceCommand(timedPlace, template.model(), template.guiModel());
+
+                        if (first) {
+                            undoManager.addNewEdit(cmd);
+                            first = false;
+                        } else {
+                            undoManager.addEdit(cmd);
+                        }
+                        cmd.redo();
+                    }
+                    tab.drawingSurface().repaint();
+
+                    StatisticsPanel.this.removeAll();
+                    StatisticsPanel.this.init();
+
+                    JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
+
+                    dialog.dispose();
+
+                    dialog = optionPane.createDialog(DIALOG_TITLE);
+
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            }
+        });
+
+        buttonsPanel.add(removeOrphanPlaces);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = gridHeight + 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = gridWidth;
+        this.add(buttonsPanel, gbc);
+    }
 }

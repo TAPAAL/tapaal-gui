@@ -15,8 +15,9 @@ public class SharedPlace extends TimedPlace{
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
-	private TimeInvariant invariant;
-	
+    private List<TimedPlace> places = new ArrayList<TimedPlace>();
+    private TimeInvariant invariant;
+
 	private TimedArcPetriNetNetwork network;
 	private TimedMarking currentMarking;
 	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
@@ -213,4 +214,8 @@ public class SharedPlace extends TimedPlace{
 		
 		return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 	}
+
+	public List<TimedPlace> getPlaces() {
+	    return places;
+    }
 }
