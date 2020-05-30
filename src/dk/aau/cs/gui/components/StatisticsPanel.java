@@ -70,8 +70,8 @@ public class StatisticsPanel extends JPanel{
 		
 		addRow(headLines, 0, true);
 		
-		//Add the content - make space for separators (except the orphan transitions
-		for(int i = 0; i < contents.length - 1; i++){
+		//Add the content - make space for separators (except the orphan transitions)
+		for(int i = 0; i < contents.length - 2; i++){
 			addRow(contents[i], (i+1)*2, false);
 		}
 		
@@ -103,7 +103,7 @@ public class StatisticsPanel extends JPanel{
 			jSep.setPreferredSize(new Dimension(1, 3));
 			gbc.gridy = contents.length*2-1;
 			this.add(jSep, gbc);
-			addRow(contents[contents.length-1], contents.length*2, false);
+			addRow(contents[contents.length-2], contents.length*2, false);
 			jSep = new JSeparator();
 			jSep.setPreferredSize(new Dimension(1, 3));
 			gbc.gridy = contents.length*2+1;
@@ -121,16 +121,20 @@ public class StatisticsPanel extends JPanel{
         }
 
         if (orphanPlaces) {
+            int gridWidth = orphanTransitions ? headLines.length - 2 : headLines.length;
+            int rowNumber = orphanTransitions ? contents.length * 2 - 2 : contents.length * 2;
+
             jSep = new JSeparator();
             jSep.setPreferredSize(new Dimension(1, 3));
-            gbc.gridy = contents.length * 2 - 1;
+            gbc.gridy =  contents.length * 2 - 1;
             this.add(jSep, gbc);
-            addRow(contents[contents.length - 1], contents.length * 2, false);
+            addRow(contents[contents.length - 1], rowNumber, false);
+
             jSep = new JSeparator();
             jSep.setPreferredSize(new Dimension(1, 3));
-            gbc.gridy = contents.length*2+1;
+            gbc.gridy =  contents.length * 2 + 1;
             this.add(jSep, gbc);
-            addOrphanPlacesButton(headLines.length - 2, contents.length * 2);
+            addOrphanPlacesButton(gridWidth, contents.length * 2);
         }
 
 		return null;
@@ -185,13 +189,14 @@ public class StatisticsPanel extends JPanel{
 						}
 						cmd.redo();
 					}
-				}
+                    contents = template.model().getStatistics();
+                }
 				
 				
 				tab.drawingSurface().repaint();
 				
 				StatisticsPanel.this.removeAll();
-				StatisticsPanel.this.init();
+                StatisticsPanel.this.init();
 				
 				JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
 				
@@ -241,20 +246,21 @@ public class StatisticsPanel extends JPanel{
                         }
                         cmd.redo();
                     }
-                    tab.drawingSurface().repaint();
-
-                    StatisticsPanel.this.removeAll();
-                    StatisticsPanel.this.init();
-
-                    JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
-
-                    dialog.dispose();
-
-                    dialog = optionPane.createDialog(DIALOG_TITLE);
-
-                    dialog.pack();
-                    dialog.setVisible(true);
+                    contents = template.model().getStatistics();
                 }
+                tab.drawingSurface().repaint();
+
+                StatisticsPanel.this.removeAll();
+                StatisticsPanel.this.init();
+
+                JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
+
+                dialog.dispose();
+
+                dialog = optionPane.createDialog(DIALOG_TITLE);
+
+                dialog.pack();
+                dialog.setVisible(true);
             }
         });
 
