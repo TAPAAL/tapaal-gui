@@ -46,6 +46,7 @@ public interface GuiFrameControllerActions {
     void toggleTokenAge();
     void toggleZeroToInfinityIntervals();
     void toggleComponents();
+    void toggleSharedPT();
     void toggleEnabledTransitionsList();
     void toggleDelayEnabledTransitions();
     void toggleDisplayToolTips();
