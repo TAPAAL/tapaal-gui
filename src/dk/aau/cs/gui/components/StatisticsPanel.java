@@ -92,7 +92,7 @@ public class StatisticsPanel extends JPanel{
 		
 		//If any orphan transitions - add them
 		boolean orphanTransitions = false;
-		for (int i = 1; i< contents[contents.length - 2].length; i++) {
+		for (int i = 1; i < contents[contents.length - 2].length; i++) {
 			if (!contents[contents.length - 2][i].toString().equals("0")) {
 				orphanTransitions = true;
 			}

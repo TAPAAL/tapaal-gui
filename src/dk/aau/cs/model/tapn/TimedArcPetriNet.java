@@ -104,6 +104,7 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
 		arc.destination().addInhibitorArc(arc);
+		arc.source().addInhibitorArc(arc);
 	}
 
 	public void add(TransportArc arc) {
@@ -118,6 +119,8 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		transportArcs.add(arc);
 		arc.transition().addTransportArcGoingThrough(arc);
+        arc.source().addTransportArc(arc);
+        arc.destination().addTransportArc(arc);
 	}
 
 	public void addToken(TimedToken token) {

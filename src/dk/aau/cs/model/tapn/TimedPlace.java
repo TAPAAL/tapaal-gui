@@ -73,32 +73,6 @@ public abstract class TimedPlace {
         }
     }
 
-    public boolean hasUntimedPreset() {
-        return hasUntimedPreset(true);
-    }
-
-    private boolean hasUntimedPreset(boolean cascade) {
-        for (TimedInputArc arc : preset) {
-            if (!arc.interval().equals(TimeInterval.ZERO_INF)) {
-                return false;
-            }
-        }
-        for (TransportArc arc : transportArcsGoingThrough) {
-            if (!arc.interval().equals(TimeInterval.ZERO_INF)) {
-                return false;
-            }
-        }
-        if (cascade && isShared()) {
-            for (TimedPlace place : sharedPlace.getPlaces()) {
-                if (!place.hasUntimedPreset(false)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     public void addToPreset(TimedInputArc arc) {
         Require.that(arc != null, "Cannot add null to preset");
         preset.add(arc);
@@ -109,7 +83,6 @@ public abstract class TimedPlace {
         postset.add(arc);
     }
 
-
     public void removeFromPreset(TimedInputArc arc) {
         preset.remove(arc);
     }
@@ -118,7 +91,7 @@ public abstract class TimedPlace {
         postset.remove(arc);
     }
 
-    public void addTransportArcGoingThrough(TransportArc arc) {
+    public void addTransportArc(TransportArc arc) {
         Require.that(arc != null, "Cannot add null to preset");
         transportArcsGoingThrough.add(arc);
     }
@@ -141,30 +114,6 @@ public abstract class TimedPlace {
 
     public int postsetSize() {
         return postset.size() + transportArcsGoingThrough.size();
-    }
-
-    public boolean hasInhibitorArcs() {
-        return inhibitorArcs.size() > 0;
-    }
-
-    public List<TimedInputArc> getInputArcs(){
-        return preset;
-    }
-
-    public List<TimedOutputArc> getOutputArcs() {
-        return postset;
-    }
-
-    public List<TransportArc> getTransportArcsGoingThrough(){
-        return transportArcsGoingThrough;
-    }
-
-    public int getNumberOfTransportArcsGoingThrough() {
-        return transportArcsGoingThrough.size();
-    }
-
-    public List<TimedInhibitorArc> getInhibitorArcs() {
-        return inhibitorArcs;
     }
 
 //	public abstract void addInhibitorArc(TimedInhibitorArc arc);
