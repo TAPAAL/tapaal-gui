@@ -233,8 +233,11 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public void translate(int x, int y) {
-		this.setPointLocation(getPositionX() + x, getPositionY() + y);
-		myArcPath.updateArc();
+	    //We should ingnore move of the endpoints (linked to source/target)
+	    if (!isEndPoint()) {
+            this.setPointLocation(getPositionX() + x, getPositionY() + y);
+            myArcPath.updateArc();
+        }
 	}
 
 	@Override
