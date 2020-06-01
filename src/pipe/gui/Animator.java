@@ -485,8 +485,9 @@ public class Animator {
 	}
 
 	private void addMarking(TAPNNetworkTraceStep action, NetworkMarking marking) {
-		if (currentAction < actionHistory.size() - 1)
-			removeStoredActions(currentAction + 1);
+		if (currentAction < actionHistory.size() - 1) {
+            removeStoredActions(currentAction + 1);
+        }
 
 		tab.network().setMarking(marking);
 		tab.getAnimationHistory().addHistoryItem(action.toString());
