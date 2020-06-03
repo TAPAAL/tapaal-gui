@@ -75,29 +75,34 @@ public class MakePlaceSharedCommand extends Command {
 		for(TimedInputArc arc : tapn.inputArcs()){
 			if(arc.source().equals(toReplace)){
 				arc.setSource(replacement);
+				replacement.addInputArc(arc);
 			}
 		}
 		
 		for(TimedInhibitorArc arc : tapn.inhibitorArcs()){
 			if(arc.source().equals(toReplace)){
 				arc.setSource(replacement);
-			}
+                replacement.addInhibitorArc(arc);
+            }
 		}
 		
 		for(TransportArc arc : tapn.transportArcs()){
 			if(arc.source().equals(toReplace)){
 				arc.setSource(replacement);
-			}
+                replacement.addTransportArc(arc);
+            }
 			
 			if(arc.destination().equals(toReplace)){
 				arc.setDestination(replacement);
-			}
+                replacement.addTransportArc(arc);
+            }
 		}
 		
 		for(TimedOutputArc arc : tapn.outputArcs()){
 			if(arc.destination().equals(toReplace)){
 				arc.setDestination(replacement);
-			}
+                replacement.addOutputArc(arc);
+            }
 		}
 	}
 	

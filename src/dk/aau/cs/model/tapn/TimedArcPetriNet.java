@@ -75,7 +75,7 @@ public class TimedArcPetriNet {
 		
 		arc.setModel(this);
 		inputArcs.add(arc);
-		arc.source().addToPreset(arc);
+		arc.source().addInputArc(arc);
 		arc.destination().addToPreset(arc);
 	}
 
@@ -91,7 +91,7 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		outputArcs.add(arc);
 		arc.source().addToPostset(arc);
-        arc.destination().addToPostset(arc);
+        arc.destination().addOutputArc(arc);
     }
 
 	public void add(TimedInhibitorArc arc) {
@@ -151,7 +151,7 @@ public class TimedArcPetriNet {
 		boolean removed = inputArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-            arc.source().removeFromPreset(arc);
+            arc.source().removeInputArc(arc);
             arc.destination().removeFromPreset(arc);
         }
 	}
@@ -160,7 +160,7 @@ public class TimedArcPetriNet {
 		boolean removed = transportArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-            arc.destination().removeTransportArcGoingThrough(arc);
+            arc.destination().removeTransportArc(arc);
             arc.transition().removeTransportArcGoingThrough(arc);
 		}
 	}
@@ -170,7 +170,7 @@ public class TimedArcPetriNet {
 		if (removed) {
 			arc.setModel(null);
             arc.source().removeFromPostset(arc);
-            arc.destination().removeFromPostset(arc);
+            arc.destination().removeOutputArc(arc);
 		}
 	}
 
@@ -565,7 +565,6 @@ public class TimedArcPetriNet {
                 orphans.add(place);
             }
         }
-
         return orphans;
     }
 	

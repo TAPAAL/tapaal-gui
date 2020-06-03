@@ -1133,7 +1133,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void showStatistics() {
-		StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
+        StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
 	}
 
 	@Override

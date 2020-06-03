@@ -11,7 +11,7 @@ public abstract class TimedPlace {
     private SharedPlace sharedPlace;
     private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
     private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
-    private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
+    private List<TransportArc> transportArcs = new ArrayList<TransportArc>();
     private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 
     public enum PlaceType{
@@ -66,38 +66,34 @@ public abstract class TimedPlace {
 	}
 
     public boolean isOrphan() {
-        if (isShared()) {
-            return sharedPlace.isOrphan();
-        } else {
-            return presetSize() == 0 && postsetSize() == 0;
-        }
+        return presetSize() == 0 && postsetSize() == 0;
     }
 
-    public void addToPreset(TimedInputArc arc) {
+    public void addInputArc(TimedInputArc arc) {
         Require.that(arc != null, "Cannot add null to preset");
         preset.add(arc);
     }
 
-    public void addToPostset(TimedOutputArc arc) {
+    public void addOutputArc(TimedOutputArc arc) {
         Require.that(arc != null, "Cannot add null to postset");
         postset.add(arc);
     }
 
-    public void removeFromPreset(TimedInputArc arc) {
+    public void removeInputArc(TimedInputArc arc) {
         preset.remove(arc);
     }
 
-    public void removeFromPostset(TimedOutputArc arc) {
+    public void removeOutputArc(TimedOutputArc arc) {
         postset.remove(arc);
     }
 
     public void addTransportArc(TransportArc arc) {
         Require.that(arc != null, "Cannot add null to preset");
-        transportArcsGoingThrough.add(arc);
+        transportArcs.add(arc);
     }
 
-    public void removeTransportArcGoingThrough(TransportArc arc) {
-        transportArcsGoingThrough.remove(arc);
+    public void removeTransportArc(TransportArc arc) {
+        transportArcs.remove(arc);
     }
 
     public void addInhibitorArc(TimedInhibitorArc arc) {
@@ -109,11 +105,11 @@ public abstract class TimedPlace {
     }
 
     public int presetSize() {
-        return preset.size() + transportArcsGoingThrough.size();
+        return preset.size() + transportArcs.size() + inhibitorArcs.size();
     }
 
     public int postsetSize() {
-        return postset.size() + transportArcsGoingThrough.size();
+        return postset.size() + transportArcs.size() + inhibitorArcs.size();
     }
 
 //	public abstract void addInhibitorArc(TimedInhibitorArc arc);
