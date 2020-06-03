@@ -218,13 +218,4 @@ public class SharedPlace extends TimedPlace{
 	public List<TimedPlace> getPlaces() {
 	    return places;
     }
-
-    public boolean isOrphan() {
-        for (TimedPlace place : places) {
-            if (place.presetSize() > 0 || place.postsetSize() > 0) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
