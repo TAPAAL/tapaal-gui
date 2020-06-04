@@ -115,8 +115,8 @@ public class RunVerification extends RunVerificationBase {
         for (int i = 0; i < statsStrings.length; i++) {
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
-            gbc.gridy = i + 1;
-            gbc.insets = new Insets(0,0,15,0);
+            gbc.gridy = i+1;
+            gbc.insets = new Insets(0,0,0,0);
             gbc.anchor = GridBagConstraints.WEST;
             JLabel statLabel = new JLabel(statsStrings[i]);
             statLabel.setToolTipText(explanations[i]);
