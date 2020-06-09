@@ -41,10 +41,8 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.widgets.*;
 import net.tapaal.swinghelpers.JSplitPaneFix;
-import pipe.gui.widgets.QueryPane;
-import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.util.Require;
@@ -1190,19 +1188,38 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     @Override
-    public void openComposedNet() {
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true);
+    public void mergeNetComponents() {
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+
+        int openCTLDialog = JOptionPane.YES_OPTION;
+        boolean inlineConstants = false;
+
+        if(!tapnNetwork.constants().isEmpty()){
+            Object[] options = {
+                "Yes",
+                "No"};
+
+            String optionText = "Do you want to replace constants with values?";
+            openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if(openCTLDialog == JOptionPane.YES_OPTION){
+                inlineConstants = true;
+            } else if(openCTLDialog == JOptionPane.NO_OPTION){
+                network.setConstants(tapnNetwork.constants());
+            }
+        }
+
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
         ArrayList<Template> templates = new ArrayList<Template>(1);
 
         templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 
-        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+
 
         network.add(transformedModel.value1());
 
-        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants());
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();

@@ -91,7 +91,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
 	private GuiAction smartDrawAction;
-	private GuiAction openComposedDialogAction;
+	private GuiAction mergeComponentsDialogAction;
 	private GuiAction stripTimeDialogAction;
 
 	private GuiAction zoomOutAction;
@@ -702,13 +702,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		stripTimeDialog.setMnemonic('e');
 		toolsMenu.add(stripTimeDialog);
 
-        JMenuItem openComposedDialog = new JMenuItem(openComposedDialogAction = new GuiAction("Open composed net", "Export an xml file of composed net and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
+        JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction = new GuiAction("Merge net components", "Export an xml file of composed net and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
             public void actionPerformed(ActionEvent e) {
-                currentTab.ifPresent(TabContentActions::openComposedNet);
+                currentTab.ifPresent(TabContentActions::mergeNetComponents);
             }
         });
-        openComposedDialog.setMnemonic('c');
-        toolsMenu.add(openComposedDialog);
+        mergeComponentsDialog.setMnemonic('c');
+        toolsMenu.add(mergeComponentsDialog);
 
 		toolsMenu.addSeparator();
 
@@ -956,7 +956,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
 			smartDrawAction.setEnabled(true);
-            openComposedDialogAction.setEnabled(true);
+            mergeComponentsDialogAction.setEnabled(true);
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
 
@@ -1007,7 +1007,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			verifyAction.setEnabled(false);
 			
 			smartDrawAction.setEnabled(false);
-            openComposedDialogAction.setEnabled(false);
+            mergeComponentsDialogAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1051,7 +1051,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			nextcomponentAction.setEnabled(false);
 			
 			smartDrawAction.setEnabled(false);
-            openComposedDialogAction.setEnabled(false);
+            mergeComponentsDialogAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 

@@ -49,7 +49,7 @@ public interface TabContentActions {
 
     void workflowAnalyse();
 
-    void openComposedNet();
+    void mergeNetComponents();
 
     File getFile();
 
