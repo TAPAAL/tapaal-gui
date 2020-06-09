@@ -110,6 +110,21 @@ public class RunVerification extends RunVerificationBase {
 		return buffer.toString();
 	}
 
+	private void displayStats(JPanel panel, String stats, String[] explanations){
+        String[] statsStrings = stats.split(System.getProperty("line.separator"));
+        for (int i = 0; i < statsStrings.length; i++) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = i+1;
+            gbc.insets = new Insets(0,0,0,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            JLabel statLabel = new JLabel(statsStrings[i]);
+            statLabel.setToolTipText(explanations[i]);
+            panel.add(statLabel, gbc);
+        }
+
+    }
+
 
 	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
@@ -243,28 +258,15 @@ public class RunVerification extends RunVerificationBase {
 		boolean isCTLQuery = result.getQueryResult().isCTL;
 
 		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel(toHTML(result.getStatsAsString())), gbc);
-			
-			JButton infoButton = new JButton("Explanation");
-			infoButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE));
-			gbc = new GridBagConstraints();
-			gbc.gridx = 1;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.EAST;
-			panel.add(infoButton, gbc);
+
+            displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations());
 			
 			if(!result.getTransitionStatistics().isEmpty()){
 				JButton transitionStatsButton = new JButton("Transition Statistics");
 				transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 2;
+				gbc.gridy = 4;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
@@ -274,7 +276,7 @@ public class RunVerification extends RunVerificationBase {
 				placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 1;
-				gbc.gridy = 2;
+				gbc.gridy = 4;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(placeStatsButton, gbc);
@@ -284,33 +286,20 @@ public class RunVerification extends RunVerificationBase {
 				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 3;
+				gbc.gridy = 5;
 				gbc.insets = new Insets(0,0,20,-90);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
 			}
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.WEST;
+            displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
 
-            panel.add(new JLabel(toHTML((result.getCTLStatsAsString()))),gbc);
-			JButton infoButton = new JButton("Explanation");
-			infoButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE));
-			gbc = new GridBagConstraints();
-			gbc.gridx = 1;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.EAST;
-			panel.add(infoButton, gbc);
 		}
-		
+
 		if(result.isSolvedUsingStateEquation()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 4;
+			gbc.gridy = 5;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
@@ -318,14 +307,14 @@ public class RunVerification extends RunVerificationBase {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 5;
+		gbc.gridy = 6;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
@@ -339,7 +328,7 @@ public class RunVerification extends RunVerificationBase {
 				&& modelChecker.useDiscreteSemantics()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 10;
+			gbc.gridy = 11;
 			gbc.gridwidth = 2;
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);
