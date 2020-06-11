@@ -61,28 +61,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
             ) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
-			} else {
-				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
-
-				switch (CreateGui.getApp().getMode()) {
-				case ADDTOKEN:
-					if (myObject instanceof TimedPlaceComponent) {
-						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, 1);
-						command.redo();
-						undoManager.addNewEdit(command);
-					}
-					break;
-				case DELTOKEN:
-					if (myObject instanceof TimedPlaceComponent) {
-						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, -1);
-						command.redo();
-						undoManager.addNewEdit(command);
-					} 
-
-					break;
-				default:
-					break;
-				}
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {

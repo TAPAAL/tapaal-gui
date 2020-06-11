@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -16,6 +17,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -1120,6 +1122,40 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (drawingSurface().createArc != null) {
 			PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
 		}
+
+		if (mode == Pipe.ElementType.ADDTOKEN) {
+		    setManager(new AbstractDrawingSurfaceManager() {
+                @Override
+                public void registerEvents() {
+                    registerEvent(
+                        e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                        e -> placeClicked((TimedPlaceComponent)e.pno)
+                    );
+                }
+                public void placeClicked(TimedPlaceComponent pno) {
+                    Command command = new TimedPlaceMarkingEdit(pno, 1);
+                    command.redo();
+                    undoManager.addNewEdit(command);
+                }
+            });
+		} else if(mode == Pipe.ElementType.DELTOKEN) {
+            setManager(new AbstractDrawingSurfaceManager() {
+                @Override
+                public void registerEvents() {
+                    registerEvent(
+                        e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                        e -> placeClicked((TimedPlaceComponent)e.pno)
+                    );
+                }
+                public void placeClicked(TimedPlaceComponent pno) {
+                    Command command = new TimedPlaceMarkingEdit(pno, -1);
+                    command.redo();
+                    undoManager.addNewEdit(command);
+                }
+            });
+        } else {
+		    setManager(notingManager);
+        }
 
 		if (mode == Pipe.ElementType.SELECT) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
