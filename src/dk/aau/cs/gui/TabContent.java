@@ -267,7 +267,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		this.setBorder(null); // avoid multiple borders
 		this.setDividerSize(8);
 		//XXX must be after the animationcontroller is created
-		animationModeController = new CanvasAnimationController(getAnimator(), getAnimationController());
+		animationModeController = new CanvasAnimationController(getAnimator());
 	}
 	
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -1492,12 +1492,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
-		private final AnimationController animationController;
 
-		public CanvasAnimationController(Animator animator, AnimationController animationController) {
+        public CanvasAnimationController(Animator animator) {
 			this.animator = animator;
-			this.animationController = animationController;
-		}
+        }
 
 		@Override
 		public void registerEvents() {
@@ -1520,7 +1518,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 			if (transition.isDEnabled()) {
 				animator.dFireTransition(transition);
-				animationController.setAnimationButtonsEnabled();
 			}
 		}
 
