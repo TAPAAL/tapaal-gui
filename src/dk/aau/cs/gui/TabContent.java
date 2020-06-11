@@ -862,7 +862,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (enable != templateExplorer.isVisible()) {
 
 			editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
-			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
 
 			if (animatorSplitPane != null) {
 				animatorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
@@ -870,6 +869,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			makeSureEditorPanelIsVisible(templateExplorer);
 		}
 	}
+
+	public void showSharedPT(boolean enable) {
+	    if (enable != sharedPTPanel.isVisible()) {
+            editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
+            makeSureEditorPanelIsVisible(sharedPTPanel);
+        }
+    }
 
 	public void showQueries(boolean enable) {
 		if (enable != queries.isVisible()) {

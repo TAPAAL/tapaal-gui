@@ -112,7 +112,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private GuiAction transportArcAction;
 
 	private GuiAction showTokenAgeAction;
-	private GuiAction showComponentsAction;
+    private GuiAction showComponentsAction;
+    private GuiAction showSharedPTAction;
 	private GuiAction showQueriesAction;
 	private GuiAction showConstantsAction;
 	private GuiAction showZeroToInfinityIntervalsAction;
@@ -465,49 +466,56 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		};
 		addCheckboxMenuItem(viewMenu, showComponentsAction);
 
-		showQueriesAction = new GuiAction("Display queries", "Show/hide verification queries.", KeyStroke.getKeyStroke('2', shortcutkey), true) {
+		showSharedPTAction = new GuiAction("Display shared places/transitions", "Show/hide the list of shared places/transitions.", KeyStroke.getKeyStroke('2', shortcutkey), true) {
+            public void actionPerformed(ActionEvent e) {
+                guiFrameController.ifPresent(GuiFrameControllerActions::toggleSharedPT);
+            }
+        };
+        addCheckboxMenuItem(viewMenu, showSharedPTAction);
+
+        showQueriesAction = new GuiAction("Display queries", "Show/hide verification queries.", KeyStroke.getKeyStroke('3', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleQueries);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showQueriesAction);
 
-		showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('3', shortcutkey), true) {
+		showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('4', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showConstantsAction);
 
-		showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('4', shortcutkey), true) {
+		showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('5', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction);
 
-		showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('5', shortcutkey), true) {
+		showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('6', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleDelayEnabledTransitions);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showDelayEnabledTransitionsAction);
 
-		showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('6', shortcutkey), true) {
+		showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('7', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
 			}
 		};
 		showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction);
 
-		showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('7', shortcutkey), true) {
+		showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('8', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
 			}
 		};
 		addCheckboxMenuItem(viewMenu, showToolTipsAction);
 
-		showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('8', shortcutkey), true) {
+		showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('9', shortcutkey), true) {
 			public void actionPerformed(ActionEvent e) {
 				guiFrameController.ifPresent(GuiFrameControllerActions::toggleTokenAge);
 			}
@@ -974,6 +982,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             alignToGrid.setEnabled(false);
 
+            showSharedPTAction.setEnabled(false);
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
 
@@ -1083,6 +1092,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		alignToGrid.setEnabled(enable);
 
 		showComponentsAction.setEnabled(enable);
+		showSharedPTAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
@@ -1093,7 +1103,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		showAdvancedWorkspaceAction.setEnabled(enable);
 		showSimpleWorkspaceAction.setEnabled(enable);
 		saveWorkSpaceAction.setEnabled(enable);
-
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -1259,7 +1268,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		showComponentsAction.setSelected(b);
 	}
 
-	@Override
+    @Override
+    public void setShowSharedPTSelected(boolean b) {
+        showSharedPTAction.setSelected(b);
+    }
+
+    @Override
 	public void setShowConstantsSelected(boolean b) {
 		showConstantsAction.setSelected(b);
 	}

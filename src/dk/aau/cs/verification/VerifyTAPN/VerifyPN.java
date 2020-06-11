@@ -63,27 +63,20 @@ public class VerifyPN implements ModelChecker{
 		public boolean supportsStats(){
 			return true;
 		}
-		
-		public String getStatsExplanation(){
-			StringBuilder buffer = new StringBuilder("<html>");
-			if(ctlOutput){
-				buffer.append("The number of configurations, markings and hyper-edges explored during<br />" +
-						"the on-the-fly generation of the dependency graph for the given net and<br />" +
-						"query before a conclusive answer was reached.");
-				buffer.append("</html>");
-			} else {
-				buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
-				buffer.append("time a successor is calculated, this number is incremented)<br/>");
-				buffer.append("<br/>");
-				buffer.append("<b>Explored markings:</b> The number of markings taken out<br/>");
-				buffer.append("of the waiting list during the search.<br />");
-				buffer.append("<br/>");
-				buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
-				buffer.append("passed/waiting list at the end of verification.<br />");
-				buffer.append("</html>");
-			}
-			return buffer.toString();
-		}
+
+        public String[] getStatsExplanations(){
+            String[] explanations = new String[3];
+            if(ctlOutput){
+                explanations[0] = "The number of configurations explored during the on-the-fly generation of the dependency graph for the given net and query before a conclusive answer was reached.";
+                explanations[1] = "The number of markings explored during the on-the-fly generation of the dependency graph for the given net and query before a conclusive answer was reached.";
+                explanations[2] = "The number of hyper-edges explored during the on-the-fly generation of the dependency graph for the given net and query before a conclusive answer was reached.";
+            } else {
+                explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
+                explanations[1] = "The number of markings taken out of the waiting list during the search.";
+                explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+            }
+            return explanations;
+        }
 
 		public String getPath() {
 			return verifypnpath;
