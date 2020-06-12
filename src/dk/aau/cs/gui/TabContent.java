@@ -7,7 +7,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
-import java.util.function.Predicate;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -60,25 +59,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
-		TabContent tab = new TabContent();
-		tab.setInitialName(name);
 
-		try {
+	    try {
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
-			tab.setNetwork(loadedModel.network(), loadedModel.templates());
-			tab.setQueries(loadedModel.queries());
-			tab.setConstants(loadedModel.network().constants());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
+            tab.setInitialName(name);
 
 			tab.selectFirstElements();
 
 			tab.setFile(null);
+			return tab;
 		} catch (Exception e) {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
-		return tab;
 	}
 
 	public static TabContent createNewEmptyTab(String name){
@@ -98,14 +94,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 */
 
 	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
-		TabContent tab = new TabContent();
-
-		String name = null;
-
-		if (file != null) {
-			name = file.getName().replaceAll(".pnml", ".tapn");
-		}
-		tab.setInitialName(name);
 
 		if (file != null) {
 			try {
@@ -114,6 +102,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
+
+                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
+
+                String name = null;
+
+                if (file != null) {
+                    name = file.getName().replaceAll(".pnml", ".tapn");
+                }
+                tab.setInitialName(name);
 
 
 				tab.setNetwork(loadedModel.network(), loadedModel.templates());
@@ -124,15 +121,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				tab.setMode(Pipe.ElementType.SELECT);
 
+                //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
+                name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
+                return tab;
 
 			} catch (Exception e) {
 				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
 			}
 		}
-
-		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		return tab;
+		return null;
 	}
 
 	/**
@@ -226,49 +223,57 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
-	public TabContent() {
-		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-			guiModels.put(net, new DataLayer());
-			zoomLevels.put(net, new Zoomer());
-			hasPositionalInfos.put(net, Boolean.FALSE);
-		}
-		
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
-		drawingSurfaceScroller = new JScrollPane(drawingSurface);
-		// make it less bad on XP
-		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		drawingSurfaceScroller.setWheelScrollingEnabled(true);
-		drawingSurfaceScroller.getVerticalScrollBar().setUnitIncrement(10);
-		drawingSurfaceScroller.getHorizontalScrollBar().setUnitIncrement(10);
+	private TabContent() {
+        for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
+            guiModels.put(net, new DataLayer());
+            zoomLevels.put(net, new Zoomer());
+            hasPositionalInfos.put(net, Boolean.FALSE);
+        }
 
-		// Make clicking the drawing area move focus to GuiFrame
-		drawingSurface.addMouseListener(new MouseAdapter() {	
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CreateGui.getApp().requestFocus();
-			}
-		});
-		
-		drawingSurfaceDummy = new JPanel(new GridBagLayout());
-		GridBagConstraints gc=new GridBagConstraints();
-		gc.fill=GridBagConstraints.HORIZONTAL;
-		gc.gridx=0;
-		gc.gridy=0;
-		drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
-		
-		createEditorLeftPane();
-		createAnimatorSplitPane();
+        drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
+        drawingSurfaceScroller = new JScrollPane(drawingSurface);
+        // make it less bad on XP
+        drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        drawingSurfaceScroller.setWheelScrollingEnabled(true);
+        drawingSurfaceScroller.getVerticalScrollBar().setUnitIncrement(10);
+        drawingSurfaceScroller.getHorizontalScrollBar().setUnitIncrement(10);
 
-		this.setOrientation(HORIZONTAL_SPLIT);
-		this.setLeftComponent(editorSplitPaneScroller);
-		this.setRightComponent(drawingSurfaceScroller);
+        // Make clicking the drawing area move focus to GuiFrame
+        drawingSurface.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                CreateGui.getApp().requestFocus();
+            }
+        });
 
-		this.setContinuousLayout(true);
-		this.setOneTouchExpandable(true);
-		this.setBorder(null); // avoid multiple borders
-		this.setDividerSize(8);
-		//XXX must be after the animationcontroller is created
-		animationModeController = new CanvasAnimationController(getAnimator());
+        drawingSurfaceDummy = new JPanel(new GridBagLayout());
+        GridBagConstraints gc=new GridBagConstraints();
+        gc.fill=GridBagConstraints.HORIZONTAL;
+        gc.gridx=0;
+        gc.gridy=0;
+        drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
+
+        createEditorLeftPane();
+        createAnimatorSplitPane();
+
+        this.setOrientation(HORIZONTAL_SPLIT);
+        this.setLeftComponent(editorSplitPaneScroller);
+        this.setRightComponent(drawingSurfaceScroller);
+
+        this.setContinuousLayout(true);
+        this.setOneTouchExpandable(true);
+        this.setBorder(null); // avoid multiple borders
+        this.setDividerSize(8);
+        //XXX must be after the animationcontroller is created
+        animationModeController = new CanvasAnimationController(getAnimator());
+    }
+
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
+        this();
+
+        setNetwork(network, templates);
+        setQueries(tapnqueries);
+        setConstants(network().constants());
 	}
 	
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -795,7 +800,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return queries.getQueries();
 	}
 
-	public void setQueries(Iterable<TAPNQuery> queries) {
+	private void setQueries(Iterable<TAPNQuery> queries) {
 		this.queries.setQueries(queries);
 	}
 
@@ -807,11 +812,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		queries.addQuery(query);
 	}
 
-	public void setConstants(Iterable<Constant> constants) {
+	private void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
 	}
 
-	public void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
+	private void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
 		Require.that(network != null, "network cannot be null");
 		tapnNetwork = network;
 
