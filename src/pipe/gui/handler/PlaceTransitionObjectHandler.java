@@ -252,52 +252,20 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				);
 
 				// else source is a place (not transition)
+                sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
+                removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
 			} else {
 
-				// Set underlying TimedInputArc
-				TimedInputArcComponent timedArc = (TimedInputArcComponent) timedArcToCreate;
-				try {
-
-				    // Should be check in model
-                    if(view.getModel().hasArcFromPlaceToTransition(((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(), ((TimedTransitionComponent) timedArc.getTarget()).underlyingTransition())){
-                        throw new RequireException("Cannot have two arcs between the same place and transition");
-                    }
-
-					TimedInputArc tia = new TimedInputArc(
-							((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(),
-							((TimedTransitionComponent) timedArc.getTarget()).underlyingTransition(),
-							TimeInterval.ZERO_INF
-                    );
-
-					view.getModel().add(tia);
-					timedArc.setUnderlyingArc(tia);
-
-				} catch (RequireException ex) {
-					cleanupArc(timedArcToCreate, view);
-					JOptionPane.showMessageDialog(
-									CreateGui.getApp(),
-									"There was an error drawing the arc. Possible problems:\n"
-											+ " - There is already an arc between the selected place and transition\n"
-											+ " - You are attempting to draw an arc between a shared transition and a shared place",
-									"Error", JOptionPane.ERROR_MESSAGE
-                    );
-					return;
-				}
-
-				undoManager.newEdit(); // new "transaction""
-
-				undoManager.addEdit(
-					new AddTimedInputArcCommand(
-						(TimedInputArcComponent) timedArcToCreate,
-						view.getModel(),
-						view.getGuiModel()
-					)
-				);
+                CreateGui.getDrawingSurface().removePrototype(timedArcToCreate);
+                CreateGui.getCurrentTab().guiModelManager.addTimedInputArc(
+                    view.getGuiModel(),
+                    (TimedPlaceComponent)timedArcToCreate.getSource(),
+                    (TimedTransitionComponent)timedArcToCreate.getTarget(),
+                    null
+                );
 
 			}
 
-			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
-			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
 
 		}
 	}

@@ -33,6 +33,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
@@ -60,7 +61,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private final UndoManager undoManager = new UndoManager();
 
-	private final GuiModelManager guiModelManager = new GuiModelManager();
+	public final GuiModelManager guiModelManager = new GuiModelManager();
 	public class GuiModelManager {
 	    public GuiModelManager(){
 
@@ -98,6 +99,44 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (pnObject.enableEditMode(true)) {
                 c.addPetriNetObject(pnObject);
                 getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, c));
+            }
+        }
+
+        public void addTimedInputArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (!modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition())) {
+
+                TimedInputArc tia = new TimedInputArc(
+                    p.underlyingPlace(),
+                    t.underlyingTransition(),
+                    TimeInterval.ZERO_INF
+                );
+
+                TimedInputArcComponent tiac = new TimedInputArcComponent(p,t,tia);
+
+                Command edit = new AddTimedInputArcCommand(
+                    tiac,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+
+                undoManager.addNewEdit(edit);
+
+            }  else {
+                //TODO: can't have two arcs between place and transition
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
             }
         }
 
