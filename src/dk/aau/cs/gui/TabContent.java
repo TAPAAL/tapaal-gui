@@ -36,8 +36,7 @@ import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
-import pipe.gui.undo.ChangeSpacingEdit;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.undo.*;
 import pipe.gui.widgets.ConstantsPane;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
@@ -1123,38 +1122,53 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
 		}
 
-		if (mode == Pipe.ElementType.ADDTOKEN) {
-		    setManager(new AbstractDrawingSurfaceManager() {
-                @Override
-                public void registerEvents() {
-                    registerEvent(
-                        e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
-                        e -> placeClicked((TimedPlaceComponent)e.pno)
-                    );
-                }
-                public void placeClicked(TimedPlaceComponent pno) {
-                    Command command = new TimedPlaceMarkingEdit(pno, 1);
-                    command.redo();
-                    undoManager.addNewEdit(command);
-                }
-            });
-		} else if(mode == Pipe.ElementType.DELTOKEN) {
-            setManager(new AbstractDrawingSurfaceManager() {
-                @Override
-                public void registerEvents() {
-                    registerEvent(
-                        e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
-                        e -> placeClicked((TimedPlaceComponent)e.pno)
-                    );
-                }
-                public void placeClicked(TimedPlaceComponent pno) {
-                    Command command = new TimedPlaceMarkingEdit(pno, -1);
-                    command.redo();
-                    undoManager.addNewEdit(command);
-                }
-            });
-        } else {
-		    setManager(notingManager);
+        switch (mode) {
+            case ADDTOKEN:
+                setManager(new AbstractDrawingSurfaceManager() {
+                    @Override
+                    public void registerEvents() {
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                        );
+                    }
+
+                    public void placeClicked(TimedPlaceComponent pno) {
+                        Command command = new TimedPlaceMarkingEdit(pno, 1);
+                        command.redo();
+                        undoManager.addNewEdit(command);
+                    }
+                });
+                break;
+            case DELTOKEN:
+                setManager(new AbstractDrawingSurfaceManager() {
+                    @Override
+                    public void registerEvents() {
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                        );
+                    }
+
+                    public void placeClicked(TimedPlaceComponent pno) {
+                        Command command = new TimedPlaceMarkingEdit(pno, -1);
+                        command.redo();
+                        undoManager.addNewEdit(command);
+                    }
+                });
+                break;
+            case TAPNPLACE:
+                setManager(new CanvasPlaceDrawController());
+                break;
+            case TAPNTRANS:
+                setManager(new CanvasTransitionDrawController());
+                break;
+            case ANNOTATION:
+                setManager(new CanvasAnnotationNoteDrawController());
+                break;
+            default:
+                setManager(notingManager);
+                break;
         }
 
 		if (mode == Pipe.ElementType.SELECT) {
@@ -1525,6 +1539,70 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return null;
 	}
 
+	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMouseClicked(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(canvas.getNameGenerator().getNewPlaceName(canvas.getModel()));
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
+            canvas.getModel().add(tp);
+            canvas.getGuiModel().addPetriNetObject(pnObject);
+
+            getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, canvas.getModel(), canvas.getGuiModel()));
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMouseClicked(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(canvas.getNameGenerator().getNewTransitionName(canvas.getModel()));
+
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
+
+            canvas.getModel().add(transition);
+            canvas.getGuiModel().addPetriNetObject(pnObject);
+
+            getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, canvas.getModel(), canvas.getGuiModel()));
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMouseClicked(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
+
+            //enableEditMode open editor, retuns true of text added, else false
+            //If no text is added,dont add it to model
+            if (pnObject.enableEditMode(true)) {
+                canvas.getGuiModel().addPetriNetObject(pnObject);
+                getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, canvas.getGuiModel()));
+            }
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
 	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
@@ -1579,7 +1657,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         //De-register old manager
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
-		managerRef.get().registerManager();
+		managerRef.get().registerManager(drawingSurface);
     }
 
     //XXX: A quick function made while refactoring to test if the tab is currently

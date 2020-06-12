@@ -366,6 +366,31 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         repaint();
     }
 
+    public Point adjustPointToZoom(Point p, int zoom) {
+        //Converts center coord to upperleft coord
+        int offset = (int) (Zoomer.getScaleFactor(zoom)
+            * Pipe.PLACE_TRANSITION_HEIGHT / 2);
+
+        int x = Zoomer.getUnzoomedValue(p.x - offset, zoom);
+        int y = Zoomer.getUnzoomedValue(p.y - offset, zoom);
+
+        p.setLocation(x, y);
+        return p;
+    }
+    public Point adjustPointToGrid(Point p) {
+        int x = Grid.getModifiedX(p.x);
+        int y = Grid.getModifiedY(p.y);
+
+        return new Point(x, y);
+    }
+
+    public Point adjustPointToGridAndZoom(Point p, int zoom) {
+        Point newP = adjustPointToZoom(p, zoom);
+        newP = adjustPointToGrid(newP);
+
+        return newP;
+    }
+
     class MouseHandler extends MouseInputAdapter {
 
 		private DrawingSurfaceImpl view;
@@ -478,17 +503,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 				switch (mode) {
 					case TAPNPLACE: // create place
-						newTimedPlaceAddToModelView(clickPoint);
+						//newTimedPlaceAddToModelView(clickPoint);
 
 						break;
 
 					case TAPNTRANS: // create transition
-						newTAPNTransitionAddToModelView(clickPoint);
+						//newTAPNTransitionAddToModelView(clickPoint);
 
 						break;
 
 					case ANNOTATION:
-						newAnnotationNoteAddToModelView(clickPoint);
+						//newAnnotationNoteAddToModelView(clickPoint);
 						break;
 
 					case ARC:
