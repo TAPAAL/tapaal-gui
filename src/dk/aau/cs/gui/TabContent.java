@@ -48,12 +48,12 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 public class TabContent extends JSplitPane implements TabContentActions{
 
 	//Model and state
-	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
-	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	private final TimedArcPetriNetNetwork tapnNetwork;
+	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
 
-	private UndoManager undoManager = new UndoManager();
+	private final UndoManager undoManager = new UndoManager();
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
@@ -219,6 +219,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 	private TabContent() {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>());
+    }
+
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates) {
+
+        Require.that(network != null, "network cannot be null");
+        tapnNetwork = network;
+
+        guiModels.clear();
+        for (Template template : templates) {
+            addGuiModel(template.model(), template.guiModel());
+            zoomLevels.put(template.model(), template.zoomer());
+            hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+        }
 
         drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
         drawingSurfaceScroller = new JScrollPane(drawingSurface);
@@ -259,7 +273,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this();
+        this(network, templates);
 
         setNetwork(network, templates);
         setQueries(tapnqueries);
@@ -807,15 +821,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
-		Require.that(network != null, "network cannot be null");
-		tapnNetwork = network;
 
-		guiModels.clear();
-		for (Template template : templates) {
-			addGuiModel(template.model(), template.guiModel());
-			zoomLevels.put(template.model(), template.zoomer());
-			hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
-		}
 
 		sharedPTPanel.setNetwork(network);
 		templateExplorer.updateTemplateList();
