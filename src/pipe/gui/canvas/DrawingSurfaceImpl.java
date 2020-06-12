@@ -44,8 +44,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private final TabContent tabContent;
 	private final Reference<AbstractDrawingSurfaceManager> managerRef;
 	private TimedArcPetriNet model;
-	private MouseHandler mouseHandler;
-	private final NameGenerator nameGenerator = new NameGenerator();
+    private final NameGenerator nameGenerator = new NameGenerator();
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
@@ -61,7 +60,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		zoomControl = new Zoomer(100);
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		mouseHandler = new MouseHandler(this);
+        MouseHandler mouseHandler = new MouseHandler(this);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
 		addMouseWheelListener(mouseHandler);
