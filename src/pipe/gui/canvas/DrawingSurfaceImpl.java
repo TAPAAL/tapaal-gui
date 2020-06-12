@@ -37,7 +37,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	private SelectionManager selection;
 
-
 	private GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
@@ -62,7 +61,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		zoomControl = new Zoomer(100);
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		mouseHandler = new MouseHandler(this, dataLayer);
+		mouseHandler = new MouseHandler(this);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
 		addMouseWheelListener(mouseHandler);
@@ -90,7 +89,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		guiModel.addedToView(this);
 
 		nameGenerator.add(model);
-		this.mouseHandler.setModel(guiModel, model);
+
 		this.guiModel = guiModel;
 		this.model = model;
 		this.zoomControl = zoomer;
@@ -395,86 +394,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 		private DrawingSurfaceImpl view;
 
-		private DataLayer guiModel;
+        private Point dragStart;
 
-		private Point dragStart;
-
-		private TimedArcPetriNet model;
-
-		public void setModel(DataLayer newGuiModel, TimedArcPetriNet newModel) {
-			this.guiModel = newGuiModel;
-			this.model = newModel;
-		}
-
-		public MouseHandler(DrawingSurfaceImpl _view, DataLayer _model) {
+		public MouseHandler(DrawingSurfaceImpl _view) {
 			super();
 			view = _view;
-			guiModel = _model;
-		}
-
-		private Point adjustPointToZoom(Point p, int zoom) {
-			int offset = (int) (Zoomer.getScaleFactor(zoom)
-					* Pipe.PLACE_TRANSITION_HEIGHT / 2);
-
-			int x = Zoomer.getUnzoomedValue(p.x - offset, zoom);
-			int y = Zoomer.getUnzoomedValue(p.y - offset, zoom);
-
-			p.setLocation(x, y);
-			return p;
-		}
-		private Point adjustPointToGrid(Point p) {
-			int x = Grid.getModifiedX(p.x);
-			int y = Grid.getModifiedY(p.y);
-
-			return new Point(x, y);
-		}
-
-		private Point adjustPointToGridAndZoom(Point p, int zoom) {
-			Point newP = adjustPointToZoom(p, zoom);
-			newP = adjustPointToGrid(newP);
-
-			return newP;
-		}
-
-		private PlaceTransitionObject newTimedPlaceAddToModelView(Point p) {
-			p = adjustPointToGridAndZoom(p, view.getZoom());
-
-			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
-			TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
-			model.add(tp);
-			guiModel.addPetriNetObject(pnObject);
-
-			tabContent.getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel));
-
-			return pnObject;
-		}
-
-		private PlaceTransitionObject newTAPNTransitionAddToModelView(Point p) {
-			p = adjustPointToGridAndZoom(p, view.getZoom());
-
-			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model));
-
-			TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
-
-			model.add(transition);
-			guiModel.addPetriNetObject(pnObject);
-
-			tabContent.getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
-			return pnObject;
-		}
-
-        private AnnotationNote newAnnotationNoteAddToModelView(Point clickPoint) {
-            Point p = adjustPointToGridAndZoom(clickPoint, view.getZoom());
-
-            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
-
-			//enableEditMode open editor, retuns true of text added, else false
-            //If no text is added,dont add it to model
-            if (pnObject.enableEditMode(true)) {
-                guiModel.addPetriNetObject(pnObject);
-                tabContent.getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
-            }
-            return pnObject;
         }
 
 		@Override
@@ -502,19 +426,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				PlaceTransitionObject newpto; //declared here as switch is one big scope
 
 				switch (mode) {
-					case TAPNPLACE: // create place
-						//newTimedPlaceAddToModelView(clickPoint);
-
-						break;
-
-					case TAPNTRANS: // create transition
-						//newTAPNTransitionAddToModelView(clickPoint);
-
-						break;
-
-					case ANNOTATION:
-						//newAnnotationNoteAddToModelView(clickPoint);
-						break;
 
 					case ARC:
 					case TAPNARC:
