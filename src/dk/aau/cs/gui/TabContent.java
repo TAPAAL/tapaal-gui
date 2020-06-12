@@ -112,11 +112,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
                 tab.setInitialName(name);
 
-
-				tab.setNetwork(loadedModel.network(), loadedModel.templates());
-				tab.setQueries(loadedModel.queries());
-				tab.setConstants(loadedModel.network().constants());
-
 				tab.selectFirstElements();
 
 				tab.setMode(Pipe.ElementType.SELECT);
