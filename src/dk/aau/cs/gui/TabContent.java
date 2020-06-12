@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.xml.crypto.Data;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -49,11 +50,59 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
+
+	//XXX: Replace with bi-map
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
+
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
 
 	private final UndoManager undoManager = new UndoManager();
+
+	private final GuiModelManager guiModelManager = new GuiModelManager();
+	public class GuiModelManager {
+	    public GuiModelManager(){
+
+        }
+
+        public void addNewTimedPlace(DataLayer c, Point p){
+	        Require.notNull(c, "datalyer can't be null");
+            Require.notNull(p, "Point can't be null");
+
+            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
+            guiModelToModel.get(c).add(tp);
+            c.addPetriNetObject(pnObject);
+
+            getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, guiModelToModel.get(c), c));
+
+        }
+
+        public void addNewTimedTransitions(DataLayer c, Point p) {
+            dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
+
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
+
+            guiModelToModel.get(c).add(transition);
+            c.addPetriNetObject(pnObject);
+
+            getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, guiModelToModel.get(c), c));
+        }
+
+        public void addAnnotationNote(DataLayer c, Point p) {
+            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
+
+            //enableEditMode open editor, retuns true of text added, else false
+            //If no text is added,dont add it to model
+            if (pnObject.enableEditMode(true)) {
+                c.addPetriNetObject(pnObject);
+                getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, c));
+            }
+        }
+
+    }
+
 
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
@@ -773,6 +822,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void addTemplate(Template template, boolean updateTemplateExplorer) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
+        guiModelToModel.put(template.guiModel(), template.model());
 		zoomLevels.put(template.model(), template.zoomer());
 		hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 		if (updateTemplateExplorer) {
@@ -786,11 +836,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {
 		guiModels.put(net, guiModel);
+		guiModelToModel.put(guiModel, net);
 	}
 
 	public void removeTemplate(Template template) {
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
+		guiModelToModel.remove(template.guiModel());
 		zoomLevels.remove(template.model());
 		hasPositionalInfos.remove(template.model());
 		templateExplorer.updateTemplateList();
@@ -1546,12 +1598,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMouseClicked(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(canvas.getNameGenerator().getNewPlaceName(canvas.getModel()));
-            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
-            canvas.getModel().add(tp);
-            canvas.getGuiModel().addPetriNetObject(pnObject);
-
-            getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, canvas.getModel(), canvas.getGuiModel()));
+            guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
         }
 
         @Override
@@ -1566,14 +1613,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMouseClicked(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(canvas.getNameGenerator().getNewTransitionName(canvas.getModel()));
-
-            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
-
-            canvas.getModel().add(transition);
-            canvas.getGuiModel().addPetriNetObject(pnObject);
-
-            getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, canvas.getModel(), canvas.getGuiModel()));
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p);
         }
 
         @Override
@@ -1588,14 +1628,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMouseClicked(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
-
-            //enableEditMode open editor, retuns true of text added, else false
-            //If no text is added,dont add it to model
-            if (pnObject.enableEditMode(true)) {
-                canvas.getGuiModel().addPetriNetObject(pnObject);
-                getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, canvas.getGuiModel()));
-            }
+           guiModelManager.addAnnotationNote(drawingSurface.getGuiModel(), p);
         }
 
         @Override
