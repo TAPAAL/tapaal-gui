@@ -219,11 +219,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 	private TabContent() {
-        for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-            guiModels.put(net, new DataLayer());
-            zoomLevels.put(net, new Zoomer());
-            hasPositionalInfos.put(net, Boolean.FALSE);
-        }
 
         drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
         drawingSurfaceScroller = new JScrollPane(drawingSurface);
