@@ -35,17 +35,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	private static final int DRAWING_SURFACE_GROW = 100;
 
-	private SelectionManager selection;
+	private final SelectionManager selection;
 
-	private GuiFrame app = CreateGui.getApp();
+	private final GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
 	private DataLayer guiModel;
-	private TabContent tabContent;
-	private Reference<AbstractDrawingSurfaceManager> managerRef;
+	private final TabContent tabContent;
+	private final Reference<AbstractDrawingSurfaceManager> managerRef;
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
-	private NameGenerator nameGenerator = new NameGenerator();
+	private final NameGenerator nameGenerator = new NameGenerator();
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
