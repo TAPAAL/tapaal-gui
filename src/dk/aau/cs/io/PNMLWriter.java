@@ -162,8 +162,8 @@ public class PNMLWriter implements NetWriter {
 		name.appendChild(nameGraphics);
 		Element nameOffset = document.createElement("offset");
 		nameGraphics.appendChild(nameOffset);
-		nameOffset.setAttribute("x", (inputPlace.getNameOffsetXObject() != null ? String.valueOf(Math.round(inputPlace.getNameOffsetXObject())) : ""));
-		nameOffset.setAttribute("y", (inputPlace.getNameOffsetYObject() != null ? String.valueOf(Math.round(inputPlace.getNameOffsetYObject())) : ""));
+		nameOffset.setAttribute("x", String.valueOf(Math.round(inputPlace.getNameOffsetX())));
+		nameOffset.setAttribute("y", String.valueOf(Math.round(inputPlace.getNameOffsetY())));
 		Element nameText = document.createElement("text");
 		name.appendChild(nameText);
 		nameText.setTextContent(inputPlace.underlyingPlace().name());
@@ -172,8 +172,8 @@ public class PNMLWriter implements NetWriter {
 		placeElement.appendChild(graphics);
 		Element offset = document.createElement("position");
 		graphics.appendChild(offset);
-		offset.setAttribute("x", (inputPlace.getPositionXObject() != null ? String.valueOf(Math.round(inputPlace.getPositionXObject())) : ""));
-		offset.setAttribute("y", (inputPlace.getPositionYObject() != null ? String.valueOf(Math.round(inputPlace.getPositionYObject()))	: ""));
+		offset.setAttribute("x", String.valueOf(Math.round(inputPlace.getPositionX())));
+		offset.setAttribute("y", String.valueOf(Math.round(inputPlace.getPositionY())));
 		
 		Element initialMarking = document.createElement("initialMarking"); //Name
 		placeElement.appendChild(name);
@@ -201,8 +201,8 @@ public class PNMLWriter implements NetWriter {
 		name.appendChild(nameGraphics);
 		Element nameOffset = document.createElement("offset");
 		nameGraphics.appendChild(nameOffset);
-		nameOffset.setAttribute("x", (inputTransition.getNameOffsetXObject() != null ? String.valueOf(Math.round(inputTransition.getNameOffsetXObject())) : ""));
-		nameOffset.setAttribute("y", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(Math.round(inputTransition.getNameOffsetYObject())) : ""));
+		nameOffset.setAttribute("x", String.valueOf(Math.round(inputTransition.getNameOffsetX())));
+		nameOffset.setAttribute("y", String.valueOf(Math.round(inputTransition.getNameOffsetY())));
 		Element nameText = document.createElement("text");
 		name.appendChild(nameText);
 		nameText.setTextContent(inputTransition.underlyingTransition().name());
@@ -211,8 +211,8 @@ public class PNMLWriter implements NetWriter {
 		transitionElement.appendChild(graphics);
 		Element offset = document.createElement("position");
 		graphics.appendChild(offset);
-		offset.setAttribute("x", (inputTransition.getPositionXObject() != null ? String.valueOf(Math.round(inputTransition.getPositionXObject())) : ""));
-		offset.setAttribute("y", (inputTransition.getPositionYObject() != null ? String.valueOf(Math.round(inputTransition.getPositionYObject())) : ""));
+		offset.setAttribute("x", String.valueOf(Math.round(inputTransition.getPositionX())));
+		offset.setAttribute("y", String.valueOf(Math.round(inputTransition.getPositionY())));
 
 		return transitionElement;
 	}

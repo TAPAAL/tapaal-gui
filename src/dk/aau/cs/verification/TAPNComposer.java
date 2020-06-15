@@ -70,9 +70,8 @@ public class TAPNComposer implements ITAPNComposer {
 		DataLayer guiModel = new DataLayer();
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
-
-		double greatestWidth = 0,
-			   greatestHeight = 0;
+		
+		int greatestWidth = 0, greatestHeight = 0;
 		if (this.guiModels != null) {
 			for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
                                 if (isComponentEmpty(this.guiModels.get(tapn1))) { 
@@ -196,7 +195,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			DataLayer currentGuiModel = null;
@@ -247,7 +246,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
                         
@@ -318,7 +317,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 	
-	private ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc, double offsetX, double offsetY) {
+	private ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc, int offsetX, int offsetY) {
 		Arc guiArc = currentGuiModel.getArcByEndpoints(source, target);
 		ArcPath arcPath = guiArc.getArcPath();
 		int arcPathPointsNum = arcPath.getNumPoints();
@@ -338,7 +337,7 @@ public class TAPNComposer implements ITAPNComposer {
 		return newArcPath;
 	}
 
-	private void createInputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createInputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
                         
@@ -379,15 +378,11 @@ public class TAPNComposer implements ITAPNComposer {
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 					
 					Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiSource,
+                        guiSource,
 							guiTarget,
 							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
-							false)
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name())
+                    )
 					);
 					
 					// Build ArcPath
@@ -406,7 +401,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-	private void createOutputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createOutputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			DataLayer currentGuiModel = null;
@@ -434,16 +429,11 @@ public class TAPNComposer implements ITAPNComposer {
 					Place guiTarget = guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 					
 					TimedOutputArcComponent newArc = new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
+                        guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
 							guiModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name())),
 							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-							false
-					);
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name())
+                    );
 					
 					// Build ArcPath
 					Transition oldGuiSource = currentGuiModel.getTransitionByName(arc.source().name());
@@ -461,7 +451,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-	private void createTransportArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createTransportArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		int nextGroupNr = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
@@ -504,16 +494,11 @@ public class TAPNComposer implements ITAPNComposer {
 									
 					TimedTransportArcComponent newInArc = new TimedTransportArcComponent(
 							new TimedInputArcComponent(new TimedOutputArcComponent(
-								0d,
-								0d,
-								0d,
-								0d,
-								guiSourceIn,
+                                guiSourceIn,
 								guiTargetIn,
 								arc.getWeight().value(),
-								mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name()),
-								false
-								)
+								mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(transitionTemplate, arc.transition().name())
+                            )
 							),
 							nextGroupNr, 
 							true
@@ -548,15 +533,11 @@ public class TAPNComposer implements ITAPNComposer {
 					
 					TimedTransportArcComponent newOutArc = new TimedTransportArcComponent(
 							new TimedInputArcComponent(new TimedOutputArcComponent(
-								0d,
-								0d,
-								0d,
-								0d,
-								guiSourceOut,
+                                guiSourceOut,
 								guiTargetOut,
 								1,
-								mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-								false)
+								mapping.map(transitionTemplate, arc.transition().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name())
+                            )
 							),
 							nextGroupNr + 1, 
 							false
@@ -580,7 +561,7 @@ public class TAPNComposer implements ITAPNComposer {
 
 	
 	
-	private void createInhibitorArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createInhibitorArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
                         
@@ -617,16 +598,11 @@ public class TAPNComposer implements ITAPNComposer {
 					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
 					Arc newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
-							0d,
-							0d,
-							0d,
-							0d,
-							guiSource,
+                        guiSource,
 							guiTarget,
 							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name()),
-							false
-							), "");
+							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(destinationTemplate, arc.destination().name())
+                    ), "");
 					
 					// Build ArcPath
 					Place oldGuiSource = currentGuiModel.getPlaceByName(arc.source().name());

@@ -192,7 +192,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.getX(), position.getY(), id, name.point.getX(), name.point.getY());
+			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
 		}
@@ -236,7 +236,7 @@ public class PNMLoader {
 		if(isNetDrawable()){
 			TimedTransitionComponent transitionComponent = 
 				//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-				new TimedTransitionComponent(position.getX(), position.getY(), id, name.point.getX(), name.point.getY(),
+				new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y,
 						true, false, 0, 0);
 			transitionComponent.setUnderlyingTransition(transition);
 			template.guiModel().addPetriNetObject(transitionComponent);
@@ -296,11 +296,11 @@ public class PNMLoader {
 		Arc tempArc;
 		
 		if(type != null && type.equals("inhibitor")) {
-			tempArc = parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
+			tempArc = parseAndAddTimedInhibitorArc(id, sourcePlace, targetTransition, source, target, weight, _endx, _endy, template);
 		} else if(sourcePlace != null && targetTransition != null) {
-			tempArc = parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _startx, _starty, _endx, _endy, template);
+			tempArc = parseInputArc(id, sourcePlace, targetTransition, source, target, weight, _endx, _endy, template);
 		} else if(sourceTransition != null && targetPlace != null) {
-			tempArc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _startx, _starty, _endx, _endy, template);
+			tempArc = parseOutputArc(id,  sourceTransition, targetPlace, source, target, weight, _endx, _endy, template);
 		} else {
 			throw new FormatException("Arcs must be only between places and transitions");
 		}
@@ -410,8 +410,8 @@ public class PNMLoader {
 	}
 	
 	private TimedInputArcComponent parseInputArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
-			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
-			int _endy, Template template) throws FormatException {
+                                                 PlaceTransitionObject target, int weight, int _endx,
+                                                 int _endy, Template template) throws FormatException {
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
 		
@@ -424,9 +424,7 @@ public class PNMLoader {
 		TimedInputArcComponent arc = null;
 		
 		if(isNetDrawable()){
-			arc = new TimedInputArcComponent(new TimedOutputArcComponent(
-				_startx, _starty, _endx, _endy, source, target, weight, arcId,
-				false));
+			arc = new TimedInputArcComponent(new TimedOutputArcComponent(source, target, weight, arcId));
 			arc.setUnderlyingArc(inputArc);
 
 			template.guiModel().addPetriNetObject(arc);
@@ -440,8 +438,8 @@ public class PNMLoader {
 	}
 	
 	private Arc parseOutputArc(String arcId, TimedTransition transition, TimedPlace place, PlaceTransitionObject source,
-			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
-			int _endy, Template template) throws FormatException {
+                               PlaceTransitionObject target, int weight, int _endx,
+                               int _endy, Template template) throws FormatException {
 		
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place, new IntWeight(weight));
 		
@@ -454,8 +452,8 @@ public class PNMLoader {
 		TimedOutputArcComponent arc = null;
 		
 		if(isNetDrawable()){
-			arc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				source, target, weight,	arcId, false);
+			arc = new TimedOutputArcComponent(
+                source, target, weight,	arcId);
 			arc.setUnderlyingArc(outputArc);
 
 			template.guiModel().addPetriNetObject(arc);
@@ -467,11 +465,11 @@ public class PNMLoader {
 	}
 	
 	private Arc parseAndAddTimedInhibitorArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
-			PlaceTransitionObject target, int weight, int _startx, int _starty, int _endx,
-			int _endy, Template template) {
+                                             PlaceTransitionObject target, int weight, int _endx,
+                                             int _endy, Template template) {
 		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
 				new TimedInputArcComponent(
-						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	source, target, weight, arcId, false)
+						new TimedOutputArcComponent(source, target, weight, arcId)
 				),
 				(""));
 		

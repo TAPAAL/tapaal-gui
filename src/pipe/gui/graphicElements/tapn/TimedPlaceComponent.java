@@ -51,7 +51,7 @@ public class TimedPlaceComponent extends Place {
 	private Window ageOfTokensWindow;
 	private Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
+	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
 		listener = timedPlaceListener();		
@@ -62,12 +62,15 @@ public class TimedPlaceComponent extends Place {
 
 	}
 
-	public TimedPlaceComponent(double positionXInput, double positionYInput,
-			String idInput, double nameOffsetXInput,
-			double nameOffsetYInput) {
+	public TimedPlaceComponent(
+	    int positionXInput,
+        int positionYInput,
+        String idInput,
+        int nameOffsetXInput,
+        int nameOffsetYInput
+    ) {
 
-		super(positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput);
+		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 		listener = timedPlaceListener();
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
@@ -427,7 +430,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, getNameOffsetX(), getNameOffsetY());
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY());
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		return placeComponent;

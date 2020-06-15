@@ -29,6 +29,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import dk.aau.cs.gui.TemplateExplorer;
+import dk.aau.cs.gui.undo.MoveElementDownCommand;
+import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
@@ -46,7 +49,7 @@ import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
-public class QueryPane extends JPanel {
+public class QueryPane extends JPanel implements SidePane {
 
 	private JPanel queryCollectionPanel;
 	private JPanel buttonsPanel;
@@ -213,7 +216,9 @@ public class QueryPane extends JPanel {
 				int index = queryList.getSelectedIndex();
 
 				if(index > 0 && queryList.getSelectedIndices().length == 1) {
-					swapQueries(index, index-1);
+                    Command c = new MoveElementUpCommand(QueryPane.this, index, index-1);
+                    undoManager.addNewEdit(c);
+                    c.redo();
 					queryList.setSelectedIndex(index-1);
 				}
 				else
@@ -232,14 +237,17 @@ public class QueryPane extends JPanel {
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int index = queryList.getSelectedIndex();
+                int index = queryList.getSelectedIndex();
 
-				if(index < listModel.size()-1 && queryList.getSelectedIndices().length == 1) {
-					swapQueries(index, index+1);
-					queryList.setSelectedIndex(index+1);
-				}
-				else
-					moveDownButton.setEnabled(false);
+                if(index < listModel.size()-1 && queryList.getSelectedIndices().length == 1) {
+                    Command c = new MoveElementDownCommand(QueryPane.this, index, index+1);
+                    undoManager.addNewEdit(c);
+                    c.redo();
+                    queryList.setSelectedIndex(index+1);
+                }
+                else
+                    moveDownButton.setEnabled(false);
+
 			}
 		});
 
@@ -513,4 +521,17 @@ public class QueryPane extends JPanel {
 	public void verifySelectedQuery() {
 		verifyQuery();
 	}
+
+	@Override
+	public void moveUp(int index){
+        swapQueries(index, index-1);
+    }
+    @Override
+    public void moveDown(int index){
+        swapQueries(index, index+1);
+    }
+    @Override
+    public JList getJList(){
+	    return queryList;
+    }
 }

@@ -36,7 +36,7 @@ public class TimedTransitionComponent extends Transition {
 	private dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
-	public TimedTransitionComponent(double positionXInput, double positionYInput,
+	public TimedTransitionComponent(int positionXInput, int positionYInput,
 			dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
@@ -46,9 +46,9 @@ public class TimedTransitionComponent extends Transition {
 
 	}
 
-	public TimedTransitionComponent(double positionXInput,
-			double positionYInput, String idInput,
-			double nameOffsetXInput, double nameOffsetYInput,
+	public TimedTransitionComponent(int positionXInput,
+			int positionYInput, String idInput,
+			int nameOffsetXInput, int nameOffsetYInput,
 			boolean timedTransition, boolean infServer, int angleInput,
 			int priority) {
 		super(positionXInput, positionYInput, idInput,
@@ -202,7 +202,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;

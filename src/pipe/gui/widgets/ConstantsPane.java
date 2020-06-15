@@ -36,6 +36,8 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.gui.undo.MoveElementDownCommand;
+import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
@@ -45,7 +47,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.components.NonsearchableJList;
 
-public class ConstantsPane extends JPanel {
+public class ConstantsPane extends JPanel implements SidePane {
 
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
@@ -71,7 +73,7 @@ public class ConstantsPane extends JPanel {
 	Timer timer;
 
 
-	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
+	public ConstantsPane(TabContent currentTab) {
 		parent = currentTab;
 
 		constantsPanel = new JPanel(new GridBagLayout());
@@ -186,7 +188,7 @@ public class ConstantsPane extends JPanel {
 		});
 		
 		addConstantsComponents();
-		addConstantsButtons(enableAddButton);
+		addConstantsButtons();
 		
 		constantsList.addFocusListener(new FocusAdapter() {
 			@Override
@@ -289,7 +291,7 @@ public class ConstantsPane extends JPanel {
 		timer.restart();
 	}
 
-	private void addConstantsButtons(boolean enableAddButton) {
+	private void addConstantsButtons() {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditConstant);
@@ -316,7 +318,7 @@ public class ConstantsPane extends JPanel {
 
 		JButton addConstantButton = new JButton("New");
 		addConstantButton.setToolTipText(toolTipNewConstant);
-		addConstantButton.setEnabled(enableAddButton);
+		addConstantButton.setEnabled(true);
 		addConstantButton.addActionListener(e -> showEditConstantDialog(null));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -353,8 +355,9 @@ public class ConstantsPane extends JPanel {
 			int index = constantsList.getSelectedIndex();
 
 			if(index > 0) {
-				parent.swapConstants(index, index-1);
-				showConstants();
+                Command c = new MoveElementUpCommand(ConstantsPane.this, index, index-1);
+                parent.getUndoManager().addNewEdit(c);
+                c.redo();
 				constantsList.setSelectedIndex(index-1);
 			}
 		});
@@ -372,8 +375,9 @@ public class ConstantsPane extends JPanel {
 			int index = constantsList.getSelectedIndex();
 
 			if(index < parent.network().constants().size() - 1) {
-				parent.swapConstants(index, index+1);
-				showConstants();
+                Command c = new MoveElementDownCommand(ConstantsPane.this, index, index+1);
+                parent.getUndoManager().addNewEdit(c);
+                c.redo();
 				constantsList.setSelectedIndex(index+1);
 			}
 		});
@@ -466,4 +470,21 @@ public class ConstantsPane extends JPanel {
 		constantsList.setSelectedIndex(0);
 
 	}
+
+    @Override
+    public void moveUp(int index) {
+        parent.swapConstants(index, index-1);
+        showConstants();
+    }
+
+    @Override
+    public void moveDown(int index) {
+        parent.swapConstants(index, index+1);
+        showConstants();
+    }
+
+    @Override
+    public JList getJList() {
+        return constantsList;
+    }
 }

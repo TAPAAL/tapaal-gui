@@ -82,11 +82,11 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
 					int x = Zoomer.getZoomedValue(
-					    ((Transition) myObject).getNameOffsetXObject().intValue(),
+					    ((Transition) myObject).getNameOffsetX(),
                         myObject.getZoom()
                     );
 					int y = Zoomer.getZoomedValue(
-					    ((Transition) myObject).getNameOffsetYObject().intValue(),
+					    ((Transition) myObject).getNameOffsetY(),
                         myObject.getZoom()
                     );
 					m.show(myObject, x, y);

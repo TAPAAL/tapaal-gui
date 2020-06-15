@@ -2,7 +2,6 @@ package pipe.gui.graphicElements.tapn;
 
 import java.util.Hashtable;
 
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -30,13 +29,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	/** @deprecated */
-	@Deprecated
-	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
-		this(arc);
-	}
-
-	@Override
+    @Override
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
@@ -78,63 +71,61 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		if(CreateGui.getModel() == null) {
 			return;
 		}
-		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-			if (inputArc == null)
-				getNameLabel().setText("");
-			else {
-				if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
-					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
-						getNameLabel().setText("");
-					}
-					else {
-						getNameLabel().setText(inputArc.interval().toString(showConstantNames));
-					}					
-				}
-				else {
-					getNameLabel().setText(inputArc.interval().toString(showConstantNames));
-				}
+        if (inputArc == null)
+            getNameLabel().setText("");
+        else {
+            if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
+                if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
+                    getNameLabel().setText("");
+                }
+                else {
+                    getNameLabel().setText(inputArc.interval().toString(showConstantNames));
+                }
+            }
+            else {
+                getNameLabel().setText(inputArc.interval().toString(showConstantNames));
+            }
 
-				getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());
-				
-				// Handle constant highlighting
-				boolean focusedConstant = false;
-				boolean isvisible = true;
-				if(inputArc.interval().lowerBound() instanceof ConstantBound){
-					if(((ConstantBound) inputArc.interval().lowerBound()).constant().hasFocus()){
-						focusedConstant = true;
-					}
-					
-					if(!((ConstantBound) inputArc.interval().lowerBound()).constant().getVisible()) {
-						isvisible = false;
-					}
-				}
-				if(inputArc.interval().upperBound() instanceof ConstantBound){
-					if(((ConstantBound) inputArc.interval().upperBound()).constant().hasFocus()){
-						focusedConstant = true;
-					}
-					if(!((ConstantBound) inputArc.interval().upperBound()).constant().getVisible()){
-						isvisible = false;
-					}
-				}
-				if(getWeight() instanceof ConstantWeight){
-					if(((ConstantWeight) getWeight()).constant().hasFocus()){
-						focusedConstant = true;
-					}
-					if(((ConstantWeight) getWeight()).constant().getVisible()){
-						isvisible = false;
-					}									
-				}
-				if(focusedConstant){
-					getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-				}else{
-					getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
-				}
-				pnName.setVisible(isvisible);
-				
-			}
-			this.setLabelPosition();
-		}
-	}
+            getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());
+
+            // Handle constant highlighting
+            boolean focusedConstant = false;
+            boolean isvisible = true;
+            if(inputArc.interval().lowerBound() instanceof ConstantBound){
+                if(((ConstantBound) inputArc.interval().lowerBound()).constant().hasFocus()){
+                    focusedConstant = true;
+                }
+
+                if(!((ConstantBound) inputArc.interval().lowerBound()).constant().getVisible()) {
+                    isvisible = false;
+                }
+            }
+            if(inputArc.interval().upperBound() instanceof ConstantBound){
+                if(((ConstantBound) inputArc.interval().upperBound()).constant().hasFocus()){
+                    focusedConstant = true;
+                }
+                if(!((ConstantBound) inputArc.interval().upperBound()).constant().getVisible()){
+                    isvisible = false;
+                }
+            }
+            if(getWeight() instanceof ConstantWeight){
+                if(((ConstantWeight) getWeight()).constant().hasFocus()){
+                    focusedConstant = true;
+                }
+                if(((ConstantWeight) getWeight()).constant().getVisible()){
+                    isvisible = false;
+                }
+            }
+            if(focusedConstant){
+                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+            }else{
+                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+            }
+            pnName.setVisible(isvisible);
+
+        }
+        this.setLabelPosition();
+    }
 
 	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {
 		return inputArc;

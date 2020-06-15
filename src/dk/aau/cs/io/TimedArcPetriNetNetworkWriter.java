@@ -193,13 +193,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			NET.setAttributeNode(netAttrActive);
 
 			Attr netAttrType = document.createAttribute("type");
-			switch (guiModel.netType()) {
-			case UNTIMED:
-				netAttrType.setValue("Untimed P/T net");
-				break;
-			default:
-				netAttrType.setValue("P/T net");
-			}
+			netAttrType.setValue("P/T net");
+
 			NET.setAttributeNode(netAttrType);
 
 			appendAnnotationNotes(document, guiModel, NET);
@@ -368,13 +363,13 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		
 		Element placeElement = document.createElement("place");
 
-		placeElement.setAttribute("positionX", (inputPlace.getPositionXObject() != null ? String.valueOf(inputPlace.getPositionXObject()) : ""));
-		placeElement.setAttribute("positionY", (inputPlace.getPositionYObject() != null ? String.valueOf(inputPlace.getPositionYObject())	: ""));
+		placeElement.setAttribute("positionX", String.valueOf(inputPlace.getPositionX()));
+		placeElement.setAttribute("positionY", String.valueOf(inputPlace.getPositionY()));
 		placeElement.setAttribute("name", inputPlace.underlyingPlace().name());
 		placeElement.setAttribute("displayName", (inputPlace.getAttributesVisible() ? "true" : "false"));
 		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
-		placeElement.setAttribute("nameOffsetX", (inputPlace.getNameOffsetXObject() != null ? String.valueOf(inputPlace.getNameOffsetXObject()) : ""));
-		placeElement.setAttribute("nameOffsetY", (inputPlace.getNameOffsetYObject() != null ? String.valueOf(inputPlace.getNameOffsetYObject()) : ""));
+		placeElement.setAttribute("nameOffsetX", String.valueOf(inputPlace.getNameOffsetX()));
+		placeElement.setAttribute("nameOffsetY", String.valueOf(inputPlace.getNameOffsetY()));
 		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
 		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
 
@@ -406,10 +401,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		
 		Element transitionElement = document.createElement("transition");
 
-		transitionElement.setAttribute("positionX", (inputTransition.getPositionXObject() != null ? String.valueOf(inputTransition.getPositionXObject()) : ""));
-		transitionElement.setAttribute("positionY",	(inputTransition.getPositionYObject() != null ? String.valueOf(inputTransition.getPositionYObject()) : ""));
-		transitionElement.setAttribute("nameOffsetX", (inputTransition.getNameOffsetXObject() != null ? String.valueOf(inputTransition.getNameOffsetXObject()) : ""));
-		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
+		transitionElement.setAttribute("positionX", String.valueOf(inputTransition.getPositionX()));
+		transitionElement.setAttribute("positionY",	String.valueOf(inputTransition.getPositionY()));
+		transitionElement.setAttribute("nameOffsetX", String.valueOf(inputTransition.getNameOffsetX()));
+		transitionElement.setAttribute("nameOffsetY", String.valueOf(inputTransition.getNameOffsetY()));
 		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
 		transitionElement.setAttribute("displayName", (inputTransition.getAttributesVisible() ? "true" : "false"));
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
@@ -431,8 +426,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		arcElement.setAttribute("id", (inputArc.getId() != null ? inputArc.getId() : "error"));
 		arcElement.setAttribute("source", (inputArc.getSource().getId() != null ? inputArc.getSource().getId() : ""));
 		arcElement.setAttribute("target", (inputArc.getTarget().getId() != null ? inputArc.getTarget().getId() : ""));
-		arcElement.setAttribute("nameOffsetX", (inputArc.getNameOffsetXObject() != null ? String.valueOf(inputArc.getNameOffsetXObject()) : ""));
-		arcElement.setAttribute("nameOffsetY", (inputArc.getNameOffsetYObject() != null ? String.valueOf(inputArc.getNameOffsetYObject()) : ""));
+		arcElement.setAttribute("nameOffsetX", String.valueOf(inputArc.getNameOffsetX()));
+		arcElement.setAttribute("nameOffsetY", String.valueOf(inputArc.getNameOffsetY()));
 		
 		if (inputArc instanceof TimedOutputArcComponent) {
 			if (inputArc instanceof TimedInputArcComponent) {

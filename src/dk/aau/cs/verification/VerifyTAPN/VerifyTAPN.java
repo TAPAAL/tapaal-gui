@@ -61,21 +61,15 @@ public class VerifyTAPN implements ModelChecker {
 	public boolean supportsStats(){
 		return true;
 	}
-	
-	public String getStatsExplanation(){
-		StringBuilder buffer = new StringBuilder("<html>");
-		buffer.append("<b>Discovered markings:</b> The number of found markings (each<br />");
-		buffer.append("time a successor is calculated, this number is incremented)<br/>");
-		buffer.append("<br/>");
-		buffer.append("<b>Explored markings:</b> The number of markings taken out<br/>");
-		buffer.append("of the waiting list during the search.<br />");
-		buffer.append("<br/>");
-		buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
-		buffer.append("passed/waiting list at the end of verification.<br />");
-		buffer.append("</html>");
-		return buffer.toString();
-	}
-	
+
+    public String[] getStatsExplanations(){
+        String[] explanations = new String[3];
+        explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
+        explanations[1] = "The number of markings taken out of the waiting list during the search.";
+        explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+        return explanations;
+    }
+
 	public String getPath() {
 		return verifytapnpath;
 	}

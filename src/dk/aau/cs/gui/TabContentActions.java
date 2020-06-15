@@ -81,6 +81,8 @@ public interface TabContentActions {
 
     void showComponents(boolean showDelayEnabledTransitions);
 
+    void showSharedPT(boolean showSharedPT);
+
     void showEnabledTransitionsList(boolean showDelayEnabledTransitions);
 
     void showDelayEnabledTransitions(boolean showDelayEnabledTransitions);
