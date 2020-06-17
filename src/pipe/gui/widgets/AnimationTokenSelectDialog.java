@@ -15,7 +15,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
-public class AnimationSelectmodeDialog extends JPanel {
+public class AnimationTokenSelectDialog extends JPanel {
 
 	TimedTransition transition = null;
 
@@ -30,7 +30,7 @@ public class AnimationSelectmodeDialog extends JPanel {
 		return cancelled;
 	}
 
-	public AnimationSelectmodeDialog(TimedTransition transition) {
+	public AnimationTokenSelectDialog(TimedTransition transition) {
 		setLayout(new GridBagLayout());
 		
 		GridBagConstraints c = new GridBagConstraints();

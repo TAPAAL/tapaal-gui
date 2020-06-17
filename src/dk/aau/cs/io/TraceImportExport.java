@@ -148,7 +148,7 @@ public class TraceImportExport {
     }
 
     public static void importTrace() {
-        if (pipe.gui.CreateGui.getCurrentTab().getAnimationHistory().getListModel().size() > 1) {
+        if (pipe.gui.CreateGui.getCurrentTab().getAnimationHistorySidePanel().getListModel().size() > 1) {
             int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
                     "You are about to import a trace. This removes the current trace.",
                     "Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
