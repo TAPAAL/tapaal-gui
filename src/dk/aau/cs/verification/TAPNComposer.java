@@ -40,12 +40,13 @@ public class TAPNComposer implements ITAPNComposer {
 	private Messenger messenger;
 	private boolean hasShownMessage = false;
 	private boolean singleComponentNoPrefix = false; // if set to true then nets with only a single component have no prefix before places/transitions 
+    private boolean inlineConstants = true;
 
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
 
-	public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentNoPrefix){
+	public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentNoPrefix, boolean inlineConstants){
 		this.messenger = messenger;
 		
 		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -55,6 +56,7 @@ public class TAPNComposer implements ITAPNComposer {
 		
 		this.guiModels = newGuiModels;
 		this.singleComponentNoPrefix = singleComponentNoPrefix;
+		this.inlineConstants = inlineConstants;
 	}
 	
 	public TAPNComposer(Messenger messenger, boolean singleComponentNoPrefix) {
@@ -68,10 +70,8 @@ public class TAPNComposer implements ITAPNComposer {
 		DataLayer guiModel = new DataLayer();
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
-
 		
-		int greatestWidth = 0,
-			   greatestHeight = 0;
+		int greatestWidth = 0, greatestHeight = 0;
 		if (this.guiModels != null) {
 			for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
                                 if (isComponentEmpty(this.guiModels.get(tapn1))) { 
@@ -304,8 +304,7 @@ public class TAPNComposer implements ITAPNComposer {
 						}
 					}else{
 						if(!hasShownMessage && !(ExportBatchDialog.isDialogVisible())){
-							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model."
-									+ System.getProperty("line.separator") + "They will be removed before the verification.");
+							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model.");
 							hasShownMessage = true;
 						}
 						else if(ExportBatchDialog.isDialogVisible()) {
@@ -360,12 +359,16 @@ public class TAPNComposer implements ITAPNComposer {
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 
 				TimeInterval newInterval = new TimeInterval(arc.interval());
-				newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
-				if (newInterval.upperBound() instanceof Bound.InfBound) {
-					newInterval.setUpperBound(newInterval.upperBound());
-				} else {
-					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
-				}
+
+				if (inlineConstants) {
+                    newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
+                    if (newInterval.upperBound() instanceof Bound.InfBound) {
+                        newInterval.setUpperBound(newInterval.upperBound());
+                    } else {
+                        newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
+                    }
+                }
+
 				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
@@ -472,12 +475,14 @@ public class TAPNComposer implements ITAPNComposer {
 				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 				
 				TimeInterval newInterval = new TimeInterval(arc.interval());
-				newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
-				if (newInterval.upperBound() instanceof Bound.InfBound) {
-					newInterval.setUpperBound(newInterval.upperBound());
-				} else {
-					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
-				}
+				if(inlineConstants){
+                    newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
+                    if (newInterval.upperBound() instanceof Bound.InfBound) {
+                        newInterval.setUpperBound(newInterval.upperBound());
+                    } else {
+                        newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
+                    }
+                }
 				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				
@@ -577,12 +582,14 @@ public class TAPNComposer implements ITAPNComposer {
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
 
 				TimeInterval newInterval = new TimeInterval(arc.interval());
-				newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
-				if (newInterval.upperBound() instanceof Bound.InfBound) {
-					newInterval.setUpperBound(newInterval.upperBound());
-				} else {
-					newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
-				}
+				if(inlineConstants){
+                    newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
+                    if (newInterval.upperBound() instanceof Bound.InfBound) {
+                        newInterval.setUpperBound(newInterval.upperBound());
+                    } else {
+                        newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
+                    }
+                }
 				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue());
 				constructedModel.add(addedArc);
 				

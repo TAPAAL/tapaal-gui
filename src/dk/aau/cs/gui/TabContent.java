@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
@@ -20,6 +22,9 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
@@ -36,10 +41,8 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.widgets.*;
 import net.tapaal.swinghelpers.JSplitPaneFix;
-import pipe.gui.widgets.QueryPane;
-import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.util.Require;
@@ -1189,7 +1192,51 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-	/* GUI Model / Actions */
+    @Override
+    public void mergeNetComponents() {
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+
+        int openCTLDialog = JOptionPane.YES_OPTION;
+        boolean inlineConstants = false;
+
+        if(!tapnNetwork.constants().isEmpty()){
+            Object[] options = {
+                "Yes",
+                "No"};
+
+            String optionText = "Do you want to replace constants with values?";
+            openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if(openCTLDialog == JOptionPane.YES_OPTION){
+                inlineConstants = true;
+            } else if(openCTLDialog == JOptionPane.NO_OPTION){
+                network.setConstants(tapnNetwork.constants());
+            }
+        }
+
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, inlineConstants);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
+
+        ArrayList<Template> templates = new ArrayList<Template>(1);
+
+        templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
+
+
+
+        network.add(transformedModel.value1());
+
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants());
+
+        try {
+            ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+            String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
+            composedName = composedName.replace(".tapn", "");
+            CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+        } catch (Exception e1) {
+            System.console().printf(e1.getMessage());
+        }
+    }
+
+    /* GUI Model / Actions */
 
 	Optional<GuiFrameActions>  app = Optional.empty();
 	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
