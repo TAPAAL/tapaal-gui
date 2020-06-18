@@ -186,11 +186,11 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public int presetSize() {
-		return preset.size() + transportArcsGoingThrough.size();
+		return preset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
 	}
 
 	public int postsetSize() {
-		return postset.size() + transportArcsGoingThrough.size();
+		return postset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
 	}
 
 	public boolean isDEnabled(){
