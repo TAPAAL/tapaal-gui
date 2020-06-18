@@ -13,13 +13,13 @@ import pipe.gui.graphicElements.Transition;
 
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
-public class AnimationHistoryComponent extends JList<String> {
+public class AnimationHistoryList extends JList<String> {
 
 	private TraceType lastShown = TraceType.NOT_EG;
 
-	public AnimationHistoryComponent() {
+	public AnimationHistoryList() {
 		super();
-		setModel(new DefaultListModel());
+		setModel(new DefaultListModel<>());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		for (MouseListener listener : getMouseListeners()) {
@@ -46,17 +46,8 @@ public class AnimationHistoryComponent extends JList<String> {
 		updateAccordingToDeadlock();
 	}
 
-	public void addHistoryItemDontChange(String transitionName) {
-		if(lastShown == TraceType.NOT_EG){
-			getListModel().addElement(transitionName);
-		} else {
-			getListModel().add(getListModel().size()-1, transitionName);
-		}
-		updateAccordingToDeadlock();
-	}
-
 	public void clearStepsForward() {
-		DefaultListModel listModel = getListModel();
+		DefaultListModel<String> listModel = getListModel();
 		int lastIndex = listModel.size() - 1;
 
 		if (listModel.size() > 1 && getSelectedIndex() < lastIndex) {
@@ -71,7 +62,7 @@ public class AnimationHistoryComponent extends JList<String> {
 			int nextIndex = getSelectedIndex() + 1;
 			setSelectedIndex(nextIndex);
 		}
-                layoutAdjustment();
+		layoutAdjustment();
 	}
 
 	public void stepBackwards() {
@@ -82,7 +73,7 @@ public class AnimationHistoryComponent extends JList<String> {
 	}
 
 	public boolean isStepForwardAllowed() {
-                layoutAdjustment();
+	    layoutAdjustment();
 		if(lastShown != TraceType.EG_DEADLOCK){
 			return getSelectedIndex() < getListModel().size() - 1;
 		} else {
@@ -99,11 +90,11 @@ public class AnimationHistoryComponent extends JList<String> {
 	}
 
 	public String getElement(int i) {
-		return (String) getListModel().get(i);
+		return getListModel().get(i);
 	}
 
-	public DefaultListModel getListModel() {
-		return (DefaultListModel) getModel();
+	public DefaultListModel<String> getListModel() {
+		return (DefaultListModel<String>) getModel();
 	}
 
 	@Override
@@ -142,17 +133,17 @@ public class AnimationHistoryComponent extends JList<String> {
 		case NOT_EG:
 			break;
 		}
-                layoutAdjustment();
+		layoutAdjustment();
 	}
-        
-        private void layoutAdjustment() { 
-            // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
-            int selectedIndex = CreateGui.getCurrentTab().getAnimationHistory().getSelectedIndex();
-            if (selectedIndex == CreateGui.getCurrentTab().getAnimationHistory().getListModel().getSize()-2) {
-                CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(selectedIndex+1);
-                CreateGui.getCurrentTab().getAnimationHistory().setSelectedIndex(selectedIndex);
-            }
+
+    private void layoutAdjustment() {
+        // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
+        int selectedIndex = CreateGui.getCurrentTab().getAnimationHistorySidePanel().getSelectedIndex();
+        if (selectedIndex == CreateGui.getCurrentTab().getAnimationHistorySidePanel().getListModel().getSize() - 2) {
+            CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex + 1);
+            CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
         }
+    }
 	
 	private void updateAccordingToDeadlock() {
 		

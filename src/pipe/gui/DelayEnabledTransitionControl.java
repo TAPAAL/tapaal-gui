@@ -57,21 +57,6 @@ public class DelayEnabledTransitionControl extends JPanel{
 		delayEnabledPrecision.setPaintTrack(false);
 		delayEnabledPrecision.setPreferredSize(new Dimension(340, delayEnabledPrecision.getPreferredSize().height));
 		setValue(defaultGranularity);
-		//UIManager.put("Slider.paintValue", false);
-		//UIManager.getLookAndFeelDefaults().put("Slider.paintValue", false);
-		
-		//TODO is this good? it's the only soloution I've found
-		//It makes sure the value of the slider is NOT written 
-		//above the knob.
-		/*Class<?> sliderUIClass;
-		try {
-			sliderUIClass = Class.forName("javax.swing.plaf.synth.SynthSliderUI");
-			Field paintValue = sliderUIClass.getDeclaredField("paintValue");
-	        paintValue.setAccessible(true);
-	        paintValue.set(delayEnabledPrecision.getUI(), false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 		
 		DelayMode[] items = {ShortestDelayMode.getInstance(), RandomDelayMode.getInstance(), ManualDelayMode.getInstance()};
 		delayMode = new JComboBox(items);
@@ -165,35 +150,6 @@ public class DelayEnabledTransitionControl extends JPanel{
 	}
 	
 	private static DelayEnabledTransitionControl instance;
-	private static JButton closeDialogButton;
-	private static JDialog dialog;
-	
-	public static void showDelayEnabledTransitionDialog(){
-		JPanel contentPane = new JPanel(new GridBagLayout());
-		
-		closeDialogButton = new JButton("Close");
-		closeDialogButton.addActionListener(arg0 -> dialog.setVisible(false));
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(0, 3, 0, 3);
-		gbc.fill = GridBagConstraints.BOTH;
-		contentPane.add(getInstance(), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(3, 3, 0, 3);
-		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		contentPane.add(closeDialogButton, gbc);
-		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Delay controller", true);
-		dialog.setContentPane(contentPane);
-		dialog.pack();
-		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(CreateGui.getApp());
-		dialog.setVisible(true);
-	}
 	
 	public static DelayEnabledTransitionControl getInstance(){
 		if(instance == null){

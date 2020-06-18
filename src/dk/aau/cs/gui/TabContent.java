@@ -11,8 +11,9 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.xml.crypto.Data;
 
+import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
@@ -22,6 +23,9 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
@@ -39,9 +43,11 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.undo.*;
 import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.undo.ChangeSpacingEdit;
+import pipe.gui.undo.UndoManager;
+import pipe.gui.widgets.*;
+
 import net.tapaal.swinghelpers.JSplitPaneFix;
-import pipe.gui.widgets.QueryPane;
-import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.util.Require;
@@ -143,7 +149,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
 
-	/**
+    /**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
@@ -286,11 +292,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationHistoryComponent animBox;
-	private AnimationController animControlerBox;
-	private JScrollPane animationHistoryScrollPane;
+	private AnimationControlSidePanel animControlerBox;
+    private AnimationHistorySidePanel animationHistorySidePanel;
+
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent abstractAnimationPane = null;
+	private AnimationHistoryList abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
 
@@ -305,6 +311,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private Boolean selectedTemplateWasActive = false;
 	
 	private WorkflowDialog workflowDialog = null;
+
 
 	private TabContent() {
 	    this(new TimedArcPetriNetNetwork(), new ArrayList<>());
@@ -556,60 +563,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	private void createAnimationHistory() {
-		animBox = new AnimationHistoryComponent();
-		animBox.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (SwingUtilities.isLeftMouseButton(e)) {
-					int selected = animBox.getSelectedIndex();
-					int clicked = animBox.locationToIndex(e.getPoint());
-					if (clicked != -1) {
-						int steps = clicked - selected;
-						Animator anim = CreateGui.getAnimator();
-						if (steps < 0) {
-							for (int i = 0; i < Math.abs(steps); i++) {
-								animBox.stepBackwards();
-								anim.stepBack();
-								getAnimationController().setAnimationButtonsEnabled();
-							}
-						} else {
-							for (int i = 0; i < Math.abs(steps); i++) {
-								animBox.stepForward();
-								anim.stepForward();
-								getAnimationController().setAnimationButtonsEnabled();
-							}
-						}
-						
-						anim.blinkSelected(animBox.getSelectedValue());
-					}
-				}
-				// Remove focus
-				CreateGui.getApp().requestFocus();
-			}
-		});
-
-		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(
-		    BorderFactory.createCompoundBorder(
-						BorderFactory.createTitledBorder("Simulation History"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)
-            )
-        );
-		//Add 10 pixel to the minimumsize of the scrollpane
-		animationHistoryScrollPane.setMinimumSize(
-		    new Dimension(
-		        animationHistoryScrollPane.getMinimumSize().width,
-                animationHistoryScrollPane.getMinimumSize().height + 20
-            )
-        );
+        animationHistorySidePanel = new AnimationHistorySidePanel();
 	}
 
 	private void createAnimatorSplitPane() {
-		if (animBox == null) {
-            createAnimationHistory();
-        }
+
+	    createAnimationHistory();
+
 		if (animControlerBox == null) {
-            createAnimationController();
+            createAnimationControlSidePanel();
         }
 		if (transitionFireing == null) {
             createTransitionFireing();
@@ -658,7 +620,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		animationControlsPanel.add(animationHistorySidePanel, gbc);
 
 		animationControlsPanel.setPreferredSize(
 		    new Dimension(
@@ -735,11 +697,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent getUntimedAnimationHistory() {
+	public AnimationHistoryList getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
-	public AnimationController getAnimationController() {
+	public AnimationControlSidePanel getAnimationController() {
 		return animControlerBox;
 	}
 	
@@ -748,8 +710,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void addAbstractAnimationPane() {
-		animationControlsPanel.remove(animationHistoryScrollPane);
-		abstractAnimationPane = new AnimationHistoryComponent();
+		animationControlsPanel.remove(animationHistorySidePanel);
+		abstractAnimationPane = new AnimationHistoryList();
 
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
 		untimedAnimationHistoryScrollPane.setBorder(
@@ -760,7 +722,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         );
 		animationHistorySplitter = new JSplitPaneFix(
 		    JSplitPane.HORIZONTAL_SPLIT,
-            animationHistoryScrollPane,
+            animationHistorySidePanel,
             untimedAnimationHistoryScrollPane
         );
 
@@ -789,20 +751,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		animationControlsPanel.add(animationHistorySidePanel, gbc);
 		animatorSplitPane.validate();
 	}
 
-	private void createAnimationController() {
-		animControlerBox = new AnimationController();
-
-		animationControllerScrollPane = new JScrollPane(animControlerBox);
-		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-		animControlerBox.requestFocus(true);
+	private void createAnimationControlSidePanel() {
+		animControlerBox = new AnimationControlSidePanel(animator);
 	}
 
-	public AnimationHistoryComponent getAnimationHistory() {
-		return animBox;
+	public AnimationHistoryList getAnimationHistorySidePanel() {
+		return animationHistorySidePanel.getAnimationHistoryList();
 	}
 
 	private void createTransitionFireing() {
@@ -1197,7 +1155,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
 		}
-		animControlerBox.setAnimationButtonsEnabled(); //Update stepBack/Forward
+		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
 
 	//XXX temp while refactoring, kyrke - 2019-07-25
@@ -1313,25 +1271,54 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return animator;
 	}
 
-	private Animator animator = new Animator(this);
+	private final Animator animator = new Animator(this);
 
-	/* GUI Model / Actions helpers */
-	//XXX: Should be moved to animationController or similar
-	/**
-	 * Updates the mouseOver label showing token ages in animationmode
-	 * when a "animation" action is happening. "live updates" any mouseOver label
-	 */
-	private void updateMouseOverInformation() {
-		// update mouseOverView
-		for (pipe.gui.graphicElements.Place p : getModel().getPlaces()) {
-			if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
-				((TimedPlaceComponent) p).showAgeOfTokens(true);
-			}
-		}
 
-	}
+    @Override
+    public void mergeNetComponents() {
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 
-	/* GUI Model / Actions */
+        int openCTLDialog = JOptionPane.YES_OPTION;
+        boolean inlineConstants = false;
+
+        if(!tapnNetwork.constants().isEmpty()){
+            Object[] options = {
+                "Yes",
+                "No"};
+
+            String optionText = "Do you want to replace constants with values?";
+            openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if(openCTLDialog == JOptionPane.YES_OPTION){
+                inlineConstants = true;
+            } else if(openCTLDialog == JOptionPane.NO_OPTION){
+                network.setConstants(tapnNetwork.constants());
+            }
+        }
+
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, inlineConstants);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
+
+        ArrayList<Template> templates = new ArrayList<Template>(1);
+
+        templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
+
+
+
+        network.add(transformedModel.value1());
+
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants());
+
+        try {
+            ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+            String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
+            composedName = composedName.replace(".tapn", "");
+            CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+        } catch (Exception e1) {
+            System.console().printf(e1.getMessage());
+        }
+    }
+
+    /* GUI Model / Actions */
 
 	Optional<GuiFrameActions>  app = Optional.empty();
 	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
@@ -1343,7 +1330,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
-			animControlerBox.setAnimationButtonsEnabled(); //Update stepBack/Forward
+			animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
@@ -1443,32 +1430,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void stepBackwards() {
-		getAnimationHistory().stepBackwards();
 		getAnimator().stepBack();
-		updateMouseOverInformation();
-		getAnimationController().setAnimationButtonsEnabled();
 	}
 
 	@Override
 	public void stepForward() {
-		getAnimationHistory().stepForward();
 		getAnimator().stepForward();
-		updateMouseOverInformation();
-		getAnimationController().setAnimationButtonsEnabled();
 	}
 
 	@Override
 	public void timeDelay() {
 		getAnimator().letTimePass(BigDecimal.ONE);
-		getAnimationController().setAnimationButtonsEnabled();
-		updateMouseOverInformation();
 	}
 
 	@Override
 	public void delayAndFire() {
 		getTransitionFireingComponent().fireSelectedTransition();
-		getAnimationController().setAnimationButtonsEnabled();
-		updateMouseOverInformation();
 	}
 
 	@Override

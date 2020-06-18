@@ -589,12 +589,14 @@ public class DataLayer {
 	}
 
 	/**
-	 * Returns an iterator for the transitions array. Used by Animator.class to
+	 * Returns an iteratbale for the transitions array. Used by Animator.class to
 	 * set all enabled transitions to highlighted
 	 */
 	public Iterable<Transition> transitions() {
+
 		return transitionsArray;
 	}
+
 
 	/**
 	 * Sets an internal ArrayList according to the class of the object passed
