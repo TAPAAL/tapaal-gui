@@ -155,9 +155,11 @@ public class DataLayer {
 
 		// Check if the arcs have a valid source and target
 		if (arcInput.getSource() == null || arcInput.getTarget() == null) {
-			System.err.println(("Cant add arc" + arcInput + " where source: "
+			System.err.println(
+			    "Cant add arc" + arcInput + " where source: "
 					+ arcInput.getSource() + " or target: "
-					+ arcInput.getTarget() + " is null"));
+					+ arcInput.getTarget() + " is null"
+            );
 			return;
 		}
 
@@ -258,11 +260,9 @@ public class DataLayer {
 		boolean unique = true;
 
 		if (inhibitorArcInput != null) {
-			if (inhibitorArcInput.getId() != null
-					&& inhibitorArcInput.getId().length() > 0) {
+			if (inhibitorArcInput.getId() != null && inhibitorArcInput.getId().length() > 0) {
 				for (int i = 0; i < arcsArray.size(); i++) {
-					if (inhibitorArcInput.getId().equals(
-							(arcsArray.get(i)).getId())) {
+					if (inhibitorArcInput.getId().equals((arcsArray.get(i)).getId())) {
 						unique = false;
 					}
 				}
@@ -516,18 +516,13 @@ public class DataLayer {
 					attached = ((Arc) pnObject).getTarget();
 
 					if (attached != null) {
-						if (tapnInhibitorsMap.get(attached) != null) { // causing
-																		// null
-																		// pointer
-																		// exceptions
-																		// (!)
+						if (tapnInhibitorsMap.get(attached) != null) { // causing null pointer exceptions (!)
 							tapnInhibitorsMap.get(attached).remove(pnObject);
 						}
 
 						attached.removeToArc((Arc) pnObject);
 						if (attached instanceof Transition) {
-							((Transition) attached)
-									.removeArcCompareObject((Arc) pnObject);
+							((Transition) attached).removeArcCompareObject((Arc) pnObject);
 						}
 						// attached.updateConnected(); //causing null pointer
 						// exceptions (?)
@@ -554,10 +549,7 @@ public class DataLayer {
 
 					attached = ((Arc) pnObject).getTarget();
 					if (attached != null) {
-						if (arcsMap.get(attached) != null) { // causing null
-																// pointer
-																// exceptions
-																// (!)
+						if (arcsMap.get(attached) != null) { // causing null pointer exceptions (!)
 							arcsMap.get(attached).remove(pnObject);
 						}
 
@@ -573,8 +565,7 @@ public class DataLayer {
 
 			}
 		} catch (NullPointerException npe) {
-			System.out.println("NullPointerException [debug]\n"
-					+ npe.getMessage());
+			System.out.println("NullPointerException [debug]\n" + npe.getMessage());
 			throw npe;
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
