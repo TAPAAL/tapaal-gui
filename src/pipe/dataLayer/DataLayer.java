@@ -82,7 +82,7 @@ public class DataLayer {
 
 	//XXX: Added from drawingsurface to have a way to acces all elements added,
     //Should be refactored later to combine the existing list, however this is the quick fix during refactoring
-    private ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
+    private final ArrayList<PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
 
     public ArrayList<PetriNetObject> getPNObjects() {
         return petriNetObjects;
@@ -163,93 +163,87 @@ public class DataLayer {
 			return;
 		}
 
-		if (arcInput != null) {
-			if (arcInput.getId() != null && arcInput.getId().length() > 0) {
-				for (int i = 0; i < arcsArray.size(); i++) {
-					if (arcInput.getId().equals((arcsArray.get(i)).getId())) {
-						unique = false;
-					}
-				}
-			} else {
-				String id = null;
-				if (arcsArray != null && arcsArray.size() > 0) {
-					int no = arcsArray.size();
-					do {
-						for (int i = 0; i < arcsArray.size(); i++) {
-							id = "A" + no;
-							if (arcsArray.get(i) != null) {
-								if (id.equals((arcsArray.get(i)).getId())) {
-									unique = false;
-									no++;
-								} else {
-									unique = true;
-								}
-							}
-						}
-					} while (!unique);
-				} else {
-					id = "A0";
-				}
-				if (id != null) {
-					arcInput.setId(id);
-				} else {
-					arcInput.setId("error");
-				}
-			}
+        if (arcInput.getId() != null && arcInput.getId().length() > 0) {
+            for (int i = 0; i < arcsArray.size(); i++) {
+                if (arcInput.getId().equals((arcsArray.get(i)).getId())) {
+                    unique = false;
+                }
+            }
+        } else {
+            String id = null;
+            if (arcsArray.size() > 0) {
+                int no = arcsArray.size();
+                do {
+                    for (int i = 0; i < arcsArray.size(); i++) {
+                        id = "A" + no;
+                        if (arcsArray.get(i) != null) {
+                            if (id.equals((arcsArray.get(i)).getId())) {
+                                unique = false;
+                                no++;
+                            } else {
+                                unique = true;
+                            }
+                        }
+                    }
+                } while (!unique);
+            } else {
+                id = "A0";
+            }
+            arcInput.setId(id);
+        }
 
-			//XXX: this is still nedede as nets loaded from file (XML/tapn) does not set connectedTo correctly //2019-09-18
-			// Transportarc fix boddy
-			if (arcInput instanceof TimedTransportArcComponent) {
-				TimedTransportArcComponent tmp = (TimedTransportArcComponent) arcInput;
-				PlaceTransitionObject first = tmp.getSource();
+        //XXX: this is still nedede as nets loaded from file (XML/tapn) does not set connectedTo correctly //2019-09-18
+        // Transportarc fix boddy
+        if (arcInput instanceof TimedTransportArcComponent) {
+            TimedTransportArcComponent tmp = (TimedTransportArcComponent) arcInput;
+            PlaceTransitionObject first = tmp.getSource();
 
-				if (tmp.getConnectedTo() == null) {
-					if (first instanceof TimedPlaceComponent) {
+            if (tmp.getConnectedTo() == null) {
+                if (first instanceof TimedPlaceComponent) {
 
-						for (Object o : tmp.getTarget().getPostset()) {
+                    for (Object o : tmp.getTarget().getPostset()) {
 
-							if (o instanceof TimedTransportArcComponent) {
-								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o).getGroupNr()) {
-									// Found partner
+                        if (o instanceof TimedTransportArcComponent) {
+                            if (tmp.getGroupNr() == ((TimedTransportArcComponent) o).getGroupNr()) {
+                                // Found partner
 
-									tmp.setConnectedTo(((TimedTransportArcComponent) o));
-									((TimedTransportArcComponent) o).setConnectedTo(tmp);
+                                tmp.setConnectedTo(((TimedTransportArcComponent) o));
+                                ((TimedTransportArcComponent) o).setConnectedTo(tmp);
 
-									break;
-								}
-							}
+                                break;
+                            }
+                        }
 
-						}
+                    }
 
-					} else {
-						// First is TimedTransition
-						tmp = (TimedTransportArcComponent) arcInput;
+                } else {
+                    // First is TimedTransition
+                    tmp = (TimedTransportArcComponent) arcInput;
 
-						for (Object o : tmp.getSource().getPreset()) {
+                    for (Object o : tmp.getSource().getPreset()) {
 
-							if (o instanceof TimedTransportArcComponent) {
-								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o).getGroupNr()) {
-									// Found partner
+                        if (o instanceof TimedTransportArcComponent) {
+                            if (tmp.getGroupNr() == ((TimedTransportArcComponent) o).getGroupNr()) {
+                                // Found partner
 
-									tmp.setConnectedTo(((TimedTransportArcComponent) o));
-									((TimedTransportArcComponent) o).setConnectedTo(tmp);
+                                tmp.setConnectedTo(((TimedTransportArcComponent) o));
+                                ((TimedTransportArcComponent) o).setConnectedTo(tmp);
 
-									break;
-								}
-							}
+                                break;
+                            }
+                        }
 
-						}
+                    }
 
-					}
-				}
+                }
+            }
 
-			}
+        }
 
-			arcsArray.add(arcInput);
-			addArcToArcsMap(arcInput);
+        arcsArray.add(arcInput);
+        addArcToArcsMap(arcInput);
 
-		}
-	}
+    }
 
 	private void addTransportArc(TimedTransportArcComponent transportArc) {
 		arcsArray.add(transportArc);
@@ -268,7 +262,7 @@ public class DataLayer {
 				}
 			} else {
 				String id = null;
-				if (arcsArray != null && arcsArray.size() > 0) {
+				if (arcsArray.size() > 0) {
 					int no = arcsArray.size();
 					do {
 						for (int i = 0; i < arcsArray.size(); i++) {
@@ -286,12 +280,8 @@ public class DataLayer {
 				} else {
 					id = "I0";
 				}
-				if (id != null) {
-					inhibitorArcInput.setId(id);
-				} else {
-					inhibitorArcInput.setId("error");
-				}
-			}
+                inhibitorArcInput.setId(id);
+            }
 
 			arcsArray.add(inhibitorArcInput);
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
@@ -715,16 +705,14 @@ public class DataLayer {
 	public Transition getTransitionById(String transitionID) {
 		Transition returnTransition = null;
 
-		if (transitionsArray != null) {
-			if (transitionID != null) {
-				for (Transition transition : transitionsArray) {
-					if (transitionID.equalsIgnoreCase(transition.getId())) {
-						returnTransition = transition;
-					}
-				}
-			}
-		}
-		return returnTransition;
+        if (transitionID != null) {
+            for (Transition transition : transitionsArray) {
+                if (transitionID.equalsIgnoreCase(transition.getId())) {
+                    returnTransition = transition;
+                }
+            }
+        }
+        return returnTransition;
 	}
 
 	/**
@@ -738,16 +726,14 @@ public class DataLayer {
 	public Transition getTransitionByName(String transitionName) {
 		Transition returnTransition = null;
 
-		if (transitionsArray != null) {
-			if (transitionName != null) {
-				for (Transition transition : transitionsArray) {
-					if (transitionName.equalsIgnoreCase(transition.getName())) {
-						returnTransition = transition;
-					}
-				}
-			}
-		}
-		return returnTransition;
+        if (transitionName != null) {
+            for (Transition transition : transitionsArray) {
+                if (transitionName.equalsIgnoreCase(transition.getName())) {
+                    returnTransition = transition;
+                }
+            }
+        }
+        return returnTransition;
 	}
 
 	/**
@@ -760,16 +746,14 @@ public class DataLayer {
 	public Place getPlaceById(String placeID) {
 		Place returnPlace = null;
 
-		if (placesArray != null) {
-			if (placeID != null) {
-				for (Place place : placesArray) {
-					if (placeID.equalsIgnoreCase(place.getId())) {
-						returnPlace = place;
-					}
-				}
-			}
-		}
-		return returnPlace;
+        if (placeID != null) {
+            for (Place place : placesArray) {
+                if (placeID.equalsIgnoreCase(place.getId())) {
+                    returnPlace = place;
+                }
+            }
+        }
+        return returnPlace;
 	}
 
 	/**
@@ -782,16 +766,14 @@ public class DataLayer {
 	public Place getPlaceByName(String placeName) {
 		Place returnPlace = null;
 
-		if (placesArray != null) {
-			if (placeName != null) {
-				for (Place place : placesArray) {
-					if (placeName.equalsIgnoreCase(place.getName())) {
-						returnPlace = place;
-					}
-				}
-			}
-		}
-		return returnPlace;
+        if (placeName != null) {
+            for (Place place : placesArray) {
+                if (placeName.equalsIgnoreCase(place.getName())) {
+                    returnPlace = place;
+                }
+            }
+        }
+        return returnPlace;
 	}
 
 	/**
