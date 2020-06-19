@@ -2,12 +2,13 @@ package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 
+import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
@@ -42,6 +43,20 @@ public class ArcHandler extends PetriNetObjectHandler {
 
 			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}
+
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            pane.setText(
+                "(Debug) \n" +
+                    "  Source: " + ((Arc) myObject).getSource().getId() +"\n"+
+                    "  Target: " + ((Arc) myObject).getTarget().getId()
+            );
+
+            popup.insert(pane, 1);
+        }
+
 		return popup;
 	}
 	
