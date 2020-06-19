@@ -164,8 +164,8 @@ public class DataLayer {
 		}
 
         if (arcInput.getId() != null && arcInput.getId().length() > 0) {
-            for (int i = 0; i < arcsArray.size(); i++) {
-                if (arcInput.getId().equals((arcsArray.get(i)).getId())) {
+            for (Arc arc : arcsArray) {
+                if (arcInput.getId().equals(arc.getId())) {
                     unique = false;
                 }
             }
@@ -174,10 +174,10 @@ public class DataLayer {
             if (arcsArray.size() > 0) {
                 int no = arcsArray.size();
                 do {
-                    for (int i = 0; i < arcsArray.size(); i++) {
+                    for (Arc arc : arcsArray) {
                         id = "A" + no;
-                        if (arcsArray.get(i) != null) {
-                            if (id.equals((arcsArray.get(i)).getId())) {
+                        if (arc != null) {
+                            if (id.equals(arc.getId())) {
                                 unique = false;
                                 no++;
                             } else {
@@ -218,7 +218,6 @@ public class DataLayer {
 
                 } else {
                     // First is TimedTransition
-                    tmp = (TimedTransportArcComponent) arcInput;
 
                     for (Object o : tmp.getSource().getPreset()) {
 
@@ -255,27 +254,27 @@ public class DataLayer {
 
 		if (inhibitorArcInput != null) {
 			if (inhibitorArcInput.getId() != null && inhibitorArcInput.getId().length() > 0) {
-				for (int i = 0; i < arcsArray.size(); i++) {
-					if (inhibitorArcInput.getId().equals((arcsArray.get(i)).getId())) {
-						unique = false;
-					}
-				}
+                for (Arc arc : arcsArray) {
+                    if (inhibitorArcInput.getId().equals(arc.getId())) {
+                        unique = false;
+                    }
+                }
 			} else {
 				String id = null;
 				if (arcsArray.size() > 0) {
 					int no = arcsArray.size();
 					do {
-						for (int i = 0; i < arcsArray.size(); i++) {
-							id = "I" + no;
-							if (arcsArray.get(i) != null) {
-								if (id.equals((arcsArray.get(i)).getId())) {
-									unique = false;
-									no++;
-								} else {
-									unique = true;
-								}
-							}
-						}
+                        for (Arc arc : arcsArray) {
+                            id = "I" + no;
+                            if (arc != null) {
+                                if (id.equals(arc.getId())) {
+                                    unique = false;
+                                    no++;
+                                } else {
+                                    unique = true;
+                                }
+                            }
+                        }
 					} while (!unique);
 				} else {
 					id = "I0";
