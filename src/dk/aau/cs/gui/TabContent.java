@@ -37,9 +37,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.undo.*;
 import pipe.gui.widgets.ConstantsPane;
@@ -146,6 +144,151 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
+        public void deleteSelection() {
+            // check if queries need to be removed
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+            Iterable<TAPNQuery> queries = queries();
+            HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+
+            boolean queriesAffected = false;
+            for (PetriNetObject pn : selection) {
+                if (pn instanceof TimedPlaceComponent) {
+                    TimedPlaceComponent place = (TimedPlaceComponent)pn;
+                    if(!place.underlyingPlace().isShared()){
+                        for (TAPNQuery q : queries) {
+                            if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+                                queriesAffected = true;
+                                queriesToDelete.add(q);
+                            }
+                        }
+                    }
+                } else if (pn instanceof TimedTransitionComponent){
+                    TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+                    if(!transition.underlyingTransition().isShared()){
+                        for (TAPNQuery q : queries) {
+                            if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
+                                queriesAffected = true;
+                                queriesToDelete.add(q);
+                            }
+                        }
+                    }
+                }
+            }
+            StringBuilder s = new StringBuilder();
+            s.append("The following queries are associated with the currently selected objects:\n\n");
+            for (TAPNQuery q : queriesToDelete) {
+                s.append(q.getName());
+                s.append('\n');
+            }
+            s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+
+            int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+                CreateGui.getApp(), s.toString(), "Warning",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+                : JOptionPane.YES_OPTION;
+
+            if (choice == JOptionPane.YES_OPTION) {
+                getUndoManager().newEdit(); // new "transaction""
+                if (queriesAffected) {
+                    TabContent currentTab = TabContent.this;
+                    for (TAPNQuery q : queriesToDelete) {
+                        Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+                        cmd.redo();
+                        getUndoManager().addEdit(cmd);
+                    }
+                }
+
+                deleteSelection(selection);
+                network().buildConstraints();
+            }
+        }
+
+        //XXX: function moved from undoManager --kyrke - 2019-07-06
+        private void deleteObject(PetriNetObject pnObject) {
+            if (pnObject instanceof ArcPathPoint) {
+
+                ArcPathPoint arcPathPoint = (ArcPathPoint)pnObject;
+
+                //If the arc is marked for deletion, skip deleting individual arcpathpoint
+                if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
+
+                    //Don't delete the two last arc path points
+                    if (arcPathPoint.isDeleteable()) {
+                        Command cmd = new DeleteArcPathPointEdit(
+                            arcPathPoint.getArcPath().getArc(),
+                            arcPathPoint,
+                            arcPathPoint.getIndex(),
+                            getModel()
+                        );
+                        cmd.redo();
+                        getUndoManager().addEdit(cmd);
+                    }
+                }
+            }else{
+                //The list of selected objects is not updated when a element is deleted
+                //We might delete the same object twice, which will give an error
+                //Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
+                //There is properly a better way to track this (check model?) but while refactoring we will keeps it close
+                //to the orginal code -- kyrke 2019-06-27
+                if (!pnObject.isDeleted()) {
+                    Command cmd = null;
+                    if(pnObject instanceof TimedPlaceComponent){
+                        TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
+                        cmd = new DeleteTimedPlaceCommand(tp, guiModelToModel.get(getModel()), getModel());
+                    }else if(pnObject instanceof TimedTransitionComponent){
+                        TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
+                        cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), getModel());
+                    }else if(pnObject instanceof TimedTransportArcComponent){
+                        TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
+                        cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), getModel());
+                    }else if(pnObject instanceof TimedInhibitorArcComponent){
+                        TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
+                        cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), getModel());
+                    }else if(pnObject instanceof TimedInputArcComponent){
+                        TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
+                        cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), getModel());
+                    }else if(pnObject instanceof TimedOutputArcComponent){
+                        TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
+                        cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), getModel());
+                    }else if(pnObject instanceof AnnotationNote){
+                        cmd = new DeleteAnnotationNoteCommand((AnnotationNote)pnObject, getModel());
+                    }else{
+                        throw new RuntimeException("This should not be possible");
+                    }
+                    cmd.redo();
+                    getUndoManager().addEdit(cmd);
+                }
+            }
+        }
+
+
+        private void deleteSelection(PetriNetObject pnObject) {
+            if(pnObject instanceof PlaceTransitionObject){
+                PlaceTransitionObject pto = (PlaceTransitionObject)pnObject;
+
+                ArrayList<Arc> arcsToDelete = new ArrayList<>();
+
+                //Notice since we delte elements from the collection we can't do this while iterating, we need to
+                // capture the arcs and delete them later.
+                for(Arc arc : pto.getPreset()){
+                    arcsToDelete.add(arc);
+                }
+
+                for(Arc arc : pto.getPostset()){
+                    arcsToDelete.add(arc);
+                }
+
+                arcsToDelete.forEach(this::deleteObject);
+            }
+
+            deleteObject(pnObject);
+        }
+
+        public void deleteSelection(ArrayList<PetriNetObject> selection) {
+            for (PetriNetObject pnObject : selection) {
+                deleteSelection(pnObject);
+            }
+        }
     }
 
 
@@ -1368,62 +1511,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void deleteSelection() {
-		// check if queries need to be removed
-		ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
-		Iterable<TAPNQuery> queries = queries();
-		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-
-		boolean queriesAffected = false;
-		for (PetriNetObject pn : selection) {
-			if (pn instanceof TimedPlaceComponent) {
-				TimedPlaceComponent place = (TimedPlaceComponent)pn;
-				if(!place.underlyingPlace().isShared()){
-					for (TAPNQuery q : queries) {
-						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
-							queriesAffected = true;
-							queriesToDelete.add(q);
-						}
-					}
-				}
-			} else if (pn instanceof TimedTransitionComponent){
-				TimedTransitionComponent transition = (TimedTransitionComponent)pn;
-				if(!transition.underlyingTransition().isShared()){
-					for (TAPNQuery q : queries) {
-						if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
-							queriesAffected = true;
-							queriesToDelete.add(q);
-						}
-					}
-				}
-			}
-		}
-		StringBuilder s = new StringBuilder();
-		s.append("The following queries are associated with the currently selected objects:\n\n");
-		for (TAPNQuery q : queriesToDelete) {
-			s.append(q.getName());
-			s.append('\n');
-		}
-		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
-
-		int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-				CreateGui.getApp(), s.toString(), "Warning",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-				: JOptionPane.YES_OPTION;
-
-		if (choice == JOptionPane.YES_OPTION) {
-			getUndoManager().newEdit(); // new "transaction""
-			if (queriesAffected) {
-				TabContent currentTab = this;
-				for (TAPNQuery q : queriesToDelete) {
-					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
-					cmd.redo();
-					getUndoManager().addEdit(cmd);
-				}
-			}
-
-			drawingSurface().deleteSelection(selection);
-			network().buildConstraints();
-		}
+		guiModelManager.deleteSelection();
 
 
 	}
