@@ -104,7 +104,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
 	@Override
-	public void addNewPetriNetObject(PetriNetObject newObject) {
+	public void addNewPetriNetObject(GraphicalElement newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		newObject.zoomUpdate(zoomControl.getPercent());
 		newObject.setManagerRef(managerRef);
@@ -125,7 +125,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	//XXX temp solution while refactorting, component removes children them self
 	//migth not be best solution long term.
 	@Override
-	public void removePetriNetObject(PetriNetObject pno) {
+	public void removePetriNetObject(GraphicalElement pno) {
 		pno.removedFromGui();
 		pno.setManagerRef(null);
 		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
@@ -341,7 +341,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
     @Override
-    public void addPrototype(PetriNetObject pno) {
+    public void addPrototype(GraphicalElement pno) {
 		pno.zoomUpdate(getZoom());
 
         add(pno);
@@ -351,7 +351,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     }
 
     @Override
-    public void removePrototype(PetriNetObject pno) {
+    public void removePrototype(GraphicalElement pno) {
         remove(pno);
     }
 

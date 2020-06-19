@@ -18,7 +18,7 @@ import pipe.gui.handler.PetriNetObjectHandler;
  * Petri-Net Object Class 
  * Implements things in common between all types of objects
  */
-public abstract class PetriNetObject extends JComponent implements Zoomable, Translatable {
+public abstract class PetriNetObject extends GraphicalElement implements Drawable {
 
 	protected static final int COMPONENT_DRAW_OFFSET= 5;
 	/** x/y position position on screen (zoomed) */
@@ -43,9 +43,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	private int zoom = Pipe.ZOOM_DEFAULT;
 
 	private DataLayer guiModel;
-	private Reference<AbstractDrawingSurfaceManager> managerRef = null;
 
-	public PetriNetObjectHandler getMouseHandler() {
+    public PetriNetObjectHandler getMouseHandler() {
 		return mouseHandler;
 	}
 
@@ -62,8 +61,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.clicked
 					));
 				}
@@ -74,8 +73,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.pressed
 					));
 				}
@@ -86,8 +85,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.released
 					));
 				}
@@ -98,8 +97,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.entered
 					));
 				}
@@ -110,8 +109,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.exited
 					));
 				}
@@ -124,8 +123,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.wheel
 					));
 				}
@@ -138,8 +137,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 		addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				if (getManagerRef() !=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.dragged
 					));
 				}
@@ -150,8 +149,8 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				/*if (managerRef!=null && managerRef.get()!=null) {
-					managerRef.get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+				/*if (getManagerRef()!=null && getManagerRef().get()!=null) {
+					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.moved
 					));
 				}*/
@@ -262,16 +261,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	}
 
 
-	public Reference<AbstractDrawingSurfaceManager> getManagerRef() {
-		return managerRef;
-	}
-
-	public void setManagerRef(Reference<AbstractDrawingSurfaceManager> manager) {
-		this.managerRef = manager;
-	}
-
-
-	public int getOriginalX() {
+    public int getOriginalX() {
 		return originalX;
 	}
 
@@ -341,4 +331,9 @@ public abstract class PetriNetObject extends JComponent implements Zoomable, Tra
 	public int getPositionY() {
 		return positionY;
 	}
+
+    @Override
+    public GraphicalElement getGraphicalElement() {
+        return this;
+    }
 }

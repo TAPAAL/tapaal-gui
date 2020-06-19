@@ -29,13 +29,13 @@ public class DataLayer {
 	//migth not be best solution long term.
 	private void removeFromViewIfConnected(PetriNetObject pno) {
 		if (view != null) {
-			view.removePetriNetObject(pno);
+			view.removePetriNetObject(pno.getGraphicalElement());
 		}
 	}
 
 	private void addToViewIfConnected(PetriNetObject pno) {
 		if (view != null) {
-			view.addNewPetriNetObject(pno);
+			view.addNewPetriNetObject(pno.getGraphicalElement());
 		}
 	}
 
