@@ -42,23 +42,23 @@ public class DataLayer {
 	/** PNML File Name */
 	public String pnmlName = null;
 	/** List containing all the Place objects in the Petri-Net */
-	private ArrayList<Place> placesArray = null;
+	private final ArrayList<Place> placesArray = new ArrayList<Place>();
 	/** ArrayList containing all the Transition objects in the Petri-Net */
-	private ArrayList<Transition> transitionsArray = null;
+	private final ArrayList<Transition> transitionsArray = new ArrayList<Transition>();
 	/** ArrayList containing all the Arc objects in the Petri-Net */
-	private ArrayList<Arc> arcsArray = null;
+	private final ArrayList<Arc> arcsArray = new ArrayList<Arc>();
 
 	/** Set holding all ArcPathPoints
 	 * Uses the reference as lookup key (not hash code)
 	 * Collections.newSetFromMap(new IdentityHashMap<E, Boolean>());
 	 * */
-	private Set<ArcPathPoint> arcPathSet = Collections.newSetFromMap(new IdentityHashMap<>());
+	private final Set<ArcPathPoint> arcPathSet = Collections.newSetFromMap(new IdentityHashMap<>());
 
 	/**
 	 * ArrayList for net-level label objects (as opposed to element-level
 	 * labels).
 	 */
-	private ArrayList<AnnotationNote> labelsArray = null;
+	private final ArrayList<AnnotationNote> labelsArray = new ArrayList<AnnotationNote>();
 
 	/**
 	 * An ArrayList used to point to either the Arc, Place or Transition
@@ -66,17 +66,18 @@ public class DataLayer {
 	 */
 	private ArrayList<? extends PetriNetObject> changeArrayList = null;
 
-	/**
+    // may as well do the hashtable here as well
+    /**
 	 * Hashtable which maps PlaceTransitionObjects to their list of connected
 	 * arcs
 	 */
-	private Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>> arcsMap = null;
+	private final Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>> arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>>();
 
 	/**
 	 * Hashtable which maps PlaceTransitionObjects to their list of connected
 	 * arcs
 	 */
-	private Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = null;
+	private final Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>>();
 
 
 	//XXX: Added from drawingsurface to have a way to acces all elements added,
@@ -101,16 +102,8 @@ public class DataLayer {
 	 * Create empty Petri-Net object
 	 */
 	public DataLayer() {
-		placesArray = new ArrayList<Place>();
-		transitionsArray = new ArrayList<Transition>();
-		arcsArray = new ArrayList<Arc>();
-
-		labelsArray = new ArrayList<AnnotationNote>();
-
-		// may as well do the hashtable here as well
-		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>>();
-		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>>();
-	}
+        super();
+    }
 
 
 	/**
