@@ -10,10 +10,7 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
 
-import dk.aau.cs.approximation.OverApproximation;
-import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
@@ -321,7 +318,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//Set Default Template
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
-		tab.addTemplate(template, false);
+		tab.addTemplate(template);
 
 		return tab;
 	}
@@ -952,26 +949,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return count;
 	}
 
-	/*
-		XXX: 2018-05-07 kyrke, added a version of addTemplate that does not call templatExplorer.updatTemplateList
-		used in createNewTab (as updateTamplateList expects the current tab to be selected)
-		this needs to be refactored asap. but the is the only way I could get it to work for now.
-		The code is very unclean on what is a template, TimeArcPetriNetNetwork, seems to mix concerns about
-		gui/controller/model. Further refactoring is needed to clean up this mess.
-	 */
-	public void addTemplate(Template template, boolean updateTemplateExplorer) {
+	public void addTemplate(Template template) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
         guiModelToModel.put(template.guiModel(), template.model());
 		zoomLevels.put(template.model(), template.zoomer());
 		hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
-		if (updateTemplateExplorer) {
-			templateExplorer.updateTemplateList();
-		}
-	}
-
-	public void addTemplate(Template template) {
-		addTemplate(template, true);
+		templateExplorer.updateTemplateList();
 	}
 
 	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {
