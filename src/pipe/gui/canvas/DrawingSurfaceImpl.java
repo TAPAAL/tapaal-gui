@@ -589,13 +589,19 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		if(pnObject instanceof PlaceTransitionObject){
 			PlaceTransitionObject pto = (PlaceTransitionObject)pnObject;
 
+			ArrayList<Arc> arcsToDelete = new ArrayList<>();
+
+			//Notice since we delte elements from the collection we can't do this while iterating, we need to
+            // capture the arcs and delete them later.
 			for(Arc arc : pto.getPreset()){
-				deleteObject(arc);
+				arcsToDelete.add(arc);
 			}
 
 			for(Arc arc : pto.getPostset()){
-				deleteObject(arc);
+				arcsToDelete.add(arc);
 			}
+
+			arcsToDelete.forEach(this::deleteObject);
 		}
 
 		deleteObject(pnObject);
