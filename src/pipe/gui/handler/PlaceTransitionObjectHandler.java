@@ -1,8 +1,9 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
+import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
@@ -47,7 +48,36 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		enablePopup = true;
 	}
 
-	private void createArc(Arc newArc, PlaceTransitionObject currentObject) {
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+	    JPopupMenu popup = super.getPopup(e);
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            String preset = "";
+            for (Arc arc : ((PlaceTransitionObject) myObject).getPreset()) {
+                preset += "    "  + arc.getId() + "\n";
+            }
+            String postset = "";
+            for (Arc arc : ((PlaceTransitionObject) myObject).getPostset()) {
+                postset += "    "  + arc.getId() + "\n";
+            }
+
+            pane.setText(
+                "(Debug) \n" +
+                    "  preset: " +"\n" +
+                    preset +
+                "  postset: " +"\n"+
+                    postset
+            );
+
+            popup.insert(pane, 1);
+        }
+        return popup;
+    }
+
+    private void createArc(Arc newArc, PlaceTransitionObject currentObject) {
 
 		//XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
 		//to avoid this we change the endpoint to set the end point to the same as the end point
