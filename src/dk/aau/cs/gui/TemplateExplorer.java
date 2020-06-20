@@ -475,7 +475,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private void onOKRenameTemplate() {		
 		Template template = selectedModel();			
 		String newName = nameTextField.getText().trim();
-		if (newName == null || template.model().name().equals(newName)) {
+		if (template.model().name().equals(newName)) {
 			exit();
 			return;
 		}
@@ -507,37 +507,34 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	private void onOK() {
-		Template template = null;		
-		String templateName = nameTextField.getText().trim();		
-		if (templateName != null) {
-			if(!isNameAllowed(templateName)) {
-				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-				exit();
-				ShowNewTemplateDialog(templateName);
-				return;
-			}
-			else if (parent.network().hasTAPNCalled(templateName)) {
-				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-				exit();
-				ShowNewTemplateDialog(templateName);
-				return;
-			}
-			else {
-				template = createNewTemplate(templateName);
+        String templateName = nameTextField.getText().trim();
+        if(!isNameAllowed(templateName)) {
+            JOptionPane.showMessageDialog(parent.drawingSurface(),
+                    "Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
+                    "Error Creating Component",
+                    JOptionPane.ERROR_MESSAGE);
+            exit();
+            ShowNewTemplateDialog(templateName);
+            return;
+        }
+        else if (parent.network().hasTAPNCalled(templateName)) {
+            JOptionPane.showMessageDialog(parent.drawingSurface(),
+                    "A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
+                    "Error Creating Component",
+                    JOptionPane.ERROR_MESSAGE);
+            exit();
+            ShowNewTemplateDialog(templateName);
+            return;
+        }
+        else {
+            Template template = createNewTemplate(templateName);
 
-				int index = listModel.size();
-				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
-				parent.addTemplate(template);
-			}
-		}
+            int index = listModel.size();
+            undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+            parent.addTemplate(template);
+        }
 
-		exit();
+        exit();
 	}
 	
 	private void exit() {
@@ -638,8 +635,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	private void ShowNewTemplateDialog(String nameToShow) {
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Enter Component Name", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Enter Component Name", true);
 		initComponentsOfNewTemplateDialog(nameToShow);
 		dialog.add(container);
 		dialog.setResizable(false);
@@ -741,8 +737,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	private void showRenameTemplateDialog(String nameToShow) {		
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Enter Component Name", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Enter Component Name", true);
 		Template template = selectedModel();
 		if (nameToShow.equals("")){
 			initComponentsOfRenameTemplateDialog(template.model().name());
@@ -788,7 +783,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	public void updateTemplateList() {
 		int selectedIndex = templateList.getSelectedIndex();
-		DefaultListModel newList = new DefaultListModel();
+		DefaultListModel<Template> newList = new DefaultListModel<>();
 		
 		if(isInAnimationMode) {
 			for (Template net : parent.activeTemplates()) {
@@ -851,7 +846,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
         listModel.setElementAt(o, index+1);
     }
     @Override
-    public JList getJList(){
+    public JList<Template> getJList(){
 	    return templateList;
     }
 
