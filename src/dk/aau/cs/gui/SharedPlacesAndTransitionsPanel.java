@@ -45,16 +45,16 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private static final String PLACES = "Places";
 
 	private JList list;
-	private SharedPlacesListModel sharedPlacesListModel;
-	private SharedTransitionsListModel sharedTransitionsListModel;
+	private final SharedPlacesListModel sharedPlacesListModel;
+	private final SharedTransitionsListModel sharedTransitionsListModel;
 	private JComboBox placesTransitionsComboBox;
-	private UndoManager undoManager;
-	private NameGenerator nameGenerator;
-	private TabContent tab;
+	private final UndoManager undoManager;
+	private final NameGenerator nameGenerator;
+	private final TabContent tab;
 
-	private JButton renameButton = new JButton("Rename");
-	private JButton removeButton  = new JButton("Remove");
-	private JButton addButton = new JButton("New");
+	private final JButton renameButton = new JButton("Rename");
+	private final JButton removeButton  = new JButton("Remove");
+	private final JButton addButton = new JButton("New");
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
