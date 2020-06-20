@@ -994,21 +994,24 @@ public class TemplateExplorer extends JPanel implements SidePane {
 						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
-						if(templateList.getModel().getSize() >= 2)
-							sortButton.setEnabled(true);
-						else
-							sortButton.setEnabled(false);
-						
-						if(index > 0)
-							moveUpButton.setEnabled(true);
-						else
-							moveUpButton.setEnabled(false);
+						if(templateList.getModel().getSize() >= 2) {
+                            sortButton.setEnabled(true);
+                        } else {
+                            sortButton.setEnabled(false);
+                        }
+
+						if(index > 0) {
+                            moveUpButton.setEnabled(true);
+                        } else {
+                            moveUpButton.setEnabled(false);
+                        }
 								
 							
-						if(index < parent.network().allTemplates().size() - 1)
-							moveDownButton.setEnabled(true);
-						else
-							moveDownButton.setEnabled(false);
+						if(index < parent.network().allTemplates().size() - 1) {
+                            moveDownButton.setEnabled(true);
+                        } else {
+                            moveDownButton.setEnabled(false);
+                        }
 					}
 					templateList.ensureIndexIsVisible(index);
 					openSelectedTemplate();
