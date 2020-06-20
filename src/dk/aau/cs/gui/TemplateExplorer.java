@@ -80,8 +80,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private JButton renameButton;
 	private JButton copyButton;
 
-	private TabContent parent;
-	private UndoManager undoManager;
+	private final TabContent parent;
+	private final UndoManager undoManager;
 	private boolean isInAnimationMode;
 
 	public JButton moveUpButton;
