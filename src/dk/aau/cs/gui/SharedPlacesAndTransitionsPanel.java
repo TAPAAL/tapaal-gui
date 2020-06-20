@@ -44,10 +44,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private static final String TRANSITIONS = "Transitions";
 	private static final String PLACES = "Places";
 
-	private JList list;
+	private final JList list = new NonsearchableJList();
 	private final SharedPlacesListModel sharedPlacesListModel;
 	private final SharedTransitionsListModel sharedTransitionsListModel;
-	private JComboBox placesTransitionsComboBox;
+	private final JComboBox placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
 	private final TabContent tab;
@@ -127,9 +127,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 
 	private void initComponents() {
 		JPanel listPanel = new JPanel(new GridBagLayout());
-		
-		list = new NonsearchableJList();
-		list.addListSelectionListener(new ListSelectionListener() {
+
+        list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){
 					JList source = (JList)e.getSource();
@@ -261,9 +260,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTH;
 		listPanel.add(sortButton,gbc);
-		
-		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
-		placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
+
+        placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
 		placesTransitionsComboBox.addActionListener(e -> {
 			JComboBox source = (JComboBox)e.getSource();
 			String selectedItem = (String)source.getSelectedItem();
