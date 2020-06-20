@@ -187,7 +187,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new GridBagLayout());
-		listModel = new DefaultListModel();
+		listModel = new DefaultListModel<>();
 		for (Template net : parent.allTemplates()) {
 			listModel.addElement(net);
 		}
@@ -213,7 +213,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			}
 		});
 
-		templateList = new NonsearchableJList(listModel);
+		templateList = new NonsearchableJList<>(listModel);
 
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
