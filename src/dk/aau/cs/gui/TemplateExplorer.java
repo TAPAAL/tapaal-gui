@@ -776,7 +776,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	public void openSelectedTemplate() {
 		Template tapn = selectedModel();
-		if (tapn != null && parent.isTabInFocus()) {
+		if (tapn != null) {
 			parent.changeToTemplate(tapn);
 		}
 		//parent.drawingSurface().repaintAll();
