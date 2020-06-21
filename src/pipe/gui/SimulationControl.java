@@ -52,10 +52,8 @@ public class SimulationControl extends JPanel {
 		simulationSpeed.setPreferredSize(new Dimension(340, simulationSpeed.getPreferredSize().height));
 		
 		simulationSpeed.addChangeListener(e -> {
-			if(timer != null){
-				setDelay((100 - simulationSpeed.getValue())*20);
-			}
-		});
+            setDelay((100 - simulationSpeed.getValue())*20);
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
