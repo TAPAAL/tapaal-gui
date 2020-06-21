@@ -4,7 +4,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
 // TODO: Fix this to work on the model class instead of the GUI class
 public class TimedPlaceMarkingEdit extends Command {
-	private int numberOfTokens;
+	private final int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;
 
 	public TimedPlaceMarkingEdit(TimedPlaceComponent tpc, int numberOfTokens) {
