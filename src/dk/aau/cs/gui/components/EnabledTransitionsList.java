@@ -110,12 +110,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 	}
 
-	public void removeTransition(Template template, Transition transition){
-		TransitionListItem item = new TransitionListItem(transition, template);
-		transitions.removeElement(item);
-	}
-
-	public void fireSelectedTransition(){
+    public void fireSelectedTransition(){
 		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
@@ -124,7 +119,6 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	interface ListItem extends Comparable<ListItem>{}
-
 
 
 	static class TransitionListItem implements ListItem{
