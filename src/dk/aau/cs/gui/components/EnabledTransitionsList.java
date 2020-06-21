@@ -38,16 +38,14 @@ public class EnabledTransitionsList extends JPanel{
 		initPanel();
 	}
 
-	DefaultListModel<TransitionListItem> transitions;
-	JList<TransitionListItem> transitionsList;
-	JScrollPane scrollPane;
+	final DefaultListModel<TransitionListItem> transitions = new DefaultListModel<>();
+	final JList<TransitionListItem> transitionsList = new JList<>(transitions);
+	final JScrollPane scrollPane = new JScrollPane(transitionsList);
 	TransitionListItem lastSelected;
 
 	public void initPanel(){
-		transitions = new DefaultListModel<>();
-		transitionsList = new JList<>(transitions);
 
-		transitionsList.addMouseListener(new MouseAdapter() {
+        transitionsList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2){
@@ -63,9 +61,7 @@ public class EnabledTransitionsList extends JPanel{
 			}
 		});
 
-		scrollPane = new JScrollPane(transitionsList);
-
-		this.add(scrollPane, BorderLayout.CENTER);
+        this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	public void startReInit(){
@@ -132,8 +128,8 @@ public class EnabledTransitionsList extends JPanel{
 
 
 	static class TransitionListItem implements ListItem{
-		private Transition transition;
-		private Template template;
+		private final Transition transition;
+		private final Template template;
 
 		public TransitionListItem(Transition transition, Template template){
 			this.transition = transition;
