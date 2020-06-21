@@ -151,18 +151,5 @@ public abstract class TimedPlace {
         currentMarking = marking;
         fireMarkingChanged();
     }
-	
-	
-//	public abstract void addInhibitorArc(TimedInhibitorArc arc);
-//	public abstract void addToPreset(TransportArc arc);
-//	public abstract void addToPreset(TimedOutputArc arc);
-//	public abstract void addToPostset(TransportArc arc);
-//	public abstract void addToPostset(TimedInputArc arc);
-//
-//	public abstract void removeFromPostset(TimedInputArc arc);
-//	public abstract void removeFromPostset(TransportArc arc);
-//	public abstract void removeFromPreset(TransportArc arc);
-//	public abstract void removeFromPreset(TimedOutputArc arc);
-//	public abstract void removeInhibitorArc(TimedInhibitorArc arc);
 
 }
