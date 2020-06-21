@@ -1,8 +1,6 @@
 package dk.aau.cs.model.tapn;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
@@ -10,18 +8,10 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class LocalTimedPlace  extends TimedPlace {
-	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
-
-	private String name;
-	private TimeInvariant invariant;
 
 	private TimedArcPetriNet model;
-	private TimedMarking currentMarking;
-	private final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
-	
-	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
 
-	public LocalTimedPlace(String name) {
+    public LocalTimedPlace(String name) {
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
 	}
 

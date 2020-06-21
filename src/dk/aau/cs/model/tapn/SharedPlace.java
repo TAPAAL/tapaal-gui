@@ -12,18 +12,10 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
-	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
-	
-	private String name;
-	private TimeInvariant invariant;
-	
-	private TimedArcPetriNetNetwork network;
-	private TimedMarking currentMarking;
-	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
-	
-	private final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 
-	public SharedPlace(String name){
+    private TimedArcPetriNetNetwork network;
+
+    public SharedPlace(String name){
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
 	}
 	

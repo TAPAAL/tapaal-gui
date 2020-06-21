@@ -3,12 +3,20 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Tuple;
 
 public abstract class TimedPlace {
-	public enum PlaceType{
+    protected static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+    protected final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
+    protected Tuple<PlaceType, Integer> extrapolation = new Tuple<PlaceType, Integer>(PlaceType.Dead, -2);
+    protected String name;
+    protected TimeInvariant invariant;
+    protected TimedMarking currentMarking;
+
+    public enum PlaceType{
 		Standard, Invariant, Dead
 	}
 	
