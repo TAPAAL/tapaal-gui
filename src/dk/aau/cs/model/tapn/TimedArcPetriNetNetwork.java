@@ -19,7 +19,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 	
-	private NetworkMarking currentMarking;
+	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
 	
 	private int defaultBound = 3;
@@ -34,8 +34,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public TimedArcPetriNetNetwork(ConstantStore constants){
 		this.constants = constants;
-		currentMarking = new NetworkMarking();
-		buildConstraints();
+        buildConstraints();
 	}
 	
 	public void addConstantsListener(ConstantsListener listener){
