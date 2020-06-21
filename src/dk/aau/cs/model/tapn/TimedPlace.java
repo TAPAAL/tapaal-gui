@@ -43,7 +43,7 @@ public abstract class TimedPlace {
         }
     }
 
-    public abstract void removeToken();
+    protected abstract void removeToken();
 	
 	public abstract Tuple<PlaceType, Integer> extrapolate();
 	
