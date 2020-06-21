@@ -1,14 +1,9 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
-import dk.aau.cs.model.tapn.event.TimedPlaceListener;
-import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
