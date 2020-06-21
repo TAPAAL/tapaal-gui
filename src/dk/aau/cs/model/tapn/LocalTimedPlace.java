@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.model.tapn.TimedPlace.PlaceType;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
@@ -129,14 +128,7 @@ public class LocalTimedPlace  extends TimedPlace {
 		fireMarkingChanged();
 	}
 
-	@Override
-	public void removeToken(TimedToken timedToken) {
-		Require.that(timedToken != null, "timedToken cannot be null");
-		currentMarking.remove(timedToken);
-		fireMarkingChanged();
-	}
-
-	@Override
+    @Override
 	public void removeToken() {
 		if (numberOfTokens() > 0) {
 			currentMarking.remove(tokens().get(0));

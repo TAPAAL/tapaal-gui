@@ -108,14 +108,7 @@ public class SharedPlace extends TimedPlace{
 		fireMarkingChanged();
 	}
 
-	@Override
-	public void removeToken(TimedToken timedToken) {
-		Require.that(timedToken != null, "timedToken cannot be null");
-		currentMarking.remove(timedToken);
-		fireMarkingChanged();
-	}
-
-	@Override
+    @Override
 	public void removeToken() {
 		if (numberOfTokens() > 0) {
 			currentMarking.remove(tokens().get(0));
