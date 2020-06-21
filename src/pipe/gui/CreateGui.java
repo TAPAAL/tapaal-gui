@@ -14,18 +14,16 @@ import dk.aau.cs.gui.TabContent;
 
 public class CreateGui {
 
-	private static GuiFrame appGui;
-    private static GuiFrameController appGuiController;
+	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
+    private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
 
-	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
+	private static final ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	public static final String imgPath = "resources/Images/";
 
 	public static void init() {
-		appGui = new GuiFrame(TAPAAL.getProgramName());
-        appGuiController = new GuiFrameController(appGui);
 
-		if (Platform.isMac()){
+        if (Platform.isMac()){
 			try {
 				SpecialMacHandler.postprocess();
 			} catch (NoClassDefFoundError e) {
@@ -39,8 +37,7 @@ public class CreateGui {
 
 	@Deprecated
 	public static DataLayer getModel() {
-	    if (appGui==null) return null;
-		return getModel(appGui.getSelectedTabIndex());
+        return getModel(appGui.getSelectedTabIndex());
 	}
 
 	@Deprecated
