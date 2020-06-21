@@ -84,8 +84,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private final UndoManager undoManager;
 	private boolean isInAnimationMode;
 
-	public JButton moveUpButton;
-	public JButton moveDownButton;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 	private JButton sortButton;
 	
 	private static final String toolTipNewComponent ="Create a new component";
