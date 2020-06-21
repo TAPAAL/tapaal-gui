@@ -18,12 +18,12 @@ public class TimedArcPetriNet {
 	//This is used when loading big nets as the checking  of names is slow.
 	private boolean checkNames = true; 
 
-	private List<TimedPlace> places = new ArrayList<TimedPlace>();
-	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
-	private List<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
-	private List<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
-	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-	private List<TransportArc> transportArcs = new ArrayList<TransportArc>();
+	private final List<TimedPlace> places = new ArrayList<TimedPlace>();
+	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
+	private final List<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
+	private final List<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+	private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+	private final List<TransportArc> transportArcs = new ArrayList<TransportArc>();
 
 	private TimedMarking currentMarking;
 
