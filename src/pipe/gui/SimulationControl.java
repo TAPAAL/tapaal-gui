@@ -97,11 +97,7 @@ public class SimulationControl extends JPanel {
         timer.setRepeats(true);
 	}
 
-	public JSlider getSimulationSpeedSlider(){
-		return simulationSpeed;
-	}
-	
-	public boolean randomSimulation(){
+    public boolean randomSimulation(){
 		return randomSimulation.isSelected();
 	}
 	
