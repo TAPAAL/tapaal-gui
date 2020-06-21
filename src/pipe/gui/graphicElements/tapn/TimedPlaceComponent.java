@@ -397,18 +397,6 @@ public class TimedPlaceComponent extends Place {
 		this.update(true);
 	}
 
-	public void addTokens(int numberOfTokensToAdd) {
-		for (int i = 0; i < numberOfTokensToAdd; i++) {
-			place.addToken(new TimedToken(place, BigDecimal.ZERO));
-		}
-	}
-
-	public void removeTokens(int numberOfTokensToRemove) {
-		for (int i = 0; i < numberOfTokensToRemove; i++) {
-			place.removeToken();
-		}
-	}
-
 	public int getNumberOfTokens() {
 		return place.numberOfTokens(); 
 	}

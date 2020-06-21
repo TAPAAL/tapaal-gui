@@ -91,9 +91,9 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		if (myObject instanceof TimedPlaceComponent) {
             TimedPlaceComponent p = (TimedPlaceComponent) myObject;
 		    if (e.getWheelRotation() < 0) {
-                p.addTokens(1);
+                p.underlyingPlace().addTokens(1);
             } else {
-                p.removeTokens(1);
+                p.underlyingPlace().removeTokens(1);
             }
         }
 	}

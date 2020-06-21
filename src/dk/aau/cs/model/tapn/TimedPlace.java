@@ -1,5 +1,6 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,18 @@ public abstract class TimedPlace {
 	
 	public abstract void addToken(TimedToken timedToken);
 	public abstract void addTokens(Iterable<TimedToken> tokens);
+
+    public void addTokens(int numberOfTokensToAdd) {
+        for (int i = 0; i < numberOfTokensToAdd; i++) {
+            addToken(new TimedToken(this, BigDecimal.ZERO));
+        }
+    }
+
+    public void removeTokens(int numberOfTokensToRemove) {
+        for (int i = 0; i < numberOfTokensToRemove; i++) {
+            removeToken();
+        }
+    }
 
 	public abstract void removeToken(TimedToken timedToken);
 	public abstract void removeToken();
