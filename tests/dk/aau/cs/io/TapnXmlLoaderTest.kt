@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
-
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent
+import java.math.BigDecimal
 
 
 internal class TapnXmlLoaderTest {
@@ -78,6 +79,49 @@ internal class TapnXmlLoaderTest {
 
             Assertions.assertThrows(Exception::class.java){
                 tapnXmlLoader.load(net)
+            }
+        }
+
+        @Test
+        fun `Place has no initial tokesn`() {
+            val net = xmlNet("""
+                    <place displayName="true" id="Start" initialMarking="0" invariant="&lt; inf" name="Start" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="30.0"/>
+                """).asInpurtStream()
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val model = tapnXmlLoader.load(net)
+            val place = model.templates().first().guiModel().getPlaceByName("Start") as TimedPlaceComponent
+
+            Assertions.assertEquals(0, place.numberOfTokens)
+        }
+
+        @Test
+        fun `Place has one token`() {
+            val net = xmlNet("""
+                    <place displayName="true" id="Start" initialMarking="1" invariant="&lt; inf" name="Start" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="30.0"/>
+                """).asInpurtStream()
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val model = tapnXmlLoader.load(net)
+            val place = model.templates().first().guiModel().getPlaceByName("Start") as TimedPlaceComponent
+
+            Assertions.assertEquals(1, place.numberOfTokens)
+            Assertions.assertEquals(BigDecimal.ZERO, place.underlyingPlace().tokens().first().age())
+        }
+
+        @Test
+        fun `Place has 5 token`() {
+            val net = xmlNet("""
+                    <place displayName="true" id="Start" initialMarking="5" invariant="&lt; inf" name="Start" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="30.0"/>
+                """).asInpurtStream()
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val model = tapnXmlLoader.load(net)
+            val place = model.templates().first().guiModel().getPlaceByName("Start") as TimedPlaceComponent
+
+            Assertions.assertEquals(5, place.numberOfTokens)
+            place.underlyingPlace().tokens().forEach {
+                Assertions.assertEquals(BigDecimal.ZERO, it.age())
             }
         }
 
