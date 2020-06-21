@@ -25,11 +25,10 @@ public class TimedArcPetriNet {
 	private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	private final List<TransportArc> transportArcs = new ArrayList<TransportArc>();
 
-	private TimedMarking currentMarking;
+	private TimedMarking currentMarking = new LocalTimedMarking();
 
 	public TimedArcPetriNet(String name) {
 		setName(name);
-		setMarking(new LocalTimedMarking());
 		isActive = true;
 	}
 
