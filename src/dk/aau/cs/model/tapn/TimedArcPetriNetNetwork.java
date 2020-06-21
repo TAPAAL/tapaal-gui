@@ -15,16 +15,16 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedArcPetriNetNetwork {
-	private List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
-	private List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
-	private List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
+	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
+	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 	
 	private NetworkMarking currentMarking;
-	private ConstantStore constants;
+	private final ConstantStore constants;
 	
 	private int defaultBound = 3;
 	
-	private List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
+	private final List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
 	
 	private boolean paintNet = true;
 	
