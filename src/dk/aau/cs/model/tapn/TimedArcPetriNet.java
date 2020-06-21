@@ -121,11 +121,7 @@ public class TimedArcPetriNet {
 		currentMarking.add(token);
 	}
 
-	public void removeToken(TimedToken token) {
-		currentMarking.remove(token);
-	}
-
-	public void remove(TimedPlace place) {
+    public void remove(TimedPlace place) {
 		boolean removed = places.remove(place);
 		if (removed && !place.isShared()){
 			currentMarking.removePlaceFromMarking(place);
