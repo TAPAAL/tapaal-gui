@@ -21,7 +21,7 @@ public class SharedPlace extends TimedPlace{
 	private TimedMarking currentMarking;
 	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
 	
-	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
+	private final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 
 	public SharedPlace(String name){
 		this(name, TimeInvariant.LESS_THAN_INFINITY);

@@ -17,7 +17,7 @@ public class LocalTimedPlace  extends TimedPlace {
 
 	private TimedArcPetriNet model;
 	private TimedMarking currentMarking;
-	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
+	private final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 	
 	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
 
