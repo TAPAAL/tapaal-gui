@@ -569,13 +569,12 @@ public class ArcPath implements Shape {
 		int length = getEndIndex() + 1;
 		String[][] details = new String[length][3];
 
-		int zoom = this.getArc().getZoom();
-		int x, y;
+        int x, y;
 		for (int c = 0; c < length; c++) {
-			x = (pathPoints.get(c)).getX();
-			details[c][0] = String.valueOf(Zoomer.getUnzoomedValue(x, zoom));
-			y = (pathPoints.get(c)).getY();
-			details[c][1] = String.valueOf(Zoomer.getUnzoomedValue(y, zoom));
+			x = (pathPoints.get(c)).getOriginalX();
+			details[c][0] = String.valueOf(x);
+			y = (pathPoints.get(c)).getOriginalY();
+			details[c][1] = String.valueOf(y);
 			details[c][2] = String.valueOf((pathPoints.get(c)).getPointType());
 		}
 		return details;
