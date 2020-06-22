@@ -59,7 +59,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
 			Iterable<Template> templates,
-			Iterable<TAPNQuery> queries, 
+			Iterable<TAPNQuery> queries,
 			Iterable<Constant> constants) {
 		this.network = network;
 		this.templates = templates;
@@ -363,8 +363,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		
 		Element placeElement = document.createElement("place");
 
-		placeElement.setAttribute("positionX", String.valueOf(inputPlace.getPositionX()));
-		placeElement.setAttribute("positionY", String.valueOf(inputPlace.getPositionY()));
+		placeElement.setAttribute("positionX", String.valueOf(inputPlace.getOriginalX()));
+		placeElement.setAttribute("positionY", String.valueOf(inputPlace.getOriginalY()));
 		placeElement.setAttribute("name", inputPlace.underlyingPlace().name());
 		placeElement.setAttribute("displayName", (inputPlace.getAttributesVisible() ? "true" : "false"));
 		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
@@ -401,8 +401,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		
 		Element transitionElement = document.createElement("transition");
 
-		transitionElement.setAttribute("positionX", String.valueOf(inputTransition.getPositionX()));
-		transitionElement.setAttribute("positionY",	String.valueOf(inputTransition.getPositionY()));
+		transitionElement.setAttribute("positionX", String.valueOf(inputTransition.getOriginalX()));
+		transitionElement.setAttribute("positionY",	String.valueOf(inputTransition.getOriginalY()));
 		transitionElement.setAttribute("nameOffsetX", String.valueOf(inputTransition.getNameOffsetX()));
 		transitionElement.setAttribute("nameOffsetY", String.valueOf(inputTransition.getNameOffsetY()));
 		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
