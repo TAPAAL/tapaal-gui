@@ -5,7 +5,7 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.io.ResourceManager;
+import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;

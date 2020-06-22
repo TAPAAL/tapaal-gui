@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
-import dk.aau.cs.io.ResourceManager;
+import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;

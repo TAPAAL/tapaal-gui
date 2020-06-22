@@ -2,7 +2,7 @@ package dk.aau.cs.verification;
 
 import javax.swing.ImageIcon;
 
-import dk.aau.cs.io.ResourceManager;
+import net.tapaal.resourcemanager.ResourceManager;
 
 public abstract class IconSelector {
 	protected static ImageIcon satisfiedIcon = ResourceManager.satisfiedIcon();
