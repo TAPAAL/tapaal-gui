@@ -25,16 +25,16 @@ public class ArcPathPoint extends PetriNetObject {
 
 	public static final boolean STRAIGHT = false;
 	public static final boolean CURVED = true;
-	private static int SIZE = 3;
-	private static int SIZE_OFFSET = 1;
+	private int SIZE = 3;
+	private final static int SIZE_OFFSET = 1;
 
 	// The offset in x for the new point resulting from splitting a point
-	private final int DELTA = 10;
+	private static final int DELTA = 10;
 
     private ArcPath myArcPath;
 
-	private Point2D.Double control1 = new Point2D.Double();
-	private Point2D.Double control2 = new Point2D.Double();
+	private final Point2D.Double control1 = new Point2D.Double();
+	private final Point2D.Double control2 = new Point2D.Double();
 
 	private boolean pointType; // STRAIGHT or CURVED
 
