@@ -29,11 +29,11 @@ import dk.aau.cs.gui.undo.Command;
 public class ArcPath implements Shape {
 
 	private GeneralPath path = new GeneralPath();
-	private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
-	private Arc myArc;
+	private final List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
+	private final Arc myArc;
 	private boolean pointLock = false;
-	private static Stroke proximityStroke = new BasicStroke(Pipe.ARC_PATH_PROXIMITY_WIDTH);
-	private static Stroke stroke = new BasicStroke(Pipe.ARC_PATH_SELECTION_WIDTH);
+	private static final Stroke proximityStroke = new BasicStroke(Pipe.ARC_PATH_PROXIMITY_WIDTH);
+	private static final Stroke stroke = new BasicStroke(Pipe.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
 	private int transitionAngle;
 	private final static boolean showDebugCurvedControlPoints = false;
@@ -334,7 +334,7 @@ public class ArcPath implements Shape {
             );
 		}
 	}
-	
+
 	public void addPoint(int index, double x, double y, boolean type) {
 		pathPoints.add(index, new ArcPathPoint(x, y, type, this));
 	}
@@ -342,7 +342,7 @@ public class ArcPath implements Shape {
 	public void addPoint(double x, double y, boolean type) {
 		pathPoints.add(new ArcPathPoint(x, y, type, this));
 	}
-	
+
 
 	public void addPoint() {
 		pathPoints.add(new ArcPathPoint(this));
