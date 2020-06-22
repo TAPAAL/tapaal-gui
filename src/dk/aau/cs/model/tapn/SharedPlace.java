@@ -1,7 +1,6 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
@@ -10,7 +9,6 @@ import dk.aau.cs.util.Tuple;
 public class SharedPlace extends TimedPlace{
 
     private TimedArcPetriNetNetwork network;
-    private List<TimedPlace> places = new ArrayList<TimedPlace>();
 
     public SharedPlace(String name){
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
@@ -104,8 +102,4 @@ public class SharedPlace extends TimedPlace{
 		
 		return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 	}
-
-	public List<TimedPlace> getPlaces() {
-	    return places;
-    }
 }
