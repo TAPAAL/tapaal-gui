@@ -75,6 +75,7 @@ public class TimedArcPetriNet {
 		
 		arc.setModel(this);
 		inputArcs.add(arc);
+		arc.source().addInputArc(arc);
 		arc.destination().addToPreset(arc);
 	}
 
@@ -90,7 +91,8 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		outputArcs.add(arc);
 		arc.source().addToPostset(arc);
-	}
+        arc.destination().addOutputArc(arc);
+    }
 
 	public void add(TimedInhibitorArc arc) {
 		Require.that(arc != null, "Argument must be a non-null output arc.");
@@ -102,6 +104,7 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
 		arc.destination().addInhibitorArc(arc);
+		arc.source().addInhibitorArc(arc);
 	}
 
 	public void add(TransportArc arc) {
@@ -116,6 +119,8 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		transportArcs.add(arc);
 		arc.transition().addTransportArcGoingThrough(arc);
+        arc.source().addTransportArc(arc);
+        arc.destination().addTransportArc(arc);
 	}
 
 	public void addToken(TimedToken token) {
@@ -146,15 +151,17 @@ public class TimedArcPetriNet {
 		boolean removed = inputArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			arc.destination().removeFromPreset(arc);
-		}
+            arc.source().removeInputArc(arc);
+            arc.destination().removeFromPreset(arc);
+        }
 	}
 
 	public void remove(TransportArc arc) {
 		boolean removed = transportArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			arc.transition().removeTransportArcGoingThrough(arc);
+            arc.destination().removeTransportArc(arc);
+            arc.transition().removeTransportArcGoingThrough(arc);
 		}
 	}
 
@@ -162,7 +169,8 @@ public class TimedArcPetriNet {
 		boolean removed = outputArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			arc.source().removeFromPostset(arc);
+            arc.source().removeFromPostset(arc);
+            arc.destination().removeOutputArc(arc);
 		}
 	}
 
@@ -170,7 +178,8 @@ public class TimedArcPetriNet {
 		boolean removed = inhibitorArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			arc.destination().removeInhibitorArc(arc);
+            arc.destination().removeInhibitorArc(arc);
+            arc.source().removeInhibitorArc(arc);
 		}
 	}
 
@@ -386,8 +395,9 @@ public class TimedArcPetriNet {
 		int numberOfTransportArcs = 0;
 		int numberOfTotalNumberOfArcs = 0;
 		int numberOfTokens = 0;
-		int numberOfOrphans = 0;
-		boolean networkUntimed = true; 
+        int numberOfOrphanTransitions = 0;
+        int numberOfOrphanPlaces = 0;
+		boolean networkUntimed = true;
 		boolean networkWeighted = false; 
 		int numberOfUntimedInputArcs = 0;
 		int numberOfUntimedTransportArcs = 0;
@@ -427,7 +437,8 @@ public class TimedArcPetriNet {
 			numberOfOutputArcs += t.outputArcs.size();
 			numberOfInhibitorArcs += t.inhibitorArcs.size();
 			numberOfTransportArcs += t.transportArcs.size();
-			numberOfOrphans += t.getOrphanTransitions().size();
+            numberOfOrphanTransitions += t.getOrphanTransitions().size();
+            numberOfOrphanPlaces += t.getOrphanPlaces().size();
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
 				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
@@ -496,12 +507,13 @@ public class TimedArcPetriNet {
 		rowNumber += 2;
 		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
 		array[rowNumber++][columnNumber] = networkWeighted ? "yes" : "no";
-		array[rowNumber++][columnNumber] = numberOfOrphans;
+        array[rowNumber++][columnNumber] = numberOfOrphanTransitions;
+        array[rowNumber++][columnNumber] = numberOfOrphanPlaces;
 	}
 	
 	public Object[][] getStatistics(){
 		
-		Object[][] result = new Object[16][4];
+		Object[][] result = new Object[17][4];
 		int rowNumber = 0;
 		int columnNumber = 0;
 		result[rowNumber++][columnNumber] = "Number of components considered: ";
@@ -520,8 +532,9 @@ public class TimedArcPetriNet {
 		result[rowNumber++][columnNumber] = "The network is untimed: ";
 		result[rowNumber++][columnNumber] = "The network is weighted: ";
 		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
-		
-		fillStatistics(Arrays.asList(new TimedArcPetriNet[] {this}), result, 1);
+        result[rowNumber++][columnNumber] = "Number of orphan places: ";
+
+        fillStatistics(Arrays.asList(new TimedArcPetriNet[] {this}), result, 1);
 		fillStatistics(this.parentNetwork().activeTemplates(), result, 2);
 		fillStatistics(this.parentNetwork().allTemplates(), result, 3);
 		
@@ -543,6 +556,17 @@ public class TimedArcPetriNet {
 		
 		return orphans;
 	}
+
+    public List<TimedPlace> getOrphanPlaces(){
+        List<TimedPlace> orphans = new ArrayList<TimedPlace>();
+
+        for (TimedPlace place : places) {
+            if (place.isOrphan()) {
+                orphans.add(place);
+            }
+        }
+        return orphans;
+    }
 	
 	public int getNumberOfTokensInNet(){
 		int result = 0;

@@ -4,10 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public abstract class TimedPlace {
-	public enum PlaceType{
+    private SharedPlace sharedPlace;
+    private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
+    private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
+    private List<TransportArc> transportArcs = new ArrayList<TransportArc>();
+    private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+
+    public enum PlaceType{
 		Standard, Invariant, Dead
 	}
 	
@@ -57,8 +64,54 @@ public abstract class TimedPlace {
 		TimedPlace other = (TimedPlace) obj;
 		return name() == other.name();
 	}
-	
-	
+
+    public boolean isOrphan() {
+        return presetSize() == 0 && postsetSize() == 0;
+    }
+
+    public void addInputArc(TimedInputArc arc) {
+        Require.that(arc != null, "Cannot add null to preset");
+        preset.add(arc);
+    }
+
+    public void addOutputArc(TimedOutputArc arc) {
+        Require.that(arc != null, "Cannot add null to postset");
+        postset.add(arc);
+    }
+
+    public void removeInputArc(TimedInputArc arc) {
+        preset.remove(arc);
+    }
+
+    public void removeOutputArc(TimedOutputArc arc) {
+        postset.remove(arc);
+    }
+
+    public void addTransportArc(TransportArc arc) {
+        Require.that(arc != null, "Cannot add null to preset");
+        transportArcs.add(arc);
+    }
+
+    public void removeTransportArc(TransportArc arc) {
+        transportArcs.remove(arc);
+    }
+
+    public void addInhibitorArc(TimedInhibitorArc arc) {
+        inhibitorArcs.add(arc);
+    }
+
+    public void removeInhibitorArc(TimedInhibitorArc arc) {
+        inhibitorArcs.remove(arc);
+    }
+
+    public int presetSize() {
+        return preset.size() + transportArcs.size() + inhibitorArcs.size();
+    }
+
+    public int postsetSize() {
+        return postset.size() + transportArcs.size() + inhibitorArcs.size();
+    }
+
 //	public abstract void addInhibitorArc(TimedInhibitorArc arc);
 //	public abstract void addToPreset(TransportArc arc);
 //	public abstract void addToPreset(TimedOutputArc arc);

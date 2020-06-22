@@ -669,7 +669,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			public void actionPerformed(ActionEvent e) {
-				currentTab.ifPresent(TabContentActions::showStatistics);
+                currentTab.ifPresent(TabContentActions::showStatistics);
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
