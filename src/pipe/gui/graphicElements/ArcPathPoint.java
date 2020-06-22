@@ -85,11 +85,6 @@ public class ArcPathPoint extends PetriNetObject {
 		return pointType;
 	}
 
-	public void updatePointLocation() {
-	    //XXX
-		//setPointLocation(point.x, point.y);
-	}
-
 	public void setPointType(boolean type) {
 		if (pointType != type) {
 			pointType = type;

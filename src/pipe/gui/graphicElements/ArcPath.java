@@ -560,7 +560,6 @@ public class ArcPath implements Shape {
 			// Nadeem 21/06/2005
 			if (!model.getPNObjects().contains(pathPoint)) {
 				model.addPetriNetObject(pathPoint);
-				pathPoint.updatePointLocation();
 			}
 		}
 	}
