@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -239,7 +240,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		templatePanel.add(scrollpane, gbc);
 		
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -262,7 +263,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.SOUTH;
 		templatePanel.add(moveUpButton,gbc);
 		
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -286,7 +287,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		templatePanel.add(moveDownButton,gbc);
 		
 		//Sort button
-		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {

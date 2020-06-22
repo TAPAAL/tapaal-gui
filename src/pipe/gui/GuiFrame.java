@@ -34,7 +34,7 @@ import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.io.ResourceManager;
+import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -245,7 +245,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			Application app = Application.getApplication();
 			try {
 				Image appImage;
-				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png"));
+				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png"));
 				app.setDockIconImage(appImage);
 			} catch (IOException e) {
 				Logger.log("Error loading Image");
@@ -263,7 +263,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		}
 
-		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
+		this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
 	}
 
 
@@ -409,7 +409,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.setMnemonic('V');
 
 		zoomMenu = new JMenu("Zoom");
-		zoomMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Zoom.png")));
+		zoomMenu.setIcon(ResourceManager.getIcon("Zoom.png"));
 		
 		addZoomMenuItems(zoomMenu);
 
@@ -669,7 +669,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
 			public void actionPerformed(ActionEvent e) {
-				currentTab.ifPresent(TabContentActions::showStatistics);
+                currentTab.ifPresent(TabContentActions::showStatistics);
 			}
 		};
 		toolsMenu.add(netStatisticsAction).setMnemonic('i');
@@ -1412,7 +1412,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				
 		// Import menu
 		JMenu importMenu = new JMenu("Import");
-		importMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		importMenu.setIcon(ResourceManager.getIcon("Export.png"));
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1437,7 +1437,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		// Export menu
 		JMenu exportMenu = new JMenu("Export");
-		exportMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		exportMenu.setIcon(ResourceManager.getIcon("Export.png"));
 		
 		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1518,7 +1518,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		// is ignored
 		if (nets != null && nets.length > 0) {
 			JMenu exampleMenu = new JMenu("Example nets");
-			exampleMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Example.png")));
+			exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 			
 			for (String filename : nets) {
 				if (filename.toLowerCase().endsWith(".tapn")) {
@@ -1537,9 +1537,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 							}
 						}
 					};
-					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
-							.getContextClassLoader().getResource(
-									CreateGui.imgPath + "Net.png")));
+					tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
 					exampleMenu.add(tmp);
 				}
 			}

@@ -18,8 +18,6 @@ public class CreateGui {
     private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
 
 	private static final ArrayList<TabContent> tabs = new ArrayList<TabContent>();
-	
-	public static final String imgPath = "resources/Images/";
 
 	public static void init() {
 

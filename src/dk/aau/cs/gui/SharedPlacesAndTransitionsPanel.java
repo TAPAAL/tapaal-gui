@@ -25,6 +25,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import dk.aau.cs.gui.undo.*;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
@@ -188,7 +189,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		listPanel.add(scrollPane, gbc);
 		
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(e -> {
@@ -209,7 +210,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		gbc.anchor = GridBagConstraints.SOUTH;
 		listPanel.add(moveUpButton,gbc);
 		
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(e -> {
@@ -229,7 +230,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		listPanel.add(moveDownButton,gbc);
 		
 		//Sort button
-		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
 		sortButton.setToolTipText(toolTipSortPlaces);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {

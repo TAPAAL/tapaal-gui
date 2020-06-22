@@ -13,7 +13,7 @@ import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.io.ResourceManager;
+import net.tapaal.resourcemanager.ResourceManager;
 
 public class VersionChecker {
 	private static final String versionURL = "http://versioncheck.tapaal.net/fileadmin/version.txt";
