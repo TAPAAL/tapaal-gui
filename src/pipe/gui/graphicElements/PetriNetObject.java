@@ -276,9 +276,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	}
 
 	@Override
-	public void translate(int x, int y) {
-		//TODO
-	}
+	public void translate(int x, int y) {}
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
 	/**

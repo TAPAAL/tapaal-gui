@@ -119,6 +119,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 );
 
                 TimedInputArcComponent tiac = new TimedInputArcComponent(p,t,tia);
+                tiac.setArcPath(new ArcPath(tiac, path));
 
                 Command edit = new AddTimedInputArcCommand(
                     tiac,

@@ -51,8 +51,8 @@ public class ArcPathPoint extends PetriNetObject {
 	public ArcPathPoint(double x, double y, boolean _pointType, ArcPath a) {
 		this();
 		myArcPath = a;
-		setPositionX((int)x);
-		setPositionY((int)y);
+		setOriginalX((int)x);
+		setOriginalY((int)y);
 		pointType = _pointType;
 	}
 
@@ -77,8 +77,7 @@ public class ArcPathPoint extends PetriNetObject {
 	public void setPointLocation(int x, int y) {
 		setPositionX(x);
 		setPositionY(y);
-		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
-				* SIZE + SIZE_OFFSET);
+		updateOnMoveOrZoom();
 	}
 
 	public boolean getPointType() {
@@ -230,19 +229,23 @@ public class ArcPathPoint extends PetriNetObject {
 	public void translate(int x, int y) {
 	    //We should ingnore move of the endpoints (linked to source/target)
 	    if (!isEndPoint()) {
-            this.setPointLocation(getPositionX() + x, getPositionY() + y);
+
+	        setPositionX(positionX + x);
+            setPositionY(positionY + y);
+
+            updateOnMoveOrZoom();
+
             myArcPath.updateArc();
         }
 	}
 
 	@Override
 	public String getName() {
-		return this.getArcPath().getArc().getName() + " - Point "
-				+ this.getIndex();
+		return this.getArcPath().getArc().getName() + " - Point " + this.getIndex();
 	}
 
 	public void zoomUpdate(int zoom) {
-		super.zoomUpdate(zoom);
+
 		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed out
 		if (zoom > 213) {
 			SIZE = 5;
@@ -251,15 +254,21 @@ public class ArcPathPoint extends PetriNetObject {
 		} else {
 			SIZE = 3;
 		}
-		int x = (int)Zoomer.getZoomedValue(getRealPoint().x, zoom);
-		int y = (int)Zoomer.getZoomedValue(getRealPoint().y, zoom);
-		setPositionX(x);
-		setPositionY(y);
-		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
-				* SIZE + SIZE_OFFSET);
+
+        super.zoomUpdate(zoom);
+
 	}
 
-	public Point2D.Double getRealPoint() {
+    @Override
+    public void updateOnMoveOrZoom() {
+        int x = Zoomer.getZoomedValue(getOriginalX(), getZoom());
+        int y = Zoomer.getZoomedValue(getOriginalY(), getZoom());
+        positionX = x;
+        positionY = y;
+        setBounds(x - SIZE, y - SIZE, 2 * SIZE + SIZE_OFFSET, 2 * SIZE + SIZE_OFFSET);
+    }
+
+    public Point2D.Double getRealPoint() {
 		return new Point2D.Double(getOriginalX(), getOriginalY());
 	}
 

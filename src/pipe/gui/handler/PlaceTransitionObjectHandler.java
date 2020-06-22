@@ -291,7 +291,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
                     view.getGuiModel(),
                     (TimedPlaceComponent)timedArcToCreate.getSource(),
                     (TimedTransitionComponent)timedArcToCreate.getTarget(),
-                    null
+                    timedArcToCreate.getArcPath()
                 );
 
 			}
