@@ -455,10 +455,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		}
 
         private void addArcPathPoint(final Arc createArc, final MouseEvent e) {
-			Point p = adjustPointToZoom(e.getPoint(), getZoom());
+			Point p = e.getPoint();
+			int x = Zoomer.getUnzoomedValue(p.x, getZoom());
+			int y = Zoomer.getUnzoomedValue(p.y, getZoom());
 
 			boolean shiftDown = e.isShiftDown();
-			createArc.getArcPath().addPoint(p.x, p.y, shiftDown);
+			//XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+			createArc.getArcPath().addPoint(createArc.getArcPath().getEndIndex(), x,y, shiftDown);
 		}
 
 		@Override

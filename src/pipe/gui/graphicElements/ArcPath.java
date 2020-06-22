@@ -336,11 +336,22 @@ public class ArcPath implements Shape {
 	}
 
 	public void addPoint(int index, double x, double y, boolean type) {
-		pathPoints.add(index, new ArcPathPoint(x, y, type, this));
+	    var arcpath = new ArcPathPoint(x, y, type, this);
+
+        if (myArc!=null) {
+            arcpath.zoomUpdate(myArc.getZoom());
+        }
+		pathPoints.add(index, arcpath);
 	}
 
 	public void addPoint(double x, double y, boolean type) {
-		pathPoints.add(new ArcPathPoint(x, y, type, this));
+	    var arcpath = new ArcPathPoint(x, y, type, this);
+
+	    //XXX: we set zoom here, it might be a prototype
+        if (myArc!=null) {
+            arcpath.zoomUpdate(myArc.getZoom());
+        }
+		pathPoints.add(arcpath);
 	}
 
 
