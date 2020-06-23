@@ -358,22 +358,13 @@ public abstract class Transition extends PlaceTransitionObject {
 					+ centreOffsetLeft(), positionY + centreOffsetTop());
 			Point2D.Double p2 = new Point2D.Double(arc.getArcPath().getPoint(index).x, arc.getArcPath().getPoint(index).y);
 
-			if (p1.y <= p2.y) {
-				angle = Math.atan((p1.x - p2.x) / (p2.y - p1.y));
-			} else {
-				angle = Math.atan((p1.x - p2.x) / (p2.y - p1.y)) + Math.PI;
-			}
+            angle = Math.atan2((p1.x - p2.x) , (p2.y - p1.y));
 
 			// This makes sure the angle overlap lies at the intersection
 			// between edges of a transition
 			// Yes it is a nasty hack (a.k.a. ingeneous solution). But it works!
 			if (angle < (Math.toRadians(30 + transition.getAngle()))) {
 				angle += (2 * Math.PI);
-			}
-
-			// Needed to eliminate an exception on Windows
-			if (p1.equals(p2)) {
-				angle = 0;
 			}
 
 		}
