@@ -353,6 +353,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     @Override
     public void removePrototype(GraphicalElement pno) {
         remove(pno);
+        validate();
+        repaint();
     }
 
     @Override
