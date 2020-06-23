@@ -231,6 +231,73 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         }
 
+        public void addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p1, "Place1 can't be null");
+            Require.notNull(t, "Transitions can't be null");
+            Require.notNull(p2, "Place2 can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (
+                !modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()) &&
+                !modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace())
+            ) {
+
+                int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
+
+                TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
+
+                TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr);
+                TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr);
+
+                ttac1.setConnectedTo(ttac2);
+                ttac2.setConnectedTo(ttac1);
+
+                if (path1 != null) {
+                    ttac1.setArcPath(new ArcPath(ttac1, path1));
+                }
+                if (path2 != null) {
+                    ttac2.setArcPath(new ArcPath(ttac2, path2));
+                }
+
+                //XXX: the Command should take both arcs
+                Command edit = new AddTransportArcCommand(
+                    ttac2,
+                    tta,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+                undoManager.addNewEdit(edit);
+
+            } else {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the source place and transition\n"
+                        + " - There is already an arc between the transtion and the target place\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+        }
+
+        private int getNextTransportArcMaxGroupNumber(TimedPlaceComponent p, TimedTransitionComponent t) {
+            int groupMaxCounter = 0;
+
+            for (Arc a : t.getPreset()) {
+                if (a instanceof TimedTransportArcComponent && a.getTarget().equals(t)) {
+                    if (((TimedTransportArcComponent) a).getGroupNr() > groupMaxCounter) {
+                        groupMaxCounter = ((TimedTransportArcComponent) a).getGroupNr();
+                    }
+                }
+            }
+
+            return groupMaxCounter+1;
+        }
+
 
         public void deleteSelection() {
             // check if queries need to be removed
