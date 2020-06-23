@@ -189,6 +189,48 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         }
 
+        public void addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (!modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition())) {
+
+                TimedInhibitorArc tiha = new TimedInhibitorArc(
+                    p.underlyingPlace(),
+                    t.underlyingTransition()
+                );
+
+                TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
+
+                if (path != null) {
+                    tihac.setArcPath(new ArcPath(tihac, path));
+                }
+
+                Command edit = new AddTimedInhibitorArcCommand(
+                    tihac,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+                undoManager.addNewEdit(edit);
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+
+            }
+
+        }
+
 
         public void deleteSelection() {
             // check if queries need to be removed
@@ -335,6 +377,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 deleteSelection(pnObject);
             }
         }
+
+
     }
 
 

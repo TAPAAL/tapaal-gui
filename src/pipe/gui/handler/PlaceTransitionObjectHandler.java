@@ -393,40 +393,17 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 	}
 
 	private void createInhibitorArc(DrawingSurfaceImpl view, UndoManager undoManager, PlaceTransitionObject currentObject) {
-		TimedInhibitorArcComponent createTAPNInhibitorArc = (TimedInhibitorArcComponent) view.createArc;
-		if (currentObject != createTAPNInhibitorArc.getSource()) {
+		TimedInhibitorArcComponent timedArcToCreate = (TimedInhibitorArcComponent) view.createArc;
+		if (currentObject != timedArcToCreate.getSource()) {
 
-			try {
-				TimedInhibitorArc tia = new TimedInhibitorArc(
-						((TimedPlaceComponent) createTAPNInhibitorArc.getSource()).underlyingPlace(),
-						((TimedTransitionComponent) createTAPNInhibitorArc.getTarget()).underlyingTransition(),
-						TimeInterval.ZERO_INF
-                );
-
-				view.getModel().add(tia);
-				createTAPNInhibitorArc.setUnderlyingArc(tia);
-
-			} catch (RequireException ex) {
-				cleanupArc(createTAPNInhibitorArc, view);
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "There was an error drawing the arc. Possible problems:\n"
-                        + " - There is already an arc between the selected place and transition\n"
-                        + " - You are attempting to draw an arc between a shared transition and a shared place",
-                    "Error", JOptionPane.ERROR_MESSAGE
-                );
-				return;
-			}
-
-			createTAPNInhibitorArc.setTarget(currentObject);
-
-			removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, createTAPNInhibitorArc);
-
-			undoManager.addNewEdit(
-					new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, view.getModel(), view.getGuiModel())
-			);
-
-			sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(createTAPNInhibitorArc);
+            view.createArc = null;
+            CreateGui.getDrawingSurface().removePrototype(timedArcToCreate);
+            CreateGui.getCurrentTab().guiModelManager.addInhibitorArc(
+                view.getGuiModel(),
+                (TimedPlaceComponent) timedArcToCreate.getSource(),
+                (TimedTransitionComponent) timedArcToCreate.getTarget(),
+                timedArcToCreate.getArcPath()
+            );
 		}
 	}
 
