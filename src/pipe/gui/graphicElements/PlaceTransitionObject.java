@@ -45,8 +45,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 */
 	@Override
 	public void setName(String nameInput) {
-		// sets the text within the label
-		// System.out.println("setting name to: " + nameInput);
 		getNameLabel().setName(nameInput);
 	}
 
@@ -82,10 +80,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		return (getNameLabel() != null) ? getNameLabel().getName() : "";
 	}
 
-
-
-
-
 	/**
 	 * Implemented in subclasses as involves some tailoring according to the
 	 * shape
@@ -107,7 +101,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 * @return Top offset of Place
 	 */
 	public int centreOffsetTop() {
-		return (int) (Zoomer.getZoomedValue(componentHeight / 2.0, getZoom()));
+		return Zoomer.getZoomedValue(componentHeight / 2.0, getZoom());
 	}
 
 	/**
@@ -118,7 +112,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 * @return Left offset of Place
 	 */
 	public int centreOffsetLeft() {
-		return (int) (Zoomer.getZoomedValue(componentWidth / 2.0, getZoom()));
+		return Zoomer.getZoomedValue(componentWidth / 2.0, getZoom());
 	}
 
 	/** Calculates the BoundsOffsets used for setBounds() method */
@@ -180,17 +174,16 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		update(true);
 	}
 
+    public Point2D.Double getCentre() {
+        return new Point2D.Double(positionX + getWidth() / 2.0, positionY + getHeight() / 2.0);
+    }
+
 	public void update(boolean displayConstantNames) {
 		update(displayConstantNames, true);
 	}
 
 	public void update(boolean displayConstantNames, boolean alignToGrid) {
 		updateOnMoveOrZoom(alignToGrid);
-	}
-
-	public Point2D.Double getCentre() {
-		return new Point2D.Double(positionX + getWidth() / 2.0, positionY
-				+ getHeight() / 2.0);
 	}
 
 	/** Handles selection for Place/Transitions */
