@@ -106,11 +106,7 @@ public class ArcPathPoint extends PetriNetObject {
 	public double getAngle(Point2D.Double p2) {
 		double angle;
 
-		if (getPositionY() <= p2.y) {
-			angle = Math.atan((getPositionX() - p2.x) / (p2.y - getPositionY()));
-		} else {
-			angle = Math.atan((getPositionX() - p2.x) / (p2.y - getPositionY())) + Math.PI;
-		}
+        angle = Math.atan2( (getPoint().x - p2.x), (p2.y - getPoint().y) );
 
 		return angle;
 	}
