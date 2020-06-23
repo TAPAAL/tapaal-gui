@@ -3,7 +3,6 @@ package pipe.gui.handler;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
-import dk.aau.cs.model.tapn.*;
 import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -18,12 +17,7 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.undo.AddTimedInhibitorArcCommand;
-import pipe.gui.undo.AddTimedInputArcCommand;
-import pipe.gui.undo.AddTimedOutputArcCommand;
-import pipe.gui.undo.AddTransportArcCommand;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.util.RequireException;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -179,10 +173,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				break;
 			}
 			case TRANSPORTARC:{
-				boolean isInPreSet = false;
-				if (currentObject instanceof Place) {
-					isInPreSet = true;
-					Arc arc = new TimedTransportArcComponent(currentObject, 1, isInPreSet);
+                if (currentObject instanceof Place) {
+                    Arc arc = new TimedTransportArcComponent(currentObject, 1, true);
 					createArc(arc, currentObject);
 				}
 				break;
@@ -219,18 +211,18 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 		switch (app.getMode()) {
 			case TAPNINHIBITOR_ARC:
-				createInhibitorArc(view, undoManager, currentObject);
+				createInhibitorArc(view, currentObject);
 				break;
 			case TRANSPORTARC:
-				createTransportArc(view, undoManager, currentObject);
+				createTransportArc(view, currentObject);
 				break;
 			case TAPNARC:
-				createTimedArc(view, undoManager, currentObject);
+				createTimedArc(view, currentObject);
 				break;
 		}
 	}
 
-	private void createTimedArc(DrawingSurfaceImpl view, UndoManager undoManager, PlaceTransitionObject currentObject) {
+	private void createTimedArc(DrawingSurfaceImpl view, PlaceTransitionObject currentObject) {
 		Arc timedArcToCreate = view.createArc;
 
 		if (currentObject != timedArcToCreate.getSource()) {
@@ -264,7 +256,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 	}
 
-	private void createTransportArc(DrawingSurfaceImpl view, UndoManager undoManager, PlaceTransitionObject currentObject) {
+	private void createTransportArc(DrawingSurfaceImpl view, PlaceTransitionObject currentObject) {
 		Arc transportArcToCreate = view.createArc;
 
 		if (currentObject != transportArcToCreate.getSource()) {
@@ -309,22 +301,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 	}
 
-	private int getTransportArcMaxGroupNumber(Arc transportArcToCreate) {
-		int groupMaxCounter = 0;
-
-		for (Object pt : transportArcToCreate.getTarget().getPostset()) {
-			if (pt instanceof TimedTransportArcComponent) {
-				if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
-					groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
-				}
-			}
-		}
-
-
-		return groupMaxCounter;
-	}
-
-	private void createInhibitorArc(DrawingSurfaceImpl view, UndoManager undoManager, PlaceTransitionObject currentObject) {
+    private void createInhibitorArc(DrawingSurfaceImpl view, PlaceTransitionObject currentObject) {
 		TimedInhibitorArcComponent timedArcToCreate = (TimedInhibitorArcComponent) view.createArc;
 		if (currentObject != timedArcToCreate.getSource()) {
 
@@ -339,17 +316,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 	}
 
-	private void removeProtoTypeFromViewAndAddNewArcToViewAndModel(DrawingSurfaceImpl view, Arc arcToCreate) {
-
-		CreateGui.getDrawingSurface().removePrototype(arcToCreate);
-
-		view.getGuiModel().addPetriNetObject(arcToCreate);
-		//view.addNewPetriNetObject(arcToCreate);
-
-		//timedArcToCreate.getTransition().updateConnected(); (used to be called only for Outputarc and inhub arc)
-	}
-
-	public static void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
+    public static void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
 		//XXX this is problematic if we are creating a transport arc and it part2, then part1 is never cleanup!
 
 		//Called delete, only removes is from view since it finished, should be same af view.remove()
