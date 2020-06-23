@@ -20,6 +20,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
@@ -144,6 +145,50 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 );
             }
         }
+
+        public void addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (!modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace())) {
+
+                TimedOutputArc toa = new TimedOutputArc(
+                    t.underlyingTransition(),
+                    p.underlyingPlace()
+                );
+
+                TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
+
+                if (path != null) {
+                    toac.setArcPath(new ArcPath(toac, path));
+                }
+
+                Command edit = new AddTimedOutputArcCommand(
+                    toac,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+                undoManager.addNewEdit(edit);
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+
+            }
+
+
+        }
+
 
         public void deleteSelection() {
             // check if queries need to be removed

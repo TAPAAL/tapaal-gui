@@ -3,6 +3,7 @@ package pipe.gui.handler;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -22,10 +23,6 @@ import pipe.gui.undo.AddTimedInputArcCommand;
 import pipe.gui.undo.AddTimedOutputArcCommand;
 import pipe.gui.undo.AddTransportArcCommand;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.util.RequireException;
 
 /**
@@ -241,51 +238,18 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			// Are we creating an Input or Output arc_
 			if (!(timedArcToCreate instanceof TimedInputArcComponent)) {
 
-				// Set underlying TimedInputArc
-				TimedOutputArcComponent outputArc = (TimedOutputArcComponent) timedArcToCreate;
+			    view.createArc = null;
+                CreateGui.getDrawingSurface().removePrototype(timedArcToCreate);
+                CreateGui.getCurrentTab().guiModelManager.addTimedOutputArc(
+                    view.getGuiModel(),
+                    (TimedTransitionComponent) timedArcToCreate.getSource(),
+                    (TimedPlaceComponent) timedArcToCreate.getTarget(),
+                    timedArcToCreate.getArcPath()
+                );
 
-				try {
-                    // Should be check in model
-                    if(view.getModel().hasArcFromTransitionToPlace(((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(), ((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace())){
-                        throw new RequireException(ERROR_MSG_TWO_ARCS);
-                    }
-
-					TimedOutputArc timedOutputArc = new TimedOutputArc(
-							((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(),
-							((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace()
-                    );
-
-					view.getModel().add(timedOutputArc);
-					outputArc.setUnderlyingArc(timedOutputArc);
-
-				} catch (RequireException ex) {
-					cleanupArc(timedArcToCreate, view);
-					JOptionPane.showMessageDialog(
-									CreateGui.getApp(),
-									"There was an error drawing the arc. Possible problems:\n"
-											+ " - There is already an arc between the selected place and transition\n"
-											+ " - You are attempting to draw an arc between a shared transition and a shared place",
-									"Error", JOptionPane.ERROR_MESSAGE
-                    );
-					return;
-				}
-
-
-				undoManager.newEdit(); // new "transaction""
-
-				undoManager.addEdit(
-					new AddTimedOutputArcCommand(
-						(TimedOutputArcComponent) timedArcToCreate,
-						view.getModel(),
-						view.getGuiModel()
-					)
-				);
-
-				// else source is a place (not transition)
-                sealArcAndRemoveDrawKeyBindingsAndResetCreateArc(timedArcToCreate);
-                removeProtoTypeFromViewAndAddNewArcToViewAndModel(view, timedArcToCreate);
 			} else {
 
+                view.createArc = null;
                 CreateGui.getDrawingSurface().removePrototype(timedArcToCreate);
                 CreateGui.getCurrentTab().guiModelManager.addTimedInputArc(
                     view.getGuiModel(),
