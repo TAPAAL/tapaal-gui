@@ -14,7 +14,6 @@ import java.util.List;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 
@@ -115,8 +114,7 @@ public class ArcPath implements Shape {
 		//Calculate the arc mid-point for lable placement
 		if (getEndIndex() < 2) {
 			midPoint.x = (((pathPoints.get(0)).getPoint().x + (pathPoints.get(1)).getPoint().x) * 0.5);
-			midPoint.y = (((pathPoints.get(0)).getPoint().y + (pathPoints
-					.get(1)).getPoint().y) * 0.5);
+			midPoint.y = (((pathPoints.get(0)).getPoint().y + (pathPoints.get(1)).getPoint().y) * 0.5);
 		} else {
 			double acc = 0;
 			double percent = 0;
@@ -134,8 +132,7 @@ public class ArcPath implements Shape {
 
 			ArcPathPoint previousPoint = pathPoints.get(c - 1);
 			midPoint.x = previousPoint.getPoint().x + ((currentPoint.getPoint().x - previousPoint.getPoint().x) * percent);
-			midPoint.y = previousPoint.getPoint().y
-					+ ((currentPoint.getPoint().y - previousPoint.getPoint().y) * percent);
+			midPoint.y = previousPoint.getPoint().y + ((currentPoint.getPoint().y - previousPoint.getPoint().y) * percent);
 		}
 
 		shape = stroke.createStrokedShape(this);
@@ -306,26 +303,22 @@ public class ArcPath implements Shape {
 		} else if (source instanceof Transition && (pathPoints.get(1)).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(1);
 			ArcPathPoint myLastPoint = pathPoints.get(0);
-			double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint())
-					/ Pipe.ARC_CONTROL_POINT_CONSTANT;
-			myPoint.setControl1((myLastPoint.getPoint().x + Math
-					.cos(anAngle)
-					* distance), (myLastPoint.getPoint().y + Math
-					.sin(anAngle)
-					* distance));
+			double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint()) / Pipe.ARC_CONTROL_POINT_CONSTANT;
+			myPoint.setControl1(
+			    (myLastPoint.getPoint().x + Math.cos(anAngle) * distance),
+                (myLastPoint.getPoint().y + Math.sin(anAngle) * distance)
+            );
 
 			myPoint = pathPoints.get(getEndIndex());
 			myPoint.setControl2(getControlPoint(myPoint.getPoint(), myPoint.getControl1(), myPoint.getPoint(), myPoint.getControl1()));
 		} else if (target != null && source instanceof Place && (pathPoints.get(getEndIndex())).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(getEndIndex());
 			ArcPathPoint myLastPoint = pathPoints.get(getEndIndex() - 1);
-            double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint())
-					/ Pipe.ARC_CONTROL_POINT_CONSTANT;
-			myPoint.setControl2((myPoint.getPoint().x + Math
-					.cos(anAngle)
-					* distance), (myPoint.getPoint().y + Math
-					.sin(anAngle)
-					* distance));
+            double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint()) / Pipe.ARC_CONTROL_POINT_CONSTANT;
+			myPoint.setControl2(
+			    (myPoint.getPoint().x + Math.cos(anAngle) * distance),
+                (myPoint.getPoint().y + Math.sin(anAngle) * distance)
+            );
 
 			myPoint = pathPoints.get(1);
 			myPoint.setControl1(getControlPoint(
@@ -445,11 +438,9 @@ public class ArcPath implements Shape {
 	public double getEndAngle() {
 		if (getEndIndex() > 0) {
 			if (getArc().getTarget() instanceof Transition) {
-				return (pathPoints.get(getEndIndex())).getAngle(((pathPoints
-						.get(getEndIndex()))).getControl2());
+				return (pathPoints.get(getEndIndex())).getAngle(((pathPoints.get(getEndIndex()))).getControl2());
 			} else {
-				return (pathPoints.get(getEndIndex())).getAngle(((pathPoints
-						.get(getEndIndex()))).getControl1());
+				return (pathPoints.get(getEndIndex())).getAngle(((pathPoints.get(getEndIndex()))).getControl1());
 			}
 		}
 		return 0;
