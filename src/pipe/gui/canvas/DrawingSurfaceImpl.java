@@ -134,8 +134,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		repaint();
 	}
 
-	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
-			throws PrinterException {
+	public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
 		if (pageIndex > 0) {
 			return Printable.NO_SUCH_PAGE;
 		}
@@ -272,10 +271,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	private Point midpoint(int zoom) {
 		JViewport viewport = (JViewport) getParent();
-		double midpointX = Zoomer.getUnzoomedValue(viewport.getViewPosition().x
-				+ (viewport.getWidth() * 0.5), zoom);
-		double midpointY = Zoomer.getUnzoomedValue(viewport.getViewPosition().y
-				+ (viewport.getHeight() * 0.5), zoom);
+		double midpointX = Zoomer.getUnzoomedValue(viewport.getViewPosition().x + (viewport.getWidth() * 0.5), zoom);
+		double midpointY = Zoomer.getUnzoomedValue(viewport.getViewPosition().y + (viewport.getHeight() * 0.5), zoom);
 		return (new java.awt.Point((int) midpointX, (int) midpointY));
 	}
 
@@ -368,8 +365,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     public Point adjustPointToZoom(Point p, int zoom) {
         //Converts center coord to upperleft coord
-        int offset = (int) (Zoomer.getScaleFactor(zoom)
-            * Pipe.PLACE_TRANSITION_HEIGHT / 2);
+        int offset = (int) (Zoomer.getScaleFactor(zoom) * Pipe.PLACE_TRANSITION_HEIGHT / 2);
 
         int x = Zoomer.getUnzoomedValue(p.x - offset, zoom);
         int y = Zoomer.getUnzoomedValue(p.y - offset, zoom);
@@ -487,8 +483,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				managerRef.get().drawingSurfaceMouseMoved(e);
 			}
 			if (createArc != null) {
-				createArc.setEndPoint(Grid.getModifiedX(e.getX()), Grid
-						.getModifiedY(e.getY()), e.isShiftDown());
+				createArc.setEndPoint(Grid.getModifiedX(e.getX()), Grid.getModifiedY(e.getY()), e.isShiftDown());
 			}
 		}
 
