@@ -31,7 +31,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canvas, PrototypeCanvas {
 
 
-	public Arc createArc; // no longer static
+	public final Arc createArc = null; // no longer static
 
 	private static final int DRAWING_SURFACE_GROW = 100;
 
@@ -420,19 +420,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
 				Pipe.ElementType mode = app.getMode();
-				PlaceTransitionObject newpto; //declared here as switch is one big scope
 
 				switch (mode) {
-
-					case ARC:
-					case TAPNARC:
-					case INHIBARC:
-					case TRANSPORTARC:
-					case TAPNINHIBITOR_ARC: // Add point to arc in creation
-						if (createArc != null) {
-							addArcPathPoint(createArc, e);
-						}
-						break;
 
 					case DRAG:
 						dragStart = new Point(clickPoint);
@@ -452,17 +441,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			updatePreferredSize();
 		}
 
-        private void addArcPathPoint(final Arc createArc, final MouseEvent e) {
-			Point p = e.getPoint();
-			int x = Zoomer.getUnzoomedValue(p.x, getZoom());
-			int y = Zoomer.getUnzoomedValue(p.y, getZoom());
-
-			boolean shiftDown = e.isShiftDown();
-			//XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
-			createArc.getArcPath().addPoint(createArc.getArcPath().getEndIndex(), x,y, shiftDown);
-		}
-
-		@Override
+        @Override
 		public void mouseReleased(MouseEvent e) {
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseReleased(e);
@@ -482,10 +461,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseMoved(e);
 			}
-			if (createArc != null) {
-				createArc.setEndPoint(Grid.getModifiedX(e.getX()), Grid.getModifiedY(e.getY()), e.isShiftDown());
-			}
-		}
+        }
 
 
 		@Override
