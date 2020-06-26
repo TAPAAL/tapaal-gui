@@ -74,27 +74,22 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 					}
 				}
 			}
-		}/*
-		 * else if (SwingUtilities.isMiddleMouseButton(e)){ // TODO -
-		 * middelclick draw a arrow }
-		 */
+		}
 	}
 
 
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
-			return;
-		}
-
-		if (myObject instanceof TimedPlaceComponent) {
-            TimedPlaceComponent p = (TimedPlaceComponent) myObject;
-		    if (e.getWheelRotation() < 0) {
-                p.underlyingPlace().addTokens(1);
-            } else {
-                p.underlyingPlace().removeTokens(1);
-            }
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
+            return;
         }
-	}
+
+        TimedPlaceComponent p = (TimedPlaceComponent) myObject;
+        if (e.getWheelRotation() < 0) {
+            p.underlyingPlace().addTokens(1);
+        } else {
+            p.underlyingPlace().removeTokens(1);
+        }
+    }
 }
