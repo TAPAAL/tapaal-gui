@@ -62,6 +62,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 	
 	public void mousePressed(MouseEvent e) {
 
+
 		if (((Arc) myObject).isPrototype()) {
 			dispatchToParentWithMouseLocationUpdated(e);
 			return;
@@ -90,4 +91,12 @@ public class ArcHandler extends PetriNetObjectHandler {
 		}
 	}
 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (((Arc) myObject).isPrototype()) {
+            dispatchToParentWithMouseLocationUpdated(e);
+            return;
+        }
+        super.mouseClicked(e);
+    }
 }

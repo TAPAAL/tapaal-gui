@@ -155,11 +155,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			case TAPNARC:{
 
 				if (currentObject instanceof TimedPlaceComponent) {
-					Arc arc = new TimedInputArcComponent(currentObject);
-					createArc(arc, currentObject);
+					//Arc arc = new TimedInputArcComponent(currentObject);
+					//createArc(arc, currentObject);
 				} else {
-					Arc arc = new TimedOutputArcComponent(currentObject);
-					createArc(arc, currentObject);
+					//Arc arc = new TimedOutputArcComponent(currentObject);
+					//createArc(arc, currentObject);
 				}
 				break;
 			}

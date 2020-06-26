@@ -149,11 +149,11 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				/*if (getManagerRef()!=null && getManagerRef().get()!=null) {
+				if (getManagerRef()!=null && getManagerRef().get()!=null) {
 					getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
 							PetriNetObject.this, e, AbstractDrawingSurfaceManager.MouseAction.moved
 					));
-				}*/
+				}
 				if (mouseHandler != null) {
 					mouseHandler.mouseMoved(e);
 				}
