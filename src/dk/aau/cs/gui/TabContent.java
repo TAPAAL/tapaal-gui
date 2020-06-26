@@ -1508,6 +1508,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case TAPNINHIBITOR_ARC:
                 setManager(new CanvasInhibitorarcDrawController());
                 break;
+            case TRANSPORTARC:
+                setManager(new CanvasTransportarcDrawController());
+                break;
             default:
                 setManager(notingManager);
                 break;
@@ -2205,4 +2208,137 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		managerRef.get().registerManager(drawingSurface);
     }
 
+    private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {
+
+        private TimedTransitionComponent transition;
+        private TimedPlaceComponent place1;
+        private TimedPlaceComponent place2;
+        private Arc arc;
+        private Arc arc1;
+        private Arc arc2;
+
+
+        @Override
+        public void registerEvents() {
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                e->placeClicked(((TimedPlaceComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.clicked,
+                e->transitionClicked(((TimedTransitionComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
+                e->placetranstionMouseOver(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.exited,
+                e->placetranstionMouseExited(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
+                e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
+            );
+        }
+
+        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
+            if (arc != null) {
+                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
+                    //Dispatch event to parent (drawing surface)
+                    e.translatePoint(pno.getX(),pno.getY());
+                    pno.getParent().dispatchEvent(e);
+                }
+            }
+        }
+
+        private void placetranstionMouseExited(PlaceTransitionObject pto) {
+            if (arc != null) {
+                arc.setTarget(null);
+                //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
+                // Relates to bug #1849786
+                if (pto instanceof Transition) {
+                    ((Transition)pto).removeArcCompareObject(arc);
+                }
+                arc.updateArcPosition();
+            }
+        }
+
+        private void placetranstionMouseOver(PlaceTransitionObject pno) {
+            if (arc != null) {
+                if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
+                    arc.setTarget(pno);
+                    arc.updateArcPosition();
+                }
+            }
+        }
+
+        private void transitionClicked(TimedTransitionComponent pno) {
+            if (place1 != null && transition == null) {
+                transition = pno;
+                arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
+
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings();
+            }
+        }
+
+        private void placeClicked(TimedPlaceComponent pno) {
+            if (place1 == null && transition == null) {
+                place1 = pno;
+                arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings();
+            } else if (transition != null && place2 == null) {
+                place2 = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
+                clearPendingArc();
+            }
+        }
+
+        private void clearPendingArc() {
+            CreateGui.getDrawingSurface().clearAllPrototype();
+            place1 = place2 = null;
+            transition = null;
+            arc = arc1 = arc2 = null;
+        }
+
+        @Override
+        public void drawingSurfaceMouseMoved(MouseEvent e) {
+            if(arc!=null) {
+                arc.setEndPoint(e.getX(), e.getY(), e.isShiftDown());
+            }
+        }
+
+        @Override
+        public void drawingSurfaceMouseClicked(MouseEvent e) {
+            if (arc!=null) {;
+                Point p = e.getPoint();
+                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
+                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+
+                boolean shiftDown = e.isShiftDown();
+                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
+            }
+        }
+
+        @Override
+        public void deregisterManager() {
+            clearPendingArc();
+        }
+    }
 }

@@ -175,7 +175,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			case TRANSPORTARC:{
                 if (currentObject instanceof Place) {
                     Arc arc = new TimedTransportArcComponent(currentObject, 1, true);
-					createArc(arc, currentObject);
+					//createArc(arc, currentObject);
 				}
 				break;
 			}
