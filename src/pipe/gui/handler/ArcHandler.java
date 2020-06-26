@@ -33,16 +33,12 @@ public class ArcHandler extends PetriNetObjectHandler {
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TimedOutputArcComponent
-				&& !(myObject instanceof TimedInputArcComponent)
-				&& !(myObject instanceof TimedTransportArcComponent)) {
-			
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
-			menuItem.setText("Insert Point");
-			popup.insert(menuItem, popupIndex++);
+        menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
+        menuItem.setText("Insert Point");
+        popup.insert(menuItem, popupIndex++);
 
-			popup.insert(new JPopupMenu.Separator(), popupIndex);
-		}
+        popup.insert(new JPopupMenu.Separator(), popupIndex);
+
 
         if ("DEV".equals(TAPAAL.VERSION)){
             JTextArea pane = new JTextArea();
