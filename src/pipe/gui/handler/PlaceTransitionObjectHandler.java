@@ -167,7 +167,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				if (currentObject instanceof Place) {
 					Arc arc = new TimedInhibitorArcComponent(currentObject);
-					createArc(arc, currentObject);
+					//createArc(arc, currentObject);
 				}
 
 				break;
