@@ -70,6 +70,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
+		controllerCheckBox = new JCheckBox("Controllable");
 		attributesCheckBox = new JCheckBox("Show transition name");
 		
 		
@@ -171,6 +172,28 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				urgentCheckBox.setSelected(false);
 			}
 		});
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(controllerCheckBox, gridBagConstraints);
+
+		if (transition.isController()) {
+		    controllerCheckBox.setSelected(true);
+        }
+
+        controllerCheckBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent arg0) {
+                JCheckBox box = (JCheckBox)arg0.getSource();
+                if (box.isSelected()) {
+                    transition.setPlayer(true);
+                } else {
+                    transition.setPlayer(false);
+                }
+            }
+        });
 	
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -504,7 +527,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JPanel transitionEditorPanel;
 	private javax.swing.JCheckBox sharedCheckBox;
 	private javax.swing.JComboBox<SharedTransition> sharedTransitionsComboBox;
-	private javax.swing.JCheckBox urgentCheckBox;
+    private javax.swing.JCheckBox urgentCheckBox;
+    private javax.swing.JCheckBox controllerCheckBox;
 	private javax.swing.JCheckBox makeNewSharedCheckBox;
 	private Vector<SharedTransition> sharedTransitions;
 	private boolean makeNewShared = false;

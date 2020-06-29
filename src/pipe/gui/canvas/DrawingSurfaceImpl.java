@@ -425,7 +425,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		private PlaceTransitionObject newTAPNTransitionAddToModelView(Point p) {
 			p = adjustPointToGridAndZoom(p, view.getZoom());
 
-			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model), false);
+			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model));
 
 			TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
 

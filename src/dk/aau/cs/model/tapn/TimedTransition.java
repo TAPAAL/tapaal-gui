@@ -33,15 +33,10 @@ public class TimedTransition extends TAPNElement {
 		this(name, false);
 	}
 	
-	/*public TimedTransition(String name, boolean isUrgent) {
+	public TimedTransition(String name, boolean isUrgent) {
 		setName(name);
 		setUrgent(isUrgent);
-	}*/
-
-    public TimedTransition(String name, boolean isController) {
-        setName(name);
-        setPlayer(isController);
-    }
+	}
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");

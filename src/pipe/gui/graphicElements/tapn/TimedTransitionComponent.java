@@ -142,15 +142,19 @@ public class TimedTransitionComponent extends Transition {
 	public boolean isUrgent(){
 		return transition.isUrgent();
 	}
-
-	public boolean isController() {
-	    return transition.isController();
-    }
 	
 	public void setUrgent(boolean value){
 		transition.setUrgent(value);
 	}
-	
+
+    public boolean isController() {
+        return transition.isController();
+    }
+
+    public void setPlayer(boolean isController) {
+        transition.setPlayer(isController);
+    }
+
 	public boolean hasUntimedPreset(){
 		return transition.hasUntimedPreset();
 	}
