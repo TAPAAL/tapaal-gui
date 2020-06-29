@@ -417,6 +417,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
+		transitionElement.setAttribute("controllable", inputTransition.underlyingTransition().isController() ? "true" : "false");
 
 		return transitionElement;
 	}

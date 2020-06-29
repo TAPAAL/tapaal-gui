@@ -1379,7 +1379,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     };
 	final AbstractDrawingSurfaceManager animationModeController;
 
-	//Writes a tapaal net to a file, with the posibility to overwrite the quires
+	//Writes a tapaal net to a file, with the possibility to overwrite the queries
 	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite) {
 		try {
 			NetworkMarking currentMarking = null;
