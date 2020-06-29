@@ -62,7 +62,7 @@ public class AnnotationNoteHandler extends NoteHandler {
 		
 		if ((e.getComponent() == myObject || !e.getComponent().isEnabled()) && (SwingUtilities.isLeftMouseButton(e))) {
 			if (e.getClickCount() == 2) {
-				((AnnotationNote) myObject).enableEditMode();
+				//((AnnotationNote) myObject).enableEditMode();
 			}
 		}
 	}
