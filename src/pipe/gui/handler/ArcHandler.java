@@ -20,7 +20,6 @@ public class ArcHandler extends PetriNetObjectHandler {
 
 	public ArcHandler(Arc obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	/**

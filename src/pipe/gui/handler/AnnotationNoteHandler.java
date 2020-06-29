@@ -20,7 +20,6 @@ public class AnnotationNoteHandler extends NoteHandler {
 
 	public AnnotationNoteHandler(AnnotationNote note) {
 		super(note);
-		enablePopup = true;
 	}
 
 	/**

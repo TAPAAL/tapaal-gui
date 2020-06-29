@@ -27,8 +27,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	protected static boolean justSelected = false;
 
 	protected boolean isDragging = false;
-	protected boolean enablePopup = false;
-	protected Point dragInit = new Point();
+    protected Point dragInit = new Point();
 
 	private int totalX = 0;
 	private int totalY = 0;
@@ -91,7 +90,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 			dragInit = e.getPoint();
 		}
 		
-		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+		if (CreateGui.getApp().isEditionAllowed()) {
 			checkForPopup(e);
 		}
 	}
@@ -104,7 +103,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	public void mouseReleased(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		// Have to check for popup here as well as on pressed for crossplatform!!
-		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+		if (CreateGui.getApp().isEditionAllowed()) {
 			checkForPopup(e);
 		}
 

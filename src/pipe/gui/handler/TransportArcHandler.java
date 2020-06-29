@@ -16,7 +16,6 @@ public class TransportArcHandler extends TimedArcHandler {
 
 	public TransportArcHandler(Arc obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	@Override

@@ -14,9 +14,6 @@ import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.undo.UndoManager;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -60,7 +57,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 				((Place) myObject).showEditor();
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
+			if (CreateGui.getApp().isEditionAllowed() && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
 

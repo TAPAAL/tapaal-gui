@@ -23,7 +23,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
     // constructor passing in all required objects
 	public PlaceTransitionObjectHandler(PlaceTransitionObject obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
     @Override

@@ -15,7 +15,6 @@ public class TimedArcHandler extends ArcHandler {
 
 	public TimedArcHandler(Arc obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	@Override

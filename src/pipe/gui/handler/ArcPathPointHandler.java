@@ -20,7 +20,6 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 
 	public ArcPathPointHandler(ArcPathPoint obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	/**
