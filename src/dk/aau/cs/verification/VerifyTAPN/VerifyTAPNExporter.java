@@ -97,8 +97,9 @@ public class VerifyTAPNExporter {
 
 	private void outputTransition(TimedTransition t, PrintStream modelStream) {
 		modelStream.append("<transition ");
-		
-		modelStream.append("id=\"" + t.name() + "\" ");
+
+        modelStream.append("player=\"" + (t.isController()? "1" : "2") + "\"");
+        modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
 		modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
 		
