@@ -49,7 +49,6 @@ public class UndoManager {
 	public void redo() {
 
 		if (undoneEdits > 0) {
-			checkArcBeingDrawn();
 
 			// The currentEdit to redo
 			for (Command command : edits.get(indexOfNextAdd)) {
@@ -78,7 +77,6 @@ public class UndoManager {
 	public void undo() {
 
 		if (sizeOfBuffer > 0) {
-			checkArcBeingDrawn();
 
 			if (--indexOfNextAdd < 0) {
 				indexOfNextAdd += UNDO_BUFFER_CAPACITY;
@@ -151,12 +149,4 @@ public class UndoManager {
 		return lastAdd;
 	}
 
-	// removes the arc currently being drawn if any
-	private void checkArcBeingDrawn() {
-        if(CreateGui.getDrawingSurface() != null) {
-            if (CreateGui.getDrawingSurface().createArc != null) {
-                PlaceTransitionObjectHandler.cleanupArc(CreateGui.getDrawingSurface().createArc, CreateGui.getDrawingSurface());
-            }
-        }
-	}
 }

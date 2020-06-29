@@ -5,16 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.function.Supplier;
 
 import javax.swing.*;
 
 import pipe.gui.CreateGui;
-import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import dk.aau.cs.model.tapn.Weight;
-import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
    Implementation of Element for drawing an arc
@@ -370,8 +369,9 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
 	 * and action names are mapped to action objects. The key bindings are disabled when the
 	 * arc object is deleted, or the arc is connected to a place/transition.
-	 */
-	public void enableDrawingKeyBindings() {
+     * @param action
+     */
+	public void enableDrawingKeyBindings(Runnable action) {
 		InputMap iMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		ActionMap aMap = this.getActionMap();
 
@@ -380,30 +380,17 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		iMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteArc");
 		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteArc");
 		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteArc");
-		aMap.put("deleteArc", new DeleteAction(this));
+		aMap.put("deleteArc", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+            }
+        });
 	}
 
 	public void disableDrawingKeyBindings() {
 		this.getInputMap().clear();
 		this.getActionMap().clear();
-	}
-
-	private static class DeleteAction extends AbstractAction {
-		Arc arcBeingDraw;
-
-		DeleteAction(Arc arc) {
-			arcBeingDraw = arc;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			DrawingSurfaceImpl aView = CreateGui.getDrawingSurface();
-			if (aView.createArc == arcBeingDraw) {
-				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
-
-				aView.repaint();
-			}
-		}
 	}
 
 	protected final void setHead(Shape head, Boolean fillHead) {

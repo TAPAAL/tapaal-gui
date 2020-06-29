@@ -1,6 +1,7 @@
 package dk.aau.cs.gui;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -35,7 +36,6 @@ import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.handler.PlaceTransitionObjectHandler;
 import pipe.gui.undo.*;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.undo.ChangeSpacingEdit;
@@ -1444,6 +1444,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
 
+	private Pipe.ElementType editorMode = Pipe.ElementType.SELECT;
+
 	//XXX temp while refactoring, kyrke - 2019-07-25
 	@Override
 	public void setMode(Pipe.ElementType mode) {
@@ -1452,12 +1454,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		//Disable selection and deselect current selection
 		drawingSurface().getSelectionObject().clearSelection();
-
-		//If pending arc draw, remove it
-		if (drawingSurface().createArc != null) {
-			PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
-		}
-
+        editorMode = mode;
         switch (mode) {
             case ADDTOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
@@ -1695,13 +1692,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 			//If arc is being drawn delete it
 
-			if (drawingSurface().createArc == null) {
+			if (editorMode == Pipe.ElementType.SELECT) {
 				getUndoManager().undo();
 				network().buildConstraints();
 
 			} else {
 
-				PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+				setMode(Pipe.ElementType.SELECT);
 
 			}
 		}
@@ -1716,13 +1713,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				//If arc is being drawn delete it
 
-				if (drawingSurface().createArc == null) {
+				if (editorMode == Pipe.ElementType.SELECT) {
 					getUndoManager().redo();
 					network().buildConstraints();
 
 				} else {
 
-					PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+                    setMode(Pipe.ElementType.SELECT);
 
 				}
 			}
@@ -1974,7 +1971,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 CreateGui.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
-                arc.enableDrawingKeyBindings();
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
@@ -2089,7 +2086,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 CreateGui.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
-                arc.enableDrawingKeyBindings();
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (place != null && transition == null) {
                 transition = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
@@ -2109,7 +2106,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 CreateGui.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
-                arc.enableDrawingKeyBindings();
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
@@ -2285,7 +2282,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 CreateGui.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
-                arc.enableDrawingKeyBindings();
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
             }
         }
 
@@ -2300,7 +2297,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 CreateGui.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
-                arc.enableDrawingKeyBindings();
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place2 == null) {
                 place2 = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
