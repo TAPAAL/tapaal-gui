@@ -105,6 +105,7 @@ public abstract class Transition extends PlaceTransitionObject {
 			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
 			//pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
+        g2.fill(transition);
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
@@ -117,8 +118,6 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		g2.draw(transition);
-		g2.fill(transition);
-		
 	}
 
 	/**
@@ -460,4 +459,8 @@ public abstract class Transition extends PlaceTransitionObject {
 			 }
 		 });
 	 }
+	 public void fillTransition(Graphics g) {
+         Graphics2D g2 = (Graphics2D) g;
+         g2.fill(transition);
+     }
 }

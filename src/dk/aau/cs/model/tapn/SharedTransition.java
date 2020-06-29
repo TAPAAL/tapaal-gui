@@ -16,6 +16,7 @@ public class SharedTransition {
 	private String name;
 	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
+	private boolean isController = true;
 
 	private TimedArcPetriNetNetwork network;
 	
@@ -41,6 +42,13 @@ public class SharedTransition {
 			t.setUrgent(value, false);
 		}
 	}
+
+	public void setPlayer(boolean isController) {
+	    this.isController = isController;
+	    for (TimedTransition transition : transitions) {
+	        transition.setPlayer(isController);
+        }
+    }
 
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");

@@ -7,9 +7,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
-import javax.swing.JLayeredPane;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import dk.aau.cs.gui.TabContent;
@@ -427,7 +425,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		private PlaceTransitionObject newTAPNTransitionAddToModelView(Point p) {
 			p = adjustPointToGridAndZoom(p, view.getZoom());
 
-			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model));
+			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model), false);
 
 			TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
 
@@ -483,7 +481,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 						break;
 
 					case TAPNTRANS: // create transition
-						newTAPNTransitionAddToModelView(clickPoint);
+                        newTAPNTransitionAddToModelView(clickPoint);
 
 						break;
 

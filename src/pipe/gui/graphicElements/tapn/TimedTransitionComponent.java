@@ -142,6 +142,10 @@ public class TimedTransitionComponent extends Transition {
 	public boolean isUrgent(){
 		return transition.isUrgent();
 	}
+
+	public boolean isController() {
+	    return transition.isController();
+    }
 	
 	public void setUrgent(boolean value){
 		transition.setUrgent(value);
@@ -183,6 +187,9 @@ public class TimedTransitionComponent extends Transition {
 			g.setColor(Color.WHITE);
 			g.fillOval(11, 11, 8,8);
 		}
+        if(isController()){
+            super.fillTransition(g);
+        }
 	}
 
 	@Override

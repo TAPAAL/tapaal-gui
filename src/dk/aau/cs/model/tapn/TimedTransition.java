@@ -23,6 +23,7 @@ public class TimedTransition extends TAPNElement {
 	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	private TimeInterval dInterval = null;
 	private boolean isUrgent = false;
+	private boolean isController = true;
 
 	private SharedTransition sharedTransition;
 
@@ -32,10 +33,15 @@ public class TimedTransition extends TAPNElement {
 		this(name, false);
 	}
 	
-	public TimedTransition(String name, boolean isUrgent) {
+	/*public TimedTransition(String name, boolean isUrgent) {
 		setName(name);
 		setUrgent(isUrgent);
-	}
+	}*/
+
+    public TimedTransition(String name, boolean isController) {
+        setName(name);
+        setPlayer(isController);
+    }
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
@@ -61,6 +67,17 @@ public class TimedTransition extends TAPNElement {
 			sharedTransition.setUrgent(value);
 		}
 	}
+
+	public boolean isController() {
+	    return isController;
+    }
+
+	public void setPlayer(boolean isController) {
+	    this.isController = isController;
+	    if (isShared()) {
+	        sharedTransition.setPlayer(isController);
+        }
+    }
 	
 	public boolean hasUntimedPreset(){
 		return hasUntimedPreset(true);

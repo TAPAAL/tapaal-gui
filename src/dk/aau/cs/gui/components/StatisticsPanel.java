@@ -1,11 +1,6 @@
 package dk.aau.cs.gui.components;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -66,7 +61,7 @@ public class StatisticsPanel extends JPanel{
 	}
 
 	private JPanel init() {
-		addRow(headLines, 0, true);
+        addRow(headLines, 0, true);
 		
 		//Add the content - make space for separators (except the orphan transitions)
 		for(int i = 0; i < contents.length - 2; i++){
@@ -241,6 +236,7 @@ public class StatisticsPanel extends JPanel{
                     contents = template.model().getStatistics();
                 }
                 tab.drawingSurface().repaint();
+
 
                 StatisticsPanel.this.removeAll();
                 StatisticsPanel.this.init();
