@@ -71,12 +71,12 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
-		
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-		    new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
-        );
-		
+
+	    if (originalOffsetX!=obj.getNameOffsetX() && originalOffsetY != obj.getNameOffsetY()) {
+            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+                new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
+            );
+        }
 	}
 
 	@Override
