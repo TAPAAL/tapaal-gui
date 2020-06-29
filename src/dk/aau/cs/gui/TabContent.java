@@ -2371,6 +2371,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.doubleClicked,
                 e-> ((TimedPlaceComponent) e.pno).showEditor()
             );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.rightClicked,
+                e-> ((TimedTransitionComponent) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+            );
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.rightClicked,
+                e-> ((TimedPlaceComponent) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+            );
         }
     }
 }

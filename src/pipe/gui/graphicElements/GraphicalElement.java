@@ -14,11 +14,14 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
 
     protected Reference<AbstractDrawingSurfaceManager> managerRef = null;
 
-    /*private*/ public GraphicalElement(){
+    /*private*/
+    public GraphicalElement() {
         addMouseListener(new MouseListener() {
+            private boolean rightMouseDown = false;
+
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                if (getManagerRef() != null && getManagerRef().get() != null) {
                     switch (e.getClickCount()) {
                         case 1:
                             getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
@@ -37,25 +40,40 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
-                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
-                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.pressed
-                    ));
+
+                if (getManagerRef() != null && getManagerRef().get() != null) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                            GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.pressed
+                        ));
+
+                    } else if (SwingUtilities.isRightMouseButton(e)) {
+                        rightMouseDown = true;
+                    }
                 }
+
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
-                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
-                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.released
-                    ));
+                if (getManagerRef() != null && getManagerRef().get() != null) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                            GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.released
+                        ));
+                    } else if (SwingUtilities.isRightMouseButton(e)) {
+                        if (rightMouseDown) {
+                            getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                                GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.rightClicked
+                            ));
+                        }
+                    }
                 }
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                if (getManagerRef() != null && getManagerRef().get() != null) {
                     getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
                         GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.entered
                     ));
@@ -64,7 +82,9 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                rightMouseDown = false;
+
+                if (getManagerRef() != null && getManagerRef().get() != null) {
                     getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
                         GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.exited
                     ));
@@ -75,7 +95,7 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
         addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                if (getManagerRef() != null && getManagerRef().get() != null) {
                     getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
                         GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.wheel
                     ));
@@ -86,7 +106,7 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
         addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                if (getManagerRef() != null && getManagerRef().get() != null) {
                     getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
                         GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.dragged
                     ));
@@ -95,7 +115,7 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                if (getManagerRef()!=null && getManagerRef().get()!=null) {
+                if (getManagerRef() != null && getManagerRef().get() != null) {
                     getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
                         GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.moved
                     ));

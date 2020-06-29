@@ -12,6 +12,8 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on all
@@ -69,7 +71,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	private void checkForPopup(MouseEvent e) {
 		if (SwingUtilities.isRightMouseButton(e) && CreateGui.getApp().getMode() == ElementType.SELECT) {
 			JPopupMenu m = getPopup(e);
-			if (m != null) {
+			if (m != null && !(myObject instanceof TimedPlaceComponent || myObject instanceof TimedTransitionComponent)) {
 				m.show(myObject, e.getX(), e.getY());
 			}
 		}

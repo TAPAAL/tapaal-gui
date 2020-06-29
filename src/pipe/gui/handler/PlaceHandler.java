@@ -50,26 +50,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isLeftMouseButton(e)) {
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && CreateGui.getApp().getMode() == ElementType.SELECT) {
-				JPopupMenu m = getPopup(e);
-				if (m != null) {
-
-					if (myObject instanceof PetriNetObjectWithLabel) {
-						int x = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetX(), myObject.getZoom());
-						int y = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetY(), myObject.getZoom());
-						m.show(myObject, x, y);
-					}
-				}
-			}
-		}
-	}
-
-
-
-	@Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
             return;

@@ -54,13 +54,4 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
         return popup;
     }
 
-    @Override
-	public void mousePressed(MouseEvent e) {
-		super.mousePressed(e);
-		// Prevent creating arcs with a right-click or a middle-click
-		if (e.getButton() != MouseEvent.BUTTON1) {
-			return;
-		}
-	}
-
 }
