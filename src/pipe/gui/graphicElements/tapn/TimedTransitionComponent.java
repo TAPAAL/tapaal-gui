@@ -187,13 +187,13 @@ public class TimedTransitionComponent extends Transition {
 
 			graphics.setStroke(oldStroke);
 		}
-		if(isUrgent()){
-			g.setColor(Color.WHITE);
-			g.fillOval(11, 11, 8,8);
-		}
         if(isController()){
             super.fillTransition(g);
         }
+		if (isUrgent()) {
+		    g.setColor(isController() ? Color.WHITE : Color.BLACK);
+			g.fillOval(11, 11, 8,8);
+		}
 	}
 
 	@Override

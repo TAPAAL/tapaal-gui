@@ -70,7 +70,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
-		controllerCheckBox = new JCheckBox("Controllable");
+		controllerCheckBox = new JCheckBox("Uncontrollable");
 		attributesCheckBox = new JCheckBox("Show transition name");
 		
 		
@@ -180,7 +180,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(controllerCheckBox, gridBagConstraints);
 
-		if (transition.isController()) {
+		if (!transition.isController()) {
 		    controllerCheckBox.setSelected(true);
         }
 
@@ -188,9 +188,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 JCheckBox box = (JCheckBox)arg0.getSource();
                 if (box.isSelected()) {
-                    transition.setPlayer(true);
-                } else {
                     transition.setPlayer(false);
+                } else {
+                    transition.setPlayer(true);
                 }
             }
         });
