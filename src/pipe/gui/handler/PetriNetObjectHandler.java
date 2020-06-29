@@ -11,6 +11,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -71,7 +72,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	private void checkForPopup(MouseEvent e) {
 		if (SwingUtilities.isRightMouseButton(e) && CreateGui.getApp().getMode() == ElementType.SELECT) {
 			JPopupMenu m = getPopup(e);
-			if (m != null && !(myObject instanceof TimedPlaceComponent || myObject instanceof TimedTransitionComponent)) {
+			if (m != null && !(myObject instanceof TimedPlaceComponent || myObject instanceof TimedTransitionComponent || myObject instanceof Arc)) {
 				m.show(myObject, e.getX(), e.getY());
 			}
 		}
