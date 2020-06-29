@@ -52,10 +52,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
-            if (e.getClickCount() == 2 && CreateGui.getApp().isEditionAllowed() && CreateGui.getApp().getMode() == ElementType.SELECT) {
-				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
-				((Place) myObject).showEditor();
-			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed() && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);

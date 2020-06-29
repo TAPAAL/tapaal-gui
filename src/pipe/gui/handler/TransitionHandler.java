@@ -69,11 +69,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed()) {
-				if (e.getClickCount() == 2 && CreateGui.getApp().getMode() == ElementType.SELECT) {
-					((Transition) myObject).showEditor();
-				}
-			}
+
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed() && CreateGui.getApp().getMode() == ElementType.SELECT) {
 				JPopupMenu m = getPopup(e);

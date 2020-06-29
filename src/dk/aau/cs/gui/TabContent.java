@@ -1508,6 +1508,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case TRANSPORTARC:
                 setManager(new CanvasTransportarcDrawController());
                 break;
+            case SELECT:
+                setManager(new CanvasGeneralDrawController());
+                break;
             default:
                 setManager(notingManager);
                 break;
@@ -2354,6 +2357,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void deregisterManager() {
             clearPendingArc();
             CreateGui.useExtendedBounds = false;
+        }
+    }
+
+    private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+        @Override
+        public void registerEvents() {
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
+                e-> ((TimedTransitionComponent) e.pno).showEditor()
+            );
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.doubleClicked,
+                e-> ((TimedPlaceComponent) e.pno).showEditor()
+            );
         }
     }
 }
