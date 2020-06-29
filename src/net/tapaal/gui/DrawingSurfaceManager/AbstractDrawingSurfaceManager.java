@@ -24,6 +24,7 @@ public abstract class AbstractDrawingSurfaceManager {
 
     public enum MouseAction {
         clicked,
+        doubleClicked,
         pressed,
         released,
         dragged,

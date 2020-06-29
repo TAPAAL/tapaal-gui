@@ -19,9 +19,19 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (getManagerRef() !=null && getManagerRef().get()!=null) {
-                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
-                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.clicked
-                    ));
+                    switch (e.getClickCount()) {
+                        case 1:
+                            getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                                GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.clicked
+                            ));
+                            break;
+                        case 2:
+                            getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                                GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.doubleClicked
+                            ));
+                            break;
+                    }
+
                 }
             }
 
