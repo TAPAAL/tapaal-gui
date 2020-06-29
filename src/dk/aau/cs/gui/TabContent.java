@@ -2008,8 +2008,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         @Override
+        public void registerManager(DrawingSurfaceImpl canvas) {
+            CreateGui.useExtendedBounds = true;
+        }
+
+        @Override
         public void deregisterManager() {
             clearPendingArc();
+            CreateGui.useExtendedBounds = false;
         }
 
 
@@ -2143,8 +2149,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         @Override
+        public void registerManager(DrawingSurfaceImpl canvas) {
+            CreateGui.useExtendedBounds = true;
+        }
+
+        @Override
         public void deregisterManager() {
             clearPendingArc();
+            CreateGui.useExtendedBounds = false;
         }
     }
 
@@ -2334,8 +2346,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         @Override
+        public void registerManager(DrawingSurfaceImpl canvas) {
+            CreateGui.useExtendedBounds = true;
+        }
+
+        @Override
         public void deregisterManager() {
             clearPendingArc();
+            CreateGui.useExtendedBounds = false;
         }
     }
 }

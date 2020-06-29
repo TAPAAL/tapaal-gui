@@ -89,8 +89,7 @@ public abstract class Place extends PlaceTransitionObject {
 		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, getZoom());
 		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, getZoom());
 
-		Arc createArc = CreateGui.getDrawingSurface().createArc;
-		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+		if (CreateGui.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
 			return (proximityPlace.contains((int) unZoomedX, (int) unZoomedY) ||
 					placeEllipse.contains((int) unZoomedX, (int) unZoomedY));
 		} else {

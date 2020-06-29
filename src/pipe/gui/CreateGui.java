@@ -137,4 +137,6 @@ public class CreateGui {
     }
 
 
+    public static boolean useExtendedBounds = false;
+
 }

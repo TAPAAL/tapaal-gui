@@ -64,5 +64,4 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 	}
 
-c
 }

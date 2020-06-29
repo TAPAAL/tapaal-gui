@@ -30,10 +30,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canvas, PrototypeCanvas {
 
-
-	public final Arc createArc = null; // no longer static
-
-	private static final int DRAWING_SURFACE_GROW = 100;
+    private static final int DRAWING_SURFACE_GROW = 100;
 
 	private final SelectionManager selection;
 
