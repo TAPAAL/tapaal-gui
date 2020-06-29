@@ -1,6 +1,7 @@
 package net.tapaal.gui.DrawingSurfaceManager;
 
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.GraphicalElement;
 import pipe.gui.graphicElements.PetriNetObject;
 
 import java.awt.event.MouseEvent;
@@ -34,12 +35,12 @@ public abstract class AbstractDrawingSurfaceManager {
     public static class DrawingSurfaceEvent {
 
 
-        public final PetriNetObject pno;
+        public final GraphicalElement pno;
         public final MouseEvent e;
         public final MouseAction a;
         //Mouse Event type eg click mouse over etc
 
-        public DrawingSurfaceEvent(PetriNetObject pno, MouseEvent e, MouseAction a) {
+        public DrawingSurfaceEvent(GraphicalElement pno, MouseEvent e, MouseAction a) {
             this.pno = pno;
             this.e = e;
             this.a = a;

@@ -7,6 +7,7 @@ import pipe.gui.Zoomable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public abstract class GraphicalElement extends JComponent implements Zoomable, Translatable {
 
@@ -14,6 +15,83 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
     protected Reference<AbstractDrawingSurfaceManager> managerRef = null;
 
     /*private*/ public GraphicalElement(){
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.clicked
+                    ));
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.pressed
+                    ));
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.released
+                    ));
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.entered
+                    ));
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.exited
+                    ));
+                }
+            }
+        });
+
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.wheel
+                    ));
+                }
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (getManagerRef() !=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.dragged
+                    ));
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (getManagerRef()!=null && getManagerRef().get()!=null) {
+                    getManagerRef().get().triggerEvent(new AbstractDrawingSurfaceManager.DrawingSurfaceEvent(
+                        GraphicalElement.this, e, AbstractDrawingSurfaceManager.MouseAction.moved
+                    ));
+                }
+            }
+        });
 
     }
 
