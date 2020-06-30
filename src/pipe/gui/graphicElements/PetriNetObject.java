@@ -289,4 +289,5 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
     public GraphicalElement getGraphicalElement() {
         return this;
     }
+
 }

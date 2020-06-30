@@ -2391,6 +2391,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof AnnotationNote && e.a == MouseAction.rightClicked,
                 e-> ((AnnotationNote) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
             );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.entered,
+                e -> ((Arc)e.pno).getArcPath().showPoints()
+            );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.exited,
+                e -> ((Arc)e.pno).getArcPath().hidePoints()
+            );
 
         }
     }

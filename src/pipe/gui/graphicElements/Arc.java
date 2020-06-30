@@ -295,18 +295,17 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public boolean contains(int x, int y) {
 		Point2D.Double point = new Point2D.Double(
 		    x + myPath.getBounds().getX() - COMPONENT_DRAW_OFFSET - zoomGrow,
-            y
-				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
+            y + myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
         );
 
-		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
+		/*if (!CreateGui.getCurrentTab().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
 				myPath.showPoints();
 			} else {
 				myPath.hidePoints();
 			}
-		}
+		}*/
 		return myPath.contains(point);
 	}
 
@@ -404,4 +403,16 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	protected void setHead() {
 		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {0, -10, -7, -10 }, 4), true) ;
 	}
+
+    @Override
+    public void select(boolean shouldRepaint) {
+        super.select(shouldRepaint);
+        myPath.showPoints();
+    }
+
+    @Override
+    public void deselect() {
+        super.deselect();
+        myPath.hidePoints();
+    }
 }
