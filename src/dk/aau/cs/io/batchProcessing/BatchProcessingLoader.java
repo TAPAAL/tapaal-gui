@@ -302,7 +302,8 @@ public class BatchProcessingLoader {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
-		
+        boolean isUncontrollable = Boolean.parseBoolean(transition.getAttribute("uncontrollable"));
+
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
 		if (idInput.length() == 0 && nameInput.length() > 0) {
@@ -315,6 +316,7 @@ public class BatchProcessingLoader {
 		
 		TimedTransition t = new TimedTransition(nameInput);
 		t.setUrgent(isUrgent);
+		t.setUncontrollable(isUncontrollable);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

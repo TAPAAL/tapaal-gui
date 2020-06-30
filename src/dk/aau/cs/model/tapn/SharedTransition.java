@@ -16,7 +16,7 @@ public class SharedTransition {
 	private String name;
 	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
-	private boolean isController = true;
+	private boolean isUncontrollable = false;
 
 	private TimedArcPetriNetNetwork network;
 	
@@ -43,10 +43,14 @@ public class SharedTransition {
 		}
 	}
 
-	public void setPlayer(boolean isController) {
-	    this.isController = isController;
+	public boolean isUncontrollable() {
+	    return isUncontrollable;
+    }
+
+	public void setUncontrollable(boolean isUncontrollable) {
+	    this.isUncontrollable = isUncontrollable;
 	    for (TimedTransition transition : transitions) {
-	        transition.setPlayer(isController);
+	        transition.setUncontrollable(isUncontrollable);
         }
     }
 
@@ -68,7 +72,7 @@ public class SharedTransition {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(templateDoesNotContainSharedTransition(transition.model()), "Another transition in the same template is already shared under that name");
 		transition.makeShared(this); // this will unshare first if part of another shared transition
-		transitions.add(transition);
+        transitions.add(transition);
 	}
 
 	private boolean templateDoesNotContainSharedTransition(TimedArcPetriNet model) {

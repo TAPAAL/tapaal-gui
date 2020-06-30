@@ -185,9 +185,11 @@ public class TapnXmlLoader {
 	private SharedTransition parseSharedTransition(Element element) {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
+        boolean isUncontrollable = Boolean.parseBoolean(element.getAttribute("uncontrollable"));
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
+		st.setUrgent(isUncontrollable);
 		return st;
 	}
 
@@ -343,7 +345,7 @@ public class TapnXmlLoader {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
         boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
-        boolean isController = Boolean.parseBoolean(transition.getAttribute("controllable"));
+        boolean isUncontrollable = Boolean.parseBoolean(transition.getAttribute("uncontrollable"));
 
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
@@ -366,7 +368,7 @@ public class TapnXmlLoader {
 		
 		TimedTransition t = new TimedTransition(nameInput);
 		t.setUrgent(isUrgent);
-		t.setPlayer(isController);
+		t.setUncontrollable(isUncontrollable);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

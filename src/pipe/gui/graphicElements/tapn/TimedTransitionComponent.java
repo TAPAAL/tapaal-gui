@@ -147,12 +147,12 @@ public class TimedTransitionComponent extends Transition {
 		transition.setUrgent(value);
 	}
 
-    public boolean isController() {
-        return transition.isController();
+    public boolean isUncontrollable() {
+        return transition.isUncontrollable();
     }
 
-    public void setPlayer(boolean isController) {
-        transition.setPlayer(isController);
+    public void setUncontrollable(boolean isUncontrollable) {
+        transition.setUncontrollable(isUncontrollable);
     }
 
 	public boolean hasUntimedPreset(){
@@ -187,11 +187,11 @@ public class TimedTransitionComponent extends Transition {
 
 			graphics.setStroke(oldStroke);
 		}
-        if(isController()){
+        if(!isUncontrollable()){
             super.fillTransition(g);
         }
 		if (isUrgent()) {
-		    g.setColor(isController() ? Color.WHITE : Color.BLACK);
+		    g.setColor(isUncontrollable() ? Color.BLACK : Color.WHITE);
 			g.fillOval(11, 11, 8,8);
 		}
 	}
