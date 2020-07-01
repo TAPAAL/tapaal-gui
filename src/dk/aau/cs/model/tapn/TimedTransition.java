@@ -67,9 +67,13 @@ public class TimedTransition extends TAPNElement {
 	    return isUncontrollable;
     }
 
-	public void setUncontrollable(boolean isUncontrollable) {
+    public void setUncontrollable(boolean isUncontrollable) {
+	    setUncontrollable(isUncontrollable, true);
+    }
+
+	public void setUncontrollable(boolean isUncontrollable, boolean cascade) {
 	    this.isUncontrollable = isUncontrollable;
-	    if (isShared()) {
+	    if (isShared() && cascade) {
 	        sharedTransition.setUncontrollable(isUncontrollable);
         }
     }

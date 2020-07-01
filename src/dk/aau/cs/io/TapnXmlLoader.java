@@ -189,7 +189,7 @@ public class TapnXmlLoader {
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
-		st.setUrgent(isUncontrollable);
+		st.setUncontrollable(isUncontrollable);
 		return st;
 	}
 

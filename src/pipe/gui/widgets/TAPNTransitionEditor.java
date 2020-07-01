@@ -476,12 +476,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		}
 		
 		if(transition.isUrgent() != urgentCheckBox.isSelected()){
-			//context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
+			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
-		if(transition.isUncontrollable() != uncontrollableCheckBox.isSelected()){
-		    transition.setUncontrollable(uncontrollableCheckBox.isSelected());
-        }
+
+        transition.setUncontrollable(uncontrollableCheckBox.isSelected());
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {

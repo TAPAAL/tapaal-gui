@@ -50,7 +50,7 @@ public class SharedTransition {
 	public void setUncontrollable(boolean isUncontrollable) {
 	    this.isUncontrollable = isUncontrollable;
 	    for (TimedTransition transition : transitions) {
-	        transition.setUncontrollable(isUncontrollable);
+	        transition.setUncontrollable(isUncontrollable, false);
         }
     }
 
