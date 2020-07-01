@@ -1465,7 +1465,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				if (canNetBeSavedAndShowMessage()) {
                     if(Preferences.getInstance().getShowPNMLWarning()) {
                             JCheckBox showAgain = new JCheckBox("Do not show this warning.");
-                            String message = "In the saved PNML all timing information will be lost\n" +
+                            String message = "In the saved PNML all timing and game information will be lost\n" +
                                     	"and the components in the net will be merged into one big net.";
                             Object[] dialogContent = {message, showAgain};
                             JOptionPane.showMessageDialog(null, dialogContent,

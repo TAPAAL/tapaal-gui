@@ -202,6 +202,13 @@ public class TikZExporter {
 				out.append(trans.getId());
 				out.append(".center) { };\n");
 			}
+            if (((TimedTransitionComponent)trans).underlyingTransition().isUncontrollable()) {
+                out.append("\\node[uncontrollabletransition");
+                out.append(angle);
+                out.append("] at (");
+                out.append(trans.getId());
+                out.append(".center) { };\n");
+            }
 			if (trans.getAttributesVisible()){
 				out.append("%% label for transition " + trans.getName() + "\n");
 				out.append("\\draw (");
@@ -322,7 +329,8 @@ public class TikZExporter {
 		out.append("\\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]\n");
 		out.append("\\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]\n");
 		out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]");
-		return out;
+        out.append("\\tikzstyle{uncontrollabletransition}=[transition,fill=white,draw=black,very thick]");
+        return out;
 	}
 
 	protected String replaceWithMathLatex(String text) {
