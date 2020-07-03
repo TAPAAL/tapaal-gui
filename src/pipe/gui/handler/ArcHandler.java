@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
+import pipe.gui.Zoomer;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -80,8 +81,8 @@ public class ArcHandler extends PetriNetObjectHandler {
 					CreateGui.getCurrentTab().getUndoManager().addNewEdit(
 							arc.getArcPath().insertPoint(
 									new Point2D.Double(
-									    arc.getX() + e.getX(),
-                                        arc.getY() + e.getY()
+                                        Zoomer.getUnzoomedValue(arc.getX() + e.getX(), arc.getZoom()),
+                                        Zoomer.getUnzoomedValue(arc.getY() + e.getY(), arc.getZoom())
                                     ),
 									e.isAltDown()
                             )

@@ -31,10 +31,6 @@ public class TimedArcHandler extends ArcHandler {
 				popup.insert(menuItem, popupIndex++);
 			}
 
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
-			menuItem.setText("Insert Point");
-			popup.insert(menuItem, popupIndex++);
-
 			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}
 		return popup;
