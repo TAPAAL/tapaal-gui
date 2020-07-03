@@ -7,6 +7,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
+import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
@@ -49,12 +50,16 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
+            String writeReducedCMD = " --write-reduced reduced-" + CreateGui.getApp().getCurrentTabName();
+            writeReducedCMD = writeReducedCMD.replace(".tapn", ".pnml");
+            result.append(writeReducedCMD);
 			break;
 		case NO_REDUCTION:
 			result.append(" -r 0 ");
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
+            result.append(" --write-reduced testopt.tapn");
 			break;
 		default:
 			break;			

@@ -6,8 +6,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,17 +28,24 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.verification.*;
+import pipe.dataLayer.NetWriter;
+import pipe.dataLayer.Template;
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.IconSelector;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.VerificationResult;
+import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class RunVerification extends RunVerificationBase {	
 	private IconSelector iconSelector;
@@ -124,7 +137,6 @@ public class RunVerification extends RunVerificationBase {
         }
 
     }
-
 
 	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
@@ -287,10 +299,38 @@ public class RunVerification extends RunVerificationBase {
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
 				gbc.gridy = 5;
-				gbc.insets = new Insets(0,0,20,-90);
+				gbc.insets = new Insets(0,0,0,-90);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
-			}
+
+                JButton openReducedButton = new JButton("Open reduced net");
+                openReducedButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String reducedName = "reduced-" + CreateGui.getApp().getCurrentTabName();
+                        reducedName = reducedName.replace(".tapn", ".pnml");
+                        File reducedNetFile = new File(reducedName);
+
+                        if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                            try {
+                                TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                CreateGui.openNewTabFromStream(reducedNetTab);
+                            } catch (Exception e1){
+                                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                    e1.getMessage(),
+                                    "Error loading reduced net file",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+                });
+                gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 6;
+                gbc.insets = new Insets(0,0,20,0);
+                gbc.anchor = GridBagConstraints.WEST;
+                panel.add(openReducedButton, gbc);
+            }
+
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
             displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
 
@@ -307,14 +347,14 @@ public class RunVerification extends RunVerificationBase {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 7;
+		gbc.gridy = 8;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
