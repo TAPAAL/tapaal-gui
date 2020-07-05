@@ -50,6 +50,27 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
+    static class TAPNLense {
+        public boolean isTimed() {
+            return timed;
+        }
+
+        public boolean isColored() {
+            return colored;
+        }
+
+        private final boolean timed;
+        private final boolean colored;
+        private final boolean game;
+
+        TAPNLense(boolean timed, boolean colored, boolean game) {
+            this.timed = timed;
+            this.colored = colored;
+            this.game = game;
+        }
+    }
+    private final TAPNLense lense;
+
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
@@ -613,12 +634,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 
 	private TabContent() {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>());
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLense(true,false, false));
     }
 
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates) {
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLense lense) {
 
         Require.that(network != null, "network cannot be null");
+        Require.notNull(lense, "Lense can't be null");
+        this.lense = lense;
         tapnNetwork = network;
 
         guiModels.clear();
@@ -666,8 +689,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animationModeController = new CanvasAnimationController(getAnimator());
     }
 
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates);
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
+        this(network, templates, tapnqueries,  new TAPNLense(true, false, false));
+    }
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLense lense) {
+        this(network, templates, lense);
 
         setNetwork(network, templates);
         setQueries(tapnqueries);
