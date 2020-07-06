@@ -1,7 +1,6 @@
 package dk.aau.cs.gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -50,7 +49,7 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
-    static class TAPNLense {
+    static class TAPNLens {
         public boolean isTimed() {
             return timed;
         }
@@ -62,12 +61,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private final boolean timed;
         private final boolean game;
 
-        TAPNLense(boolean timed, boolean game) {
+        TAPNLens(boolean timed, boolean game) {
             this.timed = timed;
             this.game = game;
         }
     }
-    private final TAPNLense lense;
+    private final TAPNLens lens;
 
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
@@ -632,14 +631,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 
 	private TabContent() {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLense(true,false));
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(true,false));
     }
 
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLense lense) {
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
 
         Require.that(network != null, "network cannot be null");
-        Require.notNull(lense, "Lense can't be null");
-        this.lense = lense;
+        Require.notNull(lens, "Lens can't be null");
+        this.lens = lens;
         tapnNetwork = network;
 
         guiModels.clear();
@@ -688,10 +687,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates, tapnqueries,  new TAPNLense(true, false));
+        this(network, templates, tapnqueries,  new TAPNLens(true, false));
     }
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLense lense) {
-        this(network, templates, lense);
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+        this(network, templates, lens);
 
         setNetwork(network, templates);
         setQueries(tapnqueries);
