@@ -18,8 +18,6 @@ public class CreateGui {
     private static GuiFrameController appGuiController;
 
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
-	
-	public static final String imgPath = "resources/Images/";
 
 	public static void init() {
 		appGui = new GuiFrame(TAPAAL.getProgramName());
@@ -39,6 +37,7 @@ public class CreateGui {
 
 	@Deprecated
 	public static DataLayer getModel() {
+	    if (appGui==null) return null;
 		return getModel(appGui.getSelectedTabIndex());
 	}
 

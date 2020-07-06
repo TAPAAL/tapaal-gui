@@ -32,6 +32,7 @@ import javax.swing.event.ListDataListener;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
@@ -208,7 +209,7 @@ public class QueryPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		queryCollectionPanel.add(queryScroller, gbc);
 
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -232,7 +233,7 @@ public class QueryPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.SOUTH;
 		queryCollectionPanel.add(moveUpButton,gbc);
 
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -258,7 +259,7 @@ public class QueryPane extends JPanel implements SidePane {
 		queryCollectionPanel.add(moveDownButton,gbc);
 
 		//Sort button
-		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
 		sortButton.setToolTipText(toolTipSortQueries);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {
@@ -322,24 +323,29 @@ public class QueryPane extends JPanel implements SidePane {
 			public void actionPerformed(ActionEvent e) {				
 				int openCTLDialog = JOptionPane.YES_OPTION;
 				boolean netIsUntimed = tabContent.network().isUntimed();
+				boolean netIsGame = tabContent.network().hasUncontrollableTransitions();
+				boolean netIsNonStrict = tabContent.network().isNonStrict();
 				String optionText = "Do you want to create a CTL query (use for untimed nets) \n or a Reachability query (use for timed nets)?";
-				
+				String warningText = "It is not possible to create a query for strict nets containing game features.";
+
 				// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
 				Object[] options = {
 					"CTL",
 					"Reachability"};
 				
 				TAPNQuery q = null;
-				if(netIsUntimed){
+				if(netIsUntimed && !netIsGame){
 					openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 					if(openCTLDialog == JOptionPane.YES_OPTION){
 						q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 					} else if(openCTLDialog == JOptionPane.NO_OPTION){
 						q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 					}
-				} else{
+				} else if (netIsNonStrict){
 					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
-				}
+				} else {
+                    JOptionPane.showMessageDialog(CreateGui.getApp(), warningText, "Query Dialog", JOptionPane.INFORMATION_MESSAGE);
+                }
 				if (q != null) {
 					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
 					addQuery(q);

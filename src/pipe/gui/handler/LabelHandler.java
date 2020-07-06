@@ -6,7 +6,6 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 
 import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.NameLabel;
@@ -21,7 +20,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	private NameLabel nl;
 
 	protected Point dragInit = new Point();
-	private double originalOffsetX, originalOffsetY;
+	private int originalOffsetX, originalOffsetY;
 
 	public LabelHandler(NameLabel _nl, PetriNetObjectWithLabel _obj) {
 		obj = _obj;
@@ -44,17 +43,15 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 			if (CreateGui.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2) {
 					Arc arc = (Arc) obj;
-					if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-						((TimedOutputArcComponent) arc).showTimeIntervalEditor();
-					}
+					((TimedOutputArcComponent) arc).showTimeIntervalEditor();
 				}
 			}
 		}
 		dragInit = e.getPoint(); //
 
 		dragInit = javax.swing.SwingUtilities.convertPoint(nl, dragInit, obj);
-		originalOffsetX = obj.getNameOffsetXObject();
-		originalOffsetY = obj.getNameOffsetYObject();
+		originalOffsetX = obj.getNameOffsetX();
+		originalOffsetY = obj.getNameOffsetY();
 	}
 
 	@Override
@@ -77,7 +74,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		
 		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-		    new UpdateNameLabelOffsetCommand(obj.getNameOffsetXObject(), obj.getNameOffsetYObject(), originalOffsetX, originalOffsetY, obj)
+		    new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
         );
 		
 	}

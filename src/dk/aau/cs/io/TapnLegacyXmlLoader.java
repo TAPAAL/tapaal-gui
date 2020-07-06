@@ -183,13 +183,13 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private Arc parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy) throws FormatException {
+                                          String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                          PlaceTransitionObject targetIn,
+                                          int _endx, int _endy) throws FormatException {
 		
 		Arc tempArc;
-		tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
-				sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput, taggedArc);
+		tempArc = new TimedOutputArcComponent(
+            sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput);
 
 		TimedPlace place = tapn.getPlaceByName(targetIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(sourceIn.getName());
@@ -208,9 +208,9 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private Arc parseAndAddTransportArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy) {
+                                        String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                        PlaceTransitionObject targetIn,
+                                        int _endx, int _endy) {
 		
 		Arc tempArc;
 		String[] inscriptionSplit = {};
@@ -221,9 +221,7 @@ public class TapnLegacyXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(
-						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
-						inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
+		tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
 
 		if (isInPreSet) {
@@ -282,14 +280,11 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy) throws FormatException {
+                                         String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                         PlaceTransitionObject targetIn,
+                                         int _endx, int _endy) throws FormatException {
 		Arc tempArc;
-		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
-				taggedArc),
-				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
+		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
 
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
@@ -309,13 +304,13 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private Arc parseAndAddTimedInhibitorArc(String idInput, boolean taggedArc,
-			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
-			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy) {
+                                             String inscriptionTempStorage, PlaceTransitionObject sourceIn,
+                                             PlaceTransitionObject targetIn,
+                                             int _endx, int _endy) {
 		Arc tempArc;
 		tempArc = new TimedInhibitorArcComponent(
 					new TimedInputArcComponent(
-						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
+						new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)
 					),
 				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
@@ -508,12 +503,12 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private void parseAndAddTransitionAsOldFormat(Element element) throws FormatException {
-		double positionXInput = getPositionAttribute(element, "x");
-		double positionYInput = getPositionAttribute(element, "y");
+		int positionXInput = (int)getPositionAttribute(element, "x");
+		int positionYInput = (int)getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
-		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
-		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
+		int nameOffsetXInput = (int)getNameOffsetAttribute(element, "x");
+		int nameOffsetYInput = (int)getNameOffsetAttribute(element, "y");
 		boolean timedTransition = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "timed");
 		boolean infiniteServer = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "infiniteServer");
 		int angle = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"orientation");
@@ -541,12 +536,12 @@ public class TapnLegacyXmlLoader {
 	}
 
 	private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
-		double positionXInput = getPositionAttribute(element, "x");
-		double positionYInput = getPositionAttribute(element, "y");
+		int positionXInput = (int)getPositionAttribute(element, "x");
+		int positionYInput = (int)getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
-		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
-		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
+		int nameOffsetXInput = (int)getNameOffsetAttribute(element, "x");
+		int nameOffsetYInput = (int)getNameOffsetAttribute(element, "y");
 		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
 		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
 		
@@ -576,8 +571,7 @@ public class TapnLegacyXmlLoader {
 //					markingOffsetYInput, capacityInput);
 //
 //		} else {
-			place = new TimedPlaceComponent(positionXInput, positionYInput,
-					idInput, nameOffsetXInput, nameOffsetYInput);
+			place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 			
 			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
@@ -597,13 +591,15 @@ public class TapnLegacyXmlLoader {
 		String targetInput = inputArcElement.getAttribute("target");
 		boolean taggedArc = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(inputArcElement, "tagged");
 		String inscriptionTempStorage = getChildNodesContentOfValueChildNodeAsString(inputArcElement, "inscription");
-		double nameOffsetXInput;
-		double nameOffsetYInput;
+		int nameOffsetXInput;
+		int nameOffsetYInput;
 		
 		//This check is done, as arcs in nets saved before this change do not have a nameOffset
+
 		if(!inputArcElement.getAttribute("nameOffsetX").equals("") && !inputArcElement.getAttribute("nameOffsetY").equals("")) {
-			nameOffsetXInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
-			nameOffsetYInput = Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
+			nameOffsetXInput = (int) Double.parseDouble(inputArcElement.getAttribute("nameOffsetX"));
+			nameOffsetYInput = (int) Double.parseDouble(inputArcElement.getAttribute("nameOffsetY"));
+
 		} else {
 			nameOffsetXInput = 0;
 			nameOffsetYInput = 0;
@@ -630,24 +626,24 @@ public class TapnLegacyXmlLoader {
 		if (type.equals("tapnInhibitor")) {
 
 			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
-					inscriptionTempStorage, sourceIn, targetIn, aStartx,
-                aStarty, aEndx, aEndy);
+					inscriptionTempStorage, sourceIn, targetIn,
+                aEndx, aEndy);
 
 		} else {
 			if (type.equals("timed")) {
 				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, aStartx,
-                    aStarty, aEndx, aEndy);
+						inscriptionTempStorage, sourceIn, targetIn,
+                    aEndx, aEndy);
 
 			} else if (type.equals("transport")) {
 				tempArc = parseAndAddTransportArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, aStartx,
-                    aStarty, aEndx, aEndy);
+						inscriptionTempStorage, sourceIn, targetIn,
+                    aEndx, aEndy);
 
 			} else {
 				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, aStartx,
-                    aStarty, aEndx, aEndy);
+						inscriptionTempStorage, sourceIn, targetIn,
+                    aEndx, aEndy);
 			}
 
 		}

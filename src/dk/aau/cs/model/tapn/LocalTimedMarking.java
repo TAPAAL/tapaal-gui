@@ -76,8 +76,9 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 	}
 
 	private List<TimedToken> getTokensFor(LocalTimedPlace place) {
-		if (!placesToTokensMap.containsKey(place))
-			return new ArrayList<TimedToken>();
+		if (!placesToTokensMap.containsKey(place)) {
+            return new ArrayList<TimedToken>();
+        }
 		return placesToTokensMap.get(place);
 	}
 
@@ -198,25 +199,5 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		
 		return true;
 	}
-
-	public void cut() {
-		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>();
-		for(TimedPlace p : placesToTokensMap.keySet()){
-			Tuple<PlaceType, Integer> extrapolation = p.extrapolate();
-			List<TimedToken> newList = new ArrayList<TimedToken>();
-			for(TimedToken t :  placesToTokensMap.get(p)){
-				if(t.age().intValue() > extrapolation.value2()){
-					if(extrapolation.value1() == PlaceType.Standard){
-						newList.add(new TimedToken(p, new BigDecimal(extrapolation.value2()+1)));
-					} 
-				}else{
-					newList.add(t.clone());
-				}
-			}
-			newMap.put(p, newList);
-		}
-		placesToTokensMap = newMap;
-	}
-	
 	
 }

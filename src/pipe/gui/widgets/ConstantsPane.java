@@ -38,6 +38,7 @@ import javax.swing.event.ListSelectionListener;
 
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
@@ -73,7 +74,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	Timer timer;
 
 
-	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
+	public ConstantsPane(TabContent currentTab) {
 		parent = currentTab;
 
 		constantsPanel = new JPanel(new GridBagLayout());
@@ -188,7 +189,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		});
 		
 		addConstantsComponents();
-		addConstantsButtons(enableAddButton);
+		addConstantsButtons();
 		
 		constantsList.addFocusListener(new FocusAdapter() {
 			@Override
@@ -291,7 +292,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		timer.restart();
 	}
 
-	private void addConstantsButtons(boolean enableAddButton) {
+	private void addConstantsButtons() {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditConstant);
@@ -318,7 +319,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		JButton addConstantButton = new JButton("New");
 		addConstantButton.setToolTipText(toolTipNewConstant);
-		addConstantButton.setEnabled(enableAddButton);
+		addConstantButton.setEnabled(true);
 		addConstantButton.addActionListener(e -> showEditConstantDialog(null));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -348,7 +349,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		constantsPanel.add(constantsScroller, gbc);
 
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(e -> {
@@ -368,7 +369,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.SOUTH;
 		constantsPanel.add(moveUpButton,gbc);
 
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(e -> {
@@ -389,7 +390,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		constantsPanel.add(moveDownButton,gbc);
 
 		//Sort button
-		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
 		sortButton.setToolTipText(toolTipSortConstants);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {

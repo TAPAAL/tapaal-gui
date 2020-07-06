@@ -27,7 +27,7 @@ public class VerifyTAPNOutputParser {
 	protected final int extraTokens;
 	protected List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
         protected List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
-	
+
 	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;

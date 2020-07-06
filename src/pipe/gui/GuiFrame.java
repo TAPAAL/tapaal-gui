@@ -25,7 +25,6 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
-import pipe.dataLayer.NetType;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -35,7 +34,7 @@ import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.io.ResourceManager;
+import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -91,6 +90,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 	private GuiAction verifyAction;
 	private GuiAction workflowDialogAction;
 	private GuiAction smartDrawAction;
+	private GuiAction mergeComponentsDialogAction;
 	private GuiAction stripTimeDialogAction;
 
 	private GuiAction zoomOutAction;
@@ -245,7 +245,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			Application app = Application.getApplication();
 			try {
 				Image appImage;
-				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png"));
+				appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png"));
 				app.setDockIconImage(appImage);
 			} catch (IOException e) {
 				Logger.log("Error loading Image");
@@ -263,7 +263,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		}
 
-		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
+		this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
 	}
 
 
@@ -409,7 +409,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		viewMenu.setMnemonic('V');
 
 		zoomMenu = new JMenu("Zoom");
-		zoomMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Zoom.png")));
+		zoomMenu.setIcon(ResourceManager.getIcon("Zoom.png"));
 		
 		addZoomMenuItems(zoomMenu);
 
@@ -709,6 +709,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		stripTimeDialog.setMnemonic('e');
 		toolsMenu.add(stripTimeDialog);
 
+        JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction = new GuiAction("Merge net components", "Export an xml file of composed net and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
+            public void actionPerformed(ActionEvent e) {
+                currentTab.ifPresent(TabContentActions::mergeNetComponents);
+            }
+        });
+        mergeComponentsDialog.setMnemonic('c');
+        toolsMenu.add(mergeComponentsDialog);
+
 		toolsMenu.addSeparator();
 
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
@@ -927,11 +935,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
-			if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
-				transportArcAction.setEnabled(true);
-			} else {
-				transportArcAction.setEnabled(false);
-			}
+			transportArcAction.setEnabled(true);
 
 			annotationAction.setEnabled(true);
 			transAction.setEnabled(true);
@@ -955,7 +959,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
 			smartDrawAction.setEnabled(true);
-
+            mergeComponentsDialogAction.setEnabled(true);
 			workflowDialogAction.setEnabled(true);
 			stripTimeDialogAction.setEnabled(true);
 
@@ -987,13 +991,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             alignToGrid.setEnabled(false);
 
+            showSharedPTAction.setEnabled(false);
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
 
-			// Only enable this if it is not an untimed net.
-			if (CreateGui.getModel().netType() != NetType.UNTIMED) {
-				timeAction.setEnabled(true);
-			}
+			timeAction.setEnabled(true);
+
 			delayFireAction.setEnabled(true);
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);
@@ -1006,6 +1009,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			verifyAction.setEnabled(false);
 			
 			smartDrawAction.setEnabled(false);
+            mergeComponentsDialogAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1049,6 +1053,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 			nextcomponentAction.setEnabled(false);
 			
 			smartDrawAction.setEnabled(false);
+            mergeComponentsDialogAction.setEnabled(false);
 			workflowDialogAction.setEnabled(false);
 			stripTimeDialogAction.setEnabled(false);
 
@@ -1407,7 +1412,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 				
 		// Import menu
 		JMenu importMenu = new JMenu("Import");
-		importMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		importMenu.setIcon(ResourceManager.getIcon("Export.png"));
 		
 		importMenu.add(importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1432,7 +1437,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 		// Export menu
 		JMenu exportMenu = new JMenu("Export");
-		exportMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Export.png")));
+		exportMenu.setIcon(ResourceManager.getIcon("Export.png"));
 		
 		exportMenu.add(exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1513,7 +1518,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 		// is ignored
 		if (nets != null && nets.length > 0) {
 			JMenu exampleMenu = new JMenu("Example nets");
-			exampleMenu.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "Example.png")));
+			exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 			
 			for (String filename : nets) {
 				if (filename.toLowerCase().endsWith(".tapn")) {
@@ -1532,9 +1537,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 							}
 						}
 					};
-					tmp.putValue(Action.SMALL_ICON, new ImageIcon(Thread.currentThread()
-							.getContextClassLoader().getResource(
-									CreateGui.imgPath + "Net.png")));
+					tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
 					exampleMenu.add(tmp);
 				}
 			}

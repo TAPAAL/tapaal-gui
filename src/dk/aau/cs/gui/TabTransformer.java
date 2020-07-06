@@ -52,15 +52,10 @@ public class TabTransformer {
                     Place guiSource = guiModel.getPlaceByName(arc.getSource().getName());
                     Transition guiTarget = guiModel.getTransitionByName(arc.getTarget().getName());
                     Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-                            0d,
-                            0d,
-                            0d,
-                            0d,
-                            guiSource,
+                        guiSource,
                             guiTarget,
                             arc.getWeight().value(),
-                            arc.getSource().getName() + "_to_" + arc.getTarget().getName(),
-                            false
+                            arc.getSource().getName() + "_to_" + arc.getTarget().getName()
                     ));
 
                     // Build ArcPath
@@ -110,15 +105,10 @@ public class TabTransformer {
         Place guiTarget = guiModel.getPlaceByName(arc.getTarget().getName());
         Transition guiSource = guiModel.getTransitionByName(arc.getSource().getName());
         TimedOutputArcComponent newArc = new TimedOutputArcComponent(
-                0d,
-                0d,
-                0d,
-                0d,
-                guiSource,
+            guiSource,
                 guiTarget,
                 arc.getWeight().value(),
-                arc.getSource().getName() + "_to_" + arc.getTarget().getName(),
-                false
+                arc.getSource().getName() + "_to_" + arc.getTarget().getName()
         );
 
         // Build ArcPath

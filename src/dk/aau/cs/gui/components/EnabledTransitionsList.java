@@ -53,12 +53,6 @@ public class EnabledTransitionsList extends JPanel{
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2){
 					fireSelectedTransition();
-					GuiFrame guiFrame = CreateGui.getApp();
-					guiFrame.stepforwardAction.setEnabled(guiFrame.getCurrentTab().getAnimationHistory().isStepForwardAllowed());
-					guiFrame.stepbackwardAction.setEnabled(guiFrame.getCurrentTab().getAnimationHistory().isStepBackAllowed());
-
-					guiFrame.getCurrentTab().getAnimationController().setAnimationButtonsEnabled();
-
 				}
 				
 				if(e.getClickCount() == 1){

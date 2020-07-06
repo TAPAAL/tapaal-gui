@@ -47,17 +47,6 @@ public abstract class Place extends PlaceTransitionObject {
 		componentHeight = DIAMETER;
 	}
 
-	@Deprecated
-	public Place(double positionXInput, double positionYInput, String idInput,
-			double nameOffsetXInput, double nameOffsetYInput) {
-		this((int)positionXInput, (int)positionYInput, idInput, (int)nameOffsetXInput, (int)nameOffsetYInput);
-	}
-
-	@Deprecated
-	public Place(double positionXInput, double positionYInput) {
-		this((int)positionXInput, (int)positionYInput, null, 0,0);
-	}
-
 	public Place(int positionXInput, int positionYInput) {
 		this(positionXInput, positionYInput, null, 0,0);
 	}

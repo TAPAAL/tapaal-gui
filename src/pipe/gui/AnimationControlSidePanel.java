@@ -21,8 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
-import pipe.dataLayer.NetType;
-import pipe.gui.action.GuiAction;
+import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -38,45 +37,40 @@ import java.util.Hashtable;
  * Licensed under the Open Software License version 3.0
  */
 
-public class AnimationController extends JPanel {
+public class AnimationControlSidePanel extends JPanel {
 
-	private javax.swing.JButton okButton;
+    private final Animator animator;
+
+    private javax.swing.JButton okButton;
 	private JSlider delaySlider;
 	private int delayScale = 10;
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 
-	private final GuiAction stepforwardAction;
-    private final GuiAction stepbackwardAction;
+
 
 	JTextField TimeDelayField = new JTextField();
-	JComboBox<String> firermodebox = null;
-	private static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+	JComboBox<String> firermodebox;
 
-	public AnimationController(NetType netType) {
 
-		stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
-		stepforwardAction = CreateGui.getAppGui().stepforwardAction;
+	public AnimationControlSidePanel(Animator animator) {
+        Require.notNull(animator, "Animator can't be null");
 
-		stepbackwardAction.setEnabled(false);
-		stepforwardAction.setEnabled(false);
+        this.animator = animator;
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		// Use the default FlowLayout.
-		// Create everything.
-
-		firermodebox = new NonsearchableJComboBox<>(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(animator.FIRINGMODES);
 		updateFiringModeComboBox();
 
-		firermodebox.addActionListener(evt -> CreateGui.getAnimator().setFiringmode((String) firermodebox.getSelectedItem()));
+		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));
 
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
 		animationToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
-		animationToolBar.add(stepbackwardAction);
-		animationToolBar.add(stepforwardAction);
+		animationToolBar.add(animator.stepbackwardAction);
+		animationToolBar.add(animator.stepforwardAction);
 
 		animationToolBar.setVisible(true);
 
@@ -86,23 +80,22 @@ public class AnimationController extends JPanel {
 		c.gridy = 2;
 		add(animationToolBar, c);
 
-		if (!netType.equals(NetType.UNTIMED)) {
-			JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-			JLabel label = new JLabel("Token selection: ");
+        JLabel label = new JLabel("Token selection: ");
 
-			firemode.add(label);
-			firemode.add(firermodebox);
+        firemode.add(label);
+        firemode.add(firermodebox);
 
-			c.weightx = 0.5;
-			c.gridx = 0;
-			c.gridy = 0;
-			add(firemode, c);
+        c.weightx = 0.5;
+        c.gridx = 0;
+        c.gridy = 0;
+        add(firemode, c);
 
-			initDelayTimePanel(animationToolBar);
+        initDelayTimePanel(animationToolBar);
 
-			initDelaySlider();
-		}
+        initDelaySlider();
+
                 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Simulation Control"), BorderFactory
@@ -113,7 +106,7 @@ public class AnimationController extends JPanel {
 		initializeDocumentFilterForDelayInput();
 	}
 
-	private void initDelaySlider() {
+    private void initDelaySlider() {
 		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
@@ -131,7 +124,7 @@ public class AnimationController extends JPanel {
 		delaySlider.setPaintTicks(true);
 		delaySlider.addChangeListener(e -> {
 			TimeDelayField.setText(Double.toString(delaySlider.getValue() * ((double) delayScale) / 160));
-			CreateGui.getAnimator().reportBlockingPlaces();
+			animator.reportBlockingPlaces();
 
 		});
 
@@ -143,7 +136,7 @@ public class AnimationController extends JPanel {
 			}
 
 			public void keyReleased(KeyEvent e) {
-				CreateGui.getAnimator().reportBlockingPlaces();
+				animator.reportBlockingPlaces();
 			}
 
 			public void keyTyped(KeyEvent e) {
@@ -223,7 +216,7 @@ public class AnimationController extends JPanel {
 			}
 
 			public void keyReleased(KeyEvent e) {
-				CreateGui.getAnimator().reportBlockingPlaces();
+				animator.reportBlockingPlaces();
 			}
 
 			public void keyTyped(KeyEvent e) {
@@ -258,20 +251,18 @@ public class AnimationController extends JPanel {
 
 	void setStepShotcutEnabled(boolean enabled){
 		if(enabled){
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
+			animator.stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+            animator.stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
 		} else {
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
+            animator.stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
+            animator.stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
 		}
 	}
 
 	public void updateFiringModeComboBox() {
-		Animator animator = CreateGui.getAnimator();
-		FiringMode currentFiringMode = null;
-		if (animator != null) {
-			currentFiringMode = animator.getFiringmode();
-		}
+
+        FiringMode currentFiringMode = animator.getFiringmode();
+
 		if (currentFiringMode == null) {
 			firermodebox.setSelectedItem("Manual");
 		} else {
@@ -285,7 +276,7 @@ public class AnimationController extends JPanel {
 	}
 
 	private void addTimeDelayToHistory() {
-		AnimationHistoryComponent animBox = CreateGui.getCurrentTab().getAnimationHistory();
+
 		try {
 
 			// Hack to allow usage of localised numbes
@@ -298,23 +289,16 @@ public class AnimationController extends JPanel {
 			parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-			Number parseTime = parser.parse(TimeDelayField.getText()); // Parse
-																		// the
-																		// number
-																		// localised
+			Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
 			// Try parse
 
-			BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
-					new MathContext(Pipe.AGE_PRECISION));
+			BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
 
-			// BigDecimal timeDelayToSet = new
-			// BigDecimal(TimeDelayField.getText(), new
-			// MathContext(Pipe.AGE_PRECISION));
 			if (timeDelayToSet.compareTo(new BigDecimal(0L)) < 0) {
 				// Nothing to do, illegal value
 				System.err.println("Illegal value");
 			} else {
-				CreateGui.getAnimator().letTimePass(timeDelayToSet);
+				animator.letTimePass(timeDelayToSet);
 			}
 		} catch (NumberFormatException e) {
 			// Do nothing, invalud number
@@ -323,7 +307,7 @@ public class AnimationController extends JPanel {
 			//e.printStackTrace();
 		}
 
-		setAnimationButtonsEnabled();
+		animator.updateAnimationButtonsEnabled();
 	}
 	
 	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
@@ -348,31 +332,12 @@ public class AnimationController extends JPanel {
 		parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse
-																	// the
-																	// number
-																	// localised
+		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
 
-		return new BigDecimal(parseTime.toString(),	new MathContext(Pipe.AGE_PRECISION));
+		return new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
 	}
 
-	private void setEnabledStepbackwardAction(boolean b) {
-		stepbackwardAction.setEnabled(b);
 
-	}
-
-	private void setEnabledStepforwardAction(boolean b) {
-		stepforwardAction.setEnabled(b);
-
-	}
-
-	public void setAnimationButtonsEnabled() {
-		AnimationHistoryComponent animationHistory = CreateGui.getCurrentTab().getAnimationHistory();
-
-		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
-		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
-
-	}
 	
 	private void initializeDocumentFilterForDelayInput() {
 		javax.swing.text.Document doc = TimeDelayField.getDocument();

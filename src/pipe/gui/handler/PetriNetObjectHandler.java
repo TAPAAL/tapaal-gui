@@ -4,10 +4,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
+import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
@@ -49,6 +48,20 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		JMenuItem menuItem = new JMenuItem(CreateGui.getApp().deleteAction);
 		menuItem.setText("Delete");
 		popup.add(menuItem);
+
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            pane.setText(
+                "(Debug) \n" +
+                "  org X:" + myObject.getOriginalX() + " Y:" + myObject.getOriginalY() +"\n" +
+                "  pos X:" + myObject.getPositionX() + " Y:" + myObject.getPositionY() +""
+            );
+
+		    popup.insert(pane, 1);
+        }
+
 		return popup;
 	}
 

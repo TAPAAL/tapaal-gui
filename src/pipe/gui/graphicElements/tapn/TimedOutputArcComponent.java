@@ -29,16 +29,6 @@ public class TimedOutputArcComponent extends Arc {
 		super(sourceInput, targetInput, weightInput, idInput);
 	}
 
-	/** @deprecated */
-	@Deprecated
-	public TimedOutputArcComponent(double startPositionXInput,
-			double startPositionYInput, double endPositionXInput,
-			double endPositionYInput, PlaceTransitionObject sourceInput,
-			PlaceTransitionObject targetInput, int weightInput, String idInput,
-			boolean taggedInput) {
-		this(sourceInput, targetInput, weightInput, idInput);
-	}
-
 	/**
 	 * Create Petri-Net Arc object
 	 */
@@ -56,11 +46,12 @@ public class TimedOutputArcComponent extends Arc {
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
-		this.setNameOffsetX(arc.getNameOffsetXObject());
-		this.setNameOffsetY(arc.getNameOffsetYObject());
+		this.setNameOffsetX(arc.getNameOffsetX());
+		this.setNameOffsetY(arc.getNameOffsetY());
 		this.getNameLabel().setPosition(
 				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
-				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))));
+				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())))
+        );
 
 	}
 

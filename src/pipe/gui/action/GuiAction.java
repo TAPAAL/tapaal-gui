@@ -9,6 +9,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 
 /**
@@ -32,7 +33,7 @@ public abstract class GuiAction extends AbstractAction {
 		super(name);
 		URL iconURL = null;
 
-		iconURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png");
+		iconURL = Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + name + ".png");
 
 		if (iconURL != null) {
 			putValue(SMALL_ICON, new ImageIcon(iconURL));
@@ -77,7 +78,7 @@ public abstract class GuiAction extends AbstractAction {
 		super(name);
 		URL iconURL = null;
 
-		iconURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png");
+		iconURL = Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + name + ".png");
 
 		if (iconURL != null) {
 			putValue(SMALL_ICON, new ImageIcon(iconURL));

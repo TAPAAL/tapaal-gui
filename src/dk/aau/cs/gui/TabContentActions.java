@@ -49,6 +49,8 @@ public interface TabContentActions {
 
     void workflowAnalyse();
 
+    void mergeNetComponents();
+
     File getFile();
 
     void verifySelectedQuery();

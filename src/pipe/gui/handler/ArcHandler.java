@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import pipe.dataLayer.NetType;
+
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
@@ -65,7 +65,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 									e.isAltDown()
                             )
                     );
-				} else if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+				} else  {
 					((TimedOutputArcComponent) myObject).showTimeIntervalEditor();
 				}
 			} else {

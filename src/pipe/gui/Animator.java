@@ -4,15 +4,16 @@ import java.awt.Container;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.widgets.AnimationSelectmodeDialog;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.widgets.AnimationTokenSelectDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
@@ -38,9 +39,9 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class Animator {
-	private ArrayList<TAPNNetworkTraceStep> actionHistory;
+	private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
 	private int currentAction;
-	private ArrayList<NetworkMarking> markings;
+	private final ArrayList<NetworkMarking> markings = new ArrayList<NetworkMarking>();
 	private int currentMarkingIndex = 0;
 	private TAPNNetworkTrace trace = null;
 
@@ -56,10 +57,8 @@ public class Animator {
 	}
 
 	public Animator(TabContent tab) {
-		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
-		currentAction = -1;
-		markings = new ArrayList<NetworkMarking>();
-		setTabContent(tab);
+        currentAction = -1;
+        setTabContent(tab);
 	}
 
 	private void setTabContent(TabContent tab)  {
@@ -83,14 +82,14 @@ public class Animator {
 		currentAction = -1;
 		currentMarkingIndex = 0;
 		tab.network().setMarking(markings.get(currentMarkingIndex));
-		tab.getAnimationHistory().setSelectedIndex(0);
-		tab.getAnimationController().setAnimationButtonsEnabled();
+		tab.getAnimationHistorySidePanel().setSelectedIndex(0);
+		updateAnimationButtonsEnabled();
 		updateFireableTransitions();
 	}
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
 		tab.addAbstractAnimationPane();
-		AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+		AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
 
 		for(TAPNNetworkTraceStep step : trace){
 			untimedAnimationHistory.addHistoryItem(step.toString());
@@ -116,7 +115,7 @@ public class Animator {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-			tab.getAnimationHistory().setLastShown(getTrace().getTraceType());
+			tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
 		}
 	}
 
@@ -129,14 +128,6 @@ public class Animator {
 	public NetworkMarking getInitialMarking(){
 		return initialMarking;
 	}
-
-	public NetworkMarking getLastMarking(){
-		return markings.get(markings.size()-1);
-	}
-	
-	public NetworkMarking getCurrentMarking(){
-		return markings.get(currentMarkingIndex);
-	}
 	
 	/**
 	 * Highlights enabled transitions
@@ -145,13 +136,11 @@ public class Animator {
 		updateFireableTransitions();
 		DataLayer current = activeGuiModel();
 
-		Iterator<Transition> transitionIterator = current.returnTransitions();
-		while (transitionIterator.hasNext()) {
-			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
-				tempTransition.repaint();
-			}
-		}
+        for (Transition tempTransition : current.transitions()) {
+            if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && !isUrgentTransitionEnabled)) {
+                tempTransition.repaint();
+            }
+        }
 	}
 
 	/**
@@ -160,13 +149,11 @@ public class Animator {
 	private void unhighlightDisabledTransitions() {
 		DataLayer current = activeGuiModel();
 
-		Iterator<Transition> transitionIterator = current.returnTransitions();
-		while (transitionIterator.hasNext()) {
-			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true)) || !tempTransition.isDelayEnabledTransition(true) || (tempTransition.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
-				tempTransition.repaint();
-			}
-		}
+        for (Transition t : current.transitions()) {
+            if (!(t.isEnabled(true)) || !t.isDelayEnabledTransition(true) || (t.isDelayEnabledTransition(true) && isUrgentTransitionEnabled)) {
+                t.repaint();
+            }
+        }
 	}
 
 	public void updateFireableTransitions(){
@@ -175,24 +162,20 @@ public class Animator {
 		isUrgentTransitionEnabled = false;
 		
 		outer: for( Template temp : tab.activeTemplates()){
-			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
-			while (transitionIterator.hasNext()) {
-				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
-					isUrgentTransitionEnabled = true;
-					break outer;
-				}
-			}
+            for (Transition tempTransition : temp.guiModel().transitions()) {
+                if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                    isUrgentTransitionEnabled = true;
+                    break outer;
+                }
+            }
 		}
 		
 		for( Template temp : tab.activeTemplates()){
-			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
-			while (transitionIterator.hasNext()) {
-				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
-					transFireComponent.addTransition(temp, tempTransition);
-				}
-			}
+            for (Transition tempTransition : temp.guiModel().transitions()) {
+                if (tempTransition.isEnabled(true) || (tempTransition.isDelayEnabledTransition(true) && CreateGui.getApp().isShowingDelayEnabledTransitions() && !isUrgentTransitionEnabled)) {
+                    transFireComponent.addTransition(temp, tempTransition);
+                }
+            }
 		}
 
 		transFireComponent.reInitDone();
@@ -205,13 +188,11 @@ public class Animator {
 	private void disableTransitions() {
 		for(Template template : tab.allTemplates())
 		{
-			Iterator<Transition> transitionIterator = template.guiModel().returnTransitions();
-			while (transitionIterator.hasNext()) {
-				Transition tempTransition = transitionIterator.next();
-				tempTransition.setEnabledFalse();
-				tempTransition.setDelayEnabledTransitionFalse();
-				tempTransition.repaint();
-			}
+            for (Transition tempTransition : template.guiModel().transitions()) {
+                tempTransition.setEnabledFalse();
+                tempTransition.setDelayEnabledTransitionFalse();
+                tempTransition.repaint();
+            }
 		}
 	}
 
@@ -231,7 +212,9 @@ public class Animator {
 	public void restoreModel() {
 		if (tab != null) {
 			disableTransitions();
-			tab.network().setMarking(initialMarking);
+			if (initialMarking != null) {
+                tab.network().setMarking(initialMarking);
+            }
 			currentAction = -1;
 		}
 	}
@@ -243,10 +226,11 @@ public class Animator {
 	 */
 
 	public void stepBack() {
+        tab.getAnimationHistorySidePanel().stepBackwards();
 		if (!actionHistory.isEmpty()){
 			TAPNNetworkTraceStep lastStep = actionHistory.get(currentAction);
 			if(isDisplayingUntimedTrace && lastStep instanceof TAPNNetworkTimedTransitionStep){
-				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+				AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String previousInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex());
 				if(previousInUntimedTrace.equals(lastStep.toString())){
 					untimedAnimationHistory.stepBackwards();
@@ -259,6 +243,9 @@ public class Animator {
 			highlightEnabledTransitions();
 			currentAction--;
 			currentMarkingIndex--;
+
+            updateAnimationButtonsEnabled();
+            updateMouseOverInformation();
 			reportBlockingPlaces();
 		}
 	}
@@ -268,8 +255,9 @@ public class Animator {
 	 */
 
 	public void stepForward() {
+        tab.getAnimationHistorySidePanel().stepForward();
 		if(currentAction == actionHistory.size()-1 && trace != null){
-			int selectedIndex = tab.getAnimationHistory().getSelectedIndex();
+			int selectedIndex = tab.getAnimationHistorySidePanel().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
 
@@ -280,7 +268,7 @@ public class Animator {
 				addToTimedTrace(getTrace().getLoopSteps());
 			}
 
-			tab.getAnimationHistory().setSelectedIndex(selectedIndex);
+			tab.getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
 			currentAction = action;
 			currentMarkingIndex = markingIndex;
 		}
@@ -288,7 +276,7 @@ public class Animator {
 		if (currentAction < actionHistory.size() - 1) {
 			TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
 			if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
-				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+				AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String nextInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 				if(nextInUntimedTrace.equals(nextStep.toString())){
 					untimedAnimationHistory.stepForward();
@@ -302,6 +290,9 @@ public class Animator {
 			currentAction++;
 			currentMarkingIndex++;
 			activeGuiModel().redrawVisibleTokenLists();
+
+            updateAnimationButtonsEnabled();
+            updateMouseOverInformation();
 			reportBlockingPlaces();
 
 		}
@@ -352,6 +343,7 @@ public class Animator {
 				}
 			
 				fireTransition(transition);
+
 			}
 		}
 	}
@@ -364,7 +356,8 @@ public class Animator {
 		}
 
 		Tuple<NetworkMarking, List<TimedToken>> next = null;
-                List<TimedToken> tokensToConsume = null;
+		List<TimedToken> tokensToConsume = null;
+
 		try{
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
@@ -382,7 +375,7 @@ public class Animator {
 		// cancelling the token selection dialogue above should not result in changes 
 		// to the untimed animation history
 		if (isDisplayingUntimedTrace){
-			AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
+			AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
 			if(untimedAnimationHistory.isStepForwardAllowed()){
 				String nextFromUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 
@@ -409,7 +402,9 @@ public class Animator {
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
-		
+
+		updateAnimationButtonsEnabled();
+        updateMouseOverInformation();
 		reportBlockingPlaces();
 
 	}
@@ -431,7 +426,11 @@ public class Animator {
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+
+        updateAnimationButtonsEnabled();
+        updateMouseOverInformation();
 		reportBlockingPlaces();
+
 		return result;
 	}
 
@@ -444,13 +443,11 @@ public class Animator {
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
 			for( Template temp : tab.activeTemplates()){
-				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
-				while (transitionIterator.hasNext()) {
-					Transition tempTransition = transitionIterator.next();
-					if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
-						sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
-					}
-				}
+                for (Transition tempTransition : temp.guiModel().transitions()) {
+                    if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()) {
+                        sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
+                    }
+                }
 			}
 			sb.append("</html>");
 			tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
@@ -493,7 +490,7 @@ public class Animator {
 		markings.clear();
 		currentAction = -1;
 		currentMarkingIndex = 0;
-		tab.getAnimationHistory().reset();
+		tab.getAnimationHistorySidePanel().reset();
 		if(tab.getUntimedAnimationHistory() != null){
 			tab.getUntimedAnimationHistory().reset();
 		}
@@ -512,11 +509,12 @@ public class Animator {
 	}
 
 	private void addMarking(TAPNNetworkTraceStep action, NetworkMarking marking) {
-		if (currentAction < actionHistory.size() - 1)
-			removeStoredActions(currentAction + 1);
+		if (currentAction < actionHistory.size() - 1) {
+            removeStoredActions(currentAction + 1);
+        }
 
 		tab.network().setMarking(marking);
-		tab.getAnimationHistory().addHistoryItem(action.toString());
+		tab.getAnimationHistorySidePanel().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
 		currentAction++;
@@ -528,6 +526,8 @@ public class Animator {
 		markings.remove(markings.size() - 1);
 	}
 
+	//XXX: should be enum?
+    public static final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 	public void setFiringmode(String t) {
 		switch (t) {
 			case "Random":
@@ -619,8 +619,8 @@ public class Animator {
 
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-		AnimationSelectmodeDialog animationSelectmodeDialog = new AnimationSelectmodeDialog(transition);
-		contentPane.add(animationSelectmodeDialog);
+		AnimationTokenSelectDialog animationTokenSelectDialog = new AnimationTokenSelectDialog(transition);
+		contentPane.add(animationTokenSelectDialog);
 		guiDialog.setResizable(true);
 
 		// Make window fit contents' preferred size
@@ -630,7 +630,7 @@ public class Animator {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 
-		return animationSelectmodeDialog.getTokens();
+		return animationTokenSelectDialog.getTokens();
 	}
 
 	public void reset(boolean keepInitial){
@@ -669,7 +669,7 @@ public class Animator {
 			answer = removeSetTrace(true);
 		}
 		if(answer){
-			tab.getAnimationHistory().clearStepsForward();
+			tab.getAnimationHistorySidePanel().clearStepsForward();
 		}
 		return answer;
 	}
@@ -681,5 +681,40 @@ public class Animator {
 	public ArrayList<TAPNNetworkTraceStep> getActionHistory() {
 		return actionHistory;
 	}
-	
+
+
+    private void setEnabledStepbackwardAction(boolean b) {
+        stepbackwardAction.setEnabled(b);
+
+    }
+
+    private void setEnabledStepforwardAction(boolean b) {
+        stepforwardAction.setEnabled(b);
+
+    }
+    public final GuiAction stepforwardAction = CreateGui.getAppGui().stepforwardAction;
+    public final GuiAction stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
+
+    public void updateAnimationButtonsEnabled() {
+        AnimationHistoryList animationHistory = CreateGui.getCurrentTab().getAnimationHistorySidePanel();
+
+        setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
+        setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
+
+    }
+
+    /* GUI Model / Actions helpers */
+    //XXX: Should be moved to animationController or similar
+    /**
+     * Updates the mouseOver label showing token ages in animationmode
+     * when a "animation" action is happening. "live updates" any mouseOver label
+     */
+    private void updateMouseOverInformation() {
+        // update mouseOverView
+        for (pipe.gui.graphicElements.Place p : CreateGui.getCurrentTab().getModel().getPlaces()) {
+            if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
+                ((TimedPlaceComponent) p).showAgeOfTokens(true);
+            }
+        }
+    }
 }

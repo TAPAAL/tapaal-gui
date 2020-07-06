@@ -45,20 +45,6 @@ public class NetworkMarking implements TimedMarking {
 		return delay(BigDecimal.ZERO);
 	}
 
-//	private NetworkMarking shallowCopy() {
-//		NetworkMarking shallowCopy = new NetworkMarking();
-//
-//		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-//			shallowCopy.markings.put(entry.getKey(), entry.getValue());
-//		}
-//		
-//		for(Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()){
-//			shallowCopy.sharedPlacesTokens.put(entry.getKey(), entry.getValue());
-//		}
-//
-//		return shallowCopy;
-//	}
-
 	public boolean isDelayPossible(BigDecimal delay) {
 		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
 			if(CreateGui.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
@@ -307,27 +293,5 @@ public class NetworkMarking implements TimedMarking {
 		}
 		return true;
 	}
-	
-	public NetworkMarking cut(){
-		NetworkMarking copy = clone();
-		for(LocalTimedMarking marking : copy.markings.values()){
-			marking.cut();
-		}
-		for(TimedPlace p : sharedPlacesTokens.keySet()){
-			Tuple<PlaceType, Integer> extrapolation = p.extrapolate();
-			List<TimedToken> newList = new ArrayList<TimedToken>();
-			for(TimedToken t : copy.sharedPlacesTokens.get(p)){
-				if(t.age().intValue() > extrapolation.value2()){
-					if(extrapolation.value1() == PlaceType.Standard){
-						newList.add(new TimedToken(p, new BigDecimal(extrapolation.value2()+1)));
-					} 
-				}else{
-					newList.add(t.clone());
-				}
-			}
-			copy.sharedPlacesTokens.put(p, newList);
-		}
-		
-		return copy;
-	}
+
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.Place;
@@ -132,13 +131,7 @@ public class TikZExporter {
 		String arcLabelPositionString = "\\draw (" + RoundCoordinate(arc.getNameLabel().getXPosition())+ "," + (RoundCoordinate(arc.getNameLabel().getYPosition())*(-1)) + ") node {";
 
 		if (arc instanceof TimedInputArcComponent) {
-            if (net.netType().equals(NetType.UNTIMED)) {
-                if (arc.getWeight().value() > 1) {
-                        arcLabel += arcLabelPositionString + "$" + arc.getWeight().value() + "\\times$}\\;\n";
-                }
-                return arcLabel;
-            }    
-			if (!(arc.getSource() instanceof TimedTransitionComponent)) {
+            if (!(arc.getSource() instanceof TimedTransitionComponent)) {
 				arcLabel = arcLabelPositionString;
                 if (arc.getWeight().value() > 1) {
                         arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
@@ -271,7 +264,7 @@ public class TikZExporter {
 		
 		String tokensInPlace = "";
 		if (tokens.size() > 0) {
-			if (tokens.size() == 1 && !net.netType().equals(NetType.UNTIMED)) {
+            if (tokens.size() == 1) {
 				tokensInPlace = ", structured tokens={" + tokens.get(0).age().setScale(1) + "},";
 			} else {
 				tokensInPlace = exportMultipleTokens(tokens);
@@ -281,8 +274,7 @@ public class TikZExporter {
 	}
 
 	protected String getPlaceInvariantString(Place place) {
-		if (net.netType().equals(NetType.UNTIMED)) return "";
-		String invariant = "";
+        String invariant = "";
 
 		if (!((TimedPlaceComponent) place).getInvariantAsString().contains("inf"))
 			invariant = "$\\mathrm{" + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + "}$};\n";
@@ -296,16 +288,14 @@ public class TikZExporter {
 		out.append(tokens.size());
 
 		out.append("},");
-		if (!net.netType().equals(NetType.UNTIMED)) {
-			out.append("pin=above:{\\{");
-			for (int i = 0; i < tokens.size() - 1; i++) {
-				out.append(tokens.get(i).age().setScale(1));
-				out.append(',');
-			}
-			out.append(tokens.get(tokens.size() - 1).age().setScale(1));
-			out.append("\\}},");
-		}
-		return out.toString();
+        out.append("pin=above:{\\{");
+        for (int i = 0; i < tokens.size() - 1; i++) {
+            out.append(tokens.get(i).age().setScale(1));
+            out.append(',');
+        }
+        out.append(tokens.get(tokens.size() - 1).age().setScale(1));
+        out.append("\\}},");
+        return out.toString();
 	}
 
 	private StringBuffer exportTikZstyle() {
@@ -320,7 +310,7 @@ public class TikZExporter {
                 out.append("%% This can be adjusted by tuning the coordinates of the label\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 
-		if (!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
+        out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
 		out.append("\\tikzstyle{inhibArc}=[->,>=o,thick]\n");
 
 		out.append("\\tikzstyle{every place}=[minimum size=6mm,thick]\n");
