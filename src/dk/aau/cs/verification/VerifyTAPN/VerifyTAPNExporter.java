@@ -98,12 +98,12 @@ public class VerifyTAPNExporter {
 	private void outputTransition(TimedTransition t, PrintStream modelStream) {
 		modelStream.append("<transition ");
 
-        modelStream.append("player=\"" + (t.isUncontrollable()? "2" : "1") + "\"");
+        modelStream.append("player=\"" + (t.isUncontrollable()? "2" : "1") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
 		modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
 		
-		modelStream.append("/>");
+		modelStream.append("/>\n");
 	}
 
 	protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {

@@ -275,6 +275,9 @@ public class TAPNComposer implements ITAPNComposer {
 						}
 						
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent());
+						if (timedTransition.isUncontrollable()) {
+						    transition.setUncontrollable(true);
+                        }
 						constructedModel.add(transition);
 						
 						// Gui work

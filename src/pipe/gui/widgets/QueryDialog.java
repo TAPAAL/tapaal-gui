@@ -793,7 +793,7 @@ public class QueryDialog extends JPanel {
 				options.add(name_DISCRETE);
 			}
 			options.add(name_COMBI);
-		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+        } else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}

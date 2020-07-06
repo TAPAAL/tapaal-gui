@@ -467,6 +467,15 @@ public class TimedArcPetriNetNetwork {
 		}
 		return false;
 	}
+
+    public boolean hasUncontrollableTransitions() {
+        for(TimedArcPetriNet t : tapns){
+            if(t.isActive() && t.hasUncontrollableTransitions()){
+                return true;
+            }
+        }
+        return false;
+    }
 	
 	public boolean hasInvariants() {
 		for(TimedArcPetriNet t : tapns){
