@@ -55,17 +55,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return timed;
         }
 
-        public boolean isColored() {
-            return colored;
+        public boolean isGame() {
+            return game;
         }
 
         private final boolean timed;
-        private final boolean colored;
         private final boolean game;
 
-        TAPNLense(boolean timed, boolean colored, boolean game) {
+        TAPNLense(boolean timed, boolean game) {
             this.timed = timed;
-            this.colored = colored;
             this.game = game;
         }
     }
@@ -634,7 +632,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 
 	private TabContent() {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLense(true,false, false));
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLense(true,false));
     }
 
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLense lense) {
@@ -690,7 +688,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates, tapnqueries,  new TAPNLense(true, false, false));
+        this(network, templates, tapnqueries,  new TAPNLense(true, false));
     }
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLense lense) {
         this(network, templates, lense);
