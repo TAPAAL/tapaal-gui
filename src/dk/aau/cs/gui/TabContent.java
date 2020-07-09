@@ -1484,7 +1484,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     @Override
                     public void registerEvents() {
                         registerEvent(
-                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
                             e -> placeClicked((TimedPlaceComponent) e.pno)
                         );
                     }
@@ -1501,7 +1501,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     @Override
                     public void registerEvents() {
                         registerEvent(
-                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
                             e -> placeClicked((TimedPlaceComponent) e.pno)
                         );
                     }
@@ -1874,7 +1874,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
-        public void drawingSurfaceMouseClicked(MouseEvent e) {
+        public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
             guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
@@ -1889,7 +1889,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
-        public void drawingSurfaceMouseClicked(MouseEvent e) {
+        public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
             guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p);
@@ -1904,7 +1904,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
-        public void drawingSurfaceMouseClicked(MouseEvent e) {
+        public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
            guiModelManager.addAnnotationNote(drawingSurface.getGuiModel(), p);
@@ -1925,11 +1925,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void registerEvents() {
             registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
                 e->placeClicked(((TimedPlaceComponent) e.pno))
             );
             registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.clicked,
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
                 e->transitionClicked(((TimedTransitionComponent) e.pno))
             );
             registerEvent(
@@ -2021,7 +2021,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         @Override
-        public void drawingSurfaceMouseClicked(MouseEvent e) {
+        public void drawingSurfaceMousePressed(MouseEvent e) {
             if (arc!=null) {;
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
@@ -2054,11 +2054,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void registerEvents() {
             registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
                 e->placeClicked(((TimedPlaceComponent) e.pno))
             );
             registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.clicked,
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
                 e->transitionClicked(((TimedTransitionComponent) e.pno))
             );
             registerEvent(
@@ -2162,7 +2162,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         @Override
-        public void drawingSurfaceMouseClicked(MouseEvent e) {
+        public void drawingSurfaceMousePressed(MouseEvent e) {
             if (arc!=null) {;
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
@@ -2197,7 +2197,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		@Override
 		public void registerEvents() {
 			registerEvent(
-					e -> e.a == MouseAction.clicked && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
+					e -> e.a == MouseAction.pressed && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
 					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
 			);
 			registerEvent(
@@ -2256,11 +2256,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void registerEvents() {
             registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.clicked,
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
                 e->placeClicked(((TimedPlaceComponent) e.pno))
             );
             registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.clicked,
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
                 e->transitionClicked(((TimedTransitionComponent) e.pno))
             );
             registerEvent(
@@ -2359,8 +2359,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         @Override
-        public void drawingSurfaceMouseClicked(MouseEvent e) {
-            if (arc!=null) {;
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            if (arc!=null) {
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
                 int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
