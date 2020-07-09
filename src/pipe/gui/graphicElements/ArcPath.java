@@ -612,6 +612,7 @@ public class ArcPath implements Shape {
 		insertPoint(wantedpoint + 1, newPoint);
 		createPath();
 		myArc.updateArcPosition();
+        showPoints();
 
 		return new AddArcPathPointEdit(this.getArc(), newPoint, getArc().getGuiModel());
 	}

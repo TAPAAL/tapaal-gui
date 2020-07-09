@@ -3,6 +3,7 @@ package dk.aau.cs.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
@@ -2422,7 +2423,23 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof Arc && e.a == MouseAction.exited,
                 e -> ((Arc)e.pno).getArcPath().hidePoints()
             );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
+                e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
+            );
 
+        }
+
+        private void arcDoubleClickedWithContrl(Arc arc, MouseEvent e) {
+            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+                arc.getArcPath().insertPoint(
+                    new Point2D.Double(
+                        Zoomer.getUnzoomedValue(arc.getX() + e.getX(), arc.getZoom()),
+                        Zoomer.getUnzoomedValue(arc.getY() + e.getY(), arc.getZoom())
+                    ),
+                    e.isAltDown()
+                )
+            );
         }
     }
 }

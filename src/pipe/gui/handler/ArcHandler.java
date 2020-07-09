@@ -74,27 +74,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 			return;
 		}
 
-		if (CreateGui.getApp().isEditionAllowed()) {
-			if (e.getClickCount() == 2) {
-				Arc arc = (Arc) myObject;
-				if (e.isControlDown()) {
-					CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-							arc.getArcPath().insertPoint(
-									new Point2D.Double(
-                                        Zoomer.getUnzoomedValue(arc.getX() + e.getX(), arc.getZoom()),
-                                        Zoomer.getUnzoomedValue(arc.getY() + e.getY(), arc.getZoom())
-                                    ),
-									e.isAltDown()
-                            )
-                    );
-				} else  {
-					((TimedOutputArcComponent) myObject).showTimeIntervalEditor();
-				}
-			} else {
-				getPopup(e);
-				super.mousePressed(e);
-			}
-		}
+        super.mousePressed(e);
 	}
 
     @Override
