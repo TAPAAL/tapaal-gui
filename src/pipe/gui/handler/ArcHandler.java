@@ -97,4 +97,8 @@ public class ArcHandler extends PetriNetObjectHandler {
 		}
 	}
 
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        //Disable mouse drag for arcs, current drag implementation does not work when dragging arcs
+    }
 }
