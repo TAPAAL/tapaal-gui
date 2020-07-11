@@ -14,8 +14,8 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class NetworkMarking implements TimedMarking {
-	private HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
-	private HashMap<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
+	private final HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
+	private final HashMap<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
 
 	public NetworkMarking() {
 	}
@@ -130,8 +130,9 @@ public class NetworkMarking implements TimedMarking {
 	private Tuple<NetworkMarking, List<TimedToken>> fireSharedTransition(SharedTransition sharedTransition, FiringMode firingMode) {
 		// validity of arguments already checked above
 		NetworkMarking clone = clone();
-                Tuple<LocalTimedMarking, List<TimedToken>> ltm;
-                List<TimedToken> consumedTokens = new ArrayList<TimedToken>();
+		Tuple<LocalTimedMarking, List<TimedToken>> ltm;
+		List<TimedToken> consumedTokens = new ArrayList<TimedToken>();
+
 		for(TimedTransition transition : sharedTransition.transitions()){
 			if(transition.model().isActive()) {
 				ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);

@@ -2,12 +2,14 @@ package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 
+import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
+import pipe.gui.Zoomer;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
@@ -19,7 +21,6 @@ public class ArcHandler extends PetriNetObjectHandler {
 
 	public ArcHandler(Arc obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	/**
@@ -32,47 +33,52 @@ public class ArcHandler extends PetriNetObjectHandler {
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TimedOutputArcComponent
-				&& !(myObject instanceof TimedInputArcComponent)
-				&& !(myObject instanceof TimedTransportArcComponent)) {
-			
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
-			menuItem.setText("Insert Point");
-			popup.insert(menuItem, popupIndex++);
+        menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
+        menuItem.setText("Insert Point");
+        popup.insert(menuItem, popupIndex++);
 
-			popup.insert(new JPopupMenu.Separator(), popupIndex);
-		}
+        popup.insert(new JPopupMenu.Separator(), popupIndex);
+
+
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            pane.setText(
+                "(Debug) \n" +
+                    "  Source: " + ((Arc) myObject).getSource().getId() +"\n"+
+                    "  Target: " + ((Arc) myObject).getTarget().getId()
+            );
+
+            popup.insert(pane, 1);
+        }
+
 		return popup;
 	}
-	
-	public void mousePressed(MouseEvent e) {
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+	    //Dispatch click on prototype arc to parent
+        if (((Arc) myObject).isPrototype()) {
+            dispatchToParentWithMouseLocationUpdated(e);
+            return;
+        }
+	    super.mouseClicked(e);
+    }
+
+    public void mousePressed(MouseEvent e) {
+
 
 		if (((Arc) myObject).isPrototype()) {
 			dispatchToParentWithMouseLocationUpdated(e);
 			return;
 		}
 
-		if (CreateGui.getApp().isEditionAllowed()) {
-			if (e.getClickCount() == 2) {
-				Arc arc = (Arc) myObject;
-				if (e.isControlDown()) {
-					CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-							arc.getArcPath().insertPoint(
-									new Point2D.Double(
-									    arc.getX() + e.getX(),
-                                        arc.getY() + e.getY()
-                                    ),
-									e.isAltDown()
-                            )
-                    );
-				} else  {
-					((TimedOutputArcComponent) myObject).showTimeIntervalEditor();
-				}
-			} else {
-				getPopup(e);
-				super.mousePressed(e);
-			}
-		}
+        super.mousePressed(e);
 	}
 
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        //Disable mouse drag for arcs, current drag implementation does not work when dragging arcs
+    }
 }

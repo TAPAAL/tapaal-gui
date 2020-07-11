@@ -1,5 +1,7 @@
 package net.tapaal.gui.DrawingSurfaceManager;
 
+import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.GraphicalElement;
 import pipe.gui.graphicElements.PetriNetObject;
 
 import java.awt.event.MouseEvent;
@@ -11,6 +13,8 @@ import java.util.function.Predicate;
 
 public abstract class AbstractDrawingSurfaceManager {
 
+    protected DrawingSurfaceImpl canvas;
+
     public void drawingSurfaceMouseClicked(MouseEvent e) {}
     public void drawingSurfaceMousePressed(MouseEvent e) {}
     public void drawingSurfaceMouseReleased(MouseEvent e){}
@@ -20,6 +24,8 @@ public abstract class AbstractDrawingSurfaceManager {
 
     public enum MouseAction {
         clicked,
+        doubleClicked,
+        rightClicked,
         pressed,
         released,
         dragged,
@@ -31,12 +37,12 @@ public abstract class AbstractDrawingSurfaceManager {
     public static class DrawingSurfaceEvent {
 
 
-        public final PetriNetObject pno;
+        public final GraphicalElement pno;
         public final MouseEvent e;
         public final MouseAction a;
         //Mouse Event type eg click mouse over etc
 
-        public DrawingSurfaceEvent(PetriNetObject pno, MouseEvent e, MouseAction a) {
+        public DrawingSurfaceEvent(GraphicalElement pno, MouseEvent e, MouseAction a) {
             this.pno = pno;
             this.e = e;
             this.a = a;
@@ -47,8 +53,12 @@ public abstract class AbstractDrawingSurfaceManager {
     private final Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
     private final AbstractDrawingSurfaceManager next = null;
 
-    public void registerManager(){}
-    public void deregisterManager(){}
+    public void registerManager(DrawingSurfaceImpl canvas){
+        this.canvas = canvas;
+    }
+    public void deregisterManager(){
+        this.canvas = null;
+    }
 
     public AbstractDrawingSurfaceManager() {
 			registerEvents();

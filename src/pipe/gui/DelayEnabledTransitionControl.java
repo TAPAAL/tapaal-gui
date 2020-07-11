@@ -30,11 +30,11 @@ public class DelayEnabledTransitionControl extends JPanel{
 	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
 	private static boolean defaultIsRandomTrasition;
 	
-	private JLabel precitionLabel;
-	private JSlider delayEnabledPrecision;
-	private JLabel delayModeLabel;
-	private JComboBox<DelayMode> delayMode;
-	JCheckBox randomMode;
+	private final JLabel precitionLabel;
+	private final JSlider delayEnabledPrecision;
+	private final JLabel delayModeLabel;
+	private final JComboBox<DelayMode> delayMode;
+	final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
 	
 	private DelayEnabledTransitionControl() {
 		super(new GridBagLayout());
@@ -61,9 +61,8 @@ public class DelayEnabledTransitionControl extends JPanel{
 		DelayMode[] items = {ShortestDelayMode.getInstance(), RandomDelayMode.getInstance(), ManualDelayMode.getInstance()};
 		delayMode = new JComboBox(items);
 		setDelayMode(defaultDelayMode);
-		
-		randomMode = new JCheckBox("Choose next transition randomly");
-		setRandomTransitionMode(defaultIsRandomTrasition);
+
+        setRandomTransitionMode(defaultIsRandomTrasition);
         
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = 2;

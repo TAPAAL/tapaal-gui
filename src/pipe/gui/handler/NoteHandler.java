@@ -6,7 +6,6 @@ public class NoteHandler extends PetriNetObjectHandler {
 
 	public NoteHandler(Note note) {
 		super(note);
-		enablePopup = true;
 	}
 
 

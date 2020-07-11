@@ -36,8 +36,12 @@ public class TransportArc extends TAPNElement {
 		setTimeInterval(interval);
 		this.weight = weight;
 	}
-	
-	public Weight getWeight(){
+
+    public TransportArc(TimedPlace source, TimedTransition transitions, TimedPlace destination) {
+        this(source, transitions, destination, TimeInterval.ZERO_INF);
+    }
+
+    public Weight getWeight(){
 		return weight;
 	}
         

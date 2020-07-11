@@ -20,9 +20,9 @@ import pipe.gui.widgets.EscapableDialog;
 
 public class SimulationControl extends JPanel {
 	
-	JSlider simulationSpeed;
-	JCheckBox randomSimulation;
-	Timer timer;
+	final JSlider simulationSpeed = new JSlider();
+	final JCheckBox randomSimulation = new JCheckBox("Enable automatic random simulation");
+	final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
 	
 	private static SimulationControl instance;
 	
@@ -43,9 +43,8 @@ public class SimulationControl extends JPanel {
 	
 	private SimulationControl() {
 		super(new GridBagLayout());
-		
-		simulationSpeed = new JSlider();
-		simulationSpeed.setSnapToTicks(false);
+
+        simulationSpeed.setSnapToTicks(false);
 		simulationSpeed.setMajorTickSpacing(10);
 		simulationSpeed.setPaintLabels(false);
 		simulationSpeed.setPaintTicks(true);
@@ -53,14 +52,10 @@ public class SimulationControl extends JPanel {
 		simulationSpeed.setPreferredSize(new Dimension(340, simulationSpeed.getPreferredSize().height));
 		
 		simulationSpeed.addChangeListener(e -> {
-			if(timer != null){
-				setDelay((100 - simulationSpeed.getValue())*20);
-			}
-		});
-		
-		randomSimulation = new JCheckBox("Enable automatic random simulation");
-		
-		GridBagConstraints gbc = new GridBagConstraints();
+            setDelay((100 - simulationSpeed.getValue())*20);
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
@@ -99,15 +94,10 @@ public class SimulationControl extends JPanel {
 	}
 	
 	private void initTimer(){
-		timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
-		timer.setRepeats(true);
+        timer.setRepeats(true);
 	}
 
-	public JSlider getSimulationSpeedSlider(){
-		return simulationSpeed;
-	}
-	
-	public boolean randomSimulation(){
+    public boolean randomSimulation(){
 		return randomSimulation.isSelected();
 	}
 	

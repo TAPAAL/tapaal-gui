@@ -38,25 +38,14 @@ public abstract class Transition extends PlaceTransitionObject {
 	protected int angle;
 	
 	// Animation Suff
-	protected boolean enabled = false;
-	protected boolean delayEnabled = false;
-	protected boolean highlighted = false;
+	protected boolean highlightedDelayEnabled = false;
+	protected boolean highlightedEnabled = false;
 	private Timer blinkTimer;
 	private int blinkCount;
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
-	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
-
-	/**
-	 * Create Petri-Net Transition object
-	 */
-	public Transition(int positionXInput, int positionYInput,
-			String idInput, int nameOffsetXInput,
-			int nameOffsetYInput,
-			boolean infServer, int angleInput, int priority) {
-		this(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, angleInput);
-	}
+	private final ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
 
 	/**
 	 * Create Petri-Net Transition object
@@ -69,9 +58,8 @@ public abstract class Transition extends PlaceTransitionObject {
 			int nameOffsetYInput,
 			int angleInput
 	){
-		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
-		componentWidth = TRANSITION_HEIGHT; // sets width
-		componentHeight = TRANSITION_HEIGHT;// sets height
+		super(TRANSITION_HEIGHT, TRANSITION_HEIGHT, positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+
 		constructTransition();
 		angle = 0;
 		rotate(angleInput);
@@ -106,9 +94,9 @@ public abstract class Transition extends PlaceTransitionObject {
 			//pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
-		if (highlighted) {
+		if (highlightedEnabled) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		} else if (delayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
+		} else if (highlightedDelayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
 			g2.setPaint(Pipe.YELLOW_TRANSITION_COLOR);
 		} else if (selected) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
@@ -142,75 +130,29 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	private void outlineTransition() {
-		proximityTransition = (new BasicStroke(
-				Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS))
-				.createStrokedShape(transition);
+		proximityTransition = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(transition);
 	}
 
 	/**
-	 * Determines whether Transition is enabled
-	 * 
-	 * @param animationStatus
-	 *            Anamation status
-	 * @return True if enabled
+	 * Hightlights a transtion as enabled
 	 */
-	public boolean isEnabled(boolean animationStatus) {
-		if (animationStatus) {
-			if (isEnabled()) {
-				highlighted = true;
-				return true;
-			} else {
-				highlighted = false;
-			}
-		}
-		return false;
-	}
+	public void markTransitionEnabled(boolean b) {
+        highlightedEnabled = b;
+    }
 
-	/**
-	 * Determines whether Transition is enabled
-	 * 
-	 * @return True if enabled
-	 */
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
+	public void markTransitionDelayEnabled(boolean b){
+        highlightedDelayEnabled = b;
+    }
 
-	public boolean isDelayEnabledTransition(boolean animationStatus){
-		if(animationStatus){
-			delayEnabled = isDelayEnabled();
-			return delayEnabled;
-		}
-		return false;
-	}
-	
-	//Dummy is overridden
-	public boolean isDelayEnabled(){
-		return delayEnabled;
-	}
-	
-	//Dummy is overridden
-	public TimeInterval getDInterval(){
-		return null;
-	}
-	
-	/* Called at the end of animation to reset Transitions to false */
-	public void setDelayEnabledTransitionFalse(){
-		delayEnabled = false;
-	}
-	
-	/**
-	 * Sets whether Transition is enabled
-	 */
-	@Override
-	public void setEnabled(boolean status) {
-		enabled = status;
-	}
+	//Named with prefix Transition due to JComponent have isEnabled
+	public abstract boolean isTransitionEnabled();
+	public abstract boolean isDelayEnabled();
+	public abstract TimeInterval getDInterval();
 
-	/* Called at the end of animation to reset Transitions to false */
-	public void setEnabledFalse() {
-		enabled = false;
-		highlighted = false;
+    /* Called at the end of animation to reset Transitions to false */
+	public void disableHightligh() {
+		highlightedEnabled = false;
+        highlightedDelayEnabled = false;
 	}
 
 	public int getAngle() {
@@ -219,9 +161,15 @@ public abstract class Transition extends PlaceTransitionObject {
 
 	protected void constructTransition() {
 		transition = new GeneralPath();
-		transition.append(new Rectangle2D.Double(
-				(componentWidth - TRANSITION_WIDTH) / 2, 0, TRANSITION_WIDTH,
-				TRANSITION_HEIGHT), false);
+		transition.append(
+		    new Rectangle2D.Double(
+		        (componentWidth - TRANSITION_WIDTH) / 2,
+                0,
+                TRANSITION_WIDTH,
+                TRANSITION_HEIGHT
+            ),
+            false
+        );
 		outlineTransition();
 	}
 
@@ -232,8 +180,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		double unZoomedX = (x - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 		double unZoomedY = (y - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 
-		Arc createArc = CreateGui.getDrawingSurface().createArc;
-		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+		if (CreateGui.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
 			return (proximityTransition.contains((int) unZoomedX, (int) unZoomedY) ||
 					transition.contains((int) unZoomedX, (int) unZoomedY));
 		} else {
@@ -242,12 +189,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	public void removeArcCompareObject(Arc a) {
-		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
-		while (arcIterator.hasNext()) {
-			if ((arcIterator.next()).arc == a) {
-				arcIterator.remove();
-			}
-		}
+        arcAngleList.removeIf(arcAngleCompare -> (arcAngleCompare).arc == a);
 	}
 
 	@Override
@@ -309,10 +251,10 @@ public abstract class Transition extends PlaceTransitionObject {
 		transform.concatenate(Zoomer.getTransform(getZoom()));
 
 		arcIterator = top.iterator();
-		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT),
-				transformed); // +1 due to rounding making it off by 1
+		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT), transformed); // +1 due to rounding making it off by 1
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
+
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -325,10 +267,10 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		arcIterator = bottom.iterator();
-		transform.transform(new Point2D.Double(0, -0.5 * TRANSITION_HEIGHT),
-				transformed);
+		transform.transform(new Point2D.Double(0, -0.5 * TRANSITION_HEIGHT), transformed);
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
+
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -345,9 +287,9 @@ public abstract class Transition extends PlaceTransitionObject {
 		double current = TRANSITION_HEIGHT / 2d - inc;
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			transform.transform(new Point2D.Double(-0.5 * TRANSITION_WIDTH,
-					current + 1), transformed); // +1 due to rounding making it off by 1
-			if (thisArc.sourceOrTarget()) {
+			transform.transform(new Point2D.Double(-0.5 * TRANSITION_WIDTH, current + 1), transformed); // +1 due to rounding making it off by 1
+
+            if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
 						+ transformed.y);
@@ -364,8 +306,8 @@ public abstract class Transition extends PlaceTransitionObject {
 		arcIterator = right.iterator();
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			transform.transform(new Point2D.Double(+0.5 * TRANSITION_WIDTH,
-					current), transformed);
+			transform.transform(new Point2D.Double(+0.5 * TRANSITION_WIDTH, current), transformed);
+
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -410,29 +352,18 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		private void calcAngle() {
-			int index = sourceOrTarget() ? arc.getArcPath().getEndIndex() - 1
-					: 1;
+			int index = sourceOrTarget() ? arc.getArcPath().getEndIndex() - 1 : 1;
 			Point2D.Double p1 = new Point2D.Double(positionX
 					+ centreOffsetLeft(), positionY + centreOffsetTop());
-			Point2D.Double p2 = new Point2D.Double(arc.getArcPath().getPoint(
-					index).x, arc.getArcPath().getPoint(index).y);
+			Point2D.Double p2 = new Point2D.Double(arc.getArcPath().getPoint(index).x, arc.getArcPath().getPoint(index).y);
 
-			if (p1.y <= p2.y) {
-				angle = Math.atan((p1.x - p2.x) / (p2.y - p1.y));
-			} else {
-				angle = Math.atan((p1.x - p2.x) / (p2.y - p1.y)) + Math.PI;
-			}
+            angle = Math.atan2((p1.x - p2.x) , (p2.y - p1.y));
 
 			// This makes sure the angle overlap lies at the intersection
 			// between edges of a transition
 			// Yes it is a nasty hack (a.k.a. ingeneous solution). But it works!
 			if (angle < (Math.toRadians(30 + transition.getAngle()))) {
 				angle += (2 * Math.PI);
-			}
-
-			// Needed to eliminate an exception on Windows
-			if (p1.equals(p2)) {
-				angle = 0;
 			}
 
 		}

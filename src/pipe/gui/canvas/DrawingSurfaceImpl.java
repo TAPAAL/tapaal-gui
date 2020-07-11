@@ -30,23 +30,18 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canvas, PrototypeCanvas {
 
+    private static final int DRAWING_SURFACE_GROW = 100;
 
-	public Arc createArc; // no longer static
+	private final SelectionManager selection;
 
-	private static final int DRAWING_SURFACE_GROW = 100;
-
-	private SelectionManager selection;
-
-
-	private GuiFrame app = CreateGui.getApp();
+	private final GuiFrame app = CreateGui.getApp();
 	private Zoomer zoomControl;
 
 	private DataLayer guiModel;
-	private TabContent tabContent;
-	private Reference<AbstractDrawingSurfaceManager> managerRef;
+	private final TabContent tabContent;
+	private final Reference<AbstractDrawingSurfaceManager> managerRef;
 	private TimedArcPetriNet model;
-	private MouseHandler mouseHandler;
-	private NameGenerator nameGenerator = new NameGenerator();
+    private final NameGenerator nameGenerator = new NameGenerator();
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
@@ -62,7 +57,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		zoomControl = new Zoomer(100);
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		mouseHandler = new MouseHandler(this, dataLayer);
+        MouseHandler mouseHandler = new MouseHandler(this);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
 		addMouseWheelListener(mouseHandler);
@@ -90,7 +85,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		guiModel.addedToView(this);
 
 		nameGenerator.add(model);
-		this.mouseHandler.setModel(guiModel, model);
+
 		this.guiModel = guiModel;
 		this.model = model;
 		this.zoomControl = zoomer;
@@ -106,7 +101,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
 	@Override
-	public void addNewPetriNetObject(PetriNetObject newObject) {
+	public void addNewPetriNetObject(GraphicalElement newObject) {
 		setLayer(newObject, DEFAULT_LAYER + newObject.getLayerOffset());
 		newObject.zoomUpdate(zoomControl.getPercent());
 		newObject.setManagerRef(managerRef);
@@ -127,7 +122,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	//XXX temp solution while refactorting, component removes children them self
 	//migth not be best solution long term.
 	@Override
-	public void removePetriNetObject(PetriNetObject pno) {
+	public void removePetriNetObject(GraphicalElement pno) {
 		pno.removedFromGui();
 		pno.setManagerRef(null);
 		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
@@ -136,8 +131,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		repaint();
 	}
 
-	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
-			throws PrinterException {
+	public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
 		if (pageIndex > 0) {
 			return Printable.NO_SUCH_PAGE;
 		}
@@ -274,10 +268,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	private Point midpoint(int zoom) {
 		JViewport viewport = (JViewport) getParent();
-		double midpointX = Zoomer.getUnzoomedValue(viewport.getViewPosition().x
-				+ (viewport.getWidth() * 0.5), zoom);
-		double midpointY = Zoomer.getUnzoomedValue(viewport.getViewPosition().y
-				+ (viewport.getHeight() * 0.5), zoom);
+		double midpointX = Zoomer.getUnzoomedValue(viewport.getViewPosition().x + (viewport.getWidth() * 0.5), zoom);
+		double midpointY = Zoomer.getUnzoomedValue(viewport.getViewPosition().y + (viewport.getHeight() * 0.5), zoom);
 		return (new java.awt.Point((int) midpointX, (int) midpointY));
 	}
 
@@ -343,7 +335,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
     @Override
-    public void addPrototype(PetriNetObject pno) {
+    public void addPrototype(GraphicalElement pno) {
 		pno.zoomUpdate(getZoom());
 
         add(pno);
@@ -353,8 +345,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     }
 
     @Override
-    public void removePrototype(PetriNetObject pno) {
+    public void removePrototype(GraphicalElement pno) {
         remove(pno);
+        validate();
+        repaint();
     }
 
     @Override
@@ -366,90 +360,39 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         repaint();
     }
 
+    public Point adjustPointToZoom(Point p, int zoom) {
+        //Converts center coord to upperleft coord
+        int offset = (int) (Zoomer.getScaleFactor(zoom) * Pipe.PLACE_TRANSITION_HEIGHT / 2);
+
+        int x = Zoomer.getUnzoomedValue(p.x - offset, zoom);
+        int y = Zoomer.getUnzoomedValue(p.y - offset, zoom);
+
+        p.setLocation(x, y);
+        return p;
+    }
+    public Point adjustPointToGrid(Point p) {
+        int x = Grid.getModifiedX(p.x);
+        int y = Grid.getModifiedY(p.y);
+
+        return new Point(x, y);
+    }
+
+    public Point adjustPointToGridAndZoom(Point p, int zoom) {
+        Point newP = adjustPointToZoom(p, zoom);
+        newP = adjustPointToGrid(newP);
+
+        return newP;
+    }
+
     class MouseHandler extends MouseInputAdapter {
 
 		private DrawingSurfaceImpl view;
 
-		private DataLayer guiModel;
+        private Point dragStart;
 
-		private Point dragStart;
-
-		private TimedArcPetriNet model;
-
-		public void setModel(DataLayer newGuiModel, TimedArcPetriNet newModel) {
-			this.guiModel = newGuiModel;
-			this.model = newModel;
-		}
-
-		public MouseHandler(DrawingSurfaceImpl _view, DataLayer _model) {
+		public MouseHandler(DrawingSurfaceImpl _view) {
 			super();
 			view = _view;
-			guiModel = _model;
-		}
-
-		private Point adjustPointToZoom(Point p, int zoom) {
-			int offset = (int) (Zoomer.getScaleFactor(zoom)
-					* Pipe.PLACE_TRANSITION_HEIGHT / 2);
-
-			int x = Zoomer.getUnzoomedValue(p.x - offset, zoom);
-			int y = Zoomer.getUnzoomedValue(p.y - offset, zoom);
-
-			p.setLocation(x, y);
-			return p;
-		}
-		private Point adjustPointToGrid(Point p) {
-			int x = Grid.getModifiedX(p.x);
-			int y = Grid.getModifiedY(p.y);
-
-			return new Point(x, y);
-		}
-
-		private Point adjustPointToGridAndZoom(Point p, int zoom) {
-			Point newP = adjustPointToZoom(p, zoom);
-			newP = adjustPointToGrid(newP);
-
-			return newP;
-		}
-
-		private PlaceTransitionObject newTimedPlaceAddToModelView(Point p) {
-			p = adjustPointToGridAndZoom(p, view.getZoom());
-
-			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
-			TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
-			model.add(tp);
-			guiModel.addPetriNetObject(pnObject);
-
-			tabContent.getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, model, guiModel));
-
-			return pnObject;
-		}
-
-		private PlaceTransitionObject newTAPNTransitionAddToModelView(Point p) {
-			p = adjustPointToGridAndZoom(p, view.getZoom());
-
-			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model));
-
-			TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
-
-			model.add(transition);
-			guiModel.addPetriNetObject(pnObject);
-
-			tabContent.getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, model, guiModel));
-			return pnObject;
-		}
-
-        private AnnotationNote newAnnotationNoteAddToModelView(Point clickPoint) {
-            Point p = adjustPointToGridAndZoom(clickPoint, view.getZoom());
-
-            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
-
-			//enableEditMode open editor, retuns true of text added, else false
-            //If no text is added,dont add it to model
-            if (pnObject.enableEditMode(true)) {
-                guiModel.addPetriNetObject(pnObject);
-                tabContent.getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, guiModel));
-            }
-            return pnObject;
         }
 
 		@Override
@@ -474,32 +417,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
 				Pipe.ElementType mode = app.getMode();
-				PlaceTransitionObject newpto; //declared here as switch is one big scope
 
 				switch (mode) {
-					case TAPNPLACE: // create place
-						newTimedPlaceAddToModelView(clickPoint);
-
-						break;
-
-					case TAPNTRANS: // create transition
-						newTAPNTransitionAddToModelView(clickPoint);
-
-						break;
-
-					case ANNOTATION:
-						newAnnotationNoteAddToModelView(clickPoint);
-						break;
-
-					case ARC:
-					case TAPNARC:
-					case INHIBARC:
-					case TRANSPORTARC:
-					case TAPNINHIBITOR_ARC: // Add point to arc in creation
-						if (createArc != null) {
-							addArcPathPoint(createArc, e);
-						}
-						break;
 
 					case DRAG:
 						dragStart = new Point(clickPoint);
@@ -519,16 +438,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			updatePreferredSize();
 		}
 
-        private void addArcPathPoint(final Arc createArc, final MouseEvent e) {
-			int x = Grid.getModifiedX(e.getX());
-			int y = Grid.getModifiedY(e.getY());
-
-			boolean shiftDown = e.isShiftDown();
-			createArc.setEndPoint(x, y, shiftDown);
-			createArc.getArcPath().addPoint(x, y, shiftDown);
-		}
-
-		@Override
+        @Override
 		public void mouseReleased(MouseEvent e) {
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseReleased(e);
@@ -548,11 +458,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseMoved(e);
 			}
-			if (createArc != null) {
-				createArc.setEndPoint(Grid.getModifiedX(e.getX()), Grid
-						.getModifiedY(e.getY()), e.isShiftDown());
-			}
-		}
+        }
 
 
 		@Override
@@ -591,86 +497,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		guiModel.repaintAll(!tabContent.isInAnimationMode());
 	}
 
-	//XXX: function moved from undoManager --kyrke - 2019-07-06
-	private void deleteObject(PetriNetObject pnObject) {
-		if (pnObject instanceof ArcPathPoint) {
 
-			ArcPathPoint arcPathPoint = (ArcPathPoint)pnObject;
-
-			//If the arc is marked for deletion, skip deleting individual arcpathpoint
-			if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
-
-				//Don't delete the two last arc path points
-				if (arcPathPoint.isDeleteable()) {
-					Command cmd = new DeleteArcPathPointEdit(
-							arcPathPoint.getArcPath().getArc(),
-							arcPathPoint,
-							arcPathPoint.getIndex(),
-							guiModel
-					);
-					cmd.redo();
-					tabContent.getUndoManager().addEdit(cmd);
-				}
-			}
-		}else{
-			//The list of selected objects is not updated when a element is deleted
-			//We might delete the same object twice, which will give an error
-			//Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
-			//There is properly a better way to track this (check model?) but while refactoring we will keeps it close
-			//to the orginal code -- kyrke 2019-06-27
-			if (!pnObject.isDeleted()) {
-				Command cmd = null;
-				if(pnObject instanceof TimedPlaceComponent){
-					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
-					cmd = new DeleteTimedPlaceCommand(tp, this.getModel(), guiModel);
-				}else if(pnObject instanceof TimedTransitionComponent){
-					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
-					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel);
-				}else if(pnObject instanceof TimedTransportArcComponent){
-					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
-					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel);
-				}else if(pnObject instanceof TimedInhibitorArcComponent){
-					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
-					cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel);
-				}else if(pnObject instanceof TimedInputArcComponent){
-					TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
-					cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel);
-				}else if(pnObject instanceof TimedOutputArcComponent){
-					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
-					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel);
-				}else if(pnObject instanceof AnnotationNote){
-					cmd = new DeleteAnnotationNoteCommand((AnnotationNote)pnObject, guiModel);
-				}else{
-					throw new RuntimeException("This should not be possible");
-				}
-				cmd.redo();
-				tabContent.getUndoManager().addEdit(cmd);
-			}
-		}
-	}
-
-
-	private void deleteSelection(PetriNetObject pnObject) {
-		if(pnObject instanceof PlaceTransitionObject){
-			PlaceTransitionObject pto = (PlaceTransitionObject)pnObject;
-
-			for(Arc arc : pto.getPreset()){
-				deleteObject(arc);
-			}
-
-			for(Arc arc : pto.getPostset()){
-				deleteObject(arc);
-			}
-		}
-
-		deleteObject(pnObject);
-	}
-
-	public void deleteSelection(ArrayList<PetriNetObject> selection) {
-		for (PetriNetObject pnObject : selection) {
-			deleteSelection(pnObject);
-		}
-	}
 
 	public void translateSelection(ArrayList<PetriNetObject> objects, int transX, int transY) {
 		tabContent.getUndoManager().newEdit(); // new "transaction""

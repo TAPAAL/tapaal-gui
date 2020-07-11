@@ -15,8 +15,8 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
     private int nameOffsetX;
     private int nameOffsetY;
 
-    PetriNetObjectWithLabel(int nameOffsetX, int nameOffsetY) {
-        super();
+    PetriNetObjectWithLabel(String idInput, int positionXInput, int positionYInput, int nameOffsetX, int nameOffsetY) {
+        super(idInput, positionXInput, positionYInput);
 
         this.nameOffsetX = nameOffsetX;
         this.nameOffsetY = nameOffsetY;
@@ -67,46 +67,19 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         removeLabelFromContainer();
     }
 
-    /**
-     * Set X-axis offset for name position
-     *
-     * @param nameOffsetXInput
-     *            Double value for name X-axis offset
-     */
-    public void setNameOffsetX(int nameOffsetXInput, boolean useCurrentZoom) {
-        if(useCurrentZoom){
-            nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
-        } else{
-            nameOffsetX = Zoomer.getUnzoomedValue(nameOffsetXInput, Pipe.ZOOM_DEFAULT);
-        }
-    }
     public void setNameOffsetX(int nameOffsetXInput) {
-        setNameOffsetX(nameOffsetXInput, true);
-    }
-
-    /**
-     * Set Y-axis offset for name position
-     *
-     * @param nameOffsetYInput
-     *            Double value for name Y-axis offset
-     */
-    public void setNameOffsetY(int nameOffsetYInput, boolean useCurrentZoom) {
-        if(useCurrentZoom){
-            nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
-        } else{
-            nameOffsetY = Zoomer.getUnzoomedValue(nameOffsetYInput, Pipe.ZOOM_DEFAULT);
-        }
+        nameOffsetX = nameOffsetXInput;
     }
     public void setNameOffsetY(int nameOffsetYInput) {
-        setNameOffsetY(nameOffsetYInput, true);
+        nameOffsetY = nameOffsetYInput;
     }
 
-    public void updateNameOffsetX(int nameOffsetXInput) {
+    public void translateNameOffsetX(int nameOffsetXInput) {
         nameOffsetX += Zoomer.getUnzoomedValue(nameOffsetXInput, getZoom());
 
     }
 
-    public void updateNameOffsetY(int nameOffsetYInput) {
+    public void translateNameOffsetY(int nameOffsetYInput) {
         nameOffsetY += Zoomer.getUnzoomedValue(nameOffsetYInput, getZoom());
     }
 

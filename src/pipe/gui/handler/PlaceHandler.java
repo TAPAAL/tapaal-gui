@@ -14,9 +14,6 @@ import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.undo.UndoManager;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -53,70 +50,16 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isLeftMouseButton(e)) {
-            if (e.getClickCount() == 2 &&
-                CreateGui.getApp().isEditionAllowed() &&
-                (CreateGui.getApp().getMode() == ElementType.PLACE || CreateGui.getApp().getMode() == ElementType.SELECT)
-            ) {
-				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
-				((Place) myObject).showEditor();
-			} else {
-				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
-
-				switch (CreateGui.getApp().getMode()) {
-				case ADDTOKEN:
-					if (myObject instanceof TimedPlaceComponent) {
-						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, 1);
-						command.redo();
-						undoManager.addNewEdit(command);
-					}
-					break;
-				case DELTOKEN:
-					if (myObject instanceof TimedPlaceComponent) {
-						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, -1);
-						command.redo();
-						undoManager.addNewEdit(command);
-					} 
-
-					break;
-				default:
-					break;
-				}
-			}
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
-				JPopupMenu m = getPopup(e);
-				if (m != null) {
-
-					if (myObject instanceof PetriNetObjectWithLabel) {
-						int x = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetX(), myObject.getZoom());
-						int y = Zoomer.getZoomedValue(((PetriNetObjectWithLabel)myObject).getNameOffsetY(), myObject.getZoom());
-						m.show(myObject, x, y);
-					}
-				}
-			}
-		}/*
-		 * else if (SwingUtilities.isMiddleMouseButton(e)){ // TODO -
-		 * middelclick draw a arrow }
-		 */
-	}
-
-
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
-			return;
-		}
-
-		if (myObject instanceof TimedPlaceComponent) {
-            TimedPlaceComponent p = (TimedPlaceComponent) myObject;
-		    if (e.getWheelRotation() < 0) {
-                p.addTokens(1);
-            } else {
-                p.removeTokens(1);
-            }
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
+            return;
         }
-	}
+
+        TimedPlaceComponent p = (TimedPlaceComponent) myObject;
+        if (e.getWheelRotation() < 0) {
+            p.underlyingPlace().addTokens(1);
+        } else {
+            p.underlyingPlace().removeTokens(1);
+        }
+    }
 }

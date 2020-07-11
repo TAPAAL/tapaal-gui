@@ -14,33 +14,28 @@ import java.util.LinkedList;
  */
 public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
-	protected double componentWidth;
-	protected double componentHeight;
+	protected final double componentWidth;
+	protected final double componentHeight;
 
-	private LinkedList<Arc> connectTo = new LinkedList<Arc>();
-	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
+	private final LinkedList<Arc> connectTo = new LinkedList<Arc>();
+	private final LinkedList<Arc> connectFrom = new LinkedList<Arc>();
 
 	protected boolean attributesVisible = false;
 
 	public PlaceTransitionObject(
+	        double componentWidth,
+			double componentHeight,
 			int positionXInput,
 			int positionYInput,
 			String idInput,
 			int nameOffsetXInput,
 			int nameOffsetYInput
 	){
-		super(nameOffsetXInput, nameOffsetYInput);
-
-		setPositionX(positionXInput);
-		setPositionY(positionYInput);
-
-		id = idInput;
-
+		super(idInput, positionXInput, positionYInput, nameOffsetXInput, nameOffsetYInput);
+		this.componentWidth = componentWidth;
+		this.componentHeight = componentHeight;
 	}
 
-	public PlaceTransitionObject(int positionXInput, int positionYInput) {
-		this(positionXInput, positionYInput, null, Pipe.DEFAULT_OFFSET_X, Pipe.DEFAULT_OFFSET_Y);
-	}
 
 	/**
 	 * Set name
@@ -50,8 +45,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 */
 	@Override
 	public void setName(String nameInput) {
-		// sets the text within the label
-		// System.out.println("setting name to: " + nameInput);
 		getNameLabel().setName(nameInput);
 	}
 
@@ -87,10 +80,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		return (getNameLabel() != null) ? getNameLabel().getName() : "";
 	}
 
-
-
-
-
 	/**
 	 * Implemented in subclasses as involves some tailoring according to the
 	 * shape
@@ -112,7 +101,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 * @return Top offset of Place
 	 */
 	public int centreOffsetTop() {
-		return (int) (Zoomer.getZoomedValue(componentHeight / 2.0, getZoom()));
+		return Zoomer.getZoomedValue(componentHeight / 2.0, getZoom());
 	}
 
 	/**
@@ -123,7 +112,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	 * @return Left offset of Place
 	 */
 	public int centreOffsetLeft() {
-		return (int) (Zoomer.getZoomedValue(componentWidth / 2.0, getZoom()));
+		return Zoomer.getZoomedValue(componentWidth / 2.0, getZoom());
 	}
 
 	/** Calculates the BoundsOffsets used for setBounds() method */
@@ -185,17 +174,16 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		update(true);
 	}
 
+    public Point2D.Double getCentre() {
+        return new Point2D.Double(positionX + getWidth() / 2.0, positionY + getHeight() / 2.0);
+    }
+
 	public void update(boolean displayConstantNames) {
 		update(displayConstantNames, true);
 	}
 
 	public void update(boolean displayConstantNames, boolean alignToGrid) {
 		updateOnMoveOrZoom(alignToGrid);
-	}
-
-	public Point2D.Double getCentre() {
-		return new Point2D.Double(positionX + getWidth() / 2.0, positionY
-				+ getHeight() / 2.0);
 	}
 
 	/** Handles selection for Place/Transitions */
@@ -252,25 +240,15 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	}
 
 	/* KYRKE - added functions for getting pre and post set af lists */
-	public LinkedList<Arc> getPreset() {
-		// XXX - possible type error
-		return new LinkedList<Arc>(connectTo);
+	public Iterable<Arc> getPreset() {
+		return connectTo;
 	}
 
-	public LinkedList<Arc> getPostset() {
-		// XXX - possible type error
-		return new LinkedList<Arc>(connectFrom);
+	public Iterable<Arc> getPostset() {
+		return connectFrom;
 	}
 
-	public Iterator<Arc> getConnectFromIterator() {
-		return connectFrom.iterator();
-	}
-
-	public Iterator<Arc> getConnectToIterator() {
-		return connectTo.iterator();
-	}
-
-	public abstract void updateEndPoint(Arc arc);
+    public abstract void updateEndPoint(Arc arc);
 
 	public abstract void showEditor();
 

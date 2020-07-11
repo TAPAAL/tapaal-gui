@@ -5,16 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.function.Supplier;
 
 import javax.swing.*;
 
 import pipe.gui.CreateGui;
-import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import dk.aau.cs.model.tapn.Weight;
-import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
    Implementation of Element for drawing an arc
@@ -47,8 +46,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
-	private Arc() {
-	    super(0, 0);
+	private Arc(String idInput) {
+	    super(idInput, 0, 0, 0, 0);
 
         setHead();
     }
@@ -58,11 +57,13 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * 
 	 */
 	public Arc(
-			PlaceTransitionObject sourceInput,
-			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		this();
+	    PlaceTransitionObject sourceInput,
+        PlaceTransitionObject targetInput,
+        int weightInput,
+        String idInput
+    ) {
+		this(idInput);
 
-		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
 
@@ -73,7 +74,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
-		this();
+		this("");
 		isPrototype = true;
 
 		setSource(newSource);
@@ -294,18 +295,17 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	public boolean contains(int x, int y) {
 		Point2D.Double point = new Point2D.Double(
 		    x + myPath.getBounds().getX() - COMPONENT_DRAW_OFFSET - zoomGrow,
-            y
-				+ myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
+            y + myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
         );
 
-		if (!CreateGui.getCurrentTab().isInAnimationMode()) {
+		/*if (!CreateGui.getCurrentTab().isInAnimationMode()) {
 			if (myPath.proximityContains(point) || selected) {
 				// show also if Arc itself selected
 				myPath.showPoints();
 			} else {
 				myPath.hidePoints();
 			}
-		}
+		}*/
 		return myPath.contains(point);
 	}
 
@@ -368,8 +368,9 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
 	 * and action names are mapped to action objects. The key bindings are disabled when the
 	 * arc object is deleted, or the arc is connected to a place/transition.
-	 */
-	public void enableDrawingKeyBindings() {
+     * @param action
+     */
+	public void enableDrawingKeyBindings(Runnable action) {
 		InputMap iMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		ActionMap aMap = this.getActionMap();
 
@@ -378,30 +379,17 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		iMap.put(KeyStroke.getKeyStroke("DELETE"), "deleteArc");
 		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteArc");
 		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteArc");
-		aMap.put("deleteArc", new DeleteAction(this));
+		aMap.put("deleteArc", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+            }
+        });
 	}
 
 	public void disableDrawingKeyBindings() {
 		this.getInputMap().clear();
 		this.getActionMap().clear();
-	}
-
-	private static class DeleteAction extends AbstractAction {
-		Arc arcBeingDraw;
-
-		DeleteAction(Arc arc) {
-			arcBeingDraw = arc;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			DrawingSurfaceImpl aView = CreateGui.getDrawingSurface();
-			if (aView.createArc == arcBeingDraw) {
-				PlaceTransitionObjectHandler.cleanupArc(aView.createArc, aView);
-
-				aView.repaint();
-			}
-		}
 	}
 
 	protected final void setHead(Shape head, Boolean fillHead) {
@@ -415,4 +403,16 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	protected void setHead() {
 		setHead(new Polygon(new int[] { 0, 5, 0, -5 }, new int[] {0, -10, -7, -10 }, 4), true) ;
 	}
+
+    @Override
+    public void select(boolean shouldRepaint) {
+        super.select(shouldRepaint);
+        myPath.showPoints();
+    }
+
+    @Override
+    public void deselect() {
+        super.deselect();
+        myPath.hidePoints();
+    }
 }

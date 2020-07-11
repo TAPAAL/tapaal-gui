@@ -15,7 +15,6 @@ public class TimedArcHandler extends ArcHandler {
 
 	public TimedArcHandler(Arc obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	@Override
@@ -31,10 +30,6 @@ public class TimedArcHandler extends ArcHandler {
 				menuItem.addActionListener(e1 -> ((TimedInputArcComponent) myObject).showTimeIntervalEditor());
 				popup.insert(menuItem, popupIndex++);
 			}
-
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e.getPoint()));
-			menuItem.setText("Insert Point");
-			popup.insert(menuItem, popupIndex++);
 
 			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}

@@ -46,21 +46,19 @@ import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 public class TimedPlaceComponent extends Place {
 
 	private dk.aau.cs.model.tapn.TimedPlace place;
-	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
+	private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-	private Window ageOfTokensWindow;
-	private Shape dashedOutline = createDashedOutline();
+	private Window ageOfTokensWindow = new Window(new Frame());
+	private final Shape dashedOutline = createDashedOutline();
 
 	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
-		listener = timedPlaceListener();		
-		this.place.addTimedPlaceListener(listener);
+        this.place.addTimedPlaceListener(listener);
 
 		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
 
-	}
+    }
 
 	public TimedPlaceComponent(
 	    int positionXInput,
@@ -71,11 +69,9 @@ public class TimedPlaceComponent extends Place {
     ) {
 
 		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
-		listener = timedPlaceListener();
-		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
+        attributesVisible = true;
 
-	}
+    }
 
 	@Override
 	protected void addMouseHandler() {
@@ -114,11 +110,12 @@ public class TimedPlaceComponent extends Place {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-		Iterable<TimedToken> tokens = place.tokens();
+
 		boolean first = true;
-		for (TimedToken token : tokens) {
-			if (!first)
-				buffer.append(", ");
+		for (TimedToken token : place.tokens()) {
+			if (!first) {
+                buffer.append(", ");
+            }
 			buffer.append(df.format(token.age()));
 
 			first = false;
@@ -269,13 +266,10 @@ public class TimedPlaceComponent extends Place {
         }
 	}
 
-	public Command setInvariant(TimeInvariant inv) {
-		TimeInvariant old = place.invariant();
+	public void setInvariant(TimeInvariant inv) {
 		place.setInvariant(inv);
 
 		update(true);
-
-		return new TimedPlaceInvariantEdit(this, old, inv);
 	}
 
 	public void showAgeOfTokens(boolean show) {
@@ -401,18 +395,6 @@ public class TimedPlaceComponent extends Place {
 		place.addTimedPlaceListener(listener);
 		this.place = place;
 		this.update(true);
-	}
-
-	public void addTokens(int numberOfTokensToAdd) {
-		for (int i = 0; i < numberOfTokensToAdd; i++) {
-			place.addToken(new TimedToken(place, BigDecimal.ZERO));
-		}
-	}
-
-	public void removeTokens(int numberOfTokensToRemove) {
-		for (int i = 0; i < numberOfTokensToRemove; i++) {
-			place.removeToken();
-		}
 	}
 
 	public int getNumberOfTokens() {

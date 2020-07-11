@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -23,6 +24,14 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		super(source);
 		updateLabel(true);
 	}
+
+	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc){
+	    super(source);
+	    setTarget(target);
+	    setUnderlyingArc(modelArc);
+	    updateLabel(true);
+	    sealArc();
+    }
 
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
 		super(arc);

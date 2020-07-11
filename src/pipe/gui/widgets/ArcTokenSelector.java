@@ -66,7 +66,7 @@ public class ArcTokenSelector extends JPanel{
 	}
 	
 	private void updateInformationLabel(){
-		informationLabel.setText("Select " + missingToSelect + " more");
+		informationLabel.setText("Remaining to select " + missingToSelect + " tokens");
 	}
 	
 	public List<TimedToken> getSelected(){

@@ -36,8 +36,7 @@ public class TimedTransitionComponent extends Transition {
 	private dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
-	public TimedTransitionComponent(int positionXInput, int positionYInput,
-			dk.aau.cs.model.tapn.TimedTransition transition) {
+	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
 		listener = timedTransitionListener();
@@ -46,14 +45,25 @@ public class TimedTransitionComponent extends Transition {
 
 	}
 
-	public TimedTransitionComponent(int positionXInput,
-			int positionYInput, String idInput,
-			int nameOffsetXInput, int nameOffsetYInput,
-			boolean timedTransition, boolean infServer, int angleInput,
-			int priority) {
-		super(positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput, infServer,
-				angleInput, priority);
+	public TimedTransitionComponent(
+	    int positionXInput,
+        int positionYInput,
+        String idInput,
+        int nameOffsetXInput,
+        int nameOffsetYInput,
+        boolean timedTransition,
+        boolean infServer,
+        int angleInput,
+        int priority
+    ) {
+		super(
+		    positionXInput,
+            positionYInput,
+            idInput,
+            nameOffsetXInput,
+            nameOffsetYInput,
+            angleInput
+        );
 		listener = timedTransitionListener();
 		attributesVisible = true;
 
@@ -102,7 +112,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	@Override
-	public boolean isEnabled() {
+	public boolean isTransitionEnabled() {
 		return transition.isEnabled();
 	}
 
