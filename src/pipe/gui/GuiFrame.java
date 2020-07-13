@@ -65,27 +65,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction createAction = new GuiAction("New", "Create a new Petri net", KeyStroke.getKeyStroke('N', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::showNewPNDialog);
-
-            if (drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JLabel) {
-                drawingToolBar.remove(drawingToolBar.getComponentCount() - 1);
-            }
-            else {
-                drawingToolBar.addSeparator();
-            }
-            String properties = (getCurrentTab().isNetTimed() ? "Timed " : "Untimed ") + "net" +
-                                (getCurrentTab().isNetGame() ? " and includes game features " : "");
-            drawingToolBar.add(new JLabel(properties));
+            addNetPropertyInfo();
         }
     };
     private final GuiAction openAction = new GuiAction("Open", "Open", KeyStroke.getKeyStroke('O', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::openTAPNFile);
+            addNetPropertyInfo();
         }
     };
     private final GuiAction closeAction = new GuiAction("Close", "Close the current tab", KeyStroke.getKeyStroke('W', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             TabContent index = (TabContent) appTab.getSelectedComponent();
             guiFrameController.ifPresent(o -> o.closeTab(index));
+            addNetPropertyInfo();
         }
     };
     private final GuiAction saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey)) {
@@ -1274,10 +1267,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 getCurrentTab().switchToEditorComponents();
 
+                addNetPropertyInfo();
+
                 break;
             case animation:
                 getCurrentTab().switchToAnimationComponents(true);
                 startAction.setSelected(true);
+
+                addNetPropertyInfo();
 
                 break;
             case noNet:
@@ -1650,6 +1647,34 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     public TabContent getCurrentTab() {
         return CreateGui.getCurrentTab();
+    }
+
+    private void addNetPropertyInfo() {
+        removeNetPropertyInfo();
+
+        if (getCurrentTab() != null) {
+            TabContent currentTab = getCurrentTab();
+            if (!(drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JSeparator)) {
+                drawingToolBar.addSeparator();
+            }
+
+            String properties = (currentTab.isNetTimed() ? " Timed " : " Untimed ") + "net" +
+                                (currentTab.isNetGame() ? " and includes game features" : "");
+            drawingToolBar.add(new JLabel(properties));
+        }
+    }
+
+    private void removeNetPropertyInfo() {
+        int toolBarIndex = drawingToolBar.getComponentCount() - 1;
+
+        if (drawingToolBar.getComponent(toolBarIndex) instanceof JLabel) {
+            drawingToolBar.remove(toolBarIndex);
+            toolBarIndex -= 1;
+
+            if (drawingToolBar.getComponent(toolBarIndex) instanceof JSeparator) {
+                drawingToolBar.remove(toolBarIndex);
+            }
+        }
     }
 
 }
