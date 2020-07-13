@@ -489,8 +489,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-	public static TabContent createNewEmptyTab(String name){
-		TabContent tab = new TabContent();
+	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
+		TabContent tab = new TabContent(isTimed, isGame);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -631,8 +631,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 
-	private TabContent() {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(true,false));
+	private TabContent(boolean isTimed, boolean isGame) {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
     }
 
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
@@ -697,7 +697,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
         setQueries(tapnqueries);
         setConstants(network().constants());
 	}
-	
+
+    public boolean isNetTimed() {
+        return lens.isTimed();
+    }
+
+    public boolean isNetGame() {
+        return lens.isGame();
+    }
+
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
 		return sharedPTPanel;
 	}

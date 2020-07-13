@@ -65,6 +65,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction createAction = new GuiAction("New", "Create a new Petri net", KeyStroke.getKeyStroke('N', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::showNewPNDialog);
+
+            if (drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JLabel) {
+                drawingToolBar.remove(drawingToolBar.getComponentCount() - 1);
+            }
+            else {
+                drawingToolBar.addSeparator();
+            }
+            String properties = (getCurrentTab().isNetTimed() ? "Timed " : "Untimed ") + "net" +
+                                (getCurrentTab().isNetGame() ? " and includes game features " : "");
+            drawingToolBar.add(new JLabel(properties));
         }
     };
     private final GuiAction openAction = new GuiAction("Open", "Open", KeyStroke.getKeyStroke('O', shortcutkey)) {

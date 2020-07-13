@@ -96,7 +96,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			TabContent tab = TabContent.createNewEmptyTab(name);
+			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame);
 			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
@@ -201,9 +201,10 @@ public class NewTAPNPanel extends JPanel {
         ButtonGroup isGameRadioButtonGroup = new ButtonGroup();
 
         JRadioButton nonGameNet = new JRadioButton("No game features");
+        nonGameNet.setSelected(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
@@ -213,7 +214,7 @@ public class NewTAPNPanel extends JPanel {
         gameNet = new JRadioButton("Game features");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
