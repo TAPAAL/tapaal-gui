@@ -10,8 +10,8 @@ import dk.aau.cs.util.MemoryMonitor;
 
 public class ProcessRunner {
 
-	private String file;
-	private String arguments;
+	private final String file;
+	private final String arguments;
 	private long runningTime = 0;
 	private Process process;
 	private BufferedReader bufferedReaderStdout;

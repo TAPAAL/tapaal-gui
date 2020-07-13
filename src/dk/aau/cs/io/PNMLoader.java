@@ -54,15 +54,15 @@ public class PNMLoader {
 	
 	enum GraphicsType { Position, Offset }
 
-	private NameGenerator nameGenerator = new NameGenerator();
-	private IdResolver idResolver = new IdResolver();
-	private HashSet<String> arcs = new HashSet<String>();
-	private HashMap<String, TimedPlace> places = new HashMap<String, TimedPlace>();
-	private HashMap<String, TimedTransition> transitions = new HashMap<String, TimedTransition>();
+	private final NameGenerator nameGenerator = new NameGenerator();
+	private final IdResolver idResolver = new IdResolver();
+	private final HashSet<String> arcs = new HashSet<String>();
+	private final HashMap<String, TimedPlace> places = new HashMap<String, TimedPlace>();
+	private final HashMap<String, TimedTransition> transitions = new HashMap<String, TimedTransition>();
 	
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
-	private int maxNetSize = 4000;
+	private final int maxNetSize = 4000;
 	private boolean hasPositionalInfo = false;
 	
 	public PNMLoader() {

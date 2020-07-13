@@ -13,7 +13,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
 
 public class MultiLineAutoWrappingTooltipUI extends BasicToolTipUI {
-	private static MultiLineAutoWrappingTooltipUI sharedInstance = new MultiLineAutoWrappingTooltipUI();			     
+	private static final MultiLineAutoWrappingTooltipUI sharedInstance = new MultiLineAutoWrappingTooltipUI();
 	protected CellRendererPane rendererPane;
 	
 	private static JTextArea textArea ;

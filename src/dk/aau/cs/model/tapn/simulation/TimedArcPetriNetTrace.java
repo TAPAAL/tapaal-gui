@@ -14,8 +14,8 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	private TraceType traceType;
 	
 	
-	private List<TimedArcPetriNetStep> steps = new ArrayList<TimedArcPetriNetStep>();
-	private boolean isTimedTrace = true;
+	private final List<TimedArcPetriNetStep> steps = new ArrayList<TimedArcPetriNetStep>();
+	private final boolean isTimedTrace;
 	
 	public TimedArcPetriNetTrace(boolean isTimedTrace) {
 		this.isTimedTrace = isTimedTrace;

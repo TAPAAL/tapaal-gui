@@ -19,8 +19,8 @@ import pipe.gui.GuiFrame;
 
 public class NewTAPNPanel extends JPanel {
 
-	private JRootPane rootPane;
-	private GuiFrame frame;
+	private final JRootPane rootPane;
+	private final GuiFrame frame;
 	private JTextField nameTextBox;
 
 	public NewTAPNPanel(JRootPane rootPane, GuiFrame frame) {

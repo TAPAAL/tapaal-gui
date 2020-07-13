@@ -4,7 +4,7 @@ import dk.aau.cs.util.Require;
 
 public class TimedOutputArc extends TAPNElement {
 	private Weight weight;
-	private TimedTransition source;
+	private final TimedTransition source;
 	private TimedPlace destination;
 	
 	public TimedOutputArc(TimedTransition source, TimedPlace destination){

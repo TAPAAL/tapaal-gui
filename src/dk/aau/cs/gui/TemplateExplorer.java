@@ -855,8 +855,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
 		private static final String CHECK_TO_ACTIVATE = "Check to active the component";
-		private JCheckBox activeCheckbox = new JCheckBox();
-		private ListCellRenderer cellRenderer;
+		private final JCheckBox activeCheckbox = new JCheckBox();
+		private final ListCellRenderer cellRenderer;
 		
 		
 		public TemplateListCellRenderer(ListCellRenderer renderer) {
@@ -886,9 +886,9 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	private class TemplateListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
-		private int checkBoxWidth = new JCheckBox().getPreferredSize().width;
-		private ListSelectionModel selectionModel;
-		private JList list;
+		private final int checkBoxWidth = new JCheckBox().getPreferredSize().width;
+		private final ListSelectionModel selectionModel;
+		private final JList list;
 		
 		public TemplateListManager(JList list) {
 			this.list = list;

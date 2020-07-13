@@ -7,9 +7,9 @@ import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class LoadedModel{
-	private Collection<Template> templates;
-	private Collection<TAPNQuery> queries;
-	private TimedArcPetriNetNetwork network; 
+	private final Collection<Template> templates;
+	private final Collection<TAPNQuery> queries;
+	private final TimedArcPetriNetNetwork network;
 	
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
 		this.templates = templates;

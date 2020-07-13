@@ -9,7 +9,7 @@ import dk.aau.cs.util.Require;
 public class ExportBatchResultTableModel extends AbstractTableModel {
  static final long serialVersionUID = 959574725280211159L;
 	private final String[] HEADINGS = new String[]{ "File name", "Destination", "Status" };
-	private ArrayList<String[]> results;
+	private final ArrayList<String[]> results;
 	
 	public ExportBatchResultTableModel() {
 		results = new ArrayList<String[]>();

@@ -19,9 +19,9 @@ import pipe.gui.graphicElements.Transition;
 
 public class TransitionFireingComponent extends JPanel {
 
-	private EnabledTransitionsList enabledTransitionsList;
-	private JButton fireButton;
-	private JButton settingsButton;
+	private final EnabledTransitionsList enabledTransitionsList;
+	private final JButton fireButton;
+	private final JButton settingsButton;
 
 	public TransitionFireingComponent(boolean showDelayEnabledTransitions) {
 		super(new GridBagLayout());

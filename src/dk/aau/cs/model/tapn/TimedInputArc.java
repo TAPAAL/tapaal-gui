@@ -15,7 +15,7 @@ public class TimedInputArc extends TAPNElement {
 	private Weight weight = new IntWeight(1);
 	private TimedPlace source;
 	private TimeInterval interval;
-	private TimedTransition destination;
+	private final TimedTransition destination;
 
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
 		this(source, destination, interval, new IntWeight(1));

@@ -31,8 +31,8 @@ public class VerifyDTAPNOutputParser {
 	private final int totalTokens;
 	private final TAPNQuery query;
 	private final int extraTokens;
-	private List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
-	private List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
+	private final List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
+	private final List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
         
 	public VerifyDTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;

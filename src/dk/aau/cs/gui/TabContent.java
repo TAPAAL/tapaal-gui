@@ -585,14 +585,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	//GUI
 
-	private HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
 
-	private JScrollPane drawingSurfaceScroller;
+	private final JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
 	private DrawingSurfaceImpl drawingSurface;
 	private File appFile;
-	private JPanel drawingSurfaceDummy;
+	private final JPanel drawingSurfaceDummy;
 	
 	// Normal mode
 	private BugHandledJXMultisplitPane editorSplitPane;

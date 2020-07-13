@@ -12,7 +12,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 public class BatchProcessingResultsTableModel extends AbstractTableModel {
 
 	private final String[] HEADINGS = new String[]{ "Method", "Model", "Query", "Result", "Verification Time", "Memory Usage" }; // TODO: somehow display discovered/explored/stored states. Maybe in tooltip
-	private List<BatchProcessingVerificationResult> results;
+	private final List<BatchProcessingVerificationResult> results;
 	
 	public BatchProcessingResultsTableModel(){
 		results = new ArrayList<BatchProcessingVerificationResult>();

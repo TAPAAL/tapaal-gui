@@ -9,12 +9,11 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
-	public static final TimeInterval ZERO_INF = new TimeInterval(true,
-			new IntBound(0), Bound.Infinity, false);
-	private boolean isLowerIncluded;
+	public static final TimeInterval ZERO_INF = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+	private final boolean isLowerIncluded;
 	private Bound lower;
 	private Bound upper;
-	private boolean isUpperIncluded;
+	private final boolean isUpperIncluded;
 
 	public TimeInterval(boolean isLowerIncluded, Bound lower, Bound upper,
 			boolean isUpperIncluded) {

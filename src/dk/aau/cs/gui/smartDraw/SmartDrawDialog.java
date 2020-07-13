@@ -122,7 +122,7 @@ public class SmartDrawDialog extends JDialog {
 	int overlappingArcWeight = 100;
 	int minimumIterations = 3;
 	
-	private Timer timer = new Timer(1000, new AbstractAction() {
+	private final Timer timer = new Timer(1000, new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText("Time elapsed: " + (System.currentTimeMillis() - startTimeMs) / 1000 + " s");
 		}

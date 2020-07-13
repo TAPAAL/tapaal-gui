@@ -1,7 +1,7 @@
 package dk.aau.cs.verification.batchProcessing;
 
 public class FileChangedEvent {
-	private String fileName;
+	private final String fileName;
 	
 	public FileChangedEvent(String fileName) {
 		this.fileName = fileName;

@@ -52,21 +52,21 @@ import dk.aau.cs.util.Require;
 
 public class QueryPane extends JPanel implements SidePane {
 
-	private JPanel queryCollectionPanel;
-	private JPanel buttonsPanel;
-	private DefaultListModel listModel;
-	private JList<TAPNQuery> queryList;
+	private final JPanel queryCollectionPanel;
+	private final JPanel buttonsPanel;
+	private final DefaultListModel listModel;
+	private final JList<TAPNQuery> queryList;
 	private List<TAPNQuery> selectedQueries;
 	private JScrollPane queryScroller;
-	private Messenger messenger =  new MessengerImpl();
+	private final Messenger messenger =  new MessengerImpl();
 
 	private JButton addQueryButton;
 	private JButton editQueryButton;
 	private JButton verifyButton;
 
 	private JButton removeQueryButton;
-	private TabContent tabContent;
-	private UndoManager undoManager;
+	private final TabContent tabContent;
+	private final UndoManager undoManager;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;

@@ -8,9 +8,9 @@ public class VerifytaOutputParser {
 	private static final String PROPERTY_IS_NOT_SATISFIED_STRING = "is NOT satisfied".toLowerCase();
 	private static final String PROPERTY_IS_SATISFIED_STRING = "is satisfied".toLowerCase();
 	private static final String DISCRETE_INCLUSION = "discrete inclusion".toLowerCase();
-	private boolean error = false;
+	private final boolean error = false;
 	private boolean discreteInclusion = false;
-	private TAPNQuery query;
+	private final TAPNQuery query;
 
 	public VerifytaOutputParser(TAPNQuery query){
 		this.query = query;

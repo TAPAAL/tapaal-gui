@@ -14,7 +14,7 @@ import dk.aau.cs.util.Require;
 public class TransportArc extends TAPNElement {
 	private Weight weight;
 	private TimedPlace source;
-	private TimedTransition transition;
+	private final TimedTransition transition;
 	private TimedPlace destination;
 
 	private TimeInterval interval;

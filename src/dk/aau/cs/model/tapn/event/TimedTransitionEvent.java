@@ -4,7 +4,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 public class TimedTransitionEvent {
-	private TimedTransition source;
+	private final TimedTransition source;
 	
 	public TimedTransitionEvent(TimedTransition source){
 		Require.that(source != null, "source cannot be null");

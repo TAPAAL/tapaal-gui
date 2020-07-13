@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class UntimedTAPNNetworkTrace implements TAPNNetworkTrace {
-	private List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
+	private final List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
 
 	public void add(TAPNNetworkTimedTransitionStep step) {
 		steps.add(step);

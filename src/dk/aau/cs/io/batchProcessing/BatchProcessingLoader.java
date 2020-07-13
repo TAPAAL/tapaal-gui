@@ -59,23 +59,17 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class BatchProcessingLoader {
-	private HashMap<Tuple<TimedTransition, Integer>, TimedPlace> presetArcs;
-	private HashMap<Tuple<TimedTransition, Integer>, TimedPlace> postsetArcs;
-	private HashMap<String, String> placeIDToName;
-	private HashMap<String, String> transitionIDToName;
-	private HashMap<Tuple<TimedTransition, Integer>, TimeInterval> transportArcsTimeIntervals;
+	private final HashMap<Tuple<TimedTransition, Integer>, TimedPlace> presetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
+	private final HashMap<Tuple<TimedTransition, Integer>, TimedPlace> postsetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
+	private final HashMap<String, String> placeIDToName = new HashMap<String, String>();
+	private final HashMap<String, String> transitionIDToName = new HashMap<String, String>();
+	private final HashMap<Tuple<TimedTransition, Integer>, TimeInterval> transportArcsTimeIntervals = new HashMap<Tuple<TimedTransition,Integer>, TimeInterval>();
 
-	private IdResolver idResolver = new IdResolver();
+	private final IdResolver idResolver = new IdResolver();
 	
-	private NameGenerator nameGenerator = new NameGenerator();
+	private final NameGenerator nameGenerator = new NameGenerator();
 	
-	public BatchProcessingLoader() {
-		presetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
-		postsetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
-		placeIDToName = new HashMap<String, String>();
-		transitionIDToName = new HashMap<String, String>();
-		transportArcsTimeIntervals = new HashMap<Tuple<TimedTransition,Integer>, TimeInterval>();
-	}
+	public BatchProcessingLoader() {}
 
 	public LoadedBatchProcessingModel load(File file) throws FormatException {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");

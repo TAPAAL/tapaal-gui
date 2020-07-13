@@ -19,11 +19,10 @@ public abstract class TimedPlace {
     protected TimeInvariant invariant;
     protected TimedMarking currentMarking;
 
-    private SharedPlace sharedPlace;
-    private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
-    private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
-    private List<TransportArc> transportArcs = new ArrayList<TransportArc>();
-    private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+    private final List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
+    private final List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
+    private final List<TransportArc> transportArcs = new ArrayList<TransportArc>();
+    private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 
     public enum PlaceType{
 		Standard, Invariant, Dead

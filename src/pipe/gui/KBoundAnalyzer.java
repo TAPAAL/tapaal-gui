@@ -26,8 +26,8 @@ public class KBoundAnalyzer {
 	protected TimedArcPetriNetNetwork tapnNetwork;
 	protected int k;
 
-	private ModelChecker modelChecker;
-	private Messenger messenger;
+	private final ModelChecker modelChecker;
+	private final Messenger messenger;
 	private final JSpinner spinner;
 
 	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k,

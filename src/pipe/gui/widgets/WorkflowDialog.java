@@ -191,8 +191,8 @@ public class WorkflowDialog extends JDialog {
 
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
 	private int errors = 0;
-	private LinkedList<Runnable> verificationQueue = new LinkedList<Runnable>();
-	private ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
+	private final LinkedList<Runnable> verificationQueue = new LinkedList<Runnable>();
+	private final ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
 
 	private TimedPlace in;
 	private TimedPlace out;
@@ -203,7 +203,7 @@ public class WorkflowDialog extends JDialog {
 	private long m;
 	private int B;
 
-	private static int maxStringLength = LABEL_UNUSED_TRANSITIONS.length();
+	private static final int maxStringLength = LABEL_UNUSED_TRANSITIONS.length();
 
 	private TimedArcPetriNetNetwork model;
 

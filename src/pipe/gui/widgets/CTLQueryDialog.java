@@ -124,7 +124,7 @@ public class CTLQueryDialog extends JPanel {
 
 	private boolean querySaved = false;
 
-	private JRootPane rootPane;
+	private final JRootPane rootPane;
 	private static EscapableDialog guiDialog;
 
 	// Query Name Panel;

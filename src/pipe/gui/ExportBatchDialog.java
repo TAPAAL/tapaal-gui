@@ -80,7 +80,7 @@ public class ExportBatchDialog extends JDialog {
 	private JTextField destinationPathField;
 	private JList fileList;
 	private DefaultListModel listModel;
-	private List<File> files = new ArrayList<File>();
+	private final List<File> files = new ArrayList<File>();
 	private String lastExportPath;
 	private String lastSelectPath;
 	private JCheckBox uniqueQueryNames;

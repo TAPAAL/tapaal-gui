@@ -30,7 +30,7 @@ public class Degree2Converter {
 	private TimedArcPetriNet degree2Model;
 	private TimedArcPetriNet conservativeModel;
 	
-	private List<TimedTransition> retainedDegree2Transitions = new ArrayList<TimedTransition>();
+	private final List<TimedTransition> retainedDegree2Transitions = new ArrayList<TimedTransition>();
 
 	public TimedArcPetriNet transformModel(TimedArcPetriNet model) throws Exception {
 		try{

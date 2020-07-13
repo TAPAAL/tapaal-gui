@@ -6,8 +6,8 @@ import pipe.dataLayer.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class LoadedBatchProcessingModel{
-	private Collection<TAPNQuery> queries;
-	private TimedArcPetriNetNetwork network; 
+	private final Collection<TAPNQuery> queries;
+	private final TimedArcPetriNetNetwork network;
 	
 	public LoadedBatchProcessingModel(TimedArcPetriNetNetwork network, Collection<TAPNQuery> queries){
 		this.network = network;

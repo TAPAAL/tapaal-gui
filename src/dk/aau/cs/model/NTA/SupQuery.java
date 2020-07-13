@@ -6,7 +6,7 @@ import java.util.List;
 
 public class SupQuery implements UPPAALQuery {
 	private static final String SUP = "sup:";
-	private List<String> elements = new ArrayList<String>();
+	private final List<String> elements = new ArrayList<String>();
 
 	public SupQuery(String... elems) {
 		for (String e : elems) {
