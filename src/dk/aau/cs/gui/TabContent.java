@@ -2023,7 +2023,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
-            if (arc!=null) {;
+            if (arc!=null) {
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
                 int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
@@ -2164,7 +2164,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
-            if (arc!=null) {;
+            if (arc!=null) {
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
                 int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
