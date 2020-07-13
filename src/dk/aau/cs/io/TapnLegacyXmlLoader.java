@@ -186,16 +186,14 @@ public class TapnLegacyXmlLoader {
                                           String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                           PlaceTransitionObject targetIn,
                                           int _endx, int _endy) throws FormatException {
-		
-		Arc tempArc;
-		tempArc = new TimedOutputArcComponent(
-            sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput);
+
+        TimedOutputArcComponent tempArc = new TimedOutputArcComponent(sourceIn, targetIn, Integer.parseInt(inscriptionTempStorage), idInput);
 
 		TimedPlace place = tapn.getPlaceByName(targetIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(sourceIn.getName());
 
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place);
-		((TimedOutputArcComponent) tempArc).setUnderlyingArc(outputArc);
+		tempArc.setUnderlyingArc(outputArc);
 		
 		if(tapn.hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
@@ -478,23 +476,23 @@ public class TapnLegacyXmlLoader {
 		String text = getFirstChildNodeByName(inputLabelElement, "text").getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage) + 1;
+			positionXInput = Integer.parseInt(positionXTempStorage) + 1;
 		}
 
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage) + 1;
+			positionYInput = Integer.parseInt(positionYTempStorage) + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp) + 1;
+			widthInput = Integer.parseInt(widthTemp) + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp) + 1;
+			heightInput = Integer.parseInt(heightTemp) + 1;
 		}
 
 		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp);
+			borderInput = Boolean.parseBoolean(borderTemp);
 		} else {
 			borderInput = true;
 		}
@@ -665,11 +663,11 @@ public class TapnLegacyXmlLoader {
 						String arcTempX = element.getAttribute("x");
 						String arcTempY = element.getAttribute("y");
 						String arcTempType = element.getAttribute("curvePoint");
-						double arcPointX = Double.valueOf(arcTempX);
-						double arcPointY = Double.valueOf(arcTempY);
+						double arcPointX = Double.parseDouble(arcTempX);
+						double arcPointY = Double.parseDouble(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType);
+						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
 				}
@@ -759,7 +757,7 @@ public class TapnLegacyXmlLoader {
 			Element graphics = ((Element) getFirstChildNodeByName(e, "graphics"));
 			String offsetCoordinate = ((Element) getFirstChildNodeByName(graphics, "offset")).getAttribute(coordinateName);
 			if (offsetCoordinate.length() > 0) {
-				return Double.valueOf(offsetCoordinate);
+				return Double.parseDouble(offsetCoordinate);
 			}
 		}
 
@@ -799,7 +797,7 @@ public class TapnLegacyXmlLoader {
 
 			String posCoordinate = ((Element) getFirstChildNodeByName(e, "position")).getAttribute(coordinateName);
 			if (posCoordinate.length() > 0) {
-				return Double.valueOf(posCoordinate);
+				return Double.parseDouble(posCoordinate);
 			}
 		}
 
