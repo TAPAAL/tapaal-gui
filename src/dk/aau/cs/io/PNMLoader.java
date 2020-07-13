@@ -321,8 +321,8 @@ public class PNMLoader {
 						String arcTempX = position.getAttribute("x");
 						String arcTempY = position.getAttribute("y");
 
-						double arcPointX = Double.valueOf(arcTempX);
-                        double arcPointY = Double.valueOf(arcTempY);
+						double arcPointX = Double.parseDouble(arcTempX);
+                        double arcPointY = Double.parseDouble(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						
@@ -364,8 +364,8 @@ public class PNMLoader {
 		String x = offset.getAttribute("x");
 		String y = offset.getAttribute("y");
 		
-                int xd = Math.round(Float.valueOf(x));
-                int yd = Math.round(Float.valueOf(y));
+                int xd = Math.round(Float.parseFloat(x));
+                int yd = Math.round(Float.parseFloat(y));
                
 		return new Point(xd, yd);
 	}

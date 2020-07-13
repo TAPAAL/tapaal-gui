@@ -77,34 +77,34 @@ public class VerifyDTAPNOutputParser {
 				} else {
 					matcher = discoveredPattern.matcher(line);
 					if(matcher.find()){
-						discovered = Integer.valueOf(matcher.group(1));
+						discovered = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = exploredPattern.matcher(line);
 					if(matcher.find()){
-						explored = Integer.valueOf(matcher.group(1));
+						explored = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = storedPattern.matcher(line);
 					if(matcher.find()){
-						stored = Integer.valueOf(matcher.group(1));
+						stored = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = maxUsedTokensPattern.matcher(line);
 					if(matcher.find()){
-						maxUsedTokens = Integer.valueOf(matcher.group(2));
+						maxUsedTokens = Integer.parseInt(matcher.group(2));
 						String operator = matcher.group(1) == null ? "" : matcher.group(1);
 						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
 					}
 					
 					matcher = wfMinExecutionPattern.matcher(line);
 					if(matcher.find()){
-						WFminExecutionTime = Integer.valueOf(matcher.group(1));
+						WFminExecutionTime = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = wfMaxExecutionPattern.matcher(line);
 					if(matcher.find()){
-						WFmaxExecutionTime = Integer.valueOf(matcher.group(1));
+						WFmaxExecutionTime = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = wfCoveredMarkingPattern.matcher(line);

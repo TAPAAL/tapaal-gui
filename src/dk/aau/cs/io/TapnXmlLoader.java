@@ -313,23 +313,23 @@ public class TapnXmlLoader {
 		String text = annotation.getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage) + 1;
+			positionXInput = Integer.parseInt(positionXTempStorage) + 1;
 		}
 
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage) + 1;
+			positionYInput = Integer.parseInt(positionYTempStorage) + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp) + 1;
+			widthInput = Integer.parseInt(widthTemp) + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp) + 1;
+			heightInput = Integer.parseInt(heightTemp) + 1;
 		}
 
 		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp);
+			borderInput = Boolean.parseBoolean(borderTemp);
 		} else {
 			borderInput = true;
 		}
@@ -511,8 +511,7 @@ public class TapnXmlLoader {
                                                               PlaceTransitionObject targetIn,
                                                               int _endx, int _endy, Template template, Weight weight) throws FormatException {
 
-		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(
-            sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.valueOf(inscriptionTempStorage) : 1), idInput);
+		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.parseInt(inscriptionTempStorage) : 1), idInput);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());
@@ -667,11 +666,11 @@ public class TapnXmlLoader {
 						// Wierd naming convention in pipe: this represents if
 						// the arc point is a curve point or not
 						String arcTempType = element.getAttribute("arcPointType");
-						double arcPointX = Double.valueOf(arcTempX);
-						double arcPointY = Double.valueOf(arcTempY);
+						double arcPointX = Double.parseDouble(arcTempX);
+						double arcPointY = Double.parseDouble(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType);
+						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
 				}
