@@ -65,20 +65,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction createAction = new GuiAction("New", "Create a new Petri net", KeyStroke.getKeyStroke('N', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::showNewPNDialog);
-            addNetPropertyInfo();
         }
     };
     private final GuiAction openAction = new GuiAction("Open", "Open", KeyStroke.getKeyStroke('O', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::openTAPNFile);
-            addNetPropertyInfo();
         }
     };
     private final GuiAction closeAction = new GuiAction("Close", "Close the current tab", KeyStroke.getKeyStroke('W', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             TabContent index = (TabContent) appTab.getSelectedComponent();
             guiFrameController.ifPresent(o -> o.closeTab(index));
-            addNetPropertyInfo();
         }
     };
     private final GuiAction saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey)) {
@@ -500,6 +497,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     @Override
                     protected void closeTab(TabContent tab) {
                         GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
+                        addNetPropertyInfo();
                     }
                 };
             }
@@ -1278,6 +1276,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 break;
             case noNet:
+                removeNetPropertyInfo();
                 break;
 
             default:
@@ -1676,5 +1675,4 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             }
         }
     }
-
 }

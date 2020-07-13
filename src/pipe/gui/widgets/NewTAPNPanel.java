@@ -166,26 +166,26 @@ public class NewTAPNPanel extends JPanel {
         JPanel isTimedPanel = new JPanel(new GridBagLayout());
         ButtonGroup isTimedRadioButtonGroup = new ButtonGroup();
 
-        JRadioButton untimedNet = new JRadioButton("Untimed net");
-        untimedNet.setSelected(true);
+        timedNet = new JRadioButton("Timed net");
+        timedNet.setSelected(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
-        isTimedPanel.add(untimedNet, gbc);
-        isTimedRadioButtonGroup.add(untimedNet);
+        isTimedPanel.add(timedNet, gbc);
+        isTimedRadioButtonGroup.add(timedNet);
 
-        timedNet = new JRadioButton("Timed net");
+        JRadioButton untimedNet = new JRadioButton("Untimed net");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
-        isTimedPanel.add(timedNet, gbc);
-        isTimedRadioButtonGroup.add(timedNet);
+        isTimedPanel.add(untimedNet, gbc);
+        isTimedRadioButtonGroup.add(untimedNet);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
