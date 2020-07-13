@@ -469,7 +469,8 @@ ReductionOption reductionOption;
 		try {
 			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
-			System.err.println("No query was specified: " + e.getStackTrace().toString());
+			System.err.println("No query was specified: " + e);
+			e.printStackTrace();
 		}
 		return query;
 	}

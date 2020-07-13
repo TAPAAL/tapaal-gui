@@ -644,7 +644,8 @@ public class BatchProcessingLoader {
 		try {
 			query = XMLCTLQueryParser.parse(queryElement);
 		} catch (XMLQueryParseException e) {
-			System.err.println("No query was specified: " + e.getStackTrace().toString());
+			System.err.println("No query was specified: " + e);
+			e.printStackTrace();
 		}
 		
 		return query;
@@ -656,7 +657,8 @@ public class BatchProcessingLoader {
 		try {
 			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
-			System.err.println("No query was specified: " + e.getStackTrace().toString());
+			System.err.println("No query was specified: " + e);
+			e.printStackTrace();
 		}
 		return query;
 	}
