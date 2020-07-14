@@ -32,7 +32,7 @@ public class TimedArcPetriNet {
 	public TimedArcPetriNet(String name) {
 		setName(name);
 		isActive = true;
-		isTimed = isUntimed();
+		isTimed = !isUntimed();
 		isGame = false;
 	}
 
