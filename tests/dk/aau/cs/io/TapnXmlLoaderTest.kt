@@ -110,6 +110,27 @@ internal class TapnXmlLoaderTest {
         }
 
         @Test
+        fun `SharedPlace has a token bug#1887512`() {
+            val net = """
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+                  <shared-place initialMarking="1" invariant="&lt; inf" name="P0"/>
+                  <net active="true" id="IntroExample" type="P/T net">
+                    <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="105" positionY="30"/>
+                  </net>
+                 </pnml>
+            """.trimIndent().asInpurtStream()
+
+            val tapnXmlLoader = TapnXmlLoader()
+
+            val model = tapnXmlLoader.load(net)
+            val place = model.templates().first().guiModel().getPlaceByName("P0") as TimedPlaceComponent
+
+            Assertions.assertEquals(1, place.numberOfTokens)
+            Assertions.assertEquals(BigDecimal.ZERO, place.underlyingPlace().tokens().first().age())
+        }
+
+        @Test
         fun `Place has 5 token`() {
             val net = xmlNet("""
                     <place displayName="true" id="Start" initialMarking="5" invariant="&lt; inf" name="Start" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="30.0"/>
