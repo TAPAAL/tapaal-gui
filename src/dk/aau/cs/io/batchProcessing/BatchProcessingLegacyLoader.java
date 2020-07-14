@@ -101,7 +101,7 @@ public class BatchProcessingLegacyLoader {
 		
 		checkThatQueriesUseExistingPlaces(network);
 		
-		return new LoadedBatchProcessingModel(network, queries);
+		return null;//new LoadedBatchProcessingModel(network, queries);
 	}
 
 	private void checkThatQueriesUseExistingPlaces(TimedArcPetriNetNetwork network) {

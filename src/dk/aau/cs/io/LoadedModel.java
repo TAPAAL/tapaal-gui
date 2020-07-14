@@ -8,7 +8,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-public class LoadedModel  {
+public class LoadedModel implements LoadedBatchProcessingModel {
 	private final Collection<Template> templates;
 	private final Collection<TAPNQuery> queries;
 	private final TimedArcPetriNetNetwork network;

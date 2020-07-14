@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
+import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 
 public class ModelLoader {
 

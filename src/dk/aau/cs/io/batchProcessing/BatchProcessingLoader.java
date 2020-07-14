@@ -100,7 +100,7 @@ public class BatchProcessingLoader {
 		Collection<TAPNQuery> queries = parseQueries(doc, network);
 
 		network.buildConstraints();
-		return new LoadedBatchProcessingModel(network, queries);
+		return null;//new LoadedBatchProcessingModel(network, queries);
 	}
 
 
