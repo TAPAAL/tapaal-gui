@@ -304,6 +304,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
                     return;
                 }finally {
                     CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
