@@ -12,8 +12,10 @@ import java.util.HashSet;
 public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
-	private boolean isActive;
-	
+    private boolean isActive;
+    public boolean isTimed;
+    public boolean isGame;
+
 	//Should the names be checked to see if the name is already used 
 	//This is used when loading big nets as the checking  of names is slow.
 	private boolean checkNames = true; 
@@ -30,7 +32,16 @@ public class TimedArcPetriNet {
 	public TimedArcPetriNet(String name) {
 		setName(name);
 		isActive = true;
+		isTimed = isUntimed();
+		isGame = false;
 	}
+
+    public TimedArcPetriNet(String name, boolean isTimed, boolean isGame) {
+        setName(name);
+        isActive = true;
+        this.isTimed = isTimed;
+        this.isGame = isGame;
+    }
 
 	public TimedMarking marking(){
 		return currentMarking;
@@ -287,7 +298,7 @@ public class TimedArcPetriNet {
 	}
 
 	public TimedArcPetriNet copy() {
-		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name, isTimed, isGame);
 
 		for(TimedPlace p : places) {
 
@@ -614,7 +625,7 @@ public class TimedArcPetriNet {
 			}
 		}
 		
-		return true;
+		return !isTimed;
 	}
 	
 	public boolean hasUrgentTransitions() {

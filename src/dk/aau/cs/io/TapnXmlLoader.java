@@ -219,11 +219,19 @@ public class TapnXmlLoader {
 	}
 
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
-		String name = getTAPNName(tapnNode);
+        TimedArcPetriNet tapn;
+        String name = getTAPNName(tapnNode);
 
 		boolean active = getActiveStatus(tapnNode);
+
+		if (canGetInfo(tapnNode)) {
+            boolean isTimed = getInfo(tapnNode, "timed");
+            boolean isGame = getInfo(tapnNode, "game");
+            tapn = new TimedArcPetriNet(name, isTimed, isGame);
+        } else {
+            tapn = new TimedArcPetriNet(name);
+        }
 		
-		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		tapn.setActive(active);
 		network.add(tapn);
 		nameGenerator.add(tapn);
@@ -244,18 +252,41 @@ public class TapnXmlLoader {
 	}
 
 	private boolean getActiveStatus(Node tapnNode) {
-		if (tapnNode instanceof Element) {
-			Element element = (Element)tapnNode;
-			String activeString = element.getAttribute("active");
-			
-			if (activeString == null || activeString.equals(""))
-				return true;
-			else
-				return activeString.equals("true");
-		} else {
-			return true;
-		}
-	}
+        if (tapnNode instanceof Element) {
+            Element element = (Element)tapnNode;
+            String activeString = element.getAttribute("active");
+
+            if (activeString == null || activeString.equals(""))
+                return true;
+            else
+                return activeString.equals("true");
+        } else {
+            return true;
+        }
+    }
+
+    private boolean getInfo(Node tapnNode, String attribute) {
+            Element element = (Element)tapnNode;
+            String string = element.getAttribute(attribute);
+            return string.equals("true");
+    }
+
+    private boolean canGetInfo(Node tapnNode) {
+        if (tapnNode instanceof Element) {
+            Element element = (Element)tapnNode;
+            String timedString = element.getAttribute("timed");
+            String gameString = element.getAttribute("game");
+
+            if (timedString == null || timedString.equals("") ||
+                gameString == null || gameString.equals("")) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
 
 	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		if ("labels".equals(element.getNodeName())) {

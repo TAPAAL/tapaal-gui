@@ -232,10 +232,18 @@ public class BatchProcessingLoader {
 	}
 
 	private void parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
-		String name = getTAPNName(tapnNode);
+        TimedArcPetriNet tapn;
+        String name = getTAPNName(tapnNode);
 		boolean active = getActiveStatus(tapnNode);
 
-		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
+		if (canGetInfo(tapnNode)) {
+            boolean isTimed = getInfo(tapnNode, "timed");
+            boolean isGame = getInfo(tapnNode, "game");
+            tapn = new TimedArcPetriNet(name, isTimed, isGame);
+        } else {
+            tapn = new TimedArcPetriNet(name);
+        }
+
 		tapn.setActive(active);
 		network.add(tapn);
 		nameGenerator.add(tapn);
@@ -262,6 +270,29 @@ public class BatchProcessingLoader {
 			return true;
 		}
 	}
+
+    private boolean getInfo(Node tapnNode, String attribute) {
+        Element element = (Element)tapnNode;
+        String string = element.getAttribute(attribute);
+        return string.equals("true");
+    }
+
+    private boolean canGetInfo(Node tapnNode) {
+        if (tapnNode instanceof Element) {
+            Element element = (Element)tapnNode;
+            String timedString = element.getAttribute("timed");
+            String gameString = element.getAttribute("game");
+
+            if (timedString == null || timedString.equals("") ||
+                gameString == null || gameString.equals("")) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
 
 	private void parseElement(Element element, TimedArcPetriNet tapn, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		if ("place".equals(element.getNodeName())) {

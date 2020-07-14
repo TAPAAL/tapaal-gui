@@ -476,7 +476,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), !loadedModel.network().isUntimed(), false);
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), !loadedModel.network().isUntimed(), loadedModel.network().isGame());
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
@@ -495,7 +495,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		//Set Default Template
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
-		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
+		Template template = new Template(new TimedArcPetriNet(templateName, isTimed, isGame), new DataLayer(), new Zoomer());
 		tab.addTemplate(template);
 
 		return tab;

@@ -754,7 +754,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	public Template createNewTemplate(String name) {
-		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name, parent.isNetTimed(), parent.isNetGame());
 
 		return new Template(tapn, new DataLayer(), new Zoomer());
 	}

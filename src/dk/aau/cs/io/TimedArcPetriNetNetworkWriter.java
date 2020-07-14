@@ -194,8 +194,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 			Attr netAttrType = document.createAttribute("type");
 			netAttrType.setValue("P/T net");
-
 			NET.setAttributeNode(netAttrType);
+
+            Attr netAttrTimed = document.createAttribute("timed");
+            netAttrTimed.setValue(tapn.model().isUntimed() ? "false" : "true");
+            NET.setAttributeNode(netAttrTimed);
+
+            Attr netAttrGame = document.createAttribute("game");
+            netAttrGame.setValue("false");
+            NET.setAttributeNode(netAttrGame);
 
 			appendAnnotationNotes(document, guiModel, NET);
 			appendPlaces(document, guiModel, NET);
