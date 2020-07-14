@@ -302,8 +302,9 @@ ReductionOption reductionOption;
 		String name = constantElement.getAttribute("name");
 		int value = Integer.parseInt(constantElement.getAttribute("value"));
 
-		if (!name.isEmpty() && !name.equals(""))
-			constants.add(new Constant(name, value));
+		if (!name.isEmpty()) {
+            constants.add(new Constant(name, value));
+        }
 	}
 
 	// //////////////////////////////////////////////////////////
