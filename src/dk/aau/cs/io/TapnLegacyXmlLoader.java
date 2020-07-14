@@ -69,26 +69,20 @@ public class TapnLegacyXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
 	private static final String SYMMETRY = "SYMMETRY";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
-	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs;
-	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs;
-	private final HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals;
+	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+	private final HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
-	private ArrayList<TAPNQuery> queries;
-	private final ConstantStore constants;
+	private ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
+	private final ConstantStore constants = new ConstantStore();
 	private final NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
 
-	public TapnLegacyXmlLoader() {
-		presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
-		postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
-		transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
-		queries = new ArrayList<TAPNQuery>();
-		constants = new ConstantStore();
-	}
+	public TapnLegacyXmlLoader() {}
 	
 	public LoadedModel load(InputStream file) throws FormatException {
 		Require.that(file != null, "file must be non-null and exist");
