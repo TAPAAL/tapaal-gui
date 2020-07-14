@@ -229,7 +229,7 @@ public class BatchProcessingLegacyLoader {
 	}
 
 	private ReductionOption getQueryReductionOption(Element queryElement) {
-ReductionOption reductionOption;
+        ReductionOption reductionOption;
 		
 		String reductionString = queryElement.getAttribute("reductionOption");
 		String reductionName = "";
