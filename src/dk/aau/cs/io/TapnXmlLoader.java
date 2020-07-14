@@ -69,8 +69,9 @@ public class TapnXmlLoader {
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
+    private final Collection<String> messages = new ArrayList<>(10);
 
-	public TapnXmlLoader() {
+    public TapnXmlLoader() {
 	}
 
 	public LoadedModel load(InputStream file) throws FormatException {
@@ -125,7 +126,7 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 		
-		return new LoadedModel(network, templates, queries);
+		return new LoadedModel(network, templates, queries, messages);
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -156,7 +157,7 @@ public class TapnXmlLoader {
 		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
 			name = "_" + name;
 			if(firstPlaceRenameWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				messages.add(PLACENAME_ERROR_MESSAGE);
 				firstPlaceRenameWarning = false;
 			}
 		}
@@ -407,7 +408,7 @@ public class TapnXmlLoader {
 		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
 			nameInput = "_" + nameInput;
 			if(firstPlaceRenameWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+                messages.add(PLACENAME_ERROR_MESSAGE);
 				firstPlaceRenameWarning = false;
 			}
 		}
@@ -638,7 +639,7 @@ public class TapnXmlLoader {
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 		
 		if(!interval.equals(TimeInterval.ZERO_INF) && firstInhibitorIntervalWarning) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).", "Unsupported Interval Detected on Inhibitor Arc", JOptionPane.INFORMATION_MESSAGE);
+            messages.add("The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).");
 			firstInhibitorIntervalWarning = false;
 		}
 		

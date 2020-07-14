@@ -8,10 +8,10 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 public class LoadedBatchProcessingModel{
 	private final Collection<TAPNQuery> queries;
 	private final TimedArcPetriNetNetwork network;
-	
+
 	public LoadedBatchProcessingModel(TimedArcPetriNetNetwork network, Collection<TAPNQuery> queries){
 		this.network = network;
-		this.queries = queries; 
+		this.queries = queries;
 	}
 
 	public Collection<TAPNQuery> queries(){ return queries; }
