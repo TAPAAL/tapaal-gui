@@ -6,6 +6,8 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Optional;
 import dk.aau.cs.gui.undo.Command;
+import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Pipe;
@@ -27,9 +29,9 @@ public class UndoManager {
 
 	private final ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private Optional<GuiFrameActions> app = Optional.empty();
-	public void setApp(GuiFrameActions app) {
-		this.app = Optional.ofNullable(app);
+	private Reference<GuiFrameActions> app = new MutableReference();
+	public void setApp(Reference<GuiFrameActions> app) {
+		this.app = app;
 
 		// Undo/Redo is enabled based on undo/redo manager
 		setUndoRedoStatus();

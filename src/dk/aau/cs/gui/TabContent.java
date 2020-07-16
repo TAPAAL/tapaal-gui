@@ -1645,12 +1645,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     /* GUI Model / Actions */
 
-	Optional<GuiFrameActions>  app = Optional.empty();
-	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
+	private final MutableReference<GuiFrameActions> app = new MutableReference<>();
+	private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 	@Override
 	public void setApp(GuiFrameActions newApp) {
-		this.app = Optional.ofNullable(newApp);
-		undoManager.setApp(newApp);
+		app.setReference(newApp);
+		undoManager.setApp(app);
 
 		//XXX
 		if (isInAnimationMode()) {
