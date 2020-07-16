@@ -23,24 +23,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		super(obj);
 	}
 
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected())) {
-			return;
-		}
-
-		int rotation = 0;
-		if (e.getWheelRotation() < 0) {
-			rotation = -e.getWheelRotation() * 135;
-		} else {
-			rotation = e.getWheelRotation() * 45;
-		}
-
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) myObject).rotate(rotation));
-
-	}
-
 	/**
 	 * Creates the popup menu that the user will see when they right click on a
 	 * component

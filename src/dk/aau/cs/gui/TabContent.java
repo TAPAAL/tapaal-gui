@@ -2467,13 +2467,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
             registerEvent(
                 e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
-                e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), e.e)
+                e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), ((MouseWheelEvent) e.e))
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
             );
 
         }
 
-        private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseEvent e) {
-            if (((MouseWheelEvent) e).getWheelRotation() < 0) {
+        private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
+            int rotation = 0;
+            if (e.getWheelRotation() < 0) {
+                rotation = -e.getWheelRotation() * 135;
+            } else {
+                rotation = e.getWheelRotation() * 45;
+            }
+
+            CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+        }
+
+        private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
+            if (e.getWheelRotation() < 0) {
                 guiModelManager.addToken(getModel(), p, 1);
             } else {
                 guiModelManager.removeToken(getModel(), p, 1);
