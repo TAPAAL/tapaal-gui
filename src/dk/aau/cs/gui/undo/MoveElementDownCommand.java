@@ -6,10 +6,10 @@ import pipe.gui.widgets.SidePane;
 import javax.swing.*;
 
 public class MoveElementDownCommand extends Command{
-    int oldIndex;
-    int newIndex;
-    SidePane sidePane;
-    JList<Template> templateList;
+    final int oldIndex;
+    final int newIndex;
+    final SidePane sidePane;
+
     public MoveElementDownCommand(SidePane sidePane, int oldIndex, int newIndex){
         this.oldIndex = oldIndex;
         this.newIndex = newIndex;

@@ -5,7 +5,7 @@ import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
 
 public class AddTemplateCommand extends Command {
-	protected Template template;
+	protected final Template template;
 	protected final TemplateExplorer templateExplorer;
 	private final int listIndex;
 

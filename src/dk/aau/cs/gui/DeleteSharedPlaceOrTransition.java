@@ -54,13 +54,13 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
 	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place is used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
 	
-	JList list;
-	SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel;
-	TabContent tab;
-	UndoManager undoManager;
-	SharedPlacesListModel sharedPlacesListModel;
-	SharedTransitionsListModel sharedTransitionsListModel;
-	NameGenerator nameGenerator;
+	final JList list;
+	final SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel;
+	final TabContent tab;
+	final UndoManager undoManager;
+	final SharedPlacesListModel sharedPlacesListModel;
+	final SharedTransitionsListModel sharedTransitionsListModel;
+	final NameGenerator nameGenerator;
 	boolean messageShown;
 	
 	public DeleteSharedPlaceOrTransition(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, TabContent tab, 
@@ -321,8 +321,8 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	}
 	
 	private static class DeleteSharedResult{
-		public int choice;
-		public boolean deleteFromTemplates;
+		public final int choice;
+		public final boolean deleteFromTemplates;
 		
 		public DeleteSharedResult(int choice, boolean deleteFromTemplates) {
 			this.choice = choice;

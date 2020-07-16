@@ -10,10 +10,10 @@ import pipe.dataLayer.Template;
 
 public class SortTemplatesCommand extends Command{
 	TimedArcPetriNet[] oldOrder;
-	TabContent tabContent; 
-	TemplateExplorer templateExplorer;
-	JList<Template> templateList;
-	DefaultListModel<Template> listModel;
+	final TabContent tabContent;
+	final TemplateExplorer templateExplorer;
+	final JList<Template> templateList;
+	final DefaultListModel<Template> listModel;
 	
 	public SortTemplatesCommand(TabContent tabContent, TemplateExplorer templateExplorer, JList<Template> templateList, DefaultListModel<Template> listModel) {
 		this.templateList = templateList;

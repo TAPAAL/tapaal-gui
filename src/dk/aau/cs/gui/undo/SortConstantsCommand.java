@@ -6,8 +6,8 @@ import dk.aau.cs.model.tapn.Constant;
 
 public class SortConstantsCommand extends Command{
 	
-	TabContent tabContent;
-	ConstantsPane constantsPane;
+	final TabContent tabContent;
+	final ConstantsPane constantsPane;
 	Constant[] oldOrder;
 	
 	public SortConstantsCommand(TabContent tabContent, ConstantsPane constantsPane) {
