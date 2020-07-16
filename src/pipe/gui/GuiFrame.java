@@ -53,17 +53,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
-    private final ExtendedJTabbedPane<TabContent> appTab = new ExtendedJTabbedPane<TabContent>() {
-        @Override
-        public Component generator() {
-            return new TabComponent(this) {
-                @Override
-                protected void closeTab(TabContent tab) {
-                    GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
-                }
-            };
-        }
-    };
+    private final ExtendedJTabbedPane<TabContent> appTab;
 
     private final StatusBar statusBar;
     private JMenuBar menuBar;
@@ -497,7 +487,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         this.setMinimumSize(new Dimension(825, 480));
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
+        appTab = new ExtendedJTabbedPane<TabContent>() {
+            @Override
+            public Component generator() {
+                return new TabComponent(this) {
+                    @Override
+                    protected void closeTab(TabContent tab) {
+                        GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
+                    }
+                };
+            }
+        };
         getContentPane().add(appTab);
         setChangeListenerOnTab(); // sets Tab properties
 
