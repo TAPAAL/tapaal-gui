@@ -62,8 +62,6 @@ public class RunVerification extends RunVerificationBase {
 				);
 	
 				if (result.getTrace() != null) {
-					CreateGui.getApp().setGUIMode(GUIMode.animation);
-	
 					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}

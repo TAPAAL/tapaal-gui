@@ -240,7 +240,6 @@ public class WorkflowDialog extends JDialog {
 	private void switchToTrace(TAPNNetworkTrace trace){
 		isInTraceMode = true;
 		setVisible(false);
-		CreateGui.getApp().setGUIMode(GUIMode.animation);
 		CreateGui.getAnimator().setTrace(trace);
 	}
 

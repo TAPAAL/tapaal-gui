@@ -175,7 +175,6 @@ public class TraceImportExport {
             TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
             TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
 
-            CreateGui.getApp().setGUIMode(pipe.gui.GuiFrame.GUIMode.animation);
             CreateGui.getAnimator().setTrace(decomposer.decompose());
 
         } catch (FileNotFoundException e) {
