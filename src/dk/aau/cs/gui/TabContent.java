@@ -2427,6 +2427,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
                 e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
             );
+            registerEvent(
+                e->e.pno instanceof TimedOutputArcComponent && e.a == MouseAction.doubleClicked && !e.e.isControlDown(),
+                e -> ((TimedOutputArcComponent) e.pno).showTimeIntervalEditor()
+            );
 
         }
 
