@@ -28,7 +28,7 @@ public class Degree2Pairing extends Pairing {
 		Require.that(presetSize == postsetSize, "The provided model is not conservative");
 		Require.that(presetSize <= 2, "The provided model is more than degree 2");
 
-		if(getTransition().presetSize() == 0)
+		if(getTransition().presetSizeWithoutInhibitorArcs() == 0)
 			return;
 		else if(getTransition().getInputArcs().size() == 1)
 			add(getTransition().getInputArcs().get(0), getTransition().getOutputArcs().get(0));
