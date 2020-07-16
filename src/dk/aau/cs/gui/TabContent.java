@@ -1,19 +1,9 @@
 package dk.aau.cs.gui;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
@@ -21,32 +11,40 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
-
-import pipe.dataLayer.*;
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
 import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.undo.ChangeSpacingEdit;
-import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.*;
-
-import net.tapaal.swinghelpers.JSplitPaneFix;
-import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
-import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.util.Require;
+import pipe.gui.widgets.QueryPane;
+import pipe.gui.widgets.WorkflowDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.*;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
@@ -1413,7 +1411,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
-				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
+                switchToAnimationComponents(true);
 
 				setManager(animationModeController);
 
@@ -1449,11 +1448,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 						"You need at least one active template to enter simulation mode",
 						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				animationmode = false;
-				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+                app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			}
 		} else {
 			drawingSurface().getSelectionObject().clearSelection();
-			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+            app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
+
+            if (isInAnimationMode()) {
+                getAnimator().restoreModel();
+            }
+
+            switchToEditorComponents();
+
 			setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
@@ -2233,7 +2239,23 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				((TimedTransitionComponent) pto).showDInterval(false);
 			}
 		}
-	}
+
+        @Override
+        public void deregisterManager() {
+            //Remove all mouse-over menus if we exit animation mode
+            ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
+
+            for (PetriNetObject pn : selection) {
+                if (pn instanceof TimedPlaceComponent) {
+                    TimedPlaceComponent place = (TimedPlaceComponent) pn;
+                    place.showAgeOfTokens(false);
+                } else if (pn instanceof TimedTransitionComponent) {
+                    TimedTransitionComponent transition = (TimedTransitionComponent) pn;
+                    transition.showDInterval(false);
+                }
+            }
+        }
+    }
 
 
     MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);

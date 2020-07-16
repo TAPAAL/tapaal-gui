@@ -487,7 +487,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         this.setMinimumSize(new Dimension(825, 480));
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        appTab = new ExtendedJTabbedPane<TabContent>() {
+        appTab= new ExtendedJTabbedPane<TabContent>() {
             @Override
             public Component generator() {
                 return new TabComponent(this) {
@@ -1247,16 +1247,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 // Enable all draw actions
                 startAction.setSelected(false);
 
-                if (getCurrentTab().isInAnimationMode()) {
-                    getCurrentTab().getAnimator().restoreModel();
-                    hideComponentWindow();
-                }
-
-                getCurrentTab().switchToEditorComponents();
-
                 break;
             case animation:
-                getCurrentTab().switchToAnimationComponents(true);
                 startAction.setSelected(true);
 
                 break;
@@ -1281,20 +1273,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         a.setUndecorated(true);
         a.setVisible(true);
         a.dispose();
-    }
-
-    private void hideComponentWindow() {
-        ArrayList<PetriNetObject> selection = getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
-
-        for (PetriNetObject pn : selection) {
-            if (pn instanceof TimedPlaceComponent) {
-                TimedPlaceComponent place = (TimedPlaceComponent) pn;
-                place.showAgeOfTokens(false);
-            } else if (pn instanceof TimedTransitionComponent) {
-                TimedTransitionComponent transition = (TimedTransitionComponent) pn;
-                transition.showDInterval(false);
-            }
-        }
     }
 
     //XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
