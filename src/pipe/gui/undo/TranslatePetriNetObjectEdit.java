@@ -15,10 +15,10 @@ import dk.aau.cs.gui.undo.Command;
  */
 public class TranslatePetriNetObjectEdit extends Command {
 
-	PetriNetObject pnObject;
-	Integer transX;
-	Integer transY;
-	DrawingSurfaceImpl ds;
+	final PetriNetObject pnObject;
+	final Integer transX;
+	final Integer transY;
+	final DrawingSurfaceImpl ds;
 
 	/** Creates a new instance of */
 	public TranslatePetriNetObjectEdit(PetriNetObject _pnObject, Integer _transX, Integer _transY, DrawingSurfaceImpl drawingSurface) {

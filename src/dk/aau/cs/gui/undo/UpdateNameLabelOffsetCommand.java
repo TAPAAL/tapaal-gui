@@ -3,8 +3,11 @@ package dk.aau.cs.gui.undo;
 import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 
 public class UpdateNameLabelOffsetCommand extends Command {
-	int newXOffset, newYOffset, oldXOffset, oldYOffset;
-	PetriNetObjectWithLabel obj;
+	final int newXOffset;
+    final int newYOffset;
+    final int oldXOffset;
+    final int oldYOffset;
+	final PetriNetObjectWithLabel obj;
 	
 	public UpdateNameLabelOffsetCommand(int newXOffset, int newYOffset, int oldXOffset, int oldYOffset, PetriNetObjectWithLabel obj) {
 		this.obj = obj;

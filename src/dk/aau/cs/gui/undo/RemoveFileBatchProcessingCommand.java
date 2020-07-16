@@ -10,8 +10,8 @@ import java.util.List;
 
 public class RemoveFileBatchProcessingCommand extends Command{
     private final DefaultListModel<File> listModel;
-    List<File> files;
-    File file;
+    final List<File> files;
+    final File file;
     private final BatchProcessingDialog dialog;
     public RemoveFileBatchProcessingCommand(DefaultListModel<File> listModel, File file, List<File> files, BatchProcessingDialog dialog){
         this.listModel = listModel;

@@ -217,18 +217,18 @@ public class CTLQueryDialog extends JPanel {
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
-	private boolean isNetDegree2;
-	private boolean hasInhibitorArcs;
-	private InclusionPlaces inclusionPlaces;
+	private final boolean isNetDegree2;
+	private final boolean hasInhibitorArcs;
+	private final InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
-	private String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
-	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
-	private String name_STANDARD = "UPPAAL: Standard Reduction";
+	private final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
+	private final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
+	private final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
+	private final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
+	private final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	
 	private boolean userChangedAtomicPropSelection = true;
 
@@ -2530,8 +2530,8 @@ public class CTLQueryDialog extends JPanel {
 	
 	public class QueryConstructionEdit extends AbstractUndoableEdit {
 
-		private TCTLAbstractProperty original;
-		private TCTLAbstractProperty replacement;
+		private final TCTLAbstractProperty original;
+		private final TCTLAbstractProperty replacement;
 
 		public TCTLAbstractProperty getOriginal() {
 			return original;

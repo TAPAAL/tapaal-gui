@@ -33,8 +33,8 @@ import java.util.List;
 
 public class GuiFrameController implements GuiFrameControllerActions{
 
-    GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
-    GuiFrameActions guiFrame;
+    final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
+    final GuiFrameActions guiFrame;
 
     final MutableReference<TabContentActions> currentTab = new MutableReference<>();
 

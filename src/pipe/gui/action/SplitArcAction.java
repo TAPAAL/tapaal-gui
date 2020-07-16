@@ -17,7 +17,7 @@ import pipe.gui.graphicElements.Arc;
 public class SplitArcAction extends javax.swing.AbstractAction {
 
 	private final Arc selected;
-	Point2D.Double mouseposition;
+	private final Point2D.Double mouseposition;
 
 	public SplitArcAction(Arc arc, Point mousepos) {
 		selected = arc;

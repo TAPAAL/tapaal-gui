@@ -13,7 +13,7 @@ import dk.aau.cs.gui.undo.Command;
  */
 public class AnnotationBorderEdit extends Command {
 
-	Note note;
+	final Note note;
 
 	/** Creates a new instance of placeRateEdit */
 	public AnnotationBorderEdit(Note _note) {
