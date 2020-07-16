@@ -12,7 +12,6 @@ public class MovePlaceTransitionObject extends Command {
 	private final PlaceTransitionObject objectToBeMoved;
 	private final int oldY;
 	private final int oldX;
-	private boolean doUpdate = false;
 	
 	
 	public MovePlaceTransitionObject(PlaceTransitionObject object, Point point) {
@@ -39,13 +38,11 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved.setOriginalX(newX);
 		objectToBeMoved.setOriginalY(newY);
 		
-		if(doUpdate) {
-			objectToBeMoved.updateOnMoveOrZoom();
-			objectToBeMoved.repaint();
-			CreateGui.getDrawingSurface().updatePreferredSize();
-		}
-		doUpdate = true;
-		
+
+		objectToBeMoved.updateOnMoveOrZoom();
+		objectToBeMoved.repaint();
+		CreateGui.getDrawingSurface().updatePreferredSize();
+
 	}
 
 }
