@@ -37,9 +37,11 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.MenuDragMouseEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.io.*;
 import java.math.BigDecimal;
@@ -312,6 +314,32 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
 
             return groupMaxCounter+1;
+        }
+
+        public void addToken(DataLayer d, TimedPlaceComponent p, int numberOfTokens) {
+	        Require.notNull(d, "Datalayer can't be null");
+	        Require.notNull(p, "TimedPlaceComponent can't be null");
+	        Require.that(numberOfTokens > 0, "Number of tokens to add must be strictly greater than 0");
+
+            Command command = new TimedPlaceMarkingEdit(p, numberOfTokens);
+            command.redo();
+            undoManager.addNewEdit(command);
+        }
+
+        public void removeToken(DataLayer d, TimedPlaceComponent p, int numberOfTokens) {
+            Require.notNull(d, "Datalayer can't be null");
+            Require.notNull(p, "TimedPlaceComponent can't be null");
+            Require.that(numberOfTokens > 0, "Number of tokens to remove must be strictly greater than 0");
+
+            //Can't remove more than the number of tokens
+            int tokensToRemove = Math.min(numberOfTokens, p.getNumberOfTokens());
+
+            //Ignore if number of tokens to remove is 0
+            if (tokensToRemove > 0) {
+                Command command = new TimedPlaceMarkingEdit(p, -tokensToRemove);
+                command.redo();
+                undoManager.addNewEdit(command);
+            }
         }
 
 
@@ -1492,14 +1520,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     public void registerEvents() {
                         registerEvent(
                             e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                            e -> guiModelManager.addToken(getModel(), (TimedPlaceComponent) e.pno, 1)
                         );
-                    }
-
-                    public void placeClicked(TimedPlaceComponent pno) {
-                        Command command = new TimedPlaceMarkingEdit(pno, 1);
-                        command.redo();
-                        undoManager.addNewEdit(command);
                     }
                 });
                 break;
@@ -1509,14 +1531,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     public void registerEvents() {
                         registerEvent(
                             e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                            e -> guiModelManager.removeToken(getModel(), (TimedPlaceComponent) e.pno, 1)
                         );
-                    }
-
-                    public void placeClicked(TimedPlaceComponent pno) {
-                        Command command = new TimedPlaceMarkingEdit(pno, -1);
-                        command.redo();
-                        undoManager.addNewEdit(command);
                     }
                 });
                 break;
@@ -2449,7 +2465,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
                 e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
             );
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), e.e)
+            );
 
+        }
+
+        private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseEvent e) {
+            if (((MouseWheelEvent) e).getWheelRotation() < 0) {
+                guiModelManager.addToken(getModel(), p, 1);
+            } else {
+                guiModelManager.removeToken(getModel(), p, 1);
+            }
         }
 
         private void arcDoubleClickedWithContrl(Arc arc, MouseEvent e) {

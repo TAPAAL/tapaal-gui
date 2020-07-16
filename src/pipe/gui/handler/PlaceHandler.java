@@ -49,17 +49,4 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		return popup;
 	}
 
-	@Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
-            return;
-        }
-
-        TimedPlaceComponent p = (TimedPlaceComponent) myObject;
-        if (e.getWheelRotation() < 0) {
-            p.underlyingPlace().addTokens(1);
-        } else {
-            p.underlyingPlace().removeTokens(1);
-        }
-    }
 }
