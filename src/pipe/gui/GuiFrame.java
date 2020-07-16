@@ -45,7 +45,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     // for zoom combobox and dropdown
     private final int[] zoomLevels = {40, 60, 80, 100, 120, 140, 160, 180, 200, 300};
 
-    private String frameTitle;
+    private final String frameTitle;
 
     private Pipe.ElementType mode;
 
@@ -53,9 +53,19 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
-    private ExtendedJTabbedPane<TabContent> appTab;
+    private final ExtendedJTabbedPane<TabContent> appTab = new ExtendedJTabbedPane<TabContent>() {
+        @Override
+        public Component generator() {
+            return new TabComponent(this) {
+                @Override
+                protected void closeTab(TabContent tab) {
+                    GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
+                }
+            };
+        }
+    };
 
-    private StatusBar statusBar;
+    private final StatusBar statusBar;
     private JMenuBar menuBar;
     private JToolBar drawingToolBar;
     private JComboBox<String> zoomComboBox;
@@ -350,7 +360,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleQueries);
         }
     };
-    private GuiAction showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('4', shortcutkey), true) {
+    private final GuiAction showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('4', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
         }
@@ -385,7 +395,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::showSimpleWorkspace);
         }
     };
-    private GuiAction saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
+    private final GuiAction saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::saveWorkspace);
         }
@@ -443,22 +453,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::stepBackwards);
         }
     };
-    private GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
+    private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::timeDelay);
         }
     };
-    private GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
+    private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::delayAndFire);
         }
     };
-    private GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
+    private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::previousComponent);
         }
     };
-    private GuiAction nextcomponentAction = new GuiAction("Next component", "Next component", "pressed DOWN") {
+    private final GuiAction nextcomponentAction = new GuiAction("Next component", "Next component", "pressed DOWN") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::nextComponent);
         }
@@ -488,19 +498,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        //XXX: Moved appTab from creategui needs further refacotring
-        //kyrke 2018-05-20
-        appTab = new ExtendedJTabbedPane<TabContent>() {
-            @Override
-            public Component generator() {
-                return new TabComponent(this) {
-                    @Override
-                    protected void closeTab(TabContent tab) {
-                        GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
-                    }
-                };
-            }
-        };
         getContentPane().add(appTab);
         setChangeListenerOnTab(); // sets Tab properties
 
@@ -602,11 +599,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private void buildMenus() {
         menuBar = new JMenuBar();
 
-        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-        menuBar.add(buildMenuFiles(shortcutkey));
-        menuBar.add(buildMenuEdit(shortcutkey));
-        menuBar.add(buildMenuView(shortcutkey));
+        menuBar.add(buildMenuFiles());
+        menuBar.add(buildMenuEdit());
+        menuBar.add(buildMenuView());
         menuBar.add(buildMenuDraw());
         menuBar.add(buildMenuAnimation());
         menuBar.add(buildMenuTools());
@@ -616,7 +611,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     }
 
-    private JMenu buildMenuEdit(int shortcutkey) {
+    private JMenu buildMenuEdit() {
 
         /* Edit Menu */
         JMenu editMenu = new JMenu("Edit");
@@ -671,7 +666,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return drawMenu;
     }
 
-    private JMenu buildMenuView(int shortcutkey) {
+    private JMenu buildMenuView() {
         /* ViewMenu */
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
@@ -785,8 +780,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         toolsMenu.add(netStatisticsAction).setMnemonic('i');
 
-
-        //JMenuItem batchProcessing = new JMenuItem("Batch processing");
         JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
         batchProcessing.setMnemonic('b');
         toolsMenu.add(batchProcessing);
@@ -799,7 +792,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         smartDrawDialog.setMnemonic('D');
         toolsMenu.add(smartDrawDialog);
 
-        //Stip off timing information
         JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction);
         stripTimeDialog.setMnemonic('e');
         toolsMenu.add(stripTimeDialog);
@@ -934,8 +926,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     currentTab.ifPresent(o -> o.zoomTo(zoomper));
                 }
             };
-
-            //JMenuItem newItem = new JMenuItem(a);
 
             zoomMenu.add(newZoomAction);
         }
@@ -1438,7 +1428,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return false;
     }
 
-    private JMenu buildMenuFiles(int shortcutkey) {
+    private JMenu buildMenuFiles() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
 
