@@ -10,8 +10,8 @@ public class MovePlaceTransitionObject extends Command {
 	private final int newY;
 	private final int newX;
 	private final PlaceTransitionObject objectToBeMoved;
-	private int oldY;
-	private int oldX;
+	private final int oldY;
+	private final int oldX;
 	private boolean doUpdate = false;
 	
 	
@@ -19,6 +19,8 @@ public class MovePlaceTransitionObject extends Command {
 		objectToBeMoved = object;
 		this.newX = point.x;
 		this.newY = point.y;
+        this.oldY = objectToBeMoved.getOriginalY();
+        this.oldX = objectToBeMoved.getOriginalX();
 	}
 
 	@Override
@@ -34,9 +36,6 @@ public class MovePlaceTransitionObject extends Command {
 
 	@Override
 	public void redo() {
-		oldY = objectToBeMoved.getOriginalY();
-		oldX = objectToBeMoved.getOriginalX();
-		
 		objectToBeMoved.setOriginalX(newX);
 		objectToBeMoved.setOriginalY(newY);
 		
