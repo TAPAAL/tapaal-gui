@@ -181,8 +181,8 @@ public class EnabledTransitionsList extends JPanel{
 			//Sort according to lower bound
 			int result = thisLower.compareTo(otherLower);
 			//According to strict non strict
-			if(result == 0 && this.transition.getDInterval().IsLowerBoundNonStrict() != o.transition.getDInterval().IsLowerBoundNonStrict()){
-				if(this.transition.getDInterval().IsLowerBoundNonStrict()){
+			if(result == 0 && this.transition.getDInterval().isLowerBoundNonStrict() != o.transition.getDInterval().isLowerBoundNonStrict()){
+				if(this.transition.getDInterval().isLowerBoundNonStrict()){
 					result = -1;
 				} else {
 					result = 1;

@@ -112,8 +112,8 @@ public class ConstantStore {
 		Bound lower = interval.lowerBound();
 		Bound upper = interval.upperBound();
 
-		int diff = interval.IsLowerBoundNonStrict()
-				&& interval.IsUpperBoundNonStrict() ? 0 : 1;
+		int diff = interval.isLowerBoundNonStrict()
+				&& interval.isUpperBoundNonStrict() ? 0 : 1;
 
 		if (lower instanceof ConstantBound && upper instanceof ConstantBound) {
 			Constant lowerConstant = getConstantByName(((ConstantBound) lower).name());

@@ -436,7 +436,7 @@ public class TimedArcPetriNet {
             numberOfOrphanPlaces += t.getOrphanPlaces().size();
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!((in.interval().lowerBound().value() == 0 && in.interval().isLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedInputArcs++;
@@ -447,7 +447,7 @@ public class TimedArcPetriNet {
 			}
 			//Test if all tansportarcs is untimed and get the number of untimed transport arcs
 			for(TransportArc in : t.transportArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!((in.interval().lowerBound().value() == 0 && in.interval().isLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedTransportArcs++;
@@ -629,13 +629,13 @@ public class TimedArcPetriNet {
 	
 	public boolean isNonStrict(){
 		for(TimedInputArc t : inputArcs){
-			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
+			if(!t.interval().isLowerBoundNonStrict() || (!t.interval().isUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
 				return false;
 			}
 		}
 		
 		for(TransportArc t : transportArcs){
-			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
+			if(!t.interval().isLowerBoundNonStrict() || (!t.interval().isUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
 				return false;
 			}
 		}

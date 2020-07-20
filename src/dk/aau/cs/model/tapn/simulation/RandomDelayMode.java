@@ -39,11 +39,11 @@ public class RandomDelayMode implements DelayMode{
 		BigDecimal result;
 		
 		if(dInterval.upperBound() instanceof Bound.InfBound){
-			TimeInterval range = new TimeInterval(dInterval.IsLowerBoundNonStrict(), new IntBound(0), Bound.Infinity, dInterval.IsUpperBoundNonStrict());
+			TimeInterval range = new TimeInterval(dInterval.isLowerBoundNonStrict(), new IntBound(0), Bound.Infinity, dInterval.isUpperBoundNonStrict());
 			result = exponentialDistribution(range, transition);
 		} else {
 			//This is safe as the difference between the bounds is always ints - and constants in the model is ints as well
-			TimeInterval range = new TimeInterval(dInterval.IsLowerBoundNonStrict(), new IntBound(0), new RatBound(upper.subtract(lower)), dInterval.IsUpperBoundNonStrict());
+			TimeInterval range = new TimeInterval(dInterval.isLowerBoundNonStrict(), new IntBound(0), new RatBound(upper.subtract(lower)), dInterval.isUpperBoundNonStrict());
 			result = randomBigDecimal(range);
 		}
 		

@@ -674,9 +674,9 @@ public class Degree2BroadcastTranslation implements
 		StringBuilder builder = new StringBuilder();
 		
 		boolean lowerBoundAdded = false;
-		if(!(interval.lowerBound().value() == 0 && interval.IsLowerBoundNonStrict())) {
+		if(!(interval.lowerBound().value() == 0 && interval.isLowerBoundNonStrict())) {
 			builder.append(CLOCK_NAME);
-			if(interval.IsLowerBoundNonStrict())
+			if(interval.isLowerBoundNonStrict())
 				builder.append(" >= ");
 			else
 				builder.append(" > ");
@@ -689,7 +689,7 @@ public class Degree2BroadcastTranslation implements
 			if(lowerBoundAdded) builder.append(" && ");
 			builder.append(CLOCK_NAME);
 			
-			if(interval.IsUpperBoundNonStrict())
+			if(interval.isUpperBoundNonStrict())
 				builder.append(" <= ");
 			else
 				builder.append(" < ");
