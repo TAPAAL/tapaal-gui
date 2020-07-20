@@ -604,15 +604,14 @@ public class TapnXmlLoader {
                                          String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                          PlaceTransitionObject targetIn,
                                          int _endx, int _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
-		Arc tempArc;
-		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
+        TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
 
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, interval, weight);
-		((TimedInputArcComponent) tempArc).setUnderlyingArc(inputArc);
+		tempArc.setUnderlyingArc(inputArc);
 
 		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
