@@ -143,7 +143,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 					highlightConstant(index);
 					
 					if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
-						showEditConstantDialog(c,index);						
+						showEditConstantDialog(c);
 					}
 				}
 			}
@@ -297,7 +297,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(e -> {
 			Constant c = (Constant) constantsList.getSelectedValue();
-			showEditConstantDialog(c,constantsList.getSelectedIndex());
+			showEditConstantDialog(c);
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -406,44 +406,21 @@ public class ConstantsPane extends JPanel implements SidePane {
 		constantsPanel.add(sortButton,gbc);
 	}
 
-	private void showEditConstantDialog(Constant constant) {	
+	private void showEditConstantDialog(Constant constant) {
 		ConstantsDialogPanel panel = null;
-		if (constant != null)
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network(), constant);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		else
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		panel.showDialog();
-		showConstants();
-	}
-
-	private void showEditConstantDialog(Constant constant, int selectedIndex) {	
-		ConstantsDialogPanel panel = null;
-		if (constant != null)
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network(), constant);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		else
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (constant != null) {
+            try {
+                panel = new ConstantsDialogPanel(new JRootPane(), parent.network(), constant);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                panel = new ConstantsDialogPanel(new JRootPane(), parent.network());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 		panel.showDialog();
 		showConstants();
 	}

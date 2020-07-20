@@ -68,8 +68,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		nameTextField.setText(oldName);
 	}
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model,
-			Constant constant) throws IOException {		
+	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model, Constant constant) throws IOException {
 		rootPane = pane;
 		this.model = model;	
 
