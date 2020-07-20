@@ -43,10 +43,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private static final String TRANSITIONS = "Transitions";
 	private static final String PLACES = "Places";
 
-	private final JList list = new NonsearchableJList();
+	//XXX contains a SharedTransition SharePlace based on what is displayed, should be a type param
+	private final JList<Object> list = new NonsearchableJList<>();
 	private final SharedPlacesListModel sharedPlacesListModel;
 	private final SharedTransitionsListModel sharedTransitionsListModel;
-	private final JComboBox placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
+	private final JComboBox<String> placesTransitionsComboBox = new JComboBox<>(new String[]{ PLACES, TRANSITIONS });
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
 	private final TabContent tab;

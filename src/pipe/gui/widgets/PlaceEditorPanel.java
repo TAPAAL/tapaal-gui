@@ -57,7 +57,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	
 	private JCheckBox sharedCheckBox;
 	private JCheckBox makeNewSharedCheckBox;
-	private WidthAdjustingComboBox sharedPlacesComboBox;
+	private WidthAdjustingComboBox<TimedPlace> sharedPlacesComboBox;
 
 	private final TimedPlaceComponent place;
 	private final Context context;
@@ -166,7 +166,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 
 		sharedPlaces.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
-		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
+		sharedPlacesComboBox.setModel(new DefaultComboBoxModel<>(sharedPlaces));
 		if(place.underlyingPlace().isShared()) {
 
 			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
@@ -336,8 +336,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Age Invariant"));
 
 		invariantGroup = new JPanel(new GridBagLayout());
-		invRelationNormal = new JComboBox(new String[] { "<=", "<" });
-		invRelationConstant = new JComboBox(new String[] { "<=", "<" });
+		invRelationNormal = new JComboBox<>(new String[] { "<=", "<" });
+		invRelationConstant = new JComboBox<>(new String[] { "<=", "<" });
 		//invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 		invariantSpinner = new CustomJSpinner(0, okButton);
 		invariantSpinner.addChangeListener(e -> {
@@ -386,15 +386,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				invariantSpinner.setEnabled(true);
 				invRelationNormal.setSelectedItem("<=");
 				if ((Integer) invariantSpinner.getValue() < 1) {
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
 				} else {
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
 				}
 			} else {
 				invRelationNormal.setEnabled(false);
 				invariantSpinner.setEnabled(false);
 				invRelationNormal.setSelectedItem("<");
-				invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+				invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<" }));
 			}
 
 		});
@@ -407,8 +407,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		String[] constantArray = constants.toArray(new String[constants.size()]);
 		Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
-		invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+		invConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
+		invConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 		//	invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMaximumRowCount(20);
 		//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
@@ -465,7 +465,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		if (invariantToSet.upperBound() instanceof InfBound) {
 			invariantSpinner.setEnabled(false);
-			invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+			invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<" }));
 			invariantInf.setSelected(true);
 			invRelationNormal.setSelectedItem("<");
 		}
@@ -481,9 +481,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			normalInvRadioButton.setSelected(true);
 			if (invariantToSet.upperBound() instanceof IntBound) {
 				if ((Integer) invariantSpinner.getValue() < 1) {
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
 				} else {
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
 				}
 				invariantSpinner.setValue(invariantToSet.upperBound().value());
 				invariantSpinner.setEnabled(true);
@@ -506,9 +506,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		String selected = invRelationConstant.getSelectedItem().toString();
 		if (value == 0) {
-			invRelationConstant.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+			invRelationConstant.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
 		} else {
-			invRelationConstant.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+			invRelationConstant.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
 		}
 		invRelationConstant.setSelectedItem(selected);
 	}
@@ -524,7 +524,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantInf.setEnabled(true);
 		invariantSpinner.setValue(0);
 		invariantInf.setSelected(true);
-		invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+		invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<" }));
 	}
 
 	protected void disableInvariantComponents() {
@@ -587,7 +587,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void setInvariantControlsBasedOn(TimeInvariant invariant) {
 		if(invariant.upperBound() instanceof ConstantBound){
 			constantInvRadioButton.setSelected(true);
-			invRelationConstant.setModel(new DefaultComboBoxModel(invariant.upperBound().value() == 0 ? new String[] { "<=" } : new String[] { "<", "<=" }));
+			invRelationConstant.setModel(new DefaultComboBoxModel<>(invariant.upperBound().value() == 0 ? new String[] { "<=" } : new String[] { "<", "<=" }));
 			invRelationConstant.setSelectedItem(invariant.isUpperNonstrict() ? "<=" : "<");
 			invRelationConstant.setEnabled(true);
 			invConstantsComboBox.setEnabled(true);
@@ -595,16 +595,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}else{
 			normalInvRadioButton.setSelected(true);
 			if(invariant.upperBound() instanceof InfBound){
-				invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+				invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<" }));
 				invariantSpinner.setValue(0);
 				invRelationNormal.setEnabled(false);
 				invariantSpinner.setEnabled(false);
 				invariantInf.setSelected(true);
 			}else{
 				if(invariant.upperBound().value() == 0 && !invariantInf.isSelected()){
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
 				}else{
-					invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<", "<=" }));
+					invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<", "<=" }));
 				}
 				invRelationNormal.setSelectedItem(invariant.isUpperNonstrict() ? "<=" : "<");
 				invariantSpinner.setValue(invariant.upperBound().value());

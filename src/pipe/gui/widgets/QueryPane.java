@@ -52,7 +52,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 	private final JPanel queryCollectionPanel;
 	private final JPanel buttonsPanel;
-	private final DefaultListModel listModel;
+	private final DefaultListModel<TAPNQuery> listModel;
 	private final JList<TAPNQuery> queryList;
 	private List<TAPNQuery> selectedQueries;
 	private JScrollPane queryScroller;
@@ -103,7 +103,7 @@ public class QueryPane extends JPanel implements SidePane {
 			}
 		});
 
-		queryList = new NonsearchableJList(listModel);
+		queryList = new NonsearchableJList<>(listModel);
 		queryList.setCellRenderer(new QueryCellRenderer());
 		queryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		queryList.addListSelectionListener(e -> {
@@ -355,7 +355,7 @@ public class QueryPane extends JPanel implements SidePane {
 	}
 
 	private void swapQueries(int currentIndex, int newIndex) {
-		TAPNQuery temp = (TAPNQuery)listModel.get(currentIndex);
+		TAPNQuery temp = listModel.get(currentIndex);
 		listModel.set(currentIndex, listModel.get(newIndex));
 		listModel.set(newIndex, temp);
 	}
@@ -417,7 +417,7 @@ public class QueryPane extends JPanel implements SidePane {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 
 		for (int i = 0; i < listModel.size(); ++i) {
-			queries.add((TAPNQuery) listModel.get(i));
+			queries.add(listModel.get(i));
 		}
 
 		return queries;
