@@ -1,5 +1,7 @@
 package net.tapaal.swinghelpers;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Iterator;
@@ -80,7 +82,7 @@ public abstract class ExtendedJTabbedPane<T extends Component> extends JTabbedPa
     }
 
     @Override
-    public Iterator<T> iterator() {
+    public @NotNull Iterator<T> iterator() {
         return new TabIterator();
     }
 

@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
+import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Transition;
@@ -165,7 +166,7 @@ public class EnabledTransitionsList extends JPanel{
 			return template.model().getTransitionByName(transition.getName()).isShared();
 		}
 
-		public int compareTo(ListItem o) {
+		public int compareTo(@NotNull ListItem o) {
 			if(o instanceof TransitionListItem){
 				return compareTo((TransitionListItem)o);
 			} else {
