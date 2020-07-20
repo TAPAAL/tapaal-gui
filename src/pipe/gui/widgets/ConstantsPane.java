@@ -53,7 +53,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	private JScrollPane constantsScroller;
 	private final JPanel buttonsPanel;
 
-	private final JList constantsList;
+	private final JList<Constant> constantsList;
 	private final ConstantsListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
@@ -97,7 +97,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			
 		});
 
-		constantsList = new NonsearchableJList(listModel);
+		constantsList = new NonsearchableJList<>(listModel);
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
