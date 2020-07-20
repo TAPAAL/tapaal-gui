@@ -203,9 +203,8 @@ public class TapnLegacyXmlLoader {
                                         String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                         PlaceTransitionObject targetIn,
                                         int _endx, int _endy) {
-		
-		Arc tempArc;
-		String[] inscriptionSplit = {};
+
+        String[] inscriptionSplit = {};
 		if (inscriptionTempStorage.contains(":")) {
 			inscriptionSplit = inscriptionTempStorage.split(":");
 		}
@@ -213,7 +212,7 @@ public class TapnLegacyXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
+        TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
 
 		if (isInPreSet) {
@@ -230,7 +229,7 @@ public class TapnLegacyXmlLoader {
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval);
 
-				((TimedTransportArcComponent) tempArc).setUnderlyingArc(transArc);
+				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
 				guiModel.addPetriNetObject(tempArc);
 				guiModel.addPetriNetObject(postsetTransportArc);
@@ -238,8 +237,8 @@ public class TapnLegacyXmlLoader {
 
 				postsetArcs.remove(targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
-				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
+				presetArcs.put((TimedTransitionComponent) targetIn, tempArc);
+				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
 			if (presetArcs.containsKey(sourceIn)) {
@@ -256,7 +255,7 @@ public class TapnLegacyXmlLoader {
 				TransportArc transArc = new TransportArc(sourcePlace, trans,
 						destPlace, interval);
 
-				((TimedTransportArcComponent) tempArc).setUnderlyingArc(transArc);
+				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
 				guiModel.addPetriNetObject(presetTransportArc);
 				guiModel.addPetriNetObject(tempArc);
@@ -265,7 +264,7 @@ public class TapnLegacyXmlLoader {
 				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
-				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
+				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);
 			}
 		}
 		return tempArc;
@@ -275,15 +274,15 @@ public class TapnLegacyXmlLoader {
                                          String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                          PlaceTransitionObject targetIn,
                                          int _endx, int _endy) throws FormatException {
-		Arc tempArc;
-		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
+
+	    TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
 
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, interval);
-		((TimedInputArcComponent) tempArc).setUnderlyingArc(inputArc);
+		tempArc.setUnderlyingArc(inputArc);
 		
 		if(tapn.hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
@@ -299,12 +298,12 @@ public class TapnLegacyXmlLoader {
                                              String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                              PlaceTransitionObject targetIn,
                                              int _endx, int _endy) {
-		Arc tempArc;
-		tempArc = new TimedInhibitorArcComponent(
-					new TimedInputArcComponent(
-						new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)
-					),
-				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
+        TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
+            new TimedInputArcComponent(
+                new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)
+            ),
+            (inscriptionTempStorage != null ? inscriptionTempStorage : "")
+        );
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
@@ -316,7 +315,7 @@ public class TapnLegacyXmlLoader {
 		
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
 
-		((TimedInhibitorArcComponent) tempArc).setUnderlyingArc(inhibArc);
+		tempArc.setUnderlyingArc(inhibArc);
 		guiModel.addPetriNetObject(tempArc);
 		tapn.add(inhibArc);
 
@@ -527,55 +526,46 @@ public class TapnLegacyXmlLoader {
 		tapn.add(t);
 	}
 
-	private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
-		int positionXInput = (int)getPositionAttribute(element, "x");
-		int positionYInput = (int)getPositionAttribute(element, "y");
-		String idInput = element.getAttribute("id");
-		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
-		int nameOffsetXInput = (int)getNameOffsetAttribute(element, "x");
-		int nameOffsetYInput = (int)getNameOffsetAttribute(element, "y");
-		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
-		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
-		
-		if (idInput.length() == 0 && nameInput.length() > 0) {
-			idInput = nameInput;
-		}
+    private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
+        int positionXInput = (int) getPositionAttribute(element, "x");
+        int positionYInput = (int) getPositionAttribute(element, "y");
+        String idInput = element.getAttribute("id");
+        String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
+        int nameOffsetXInput = (int) getNameOffsetAttribute(element, "x");
+        int nameOffsetYInput = (int) getNameOffsetAttribute(element, "y");
+        int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
+        String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
 
-		if (nameInput.length() == 0 && idInput.length() > 0) {
-			nameInput = idInput;
-		}
-		
-		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
-			nameInput = "_" + nameInput;
-			if(firstPlaceRenameWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
-				firstPlaceRenameWarning = false;
-			}
-		}
-		idResolver.add(tapn.name(), idInput, nameInput);
+        if (idInput.length() == 0 && nameInput.length() > 0) {
+            idInput = nameInput;
+        }
 
-		Place place = null;
+        if (nameInput.length() == 0 && idInput.length() > 0) {
+            nameInput = idInput;
+        }
 
-//		if (invariant == null || invariant.equals("")) {
-//			place = new Place(positionXInput, positionYInput, idInput,
-//					nameInput, nameOffsetXInput, nameOffsetYInput,
-//					initialMarkingInput, markingOffsetXInput,
-//					markingOffsetYInput, capacityInput);
-//
-//		} else {
-			place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
-			
-			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
-			tapn.add(p);
-			
-			((TimedPlaceComponent) place).setUnderlyingPlace(p);
-			guiModel.addPetriNetObject(place);
+        if (nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+            nameInput = "_" + nameInput;
+            if (firstPlaceRenameWarning) {
+                JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+                firstPlaceRenameWarning = false;
+            }
+        }
+        idResolver.add(tapn.name(), idInput, nameInput);
 
-			for (int i = 0; i < initialMarkingInput; i++) {
-				marking.add(new TimedToken(p, new BigDecimal(0.0)));
-			}
-		}
-//	}
+        TimedPlaceComponent place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+
+        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+        tapn.add(p);
+
+        place.setUnderlyingPlace(p);
+        guiModel.addPetriNetObject(place);
+
+        for (int i = 0; i < initialMarkingInput; i++) {
+            marking.add(new TimedToken(p, new BigDecimal(0.0)));
+        }
+    }
+
 
 	private void parseAndAddArcAsOldFormat(Element inputArcElement) throws FormatException {
 		String idInput = inputArcElement.getAttribute("id");
