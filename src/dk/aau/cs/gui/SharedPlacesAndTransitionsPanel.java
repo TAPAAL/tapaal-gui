@@ -144,31 +144,36 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 					}
 					
 					int index = list.getSelectedIndex();
-					if(index > 0 && list.getSelectedIndices().length == 1)
-						moveUpButton.setEnabled(true);
-					else
-						moveUpButton.setEnabled(false);
+					if(index > 0 && list.getSelectedIndices().length == 1) {
+                        moveUpButton.setEnabled(true);
+                    } else {
+                        moveUpButton.setEnabled(false);
+                    }
 								
 					if(isDisplayingTransitions()) {
-						if(index < sharedTransitionsListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
-							moveDownButton.setEnabled(true);
-						else
-							moveDownButton.setEnabled(false);
+						if(index < sharedTransitionsListModel.getSize() - 1 && list.getSelectedIndices().length == 1) {
+                            moveDownButton.setEnabled(true);
+                        } else {
+                            moveDownButton.setEnabled(false);
+                        }
 						
 						if (sharedTransitionsListModel.getSize() >=2) {
 							sortButton.setEnabled(true);
-						} else
-							sortButton.setEnabled(false);
+						} else {
+                            sortButton.setEnabled(false);
+                        }
 					} else {
-						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
-							moveDownButton.setEnabled(true);
-						else
-							moveDownButton.setEnabled(false);
+						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1) {
+                            moveDownButton.setEnabled(true);
+                        } else {
+                            moveDownButton.setEnabled(false);
+                        }
 						
 						if (sharedPlacesListModel.getSize() >=2) {
 							sortButton.setEnabled(true);
-						} else
-							sortButton.setEnabled(false);
+						} else {
+                            sortButton.setEnabled(false);
+                        }
 					}
 				}
 			}
