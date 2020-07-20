@@ -21,14 +21,18 @@ public class Logger {
 		if (enableDebug) {
 			logDevice.println(log);
 		}
-
 	}
+
+    public static void log(Exception e) {
+        if (enableDebug) {
+            e.printStackTrace();
+        }
+    }
 
 	public static void log(Object log) {
 		if (enableDebug) {
 			logDevice.println(log.toString());
 		}
-
 	}
 
 }

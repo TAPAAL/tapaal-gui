@@ -1,8 +1,10 @@
 package dk.aau.cs.util;
 
 import com.sun.jna.*;
+import dk.aau.cs.debug.Logger;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -79,17 +81,19 @@ public class MemoryMonitor {
 					if(m.matches()){
 						memory = Double.parseDouble(m.group(1).replace(".", "").replace(",", ""))/1024;
 					}
-				} catch (Exception e) { 
+				} catch (IOException e) {
+				    Logger.log(e);
 				} 
 			}else{
 				try { 
 					Process p = Runtime.getRuntime().exec("ps -p "+PID+" -o rss"); 
 					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); 
-					
-					String s = input.readLine();
-					s = input.readLine();	//Actual memory usage is second line output
+
+					input.readLine(); //Actual memory usage is second line output
+                    String s = input.readLine();
 					memory = Double.parseDouble(s.replace(" ", ""))/1024;
-				} catch (Exception e) { 
+				} catch (IOException e) {
+                    Logger.log(e);
 				} 
 			}
 
