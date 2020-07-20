@@ -28,7 +28,7 @@ public class UndoManager {
 
 	private final ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private Reference<GuiFrameActions> app = new MutableReference();
+	private Reference<GuiFrameActions> app = new MutableReference<>();
 	public void setApp(Reference<GuiFrameActions> app) {
 		this.app = app;
 
