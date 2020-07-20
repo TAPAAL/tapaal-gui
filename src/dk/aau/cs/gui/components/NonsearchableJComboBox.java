@@ -19,7 +19,7 @@ public class NonsearchableJComboBox<E> extends JComboBox<E> {
 		removeKeyListener();
 	}
 
-	public NonsearchableJComboBox(ComboBoxModel aModel) {
+	public NonsearchableJComboBox(ComboBoxModel<E> aModel) {
 		super(aModel);
 		removeKeyListener();
 	}
