@@ -13,7 +13,7 @@ import java.util.Iterator;
  * TODO: check that input type is T?!??!?
  *
  */
-public abstract class ExtendedJTabbedPane<T> extends JTabbedPane implements Iterable<T>{
+public abstract class ExtendedJTabbedPane<T extends Component> extends JTabbedPane implements Iterable<T>{
 
     public ExtendedJTabbedPane() {
     }
@@ -95,6 +95,8 @@ public abstract class ExtendedJTabbedPane<T> extends JTabbedPane implements Iter
 
         @Override
         public T next() {
+            //XXX - known unsafe call, in theory someone could add something not of type T
+            //noinspection unchecked
             T toReturn = (T) getTabComponentAt(position);
             position += 1;
             return toReturn;
