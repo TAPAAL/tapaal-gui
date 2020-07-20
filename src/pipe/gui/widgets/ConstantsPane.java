@@ -450,7 +450,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
 
     @Override
-    public JList getJList() {
+    public JList<Constant> getJList() {
         return constantsList;
     }
 }
