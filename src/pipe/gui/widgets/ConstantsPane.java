@@ -407,13 +407,8 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void showEditConstantDialog(Constant constant) {
-		ConstantsDialogPanel panel;
+		ConstantsDialogPanel panel = new ConstantsDialogPanel(parent.network(), constant);
 
-		if (constant != null) {
-            panel = new ConstantsDialogPanel(new JRootPane(), parent.network(), constant);
-        } else {
-            panel = new ConstantsDialogPanel(new JRootPane(), parent.network());
-        }
 		panel.showDialog();
 		showConstants();
 	}
@@ -426,8 +421,9 @@ public class ConstantsPane extends JPanel implements SidePane {
 					"You cannot remove a constant that is used in the net.\nRemove all references "
 							+ "to the constant in the net and try again.",
 							"Constant in use", JOptionPane.ERROR_MESSAGE);
-		} else
-			parent.getUndoManager().addNewEdit(edit);
+		} else {
+            parent.getUndoManager().addNewEdit(edit);
+        }
 
 		//showConstants();
 	}

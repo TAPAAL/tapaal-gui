@@ -24,49 +24,41 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class ConstantsDialogPanel extends javax.swing.JPanel {
 
-	private JRootPane rootPane;
-	private TimedArcPetriNetNetwork model;
+    private final TimedArcPetriNetNetwork model;
 	private int lowerBound;
 	private int upperBound;
 	private int initialValue = 0;
 	private EscapableDialog dialog;
 
-	JPanel nameTextFieldPane;
-	JTextField nameTextField;
+    JTextField nameTextField;
 	Dimension size;
-	JLabel nameLabel;  
-	JPanel valueSpinnerPane;
-	JLabel valueLabel; 	
+	JLabel nameLabel;
+    JLabel valueLabel;
 	CustomJSpinner valueSpinner;
 	JPanel container;
 	JPanel buttonContainer;
 	JButton okButton;
 	JButton cancelButton;
 
-	private String oldName;
+	private final String oldName;
 
-	public ConstantsDialogPanel() {
-		initComponents();		
+    public ConstantsDialogPanel(TimedArcPetriNetNetwork model) {
+		this(model, null);
 	}
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) {
-		initComponents();
-		rootPane = pane;
-		this.model = model;		
-		oldName = "";
-		nameTextField.setText(oldName);
-	}
+	public ConstantsDialogPanel(TimedArcPetriNetNetwork model, Constant constant) {
+        this.model = model;
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model, Constant constant) {
-		rootPane = pane;
-		this.model = model;	
-
-		initialValue = constant.value();		
+        if (constant != null) {
+            initialValue = constant.value();
+            oldName = constant.name();
+            lowerBound = constant.lowerBound();
+            upperBound = constant.upperBound();
+        } else {
+            oldName = "";
+        }
 		initComponents();
-		
-		oldName = constant.name();
-		lowerBound = constant.lowerBound();
-		upperBound = constant.upperBound();		 
+
 		nameTextField.setText(oldName);
 	}
 
