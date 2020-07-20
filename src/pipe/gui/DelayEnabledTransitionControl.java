@@ -54,7 +54,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 		setValue(defaultGranularity);
 		
 		DelayMode[] items = {ShortestDelayMode.getInstance(), RandomDelayMode.getInstance(), ManualDelayMode.getInstance()};
-		delayMode = new JComboBox(items);
+		delayMode = new JComboBox<>(items);
 		setDelayMode(defaultDelayMode);
 
         setRandomTransitionMode(defaultIsRandomTrasition);
