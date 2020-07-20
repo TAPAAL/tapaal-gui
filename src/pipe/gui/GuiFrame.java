@@ -9,6 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -1534,7 +1535,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 /* A JAR path */
                 String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); // strip out only the JAR
                 // file
-                JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+                JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8));
                 Enumeration<JarEntry> entries = jar.entries(); // gives ALL entries in jar
                 Set<String> result = new HashSet<String>(); // avoid duplicates in case it is a subdirectory
                 while (entries.hasMoreElements()) {
