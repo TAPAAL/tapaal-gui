@@ -82,7 +82,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		JList listOfComponents = new JList(affectedComponents.toArray());
 		JScrollPane scrollPane = new JScrollPane(listOfComponents);
 		Object[] params = {label, checkBox, new JLabel("Components affected:"), scrollPane};
-		result = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
+		result = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.OK_CANCEL_OPTION);
 		boolean deleteFromTemplates = checkBox.isSelected();
 		return new DeleteSharedResult(result, deleteFromTemplates);
 	}
