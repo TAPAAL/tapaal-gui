@@ -2,7 +2,6 @@ package net.tapaal.gui.DrawingSurfaceManager;
 
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.GraphicalElement;
-import pipe.gui.graphicElements.PetriNetObject;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;

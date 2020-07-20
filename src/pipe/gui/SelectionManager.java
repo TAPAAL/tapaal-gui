@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
 import pipe.gui.canvas.DrawingSurfaceImpl;

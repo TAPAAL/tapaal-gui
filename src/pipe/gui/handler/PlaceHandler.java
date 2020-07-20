@@ -1,19 +1,12 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
-import pipe.gui.CreateGui;
-import pipe.gui.Zoomer;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
-import pipe.gui.graphicElements.PetriNetObjectWithLabel;
 import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.

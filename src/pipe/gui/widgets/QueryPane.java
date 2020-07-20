@@ -19,7 +19,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -29,7 +28,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;

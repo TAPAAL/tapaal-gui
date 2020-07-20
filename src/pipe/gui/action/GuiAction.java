@@ -10,7 +10,6 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.CreateGui;
 
 /**
  * GuiAction class

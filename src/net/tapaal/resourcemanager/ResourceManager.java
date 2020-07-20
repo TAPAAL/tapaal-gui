@@ -8,8 +8,6 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import pipe.gui.CreateGui;
-
 public class ResourceManager {
     public static final String imgPath = "resources/Images/";
 

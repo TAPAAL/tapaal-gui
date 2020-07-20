@@ -13,7 +13,6 @@ import java.awt.event.MouseListener;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -28,7 +27,6 @@ import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
 
 import dk.aau.cs.gui.components.NonsearchableJList;

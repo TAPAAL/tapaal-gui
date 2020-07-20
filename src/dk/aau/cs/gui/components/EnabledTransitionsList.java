@@ -1,11 +1,7 @@
 package dk.aau.cs.gui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,20 +9,16 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 

@@ -11,11 +11,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on all

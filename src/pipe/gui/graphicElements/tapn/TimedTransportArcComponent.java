@@ -3,7 +3,6 @@ package pipe.gui.graphicElements.tapn;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
-import com.sun.jdi.connect.Transport;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;

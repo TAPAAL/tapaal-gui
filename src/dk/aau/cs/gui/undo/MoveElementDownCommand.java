@@ -1,9 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.dataLayer.Template;
 import pipe.gui.widgets.SidePane;
-
-import javax.swing.*;
 
 public class MoveElementDownCommand extends Command{
     final int oldIndex;

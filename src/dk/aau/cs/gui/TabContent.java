@@ -37,7 +37,6 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.MenuDragMouseEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

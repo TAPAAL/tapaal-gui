@@ -1,8 +1,6 @@
 package dk.aau.cs.gui.undo;
 
 import dk.aau.cs.gui.BatchProcessingDialog;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
-import dk.aau.cs.model.tapn.SharedPlace;
 
 import javax.swing.*;
 import java.io.File;

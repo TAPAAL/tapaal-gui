@@ -1,15 +1,10 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
-import pipe.gui.CreateGui;
-import pipe.gui.Zoomer;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.Transition;
 
