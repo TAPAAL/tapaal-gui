@@ -63,7 +63,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		nameTextField = new javax.swing.JTextField();
 		nameTextField.setPreferredSize(new Dimension(290,27));
 		rotationLabel = new javax.swing.JLabel();
-		rotationComboBox = new javax.swing.JComboBox();
+		rotationComboBox = new javax.swing.JComboBox<>();
 		buttonPanel = new javax.swing.JPanel();
 		cancelButton = new javax.swing.JButton();
 		makeSharedButton = new javax.swing.JButton();
@@ -75,7 +75,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		
 		
 		
-		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
+		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
 		sharedTransitionsComboBox.addActionListener(e -> {
 			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
@@ -262,10 +262,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		
 		sharedTransitions.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 		
-		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
-				"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
+		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		nameTextField.setText(transition.getName());
-		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
+		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel<>(sharedTransitions));
 		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		urgentCheckBox.setSelected(transition.isUrgent());
 		
