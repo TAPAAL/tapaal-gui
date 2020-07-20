@@ -130,7 +130,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
         list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){
-					JList source = (JList)e.getSource();
+					JList<Object> source = (JList<Object>)e.getSource();
 					if(source.getSelectedIndex() == -1){
 						removeButton.setEnabled(false);
 						renameButton.setEnabled(false);
