@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
@@ -23,16 +22,6 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-/*
- * LeftConstantsPane.java
- *
- * Created on 08-10-2009, 13:51:42
- */
-
-/**
- * 
- * @author Morten Jacobsen
- */
 public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 	private JRootPane rootPane;
@@ -56,11 +45,11 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 	private String oldName;
 
-	public ConstantsDialogPanel() throws IOException {
+	public ConstantsDialogPanel() {
 		initComponents();		
 	}
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) throws IOException {
+	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) {
 		initComponents();
 		rootPane = pane;
 		this.model = model;		
@@ -68,7 +57,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		nameTextField.setText(oldName);
 	}
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model, Constant constant) throws IOException {
+	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model, Constant constant) {
 		rootPane = pane;
 		this.model = model;	
 
@@ -82,8 +71,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	}
 
 	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Constant", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Edit Constant", true);
 		dialog.add(container);
 		dialog.getRootPane().setDefaultButton(okButton);
 		dialog.setResizable(false);
@@ -92,7 +80,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		dialog.setVisible(true);
 	}
 
-	private void initComponents() throws IOException {						
+	private void initComponents() {
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
 		size = new Dimension(330, 25);

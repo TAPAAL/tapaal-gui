@@ -407,19 +407,12 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void showEditConstantDialog(Constant constant) {
-		ConstantsDialogPanel panel = null;
+		ConstantsDialogPanel panel;
+
 		if (constant != null) {
-            try {
-                panel = new ConstantsDialogPanel(new JRootPane(), parent.network(), constant);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            panel = new ConstantsDialogPanel(new JRootPane(), parent.network(), constant);
         } else {
-            try {
-                panel = new ConstantsDialogPanel(new JRootPane(), parent.network());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            panel = new ConstantsDialogPanel(new JRootPane(), parent.network());
         }
 		panel.showDialog();
 		showConstants();
