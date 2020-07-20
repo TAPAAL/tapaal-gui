@@ -366,7 +366,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
 	 * and action names are mapped to action objects. The key bindings are disabled when the
 	 * arc object is deleted, or the arc is connected to a place/transition.
-     * @param action
      */
 	public void enableDrawingKeyBindings(Runnable action) {
 		InputMap iMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
