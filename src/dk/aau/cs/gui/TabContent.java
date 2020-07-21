@@ -1982,37 +1982,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
 
-        protected void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
-            if (arc != null) {
-                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
-                    //Dispatch event to parent (drawing surface)
-                    e.translatePoint(pno.getX(),pno.getY());
-                    pno.getParent().dispatchEvent(e);
-                }
-            }
-        }
-
-        protected void placetranstionMouseExited(PlaceTransitionObject pto) {
-            if (arc != null) {
-                arc.setTarget(null);
-                //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
-                // Relates to bug #1849786
-                if (pto instanceof Transition) {
-                    ((Transition)pto).removeArcCompareObject(arc);
-                }
-                arc.updateArcPosition();
-            }
-        }
-
-        protected void placetranstionMouseOver(PlaceTransitionObject pno) {
-            if (arc != null) {
-                if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
-                    arc.setTarget(pno);
-                    arc.updateArcPosition();
-                }
-            }
-        }
-
         protected void transitionClicked(TimedTransitionComponent pno) {
             if (place != null && transition == null) {
                 transition = pno;
@@ -2085,9 +2054,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
         }
 
-        protected abstract void placetranstionMouseOver(PlaceTransitionObject pno);
-        protected abstract void placetranstionMouseExited(PlaceTransitionObject pno);
-        protected abstract void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e);
         protected abstract void transitionClicked(TimedTransitionComponent pno);
         protected abstract void placeClicked(TimedPlaceComponent pno);
 
@@ -2139,11 +2105,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 );
             }
         }
-    }
-
-    final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
-        private TimedTransitionComponent transition;
-        private TimedPlaceComponent place;
 
         protected void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
             if (arc != null) {
@@ -2175,6 +2136,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             }
         }
+    }
+
+    final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
+        private TimedTransitionComponent transition;
+        private TimedPlaceComponent place;
 
         protected void transitionClicked(TimedTransitionComponent pno) {
             if (place == null && transition == null) {
@@ -2309,16 +2275,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private TimedPlaceComponent place2;
         private Arc arc1;
         private Arc arc2;
-
-        protected void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
-            if (arc != null) {
-                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
-                    //Dispatch event to parent (drawing surface)
-                    e.translatePoint(pno.getX(),pno.getY());
-                    pno.getParent().dispatchEvent(e);
-                }
-            }
-        }
 
         protected void placetranstionMouseExited(PlaceTransitionObject pto) {
             if (arc != null) {
