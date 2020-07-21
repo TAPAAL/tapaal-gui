@@ -75,6 +75,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
 
+	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
 
