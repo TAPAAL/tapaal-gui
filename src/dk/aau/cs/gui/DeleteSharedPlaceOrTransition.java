@@ -161,13 +161,17 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(placeToRemove.name());
 				if(place != null){
-					for(Arc arc : place.getPreset()){
-						deleteArc(arc, template);
-					}
+                    //XXX: we need to save arcs to delete, if we delete it while iterating pre/post set it can lead to errors
+                    ArrayList<Arc> arcsToDelete = new ArrayList<>();
 
-					for(Arc arc : place.getPostset()){
-						deleteArc(arc, template);
-					}
+                    for(Arc arc : place.getPreset()){
+                        arcsToDelete.add(arc);
+                    }
+
+                    for(Arc arc : place.getPostset()){
+                        arcsToDelete.add(arc);
+                    }
+                    arcsToDelete.forEach(arc->deleteArc(arc, template));
 
 					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel());
 					cmd.redo();
@@ -280,13 +284,17 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transitionToBeRemoved.name());
 				if(transition != null){
+				    //XXX: we need to save arcs to delete, if we delete it while iterating pre/post set it can lead to errors
+				    ArrayList<Arc> arcsToDelete = new ArrayList<>();
+
 					for(Arc arc : transition.getPreset()){
-						deleteArc(arc, template);
+						arcsToDelete.add(arc);
 					}
 
 					for(Arc arc : transition.getPostset()){
-						deleteArc(arc, template);
+						arcsToDelete.add(arc);
 					}
+					arcsToDelete.forEach(arc->deleteArc(arc, template));
 
 					Command c = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel());
 					undoManager.addEdit(c);
