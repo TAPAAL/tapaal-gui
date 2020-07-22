@@ -2,17 +2,23 @@ package pipe.gui;
 
 import java.awt.*;
 import java.awt.desktop.*;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import com.apple.eawt.Application;
 import com.sun.jna.Platform;
 import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
+
+import javax.imageio.ImageIO;
 
 
 public class CreateGui {
@@ -36,12 +42,45 @@ public class CreateGui {
 	        Logger.log("Failed to set native quit handler");
         }
 
+        try {
+
+            Image appImage = ResourceManager.getIcon("icon.png").getImage();
+            //ImageIO.read(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png")));
+            Application.getApplication().setDockIconImage(appImage);
+
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+            Logger.log("Failed to set DockIcon");
+        }
+
         if (Platform.isMac()){
+
+
+            //Set specific settings
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
+
+            // Use native file chooser
+            System.setProperty("apple.awt.fileDialogForDirectories", "false");
+
+            // Grow size of boxes to add room for the resizer
+            System.setProperty("apple.awt.showGrowBox", "true");
+
+            /*
 			try {
-				SpecialMacHandler.postprocess();
+                // Enable fullscreen on Mac
+                // Use reflection to prevent compile errors
+                try {
+                    Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+                    Class[] params = new Class[]{Window.class, Boolean.TYPE};
+                    Method method = util.getMethod("setWindowCanFullScreen", params);
+                    method.invoke(util, CreateGui.getAppGui(), true);
+                } catch (Exception e) {
+                    // Fullscreen not supported
+                }
 			} catch (NoClassDefFoundError e) {
 				//Failed loading special mac handler, ignore and run program without MacOS integration
 			}
+			*/
 		}
 
 		appGui.setVisible(true);

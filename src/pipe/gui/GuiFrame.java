@@ -28,7 +28,6 @@ import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
@@ -548,36 +547,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         } catch (Exception exc) {
             Logger.log("Error loading L&F: " + exc);
-        }
-
-        if (Platform.isMac()) {
-
-            try {
-                new SpecialMacHandler(guiFrameController);
-            } catch (NoClassDefFoundError e) {
-                //Failed loading special mac handler, ignore and run program without MacOS integration
-            }
-
-            //XXX Refactor to sperate function, only a test to see of this fixes issues for TAPAAL on Java9 bug #1764383
-            Application app = Application.getApplication();
-            try {
-                Image appImage;
-                appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png"));
-                app.setDockIconImage(appImage);
-            } catch (IOException e) {
-                Logger.log("Error loading Image");
-            }
-
-            //Set specific settings
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
-
-            // Use native file chooser
-            System.setProperty("apple.awt.fileDialogForDirectories", "false");
-
-            // Grow size of boxes to add room for the resizer
-            System.setProperty("apple.awt.showGrowBox", "true");
-
         }
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
