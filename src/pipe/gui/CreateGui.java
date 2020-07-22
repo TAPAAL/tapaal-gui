@@ -1,8 +1,7 @@
 package pipe.gui;
 
 import java.awt.*;
-import java.awt.desktop.AboutEvent;
-import java.awt.desktop.AboutHandler;
+import java.awt.desktop.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,12 @@ public class CreateGui {
             Desktop.getDesktop().setAboutHandler(e -> appGuiController.showAbout());
         } catch (SecurityException | UnsupportedOperationException ignored) {
             Logger.log("Failed to set native about handler");
+        }
+
+	    try {
+	        Desktop.getDesktop().setQuitHandler((e, response) -> appGuiController.exit());
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+	        Logger.log("Failed to set native quit handler");
         }
 
         if (Platform.isMac()){
