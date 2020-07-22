@@ -1,15 +1,9 @@
 package pipe.gui;
 
 import java.awt.*;
-import java.awt.desktop.*;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.apple.eawt.Application;
 import com.sun.jna.Platform;
 import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
@@ -17,9 +11,6 @@ import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import dk.aau.cs.gui.TabContent;
-
-import javax.imageio.ImageIO;
-
 
 public class CreateGui {
 
@@ -42,12 +33,13 @@ public class CreateGui {
 	        Logger.log("Failed to set native quit handler");
         }
 
-        /*try {
+        try {
             Image appImage = ResourceManager.getIcon("icon.png").getImage();
-            Application.getApplication().setDockIconImage(appImage);
+            Taskbar.getTaskbar().setIconImage(appImage);
+
         } catch (SecurityException | UnsupportedOperationException ignored) {
             Logger.log("Failed to set DockIcon");
-        }*/
+        }
 
         if (Platform.isMac()){
 
