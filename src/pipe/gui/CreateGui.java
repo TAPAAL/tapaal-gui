@@ -1,10 +1,14 @@
 package pipe.gui;
 
+import java.awt.*;
+import java.awt.desktop.AboutEvent;
+import java.awt.desktop.AboutHandler;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.jna.Platform;
+import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -20,6 +24,12 @@ public class CreateGui {
 	private static final ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 
 	public static void init() {
+
+	    try {
+            Desktop.getDesktop().setAboutHandler(e -> appGuiController.showAbout());
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+            Logger.log("Failed to set native about handler");
+        }
 
         if (Platform.isMac()){
 			try {
