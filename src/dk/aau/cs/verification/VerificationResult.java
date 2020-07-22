@@ -96,8 +96,7 @@ public class VerificationResult<TTrace> {
 	public static class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
 		
 		public int compare(Tuple<String,Integer> tuple1,Tuple<String,Integer> tuple2) {
-			//return (tuple1.value2() > tuple2.value2() ? 1 : (tuple1.value2() == tuple2.value2() ? 0 : -1));
-            return tuple1.value2() - tuple2.value2();
+            return tuple2.value2() - tuple1.value2();
 		}
 	}
 
