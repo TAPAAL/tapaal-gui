@@ -42,12 +42,12 @@ public class CreateGui {
 	        Logger.log("Failed to set native quit handler");
         }
 
-        try {
+        /*try {
             Image appImage = ResourceManager.getIcon("icon.png").getImage();
             Application.getApplication().setDockIconImage(appImage);
         } catch (SecurityException | UnsupportedOperationException ignored) {
             Logger.log("Failed to set DockIcon");
-        }
+        }*/
 
         if (Platform.isMac()){
 
