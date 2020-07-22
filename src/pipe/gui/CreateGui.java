@@ -43,17 +43,13 @@ public class CreateGui {
         }
 
         try {
-
             Image appImage = ResourceManager.getIcon("icon.png").getImage();
-            //ImageIO.read(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png")));
             Application.getApplication().setDockIconImage(appImage);
-
         } catch (SecurityException | UnsupportedOperationException ignored) {
             Logger.log("Failed to set DockIcon");
         }
 
         if (Platform.isMac()){
-
 
             //Set specific settings
             System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -65,22 +61,6 @@ public class CreateGui {
             // Grow size of boxes to add room for the resizer
             System.setProperty("apple.awt.showGrowBox", "true");
 
-            /*
-			try {
-                // Enable fullscreen on Mac
-                // Use reflection to prevent compile errors
-                try {
-                    Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
-                    Class[] params = new Class[]{Window.class, Boolean.TYPE};
-                    Method method = util.getMethod("setWindowCanFullScreen", params);
-                    method.invoke(util, CreateGui.getAppGui(), true);
-                } catch (Exception e) {
-                    // Fullscreen not supported
-                }
-			} catch (NoClassDefFoundError e) {
-				//Failed loading special mac handler, ignore and run program without MacOS integration
-			}
-			*/
 		}
 
 		appGui.setVisible(true);
