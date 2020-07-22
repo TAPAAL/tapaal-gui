@@ -88,6 +88,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
 
         showToolTips = prefs.getShowToolTips();
+        setDisplayToolTips(showToolTips);
         guiFrame.setShowToolTipsSelected(showToolTips);
 
         showZeroToInfinityIntervals = prefs.getShowZeroInfIntervals();
@@ -670,7 +671,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void toggleDisplayToolTips() {
-        setDisplayToolTips(!showToolTips);
+        showToolTips = !showToolTips;
+        setDisplayToolTips(showToolTips);
     }
 
     private void setDisplayToolTips(boolean b) {
