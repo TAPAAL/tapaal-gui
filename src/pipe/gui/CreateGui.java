@@ -28,7 +28,13 @@ public class CreateGui {
         }
 
 	    try {
-	        Desktop.getDesktop().setQuitHandler((e, response) -> appGuiController.exit());
+	        Desktop.getDesktop().setQuitHandler(
+	            (e, response) -> {
+	                appGuiController.exit();
+	                response.cancelQuit(); //If we get here the request was canceled.
+	            }
+	        );
+
         } catch (SecurityException | UnsupportedOperationException ignored) {
 	        Logger.log("Failed to set native quit handler");
         }
