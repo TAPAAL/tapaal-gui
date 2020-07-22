@@ -16,14 +16,7 @@ import java.util.regex.Pattern;
 
 public class MemoryMonitor {
 
-	interface Kernel32 extends Library {
-
-		static Kernel32 INSTANCE = Native.loadLibrary("kernel32", Kernel32.class);
-
-		int GetProcessId(Long hProcess);
-	}
-
-	private static int PID = -1;
+	private static long PID = -1;
 	private static Semaphore busy = new Semaphore(1);
 	private static double peakMemory = -1;
 	private static Boolean cumulativePeakMemory = false;
@@ -39,7 +32,7 @@ public class MemoryMonitor {
 	}
 
 	public static void attach(Process p){
-		PID = getPid(p);
+		PID = p.pid();
 		
 		if( ! cumulativePeakMemory) {
 			peakMemory = -1;
@@ -109,24 +102,6 @@ public class MemoryMonitor {
 		}
 	}
 
-	private static int getPid(Process p) {
-		Field f;
-
-		try{
-			if (Platform.isWindows()) {
-				f = p.getClass().getDeclaredField("handle");
-				f.setAccessible(true);
-                return Kernel32.INSTANCE.GetProcessId((Long) f.get(p));
-			} else {
-				f = p.getClass().getDeclaredField("pid");
-				f.setAccessible(true);
-                return (int) (Integer) f.get(p);
-			}
-		}catch(Exception e){
-			return -1;
-		}
-	}
-	
 	public static String getPeakMemory(){
 		return peakMemory == -1? "N/A":getFormatter().format(Math.ceil(peakMemory)) + " MB";
 	}
