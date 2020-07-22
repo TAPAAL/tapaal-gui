@@ -525,20 +525,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         VerifyTAPNDiscreteVerification.trySetup();
         VerifyPN.trySetup();
 
-        if (Platform.isMac()){
-
-            //Set specific settings
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
-
-            // Use native file chooser
-            System.setProperty("apple.awt.fileDialogForDirectories", "false");
-
-            // Grow size of boxes to add room for the resizer
-            System.setProperty("apple.awt.showGrowBox", "true");
-
-        }
-
     }
 
     private void trySetLookAndFeel() {
@@ -559,6 +545,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         } catch (Exception exc) {
             Logger.log("Error loading L&F: " + exc);
+        }
+
+
+        if (Platform.isMac()){
+
+            //Set specific settings
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
+
+            // Use native file chooser
+            System.setProperty("apple.awt.fileDialogForDirectories", "false");
+
+            // Grow size of boxes to add room for the resizer
+            System.setProperty("apple.awt.showGrowBox", "true");
+
         }
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
