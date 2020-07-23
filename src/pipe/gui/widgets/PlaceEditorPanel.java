@@ -139,7 +139,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+		gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 		buttonPanel.add(cancelButton, gridBagConstraints);
 
 
@@ -148,7 +148,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+		gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 		buttonPanel.add(okButton, gridBagConstraints);
 
 		setupInitialState();
@@ -282,7 +282,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		attributesCheckBox = new javax.swing.JCheckBox("Show place name");
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		attributesCheckBox.setMargin(new Insets(0, 0, 0, 0));
 
 		gridBagConstraints = GridBagHelper.as(1,3,WEST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
@@ -444,7 +444,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		}
 
-		GridBagConstraints gridBagConstraints = GridBagHelper.as(1,4,2, WEST, new java.awt.Insets(3, 3, 3, 3));
+		GridBagConstraints gridBagConstraints = GridBagHelper.as(1,4,2, WEST, new Insets(3, 3, 3, 3));
 		timeInvariantPanel.add(invariantGroup, gridBagConstraints);
 	}
 
@@ -484,7 +484,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private void switchToNameTextField() {
 		basicPropertiesPanel.remove(sharedPlacesComboBox);
-		GridBagConstraints gbc = GridBagHelper.as(1,1, HORIZONTAL, new java.awt.Insets(3, 3, 3, 3));
+		GridBagConstraints gbc = GridBagHelper.as(1,1, HORIZONTAL, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(nameTextField, gbc);
 
 		basicPropertiesPanel.validate();
@@ -493,7 +493,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private void switchToNameDropDown() {
 		basicPropertiesPanel.remove(nameTextField);
-		GridBagConstraints gbc = GridBagHelper.as(1,1, HORIZONTAL, new java.awt.Insets(3, 3, 3, 3));
+		GridBagConstraints gbc = GridBagHelper.as(1,1, HORIZONTAL, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(sharedPlacesComboBox, gbc);
 
 		basicPropertiesPanel.validate();
