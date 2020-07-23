@@ -442,21 +442,12 @@ public class TimedArcPetriNetNetwork {
 	
 	public boolean isUntimed(){
 		for(TimedArcPetriNet t : tapns){
-			if(t.isTimed || !t.isUntimed()){
+			if(!t.isUntimed()){
 				return false;
 			}
 		}
 		return true;
 	}
-
-    public boolean isGame(){
-        for(TimedArcPetriNet t : tapns){
-            if(t.isGame){
-                return true;
-            }
-        }
-        return false;
-    }
 
 	public boolean hasWeights() {
 		for(TimedArcPetriNet t : tapns){

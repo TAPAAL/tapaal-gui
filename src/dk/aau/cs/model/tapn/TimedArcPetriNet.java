@@ -13,8 +13,6 @@ public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
     private boolean isActive;
-    public boolean isTimed;
-    public boolean isGame;
 
 	//Should the names be checked to see if the name is already used 
 	//This is used when loading big nets as the checking  of names is slow.
@@ -30,17 +28,8 @@ public class TimedArcPetriNet {
 	private TimedMarking currentMarking = new LocalTimedMarking();
 
 	public TimedArcPetriNet(String name) {
-		setName(name);
-		isActive = true;
-		isTimed = !isUntimed();
-		isGame = false;
-	}
-
-    public TimedArcPetriNet(String name, boolean isTimed, boolean isGame) {
         setName(name);
         isActive = true;
-        this.isTimed = isTimed;
-        this.isGame = isGame;
     }
 
 	public TimedMarking marking(){
@@ -298,7 +287,7 @@ public class TimedArcPetriNet {
 	}
 
 	public TimedArcPetriNet copy() {
-		TimedArcPetriNet tapn = new TimedArcPetriNet(name, isTimed, isGame);
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 
 		for(TimedPlace p : places) {
 
@@ -625,7 +614,7 @@ public class TimedArcPetriNet {
 			}
 		}
 		
-		return !isTimed;
+		return true;
 	}
 	
 	public boolean hasUrgentTransitions() {

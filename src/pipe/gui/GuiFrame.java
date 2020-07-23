@@ -497,7 +497,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     @Override
                     protected void closeTab(TabContent tab) {
                         GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
-                        addNetPropertyInfo();
+                        changeNetPropertyInfo();
                     }
                 };
             }
@@ -1265,14 +1265,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 getCurrentTab().switchToEditorComponents();
 
-                addNetPropertyInfo();
+                changeNetPropertyInfo();
 
                 break;
             case animation:
                 getCurrentTab().switchToAnimationComponents(true);
                 startAction.setSelected(true);
 
-                addNetPropertyInfo();
+                changeNetPropertyInfo();
 
                 break;
             case noNet:
@@ -1648,22 +1648,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return CreateGui.getCurrentTab();
     }
 
-    private void addNetPropertyInfo() {
-        removeNetPropertyInfo();
-
+    private void changeNetPropertyInfo() {
         if (getCurrentTab() != null) {
-            TabContent currentTab = getCurrentTab();
-            if (!(drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JSeparator)) {
-                drawingToolBar.addSeparator();
-            }
-
-            String properties = (currentTab.isNetTimed() ? " Timed " : " Untimed ") + "net" +
-                                (currentTab.isNetGame() ? " and includes game features" : "");
-            drawingToolBar.add(new JLabel(properties));
+            drawingToolBar = getCurrentTab().addNetPropertyInfo(drawingToolBar);
         }
     }
 
-    private void removeNetPropertyInfo() {
+    public void removeNetPropertyInfo() {
         int toolBarIndex = drawingToolBar.getComponentCount() - 1;
 
         if (drawingToolBar.getComponent(toolBarIndex) instanceof JLabel) {

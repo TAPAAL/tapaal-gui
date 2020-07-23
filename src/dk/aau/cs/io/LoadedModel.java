@@ -9,8 +9,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 public class LoadedModel{
 	private Collection<Template> templates;
 	private Collection<TAPNQuery> queries;
-	private TimedArcPetriNetNetwork network; 
-	
+	private TimedArcPetriNetNetwork network;
+
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
 		this.templates = templates;
 		this.network = network;

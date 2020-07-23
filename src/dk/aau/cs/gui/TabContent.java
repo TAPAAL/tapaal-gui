@@ -476,7 +476,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), !loadedModel.network().isUntimed(), loadedModel.network().isGame());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), !loadedModel.network().isUntimed(), false);
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
@@ -495,7 +495,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		//Set Default Template
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
-		Template template = new Template(new TimedArcPetriNet(templateName, isTimed, isGame), new DataLayer(), new Zoomer());
+		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template);
 
 		return tab;
@@ -701,14 +701,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
         setQueries(tapnqueries);
         setConstants(network().constants());
 	}
-
-    public boolean isNetTimed() {
-        return lens.isTimed();
-    }
-
-    public boolean isNetGame() {
-        return lens.isGame();
-    }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
 		return sharedPTPanel;
@@ -2254,6 +2246,34 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
 		managerRef.get().registerManager(drawingSurface);
+    }
+
+    public JToolBar addNetPropertyInfo(JToolBar drawingToolBar) {
+        drawingToolBar = removeNetPropertyInfo(drawingToolBar);
+
+        if (!(drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JSeparator)) {
+            drawingToolBar.addSeparator();
+        }
+
+        String properties = "Timed: " + (lens.isTimed() ? "Yes" : "No") +
+                            ", Game: " + (lens.isGame() ? "Yes" : "No");
+        drawingToolBar.add(new JLabel(properties));
+
+        return drawingToolBar;
+    }
+
+    public JToolBar removeNetPropertyInfo(JToolBar drawingToolBar) {
+        int toolBarIndex = drawingToolBar.getComponentCount() - 1;
+
+        if (drawingToolBar.getComponent(toolBarIndex) instanceof JLabel) {
+            drawingToolBar.remove(toolBarIndex);
+            toolBarIndex -= 1;
+
+            if (drawingToolBar.getComponent(toolBarIndex) instanceof JSeparator) {
+                drawingToolBar.remove(toolBarIndex);
+            }
+        }
+        return drawingToolBar;
     }
 
     private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {

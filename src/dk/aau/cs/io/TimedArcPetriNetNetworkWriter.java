@@ -196,20 +196,22 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			netAttrType.setValue("P/T net");
 			NET.setAttributeNode(netAttrType);
 
-            Attr netAttrTimed = document.createAttribute("timed");
-            netAttrTimed.setValue(tapn.model().isUntimed() ? "false" : "true");
-            NET.setAttributeNode(netAttrTimed);
-
-            Attr netAttrGame = document.createAttribute("game");
-            netAttrGame.setValue("false");
-            NET.setAttributeNode(netAttrGame);
-
+            appendProperties(document, tapn, NET);
 			appendAnnotationNotes(document, guiModel, NET);
 			appendPlaces(document, guiModel, NET);
 			appendTransitions(document, guiModel, NET);
 			appendArcs(document, guiModel, NET);
 		}
 	}
+
+    private void appendProperties(Document document, Template tapn, Element NET) {
+	    String isTimed = "true";
+	    if (tapn.model().isUntimed()) {
+	        isTimed = "false";
+        }
+
+	    NET.appendChild(createPropertyElement(isTimed, "false", document));
+    }
 
 	private void appendAnnotationNotes(Document document, DataLayer guiModel, Element NET) {
 		AnnotationNote[] labels = guiModel.getLabels();
@@ -479,5 +481,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 		return arcPoint;
 	}
+
+	private Element createPropertyElement(String isTimed, String isGame, Document document) {
+        Require.that(document != null, "Error: document was null");
+        Element property = document.createElement("property");
+
+        property.setAttribute("isTimed", isTimed);
+        property.setAttribute("isGame", isGame);
+
+        return property;
+    }
 
 }

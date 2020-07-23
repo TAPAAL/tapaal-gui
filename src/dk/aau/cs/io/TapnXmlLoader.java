@@ -124,7 +124,7 @@ public class TapnXmlLoader {
 		network.buildConstraints();
 		
 		parseBound(doc, network);
-		
+
 		return new LoadedModel(network, templates, queries);
 	}
 
@@ -219,19 +219,11 @@ public class TapnXmlLoader {
 	}
 
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
-        TimedArcPetriNet tapn;
         String name = getTAPNName(tapnNode);
 
 		boolean active = getActiveStatus(tapnNode);
 
-		if (canGetInfo(tapnNode)) {
-            boolean isTimed = getInfo(tapnNode, "timed");
-            boolean isGame = getInfo(tapnNode, "game");
-            tapn = new TimedArcPetriNet(name, isTimed, isGame);
-        } else {
-            tapn = new TimedArcPetriNet(name);
-        }
-		
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		tapn.setActive(active);
 		network.add(tapn);
 		nameGenerator.add(tapn);
@@ -300,7 +292,9 @@ public class TapnXmlLoader {
 			template.guiModel().addPetriNetObject(transition);
 		} else if ("arc".equals(element.getNodeName())) {
 			parseAndAddArc(element, template, constants);
-		}
+		} else if ("property".equals(element.getNodeName())) {
+		    parseProperties(element);
+        }
 	}
 
 	private boolean isNameAllowed(String name) {
@@ -716,5 +710,10 @@ public class TapnXmlLoader {
 
 		return new Constant(name, value);
 	}
+
+	private void parseProperties(Element property) {
+        boolean isTime = Boolean.parseBoolean(property.getAttribute("isTimed"));
+        boolean isGame = Boolean.parseBoolean(property.getAttribute("isGame"));
+    }
 
 }

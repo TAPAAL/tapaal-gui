@@ -166,10 +166,19 @@ public class NewTAPNPanel extends JPanel {
         JPanel isTimedPanel = new JPanel(new GridBagLayout());
         ButtonGroup isTimedRadioButtonGroup = new ButtonGroup();
 
-        timedNet = new JRadioButton("Timed net");
-        timedNet.setSelected(true);
+        JLabel timedText = new JLabel("Use time semantics: ");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isTimedPanel.add(timedText, gbc);
+
+        timedNet = new JRadioButton("Yes");
+        timedNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -177,10 +186,10 @@ public class NewTAPNPanel extends JPanel {
         isTimedPanel.add(timedNet, gbc);
         isTimedRadioButtonGroup.add(timedNet);
 
-        JRadioButton untimedNet = new JRadioButton("Untimed net");
+        JRadioButton untimedNet = new JRadioButton("No");
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
@@ -200,10 +209,29 @@ public class NewTAPNPanel extends JPanel {
         JPanel isGamePanel = new JPanel(new GridBagLayout());
         ButtonGroup isGameRadioButtonGroup = new ButtonGroup();
 
-        JRadioButton nonGameNet = new JRadioButton("No game features");
-        nonGameNet.setSelected(true);
+        JLabel gameText = new JLabel("Use game semantics:");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isGamePanel.add(gameText, gbc);
+
+        gameNet = new JRadioButton("Yes");
+        gameNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isGamePanel.add(gameNet, gbc);
+        isGameRadioButtonGroup.add(gameNet);
+
+        JRadioButton nonGameNet = new JRadioButton("No");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -211,19 +239,9 @@ public class NewTAPNPanel extends JPanel {
         isGamePanel.add(nonGameNet, gbc);
         isGameRadioButtonGroup.add(nonGameNet);
 
-        gameNet = new JRadioButton("Game features");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        isGamePanel.add(gameNet, gbc);
-        isGameRadioButtonGroup.add(gameNet);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isGamePanel, gbc);

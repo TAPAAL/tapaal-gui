@@ -232,18 +232,10 @@ public class BatchProcessingLoader {
 	}
 
 	private void parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
-        TimedArcPetriNet tapn;
         String name = getTAPNName(tapnNode);
 		boolean active = getActiveStatus(tapnNode);
 
-		if (canGetInfo(tapnNode)) {
-            boolean isTimed = getInfo(tapnNode, "timed");
-            boolean isGame = getInfo(tapnNode, "game");
-            tapn = new TimedArcPetriNet(name, isTimed, isGame);
-        } else {
-            tapn = new TimedArcPetriNet(name);
-        }
-
+        TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		tapn.setActive(active);
 		network.add(tapn);
 		nameGenerator.add(tapn);
