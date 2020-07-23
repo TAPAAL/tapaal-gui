@@ -38,6 +38,8 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
+import static net.tapaal.swinghelpers.GridBagHelper.*;
+
 public class TAPNTransitionEditor extends JPanel {
 
 	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,inf).";
@@ -102,7 +104,7 @@ public class TAPNTransitionEditor extends JPanel {
                 makeSharedButton.setEnabled(true);
             }
         });
-		gridBagConstraints = GridBagHelper.as(2, 1, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(2, 1, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);	
 		
 		
@@ -123,11 +125,11 @@ public class TAPNTransitionEditor extends JPanel {
             makeNewShared = false;
         });
 		
-		gridBagConstraints = GridBagHelper.as(3,1, GridBagConstraints.WEST, new Insets(5, 5, 5, 5));
+		gridBagConstraints = as(3,1, Anchor.WEST, new Insets(5, 5, 5, 5));
 		transitionEditorPanel.add(makeSharedButton, gridBagConstraints);
 		
 		nameLabel.setText("Name:");
-		gridBagConstraints = GridBagHelper.as(0,1, GridBagConstraints.EAST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(0,1, Anchor.EAST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -142,7 +144,7 @@ public class TAPNTransitionEditor extends JPanel {
 			}
 		});
 		
-		gridBagConstraints = GridBagHelper.as(2, 2, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(2, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
 		
 		urgentCheckBox.addActionListener(e -> {
@@ -152,10 +154,10 @@ public class TAPNTransitionEditor extends JPanel {
 		});
 	
 		rotationLabel.setText("Rotate:");
-		gridBagConstraints = GridBagHelper.as(0,2,  GridBagConstraints.NORTH, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(0,2, Anchor.NORTH, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		gridBagConstraints = GridBagHelper.as(1,2, GridBagConstraints.NORTHWEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
@@ -180,20 +182,20 @@ public class TAPNTransitionEditor extends JPanel {
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(this::cancelButtonHandler);
 		
-		gridBagConstraints = GridBagHelper.as(0,1, GridBagConstraints.EAST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(0,1, Anchor.EAST, new Insets(3, 3, 3, 3));
 		buttonPanel.add(cancelButton, gridBagConstraints);
 
 		
 
-		gridBagConstraints = GridBagHelper.as(1,1, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(1,1, Anchor.WEST, new Insets(3, 3, 3, 3));
 		buttonPanel.add(okButton, gridBagConstraints);
 
-		gridBagConstraints = GridBagHelper.as(0,3, GridBagConstraints.EAST, new Insets(5, 0, 8, 3));
+		gridBagConstraints = as(0,3, Anchor.EAST, new Insets(5, 0, 8, 3));
 		add(buttonPanel, gridBagConstraints);
 
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = GridBagHelper.as(1,3, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = as(1,3, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 		
 		setupInitialState();
