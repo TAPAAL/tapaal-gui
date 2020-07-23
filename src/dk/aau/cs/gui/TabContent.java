@@ -2276,6 +2276,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
         return drawingToolBar;
     }
 
+    public boolean isNetTimed() {
+        return lens.isTimed();
+    }
+
     private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {
 
         private TimedTransitionComponent transition;

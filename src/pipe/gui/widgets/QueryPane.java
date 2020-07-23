@@ -320,25 +320,12 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.setPreferredSize(dimension);
 		addQueryButton.setToolTipText(toolTipNewQuery);
 		addQueryButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {				
-				int openCTLDialog = JOptionPane.YES_OPTION;
-				boolean netIsUntimed = tabContent.network().isUntimed();
-				String optionText = "Do you want to create a CTL query (use for untimed nets) \n or a Reachability query (use for timed nets)?";
-				
-				// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
-				Object[] options = {
-					"CTL",
-					"Reachability"};
-				
+			public void actionPerformed(ActionEvent e) {
+
 				TAPNQuery q = null;
-				if(netIsUntimed){
-					openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-					if(openCTLDialog == JOptionPane.YES_OPTION){
-						q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
-					} else if(openCTLDialog == JOptionPane.NO_OPTION){
-						q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
-					}
-				} else{
+				if (!tabContent.isNetTimed()){
+                    q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+				} else if (tabContent.isNetTimed()) {
 					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 				}
 				if (q != null) {
