@@ -143,7 +143,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         }
 
-        public void addNewTimedPlace(DataLayer c, Point p){
+        public Result<TimedPlaceComponent, ModelViolation> addNewTimedPlace(DataLayer c, Point p){
 	        Require.notNull(c, "datalyer can't be null");
             Require.notNull(p, "Point can't be null");
 
@@ -153,10 +153,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             c.addPetriNetObject(pnObject);
 
             getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, guiModelToModel.get(c), c));
-
+            return new Result<>(pnObject);
         }
 
-        public void addNewTimedTransitions(DataLayer c, Point p) {
+        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
@@ -165,6 +165,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             c.addPetriNetObject(pnObject);
 
             getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, guiModelToModel.get(c), c));
+            return new Result<>(pnObject);
         }
 
         public void addAnnotationNote(DataLayer c, Point p) {
@@ -2009,27 +2010,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         protected void clearPendingArc() {
+            super.clearPendingArc();
             CreateGui.getDrawingSurface().clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
         }
-
-        @Override
-        public void registerManager(DrawingSurfaceImpl canvas) {
-            super.registerManager(null);
-        }
-
-        @Override
-        public void deregisterManager() {
-            super.deregisterManager();
-        }
-
-
     }
 
-    abstract static class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
+    abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
         protected Arc arc;
+        protected int connectsTo; // 0 if nothing, 1 if place, 2 if transition
+
         @Override
         public void registerEvents() {
             registerEvent(
@@ -2057,15 +2049,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected abstract void transitionClicked(TimedTransitionComponent pno);
         protected abstract void placeClicked(TimedPlaceComponent pno);
 
-        protected abstract void clearPendingArc();
+        protected void clearPendingArc() {
+            connectsTo = 0;
+        };
 
         @Override
-        public void registerManager(DrawingSurfaceImpl canvas) {
+        public void setupManager() {
             CreateGui.useExtendedBounds = true;
         }
 
         @Override
-        public void deregisterManager() {
+        public void teardownManager() {
             clearPendingArc();
             CreateGui.useExtendedBounds = false;
         }
@@ -2080,13 +2074,25 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             if (arc!=null) {
-                Point p = e.getPoint();
-                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
-                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+                if (!e.isControlDown()) {
+                    Point p = e.getPoint();
+                    int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
+                    int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
 
-                boolean shiftDown = e.isShiftDown();
-                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
-                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
+                    boolean shiftDown = e.isShiftDown();
+                    //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+                    arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x, y, shiftDown);
+                } else if (connectsTo != 0) { // Quick draw
+                    Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+                    if (connectsTo == 1) { // Place
+                        var r = guiModelManager.addNewTimedPlace(getModel(), p);
+                        placeClicked(r.result);
+                    } else { //Transition
+                        var r = guiModelManager.addNewTimedTransitions(getModel(), p);
+                        transitionClicked(r.result);
+                    }
+                }
             }
         }
 
@@ -2145,6 +2151,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected void transitionClicked(TimedTransitionComponent pno) {
             if (place == null && transition == null) {
                 transition = pno;
+                connectsTo = 1;
                 arc = new TimedOutputArcComponent(pno);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
@@ -2167,6 +2174,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected void placeClicked(TimedPlaceComponent pno) {
             if (place == null && transition == null) {
                 place = pno;
+                connectsTo = 2;
                 arc = new TimedInputArcComponent(pno);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2187,6 +2195,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         protected void clearPendingArc() {
+            super.clearPendingArc();
             CreateGui.getDrawingSurface().clearAllPrototype();
             place = null;
             transition = null;
@@ -2243,7 +2252,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 
         @Override
-        public void deregisterManager() {
+        public void teardownManager() {
             //Remove all mouse-over menus if we exit animation mode
             ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
 
@@ -2300,6 +2309,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected void transitionClicked(TimedTransitionComponent pno) {
             if (place1 != null && transition == null) {
                 transition = pno;
+                connectsTo = 1;
                 arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
@@ -2316,6 +2326,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected void placeClicked(TimedPlaceComponent pno) {
             if (place1 == null && transition == null) {
                 place1 = pno;
+                connectsTo = 2;
                 arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2336,6 +2347,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         protected void clearPendingArc() {
+            super.clearPendingArc();
             CreateGui.getDrawingSurface().clearAllPrototype();
             place1 = place2 = null;
             transition = null;

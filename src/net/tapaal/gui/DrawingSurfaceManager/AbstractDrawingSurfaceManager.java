@@ -52,12 +52,16 @@ public abstract class AbstractDrawingSurfaceManager {
     private final Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
     private final AbstractDrawingSurfaceManager next = null;
 
-    public void registerManager(DrawingSurfaceImpl canvas){
+    public final void registerManager(DrawingSurfaceImpl canvas){
         this.canvas = canvas;
     }
-    public void deregisterManager(){
+
+    public final void deregisterManager(){
         this.canvas = null;
     }
+
+    public void setupManager(){}
+    public void teardownManager(){}
 
     public AbstractDrawingSurfaceManager() {
 			registerEvents();
