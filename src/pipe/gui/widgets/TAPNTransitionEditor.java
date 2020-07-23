@@ -1,8 +1,6 @@
 package pipe.gui.widgets;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -19,6 +17,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
+import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -103,11 +102,7 @@ public class TAPNTransitionEditor extends JPanel {
                 makeSharedButton.setEnabled(true);
             }
         });
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(2, 1, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);	
 		
 		
@@ -128,19 +123,11 @@ public class TAPNTransitionEditor extends JPanel {
             makeNewShared = false;
         });
 		
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+		gridBagConstraints = GridBagHelper.as(3,1, GridBagConstraints.WEST, new Insets(5, 5, 5, 5));
 		transitionEditorPanel.add(makeSharedButton, gridBagConstraints);
 		
 		nameLabel.setText("Name:");
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(0,1, GridBagConstraints.EAST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -155,11 +142,7 @@ public class TAPNTransitionEditor extends JPanel {
 			}
 		});
 		
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(2, 2, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
 		
 		urgentCheckBox.addActionListener(e -> {
@@ -169,18 +152,10 @@ public class TAPNTransitionEditor extends JPanel {
 		});
 	
 		rotationLabel.setText("Rotate:");
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.NORTH;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(0,2,  GridBagConstraints.NORTH, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(1,2, GridBagConstraints.NORTHWEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
@@ -205,36 +180,20 @@ public class TAPNTransitionEditor extends JPanel {
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(this::cancelButtonHandler);
 		
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(0,1, GridBagConstraints.EAST, new Insets(3, 3, 3, 3));
 		buttonPanel.add(cancelButton, gridBagConstraints);
 
 		
 
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(1,1, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
 		buttonPanel.add(okButton, gridBagConstraints);
 
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(5, 0, 8, 3);
+		gridBagConstraints = GridBagHelper.as(0,3, GridBagConstraints.EAST, new Insets(5, 0, 8, 3));
 		add(buttonPanel, gridBagConstraints);
 
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(1,3, GridBagConstraints.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 		
 		setupInitialState();
@@ -316,7 +275,7 @@ public class TAPNTransitionEditor extends JPanel {
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
-		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);		
+		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);
 		if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
 			((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
 		}else{
