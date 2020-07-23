@@ -4,6 +4,9 @@ import java.awt.*;
 
 public class GridBagHelper {
 
+
+
+
     public enum Anchor {
         NORTH(11),
         EAST(13),
@@ -57,6 +60,23 @@ public class GridBagHelper {
 
     public static GridBagConstraints as(int gridx, int gridy, Anchor anchor) {
         return as(gridx, gridy, anchor, null);
+    }
+
+    public static GridBagConstraints as(int gridx, int gridy, Insets inset) {
+        return as(gridx, gridy, null, null, inset);
+    }
+
+    public static GridBagConstraints as(int gridx, int gridy) {
+        return as(gridx, gridy, null, null, null);
+    }
+    public static GridBagConstraints as(int gridx, int gridy, int gridwidth, Anchor anchor, Insets inset) {
+        return as(gridx, gridy, gridwidth, 1, anchor, inset);
+    }
+    public static GridBagConstraints as(int gridx, int gridy, int gridwidth, int gridtheight, Anchor anchor, Insets inset) {
+        var r = as(gridx, gridy, anchor, null, inset );
+        r.gridwidth = gridwidth;
+        r.gridheight = gridtheight;
+        return r;
     }
 
 }

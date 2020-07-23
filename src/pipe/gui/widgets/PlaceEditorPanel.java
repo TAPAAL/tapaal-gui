@@ -23,6 +23,7 @@ import javax.swing.JSpinner;
 import javax.swing.event.ChangeListener;
 
 import net.tapaal.swinghelpers.CustomJSpinner;
+import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
@@ -50,6 +51,9 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
+
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
+import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
 
 public class PlaceEditorPanel extends javax.swing.JPanel {
 
@@ -224,11 +228,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		});
 
-		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
+		GridBagConstraints gridBagConstraints = GridBagHelper.as(2,1, WEST, new Insets(0, 3, 3, 3));
 		basicPropertiesPanel.add(sharedCheckBox, gridBagConstraints);
 
 		makeSharedButton = new javax.swing.JButton();
@@ -250,19 +250,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			makeNewShared = false;
 		});
 		
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+		gridBagConstraints = GridBagHelper.as(3,1, WEST, new Insets(5, 5, 5, 5));
 		basicPropertiesPanel.add(makeSharedButton, gridBagConstraints);
 		
 		nameLabel = new javax.swing.JLabel("Name:");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(0,1, EAST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField = new javax.swing.JTextField();
@@ -281,32 +273,18 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		});
 
 		markingLabel = new javax.swing.JLabel("Marking:");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(0,2, EAST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(markingLabel, gridBagConstraints);
 
-		//		markingSpinner = new javax.swing.JSpinner();
-		//		markingSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-		//		markingSpinner.setPreferredSize(new Dimension(75,27));
 		markingSpinner = new CustomJSpinner(0, okButton);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		gridBagConstraints = GridBagHelper.as(1,2, WEST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
 
 		attributesCheckBox = new javax.swing.JCheckBox("Show place name");
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+
+		gridBagConstraints = GridBagHelper.as(1,3,WEST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
 	}
 
@@ -351,28 +329,13 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		});
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		GridBagConstraints gbc = GridBagHelper.as(1,0, HORIZONTAL, new Insets(3, 3, 3, 3));
 		invariantGroup.add(invRelationNormal, gbc);
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		invariantGroup.add(invRelationConstant, gbc);
+		gbc = GridBagHelper.as(1,1, HORIZONTAL, new Insets(3, 3, 3, 3));
+        invariantGroup.add(invRelationConstant, gbc);
 
-		//	invariantSpinner.setMaximumSize(new Dimension(100, 30));
-		//  invariantSpinner.setMinimumSize(new Dimension(230, 30));
-		//invariantSpinner.setPreferredSize(new Dimension(230, 30));
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(3, 3, 3, 3);
+		gbc = GridBagHelper.as(2,0, new Insets(3, 3, 3, 3));
 		invariantGroup.add(invariantSpinner, gbc);
 
 		invariantInf = new JCheckBox("inf");
@@ -398,9 +361,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 
 		});
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 0;
+		gbc = GridBagHelper.as(3,0);
 		invariantGroup.add(invariantInf, gbc);
 
 		Set<String> constants = context.network().getConstantNames();
@@ -419,10 +380,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		});
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(2,1, WEST);
 		invariantGroup.add(invConstantsComboBox, gbc);
 
 		normalInvRadioButton = new JRadioButton("Normal");
@@ -443,16 +401,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		btnGroup.add(normalInvRadioButton);
 		btnGroup.add(constantInvRadioButton);
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0,0, WEST);
 		invariantGroup.add(normalInvRadioButton, gbc);
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0,1, WEST);
 		invariantGroup.add(constantInvRadioButton, gbc);
 
 		TimeInvariant invariantToSet = place.getInvariant();
@@ -492,12 +444,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		}
 
-		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		GridBagConstraints gridBagConstraints = GridBagHelper.as(1,4,2, WEST, new java.awt.Insets(3, 3, 3, 3));
 		timeInvariantPanel.add(invariantGroup, gridBagConstraints);
 	}
 
@@ -535,35 +482,20 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantInf.setEnabled(false);
 	}
 
-	ChangeListener changeListener = new javax.swing.event.ChangeListener() {
-		public void stateChanged(javax.swing.event.ChangeEvent evt) {
-			JSpinner spinner = (JSpinner) evt.getSource();
-			JSpinner.NumberEditor numberEditor = ((JSpinner.NumberEditor) spinner.getEditor());
-			numberEditor.getTextField().setBackground(new Color(255, 255, 255));
-			spinner.removeChangeListener(this);
-		}
-	};
-
 	private void switchToNameTextField() {
 		basicPropertiesPanel.remove(sharedPlacesComboBox);
-		GridBagConstraints gbc = new java.awt.GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
-		basicPropertiesPanel.add(nameTextField, gbc);	
+		GridBagConstraints gbc = GridBagHelper.as(1,1, HORIZONTAL, new java.awt.Insets(3, 3, 3, 3));
+		basicPropertiesPanel.add(nameTextField, gbc);
+
 		basicPropertiesPanel.validate();
 		basicPropertiesPanel.repaint();
 	}
 
 	private void switchToNameDropDown() {
 		basicPropertiesPanel.remove(nameTextField);
-		GridBagConstraints gbc = new java.awt.GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
-		basicPropertiesPanel.add(sharedPlacesComboBox, gbc);		
+		GridBagConstraints gbc = GridBagHelper.as(1,1, HORIZONTAL, new java.awt.Insets(3, 3, 3, 3));
+		basicPropertiesPanel.add(sharedPlacesComboBox, gbc);
+
 		basicPropertiesPanel.validate();
 		basicPropertiesPanel.repaint();
 
