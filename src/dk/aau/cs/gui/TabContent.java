@@ -1983,7 +1983,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
 
-        protected void transitionClicked(TimedTransitionComponent pno) {
+        protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place != null && transition == null) {
                 transition = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
@@ -1993,9 +1993,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        protected void placeClicked(TimedPlaceComponent pno) {
+        protected void placeClicked(TimedPlaceComponent pno, MouseEvent e) {
             if (place == null && transition == null) {
                 place = pno;
+                connectsTo = 2;
                 arc = new TimedInhibitorArcComponent(pno);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2016,21 +2017,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
             transition = null;
             arc = null;
         }
+
     }
 
     abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
         protected Arc arc;
-        protected int connectsTo; // 0 if nothing, 1 if place, 2 if transition
+        protected int connectsTo = 1; // 0 if nothing, 1 if place, 2 if transition
 
         @Override
         public void registerEvents() {
             registerEvent(
                 e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                e->placeClicked(((TimedPlaceComponent) e.pno))
+                e->placeClicked(((TimedPlaceComponent) e.pno), e.e)
             );
             registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
-                e->transitionClicked(((TimedTransitionComponent) e.pno))
+                e->transitionClicked(((TimedTransitionComponent) e.pno), e.e)
             );
             registerEvent(
                 e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
@@ -2046,8 +2048,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
         }
 
-        protected abstract void transitionClicked(TimedTransitionComponent pno);
-        protected abstract void placeClicked(TimedPlaceComponent pno);
+        protected abstract void transitionClicked(TimedTransitionComponent pno, MouseEvent e);
+        protected abstract void placeClicked(TimedPlaceComponent pno, MouseEvent e);
 
         protected void clearPendingArc() {
             connectsTo = 0;
@@ -2087,12 +2089,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
                     if (connectsTo == 1) { // Place
                         var r = guiModelManager.addNewTimedPlace(getModel(), p);
-                        placeClicked(r.result);
+                        placeClicked(r.result, e);
                     } else { //Transition
                         var r = guiModelManager.addNewTimedTransitions(getModel(), p);
-                        transitionClicked(r.result);
+                        transitionClicked(r.result, e);
                     }
                 }
+            } else { // Quick draw
+                Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+                var r = guiModelManager.addNewTimedPlace(getModel(), p);
+
+                placeClicked(r.result, e);
             }
         }
 
@@ -2148,7 +2155,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
 
-        protected void transitionClicked(TimedTransitionComponent pno) {
+        protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place == null && transition == null) {
                 transition = pno;
                 connectsTo = 1;
@@ -2168,10 +2175,24 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 var result = guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
+
+                if (e != null && e.isControlDown()) {
+                    transition = pno;
+                    connectsTo = 1;
+                    arc = new TimedOutputArcComponent(pno);
+                    //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                    //to avoid this we change the endpoint to set the end point to the same as the end point
+                    //needs further refactorings //kyrke 2019-09-05
+                    arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    arc.requestFocusInWindow();
+                    arc.setSelectable(false);
+                    arc.enableDrawingKeyBindings(this::clearPendingArc);
+                }
             }
         }
 
-        protected void placeClicked(TimedPlaceComponent pno) {
+        protected void placeClicked(TimedPlaceComponent pno, MouseEvent e) {
             if (place == null && transition == null) {
                 place = pno;
                 connectsTo = 2;
@@ -2190,6 +2211,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 var result = guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
+
+                if (e!= null && e.isControlDown()) {
+                    place = pno;
+                    connectsTo = 2;
+                    arc = new TimedInputArcComponent(pno);
+                    //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                    //to avoid this we change the endpoint to set the end point to the same as the end point
+                    //needs further refactorings //kyrke 2019-09-05
+                    arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    arc.requestFocusInWindow();
+                    arc.setSelectable(false);
+                    arc.enableDrawingKeyBindings(this::clearPendingArc);
+                }
             }
         }
 
@@ -2306,7 +2341,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        protected void transitionClicked(TimedTransitionComponent pno) {
+        protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place1 != null && transition == null) {
                 transition = pno;
                 connectsTo = 1;
@@ -2323,7 +2358,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        protected void placeClicked(TimedPlaceComponent pno) {
+        protected void placeClicked(TimedPlaceComponent pno, MouseEvent e) {
             if (place1 == null && transition == null) {
                 place1 = pno;
                 connectsTo = 2;
@@ -2342,6 +2377,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 var result = guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
+
+                if (e != null && e.isControlDown()) {
+                    place1 = pno;
+                    connectsTo = 2;
+                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                    //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                    //to avoid this we change the endpoint to set the end point to the same as the end point
+                    //needs further refactorings //kyrke 2019-09-05
+                    arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    arc.requestFocusInWindow();
+                    arc.setSelectable(false);
+                    arc.enableDrawingKeyBindings(this::clearPendingArc);
+                }
             }
         }
 

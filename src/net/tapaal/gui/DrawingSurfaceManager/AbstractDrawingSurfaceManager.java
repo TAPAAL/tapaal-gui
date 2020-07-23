@@ -54,10 +54,12 @@ public abstract class AbstractDrawingSurfaceManager {
 
     public final void registerManager(DrawingSurfaceImpl canvas){
         this.canvas = canvas;
+        setupManager();
     }
 
     public final void deregisterManager(){
         this.canvas = null;
+        teardownManager();
     }
 
     public void setupManager(){}
