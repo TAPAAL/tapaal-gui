@@ -17,17 +17,42 @@ public class GridBagHelper {
         }
     }
 
-    public static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Insets inset) {
+    public enum Fill {
+        HORIZONTAL(2);
+
+        public final int value;
+
+        Fill(int value) {
+
+            this.value = value;
+        }
+    }
+
+    private static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Fill fill, Insets inset) {
         var gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = anchor.value;
+
+        if (anchor != null) {
+            gridBagConstraints.anchor = anchor.value;
+        }
+
+        if (fill != null) {
+            gridBagConstraints.fill = fill.value;
+        }
 
         if (inset != null) {
             gridBagConstraints.insets = inset;
         }
 
         return gridBagConstraints;
+    }
+    public static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Insets inset) {
+        return as(gridx, gridy, anchor, null, inset);
+    }
+
+    public static GridBagConstraints as(int gridx, int gridy, Fill fill, Insets inset) {
+        return as(gridx, gridy, null, fill, inset);
     }
 
     public static GridBagConstraints as(int gridx, int gridy, Anchor anchor) {
