@@ -90,8 +90,7 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Transition", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Transition", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
