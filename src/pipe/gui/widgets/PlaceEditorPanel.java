@@ -82,30 +82,19 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		setLayout(new java.awt.GridBagLayout());
 
 		initBasicPropertiesPanel();
-		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new Insets(5, 8, 0, 8);
+		GridBagConstraints gridBagConstraints = GridBagHelper.as(0,0, WEST, HORIZONTAL, new Insets(5, 8, 0, 8));
 		add(basicPropertiesPanel, gridBagConstraints);
 
 		initTimeInvariantPanel();
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new Insets(0, 8, 0, 8);
+
+		gridBagConstraints = GridBagHelper.as(0,1, WEST, HORIZONTAL, new Insets(0, 8, 0, 8));
 		add(timeInvariantPanel, gridBagConstraints);
 
 		initButtonPanel();
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+
+		gridBagConstraints = GridBagHelper.as(0,2, new Insets(0, 8, 5, 8));
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		//	gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new Insets(0, 8, 5, 8);
+		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		add(buttonPanel, gridBagConstraints);
 	}
 
@@ -134,21 +123,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(evt -> exit());
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints = GridBagHelper.as(0,0,EAST, new Insets(5, 5, 5, 5));
 		gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+
 		buttonPanel.add(cancelButton, gridBagConstraints);
 
 
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+		gridBagConstraints = GridBagHelper.as(1,0, WEST, new Insets(5, 5, 5, 5));
 		buttonPanel.add(okButton, gridBagConstraints);
 
 		setupInitialState();

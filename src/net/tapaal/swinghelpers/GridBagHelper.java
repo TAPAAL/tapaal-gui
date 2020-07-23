@@ -31,7 +31,7 @@ public class GridBagHelper {
         }
     }
 
-    private static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Fill fill, Insets inset) {
+    public static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Fill fill, Insets inset) {
         var gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx;
         gridBagConstraints.gridy = gridy;
