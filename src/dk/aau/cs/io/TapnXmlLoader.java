@@ -128,6 +128,8 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 
+		parseProperty(doc);
+
 		return new LoadedModel(network, templates, queries, isTimed, isGame);
 	}
 
@@ -137,6 +139,16 @@ public class TapnXmlLoader {
 			network.setDefaultBound(i);
 		}
 	}
+
+    private void parseProperty(Document doc) {
+	    if (doc.getElementsByTagName("property").getLength() > 0) {
+	        NodeList nodeList = doc.getElementsByTagName("property");
+
+            isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
+            isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
+        }
+
+    }
 
 	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");
@@ -294,9 +306,7 @@ public class TapnXmlLoader {
 			TimedTransitionComponent transition = parseTransition(element, network, template.model());
 			template.guiModel().addPetriNetObject(transition);
 		} else if ("arc".equals(element.getNodeName())) {
-			parseAndAddArc(element, template, constants);
-		} else if ("property".equals(element.getNodeName())) {
-		    parseProperties(element);
+            parseAndAddArc(element, template, constants);
         }
 	}
 
@@ -713,10 +723,5 @@ public class TapnXmlLoader {
 
 		return new Constant(name, value);
 	}
-
-	private void parseProperties(Element property) {
-        isTimed = Boolean.parseBoolean(property.getAttribute("isTimed"));
-        isGame = Boolean.parseBoolean(property.getAttribute("isGame"));
-    }
 
 }

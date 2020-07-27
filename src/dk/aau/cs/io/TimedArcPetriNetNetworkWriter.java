@@ -106,6 +106,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 		appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
+		appendProperties(document, pnmlRootNode);
 
 		document.normalize();
 		// Create Transformer with XSL Source File
@@ -156,6 +157,29 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		element.setAttribute("bound", network.getDefaultBound() + "");
 		root.appendChild(element);
 	}
+
+    private void appendProperties(Document document, Element root) {
+        String isTimed = "true";
+        String isGame = "true";
+        if (!this.isTimed) {
+            isTimed = "false";
+        }
+        if (!this.isGame) {
+            isGame = "false";
+        }
+
+        root.appendChild(createPropertyElement(isTimed, isGame, document));
+    }
+
+    private Element createPropertyElement(String isTimed, String isGame, Document document) {
+        Require.that(document != null, "Error: document was null");
+        Element property = document.createElement("property");
+
+        property.setAttribute("isTimed", isTimed);
+        property.setAttribute("isGame", isGame);
+
+        return property;
+    }
 	
 	private void appendSharedPlaces(Document document, Element root) {
 		for(SharedPlace place : network.sharedPlaces()){
@@ -213,26 +237,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			netAttrType.setValue("P/T net");
 			NET.setAttributeNode(netAttrType);
 
-            appendProperties(document, tapn, NET);
 			appendAnnotationNotes(document, guiModel, NET);
 			appendPlaces(document, guiModel, NET);
 			appendTransitions(document, guiModel, NET);
 			appendArcs(document, guiModel, NET);
 		}
 	}
-
-    private void appendProperties(Document document, Template tapn, Element NET) {
-        String isTimed = "true";
-        String isGame = "true";
-	    if (!this.isTimed && tapn.model().isUntimed()) {
-	        isTimed = "false";
-        }
-	    if (!this.isGame) {
-	        isGame = "false";
-        }
-
-	    NET.appendChild(createPropertyElement(isTimed, isGame, document));
-    }
 
 	private void appendAnnotationNotes(Document document, DataLayer guiModel, Element NET) {
 		AnnotationNote[] labels = guiModel.getLabels();
@@ -502,15 +512,5 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 		return arcPoint;
 	}
-
-	private Element createPropertyElement(String isTimed, String isGame, Document document) {
-        Require.that(document != null, "Error: document was null");
-        Element property = document.createElement("property");
-
-        property.setAttribute("isTimed", isTimed);
-        property.setAttribute("isGame", isGame);
-
-        return property;
-    }
 
 }
