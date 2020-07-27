@@ -1765,7 +1765,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	final AbstractDrawingSurfaceManager animationModeController;
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
-	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite) {
+	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
 		try {
 			NetworkMarking currentMarking = null;
 			if(isInAnimationMode()){
@@ -1777,7 +1777,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					network(),
 					allTemplates(),
 					queriesOverwrite,
-					network().constants()
+					network().constants(),
+                    lens.timed,
+					lens.game
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -1794,7 +1796,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void writeNetToFile(File outFile) {
-		writeNetToFile(outFile, (List<TAPNQuery>) queries());
+		writeNetToFile(outFile, (List<TAPNQuery>) queries(), lens);
 	}
 
 	@Override
@@ -2278,6 +2280,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public boolean isNetTimed() {
         return lens.isTimed();
+    }
+
+    public TAPNLens getLens() {
+        return lens;
     }
 
     private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {

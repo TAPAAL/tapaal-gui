@@ -55,6 +55,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private Iterable<TAPNQuery> queries;
 	private Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
+    private boolean isTimed;
+    private boolean isGame;
 
 	public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
@@ -66,6 +68,21 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		this.queries = queries;
 		this.constants = constants;
 	}
+
+    public TimedArcPetriNetNetworkWriter(
+        TimedArcPetriNetNetwork network,
+        Iterable<Template> templates,
+        Iterable<TAPNQuery> queries,
+        Iterable<Constant> constants,
+        boolean isTimed,
+        boolean isGame) {
+        this.network = network;
+        this.templates = templates;
+        this.queries = queries;
+        this.constants = constants;
+        this.isTimed = isTimed;
+        this.isGame = isGame;
+    }
 	
 	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
 		Document document = null;
@@ -205,12 +222,16 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	}
 
     private void appendProperties(Document document, Template tapn, Element NET) {
-	    String isTimed = "true";
-	    if (tapn.model().isUntimed()) {
+        String isTimed = "true";
+        String isGame = "true";
+	    if (!this.isTimed && tapn.model().isUntimed()) {
 	        isTimed = "false";
         }
+	    if (!this.isGame) {
+	        isGame = "false";
+        }
 
-	    NET.appendChild(createPropertyElement(isTimed, "false", document));
+	    NET.appendChild(createPropertyElement(isTimed, isGame, document));
     }
 
 	private void appendAnnotationNotes(Document document, DataLayer guiModel, Element NET) {
