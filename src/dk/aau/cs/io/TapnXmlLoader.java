@@ -70,6 +70,9 @@ public class TapnXmlLoader {
 	private boolean firstPlaceRenameWarning = true;
 	private IdResolver idResolver = new IdResolver();
 
+	private boolean isTimed;
+	private boolean isGame;
+
 	public TapnXmlLoader() {
 	}
 
@@ -125,7 +128,7 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 
-		return new LoadedModel(network, templates, queries);
+		return new LoadedModel(network, templates, queries, isTimed, isGame);
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -712,8 +715,8 @@ public class TapnXmlLoader {
 	}
 
 	private void parseProperties(Element property) {
-        boolean isTime = Boolean.parseBoolean(property.getAttribute("isTimed"));
-        boolean isGame = Boolean.parseBoolean(property.getAttribute("isGame"));
+        isTimed = Boolean.parseBoolean(property.getAttribute("isTimed"));
+        isGame = Boolean.parseBoolean(property.getAttribute("isGame"));
     }
 
 }
