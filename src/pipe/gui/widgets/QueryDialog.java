@@ -68,10 +68,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
-import pipe.gui.MessengerImpl;
-import pipe.gui.Verifier;
-import pipe.gui.Zoomer;
+import pipe.gui.*;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -254,8 +251,17 @@ public class QueryDialog extends JPanel {
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
+	private final EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(name_verifyTAPN,false, false, false,false,false,true,false,false,true);
+    private final EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(name_COMBI,false, true,false,false,true,true,true,true,true);
+    private final EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(name_OPTIMIZEDSTANDARD,false, false,false,false,false,false,false,true,true);
+    private final EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(name_STANDARD,false, false, false,false,false,false,false,false,true);
+    private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(name_BROADCAST,false, true, false,false,false,true,false,true,true);
+    private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(name_BROADCASTDEG2,false, true, false,false,false,true,false,true,true);
+    private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(name_DISCRETE,true, true, true,true,true,true,true,true,false);
+    private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,true,true,true);
+    private final EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyDTAPNOptions,verifyPNOptions};
 
-	private TCTLAbstractProperty newProperty;
+    private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 
 	private static Boolean advancedView = false;
@@ -726,12 +732,23 @@ public class QueryDialog extends JPanel {
 		ArrayList<String> options = new ArrayList<String>();
 		
 		disableSymmetryUpdate = true;
-
+		//The order here should be the same as in EngineSupportOptions
+        boolean[] queryOptions = new boolean[]{fastestTraceRadioButton.isSelected(),
+            (queryHasDeadlock() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && isNetDegree2),
+            (queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))),
+            (queryHasDeadlock() && hasInhibitorArcs),
+            tapnNetwork.hasWeights(),
+            hasInhibitorArcs,
+            tapnNetwork.hasUrgentTransitions(),
+            (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")),
+            !tapnNetwork.isNonStrict()
+        };
 		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
 		}
 		*/
+
 		
 		if(useTimeDarts != null){
 			if(hasForcedDisabledTimeDarts){
@@ -756,8 +773,26 @@ public class QueryDialog extends JPanel {
 			}
             useGCD.setEnabled(true);     
         }
-		
-        if (fastestTraceRadioButton.isSelected()) {
+        if (tapnNetwork.isNonStrict()) {
+            //options.add(name_DISCRETE);
+            // disable timedarts if liveness and deadlock prop
+            if((getQuantificationSelection().equals("E[]") ||
+                getQuantificationSelection().equals("A<>"))){
+                if (useTimeDarts != null) {
+                    if(useTimeDarts.isSelected()){
+                        hasForcedDisabledTimeDarts = true;
+                    }
+                    useTimeDarts.setEnabled(false);
+                    useTimeDarts.setSelected(false);
+                }
+            }
+        }
+		for(EngineSupportOptions engine : engineSupportOptions){
+		    if(engine.areOptionsSupported(queryOptions)){
+		        options.add(engine.getNameString());
+            }
+        }
+        /*if (fastestTraceRadioButton.isSelected()) {
         	options.add(name_DISCRETE);
         } else if (queryHasDeadlock()) {
             if (tapnNetwork.isNonStrict()) {
@@ -814,7 +849,7 @@ public class QueryDialog extends JPanel {
 				options.add(name_DISCRETE);
 			}
 			options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
-		}
+		}*/
 
 		reductionOption.removeAllItems();
 
