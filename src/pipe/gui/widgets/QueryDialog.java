@@ -251,14 +251,14 @@ public class QueryDialog extends JPanel {
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
-	private final EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(name_verifyTAPN,false, false, false,false,false,true,false,false,true);
-    private final EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(name_COMBI,false, true,false,false,true,true,true,true,true);
-    private final EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(name_OPTIMIZEDSTANDARD,false, false,false,false,false,false,false,true,true);
-    private final EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(name_STANDARD,false, false, false,false,false,false,false,false,true);
-    private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(name_BROADCAST,false, true, false,false,false,true,false,true,true);
-    private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(name_BROADCASTDEG2,false, true, false,false,false,true,false,true,true);
-    private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(name_DISCRETE,true, true, true,true,true,true,true,true,false);
-    private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,true,true,true);
+	private final EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(name_verifyTAPN,false, false, false,false,false,true,false,false,true, true);
+    private final EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(name_COMBI,false, true,false,false,true,true,true,true,true, true);
+    private final EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(name_OPTIMIZEDSTANDARD,false, false,false,false,false,false,false,true,true, true);
+    private final EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(name_STANDARD,false, false, false,false,false,false,false,false,true, true);
+    private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(name_BROADCAST,false, true, false,false,false,true,false,true,true, true);
+    private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(name_BROADCASTDEG2,false, true, false,false,false,true,false,true,true, true);
+    private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(name_DISCRETE,true, true, true,true,true,true,true,true,false, true);
+    private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,true,true,true, false);
     private final EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyDTAPNOptions,verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
@@ -741,7 +741,10 @@ public class QueryDialog extends JPanel {
             hasInhibitorArcs,
             tapnNetwork.hasUrgentTransitions(),
             (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")),
-            !tapnNetwork.isNonStrict()
+            //we want to know if it is strict
+            !tapnNetwork.isNonStrict(),
+            //we want to know if it is timed
+            !tapnNetwork.isUntimed()
         };
 		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
