@@ -47,8 +47,9 @@ public class VerifyTAPNExporter {
 			    CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
 			    queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
 			} else {
-			    queryStream.append(query.getProperty().toString());
-			}
+                queryStream.append(query.getProperty().toString());
+            }
+
 			
 			queryStream.close();
 		} catch(FileNotFoundException e) {

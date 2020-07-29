@@ -301,8 +301,8 @@ public class BatchProcessingLoader {
 	private void parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
-		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
-        boolean isUncontrollable = Boolean.parseBoolean(transition.getAttribute("uncontrollable"));
+		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("u®rgent"));
+        boolean isUncontrollable = transition.getAttribute("player").equals("1");
 
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
