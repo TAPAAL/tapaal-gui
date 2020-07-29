@@ -258,8 +258,8 @@ public class QueryDialog extends JPanel {
     private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(name_BROADCAST,false, true, false,false,false,true,false,true,true, true);
     private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(name_BROADCASTDEG2,false, true, false,false,false,true,false,true,true, true);
     private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(name_DISCRETE,true, true, true,true,true,true,true,true,false, true);
-    private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,true,true,true, false);
-    private final EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyDTAPNOptions,verifyPNOptions};
+    //private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false);
+    private final EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
