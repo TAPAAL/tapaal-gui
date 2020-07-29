@@ -38,15 +38,17 @@ public class VerifyTAPNExporter {
 
 		try{
 			PrintStream modelStream = new PrintStream(modelFile);
-			
+
 			outputModel(model, modelStream);
 			modelStream.close();
-			
+
 			PrintStream queryStream = new PrintStream(queryFile);
 			if (query.getCategory() == QueryCategory.CTL){
 			    CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
 			    queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-			} else {
+			} else if (model.hasUncontrollableTransitions()) {
+			    queryStream.append("control: " + query.getProperty().toString());
+            } else {
                 queryStream.append(query.getProperty().toString());
             }
 

@@ -946,8 +946,25 @@ public class QueryDialog extends JPanel {
 		falsePredicateButton.setEnabled(true);
 		deadLockPredicateButton.setEnabled(true);
 		setEnablednessOfAddPredicateButton();
-
 	}
+
+    private void enableOnlyForAllBox() {
+        existsBox.setEnabled(false);
+        existsDiamond.setEnabled(false);
+        forAllBox.setEnabled(true);
+        forAllDiamond.setEnabled(false);
+        conjunctionButton.setEnabled(false);
+        disjunctionButton.setEnabled(false);
+        negationButton.setEnabled(false);
+        templateBox.setEnabled(false);
+        placesBox.setEnabled(false);
+        relationalOperatorBox.setEnabled(false);
+        placeMarking.setEnabled(false);
+        addPredicateButton.setEnabled(false);
+        truePredicateButton.setEnabled(false);
+        falsePredicateButton.setEnabled(false);
+        deadLockPredicateButton.setEnabled(false);
+    }
 
 	private void setEnablednessOfAddPredicateButton() {
 		if (placesBox.getSelectedItem() == null)
@@ -2422,7 +2439,11 @@ public class QueryDialog extends JPanel {
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
 			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-				enableOnlyPathButtons();
+			    if (tapnNetwork.hasUncontrollableTransitions()) {
+                    enableOnlyForAllBox();
+                } else {
+                    enableOnlyPathButtons();
+                }
 			} else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
 				enableOnlyStateButtons();
 			}
@@ -2513,7 +2534,8 @@ public class QueryDialog extends JPanel {
 			}
 
 			// Disable GCD calculation for EG/AF or deadlock queries
-			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") ||
+                tapnNetwork.hasUncontrollableTransitions()){
 				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
 				useGCD.setSelected(false);
 				useGCD.setEnabled(false);

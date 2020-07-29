@@ -52,7 +52,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 		
 		for (int i = 0; i < queryNodes.getLength(); i++) {
-			Node q = queryNodes.item(i);
+            Node q = queryNodes.item(i);
 
 			if (q instanceof Element) {
 				TAPNQuery query = parseTAPNQuery((Element) q, network);
