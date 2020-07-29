@@ -106,7 +106,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 		appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
-		appendProperties(document, pnmlRootNode);
+		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
 		// Create Transformer with XSL Source File
@@ -158,7 +158,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		root.appendChild(element);
 	}
 
-    private void appendProperties(Document document, Element root) {
+    private void appendFeature(Document document, Element root) {
         String isTimed = "true";
         String isGame = "true";
         if (!this.isTimed) {
@@ -168,12 +168,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
             isGame = "false";
         }
 
-        root.appendChild(createPropertyElement(isTimed, isGame, document));
+        root.appendChild(createFeatureElement(isTimed, isGame, document));
     }
 
-    private Element createPropertyElement(String isTimed, String isGame, Document document) {
+    private Element createFeatureElement(String isTimed, String isGame, Document document) {
         Require.that(document != null, "Error: document was null");
-        Element property = document.createElement("property");
+        Element property = document.createElement("feature");
 
         property.setAttribute("isTimed", isTimed);
         property.setAttribute("isGame", isGame);

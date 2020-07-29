@@ -128,7 +128,7 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 
-		parseProperty(doc);
+		parseFeature(doc);
 
 		return new LoadedModel(network, templates, queries, isTimed, isGame);
 	}
@@ -140,9 +140,9 @@ public class TapnXmlLoader {
 		}
 	}
 
-    private void parseProperty(Document doc) {
-	    if (doc.getElementsByTagName("property").getLength() > 0) {
-	        NodeList nodeList = doc.getElementsByTagName("property");
+    private void parseFeature(Document doc) {
+	    if (doc.getElementsByTagName("feature").getLength() > 0) {
+	        NodeList nodeList = doc.getElementsByTagName("feature");
 
             isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
             isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
