@@ -322,16 +322,16 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				TAPNQuery q = null;
+				TAPNQuery q;
 				if (!tabContent.isNetTimed()){
                     q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
-				} else if (tabContent.isNetTimed()) {
+				} else {
 					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 				}
-				if (q != null) {
-					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
-					addQuery(q);
-				}
+
+                undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
+                addQuery(q);
+
 				updateQueryButtons();
 			}
 		});
