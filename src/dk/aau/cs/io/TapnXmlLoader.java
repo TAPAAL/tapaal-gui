@@ -61,8 +61,6 @@ import dk.aau.cs.util.Require;
 
 public class TapnXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
-    private static final String TIME_ERROR_MESSAGE = "The net contains time features. The entire net will be changed to include time features.";
-    private static final String GAME_ERROR_MESSAGE = "The net contains game features. The entire net will be changed to include game features.";
     private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
@@ -154,11 +152,9 @@ public class TapnXmlLoader {
 
             if (networkIsTimed && !isTimed) {
                 isTimed = true;
-                JOptionPane.showMessageDialog(CreateGui.getApp(), TIME_ERROR_MESSAGE);
             }
             if (hasUncontrollableTransitions && !isGame) {
                 isGame = true;
-                JOptionPane.showMessageDialog(CreateGui.getApp(), GAME_ERROR_MESSAGE);
             }
         } else {
             isTimed = networkIsTimed;
@@ -269,7 +265,6 @@ public class TapnXmlLoader {
 				parseElement((Element)node, template, network, constants);
 			}
 		}
-
 
 		return template;
 	}

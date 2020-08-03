@@ -477,12 +477,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			LoadedModel loadedModel = loader.load(file);
 
             TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
 
 			tab.setFile(null);
-			return tab;
+
+            return tab;
 		} catch (Exception e) {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
 		}
@@ -2280,6 +2282,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public boolean isNetTimed() {
         return lens.isTimed();
+    }
+
+    public boolean isNetGame() {
+        return lens.isGame();
     }
 
     public TAPNLens getLens() {
