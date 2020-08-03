@@ -366,7 +366,7 @@ public class TimedArcPetriNet {
 	
 	public boolean isDegree2(){
 		for(TimedTransition t : this.transitions()) {
-			if(t.presetSize() > 2 || t.postsetSize() > 2)
+			if(t.presetSizeWithoutInhibitorArcs() > 2 || t.postsetSize() > 2)
 				return false;
 		}
 		return true;
