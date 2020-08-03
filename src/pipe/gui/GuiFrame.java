@@ -58,6 +58,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private StatusBar statusBar;
     private JMenuBar menuBar;
     private JToolBar drawingToolBar;
+    private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -497,7 +498,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     @Override
                     protected void closeTab(TabContent tab) {
                         GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
-                        changeNetFeatureInfo();
                     }
                 };
             }
@@ -899,6 +899,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.add(new ToggleButtonWithoutText(tokenAction));
         drawingToolBar.add(new ToggleButtonWithoutText(deleteTokenAction));
 
+        //Net Type
+        drawingToolBar.addSeparator();
+        drawingToolBar.add(featureInfoText);
+
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -1265,18 +1269,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 getCurrentTab().switchToEditorComponents();
 
-                changeNetFeatureInfo();
-
                 break;
             case animation:
                 getCurrentTab().switchToAnimationComponents(true);
                 startAction.setSelected(true);
 
-                changeNetFeatureInfo();
-
                 break;
             case noNet:
-                removeNetFeatureInfo();
+                setFeatureInfoText("");
                 break;
 
             default:
@@ -1648,22 +1648,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return CreateGui.getCurrentTab();
     }
 
-    private void changeNetFeatureInfo() {
-        if (getCurrentTab() != null) {
-            drawingToolBar = getCurrentTab().addNetFeatureInfo(drawingToolBar);
-        }
+    @Override
+    public void setFeatureInfoText(String s) {
+        if (s == null) s = "";
+        featureInfoText.setText(s);
     }
 
-    public void removeNetFeatureInfo() {
-        int toolBarIndex = drawingToolBar.getComponentCount() - 1;
-
-        if (drawingToolBar.getComponent(toolBarIndex) instanceof JLabel) {
-            drawingToolBar.remove(toolBarIndex);
-            toolBarIndex -= 1;
-
-            if (drawingToolBar.getComponent(toolBarIndex) instanceof JSeparator) {
-                drawingToolBar.remove(toolBarIndex);
-            }
-        }
-    }
 }
