@@ -619,7 +619,7 @@ public class TimedArcPetriNet {
         }
 
 		for (TimedPlace p : places) {
-		    if (p.invariant().upperBound().toString().equals("inf")) {
+		    if (!p.invariant().upperBound().toString().equals("inf")) {
 		        return false;
             }
         }
