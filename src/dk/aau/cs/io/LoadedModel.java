@@ -16,7 +16,7 @@ public class LoadedModel{
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
 		this.templates = templates;
 		this.network = network;
-		this.queries = queries; 
+		this.queries = queries;
 	}
 
     public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, boolean isTimed, boolean isGame){

@@ -300,14 +300,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
                 try {
                     List<TabContent> tabs = get();
                     openTab(tabs);
-                    TabContent currentTab = tabs.get(0);
-                    if (!currentTab.network().isUntimed() && currentTab.isNetTimed()) {
-                        JOptionPane.showMessageDialog(CreateGui.getApp(), "The net contains time features. The entire net will be changed to include time features.");
-                    }
-                    //todo: add the complete check for game features
-                    if (false && currentTab.isNetGame()) {
-                        JOptionPane.showMessageDialog(CreateGui.getApp(), "The net contains game features. The entire net will be changed to include game features.");
-                    }
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(CreateGui.getApp(),
                             e.getMessage(),
