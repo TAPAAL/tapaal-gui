@@ -73,7 +73,7 @@ public class TapnXmlLoader {
 
 	private boolean isTimed;
 	private boolean isGame;
-	private boolean hasUncontrollableTransitions;
+	private boolean hasUncontrollableTransitions = false;
 
 	public TapnXmlLoader() {
 	}

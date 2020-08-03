@@ -613,6 +613,16 @@ public class TimedArcPetriNet {
 				return false;
 			}
 		}
+
+		if (hasUrgentTransitions()) {
+		    return false;
+        }
+
+		for (TimedPlace p : places) {
+		    if (p.invariant().upperBound().toString().equals("inf")) {
+		        return false;
+            }
+        }
 		
 		return true;
 	}
