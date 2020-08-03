@@ -13,9 +13,10 @@ public class EngineSupportOptions {
     private boolean supportEGorAF;
     private boolean supportStrictNets;
     private boolean supportTimedNets;
+    boolean supportDeadlockNetdegreeGreaterThan2;
     private boolean[] optionsArray;
     public EngineSupportOptions(String nameString, boolean supportFastestTrace, boolean supportDeadlockNetdegree2EForAG, boolean supportDeadlockEGorAF, boolean supportDeadlockWithInhib,
-                                boolean supportWeights, boolean supportInhibArcs, boolean supportUrgentTransitions, boolean supportEGorAF, boolean supportStrictNets, boolean supportTimedNets){
+                                boolean supportWeights, boolean supportInhibArcs, boolean supportUrgentTransitions, boolean supportEGorAF, boolean supportStrictNets, boolean supportTimedNets, boolean supportDeadlockNetdegreeGreaterThan2){
         this.nameString = nameString;
         this.supportFastestTrace =  supportFastestTrace;
         this.supportDeadlockNetdegree2EForAG =  supportDeadlockNetdegree2EForAG;
@@ -26,7 +27,8 @@ public class EngineSupportOptions {
         this.supportEGorAF =  supportEGorAF;
         this.supportStrictNets =  supportStrictNets;
         this.supportTimedNets = supportTimedNets;
-        this.optionsArray = new boolean[]{supportFastestTrace, supportDeadlockNetdegree2EForAG, supportDeadlockEGorAF, supportDeadlockWithInhib, supportWeights, supportInhibArcs, supportUrgentTransitions, supportEGorAF, supportStrictNets, supportTimedNets};
+        this.supportDeadlockNetdegreeGreaterThan2 = supportDeadlockNetdegreeGreaterThan2;
+        this.optionsArray = new boolean[]{supportFastestTrace, supportDeadlockNetdegree2EForAG, supportDeadlockEGorAF, supportDeadlockWithInhib, supportWeights, supportInhibArcs, supportUrgentTransitions, supportEGorAF, supportStrictNets, supportTimedNets, supportDeadlockNetdegreeGreaterThan2};
     }
     public String getNameString(){
         return nameString;
@@ -60,6 +62,9 @@ public class EngineSupportOptions {
     }
     public boolean getSupportTimedNets(){
         return supportTimedNets;
+    }
+    public boolean getSupportDeadlockNetdegreeGreaterThan2(){
+        return supportDeadlockNetdegreeGreaterThan2;
     }
 
     public boolean areOptionsSupported(boolean[] queryOptions){

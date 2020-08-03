@@ -251,14 +251,107 @@ public class QueryDialog extends JPanel {
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
-	private final EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(name_verifyTAPN,false, false, false,false,false,true,false,false,true, true);
-    private final EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(name_COMBI,false, true,false,false,true,true,true,true,true, true);
-    private final EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(name_OPTIMIZEDSTANDARD,false, false,false,false,false,false,false,true,true, true);
-    private final EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(name_STANDARD,false, false, false,false,false,false,false,false,true, true);
-    private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(name_BROADCAST,false, true, false,false,false,true,false,true,true, true);
-    private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(name_BROADCASTDEG2,false, true, false,false,false,true,false,true,true, true);
-    private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(name_DISCRETE,true, true, true,true,true,true,true,true,false, true);
-    //private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false);
+	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
+    //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
+	private final EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
+	    name_verifyTAPN, //name of engine
+        false, //  support fastest trace
+        false, // support deadlock with net degree 2 and (EF or AG)
+        false, //  support deadlock with EG or AF
+        false, // support deadlock with inhibitor arcs
+        false,  //support weights
+        true,  //support inhibitor arcs
+        false, // support urgent transitions
+        false, // support EG or AF
+        true, // support strict nets
+        true, //  support timed nets/time intervals
+        false);// support deadlock with net degree > 2
+
+    private final EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
+        name_COMBI,//name of engine
+        false,//  support fastest trace
+        true,// support deadlock with net degree 2 and (EF or AG)
+        false,//  support deadlock with EG or AF
+        false,// support deadlock with inhibitor arcs
+        true, //support weights
+        true, //support inhibitor arcs
+        true,// support urgent transitions
+        true,// support EG or AF
+        true,// support strict nets
+        true,//  support timed nets/time intervals
+        false);// support deadlock with net degree > 2
+
+    private final EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
+        name_OPTIMIZEDSTANDARD,//name of engine
+        false,//  support fastest trace
+        false,// support deadlock with net degree 2 and (EF or AG)
+        false,//  support deadlock with EG or AF
+        false,// support deadlock with inhibitor arcs
+        false, //support weights
+        false, //support inhibitor arcs
+        false,// support urgent transitions
+        true,// support EG or AF
+        true,// support strict nets
+        true,//  support timed nets/time intervals
+        false);// support deadlock with net degree > 2
+
+    private final EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
+        name_STANDARD,//name of engine
+        false,//  support fastest trace
+        false,// support deadlock with net degree 2 and (EF or AG)
+        false,//  support deadlock with EG or AF
+        false,// support deadlock with inhibitor arcs
+        false, //support weights
+        false, //support inhibitor arcs
+        false,// support urgent transitions
+        false,// support EG or AF
+        true,// support strict nets
+        true,//  support timed nets/time intervals
+        false);// support deadlock with net degree > 2
+
+    private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
+        name_BROADCAST,//name of engine
+        false,//  support fastest trace
+        true,// support deadlock with net degree 2 and (EF or AG)
+        false,//  support deadlock with EG or AF
+        false,// support deadlock with inhibitor arcs
+        false, //support weights
+        true, //support inhibitor arcs
+        false,// support urgent transitions
+        true,// support EG or AF
+        true,// support strict nets
+        true,//  support timed nets/time intervals
+        false);// support deadlock with net degree > 2
+
+    private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
+        name_BROADCASTDEG2,//name of engine
+        false,//  support fastest trace
+        true,// support deadlock with net degree 2 and (EF or AG)
+        false,//  support deadlock with EG or AF
+        false,// support deadlock with inhibitor arcs
+        false, //support weights
+        true, //support inhibitor arcs
+        false,// support urgent transitions
+        true,// support EG or AF
+        true,// support strict nets
+        true,//  support timed nets/time intervals
+        false);// support deadlock with net degree > 2
+
+    private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
+        name_DISCRETE,//name of engine
+        true,//  support fastest trace
+        true,// support deadlock with net degree 2 and (EF or AG)
+        true,//  support deadlock with EG or AF
+        true,// support deadlock with inhibitor arcs
+        true, //support weights
+        true, //support inhibitor arcs
+        true,// support urgent transitions
+        true,// support EG or AF
+        false,// support strict nets
+        true,//  support timed nets/time intervals
+        true);// support deadlock with net degree > 2
+
+    //private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
     private final EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
 
     private TCTLAbstractProperty newProperty;
@@ -744,7 +837,8 @@ public class QueryDialog extends JPanel {
             //we want to know if it is strict
             !tapnNetwork.isNonStrict(),
             //we want to know if it is timed
-            !tapnNetwork.isUntimed()
+            !tapnNetwork.isUntimed(),
+            (queryHasDeadlock() && !isNetDegree2)
         };
 		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
