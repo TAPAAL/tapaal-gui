@@ -463,8 +463,10 @@ public class TimedArcPetriNet {
                 }
             }
 
-			if (hasUrgentTransitions() ) {
-			    networkUntimed = false;
+			for (TimedTransition transition : t.transitions) {
+			    if (transition.isUrgent()) {
+			        networkUntimed = false;
+                }
             }
 			
 			// Test all output arcs for weights
