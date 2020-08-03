@@ -500,7 +500,7 @@ public class TimedArcPetriNet {
 		array[rowNumber++][columnNumber] = numberOfUntimedTransportArcs;
 		//Make space for number of shared transitions and places
 		rowNumber += 2;
-		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
+		array[rowNumber++][columnNumber] = isUntimed() ? "yes" : "no";
 		array[rowNumber++][columnNumber] = networkWeighted ? "yes" : "no";
         array[rowNumber++][columnNumber] = numberOfOrphanTransitions;
         array[rowNumber++][columnNumber] = numberOfOrphanPlaces;
