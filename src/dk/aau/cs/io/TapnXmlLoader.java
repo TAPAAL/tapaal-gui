@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.debug.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -152,9 +153,12 @@ public class TapnXmlLoader {
 
             if (networkIsTimed && !isTimed) {
                 isTimed = true;
+                Logger.log("The net contains time features. The entire net will be changed to include time features.");
             }
             if (hasUncontrollableTransitions && !isGame) {
                 isGame = true;
+                Logger.log("The net contains game features. The entire net will be changed to include game features.");
+
             }
         } else {
             isTimed = networkIsTimed;
