@@ -239,6 +239,7 @@ public class QueryDialog extends JPanel {
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 	private boolean isNetDegree2;
+	private int highestNetDegree;
 	private boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
 
@@ -457,6 +458,7 @@ public class QueryDialog extends JPanel {
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		isNetDegree2 = tapnNetwork.isDegree2();
+		highestNetDegree = tapnNetwork.getHighestNetDegree();
 		hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
 
 		setLayout(new GridBagLayout());
@@ -827,7 +829,7 @@ public class QueryDialog extends JPanel {
 		disableSymmetryUpdate = true;
 		//The order here should be the same as in EngineSupportOptions
         boolean[] queryOptions = new boolean[]{fastestTraceRadioButton.isSelected(),
-            (queryHasDeadlock() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && isNetDegree2),
+            (queryHasDeadlock() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && highestNetDegree <= 2),
             (queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))),
             (queryHasDeadlock() && hasInhibitorArcs),
             tapnNetwork.hasWeights(),
@@ -838,7 +840,7 @@ public class QueryDialog extends JPanel {
             !tapnNetwork.isNonStrict(),
             //we want to know if it is timed
             !tapnNetwork.isUntimed(),
-            (queryHasDeadlock() && !isNetDegree2)
+            (queryHasDeadlock() && highestNetDegree > 2)
         };
 		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){

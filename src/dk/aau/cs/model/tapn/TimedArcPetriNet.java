@@ -371,6 +371,19 @@ public class TimedArcPetriNet {
 		}
 		return true;
 	}
+
+    public int getHighestNetDegree(){
+	    int currentHighestNetDegree = 0;
+        for (TimedTransition t : this.transitions()) {
+            if (t.presetSize() > currentHighestNetDegree){
+                currentHighestNetDegree = t.presetSize();
+            }
+            if(t.postsetSize() > currentHighestNetDegree){
+                currentHighestNetDegree = t.postsetSize();
+            }
+        }
+        return currentHighestNetDegree;
+    }
 	
 	public boolean isActive() {
 		return isActive;
