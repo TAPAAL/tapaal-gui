@@ -55,6 +55,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private Iterable<TAPNQuery> queries;
 	private Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
+    private boolean isTimed;
+    private boolean isGame;
 
 	public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
@@ -66,6 +68,21 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		this.queries = queries;
 		this.constants = constants;
 	}
+
+    public TimedArcPetriNetNetworkWriter(
+        TimedArcPetriNetNetwork network,
+        Iterable<Template> templates,
+        Iterable<TAPNQuery> queries,
+        Iterable<Constant> constants,
+        boolean isTimed,
+        boolean isGame) {
+        this.network = network;
+        this.templates = templates;
+        this.queries = queries;
+        this.constants = constants;
+        this.isTimed = isTimed;
+        this.isGame = isGame;
+    }
 	
 	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
 		Document document = null;
@@ -89,6 +106,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 		appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
+		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
 		// Create Transformer with XSL Source File
@@ -139,6 +157,29 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		element.setAttribute("bound", network.getDefaultBound() + "");
 		root.appendChild(element);
 	}
+
+    private void appendFeature(Document document, Element root) {
+        String isTimed = "true";
+        String isGame = "true";
+        if (!this.isTimed) {
+            isTimed = "false";
+        }
+        if (!this.isGame) {
+            isGame = "false";
+        }
+
+        root.appendChild(createFeatureElement(isTimed, isGame, document));
+    }
+
+    private Element createFeatureElement(String isTimed, String isGame, Document document) {
+        Require.that(document != null, "Error: document was null");
+        Element feature = document.createElement("feature");
+
+        feature.setAttribute("isTimed", isTimed);
+        feature.setAttribute("isGame", isGame);
+
+        return feature;
+    }
 	
 	private void appendSharedPlaces(Document document, Element root) {
 		for(SharedPlace place : network.sharedPlaces()){
@@ -194,7 +235,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 			Attr netAttrType = document.createAttribute("type");
 			netAttrType.setValue("P/T net");
-
 			NET.setAttributeNode(netAttrType);
 
 			appendAnnotationNotes(document, guiModel, NET);
