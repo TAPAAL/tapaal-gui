@@ -1652,6 +1652,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		this.app = Optional.ofNullable(newApp);
 		undoManager.setApp(newApp);
 
+		updateFeatureText();
+
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -2252,32 +2254,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		managerRef.get().registerManager(drawingSurface);
     }
 
-    public JToolBar addNetFeatureInfo(JToolBar drawingToolBar) {
-        drawingToolBar = removeNetPropertyInfo(drawingToolBar);
-
-        if (!(drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JSeparator)) {
-            drawingToolBar.addSeparator();
-        }
+    public void updateFeatureText() {
 
         String properties = "Timed: " + (lens.isTimed() ? "Yes" : "No") +
                             ", Game: " + (lens.isGame() ? "Yes" : "No");
-        drawingToolBar.add(new JLabel(properties));
+        app.ifPresent(o->o.setFeatureInfoText(properties));
 
-        return drawingToolBar;
-    }
-
-    public JToolBar removeNetPropertyInfo(JToolBar drawingToolBar) {
-        int toolBarIndex = drawingToolBar.getComponentCount() - 1;
-
-        if (drawingToolBar.getComponent(toolBarIndex) instanceof JLabel) {
-            drawingToolBar.remove(toolBarIndex);
-            toolBarIndex -= 1;
-
-            if (drawingToolBar.getComponent(toolBarIndex) instanceof JSeparator) {
-                drawingToolBar.remove(toolBarIndex);
-            }
-        }
-        return drawingToolBar;
     }
 
     public boolean isNetTimed() {
