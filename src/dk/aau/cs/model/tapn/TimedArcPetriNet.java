@@ -436,7 +436,7 @@ public class TimedArcPetriNet {
             numberOfOrphanPlaces += t.getOrphanPlaces().size();
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!(in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedInputArcs++;
@@ -447,7 +447,7 @@ public class TimedArcPetriNet {
 			}
 			//Test if all tansportarcs is untimed and get the number of untimed transport arcs
 			for(TransportArc in : t.transportArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!(in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedTransportArcs++;
@@ -456,6 +456,16 @@ public class TimedArcPetriNet {
 					networkWeighted = true;
 				}
 			}
+
+			for (TimedPlace p : t.places) {
+			    if (!p.invariant().upperBound().equals(Bound.Infinity)) {
+			        networkUntimed = false;
+                }
+            }
+
+			if (hasUrgentTransitions() ) {
+			    networkUntimed = false;
+            }
 			
 			// Test all output arcs for weights
 			if(!networkWeighted){
@@ -500,7 +510,7 @@ public class TimedArcPetriNet {
 		array[rowNumber++][columnNumber] = numberOfUntimedTransportArcs;
 		//Make space for number of shared transitions and places
 		rowNumber += 2;
-		array[rowNumber++][columnNumber] = isUntimed() ? "yes" : "no";
+		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
 		array[rowNumber++][columnNumber] = networkWeighted ? "yes" : "no";
         array[rowNumber++][columnNumber] = numberOfOrphanTransitions;
         array[rowNumber++][columnNumber] = numberOfOrphanPlaces;
