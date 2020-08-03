@@ -173,12 +173,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
     private Element createFeatureElement(String isTimed, String isGame, Document document) {
         Require.that(document != null, "Error: document was null");
-        Element property = document.createElement("feature");
+        Element feature = document.createElement("feature");
 
-        property.setAttribute("isTimed", isTimed);
-        property.setAttribute("isGame", isGame);
+        feature.setAttribute("isTimed", isTimed);
+        feature.setAttribute("isGame", isGame);
 
-        return property;
+        return feature;
     }
 	
 	private void appendSharedPlaces(Document document, Element root) {

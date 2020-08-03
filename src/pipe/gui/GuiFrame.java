@@ -497,7 +497,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     @Override
                     protected void closeTab(TabContent tab) {
                         GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
-                        changeNetPropertyInfo();
+                        changeNetFeatureInfo();
                     }
                 };
             }
@@ -1265,18 +1265,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 getCurrentTab().switchToEditorComponents();
 
-                changeNetPropertyInfo();
+                changeNetFeatureInfo();
 
                 break;
             case animation:
                 getCurrentTab().switchToAnimationComponents(true);
                 startAction.setSelected(true);
 
-                changeNetPropertyInfo();
+                changeNetFeatureInfo();
 
                 break;
             case noNet:
-                removeNetPropertyInfo();
+                removeNetFeatureInfo();
                 break;
 
             default:
@@ -1648,13 +1648,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return CreateGui.getCurrentTab();
     }
 
-    private void changeNetPropertyInfo() {
+    private void changeNetFeatureInfo() {
         if (getCurrentTab() != null) {
-            drawingToolBar = getCurrentTab().addNetPropertyInfo(drawingToolBar);
+            drawingToolBar = getCurrentTab().addNetFeatureInfo(drawingToolBar);
         }
     }
 
-    public void removeNetPropertyInfo() {
+    public void removeNetFeatureInfo() {
         int toolBarIndex = drawingToolBar.getComponentCount() - 1;
 
         if (drawingToolBar.getComponent(toolBarIndex) instanceof JLabel) {

@@ -2250,7 +2250,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		managerRef.get().registerManager(drawingSurface);
     }
 
-    public JToolBar addNetPropertyInfo(JToolBar drawingToolBar) {
+    public JToolBar addNetFeatureInfo(JToolBar drawingToolBar) {
         drawingToolBar = removeNetPropertyInfo(drawingToolBar);
 
         if (!(drawingToolBar.getComponent(drawingToolBar.getComponentCount() - 1) instanceof JSeparator)) {

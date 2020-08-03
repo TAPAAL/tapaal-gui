@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,7 +61,9 @@ import dk.aau.cs.util.Require;
 
 public class TapnXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
-	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+    private static final String TIME_ERROR_MESSAGE = "The net contains time features. The entire net will be changed to include time features.";
+    private static final String GAME_ERROR_MESSAGE = "The net contains game features. The entire net will be changed to include game features.";
+    private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
@@ -72,6 +74,7 @@ public class TapnXmlLoader {
 
 	private boolean isTimed;
 	private boolean isGame;
+	private boolean hasUncontrollableTransitions;
 
 	public TapnXmlLoader() {
 	}
@@ -128,7 +131,7 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 
-		parseFeature(doc);
+		parseFeature(doc, network);
 
 		return new LoadedModel(network, templates, queries, isTimed, isGame);
 	}
@@ -140,14 +143,27 @@ public class TapnXmlLoader {
 		}
 	}
 
-    private void parseFeature(Document doc) {
-	    if (doc.getElementsByTagName("feature").getLength() > 0) {
+    private void parseFeature(Document doc, TimedArcPetriNetNetwork network) {
+	    boolean networkIsTimed = !network.isUntimed();
+
+        if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");
 
             isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
             isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
-        }
 
+            if (networkIsTimed && !isTimed) {
+                isTimed = true;
+                JOptionPane.showMessageDialog(CreateGui.getApp(), TIME_ERROR_MESSAGE);
+            }
+            if (hasUncontrollableTransitions && !isGame) {
+                isGame = true;
+                JOptionPane.showMessageDialog(CreateGui.getApp(), GAME_ERROR_MESSAGE);
+            }
+        } else {
+            isTimed = networkIsTimed;
+            isGame = hasUncontrollableTransitions;
+        }
     }
 
 	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
@@ -272,29 +288,6 @@ public class TapnXmlLoader {
         }
     }
 
-    private boolean getInfo(Node tapnNode, String attribute) {
-            Element element = (Element)tapnNode;
-            String string = element.getAttribute(attribute);
-            return string.equals("true");
-    }
-
-    private boolean canGetInfo(Node tapnNode) {
-        if (tapnNode instanceof Element) {
-            Element element = (Element)tapnNode;
-            String timedString = element.getAttribute("timed");
-            String gameString = element.getAttribute("game");
-
-            if (timedString == null || timedString.equals("") ||
-                gameString == null || gameString.equals("")) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
 	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		if ("labels".equals(element.getNodeName())) {
 			AnnotationNote note = parseAnnotation(element);
@@ -380,6 +373,11 @@ public class TapnXmlLoader {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
+
+		String player = transition.getAttribute("player");
+		if (player.length() > 0 && player.equals("1")) {
+		    hasUncontrollableTransitions = true;
+        }
 		
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
