@@ -323,9 +323,9 @@ public class QueryPane extends JPanel implements SidePane {
 		    public void actionPerformed(ActionEvent e) {
 				TAPNQuery q;
 				if (!tabContent.isNetTimed()){
-                    q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+                    q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.isNetGame());
 				} else {
-					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.isNetGame());
 				}
                 if(q == null) return;
                 undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
@@ -375,15 +375,15 @@ public class QueryPane extends JPanel implements SidePane {
 			if(netIsUntimed && q.getCategory() != TAPNQuery.QueryCategory.CTL){
 				openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 				if(openCTLDialog == JOptionPane.YES_OPTION){
-					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.isNetGame());
 				} else if(openCTLDialog == JOptionPane.NO_OPTION){
-					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.isNetGame());
 				}
 			} else {
 				if(q.getCategory() == TAPNQuery.QueryCategory.CTL) {
-					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.isNetGame());
 				} else {
-					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
+					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.isNetGame());
 				}
 			}
 

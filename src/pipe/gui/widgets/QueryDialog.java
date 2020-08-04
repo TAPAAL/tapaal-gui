@@ -244,6 +244,7 @@ public class QueryDialog extends JPanel {
 	private final boolean isNetDegree2;
 	private final boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
+	private boolean isGame;
 
 	private final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -351,9 +352,10 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
-			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean isGame) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
+		this.isGame = isGame;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
@@ -548,7 +550,8 @@ public class QueryDialog extends JPanel {
 		return new HasDeadlockVisitor().hasDeadLock(newProperty);
 	}
 
-	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
+                                              HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean isGame) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
@@ -564,7 +567,7 @@ public class QueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels);
+		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, isGame);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
