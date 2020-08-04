@@ -442,9 +442,8 @@ public class QueryPane extends JPanel implements SidePane {
 				setForeground(list.getForeground());
 			}
 
-			if (value != null) {
-                setEnabled(list.isEnabled() && ((TAPNQuery)value).isActive());
-            }
+			setEnabled(list.isEnabled() && ((TAPNQuery)value).isActive());
+
 			if(!isEnabled())
 				setToolTipText("This query is disabled because it contains propositions involving places from a deactivated component");
 			else
