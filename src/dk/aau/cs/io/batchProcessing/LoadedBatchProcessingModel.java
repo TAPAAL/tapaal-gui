@@ -5,15 +5,8 @@ import java.util.Collection;
 import pipe.dataLayer.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-public class LoadedBatchProcessingModel{
-	private final Collection<TAPNQuery> queries;
-	private final TimedArcPetriNetNetwork network;
-	
-	public LoadedBatchProcessingModel(TimedArcPetriNetNetwork network, Collection<TAPNQuery> queries){
-		this.network = network;
-		this.queries = queries; 
-	}
+public interface LoadedBatchProcessingModel{
 
-	public Collection<TAPNQuery> queries(){ return queries; }
-	public TimedArcPetriNetNetwork network(){ return network; }
+	Collection<TAPNQuery> queries();
+	TimedArcPetriNetNetwork network();
 }

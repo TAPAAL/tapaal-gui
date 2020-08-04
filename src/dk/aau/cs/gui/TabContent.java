@@ -540,6 +540,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
+			if (loadedModel.getMessages().size() != 0) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        String message = "While loading the net we found one or more warnings: \n\n";
+                        for (String s : loadedModel.getMessages()) {
+                            message += s + "\n\n";
+                        }
+
+                        new MessengerImpl().displayInfoMessage(message, "Warning");
+                    }
+                }).start();
+            }
+
             TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
 
             tab.setInitialName(name);
@@ -1714,6 +1729,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		updateFeatureText();
 
+		updateFeatureText();
+
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -2341,6 +2358,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         return lens;
     }
 
+
     private final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
@@ -2472,6 +2490,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             registerEvent(
                 e->e.pno instanceof Arc && e.a == MouseAction.exited,
                 e -> ((Arc)e.pno).getArcPath().hidePoints()
+            );
+            registerEvent(
+                e->e.pno instanceof TimedOutputArcComponent && e.a == MouseAction.doubleClicked && !e.e.isControlDown(),
+                e -> ((TimedOutputArcComponent) e.pno).showTimeIntervalEditor()
             );
             registerEvent(
                 e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),

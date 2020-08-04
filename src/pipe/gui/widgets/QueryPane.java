@@ -48,6 +48,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 	private final JPanel queryCollectionPanel;
 	private final JPanel buttonsPanel;
+
 	private final DefaultListModel<TAPNQuery> listModel;
 	private final JList<TAPNQuery> queryList;
 	private List<TAPNQuery> selectedQueries;
@@ -325,6 +326,7 @@ public class QueryPane extends JPanel implements SidePane {
 				} else {
 					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 				}
+                if(q == null) return;
 
                 undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
                 addQuery(q);
