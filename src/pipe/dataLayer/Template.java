@@ -53,7 +53,7 @@ public class Template {
 	public void setHasPositionalInfo(boolean positionalInfo) {
 		hasPositionalInfo = positionalInfo;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Template){

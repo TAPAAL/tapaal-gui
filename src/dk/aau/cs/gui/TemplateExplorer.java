@@ -240,6 +240,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		templatePanel.add(scrollpane, gbc);
 		
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
+		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -263,6 +264,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		templatePanel.add(moveUpButton,gbc);
 		
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
+		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -287,6 +289,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		
 		//Sort button
 		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
+		sortButton.setMargin(new Insets(2,2,2,2));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {

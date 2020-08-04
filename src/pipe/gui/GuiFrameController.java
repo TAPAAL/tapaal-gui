@@ -150,6 +150,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         currentTab.ifPresent(t -> t.setApp(guiFrame));
         guiFrameDirectAccess.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
+
     }
 
     @Override
@@ -307,6 +308,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
                     return;
                 }finally {
                     CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

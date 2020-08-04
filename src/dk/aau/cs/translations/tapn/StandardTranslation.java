@@ -181,7 +181,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		}
 
 		for (TimedTransition t : degree2Model.transitions()) {
-			if(t.presetSize() == 0) {
+			if(t.presetSizeWithoutInhibitorArcs() == 0) {
 				continue;
 			}
 			
@@ -279,7 +279,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 	
 	private void createEdgesForTokenAutomata(TimedArcPetriNet degree2Model, TimedAutomaton tokenTA) {
 		for(TimedTransition transition : degree2Model.transitions()) {
-			if(transition.presetSize() == 0)
+			if(transition.presetSizeWithoutInhibitorArcs() == 0)
 				continue;
 			
 			Degree2Pairing pairing = new Degree2Pairing(transition);

@@ -1,10 +1,6 @@
 package pipe.gui.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -208,6 +204,7 @@ public class QueryPane extends JPanel implements SidePane {
 		queryCollectionPanel.add(queryScroller, gbc);
 
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
+		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -232,6 +229,7 @@ public class QueryPane extends JPanel implements SidePane {
 		queryCollectionPanel.add(moveUpButton,gbc);
 
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
+		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -258,6 +256,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 		//Sort button
 		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
+		sortButton.setMargin(new Insets(2,2,2,2));
 		sortButton.setToolTipText(toolTipSortQueries);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {
@@ -318,31 +317,18 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.setPreferredSize(dimension);
 		addQueryButton.setToolTipText(toolTipNewQuery);
 		addQueryButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {				
-				int openCTLDialog = JOptionPane.YES_OPTION;
-				boolean netIsUntimed = tabContent.network().isUntimed();
-				String optionText = "Do you want to create a CTL query (use for untimed nets) \n or a Reachability query (use for timed nets)?";
-				
-				// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
-				Object[] options = {
-					"CTL",
-					"Reachability"};
-				
-				TAPNQuery q = null;
-				if(netIsUntimed){
-					openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-					if(openCTLDialog == JOptionPane.YES_OPTION){
-						q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
-					} else if(openCTLDialog == JOptionPane.NO_OPTION){
-						q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
-					}
-				} else{
+			public void actionPerformed(ActionEvent e) {
+
+				TAPNQuery q;
+				if (!tabContent.isNetTimed()){
+                    q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
+				} else {
 					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 				}
-				if (q != null) {
-					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
-					addQuery(q);
-				}
+
+                undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
+                addQuery(q);
+
 				updateQueryButtons();
 			}
 		});
@@ -494,7 +480,7 @@ public class QueryPane extends JPanel implements SidePane {
 			tempFile = File.createTempFile(CreateGui.getAppGui().getCurrentTabName(), ".xml");
 
 			TabContent tab = CreateGui.getApp().getCurrentTab();
-			tab.writeNetToFile(tempFile, selectedQueries);
+			tab.writeNetToFile(tempFile, selectedQueries, tab.getLens());
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {
