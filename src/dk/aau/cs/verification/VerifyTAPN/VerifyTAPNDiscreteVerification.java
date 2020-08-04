@@ -49,8 +49,8 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	protected static String verifydtapnpath = "";
 
-	private FileFinder fileFinder;
-	private Messenger messenger;
+	private final FileFinder fileFinder;
+	private final Messenger messenger;
 
 	private ProcessRunner runner;
 

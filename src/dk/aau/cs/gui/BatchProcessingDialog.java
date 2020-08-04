@@ -216,20 +216,19 @@ public class BatchProcessingDialog extends JDialog {
 	private JComboBox<String> approximationMethodOption;
 	private CustomJSpinner approximationDenominator;
 	private JCheckBox approximationDenominatorCheckbox;
-	private JList<TAPNQuery> ListOfQueries;
+	private final JList<TAPNQuery> ListOfQueries;
 	
-	private Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
+	private final Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
 
 	private BatchProcessingResultsTableModel tableModel;
 
-	private List<File> files = new ArrayList<File>();
+	private final List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
-	private UndoManager undoManager = new UndoManager();
+	private final UndoManager undoManager = new UndoManager();
 	
-	private Timer timer = new Timer(1000, new AbstractAction() {
+	private final Timer timer = new Timer(1000, new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
-					/ 1000 + " s");
+			timerLabel.setText((System.currentTimeMillis() - startTimeMs) / 1000 + " s");
 			memory.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
 		}
 	});
@@ -256,7 +255,7 @@ public class BatchProcessingDialog extends JDialog {
 		MemoryMonitor.detach();
 	}
 	
-	private Timer memoryTimer = new Timer(50, new AbstractAction() {
+	private final Timer memoryTimer = new Timer(50, new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
 			if(MemoryMonitor.isAttached()){
 				MemoryMonitor.getUsage();

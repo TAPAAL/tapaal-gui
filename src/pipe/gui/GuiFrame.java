@@ -225,7 +225,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabContentActions::verifySelectedQuery);
         }
-    };;
+    };
     private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::workflowAnalyse);

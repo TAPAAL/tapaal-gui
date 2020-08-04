@@ -24,16 +24,16 @@ public class BatchProcessingVerificationOptions {
 		KeepQueryOption, None, OverApproximation, UnderApproximation
 	}
 	
-	private List<ReductionOption> reductionOptions;
-	private ReductionOption reductionOption;
-	private SearchOption searchOption;
-	private QueryPropertyOption queryPropertyOption;
-	private SymmetryOption symmetryOption;
-	private StubbornReductionOption stubbornReductionOption;
-	private ApproximationMethodOption approximationMethodOption;
+	private final List<ReductionOption> reductionOptions;
+	private final ReductionOption reductionOption;
+	private final SearchOption searchOption;
+	private final QueryPropertyOption queryPropertyOption;
+	private final SymmetryOption symmetryOption;
+	private final StubbornReductionOption stubbornReductionOption;
+	private final ApproximationMethodOption approximationMethodOption;
 	private int approximationDenominator = 0;
-	private boolean keepQueryCapacity;
-	private int capacity;
+	private final boolean keepQueryCapacity;
+	private final int capacity;
 	private boolean discreteInclusion = false; // only for VerifyTAPN
 	private boolean useTimeDartPTrie = false;
 	private boolean useTimeDart = false;

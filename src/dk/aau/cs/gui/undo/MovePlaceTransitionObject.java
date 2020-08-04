@@ -7,9 +7,9 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class MovePlaceTransitionObject extends Command {
 	
-	private int newY;
-	private int newX;
-	private PlaceTransitionObject objectToBeMoved;
+	private final int newY;
+	private final int newX;
+	private final PlaceTransitionObject objectToBeMoved;
 	private int oldY;
 	private int oldX;
 	private boolean doUpdate = false;

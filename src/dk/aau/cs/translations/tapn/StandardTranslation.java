@@ -50,10 +50,10 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 	
 	private int extraTokens;
-	private boolean useSymmetry;
+	private final boolean useSymmetry;
 	private int numberOfInitChannels;
 	
-	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	
 
 	public StandardTranslation(boolean useSymmetry) {
@@ -380,9 +380,9 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1_in$";
 		private final String DEG1_START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1$";
-		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-		private Pattern deg1StartPattern = Pattern.compile(DEG1_START_OF_SEQUENCE_PATTERN);
-		private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
+		private final Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final Pattern deg1StartPattern = Pattern.compile(DEG1_START_OF_SEQUENCE_PATTERN);
+		private final Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
 		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {

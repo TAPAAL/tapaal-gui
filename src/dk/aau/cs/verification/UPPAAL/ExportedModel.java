@@ -6,7 +6,7 @@ public class ExportedModel {
 
 	private final String queryFile;
 	private final String modelFile;
-	private TranslationNamingScheme namingScheme;
+	private final TranslationNamingScheme namingScheme;
 
 	ExportedModel(String modelFile, String queryFile,
 			TranslationNamingScheme namingScheme) {

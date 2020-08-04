@@ -1,17 +1,17 @@
 package dk.aau.cs.verification;
 
 public class ReductionStats {
-	private int removedTrantitions;
-	private int removedPlaces;
-	private int ruleA;
-	private int ruleB;
-	private int ruleC;
-	private int ruleD;
-	private int ruleE;
-	private int ruleF;
-	private int ruleG;
-	private int ruleH;
-	private int ruleI;
+	private final int removedTrantitions;
+	private final int removedPlaces;
+	private final int ruleA;
+	private final int ruleB;
+	private final int ruleC;
+	private final int ruleD;
+	private final int ruleE;
+	private final int ruleF;
+	private final int ruleG;
+	private final int ruleH;
+	private final int ruleI;
 
 	
 	public ReductionStats(int removedTransitions, int removedPlaces, int ruleA, int ruleB, int ruleC, int ruleD, int ruleE, int ruleF, int ruleG, int ruleH, int ruleI) {
