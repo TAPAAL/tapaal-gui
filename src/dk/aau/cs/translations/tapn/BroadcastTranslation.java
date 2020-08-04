@@ -188,7 +188,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		}
 
 		for (TimedTransition t : model.transitions()) {
-			if(t.presetSize() == 0 && !t.hasInhibitorArcs()) {
+			if(t.presetSizeWithoutInhibitorArcs() == 0 && !t.hasInhibitorArcs()) {
 				continue;
 			} else if (isTransitionDegree1(t) && !t.hasInhibitorArcs()) {
 				builder.append("broadcast chan ");
@@ -221,11 +221,11 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 
 	private boolean isTransitionDegree1(TimedTransition t) {
-		return t.presetSize() == 1 && t.postsetSize() == 1;
+		return t.presetSizeWithoutInhibitorArcs() == 1 && t.postsetSize() == 1;
 	}
 	
 	private boolean isTransitionDegree2(TimedTransition t) {
-		return t.presetSize() == 2 && t.postsetSize() == 2;
+		return t.presetSizeWithoutInhibitorArcs() == 2 && t.postsetSize() == 2;
 	}
 
 	private TimedAutomaton createControlTemplate(TimedArcPetriNet model) {
@@ -256,7 +256,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	protected void createTransitionSimulations(TimedAutomaton control, Location lock, TimedArcPetriNet model) {
 
 		for (TimedTransition transition : model.transitions()) {
-			if(transition.presetSize() == 0 && !transition.hasInhibitorArcs())
+			if(transition.presetSizeWithoutInhibitorArcs() == 0 && !transition.hasInhibitorArcs())
 				continue;
 			
 			if (!(isTransitionDegree1(transition) || isTransitionDegree2(transition)) || transition.hasInhibitorArcs()) {
@@ -430,7 +430,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		ta.setLocations(CreateLocationsFromModel(model));
 
 		for (TimedTransition t : model.transitions()) {
-			int presetSize = t.presetSize() + t.getInhibitorArcs().size();
+			int presetSize = t.presetSizeWithoutInhibitorArcs() + t.getInhibitorArcs().size();
 			
 			if(presetSize == 0)
 				continue;

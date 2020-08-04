@@ -196,7 +196,7 @@ public class Degree2BroadcastTranslation implements
 		}
 
 		for (TimedTransition t : degree2Net.transitions()) {
-			if(t.presetSize() == 0 && !t.hasInhibitorArcs()) {
+			if(t.presetSizeWithoutInhibitorArcs() == 0 && !t.hasInhibitorArcs()) {
 				continue;
 			}
 			else if (isTransitionDegree1(t)) {
@@ -216,7 +216,7 @@ public class Degree2BroadcastTranslation implements
 		}
 
 		for (TimedTransition t : originalModel.transitions()) {
-			if((t.presetSize() == 0 || isTransitionDegree1(t)) && !t.hasInhibitorArcs()) {
+			if((t.presetSizeWithoutInhibitorArcs() == 0 || isTransitionDegree1(t)) && !t.hasInhibitorArcs()) {
 				continue;
 			}
 			else if (!isTransitionDegree2(t) || t.hasInhibitorArcs()) {
@@ -240,11 +240,11 @@ public class Degree2BroadcastTranslation implements
 	}
 
 	private boolean isTransitionDegree1(TimedTransition t) {
-		return t.presetSize() == 1 && t.postsetSize() == 1;
+		return t.presetSizeWithoutInhibitorArcs() == 1 && t.postsetSize() == 1;
 	}
 	
 	private boolean isTransitionDegree2(TimedTransition t) {
-		return t.presetSize() == 2 && t.postsetSize() == 2;
+		return t.presetSizeWithoutInhibitorArcs() == 2 && t.postsetSize() == 2;
 	}
 
 	protected String convertInvariant(TimedPlace place) {
@@ -339,7 +339,7 @@ public class Degree2BroadcastTranslation implements
 				Edge first = new Edge(getLocationByName(PLOCK), ptest, "", String.format(TEST_CHANNEL, transition.name(), "!"), "");
 				control.addTransition(first);
 
-				if (transition.presetSize() != 1) {
+				if (transition.presetSizeWithoutInhibitorArcs() != 1) {
 					Edge second = new Edge(ptest, getLocationByName(String.format(P_T_IN_FORMAT, transition.name(), 1)),
 							"", String.format(T_I_IN_FORMAT + "%3$s", transition.name(), 1, "!"),
 							createResetExpressionForControl(transition));
@@ -399,7 +399,7 @@ public class Degree2BroadcastTranslation implements
 
 	private void createEdgesForTokenAutomata(TimedArcPetriNet degree2Net, TimedAutomaton token) {
 		for (TimedTransition transition : degree2Net.transitions()) {
-			if(transition.presetSize() == 0 && !transition.hasInhibitorArcs())
+			if(transition.presetSizeWithoutInhibitorArcs() == 0 && !transition.hasInhibitorArcs())
 				continue;
 			
 			Degree2Pairing pairing = new Degree2Pairing(transition);
@@ -496,7 +496,7 @@ public class Degree2BroadcastTranslation implements
 	private void createTestingEdgesForTokenAutomata(TimedArcPetriNet originalModel, TimedAutomaton ta) throws Exception {
 
 		for (TimedTransition transition : originalModel.transitions()) {
-			int size = transition.presetSize() + transition.getInhibitorArcs().size();
+			int size = transition.presetSizeWithoutInhibitorArcs() + transition.getInhibitorArcs().size();
 			if (size > largestPresetSize)
 				largestPresetSize = size;
 			
