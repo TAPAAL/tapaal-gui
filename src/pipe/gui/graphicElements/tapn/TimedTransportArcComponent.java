@@ -3,11 +3,10 @@ package pipe.gui.graphicElements.tapn;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
-import com.sun.jdi.connect.Transport;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.handler.TransportArcHandler;
+import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -68,7 +67,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TransportArcHandler(this);
+		mouseHandler = new TimedArcHandler(this);
 	}
 
 	public void setUnderlyingArc(TransportArc arc) {
