@@ -27,6 +27,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
@@ -66,14 +67,16 @@ public class GuardDialogue extends JPanel /*
 	private WidthAdjustingComboBox rightConstantsComboBox;
 	private JCheckBox weightUseConstant;
 	private WidthAdjustingComboBox weightConstantsComboBox;
+	private TabContent currentTab;
 	
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
-	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
+	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited, TabContent currentTab) {
 		myRootPane = rootPane;
 		setLayout(new GridBagLayout());
+		this.currentTab = currentTab;
 
-		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent) && currentTab.isNetTimed()){
 			initTimeGuardPanel();
 		}
 		
@@ -82,7 +85,7 @@ public class GuardDialogue extends JPanel /*
 
 		myRootPane.setDefaultButton(okButton);
 		
-		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent) && currentTab.isNetTimed()){
 			setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
 		}
 		// Weights

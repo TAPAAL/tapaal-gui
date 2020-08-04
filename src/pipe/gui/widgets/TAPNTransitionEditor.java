@@ -15,6 +15,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -45,15 +46,23 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	
 	private final int maxNumberOfTransitionsToShowAtOnce = 20;
 	boolean doNewEdit = true;
+	private final TabContent currentTab;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
 		rootPane = _rootPane;
 		transition = _transition;
 		this.context = context;
+		currentTab = context.tabContent();
 		initComponents();
-
+        hideTimedInformation();
 		rootPane.setDefaultButton(okButton);
 	}
+
+	private void hideTimedInformation(){
+	    if(!currentTab.isNetTimed()) {
+            urgentCheckBox.setVisible(false);
+        }
+    }
 
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;

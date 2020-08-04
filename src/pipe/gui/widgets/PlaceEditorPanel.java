@@ -22,6 +22,7 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeListener;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
@@ -63,16 +64,25 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private final Context context;
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
+	private final TabContent currentTab;
 	
 	private Vector<TimedPlace> sharedPlaces;
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
+		currentTab = context.tabContent();
 		place = placeComponent;
 		this.context = context;
 		initComponents();
+		hideTimedInformation();
 	}
+
+	private void hideTimedInformation(){
+        if(!currentTab.isNetTimed()) {
+            timeInvariantPanel.setVisible(false);
+        }
+    }
 
 	private void initComponents() {
 		setLayout(new java.awt.GridBagLayout());
@@ -86,14 +96,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new Insets(5, 8, 0, 8);
 		add(basicPropertiesPanel, gridBagConstraints);
 
-		initTimeInvariantPanel();
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new Insets(0, 8, 0, 8);
-		add(timeInvariantPanel, gridBagConstraints);
+        initTimeInvariantPanel();
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(0, 8, 0, 8);
+        add(timeInvariantPanel, gridBagConstraints);
 
 		initButtonPanel();
 		gridBagConstraints = new java.awt.GridBagConstraints();
