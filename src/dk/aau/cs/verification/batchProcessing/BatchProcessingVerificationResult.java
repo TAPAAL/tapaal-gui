@@ -5,12 +5,12 @@ import dk.aau.cs.verification.NullStats;
 import dk.aau.cs.verification.Stats;
 
 public class BatchProcessingVerificationResult {
-	private String file;
-	private TAPNQuery query;
-	private long verificationTimeInMs;
-	private String verificationMemory;
-	private String verificationResult;
-	private Stats stats;
+	private final String file;
+	private final TAPNQuery query;
+	private final long verificationTimeInMs;
+	private final String verificationMemory;
+	private final String verificationResult;
+	private final Stats stats;
 	
 	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, String verificationMemory, Stats stats) {
 		this.file = file;

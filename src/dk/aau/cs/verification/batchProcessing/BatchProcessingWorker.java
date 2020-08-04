@@ -67,9 +67,9 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
-	private List<File> files;
+	private final List<File> files;
 	private final BatchProcessingResultsTableModel tableModel;
-	private BatchProcessingVerificationOptions batchProcessingVerificationOptions;
+	private final BatchProcessingVerificationOptions batchProcessingVerificationOptions;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();

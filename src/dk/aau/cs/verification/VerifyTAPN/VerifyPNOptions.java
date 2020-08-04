@@ -12,9 +12,9 @@ import pipe.gui.widgets.InclusionPlaces;
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
-	private ModelReduction modelReduction;
-	private QueryCategory queryCategory;
-	private AlgorithmOption algorithmOption;
+	private final ModelReduction modelReduction;
+	private final QueryCategory queryCategory;
+	private final AlgorithmOption algorithmOption;
 	private boolean useSiphontrap = false; 
 	private boolean useQueryReduction = true; 
 	private boolean useStubbornReduction = true;

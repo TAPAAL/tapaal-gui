@@ -38,7 +38,7 @@ import dk.aau.cs.verification.TAPNComposer;
 
 public class PNMLWriter implements NetWriter {
 
-	private TimedArcPetriNetNetwork network;
+	private final TimedArcPetriNetNetwork network;
 	private TimedArcPetriNet composedNetwork;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 

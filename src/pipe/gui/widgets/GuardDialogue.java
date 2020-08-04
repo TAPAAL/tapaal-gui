@@ -42,7 +42,7 @@ public class GuardDialogue extends JPanel /*
  * PropertyChangeListener
  */
 {
-	private JRootPane myRootPane;
+	private final JRootPane myRootPane;
 	private JPanel guardEditPanel;
 	private JPanel weightEditPanel;
 	private JPanel buttonPanel;
@@ -67,7 +67,7 @@ public class GuardDialogue extends JPanel /*
 	private JCheckBox weightUseConstant;
 	private WidthAdjustingComboBox weightConstantsComboBox;
 	
-	private int maxNumberOfPlacesToShowAtOnce = 20;
+	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
 		myRootPane = rootPane;

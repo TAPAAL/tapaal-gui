@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class UppaalTrace implements Iterable<TAFiringAction> {
-	private List<TAFiringAction> firingActions;
-	private List<SymbolicState> states;
+	private final List<TAFiringAction> firingActions;
+	private final List<SymbolicState> states;
 
 	public UppaalTrace() {
 		firingActions = new ArrayList<TAFiringAction>();

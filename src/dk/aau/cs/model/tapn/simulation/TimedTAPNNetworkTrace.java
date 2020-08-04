@@ -7,9 +7,9 @@ import java.util.List;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class TimedTAPNNetworkTrace implements TAPNNetworkTrace {
-	private List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
+	private final List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
 	TraceType traceType;
-	private int loopToIndex;
+	private final int loopToIndex;
 	
 	public TimedTAPNNetworkTrace(int loopToIndex) {
 		this.loopToIndex = loopToIndex;

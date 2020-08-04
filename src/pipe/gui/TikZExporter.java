@@ -24,10 +24,10 @@ public class TikZExporter {
 		FIGURE_ONLY, FULL_LATEX
 	}
 
-	private DataLayer net;
-	private String fullpath;
-	private TikZOutputOption option;
-	private double scale = 1.0 / 55.0;
+	private final DataLayer net;
+	private final String fullpath;
+	private final TikZOutputOption option;
+	private final double scale = 1.0 / 55.0;
         
         private double RoundCoordinate(double position) {
             return Math.round(position * scale * 10)/10.0d;

@@ -39,11 +39,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 
 	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,inf).";
 	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
-	private TimedTransitionComponent transition;
-	private JRootPane rootPane;
-	private Context context;
+	private final TimedTransitionComponent transition;
+	private final JRootPane rootPane;
+	private final Context context;
 	
-	private int maxNumberOfTransitionsToShowAtOnce = 20;
+	private final int maxNumberOfTransitionsToShowAtOnce = 20;
 	boolean doNewEdit = true;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {

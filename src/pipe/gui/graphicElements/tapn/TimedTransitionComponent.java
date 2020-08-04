@@ -33,7 +33,7 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 public class TimedTransitionComponent extends Transition {
 
 	private dk.aau.cs.model.tapn.TimedTransition transition;
-	private dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
+	private final dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
 	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition) {

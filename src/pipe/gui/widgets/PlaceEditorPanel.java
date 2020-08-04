@@ -53,19 +53,19 @@ import dk.aau.cs.util.RequireException;
 
 public class PlaceEditorPanel extends javax.swing.JPanel {
 
-	private JRootPane rootPane;
+	private final JRootPane rootPane;
 	
 	private JCheckBox sharedCheckBox;
 	private JCheckBox makeNewSharedCheckBox;
 	private WidthAdjustingComboBox sharedPlacesComboBox;
 
-	private TimedPlaceComponent place;
-	private Context context;
+	private final TimedPlaceComponent place;
+	private final Context context;
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
 	
 	private Vector<TimedPlace> sharedPlaces;
-	private int maxNumberOfPlacesToShowAtOnce = 20;
+	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;

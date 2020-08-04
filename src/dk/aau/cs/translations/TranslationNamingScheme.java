@@ -13,10 +13,10 @@ public interface TranslationNamingScheme {
 	boolean isIgnoredAutomata(String automata);
 
 	class TransitionTranslation {
-		private int startsAt;
-		private String originalTransitionName;
-		private int endsAt;
-		private SequenceInfo sequenceInfo;
+		private final int startsAt;
+		private final String originalTransitionName;
+		private final int endsAt;
+		private final SequenceInfo sequenceInfo;
 
 		public enum SequenceInfo {
 			WHOLE, END

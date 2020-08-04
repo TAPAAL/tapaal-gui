@@ -7,7 +7,7 @@ import java.util.List;
 import dk.aau.cs.util.Tuple;
 
 public class Stats {
-	private long discovered;
+	private final long discovered;
 	private long explored;
 	private long stored;
 

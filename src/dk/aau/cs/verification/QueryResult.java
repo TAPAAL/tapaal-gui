@@ -4,11 +4,11 @@ import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.tapn.TAPNQuery;
 
 public class QueryResult {
-	private boolean satisfied = false;
+	private final boolean satisfied;
 	private boolean approximationInconclusive = false;
-	private boolean discreteInclusion = false;
-	private TAPNQuery query;
-	private BoundednessAnalysisResult boundednessAnalysis;
+	private final boolean discreteInclusion;
+	private final TAPNQuery query;
+	private final BoundednessAnalysisResult boundednessAnalysis;
 
 	public boolean isCTL = false;
 	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){

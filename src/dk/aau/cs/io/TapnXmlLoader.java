@@ -62,20 +62,23 @@ import dk.aau.cs.util.Require;
 
 public class TapnXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
-    private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
-	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
-	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
-	private NameGenerator nameGenerator = new NameGenerator();
+	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+	private final HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
+
+	private final NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
-	private IdResolver idResolver = new IdResolver();
+	private final IdResolver idResolver = new IdResolver();
+    private final Collection<String> messages = new ArrayList<>(10);
 
 	private boolean isTimed;
 	private boolean isGame;
 	private boolean isUncontrollable = false;
 
 	public TapnXmlLoader() {
+
 	}
 
 	public LoadedModel load(InputStream file) throws FormatException {
@@ -132,7 +135,8 @@ public class TapnXmlLoader {
 
 		parseFeature(doc, network);
 
-		return new LoadedModel(network, templates, queries, isTimed, isGame);
+		return new LoadedModel(network, templates, queries,messages, isTimed, isGame);
+
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -187,7 +191,7 @@ public class TapnXmlLoader {
 		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
 			name = "_" + name;
 			if(firstPlaceRenameWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				messages.add(PLACENAME_ERROR_MESSAGE);
 				firstPlaceRenameWarning = false;
 			}
 		}
@@ -346,23 +350,23 @@ public class TapnXmlLoader {
 		String text = annotation.getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage) + 1;
+			positionXInput = Integer.parseInt(positionXTempStorage) + 1;
 		}
 
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage) + 1;
+			positionYInput = Integer.parseInt(positionYTempStorage) + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp) + 1;
+			widthInput = Integer.parseInt(widthTemp) + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp) + 1;
+			heightInput = Integer.parseInt(heightTemp) + 1;
 		}
 
 		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp);
+			borderInput = Boolean.parseBoolean(borderTemp);
 		} else {
 			borderInput = true;
 		}
@@ -446,7 +450,7 @@ public class TapnXmlLoader {
 		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
 			nameInput = "_" + nameInput;
 			if(firstPlaceRenameWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+                messages.add(PLACENAME_ERROR_MESSAGE);
 				firstPlaceRenameWarning = false;
 			}
 		}
@@ -550,8 +554,7 @@ public class TapnXmlLoader {
                                                               PlaceTransitionObject targetIn,
                                                               int _endx, int _endy, Template template, Weight weight) throws FormatException {
 
-		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(
-            sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.valueOf(inscriptionTempStorage) : 1), idInput);
+		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.parseInt(inscriptionTempStorage) : 1), idInput);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());
@@ -678,7 +681,7 @@ public class TapnXmlLoader {
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 		
 		if(!interval.equals(TimeInterval.ZERO_INF) && firstInhibitorIntervalWarning) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).", "Unsupported Interval Detected on Inhibitor Arc", JOptionPane.INFORMATION_MESSAGE);
+            messages.add("The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).");
 			firstInhibitorIntervalWarning = false;
 		}
 		
@@ -706,11 +709,11 @@ public class TapnXmlLoader {
 						// Wierd naming convention in pipe: this represents if
 						// the arc point is a curve point or not
 						String arcTempType = element.getAttribute("arcPointType");
-						double arcPointX = Double.valueOf(arcTempX);
-						double arcPointY = Double.valueOf(arcTempY);
+						double arcPointX = Double.parseDouble(arcTempX);
+						double arcPointY = Double.parseDouble(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType);
+						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
 				}

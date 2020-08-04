@@ -476,6 +476,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
+			if (loadedModel.getMessages().size() != 0) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        String message = "While loading the net we found one or more warnings: \n\n";
+                        for (String s : loadedModel.getMessages()) {
+                            message += s + "\n\n";
+                        }
+
+                        new MessengerImpl().displayInfoMessage(message, "Warning");
+                    }
+                }).start();
+            }
+
             TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
 
             tab.setInitialName(name);
@@ -587,14 +602,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	//GUI
 
-	private HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
 
-	private JScrollPane drawingSurfaceScroller;
+	private final JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
 	private DrawingSurfaceImpl drawingSurface;
 	private File appFile;
-	private JPanel drawingSurfaceDummy;
+	private final JPanel drawingSurfaceDummy;
 	
 	// Normal mode
 	private BugHandledJXMultisplitPane editorSplitPane;
@@ -2033,7 +2048,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
-            if (arc!=null) {;
+            if (arc!=null) {
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
                 int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
@@ -2174,7 +2189,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
-            if (arc!=null) {;
+            if (arc!=null) {
                 Point p = e.getPoint();
                 int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
                 int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());

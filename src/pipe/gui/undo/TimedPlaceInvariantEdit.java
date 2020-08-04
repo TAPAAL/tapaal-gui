@@ -6,9 +6,9 @@ import dk.aau.cs.model.tapn.TimeInvariant;
 
 public class TimedPlaceInvariantEdit extends Command {
 
-	private TimeInvariant oldvalue;
-	private TimeInvariant newvalue;
-	private TimedPlaceComponent place;
+	private final TimeInvariant oldvalue;
+	private final TimeInvariant newvalue;
+	private final TimedPlaceComponent place;
 
 	public TimedPlaceInvariantEdit(TimedPlaceComponent place,
 			TimeInvariant oldvalue, TimeInvariant newvalue) {

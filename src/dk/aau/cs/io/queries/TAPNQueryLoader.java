@@ -40,7 +40,7 @@ import dk.aau.cs.translations.ReductionOption;
 
 public class TAPNQueryLoader extends QueryLoader{
 
-	private Document doc;
+	private final Document doc;
 	
 	public TAPNQueryLoader(Document doc, TimedArcPetriNetNetwork network) {
 		super(network);

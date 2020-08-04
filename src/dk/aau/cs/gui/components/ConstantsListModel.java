@@ -12,7 +12,7 @@ public class ConstantsListModel extends AbstractListModel {
 	
 	private TimedArcPetriNetNetwork network;
 
-	private ConstantsListener listener;
+	private final ConstantsListener listener;
 
 	public ConstantsListModel(TimedArcPetriNetNetwork network){
 		listener = new ConstantsListener() {

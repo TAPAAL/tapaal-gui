@@ -21,9 +21,9 @@ public class AnimationTokenSelectDialog extends JPanel {
 
 	public ArrayList<ArcTokenSelector> arcTokenSelectors = new ArrayList<ArcTokenSelector>();
 
-	private JPanel namePanel;
+	private final JPanel namePanel;
 
-	private JButton okButton;
+	private final JButton okButton;
 	private boolean cancelled = true;
 
 	public boolean cancelled() {

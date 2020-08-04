@@ -49,8 +49,8 @@ public class VerifyPN implements ModelChecker{
 		
 		protected static String verifypnpath = "";
 		
-		private FileFinder fileFinder;
-		private Messenger messenger;
+		private final FileFinder fileFinder;
+		private final Messenger messenger;
 
 		private ProcessRunner runner;
 		private boolean ctlOutput = false;

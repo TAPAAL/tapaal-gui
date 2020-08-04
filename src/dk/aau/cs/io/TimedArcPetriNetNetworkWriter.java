@@ -51,9 +51,9 @@ import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
-	private Iterable<Template> templates;
-	private Iterable<TAPNQuery> queries;
-	private Iterable<Constant> constants;
+	private final Iterable<Template> templates;
+	private final Iterable<TAPNQuery> queries;
+	private final Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
     private boolean isTimed;
     private boolean isGame;
