@@ -1290,7 +1290,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 break;
             case noNet:
-                setFeatureInfoText("");
+                setFeatureInfoText(null);
                 break;
 
             default:
@@ -1663,9 +1663,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void setFeatureInfoText(String s) {
-        if (s == null) s = "";
-        featureInfoText.setText(s);
+    public void setFeatureInfoText(boolean[] features) {
+        if (features != null) {
+            timeFeatureOptions.setSelectedIndex(features[0] ? 1 : 0);
+            gameFeatureOptions.setSelectedIndex(features[1] ? 1 : 0);
+        }
     }
 
 }

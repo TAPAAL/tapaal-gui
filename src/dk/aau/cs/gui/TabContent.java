@@ -1364,8 +1364,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		editorSplitPane.getMultiSplitLayout().layoutByWeight(editorSplitPane);
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
 	}
-	
-	public static Split getEditorModelRoot(){
+
+    public static Split getEditorModelRoot(){
 		return editorModelroot;
 	}
 	
@@ -2270,19 +2270,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     public void updateFeatureText() {
-
-        String properties = "Timed: " + (lens.isTimed() ? "Yes" : "No") +
-                            ", Game: " + (lens.isGame() ? "Yes" : "No");
-        app.ifPresent(o->o.setFeatureInfoText(properties));
-
+        boolean[] features = {lens.isTimed(), lens.isGame()};
+        app.ifPresent(o->o.setFeatureInfoText(features));
     }
 
     public boolean isNetTimed() {
         return lens.isTimed();
-    }
-
-    public boolean isNetGame() {
-        return lens.isGame();
     }
 
     public TAPNLens getLens() {
