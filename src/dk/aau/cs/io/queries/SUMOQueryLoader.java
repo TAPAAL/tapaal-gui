@@ -26,7 +26,7 @@ import dk.aau.cs.translations.ReductionOption;
 
 public class SUMOQueryLoader extends QueryLoader{
 
-	private File file;
+	private final File file;
 
 	public SUMOQueryLoader(File file, TimedArcPetriNetNetwork network) {
 		super(network);

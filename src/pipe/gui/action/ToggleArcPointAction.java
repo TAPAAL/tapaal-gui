@@ -12,7 +12,7 @@ import pipe.gui.graphicElements.ArcPathPoint;
 
 public class ToggleArcPointAction extends javax.swing.AbstractAction {
 
-	private ArcPathPoint arcPathPoint;
+	private final ArcPathPoint arcPathPoint;
 
 	public ToggleArcPointAction(ArcPathPoint _arcPathPoint) {
 		arcPathPoint = _arcPathPoint;

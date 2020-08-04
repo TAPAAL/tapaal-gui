@@ -337,8 +337,8 @@ public abstract class Transition extends PlaceTransitionObject {
 
 		private static final boolean SOURCE = false;
 		private static final boolean TARGET = true;
-		private Arc arc;
-		private Transition transition;
+		private final Arc arc;
+		private final Transition transition;
 		private double angle;
 
 		public ArcAngleCompare(Arc _arc, Transition _transition) {

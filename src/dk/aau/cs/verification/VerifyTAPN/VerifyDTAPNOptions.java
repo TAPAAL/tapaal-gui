@@ -7,11 +7,11 @@ import pipe.gui.widgets.InclusionPlaces;
 
 public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
-	private boolean gcd;
-	private boolean timeDarts;
-	private boolean pTrie;
-	private WorkflowMode workflow;
-	private long workflowbound;
+	private final boolean gcd;
+	private final boolean timeDarts;
+	private final boolean pTrie;
+	private final WorkflowMode workflow;
+	private final long workflowbound;
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 	private boolean useStubbornReduction = true;

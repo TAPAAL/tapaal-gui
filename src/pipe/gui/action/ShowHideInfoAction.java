@@ -7,7 +7,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class ShowHideInfoAction extends javax.swing.AbstractAction {
 
-	private PlaceTransitionObject pto;
+	private final PlaceTransitionObject pto;
 
 	public ShowHideInfoAction(PlaceTransitionObject component) {
 		pto = component;

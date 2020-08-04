@@ -47,16 +47,16 @@ import dk.aau.cs.gui.components.NonsearchableJList;
 
 public class ConstantsPane extends JPanel implements SidePane {
 
-	private JPanel constantsPanel;
+	private final JPanel constantsPanel;
 	private JScrollPane constantsScroller;
-	private JPanel buttonsPanel;
+	private final JPanel buttonsPanel;
 
-	private JList constantsList;
-	private ConstantsListModel listModel;
+	private final JList constantsList;
+	private final ConstantsListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
 
-	private TabContent parent;
+	private final TabContent parent;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;

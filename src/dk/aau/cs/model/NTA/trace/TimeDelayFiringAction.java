@@ -18,8 +18,8 @@ import pipe.gui.Pipe;
  */
 public class TimeDelayFiringAction implements TAFiringAction {
 
-	private SymbolicState state;
-	private BigDecimal timedelay;
+	private final SymbolicState state;
+	private final BigDecimal timedelay;
 
 	public TimeDelayFiringAction(SymbolicState state, BigDecimal delay) {
 		this.state = state;

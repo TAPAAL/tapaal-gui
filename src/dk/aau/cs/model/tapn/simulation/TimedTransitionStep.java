@@ -8,8 +8,8 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 public class TimedTransitionStep implements TimedArcPetriNetStep {
-	private TimedTransition transition;
-	private List<TimedToken> consumedTokens;
+	private final TimedTransition transition;
+	private final List<TimedToken> consumedTokens;
 
 	public TimedTransitionStep(TimedTransition transition, List<TimedToken> consumedTokens) {
 		Require.that(transition != null, "transition cannot be null");

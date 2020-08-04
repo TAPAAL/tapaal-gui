@@ -30,12 +30,12 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	private Point startPoint;
 
-	private Point upperLeftCorner = new Point(0,0);
-	private Rectangle selectionRectangle = new Rectangle(-1, -1);
+	private final Point upperLeftCorner = new Point(0,0);
+	private final Rectangle selectionRectangle = new Rectangle(-1, -1);
 	private boolean isSelecting;
 	private static final Color selectionColor = new Color(0, 0, 255, 30);
 	private static final Color selectionColorOutline = new Color(0, 0, 100);
-	private DrawingSurfaceImpl drawingSurface;
+	private final DrawingSurfaceImpl drawingSurface;
 
 	public SelectionManager(DrawingSurfaceImpl _view) {
 		addMouseListener(this);

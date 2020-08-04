@@ -38,7 +38,7 @@ public class StatusBar extends JPanel {
 	public static final String textforDrag = "Drag Mode";
 
 
-	private JLabel label;
+	private final JLabel label;
 
 	public StatusBar() {
 		super();

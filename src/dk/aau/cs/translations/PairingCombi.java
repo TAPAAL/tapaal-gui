@@ -15,7 +15,7 @@ import dk.aau.cs.util.Require;
 // This class assumes that the transition is conservative
 public class PairingCombi extends Pairing {
 	
-	private Hashtable<String, Boolean> placeNameToTimed;
+	private final Hashtable<String, Boolean> placeNameToTimed;
 	
 	public PairingCombi(TimedTransition t, Hashtable<String, Boolean> placeNameToTimed) {
 		super(t);

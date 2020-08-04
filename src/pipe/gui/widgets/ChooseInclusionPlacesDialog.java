@@ -43,12 +43,12 @@ import dk.aau.cs.model.tapn.TimedPlace;
 
 public class ChooseInclusionPlacesDialog extends JPanel {
 	
-	private JRootPane rootPane;
+	private final JRootPane rootPane;
 	
 	private JList placeList;
 	private DefaultListModel listModel;
 
-	private TimedArcPetriNetNetwork tapnNetwork;
+	private final TimedArcPetriNetNetwork tapnNetwork;
 
 	private JCheckBox userSpecifiedCheckBox;
 	private JCheckBox AllPlacesCheckBox;
@@ -262,7 +262,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	}
 	
 	private static class CheckBoxListItem {
-		private TimedPlace place;
+		private final TimedPlace place;
 		private boolean isSelected;
 		
 		public CheckBoxListItem(TimedPlace place, boolean selected) {
@@ -291,8 +291,8 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to exclude place from inclusion check.";
 		private static final String CHECK_TO_ACTIVATE = "Check to make place eligible for inclusion check.";
-		private JCheckBox activeCheckbox = new JCheckBox();
-		private ListCellRenderer cellRenderer;
+		private final JCheckBox activeCheckbox = new JCheckBox();
+		private final ListCellRenderer cellRenderer;
 		
 		
 		public InclusionPlacesCellRenderer(ListCellRenderer renderer) {
@@ -317,8 +317,8 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	}
 	
 	private class InclusionPlacesListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
-		private ListSelectionModel selectionModel;
-		private JList list;
+		private final ListSelectionModel selectionModel;
+		private final JList list;
 		
 		public InclusionPlacesListManager(JList list) {
 			this.list = list;

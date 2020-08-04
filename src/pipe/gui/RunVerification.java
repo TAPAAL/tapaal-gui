@@ -35,8 +35,8 @@ import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
 
 public class RunVerification extends RunVerificationBase {	
-	private IconSelector iconSelector;
-	private VerificationCallback callback;
+	private final IconSelector iconSelector;
+	private final VerificationCallback callback;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
 		super(modelChecker, messenger);
 		iconSelector = selector;
