@@ -3,6 +3,7 @@ package dk.aau.cs.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
@@ -11,12 +12,11 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import dk.aau.cs.approximation.OverApproximation;
-import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -35,12 +35,13 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.handler.PlaceTransitionObjectHandler;
+import pipe.gui.graphicElements.tapn.*;
+import pipe.gui.undo.*;
+import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.undo.ChangeSpacingEdit;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.*;
+
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
@@ -49,47 +50,455 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
+    static class TAPNLens {
+        public boolean isTimed() {
+            return timed;
+        }
+
+        public boolean isGame() {
+            return game;
+        }
+
+        private final boolean timed;
+        private final boolean game;
+
+        TAPNLens(boolean timed, boolean game) {
+            this.timed = timed;
+            this.game = game;
+        }
+    }
+    private final TAPNLens lens;
+
 	//Model and state
-	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
-	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	private final TimedArcPetriNetNetwork tapnNetwork;
+
+	//XXX: Replace with bi-map
+	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
+
+	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
 
-	private UndoManager undoManager = new UndoManager();
+	private final UndoManager undoManager = new UndoManager();
+
+	public final GuiModelManager guiModelManager = new GuiModelManager();
+	public class GuiModelManager {
+	    public GuiModelManager(){
+
+        }
+
+        public void addNewTimedPlace(DataLayer c, Point p){
+	        Require.notNull(c, "datalyer can't be null");
+            Require.notNull(p, "Point can't be null");
+
+            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
+            guiModelToModel.get(c).add(tp);
+            c.addPetriNetObject(pnObject);
+
+            getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, guiModelToModel.get(c), c));
+
+        }
+
+        public void addNewTimedTransitions(DataLayer c, Point p) {
+            dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
+
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
+
+            guiModelToModel.get(c).add(transition);
+            c.addPetriNetObject(pnObject);
+
+            getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, guiModelToModel.get(c), c));
+        }
+
+        public void addAnnotationNote(DataLayer c, Point p) {
+            AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
+
+            //enableEditMode open editor, retuns true of text added, else false
+            //If no text is added,dont add it to model
+            if (pnObject.enableEditMode(true)) {
+                c.addPetriNetObject(pnObject);
+                getUndoManager().addEdit(new AddAnnotationNoteCommand(pnObject, c));
+            }
+        }
+
+        public void addTimedInputArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (!modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition())) {
+
+                TimedInputArc tia = new TimedInputArc(
+                    p.underlyingPlace(),
+                    t.underlyingTransition(),
+                    TimeInterval.ZERO_INF
+                );
+
+                TimedInputArcComponent tiac = new TimedInputArcComponent(p,t,tia);
+
+                if (path != null) {
+                    tiac.setArcPath(new ArcPath(tiac, path));
+                }
+
+                Command edit = new AddTimedInputArcCommand(
+                    tiac,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+
+                undoManager.addNewEdit(edit);
+
+            }  else {
+                //TODO: can't have two arcs between place and transition
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+
+        public void addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (!modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace())) {
+
+                TimedOutputArc toa = new TimedOutputArc(
+                    t.underlyingTransition(),
+                    p.underlyingPlace()
+                );
+
+                TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
+
+                if (path != null) {
+                    toac.setArcPath(new ArcPath(toac, path));
+                }
+
+                Command edit = new AddTimedOutputArcCommand(
+                    toac,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+                undoManager.addNewEdit(edit);
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+
+            }
+
+
+        }
+
+        public void addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (!modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition())) {
+
+                TimedInhibitorArc tiha = new TimedInhibitorArc(
+                    p.underlyingPlace(),
+                    t.underlyingTransition()
+                );
+
+                TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
+
+                if (path != null) {
+                    tihac.setArcPath(new ArcPath(tihac, path));
+                }
+
+                Command edit = new AddTimedInhibitorArcCommand(
+                    tihac,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+                undoManager.addNewEdit(edit);
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the selected place and transition\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+
+            }
+
+        }
+
+        public void addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p1, "Place1 can't be null");
+            Require.notNull(t, "Transitions can't be null");
+            Require.notNull(p2, "Place2 can't be null");
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            if (
+                !modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()) &&
+                !modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace())
+            ) {
+
+                int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
+
+                TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
+
+                TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr);
+                TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr);
+
+                ttac1.setConnectedTo(ttac2);
+                ttac2.setConnectedTo(ttac1);
+
+                if (path1 != null) {
+                    ttac1.setArcPath(new ArcPath(ttac1, path1));
+                }
+                if (path2 != null) {
+                    ttac2.setArcPath(new ArcPath(ttac2, path2));
+                }
+
+                //XXX: the Command should take both arcs
+                Command edit = new AddTransportArcCommand(
+                    ttac2,
+                    tta,
+                    modelNet,
+                    c
+                );
+                edit.redo();
+                undoManager.addNewEdit(edit);
+
+            } else {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "There was an error drawing the arc. Possible problems:\n"
+                        + " - There is already an arc between the source place and transition\n"
+                        + " - There is already an arc between the transtion and the target place\n"
+                        + " - You are attempting to draw an arc between a shared transition and a shared place",
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+        }
+
+        private int getNextTransportArcMaxGroupNumber(TimedPlaceComponent p, TimedTransitionComponent t) {
+            int groupMaxCounter = 0;
+
+            for (Arc a : t.getPreset()) {
+                if (a instanceof TimedTransportArcComponent && a.getTarget().equals(t)) {
+                    if (((TimedTransportArcComponent) a).getGroupNr() > groupMaxCounter) {
+                        groupMaxCounter = ((TimedTransportArcComponent) a).getGroupNr();
+                    }
+                }
+            }
+
+            return groupMaxCounter+1;
+        }
+
+
+        public void deleteSelection() {
+            // check if queries need to be removed
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+            Iterable<TAPNQuery> queries = queries();
+            HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+
+            boolean queriesAffected = false;
+            for (PetriNetObject pn : selection) {
+                if (pn instanceof TimedPlaceComponent) {
+                    TimedPlaceComponent place = (TimedPlaceComponent)pn;
+                    if(!place.underlyingPlace().isShared()){
+                        for (TAPNQuery q : queries) {
+                            if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+                                queriesAffected = true;
+                                queriesToDelete.add(q);
+                            }
+                        }
+                    }
+                } else if (pn instanceof TimedTransitionComponent){
+                    TimedTransitionComponent transition = (TimedTransitionComponent)pn;
+                    if(!transition.underlyingTransition().isShared()){
+                        for (TAPNQuery q : queries) {
+                            if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
+                                queriesAffected = true;
+                                queriesToDelete.add(q);
+                            }
+                        }
+                    }
+                }
+            }
+            StringBuilder s = new StringBuilder();
+            s.append("The following queries are associated with the currently selected objects:\n\n");
+            for (TAPNQuery q : queriesToDelete) {
+                s.append(q.getName());
+                s.append('\n');
+            }
+            s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+
+            int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+                CreateGui.getApp(), s.toString(), "Warning",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+                : JOptionPane.YES_OPTION;
+
+            if (choice == JOptionPane.YES_OPTION) {
+                getUndoManager().newEdit(); // new "transaction""
+                if (queriesAffected) {
+                    TabContent currentTab = TabContent.this;
+                    for (TAPNQuery q : queriesToDelete) {
+                        Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+                        cmd.redo();
+                        getUndoManager().addEdit(cmd);
+                    }
+                }
+
+                deleteSelection(selection);
+                network().buildConstraints();
+            }
+        }
+
+        //XXX: function moved from undoManager --kyrke - 2019-07-06
+        private void deleteObject(PetriNetObject pnObject) {
+            if (pnObject instanceof ArcPathPoint) {
+
+                ArcPathPoint arcPathPoint = (ArcPathPoint)pnObject;
+
+                //If the arc is marked for deletion, skip deleting individual arcpathpoint
+                if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
+
+                    //Don't delete the two last arc path points
+                    if (arcPathPoint.isDeleteable()) {
+                        Command cmd = new DeleteArcPathPointEdit(
+                            arcPathPoint.getArcPath().getArc(),
+                            arcPathPoint,
+                            arcPathPoint.getIndex(),
+                            getModel()
+                        );
+                        cmd.redo();
+                        getUndoManager().addEdit(cmd);
+                    }
+                }
+            }else{
+                //The list of selected objects is not updated when a element is deleted
+                //We might delete the same object twice, which will give an error
+                //Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
+                //There is properly a better way to track this (check model?) but while refactoring we will keeps it close
+                //to the orginal code -- kyrke 2019-06-27
+                if (!pnObject.isDeleted()) {
+                    Command cmd = null;
+                    if(pnObject instanceof TimedPlaceComponent){
+                        TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
+                        cmd = new DeleteTimedPlaceCommand(tp, guiModelToModel.get(getModel()), getModel());
+                    }else if(pnObject instanceof TimedTransitionComponent){
+                        TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
+                        cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), getModel());
+                    }else if(pnObject instanceof TimedTransportArcComponent){
+                        TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
+                        cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), getModel());
+                    }else if(pnObject instanceof TimedInhibitorArcComponent){
+                        TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
+                        cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), getModel());
+                    }else if(pnObject instanceof TimedInputArcComponent){
+                        TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
+                        cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), getModel());
+                    }else if(pnObject instanceof TimedOutputArcComponent){
+                        TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
+                        cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), getModel());
+                    }else if(pnObject instanceof AnnotationNote){
+                        cmd = new DeleteAnnotationNoteCommand((AnnotationNote)pnObject, getModel());
+                    }else{
+                        throw new RuntimeException("This should not be possible");
+                    }
+                    cmd.redo();
+                    getUndoManager().addEdit(cmd);
+                }
+            }
+        }
+
+
+        private void deleteSelection(PetriNetObject pnObject) {
+            if(pnObject instanceof PlaceTransitionObject){
+                PlaceTransitionObject pto = (PlaceTransitionObject)pnObject;
+
+                ArrayList<Arc> arcsToDelete = new ArrayList<>();
+
+                //Notice since we delte elements from the collection we can't do this while iterating, we need to
+                // capture the arcs and delete them later.
+                for(Arc arc : pto.getPreset()){
+                    arcsToDelete.add(arc);
+                }
+
+                for(Arc arc : pto.getPostset()){
+                    arcsToDelete.add(arc);
+                }
+
+                arcsToDelete.forEach(this::deleteObject);
+            }
+
+            deleteObject(pnObject);
+        }
+
+        public void deleteSelection(ArrayList<PetriNetObject> selection) {
+            for (PetriNetObject pnObject : selection) {
+                deleteSelection(pnObject);
+            }
+        }
+
+
+    }
+
 
     /**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
-		TabContent tab = new TabContent();
-		tab.setInitialName(name);
 
-		try {
+	    try {
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
-			tab.setNetwork(loadedModel.network(), loadedModel.templates());
-			tab.setQueries(loadedModel.queries());
-			tab.setConstants(loadedModel.network().constants());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+
+            tab.setInitialName(name);
 
 			tab.selectFirstElements();
 
 			tab.setFile(null);
+
+            return tab;
 		} catch (Exception e) {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
-		return tab;
 	}
 
-	public static TabContent createNewEmptyTab(String name){
-		TabContent tab = new TabContent();
+	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
+		TabContent tab = new TabContent(isTimed, isGame);
 		tab.setInitialName(name);
 
 		//Set Default Template
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
-		tab.addTemplate(template, false);
+		tab.addTemplate(template);
 
 		return tab;
 	}
@@ -99,14 +508,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 */
 
 	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
-		TabContent tab = new TabContent();
-
-		String name = null;
-
-		if (file != null) {
-			name = file.getName().replaceAll(".pnml", ".tapn");
-		}
-		tab.setInitialName(name);
 
 		if (file != null) {
 			try {
@@ -116,24 +517,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
+                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
 
-				tab.setNetwork(loadedModel.network(), loadedModel.templates());
-				tab.setQueries(loadedModel.queries());
-				tab.setConstants(loadedModel.network().constants());
+                String name = null;
+
+                if (file != null) {
+                    name = file.getName().replaceAll(".pnml", ".tapn");
+                }
+                tab.setInitialName(name);
 
 				tab.selectFirstElements();
 
 				tab.setMode(Pipe.ElementType.SELECT);
 
+                //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
+                name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
+                return tab;
 
 			} catch (Exception e) {
 				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
 			}
 		}
-
-		//appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-		name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-		return tab;
+		return null;
 	}
 
 	/**
@@ -227,51 +632,78 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
-	public TabContent() {
-		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-			guiModels.put(net, new DataLayer());
-			zoomLevels.put(net, new Zoomer());
-			hasPositionalInfos.put(net, Boolean.FALSE);
-		}
-		
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
-		drawingSurfaceScroller = new JScrollPane(drawingSurface);
-		// make it less bad on XP
-		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		drawingSurfaceScroller.setWheelScrollingEnabled(true);
-		drawingSurfaceScroller.getVerticalScrollBar().setUnitIncrement(10);
-		drawingSurfaceScroller.getHorizontalScrollBar().setUnitIncrement(10);
 
-		// Make clicking the drawing area move focus to GuiFrame
-		drawingSurface.addMouseListener(new MouseAdapter() {	
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CreateGui.getApp().requestFocus();
-			}
-		});
-		
-		drawingSurfaceDummy = new JPanel(new GridBagLayout());
-		GridBagConstraints gc=new GridBagConstraints();
-		gc.fill=GridBagConstraints.HORIZONTAL;
-		gc.gridx=0;
-		gc.gridy=0;
-		drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
-		
-		createEditorLeftPane();
-		createAnimatorSplitPane();
+	private TabContent(boolean isTimed, boolean isGame) {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
+    }
 
-		this.setOrientation(HORIZONTAL_SPLIT);
-		this.setLeftComponent(editorSplitPaneScroller);
-		this.setRightComponent(drawingSurfaceScroller);
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
 
-		this.setContinuousLayout(true);
-		this.setOneTouchExpandable(true);
-		this.setBorder(null); // avoid multiple borders
-		this.setDividerSize(8);
-		//XXX must be after the animationcontroller is created
-		animationModeController = new CanvasAnimationController(getAnimator());
+        Require.that(network != null, "network cannot be null");
+        Require.notNull(lens, "Lens can't be null");
+        this.lens = lens;
+        tapnNetwork = network;
+
+        guiModels.clear();
+        for (Template template : templates) {
+            addGuiModel(template.model(), template.guiModel());
+            zoomLevels.put(template.model(), template.zoomer());
+            hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+        }
+
+        drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
+        drawingSurfaceScroller = new JScrollPane(drawingSurface);
+        // make it less bad on XP
+        drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        drawingSurfaceScroller.setWheelScrollingEnabled(true);
+        drawingSurfaceScroller.getVerticalScrollBar().setUnitIncrement(10);
+        drawingSurfaceScroller.getHorizontalScrollBar().setUnitIncrement(10);
+
+        // Make clicking the drawing area move focus to GuiFrame
+        drawingSurface.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                CreateGui.getApp().requestFocus();
+            }
+        });
+
+        drawingSurfaceDummy = new JPanel(new GridBagLayout());
+        GridBagConstraints gc=new GridBagConstraints();
+        gc.fill=GridBagConstraints.HORIZONTAL;
+        gc.gridx=0;
+        gc.gridy=0;
+        drawingSurfaceDummy.add(new JLabel("The net is too big to be drawn"), gc);
+
+        createEditorLeftPane();
+        createAnimatorSplitPane();
+
+        this.setOrientation(HORIZONTAL_SPLIT);
+        this.setLeftComponent(editorSplitPaneScroller);
+        this.setRightComponent(drawingSurfaceScroller);
+
+        this.setContinuousLayout(true);
+        this.setOneTouchExpandable(true);
+        this.setBorder(null); // avoid multiple borders
+        this.setDividerSize(8);
+        //XXX must be after the animationcontroller is created
+        animationModeController = new CanvasAnimationController(getAnimator());
+    }
+
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame) {
+        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame));
+    }
+
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
+        this(network, templates, tapnqueries,  new TAPNLens(true, false));
+    }
+	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+        this(network, templates, lens);
+
+        setNetwork(network, templates);
+        setQueries(tapnqueries);
+        setConstants(network().constants());
 	}
-	
+
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
 		return sharedPTPanel;
 	}
@@ -706,34 +1138,24 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return count;
 	}
 
-	/*
-		XXX: 2018-05-07 kyrke, added a version of addTemplate that does not call templatExplorer.updatTemplateList
-		used in createNewTab (as updateTamplateList expects the current tab to be selected)
-		this needs to be refactored asap. but the is the only way I could get it to work for now.
-		The code is very unclean on what is a template, TimeArcPetriNetNetwork, seems to mix concerns about
-		gui/controller/model. Further refactoring is needed to clean up this mess.
-	 */
-	public void addTemplate(Template template, boolean updateTemplateExplorer) {
+	public void addTemplate(Template template) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
+        guiModelToModel.put(template.guiModel(), template.model());
 		zoomLevels.put(template.model(), template.zoomer());
 		hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
-		if (updateTemplateExplorer) {
-			templateExplorer.updateTemplateList();
-		}
-	}
-
-	public void addTemplate(Template template) {
-		addTemplate(template, true);
+		templateExplorer.updateTemplateList();
 	}
 
 	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {
 		guiModels.put(net, guiModel);
+		guiModelToModel.put(guiModel, net);
 	}
 
 	public void removeTemplate(Template template) {
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
+		guiModelToModel.remove(template.guiModel());
 		zoomLevels.remove(template.model());
 		hasPositionalInfos.remove(template.model());
 		templateExplorer.updateTemplateList();
@@ -747,7 +1169,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return queries.getQueries();
 	}
 
-	public void setQueries(Iterable<TAPNQuery> queries) {
+	private void setQueries(Iterable<TAPNQuery> queries) {
 		this.queries.setQueries(queries);
 	}
 
@@ -759,20 +1181,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		queries.addQuery(query);
 	}
 
-	public void setConstants(Iterable<Constant> constants) {
+	private void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
 	}
 
-	public void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
-		Require.that(network != null, "network cannot be null");
-		tapnNetwork = network;
+	private void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
 
-		guiModels.clear();
-		for (Template template : templates) {
-			addGuiModel(template.model(), template.guiModel());
-			zoomLevels.put(template.model(), template.zoomer());
-			hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
-		}
 
 		sharedPTPanel.setNetwork(network);
 		templateExplorer.updateTemplateList();
@@ -1060,6 +1474,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
 
+	private Pipe.ElementType editorMode = Pipe.ElementType.SELECT;
+
 	//XXX temp while refactoring, kyrke - 2019-07-25
 	@Override
 	public void setMode(Pipe.ElementType mode) {
@@ -1068,11 +1484,67 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		//Disable selection and deselect current selection
 		drawingSurface().getSelectionObject().clearSelection();
+        editorMode = mode;
+        switch (mode) {
+            case ADDTOKEN:
+                setManager(new AbstractDrawingSurfaceManager() {
+                    @Override
+                    public void registerEvents() {
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                        );
+                    }
 
-		//If pending arc draw, remove it
-		if (drawingSurface().createArc != null) {
-			PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
-		}
+                    public void placeClicked(TimedPlaceComponent pno) {
+                        Command command = new TimedPlaceMarkingEdit(pno, 1);
+                        command.redo();
+                        undoManager.addNewEdit(command);
+                    }
+                });
+                break;
+            case DELTOKEN:
+                setManager(new AbstractDrawingSurfaceManager() {
+                    @Override
+                    public void registerEvents() {
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                        );
+                    }
+
+                    public void placeClicked(TimedPlaceComponent pno) {
+                        Command command = new TimedPlaceMarkingEdit(pno, -1);
+                        command.redo();
+                        undoManager.addNewEdit(command);
+                    }
+                });
+                break;
+            case TAPNPLACE:
+                setManager(new CanvasPlaceDrawController());
+                break;
+            case TAPNTRANS:
+                setManager(new CanvasTransitionDrawController());
+                break;
+            case ANNOTATION:
+                setManager(new CanvasAnnotationNoteDrawController());
+                break;
+            case TAPNARC:
+                setManager(new CanvasArcDrawController());
+                break;
+            case TAPNINHIBITOR_ARC:
+                setManager(new CanvasInhibitorarcDrawController());
+                break;
+            case TRANSPORTARC:
+                setManager(new CanvasTransportarcDrawController());
+                break;
+            case SELECT:
+                setManager(new CanvasGeneralDrawController());
+                break;
+            default:
+                setManager(notingManager);
+                break;
+        }
 
 		if (mode == Pipe.ElementType.SELECT) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1180,6 +1652,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		this.app = Optional.ofNullable(newApp);
 		undoManager.setApp(newApp);
 
+		updateFeatureText();
+
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -1221,63 +1695,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void deleteSelection() {
-		// check if queries need to be removed
-		ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
-		Iterable<TAPNQuery> queries = queries();
-		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-
-		boolean queriesAffected = false;
-		for (PetriNetObject pn : selection) {
-			if (pn instanceof TimedPlaceComponent) {
-				TimedPlaceComponent place = (TimedPlaceComponent)pn;
-				if(!place.underlyingPlace().isShared()){
-					for (TAPNQuery q : queries) {
-						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
-							queriesAffected = true;
-							queriesToDelete.add(q);
-						}
-					}
-				}
-			} else if (pn instanceof TimedTransitionComponent){
-				TimedTransitionComponent transition = (TimedTransitionComponent)pn;
-				if(!transition.underlyingTransition().isShared()){
-					for (TAPNQuery q : queries) {
-						if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(),transition.underlyingTransition().name())) {
-							queriesAffected = true;
-							queriesToDelete.add(q);
-						}
-					}
-				}
-			}
-		}
-		StringBuilder s = new StringBuilder();
-		s.append("The following queries are associated with the currently selected objects:\n\n");
-		for (TAPNQuery q : queriesToDelete) {
-			s.append(q.getName());
-			s.append('\n');
-		}
-		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
-
-		int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-				CreateGui.getApp(), s.toString(), "Warning",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-				: JOptionPane.YES_OPTION;
-
-		if (choice == JOptionPane.YES_OPTION) {
-			getUndoManager().newEdit(); // new "transaction""
-			if (queriesAffected) {
-				TabContent currentTab = this;
-				for (TAPNQuery q : queriesToDelete) {
-					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
-					cmd.redo();
-					getUndoManager().addEdit(cmd);
-				}
-			}
-
-			drawingSurface().deleteSelection(drawingSurface().getSelectionObject().getSelection());
-			//getCurrentTab().drawingSurface().repaint();
-			network().buildConstraints();
-		}
+		guiModelManager.deleteSelection();
 
 
 	}
@@ -1309,13 +1727,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 			//If arc is being drawn delete it
 
-			if (drawingSurface().createArc == null) {
+			if (editorMode == Pipe.ElementType.SELECT) {
 				getUndoManager().undo();
 				network().buildConstraints();
 
 			} else {
 
-				PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+				setMode(Pipe.ElementType.SELECT);
 
 			}
 		}
@@ -1330,13 +1748,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				//If arc is being drawn delete it
 
-				if (drawingSurface().createArc == null) {
+				if (editorMode == Pipe.ElementType.SELECT) {
 					getUndoManager().redo();
 					network().buildConstraints();
 
 				} else {
 
-					PlaceTransitionObjectHandler.cleanupArc(drawingSurface().createArc, drawingSurface());
+                    setMode(Pipe.ElementType.SELECT);
 
 				}
 			}
@@ -1350,8 +1768,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
     };
 	final AbstractDrawingSurfaceManager animationModeController;
 
-	//Writes a tapaal net to a file, with the possibility to overwrite the queries
-	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite) {
+	//Writes a tapaal net to a file, with the posibility to overwrite the quires
+	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
 		try {
 			NetworkMarking currentMarking = null;
 			if(isInAnimationMode()){
@@ -1363,7 +1781,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					network(),
 					allTemplates(),
 					queriesOverwrite,
-					network().constants()
+					network().constants(),
+                    lens.timed,
+					lens.game
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -1380,7 +1800,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void writeNetToFile(File outFile) {
-		writeNetToFile(outFile, (List<TAPNQuery>) queries());
+		writeNetToFile(outFile, (List<TAPNQuery>) queries(), lens);
 	}
 
 	@Override
@@ -1462,6 +1882,321 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return null;
 	}
 
+	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+           guiModelManager.addAnnotationNote(drawingSurface.getGuiModel(), p);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasInhibitorarcDrawController extends AbstractDrawingSurfaceManager {
+
+        private TimedTransitionComponent transition;
+        private TimedPlaceComponent place;
+        private Arc arc;
+
+        @Override
+        public void registerEvents() {
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                e->placeClicked(((TimedPlaceComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
+                e->transitionClicked(((TimedTransitionComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
+                e->placetranstionMouseOver(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.exited,
+                e->placetranstionMouseExited(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
+                e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
+            );
+        }
+
+        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
+            if (arc != null) {
+                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
+                    //Dispatch event to parent (drawing surface)
+                    e.translatePoint(pno.getX(),pno.getY());
+                    pno.getParent().dispatchEvent(e);
+                }
+            }
+        }
+
+        private void placetranstionMouseExited(PlaceTransitionObject pto) {
+            if (arc != null) {
+                arc.setTarget(null);
+                //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
+                // Relates to bug #1849786
+                if (pto instanceof Transition) {
+                    ((Transition)pto).removeArcCompareObject(arc);
+                }
+                arc.updateArcPosition();
+            }
+        }
+
+        private void placetranstionMouseOver(PlaceTransitionObject pno) {
+            if (arc != null) {
+                if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
+                    arc.setTarget(pno);
+                    arc.updateArcPosition();
+                }
+            }
+        }
+
+        private void transitionClicked(TimedTransitionComponent pno) {
+            if (place != null && transition == null) {
+                transition = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
+                clearPendingArc();
+            }
+        }
+
+        private void placeClicked(TimedPlaceComponent pno) {
+            if (place == null && transition == null) {
+                place = pno;
+                arc = new TimedInhibitorArcComponent(pno);
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
+            } else if (transition != null && place == null) {
+                place = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
+                clearPendingArc();
+            }
+        }
+
+        private void clearPendingArc() {
+            CreateGui.getDrawingSurface().clearAllPrototype();
+            place = null;
+            transition = null;
+            arc = null;
+        }
+
+        @Override
+        public void drawingSurfaceMouseMoved(MouseEvent e) {
+            if(arc!=null) {
+                arc.setEndPoint(e.getX(), e.getY(), e.isShiftDown());
+            }
+        }
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            if (arc!=null) {;
+                Point p = e.getPoint();
+                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
+                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+
+                boolean shiftDown = e.isShiftDown();
+                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
+            }
+        }
+
+        @Override
+        public void registerManager(DrawingSurfaceImpl canvas) {
+            CreateGui.useExtendedBounds = true;
+        }
+
+        @Override
+        public void deregisterManager() {
+            clearPendingArc();
+            CreateGui.useExtendedBounds = false;
+        }
+
+
+    }
+    class CanvasArcDrawController extends  AbstractDrawingSurfaceManager {
+        private TimedTransitionComponent transition;
+        private TimedPlaceComponent place;
+        private Arc arc;
+
+        @Override
+        public void registerEvents() {
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                e->placeClicked(((TimedPlaceComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
+                e->transitionClicked(((TimedTransitionComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
+                e->placetranstionMouseOver(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.exited,
+                e->placetranstionMouseExited(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
+                e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
+            );
+        }
+
+        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
+            if (arc != null) {
+                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
+                    //Dispatch event to parent (drawing surface)
+                    e.translatePoint(pno.getX(),pno.getY());
+                    pno.getParent().dispatchEvent(e);
+                }
+            }
+        }
+
+        private void placetranstionMouseExited(PlaceTransitionObject pto) {
+            if (arc != null) {
+                arc.setTarget(null);
+                //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
+                // Relates to bug #1849786
+                if (pto instanceof Transition) {
+                    ((Transition)pto).removeArcCompareObject(arc);
+                }
+                arc.updateArcPosition();
+            }
+        }
+
+        private void placetranstionMouseOver(PlaceTransitionObject pno) {
+            if (arc != null) {
+                if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
+                    arc.setTarget(pno);
+                    arc.updateArcPosition();
+                }
+            }
+        }
+
+        private void transitionClicked(TimedTransitionComponent pno) {
+            if (place == null && transition == null) {
+                transition = pno;
+                arc = new TimedOutputArcComponent(pno);
+
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
+            } else if (place != null && transition == null) {
+                transition = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
+                clearPendingArc();
+            }
+        }
+
+        private void placeClicked(TimedPlaceComponent pno) {
+            if (place == null && transition == null) {
+                place = pno;
+                arc = new TimedInputArcComponent(pno);
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
+            } else if (transition != null && place == null) {
+                place = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
+                clearPendingArc();
+            }
+        }
+
+        private void clearPendingArc() {
+            CreateGui.getDrawingSurface().clearAllPrototype();
+            place = null;
+            transition = null;
+            arc = null;
+        }
+
+        @Override
+        public void drawingSurfaceMouseMoved(MouseEvent e) {
+            if(arc!=null) {
+                arc.setEndPoint(e.getX(), e.getY(), e.isShiftDown());
+            }
+        }
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            if (arc!=null) {;
+                Point p = e.getPoint();
+                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
+                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+
+                boolean shiftDown = e.isShiftDown();
+                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
+            }
+        }
+
+        @Override
+        public void registerManager(DrawingSurfaceImpl canvas) {
+            CreateGui.useExtendedBounds = true;
+        }
+
+        @Override
+        public void deregisterManager() {
+            clearPendingArc();
+            CreateGui.useExtendedBounds = false;
+        }
+    }
+
 	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
@@ -1473,7 +2208,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		@Override
 		public void registerEvents() {
 			registerEvent(
-					e -> e.a == MouseAction.clicked && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
+					e -> e.a == MouseAction.pressed && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
 					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
 			);
 			registerEvent(
@@ -1516,13 +2251,225 @@ public class TabContent extends JSplitPane implements TabContentActions{
         //De-register old manager
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
-		managerRef.get().registerManager();
+		managerRef.get().registerManager(drawingSurface);
     }
 
-    //XXX: A quick function made while refactoring to test if the tab is currently
-	// the tab selected, and is allowed to change gui the gui. Should be controlled an other way
-	// /kyrke 2019-11-10
-	public boolean isTabInFocus(){
-		return app.isPresent();
-	}
+    public void updateFeatureText() {
+
+        String properties = "Timed: " + (lens.isTimed() ? "Yes" : "No") +
+                            ", Game: " + (lens.isGame() ? "Yes" : "No");
+        app.ifPresent(o->o.setFeatureInfoText(properties));
+
+    }
+
+    public boolean isNetTimed() {
+        return lens.isTimed();
+    }
+
+    public boolean isNetGame() {
+        return lens.isGame();
+    }
+
+    public TAPNLens getLens() {
+        return lens;
+    }
+
+    private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {
+
+        private TimedTransitionComponent transition;
+        private TimedPlaceComponent place1;
+        private TimedPlaceComponent place2;
+        private Arc arc;
+        private Arc arc1;
+        private Arc arc2;
+
+
+        @Override
+        public void registerEvents() {
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                e->placeClicked(((TimedPlaceComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
+                e->transitionClicked(((TimedTransitionComponent) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
+                e->placetranstionMouseOver(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.exited,
+                e->placetranstionMouseExited(((PlaceTransitionObject) e.pno))
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
+                e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
+            );
+        }
+
+        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
+            if (arc != null) {
+                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
+                    //Dispatch event to parent (drawing surface)
+                    e.translatePoint(pno.getX(),pno.getY());
+                    pno.getParent().dispatchEvent(e);
+                }
+            }
+        }
+
+        private void placetranstionMouseExited(PlaceTransitionObject pto) {
+            if (arc != null) {
+                arc.setTarget(null);
+                //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
+                // Relates to bug #1849786
+                if (pto instanceof Transition) {
+                    ((Transition)pto).removeArcCompareObject(arc);
+                }
+                arc.updateArcPosition();
+            }
+        }
+
+        private void placetranstionMouseOver(PlaceTransitionObject pno) {
+            if (arc != null) {
+                if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
+                    arc.setTarget(pno);
+                    arc.updateArcPosition();
+                }
+            }
+        }
+
+        private void transitionClicked(TimedTransitionComponent pno) {
+            if (place1 != null && transition == null) {
+                transition = pno;
+                arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
+
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
+            }
+        }
+
+        private void placeClicked(TimedPlaceComponent pno) {
+            if (place1 == null && transition == null) {
+                place1 = pno;
+                arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
+            } else if (transition != null && place2 == null) {
+                place2 = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
+                clearPendingArc();
+            }
+        }
+
+        private void clearPendingArc() {
+            CreateGui.getDrawingSurface().clearAllPrototype();
+            place1 = place2 = null;
+            transition = null;
+            arc = arc1 = arc2 = null;
+        }
+
+        @Override
+        public void drawingSurfaceMouseMoved(MouseEvent e) {
+            if(arc!=null) {
+                arc.setEndPoint(e.getX(), e.getY(), e.isShiftDown());
+            }
+        }
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            if (arc!=null) {
+                Point p = e.getPoint();
+                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
+                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+
+                boolean shiftDown = e.isShiftDown();
+                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
+            }
+        }
+
+        @Override
+        public void registerManager(DrawingSurfaceImpl canvas) {
+            CreateGui.useExtendedBounds = true;
+        }
+
+        @Override
+        public void deregisterManager() {
+            clearPendingArc();
+            CreateGui.useExtendedBounds = false;
+        }
+    }
+
+    private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+        @Override
+        public void registerEvents() {
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
+                e-> ((TimedTransitionComponent) e.pno).showEditor()
+            );
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.doubleClicked,
+                e-> ((TimedPlaceComponent) e.pno).showEditor()
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.rightClicked,
+                e-> ((TimedTransitionComponent) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+            );
+            registerEvent(
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.rightClicked,
+                e-> ((TimedPlaceComponent) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+            );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.rightClicked,
+                e-> ((Arc) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+            );
+            registerEvent(
+                e->e.pno instanceof AnnotationNote && e.a == MouseAction.doubleClicked,
+                e-> ((AnnotationNote) e.pno).enableEditMode()
+            );
+            registerEvent(
+                e->e.pno instanceof AnnotationNote && e.a == MouseAction.rightClicked,
+                e-> ((AnnotationNote) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+            );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.entered,
+                e -> ((Arc)e.pno).getArcPath().showPoints()
+            );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.exited,
+                e -> ((Arc)e.pno).getArcPath().hidePoints()
+            );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
+                e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
+            );
+
+        }
+
+        private void arcDoubleClickedWithContrl(Arc arc, MouseEvent e) {
+            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+                arc.getArcPath().insertPoint(
+                    new Point2D.Double(
+                        Zoomer.getUnzoomedValue(arc.getX() + e.getX(), arc.getZoom()),
+                        Zoomer.getUnzoomedValue(arc.getY() + e.getY(), arc.getZoom())
+                    ),
+                    e.isAltDown()
+                )
+            );
+        }
+    }
 }

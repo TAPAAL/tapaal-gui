@@ -1,5 +1,6 @@
 package pipe.gui.canvas;
 
+import pipe.gui.graphicElements.GraphicalElement;
 import pipe.gui.graphicElements.PetriNetObject;
 
 /**
@@ -8,8 +9,8 @@ import pipe.gui.graphicElements.PetriNetObject;
  */
 public interface PrototypeCanvas {
 
-    void addPrototype(PetriNetObject pno);
-    void removePrototype(PetriNetObject pno);
+    void addPrototype(GraphicalElement pno);
+    void removePrototype(GraphicalElement pno);
 
     void clearAllPrototype();
 

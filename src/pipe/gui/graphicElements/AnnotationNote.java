@@ -15,6 +15,7 @@ import java.util.EnumMap;
 
 import javax.swing.JDialog;
 
+import net.tapaal.swinghelpers.DispatchEventsToParentHandler;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
@@ -36,16 +37,16 @@ public class AnnotationNote extends Note {
 		super(x, y);
 		setDragPoints();
 
-        getNote().addMouseListener(getMouseHandler());
-        getNote().addMouseMotionListener(getMouseHandler());
+        getNote().addMouseListener(new DispatchEventsToParentHandler());
+        getNote().addMouseMotionListener(new DispatchEventsToParentHandler());
 	}
 
 	public AnnotationNote(String text, int x, int y, int w, int h, boolean border) {
 		super(text, x, y, w, h, border);
 		setDragPoints();
 
-        getNote().addMouseListener(getMouseHandler());
-        getNote().addMouseMotionListener(getMouseHandler());
+        getNote().addMouseListener(new DispatchEventsToParentHandler());
+        getNote().addMouseMotionListener(new DispatchEventsToParentHandler());
 	}
 
 	@Override

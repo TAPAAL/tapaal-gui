@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.model.tapn.*;
 import pipe.gui.CreateGui;
 
 import pipe.gui.Grid;
@@ -17,9 +18,6 @@ import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.Weight;
 
 public class TimedOutputArcComponent extends Arc {
 
@@ -54,6 +52,16 @@ public class TimedOutputArcComponent extends Arc {
         );
 
 	}
+
+
+    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc){
+        super(source);
+        setTarget(target);
+        setUnderlyingArc(modelArc);
+        updateLabel(true);
+        sealArc();
+    }
+
 
 	@Override
 	protected void addMouseHandler() {

@@ -147,6 +147,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         currentTab.ifPresent(t -> t.setApp(guiFrame));
         guiFrameDirectAccess.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
+
     }
 
     @Override
@@ -230,7 +231,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     }
 
     @Override
-    public void showAbout() {
+    public void     showAbout() {
         StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
         buffer.append("\n\n");
         buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
@@ -304,6 +305,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
                     return;
                 }finally {
                     CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

@@ -66,33 +66,5 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		return popup;
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed()) {
-				if (e.getClickCount() == 2
-						&& (CreateGui.getApp().getMode() == ElementType.TIMEDTRANS
-								|| CreateGui.getApp().getMode() == ElementType.IMMTRANS || CreateGui
-								.getApp().getMode() == ElementType.SELECT)) {
-					((Transition) myObject).showEditor();
-				}
-			}
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
-				JPopupMenu m = getPopup(e);
-				if (m != null) {
-					int x = Zoomer.getZoomedValue(
-					    ((Transition) myObject).getNameOffsetX(),
-                        myObject.getZoom()
-                    );
-					int y = Zoomer.getZoomedValue(
-					    ((Transition) myObject).getNameOffsetY(),
-                        myObject.getZoom()
-                    );
-					m.show(myObject, x, y);
-				}
-			}
-		}
-	}
 
 }

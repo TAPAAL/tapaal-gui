@@ -38,17 +38,14 @@ public class EnabledTransitionsList extends JPanel{
 		initPanel();
 	}
 
-	DefaultListModel<TransitionListItem> transitions;
-	JList<TransitionListItem> transitionsList;
-	JScrollPane scrollPane;
+	final DefaultListModel<TransitionListItem> transitions = new DefaultListModel<>();
+	final JList<TransitionListItem> transitionsList = new JList<>(transitions);
+	final JScrollPane scrollPane = new JScrollPane(transitionsList);
 	TransitionListItem lastSelected;
 
 	public void initPanel(){
-		transitions = new DefaultListModel<>();
-		transitionsList = new JList<>(transitions);
-		transitionsList.setCellRenderer(new EnabledTransitionListCellRenderer());
 
-		transitionsList.addMouseListener(new MouseAdapter() {
+        transitionsList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2){
@@ -64,9 +61,7 @@ public class EnabledTransitionsList extends JPanel{
 			}
 		});
 
-		scrollPane = new JScrollPane(transitionsList);
-
-		this.add(scrollPane, BorderLayout.CENTER);
+        this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	public void startReInit(){
@@ -110,18 +105,12 @@ public class EnabledTransitionsList extends JPanel{
 	public void addTransition(Template template, Transition transition){
 		TransitionListItem item = new TransitionListItem(transition, template);
 
-		transition.isDelayEnabled();
 		if(!transitions.contains(item)){
 			transitions.addElement(item);
 		}
 	}
 
-	public void removeTransition(Template template, Transition transition){
-		TransitionListItem item = new TransitionListItem(transition, template);
-		transitions.removeElement(item);
-	}
-
-	public void fireSelectedTransition(){
+    public void fireSelectedTransition(){
 		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
@@ -131,27 +120,10 @@ public class EnabledTransitionsList extends JPanel{
 
 	interface ListItem extends Comparable<ListItem>{}
 
-	class SplitterListItem implements ListItem{
-
-		@Override
-		public int compareTo(ListItem o) {
-			if(o instanceof TransitionListItem){
-				return o.compareTo(this);
-			} else {
-				return 0;
-			}
-		}
-
-		@Override
-		public String toString() {
-			return "_";
-		}
-
-	}
 
 	static class TransitionListItem implements ListItem{
-		private Transition transition;
-		private Template template;
+		private final Transition transition;
+		private final Template template;
 
 		public TransitionListItem(Transition transition, Template template){
 			this.transition = transition;
@@ -160,8 +132,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null || !showIntervals ? 
-					"" : transition.getDInterval().toString() + " ";
+			String interval = transition.getDInterval() == null || !showIntervals ? "" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 
 			if(isShared()){
@@ -234,51 +205,6 @@ public class EnabledTransitionsList extends JPanel{
 			}
 			
 			return result;
-		}
-	}
-
-	//This class creates the stippled line shown between the enabled transitions and the delay-enabled transitions
-	class EnabledTransitionListCellRenderer extends DefaultListCellRenderer{
-
-		@Override
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			if(value instanceof SplitterListItem){
-				JLabel separator = new JLabel();
-				separator.setBorder(new DashBorder());
-				separator.setPreferredSize(new Dimension(1, 1));
-				return separator;
-			} else {
-				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			}
-		}
-
-		class DashBorder implements Border {
-			private final Insets	insets	= new Insets(1, 1, 1, 1);
-			private final int	 length	= 5;
-			private final int	 space	= 3;
-			public boolean isBorderOpaque() {
-				return false;
-			}
-			public void paintBorder(Component c, Graphics g, int x, int y,
-					int width, int height) {
-				g.setColor(Color.BLACK);
-				// --- draw horizontal ---
-				for (int i = 0; i < width; i += length) {
-					g.drawLine(i, y, i + length, y);
-					g.drawLine(i, height - 1, i + length, height - 1);
-					i += space;
-				}
-				// --- draw vertical ---
-				for (int i = 0; i < height; i += length) {
-					g.drawLine(0, i, 0, i + length);
-					g.drawLine(width - 1, i, width - 1, i + length);
-					i += space;
-				}
-			}
-			public Insets getBorderInsets(Component c) {
-				return insets;
-			}
 		}
 	}
 

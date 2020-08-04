@@ -15,9 +15,9 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
 
-	private PetriNetObjectWithLabel obj;
+	private final PetriNetObjectWithLabel obj;
 
-	private NameLabel nl;
+	private final NameLabel nl;
 
 	protected Point dragInit = new Point();
 	private int originalOffsetX, originalOffsetY;
@@ -63,20 +63,20 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 
 		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
 		
-		obj.updateNameOffsetX((p.x - dragInit.x));
-		obj.updateNameOffsetY((p.y - dragInit.y));
+		obj.translateNameOffsetX((p.x - dragInit.x));
+		obj.translateNameOffsetY((p.y - dragInit.y));
 		dragInit = p;
 		obj.updateOnMoveOrZoom();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Point p = javax.swing.SwingUtilities.convertPoint(nl, e.getPoint(), obj);
-		
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-		    new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
-        );
-		
+
+	    if (originalOffsetX!=obj.getNameOffsetX() && originalOffsetY != obj.getNameOffsetY()) {
+            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+                new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
+            );
+        }
 	}
 
 	@Override

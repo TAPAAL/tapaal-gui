@@ -17,17 +17,17 @@ public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
 	private String name;
-	private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
-	private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
-	private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
-	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+	private final List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
+	private final List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
+	private final List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
+	private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	private TimeInterval dInterval = null;
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
 
 	private SharedTransition sharedTransition;
 
-	private List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
+	private final List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
 		this(name, false);
@@ -201,12 +201,16 @@ public class TimedTransition extends TAPNElement {
 		model().remove(this);
 	}
 
-	public int presetSize() {
-		return preset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
+	//XXX: See bug #1887524, old degree-2 converter does not expect inhibitorArcs to count in the size of preset
+	public int presetSizeWithoutInhibitorArcs() {
+		return preset.size() + transportArcsGoingThrough.size();
 	}
+    public int presetSize() {
+        return preset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
+    }
 
 	public int postsetSize() {
-		return postset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
+		return postset.size() + transportArcsGoingThrough.size();
 	}
 
 	public boolean isDEnabled(){

@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import pipe.gui.*;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -29,6 +30,7 @@ public class StatisticsPanel extends JPanel{
 
 	private final int topBottomMargin = 3;
 	private final int rightMargin = 10;
+	private Point location;
 	
 	private JButton removeOrphanTransitions;
     private JButton removeOrphanPlaces;
@@ -198,6 +200,8 @@ public class StatisticsPanel extends JPanel{
                 }
                 tab.drawingSurface().repaint();
 
+                location = StatisticsPanel.dialog.getLocationOnScreen();
+
                 StatisticsPanel.this.removeAll();
                 StatisticsPanel.this.init();
 
@@ -205,6 +209,7 @@ public class StatisticsPanel extends JPanel{
 
                 dialog.dispose();
                 dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);
             }
@@ -237,6 +242,7 @@ public class StatisticsPanel extends JPanel{
                 }
                 tab.drawingSurface().repaint();
 
+                location = StatisticsPanel.dialog.getLocationOnScreen();
 
                 StatisticsPanel.this.removeAll();
                 StatisticsPanel.this.init();
@@ -245,6 +251,7 @@ public class StatisticsPanel extends JPanel{
 
                 dialog.dispose();
                 dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);
             }

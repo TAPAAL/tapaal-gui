@@ -16,7 +16,6 @@ public class TransportArcHandler extends TimedArcHandler {
 
 	public TransportArcHandler(Arc obj) {
 		super(obj);
-		enablePopup = true;
 	}
 
 	@Override
@@ -43,6 +42,7 @@ public class TransportArcHandler extends TimedArcHandler {
 		}
 		return popup;
 	}
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 

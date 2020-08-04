@@ -25,21 +25,21 @@ public class ArcPathPoint extends PetriNetObject {
 
 	public static final boolean STRAIGHT = false;
 	public static final boolean CURVED = true;
-	private static int SIZE = 3;
-	private static int SIZE_OFFSET = 1;
+	private int SIZE = 3;
+	private final static int SIZE_OFFSET = 1;
 
 	// The offset in x for the new point resulting from splitting a point
-	private final int DELTA = 10;
+	private static final int DELTA = 10;
 
     private ArcPath myArcPath;
 
-	private Point2D.Double control1 = new Point2D.Double();
-	private Point2D.Double control2 = new Point2D.Double();
+	private final Point2D.Double control1 = new Point2D.Double();
+	private final Point2D.Double control2 = new Point2D.Double();
 
 	private boolean pointType; // STRAIGHT or CURVED
 
 	private ArcPathPoint() {
-	    super();
+	    super("", 0, 0);
 	}
 
 	public ArcPathPoint(ArcPath a) {
@@ -51,8 +51,8 @@ public class ArcPathPoint extends PetriNetObject {
 	public ArcPathPoint(double x, double y, boolean _pointType, ArcPath a) {
 		this();
 		myArcPath = a;
-		setPositionX((int)x);
-		setPositionY((int)y);
+		setOriginalX((int)x);
+		setOriginalY((int)y);
 		pointType = _pointType;
 	}
 
@@ -77,17 +77,11 @@ public class ArcPathPoint extends PetriNetObject {
 	public void setPointLocation(int x, int y) {
 		setPositionX(x);
 		setPositionY(y);
-		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
-				* SIZE + SIZE_OFFSET);
+		updateOnMoveOrZoom();
 	}
 
 	public boolean getPointType() {
 		return pointType;
-	}
-
-	public void updatePointLocation() {
-	    //XXX
-		//setPointLocation(point.x, point.y);
 	}
 
 	public void setPointType(boolean type) {
@@ -112,11 +106,7 @@ public class ArcPathPoint extends PetriNetObject {
 	public double getAngle(Point2D.Double p2) {
 		double angle;
 
-		if (getPositionY() <= p2.y) {
-			angle = Math.atan((getPositionX() - p2.x) / (p2.y - getPositionY()));
-		} else {
-			angle = Math.atan((getPositionX() - p2.x) / (p2.y - getPositionY())) + Math.PI;
-		}
+        angle = Math.atan2( (getPoint().x - p2.x), (p2.y - getPoint().y) );
 
 		return angle;
 	}
@@ -233,18 +223,25 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	public void translate(int x, int y) {
-		this.setPointLocation(getPositionX() + x, getPositionY() + y);
-		myArcPath.updateArc();
+	    //We should ingnore move of the endpoints (linked to source/target)
+	    if (!isEndPoint()) {
+
+	        setPositionX(positionX + x);
+            setPositionY(positionY + y);
+
+            updateOnMoveOrZoom();
+
+            myArcPath.updateArc();
+        }
 	}
 
 	@Override
 	public String getName() {
-		return this.getArcPath().getArc().getName() + " - Point "
-				+ this.getIndex();
+		return this.getArcPath().getArc().getName() + " - Point " + this.getIndex();
 	}
 
 	public void zoomUpdate(int zoom) {
-		super.zoomUpdate(zoom);
+
 		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed out
 		if (zoom > 213) {
 			SIZE = 5;
@@ -253,15 +250,21 @@ public class ArcPathPoint extends PetriNetObject {
 		} else {
 			SIZE = 3;
 		}
-		int x = (int)Zoomer.getZoomedValue(getRealPoint().x, zoom);
-		int y = (int)Zoomer.getZoomedValue(getRealPoint().y, zoom);
-		setPositionX(x);
-		setPositionY(y);
-		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
-				* SIZE + SIZE_OFFSET);
+
+        super.zoomUpdate(zoom);
+
 	}
 
-	public Point2D.Double getRealPoint() {
+    @Override
+    public void updateOnMoveOrZoom() {
+        int x = Zoomer.getZoomedValue(getOriginalX(), getZoom());
+        int y = Zoomer.getZoomedValue(getOriginalY(), getZoom());
+        positionX = x;
+        positionY = y;
+        setBounds(x - SIZE, y - SIZE, 2 * SIZE + SIZE_OFFSET, 2 * SIZE + SIZE_OFFSET);
+    }
+
+    public Point2D.Double getRealPoint() {
 		return new Point2D.Double(getOriginalX(), getOriginalY());
 	}
 

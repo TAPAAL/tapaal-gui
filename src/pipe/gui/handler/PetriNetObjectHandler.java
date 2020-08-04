@@ -11,7 +11,11 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on all
@@ -19,17 +23,15 @@ import pipe.gui.graphicElements.PetriNetObject;
  * 
  * @author unknown
  */
-public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
-		implements java.awt.event.MouseWheelListener {
+public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter implements java.awt.event.MouseWheelListener {
 
-	protected PetriNetObject myObject = null;
+	protected final PetriNetObject myObject;
 
 	// justSelected: set to true on press, and false on release;
 	protected static boolean justSelected = false;
 
 	protected boolean isDragging = false;
-	protected boolean enablePopup = false;
-	protected Point dragInit = new Point();
+    protected Point dragInit = new Point();
 
 	private int totalX = 0;
 	private int totalY = 0;
@@ -71,7 +73,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	private void checkForPopup(MouseEvent e) {
 		if (SwingUtilities.isRightMouseButton(e) && CreateGui.getApp().getMode() == ElementType.SELECT) {
 			JPopupMenu m = getPopup(e);
-			if (m != null) {
+			if (m != null && !(myObject instanceof TimedPlaceComponent || myObject instanceof TimedTransitionComponent || myObject instanceof Arc || myObject instanceof AnnotationNote)) {
 				m.show(myObject, e.getX(), e.getY());
 			}
 		}
@@ -92,7 +94,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			dragInit = e.getPoint();
 		}
 		
-		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+		if (CreateGui.getApp().isEditionAllowed()) {
 			checkForPopup(e);
 		}
 	}
@@ -105,7 +107,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	public void mouseReleased(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 		// Have to check for popup here as well as on pressed for crossplatform!!
-		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+		if (CreateGui.getApp().isEditionAllowed()) {
 			checkForPopup(e);
 		}
 
@@ -116,8 +118,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
-				CreateGui.getDrawingSurface().translateSelection(
-						myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
+				CreateGui.getDrawingSurface().translateSelection(myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
 				totalX = 0;
 				totalY = 0;
 			} else {

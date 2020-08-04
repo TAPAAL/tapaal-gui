@@ -1,9 +1,6 @@
 package dk.aau.cs.gui;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -45,17 +42,17 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private static final String TRANSITIONS = "Transitions";
 	private static final String PLACES = "Places";
 
-	private JList list;
-	private SharedPlacesListModel sharedPlacesListModel;
-	private SharedTransitionsListModel sharedTransitionsListModel;
-	private JComboBox placesTransitionsComboBox;
-	private UndoManager undoManager;
-	private NameGenerator nameGenerator;
-	private TabContent tab;
+	private final JList list = new NonsearchableJList();
+	private final SharedPlacesListModel sharedPlacesListModel;
+	private final SharedTransitionsListModel sharedTransitionsListModel;
+	private final JComboBox placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
+	private final UndoManager undoManager;
+	private final NameGenerator nameGenerator;
+	private final TabContent tab;
 
-	private JButton renameButton = new JButton("Rename");
-	private JButton removeButton  = new JButton("Remove");
-	private JButton addButton = new JButton("New");
+	private final JButton renameButton = new JButton("Rename");
+	private final JButton removeButton  = new JButton("Remove");
+	private final JButton addButton = new JButton("New");
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
@@ -128,9 +125,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 
 	private void initComponents() {
 		JPanel listPanel = new JPanel(new GridBagLayout());
-		
-		list = new NonsearchableJList();
-		list.addListSelectionListener(new ListSelectionListener() {
+
+        list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){
 					JList source = (JList)e.getSource();
@@ -191,6 +187,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		listPanel.add(scrollPane, gbc);
 		
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
+		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(e -> {
@@ -212,6 +209,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		listPanel.add(moveUpButton,gbc);
 		
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
+		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(e -> {
@@ -232,6 +230,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		
 		//Sort button
 		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
+		sortButton.setMargin(new Insets(2,2,2,2));
 		sortButton.setToolTipText(toolTipSortPlaces);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {
@@ -262,9 +261,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTH;
 		listPanel.add(sortButton,gbc);
-		
-		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
-		placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
+
+        placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
 		placesTransitionsComboBox.addActionListener(e -> {
 			JComboBox source = (JComboBox)e.getSource();
 			String selectedItem = (String)source.getSelectedItem();

@@ -25,10 +25,7 @@ public abstract class Note extends PetriNetObject {
 	protected RectangularShape noteRect = new Rectangle();
 
 	public Note(int x, int y) {
-		super();
-
-		originalX = x;
-		originalY = y;
+		super("", x, y);
 
 		note.setAlignmentX(Component.CENTER_ALIGNMENT);
 		note.setAlignmentY(Component.CENTER_ALIGNMENT);
