@@ -177,20 +177,23 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		transitionEditorPanel.add(uncontrollableCheckBox, gridBagConstraints);
+        if (context.tabContent().isNetGame()) {
+            transitionEditorPanel.add(uncontrollableCheckBox, gridBagConstraints);
 
-        uncontrollableCheckBox.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent arg0) {
-                JCheckBox box = (JCheckBox)arg0.getSource();
-                if (box.isSelected()) {
-                    uncontrollableCheckBox.setSelected(true);
-                    transition.setUncontrollable(true);
-                } else {
-                    uncontrollableCheckBox.setSelected(false);
-                    transition.setUncontrollable(false);
+
+            uncontrollableCheckBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    JCheckBox box = (JCheckBox) arg0.getSource();
+                    if (box.isSelected()) {
+                        uncontrollableCheckBox.setSelected(true);
+                        transition.setUncontrollable(true);
+                    } else {
+                        uncontrollableCheckBox.setSelected(false);
+                        transition.setUncontrollable(false);
+                    }
                 }
-            }
-        });
+            });
+        }
 	
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
