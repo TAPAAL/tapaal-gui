@@ -243,14 +243,14 @@ public class QueryDialog extends JPanel {
 	private boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
-	private String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
-	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
-	private String name_STANDARD = "UPPAAL: Standard Reduction";
-	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
+	private final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
+	private final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
+	private final String name_STANDARD = "UPPAAL: Standard Reduction";
+	private final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
+	private final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
+	private final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
 	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2

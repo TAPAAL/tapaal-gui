@@ -56,11 +56,11 @@ public class Degree2BroadcastTranslation implements
 	protected static final String P_T_IN_FORMAT = "P_" + T_I_IN_FORMAT;
 	protected static final String LOCK_BOOL = "lock";
 
-	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	private Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
-	private Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
-	private Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
-	private Hashtable<String, Hashtable<String, String>> arcGuards = new Hashtable<String, Hashtable<String, String>>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
+	private final Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
+	private final Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
+	private final Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
+	private final Hashtable<String, Hashtable<String, String>> arcGuards = new Hashtable<String, Hashtable<String, String>>();
 	
 	private List<TimedTransition> retainedTransitions;
 	
@@ -744,9 +744,9 @@ public class Degree2BroadcastTranslation implements
 			TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+)_(?:test|single|deg2)$";
-		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-		private Pattern testTransitionPattern = Pattern.compile("^(\\w+)_test$");
-		private Pattern ignoredPlacePattern = Pattern.compile("^" + PLOCK + "|" + P_CAPACITY + "|P_hp_\\w+_\\d+$");
+		private final Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final Pattern testTransitionPattern = Pattern.compile("^(\\w+)_test$");
+		private final Pattern ignoredPlacePattern = Pattern.compile("^" + PLOCK + "|" + P_CAPACITY + "|P_hp_\\w+_\\d+$");
 		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {

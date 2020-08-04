@@ -69,7 +69,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 	protected static int maxTimeIn = 0;
 	protected static int capInTokens;
 
-	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
 	protected Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
 	protected Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
@@ -1227,8 +1227,8 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		private final String TAU = "tau";
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(_test)?$";
 		private final String END_OF_SEQUENCE_PATTERN = "^(\\w+?)_fire$";
-		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-		private Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
+		private final Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
 		private final SequenceInfo seqInfo = SequenceInfo.END;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {

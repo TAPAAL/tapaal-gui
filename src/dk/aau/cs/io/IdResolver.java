@@ -3,7 +3,7 @@ package dk.aau.cs.io;
 import java.util.HashMap;
 
 public class IdResolver {
-	private HashMap<String, HashMap<String, String>> idToNamesPerTemplate = new HashMap<String, HashMap<String, String>>();
+	private final HashMap<String, HashMap<String, String>> idToNamesPerTemplate = new HashMap<String, HashMap<String, String>>();
 	
 	public void add(String template, String id, String name){
 		if(!idToNamesPerTemplate.containsKey(template)){

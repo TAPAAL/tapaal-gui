@@ -29,7 +29,7 @@ public class SharedTransitionNamePanel extends JPanel {
 	private final JRootPane rootPane;
 	private final SharedTransitionsListModel listModel;
 	private JTextField nameField;
-	private SharedTransition transitionToEdit;
+	private final SharedTransition transitionToEdit;
 
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;

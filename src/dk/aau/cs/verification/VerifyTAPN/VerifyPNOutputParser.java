@@ -92,17 +92,17 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 				} else {
 					matcher = discoveredPattern.matcher(line);
 					if(matcher.find()){
-						discovered = Integer.valueOf(matcher.group(1));
+						discovered = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = exploredPattern.matcher(line);
 					if(matcher.find()){
-						explored = Integer.valueOf(matcher.group(1));
+						explored = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = maxUsedTokensPattern.matcher(line);
 					if(matcher.find()){
-						maxUsedTokens = Integer.valueOf(matcher.group(1));
+						maxUsedTokens = Integer.parseInt(matcher.group(1));
 						String operator = matcher.group(1) == null ? "" : matcher.group(1);
 						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
 					}
@@ -114,57 +114,57 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 					
 					matcher = removedTransitionsPattern.matcher(line);
 					if(matcher.find()){
-						removedTransitions = Integer.valueOf(matcher.group(1));
+						removedTransitions = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = removedPlacesPattern.matcher(line);
 					if(matcher.find()){
-						removedPlaces = Integer.valueOf(matcher.group(1));
+						removedPlaces = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleAApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleA = Integer.valueOf(matcher.group(1));
+						ruleA = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleBApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleB = Integer.valueOf(matcher.group(1));
+						ruleB = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleCApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleC = Integer.valueOf(matcher.group(1));
+						ruleC = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleDApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleD = Integer.valueOf(matcher.group(1));
+						ruleD = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleEApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleE = Integer.valueOf(matcher.group(1));
+						ruleE = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleFApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleF = Integer.valueOf(matcher.group(1));
+						ruleF = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleGApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleG = Integer.valueOf(matcher.group(1));
+						ruleG = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleHApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleH = Integer.valueOf(matcher.group(1));
+						ruleH = Integer.parseInt(matcher.group(1));
 					}
 					
 					matcher = ruleIApplicationPattern.matcher(line);
 					if(matcher.find()){
-						ruleI = Integer.valueOf(matcher.group(1));
+						ruleI = Integer.parseInt(matcher.group(1));
 					}
 				}
 			}

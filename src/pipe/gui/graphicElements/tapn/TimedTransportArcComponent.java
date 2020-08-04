@@ -19,8 +19,8 @@ import dk.aau.cs.model.tapn.Weight;
 public class TimedTransportArcComponent extends TimedInputArcComponent {
 
 	private int group;
-	private boolean isInPreSet;
-	private TimedTransportArcComponent connectedTo = null;
+	private final boolean isInPreSet;
+	private TimedTransportArcComponent connectedTo;
 	private TransportArc underlyingTransportArc;
 
 	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {

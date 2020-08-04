@@ -5,13 +5,10 @@ import java.util.HashMap;
 import dk.aau.cs.util.Tuple;
 
 public class NameMapping {
-	private HashMap<String, Tuple<String, String>> mappedNamesToOriginalNames;
-	private HashMap<Tuple<String, String>, String> originalToMappedNames;
+	private final HashMap<String, Tuple<String, String>> mappedNamesToOriginalNames = new HashMap<String, Tuple<String, String>>();
+	private final HashMap<Tuple<String, String>, String> originalToMappedNames = new HashMap<Tuple<String, String>, String>();
 
-	public NameMapping() {
-		mappedNamesToOriginalNames = new HashMap<String, Tuple<String, String>>();
-		originalToMappedNames = new HashMap<Tuple<String, String>, String>();
-	}
+	public NameMapping() {}
 
 	public void addMappingForShared(String objectName, String mappedName){
 		this.addMapping("", objectName, mappedName);

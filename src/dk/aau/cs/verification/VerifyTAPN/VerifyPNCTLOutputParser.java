@@ -50,33 +50,33 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
                 } else {
                     Matcher matcher = configurationsPattern.matcher(line);
                     if (matcher.find()) {
-                        configurtations = Long.valueOf(matcher.group(1));
+                        configurtations = Long.parseLong(matcher.group(1));
                     }
                     matcher = markingsPattern.matcher(line);
                     if (matcher.find()) {
-                        markings = Long.valueOf(matcher.group(1));
+                        markings = Long.parseLong(matcher.group(1));
                     }
                     matcher = edgesPattern.matcher(line);
                     if (matcher.find()) {
-                        edges = Long.valueOf(matcher.group(1));
+                        edges = Long.parseLong(matcher.group(1));
                     }
 
                     matcher = processedEdgesPattern.matcher(line);
                     if (matcher.find()) {
-                        processedEdges = Long.valueOf(matcher.group(1));
+                        processedEdges = Long.parseLong(matcher.group(1));
                     }
                     matcher = processedNEdgesPattern.matcher(line);
                     if (matcher.find()) {
-                        processedNEdges = Long.valueOf(matcher.group(1));
+                        processedNEdges = Long.parseLong(matcher.group(1));
                     }
                     matcher = exploredConfigurationsPattern.matcher(line);
                     if (matcher.find()) {
-                        exploredConfigurations = Long.valueOf(matcher.group(1));
+                        exploredConfigurations = Long.parseLong(matcher.group(1));
                     }
 
                     matcher = maxUsedTokensPattern.matcher(line);
                     if(matcher.find()){
-                        maxUsedTokens = Integer.valueOf(matcher.group(1));
+                        maxUsedTokens = Integer.parseInt(matcher.group(1));
                         String operator = matcher.group(1) == null ? "" : matcher.group(1);
                         if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
                     }

@@ -21,7 +21,7 @@ import pipe.gui.graphicElements.AnnotationNote;
  */
 public class AnnotationPanel extends javax.swing.JPanel {
 
-	private AnnotationNote annotation;
+	private final AnnotationNote annotation;
 
 	/**
 	 * Creates new form ParameterPanel

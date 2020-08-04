@@ -53,12 +53,12 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 	
 	private int extraTokens;
-	private boolean useSymmetry;
+	private final boolean useSymmetry;
 	private int numberOfInitChannels;
 	
 	private List<TimedTransition> retainedTransitions;
 	
-	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	
 	public OptimizedStandardTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;
@@ -435,8 +435,8 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	protected static class OptimizedStandardNamingScheme implements TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_(?:1_in|single|deg2)$";
-		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-		private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
+		private final Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
 		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {

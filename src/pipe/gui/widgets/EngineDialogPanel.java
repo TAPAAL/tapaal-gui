@@ -51,13 +51,13 @@ public class EngineDialogPanel {
 	JLabel uppaalLocationLabelVal = new JLabel("Not setup");
 	JLabel uppaalVersionLabelVal = new JLabel("N/A");
 
-	private Dimension minimumSize = new Dimension(320,1);
-	private Insets panelInsets = new Insets(5, 5, 5, 5);
-	private Insets smallPanelInsets = new Insets(0, 5, 0, 5);
-	private Insets buttonInsets = new Insets(0, 5, 0, 0);
+	private final Dimension minimumSize = new Dimension(320,1);
+	private final Insets panelInsets = new Insets(5, 5, 5, 5);
+	private final Insets smallPanelInsets = new Insets(0, 5, 0, 5);
+	private final Insets buttonInsets = new Insets(0, 5, 0, 0);
 
-	private String toolTipSelect = "Select a path to the verification engine.";
-	private String toolTipReset = "Reset the path to the verification engine.";
+	private final String toolTipSelect = "Select a path to the verification engine.";
+	private final String toolTipReset = "Reset the path to the verification engine.";
 
 	public EngineDialogPanel() {
 		initComponents();		

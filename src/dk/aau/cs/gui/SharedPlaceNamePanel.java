@@ -28,7 +28,7 @@ public class SharedPlaceNamePanel extends JPanel {
 	private final JRootPane rootPane;
 	private final SharedPlacesListModel listModel;
 	private JTextField nameField;
-	private SharedPlace placeToEdit;
+	private final SharedPlace placeToEdit;
 	private final Context context;
 	
 	JButton okButton;

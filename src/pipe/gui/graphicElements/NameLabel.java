@@ -22,7 +22,7 @@ public class NameLabel extends JTextArea implements Zoomable {
 	private String name = "";
 	private String text = "";
 
-	private Font font = new Font(Pipe.LABEL_FONT, Font.BOLD, Pipe.LABEL_DEFAULT_FONT_SIZE);
+	private final Font font = new Font(Pipe.LABEL_FONT, Font.BOLD, Pipe.LABEL_DEFAULT_FONT_SIZE);
 
 	public NameLabel() {
 		this("");

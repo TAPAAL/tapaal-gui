@@ -10,8 +10,8 @@ import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifytaOptions extends VerificationOptions {
 
-	private boolean untimedTrace;
-	private ReductionOption reduction;
+	private final boolean untimedTrace;
+	private final ReductionOption reduction;
 	private boolean symmetry;
 
 

@@ -9,7 +9,7 @@ public class InclusionPlaces {
 	public enum InclusionPlacesOption { AllPlaces, UserSpecified }
 
 	private InclusionPlacesOption inclusionOption;
-	private List<TimedPlace> inclusionPlaces;
+	private final List<TimedPlace> inclusionPlaces;
 	
 	public InclusionPlaces() {
 		this(InclusionPlacesOption.AllPlaces, new ArrayList<TimedPlace>());

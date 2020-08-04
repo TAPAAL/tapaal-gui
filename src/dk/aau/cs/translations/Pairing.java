@@ -10,7 +10,7 @@ import dk.aau.cs.util.Require;
 
 // This class assumes that the transition is conservative
 public class Pairing {
-	private TimedTransition transition;
+	private final TimedTransition transition;
 	
 	private Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = null;
 	

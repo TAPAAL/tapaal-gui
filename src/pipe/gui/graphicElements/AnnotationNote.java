@@ -29,7 +29,7 @@ public class AnnotationNote extends Note {
 
 	private boolean fillNote = true;
 
-	private EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
+	private final EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
 
 	private AffineTransform prova = new AffineTransform();
 
@@ -253,7 +253,7 @@ public class AnnotationNote extends Note {
 	private class ResizePointHandler extends
 			javax.swing.event.MouseInputAdapter {
 
-		private ResizePoint myPoint;
+		private final ResizePoint myPoint;
 		private Point start;
 
 		public ResizePointHandler(ResizePoint point) {
@@ -309,7 +309,7 @@ public class AnnotationNote extends Note {
 
 		private Rectangle shape;
 		private boolean isPressed = false;
-		private Note myNote;
+		private final Note myNote;
 		public int typeMask;
 
 		public ResizePoint(Note obj, int type) {

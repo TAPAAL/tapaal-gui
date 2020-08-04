@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import pipe.gui.Pipe;
 
 public class TimedToken {
-	private TimedPlace place;
+	private final TimedPlace place;
 	private BigDecimal age;
 
 	public TimedToken(TimedPlace place) {
