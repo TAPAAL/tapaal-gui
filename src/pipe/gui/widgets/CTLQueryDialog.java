@@ -458,7 +458,10 @@ public class CTLQueryDialog extends JPanel {
 			return;
 		}
 
-		if(queryIsReachability()){
+        if (CreateGui.getCurrentTab().isNetGame()) {
+            someTraceRadioButton.setEnabled(false);
+            noTraceRadioButton.setEnabled(true);
+        } else if(queryIsReachability()){
 			someTraceRadioButton.setEnabled(true);
 			noTraceRadioButton.setEnabled(true);
 
@@ -697,7 +700,9 @@ public class CTLQueryDialog extends JPanel {
 	
 	private void setEnabledReductionOptions(){
 		reductionOption.removeAllItems();
-		reductionOption.addItem(name_UNTIMED);
+        if (!CreateGui.getCurrentTab().isNetGame()) {
+		    reductionOption.addItem(name_UNTIMED);
+        }
 	}
 
 	private void updateSearchStrategies(){
@@ -808,13 +813,37 @@ public class CTLQueryDialog extends JPanel {
 
 	}
 
+    private void enableOnlyForAllBox() {
+        existsBox.setEnabled(false);
+        existsDiamond.setEnabled(false);
+        forAllBox.setEnabled(true);
+        forAllDiamond.setEnabled(false);
+        existsUntil.setEnabled(false);
+        existsNext.setEnabled(false);
+        forAllUntil.setEnabled(false);
+        forAllNext.setEnabled(false);
+
+        conjunctionButton.setEnabled(true);
+        disjunctionButton.setEnabled(true);
+        negationButton.setEnabled(true);
+        templateBox.setEnabled(true);
+        placesTransitionsBox.setEnabled(true);
+        relationalOperatorBox.setEnabled(true);
+        placeMarking.setEnabled(true);
+        truePredicateButton.setEnabled(true);
+        falsePredicateButton.setEnabled(true);
+        deadLockPredicateButton.setEnabled(true);
+        setEnablednessOfAddPredicateButton();
+        setEnablednessOfOperatorAndMarkingBoxes();
+    }
+
 	private void setEnablednessOfAddPredicateButton() {
 		if (placesTransitionsBox.getSelectedItem() == null)
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
 	}
-	
+
 	private void setEnablednessOfOperatorAndMarkingBoxes(){
 		if (transitionIsSelected()){
 			placeMarking.setVisible(false);
@@ -2290,8 +2319,12 @@ public class CTLQueryDialog extends JPanel {
 
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
-			enableOnlyStateButtons();
-			updateQueryButtonsAccordingToSelection();
+            if (CreateGui.getCurrentTab().isNetGame()) {
+                enableOnlyForAllBox();
+            } else {
+                enableOnlyStateButtons();
+                updateQueryButtonsAccordingToSelection();
+            }
 		}
 	}
 

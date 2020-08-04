@@ -503,7 +503,7 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 
-		if (tapnNetwork.hasUncontrollableTransitions()) {
+		if (CreateGui.getCurrentTab().isNetGame()) {
 		    fastestTraceRadioButton.setEnabled(false);
 		    someTraceRadioButton.setEnabled(false);
 		    noTraceRadioButton.setEnabled(true);
@@ -762,7 +762,7 @@ public class QueryDialog extends JPanel {
             useGCD.setEnabled(true);     
         }
 
-		if (tapnNetwork.hasUncontrollableTransitions()) {
+		if (CreateGui.getCurrentTab().isNetGame()) {
 		    if (tapnNetwork.isNonStrict()) {
 		        options.add(name_DISCRETE);
             }
@@ -2439,7 +2439,7 @@ public class QueryDialog extends JPanel {
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
 			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-			    if (tapnNetwork.hasUncontrollableTransitions()) {
+			    if (CreateGui.getCurrentTab().isNetGame()) {
                     enableOnlyForAllBox();
                 } else {
                     enableOnlyPathButtons();
@@ -2492,7 +2492,7 @@ public class QueryDialog extends JPanel {
 			useOverApproximation.setEnabled(true);
 		}
 
-        if (tapnNetwork.hasUncontrollableTransitions()) {
+        if (CreateGui.getCurrentTab().isNetGame()) {
             noApproximationEnable.setEnabled(true);
             overApproximationEnable.setEnabled(false);
             underApproximationEnable.setEnabled(false);
@@ -2535,7 +2535,7 @@ public class QueryDialog extends JPanel {
 
 			// Disable GCD calculation for EG/AF or deadlock queries
 			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") ||
-                tapnNetwork.hasUncontrollableTransitions()){
+                CreateGui.getCurrentTab().isNetGame()){
 				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
 				useGCD.setSelected(false);
 				useGCD.setEnabled(false);
