@@ -705,4 +705,8 @@ public class Animator {
         }
     }
 
+    public TabContent getTab(){
+        return tab;
+    }
+
 }

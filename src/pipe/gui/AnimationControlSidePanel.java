@@ -46,10 +46,12 @@ public class AnimationControlSidePanel extends JPanel {
 	private int delayScale = 10;
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
+	private JPanel sliderPanel;
+	private JPanel timedelayPanel;
 
 
 
-	JTextField TimeDelayField = new JTextField();
+    JTextField TimeDelayField = new JTextField();
 	JComboBox<String> firermodebox;
 
 
@@ -104,10 +106,23 @@ public class AnimationControlSidePanel extends JPanel {
 		this.setMinimumSize(new Dimension(275, 180));
 		
 		initializeDocumentFilterForDelayInput();
+		hideTimedInformation();
 	}
 
+	private void hideTimedInformation(){
+	    if(!animator.getTab().isNetTimed()){
+            sliderPanel.setVisible(false);
+            timedelayPanel.setVisible(false);
+            //firermodebox = new NonsearchableJComboBox<String>(new String[]{"Random", "Manual"});
+            firermodebox.removeItem("Oldest");
+            firermodebox.removeItem("Youngest");
+            //updateFiringModeComboBox();
+            firermodebox.updateUI();
+        }
+    }
+
     private void initDelaySlider() {
-		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
 		decrese.addActionListener(e -> {
@@ -174,7 +189,7 @@ public class AnimationControlSidePanel extends JPanel {
 
 
 	private void initDelayTimePanel(JToolBar animationToolBar) {
-		JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 		okButton = new javax.swing.JButton();
 
