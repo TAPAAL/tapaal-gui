@@ -59,6 +59,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenuBar menuBar;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
+    private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -901,7 +903,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         //Net Type
         drawingToolBar.addSeparator();
-        drawingToolBar.add(featureInfoText);
+        drawingToolBar.add(new JLabel("Timed: "));
+        drawingToolBar.add(timeFeatureOptions);
+        drawingToolBar.add(new JLabel("Game: "));
+        drawingToolBar.add(gameFeatureOptions);
 
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
@@ -1040,6 +1045,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 workflowDialogAction.setEnabled(true);
                 stripTimeDialogAction.setEnabled(true);
 
+                timeFeatureOptions.setEnabled(true);
+                gameFeatureOptions.setEnabled(true);
+
                 if (getCurrentTab().restoreWorkflowDialog()) {
                     WorkflowDialog.showDialog();
                 }
@@ -1090,6 +1098,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 workflowDialogAction.setEnabled(false);
                 stripTimeDialogAction.setEnabled(false);
 
+                timeFeatureOptions.setEnabled(false);
+                gameFeatureOptions.setEnabled(false);
+
                 // Remove constant highlight
                 getCurrentTab().removeConstantHighlights();
 
@@ -1133,6 +1144,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 mergeComponentsDialogAction.setEnabled(false);
                 workflowDialogAction.setEnabled(false);
                 stripTimeDialogAction.setEnabled(false);
+
+                timeFeatureOptions.setEnabled(false);
+                gameFeatureOptions.setEnabled(false);
 
                 enableAllActions(false);
 
