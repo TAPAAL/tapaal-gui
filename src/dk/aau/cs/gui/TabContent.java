@@ -476,21 +476,23 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
 
 			tab.setFile(null);
-			return tab;
+
+            return tab;
 		} catch (Exception e) {
 			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
 	}
 
-	public static TabContent createNewEmptyTab(String name){
-		TabContent tab = new TabContent();
+	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
+		TabContent tab = new TabContent(isTimed, isGame);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -631,8 +633,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 
-	private TabContent() {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(true,false));
+	private TabContent(boolean isTimed, boolean isGame) {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
     }
 
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
@@ -687,6 +689,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animationModeController = new CanvasAnimationController(getAnimator());
     }
 
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame) {
+        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame));
+    }
+
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
         this(network, templates, tapnqueries,  new TAPNLens(true, false));
     }
@@ -697,7 +703,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         setQueries(tapnqueries);
         setConstants(network().constants());
 	}
-	
+
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
 		return sharedPTPanel;
 	}
@@ -1646,6 +1652,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		this.app = Optional.ofNullable(newApp);
 		undoManager.setApp(newApp);
 
+		updateFeatureText();
+
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -1761,7 +1769,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	final AbstractDrawingSurfaceManager animationModeController;
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
-	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite) {
+	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
 		try {
 			NetworkMarking currentMarking = null;
 			if(isInAnimationMode()){
@@ -1773,7 +1781,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					network(),
 					allTemplates(),
 					queriesOverwrite,
-					network().constants()
+					network().constants(),
+                    lens.timed,
+					lens.game
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -1790,7 +1800,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	public void writeNetToFile(File outFile) {
-		writeNetToFile(outFile, (List<TAPNQuery>) queries());
+		writeNetToFile(outFile, (List<TAPNQuery>) queries(), lens);
 	}
 
 	@Override
@@ -2242,6 +2252,26 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
 		managerRef.get().registerManager(drawingSurface);
+    }
+
+    public void updateFeatureText() {
+
+        String properties = "Timed: " + (lens.isTimed() ? "Yes" : "No") +
+                            ", Game: " + (lens.isGame() ? "Yes" : "No");
+        app.ifPresent(o->o.setFeatureInfoText(properties));
+
+    }
+
+    public boolean isNetTimed() {
+        return lens.isTimed();
+    }
+
+    public boolean isNetGame() {
+        return lens.isGame();
+    }
+
+    public TAPNLens getLens() {
+        return lens;
     }
 
     private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {

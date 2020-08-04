@@ -200,11 +200,10 @@ public abstract class TimedPlace {
     }
 
     public int presetSize() {
-        return preset.size() + transportArcs.size() + inhibitorArcs.size();
+        return preset.size() + transportArcs.size();
     }
 
     public int postsetSize() {
         return postset.size() + transportArcs.size() + inhibitorArcs.size();
     }
-
 }

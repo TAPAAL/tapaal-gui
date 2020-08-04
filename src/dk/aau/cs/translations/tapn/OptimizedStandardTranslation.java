@@ -184,7 +184,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		}
 
 		for (TimedTransition t : degree2Model.transitions()) {
-			if(t.presetSize() == 0) {
+			if(t.presetSizeWithoutInhibitorArcs() == 0) {
 				continue;
 			}
 			else if (isTransitionDegree1(t)) {
@@ -299,7 +299,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			if(transition.hasInhibitorArcs())
 				throw new RuntimeException("Standard translation does not support inhibitor arcs!");
 			
-			if(transition.presetSize() == 0)
+			if(transition.presetSizeWithoutInhibitorArcs() == 0)
 				continue;
 			
 			Degree2Pairing pairing = new Degree2Pairing(transition);
@@ -351,7 +351,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	}
 
 	private boolean isTransitionDegree1(TimedTransition transition) {
-		return transition.presetSize() == 1 && transition.postsetSize() == 1;
+		return transition.presetSizeWithoutInhibitorArcs() == 1 && transition.postsetSize() == 1;
 	}
 
 	private String createTransitionGuardWithLock(TimeInterval interval) {
@@ -504,7 +504,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			return false;
 		
 		for(TimedTransition t : model.transitions()) {
-			if(t.presetSize() > 2 || t.postsetSize() > 2)
+			if(t.presetSizeWithoutInhibitorArcs() > 2 || t.postsetSize() > 2)
 				return false;
 		}
 		

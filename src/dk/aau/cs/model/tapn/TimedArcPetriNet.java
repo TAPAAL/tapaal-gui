@@ -12,8 +12,8 @@ import java.util.HashSet;
 public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
-	private boolean isActive;
-	
+    private boolean isActive;
+
 	//Should the names be checked to see if the name is already used 
 	//This is used when loading big nets as the checking  of names is slow.
 	private boolean checkNames = true; 
@@ -28,9 +28,9 @@ public class TimedArcPetriNet {
 	private TimedMarking currentMarking = new LocalTimedMarking();
 
 	public TimedArcPetriNet(String name) {
-		setName(name);
-		isActive = true;
-	}
+        setName(name);
+        isActive = true;
+    }
 
 	public TimedMarking marking(){
 		return currentMarking;
@@ -366,7 +366,7 @@ public class TimedArcPetriNet {
 	
 	public boolean isDegree2(){
 		for(TimedTransition t : this.transitions()) {
-			if(t.presetSize() > 2 || t.postsetSize() > 2)
+			if(t.presetSizeWithoutInhibitorArcs() > 2 || t.postsetSize() > 2)
 				return false;
 		}
 		return true;
@@ -449,7 +449,7 @@ public class TimedArcPetriNet {
             numberOfOrphanPlaces += t.getOrphanPlaces().size();
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!(in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedInputArcs++;
@@ -460,7 +460,7 @@ public class TimedArcPetriNet {
 			}
 			//Test if all tansportarcs is untimed and get the number of untimed transport arcs
 			for(TransportArc in : t.transportArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!(in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedTransportArcs++;
@@ -469,6 +469,18 @@ public class TimedArcPetriNet {
 					networkWeighted = true;
 				}
 			}
+
+			for (TimedPlace p : t.places) {
+			    if (!p.invariant().upperBound().equals(Bound.Infinity)) {
+			        networkUntimed = false;
+                }
+            }
+
+			for (TimedTransition transition : t.transitions) {
+			    if (transition.isUrgent()) {
+			        networkUntimed = false;
+                }
+            }
 			
 			// Test all output arcs for weights
 			if(!networkWeighted){
@@ -626,6 +638,16 @@ public class TimedArcPetriNet {
 				return false;
 			}
 		}
+
+		if (hasUrgentTransitions()) {
+		    return false;
+        }
+
+		for (TimedPlace p : places) {
+		    if (!p.invariant().upperBound().toString().equals("inf")) {
+		        return false;
+            }
+        }
 		
 		return true;
 	}

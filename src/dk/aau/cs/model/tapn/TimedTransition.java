@@ -185,12 +185,16 @@ public class TimedTransition extends TAPNElement {
 		model().remove(this);
 	}
 
-	public int presetSize() {
-		return preset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
+	//XXX: See bug #1887524, old degree-2 converter does not expect inhibitorArcs to count in the size of preset
+	public int presetSizeWithoutInhibitorArcs() {
+		return preset.size() + transportArcsGoingThrough.size();
 	}
+    public int presetSize() {
+        return preset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
+    }
 
 	public int postsetSize() {
-		return postset.size() + transportArcsGoingThrough.size() + inhibitorArcs.size();
+		return postset.size() + transportArcsGoingThrough.size();
 	}
 
 	public boolean isDEnabled(){

@@ -58,6 +58,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private StatusBar statusBar;
     private JMenuBar menuBar;
     private JToolBar drawingToolBar;
+    private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -898,6 +899,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.add(new ToggleButtonWithoutText(tokenAction));
         drawingToolBar.add(new ToggleButtonWithoutText(deleteTokenAction));
 
+        //Net Type
+        drawingToolBar.addSeparator();
+        drawingToolBar.add(featureInfoText);
+
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -1271,6 +1276,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 break;
             case noNet:
+                setFeatureInfoText("");
                 break;
 
             default:
@@ -1640,6 +1646,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     public TabContent getCurrentTab() {
         return CreateGui.getCurrentTab();
+    }
+
+    @Override
+    public void setFeatureInfoText(String s) {
+        if (s == null) s = "";
+        featureInfoText.setText(s);
     }
 
 }

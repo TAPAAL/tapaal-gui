@@ -23,7 +23,7 @@ public class TAPNToConservativeTAPNConverter {
 		
 		
 		for (TimedTransition t : conservativeModel.transitions()) {
-			int difference = t.postsetSize() - t.presetSize();
+			int difference = t.postsetSize() - t.presetSizeWithoutInhibitorArcs();
 
 			if (difference < 0) {
 				for(int i = 0; i < Math.abs(difference); i++) {
