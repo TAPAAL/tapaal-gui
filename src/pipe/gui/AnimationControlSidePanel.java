@@ -106,20 +106,7 @@ public class AnimationControlSidePanel extends JPanel {
 		this.setMinimumSize(new Dimension(275, 180));
 		
 		initializeDocumentFilterForDelayInput();
-		hideTimedInformation();
 	}
-
-	private void hideTimedInformation(){
-	    if(!animator.getTab().isNetTimed()){
-            sliderPanel.setVisible(false);
-            timedelayPanel.setVisible(false);
-            //firermodebox = new NonsearchableJComboBox<String>(new String[]{"Random", "Manual"});
-            firermodebox.removeItem("Oldest");
-            firermodebox.removeItem("Youngest");
-            //updateFiringModeComboBox();
-            firermodebox.updateUI();
-        }
-    }
 
     private void initDelaySlider() {
 		sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

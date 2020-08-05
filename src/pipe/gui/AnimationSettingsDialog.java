@@ -18,7 +18,7 @@ public class AnimationSettingsDialog {
 	private static JDialog dialog;
 	private static DelayEnabledTransitionControl delayEnabled;
 	private static SimulationControl simControl;
-	
+
 	private static JPanel getContent(){
 		JPanel content = new JPanel(new BorderLayout());
 		 
@@ -35,9 +35,15 @@ public class AnimationSettingsDialog {
 		
 		content.add(delayEnabled, BorderLayout.NORTH);
 		content.add(simControl, BorderLayout.SOUTH);
+		hideTimedInformation();
 		return content;
 	}
-	
+
+    private static void hideTimedInformation(){
+	    if(!CreateGui.getCurrentTab().isNetTimed()) {
+            delayEnabled.setVisible(false);
+        }
+    }
 	
 	public static void showAnimationSettings(){
 		JPanel contentPane = new JPanel(new GridBagLayout());

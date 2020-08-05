@@ -1013,8 +1013,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-
+        hideTimedInformation();
 	}
+
+	private void hideTimedInformation(){
+	    if(!isNetTimed()){
+            animControlerBox.setVisible(false);
+        }
+
+    }
 
 	public void switchToEditorComponents() {
 		
@@ -1108,7 +1115,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createTransitionFireing() {
-		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions());
+		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions(), isNetTimed());
 	}
 
 	public TransitionFireingComponent getTransitionFireingComponent() {

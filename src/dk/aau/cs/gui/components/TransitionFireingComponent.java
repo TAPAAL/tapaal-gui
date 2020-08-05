@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.Template;
 import pipe.gui.AnimationSettingsDialog;
 import pipe.gui.DelayEnabledTransitionControl;
@@ -22,10 +23,11 @@ public class TransitionFireingComponent extends JPanel {
 	private final EnabledTransitionsList enabledTransitionsList;
 	private final JButton fireButton;
 	private final JButton settingsButton;
+	private final boolean showTimedInformation;
 
-	public TransitionFireingComponent(boolean showDelayEnabledTransitions) {
+	public TransitionFireingComponent(boolean showDelayEnabledTransitions, boolean showTimedInformation) {
 		super(new GridBagLayout());
-
+        this.showTimedInformation = showTimedInformation;
 		enabledTransitionsList = new EnabledTransitionsList();
 
 		this.setBorder(
@@ -125,7 +127,10 @@ public class TransitionFireingComponent extends JPanel {
 				fireButton.setToolTipText(SIMULATE_ACTIVATED_TOOL_TIP);
 			}
 		} else { //If random simulation is not enabled.
-			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions() ? "Delay & Fire" : "Fire");
+			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions()  ? "Delay & Fire" : "Fire");
+			if(!showTimedInformation){
+			    fireButton.setText("Fire");
+            }
 
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){
 				fireButton.setEnabled(false);
