@@ -619,9 +619,12 @@ public class TimedArcPetriNet {
 				return false;
 			}
 		}
-		
+		if (transportArcs.size() > 0) {
+		    return false;
+        }
+
 		for(TransportArc t : transportArcs){
-			if(!t.interval().equals(TimeInterval.ZERO_INF)){
+		    if(!t.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
 		}
