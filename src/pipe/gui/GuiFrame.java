@@ -467,6 +467,33 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
+    private GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
+        public void actionPerformed(ActionEvent e) {
+            boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
+            TabContent currentTab = getCurrentTab();
+
+            if (isTime != currentTab.isNetTimed()) {
+                if (!isTime){
+                    if (!currentTab.network().isUntimed()){
+                        String removeTimeWarning = "The net contains time information, which will be removed. Do you still wish to make the net untimed?";
+                        int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove time information",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                        if (choice == 0) {
+                            createNewAndConvertUntimed();
+                        }
+                    } else {
+                        createNewAndConvertUntimed();
+                    }
+                } else {
+                    TabContent tab = currentTab.createNewTabChangedLens(true, isTime);
+                    guiFrameController.ifPresent(o -> o.closeTab(currentTab));
+                    guiFrameController.ifPresent(o -> o.openTab(tab));
+                }
+                currentTab.updateFeatureText();
+            }
+        }
+    };
+
     public enum GUIMode {
         draw, animation, noNet
     }
@@ -828,6 +855,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         guiFrameController.ifPresent(o -> o.openTab(duplicate));
     }
 
+    private void createNewAndConvertUntimed() {
+        TabContent tab = getCurrentTab().createNewTabChangedLens(true, false);
+        convertToUntimedTab(tab);
+        guiFrameController.ifPresent(o -> o.openTab(tab));
+    }
+
 
     private void buildToolbar() {
 
@@ -907,6 +940,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.add(timeFeatureOptions);
         drawingToolBar.add(new JLabel("Game: "));
         drawingToolBar.add(gameFeatureOptions);
+        timeFeatureOptions.addActionListener(changeTimeFeatureAction);
 
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();

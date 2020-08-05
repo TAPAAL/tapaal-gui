@@ -1339,6 +1339,23 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 	}
 
+	public TabContent createNewTabChangedLens(boolean isTime, boolean isYes) {
+        TabContent tab;
+        String name = getTabTitle().replace(".tapn", "");
+
+	    List<Template> templates = new ArrayList<>();
+        allTemplates().forEach(templates::add);
+
+        if (isTime) {
+            tab = new TabContent(network(), templates, queries(), isYes, lens.isGame());
+            tab.setInitialName(name + (isYes ? "-timed" : "-untimed"));
+        } else {
+            tab = new TabContent(network(), templates, queries(), lens.isTimed(), isYes);
+            tab.setInitialName(name + (isYes ? "-game" : "-noGame"));
+        }
+        return tab;
+    }
+
 	public void editSelectedQuery(){
 		queries.showEditDialog();
 	}
