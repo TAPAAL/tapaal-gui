@@ -76,16 +76,18 @@ public class GuardDialogue extends JPanel /*
 		setLayout(new GridBagLayout());
 		this.currentTab = currentTab;
 
-		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent) && currentTab.isNetTimed()){
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			initTimeGuardPanel();
 		}
-		
+		if(!currentTab.isNetTimed()){
+		    guardEditPanel.setVisible(false);
+        }
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 
 		myRootPane.setDefaultButton(okButton);
 		
-		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent) && currentTab.isNetTimed()){
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
 		}
 		// Weights

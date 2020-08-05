@@ -175,7 +175,9 @@ public class TimedPlaceComponent extends Place {
 				}
 			}
         }
-
+        if(!CreateGui.getCurrentTab().isNetTimed()){
+            drawDots = (marking > 0 && marking < 6);
+        }
         // structure sees how many markings there are and fills the place in
         // with the appropriate number or tokens.
         if(drawDots) {

@@ -83,7 +83,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
         if (inputArc == null)
             getNameLabel().setText("");
         else {
-            if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
+            if (!CreateGui.getApp().showZeroToInfinityIntervals() || !CreateGui.getCurrentTab().isNetTimed()) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }
