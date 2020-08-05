@@ -243,18 +243,18 @@ public class QueryDialog extends JPanel {
 	private boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
 
-	private final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
-	private final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
-	private final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
-	private final String name_STANDARD = "UPPAAL: Standard Reduction";
-	private final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-	private final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-	private final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private static final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
+	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
+	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
+	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
+	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
+	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
 	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
-	private final EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
+	private final static EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
 	    name_verifyTAPN, //name of engine
         false, //  support fastest trace
         false, // support deadlock with net degree 2 and (EF or AG)
@@ -268,7 +268,7 @@ public class QueryDialog extends JPanel {
         true, //  support timed nets/time intervals
         false);// support deadlock with net degree > 2
 
-    private final EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
+    private final static EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
         name_COMBI,//name of engine
         false,//  support fastest trace
         true,// support deadlock with net degree 2 and (EF or AG)
@@ -282,7 +282,7 @@ public class QueryDialog extends JPanel {
         true,//  support timed nets/time intervals
         false);// support deadlock with net degree > 2
 
-    private final EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
+    private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
         name_OPTIMIZEDSTANDARD,//name of engine
         false,//  support fastest trace
         false,// support deadlock with net degree 2 and (EF or AG)
@@ -296,7 +296,7 @@ public class QueryDialog extends JPanel {
         true,//  support timed nets/time intervals
         false);// support deadlock with net degree > 2
 
-    private final EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
+    private final static EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
         name_STANDARD,//name of engine
         false,//  support fastest trace
         false,// support deadlock with net degree 2 and (EF or AG)
@@ -310,7 +310,7 @@ public class QueryDialog extends JPanel {
         true,//  support timed nets/time intervals
         false);// support deadlock with net degree > 2
 
-    private final EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
+    private final static EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
         name_BROADCAST,//name of engine
         false,//  support fastest trace
         true,// support deadlock with net degree 2 and (EF or AG)
@@ -324,7 +324,7 @@ public class QueryDialog extends JPanel {
         true,//  support timed nets/time intervals
         false);// support deadlock with net degree > 2
 
-    private final EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
+    private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
         name_BROADCASTDEG2,//name of engine
         false,//  support fastest trace
         true,// support deadlock with net degree 2 and (EF or AG)
@@ -338,7 +338,7 @@ public class QueryDialog extends JPanel {
         true,//  support timed nets/time intervals
         false);// support deadlock with net degree > 2
 
-    private final EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
+    private final static EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
         name_DISCRETE,//name of engine
         true,//  support fastest trace
         true,// support deadlock with net degree 2 and (EF or AG)
@@ -352,8 +352,8 @@ public class QueryDialog extends JPanel {
         true,//  support timed nets/time intervals
         true);// support deadlock with net degree > 2
 
-    //private final EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
-    private final EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
+    //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
@@ -873,7 +873,6 @@ public class QueryDialog extends JPanel {
             useGCD.setEnabled(true);     
         }
         if (tapnNetwork.isNonStrict()) {
-            //options.add(name_DISCRETE);
             // disable timedarts if liveness and deadlock prop
             if((getQuantificationSelection().equals("E[]") ||
                 getQuantificationSelection().equals("A<>"))){
@@ -888,67 +887,9 @@ public class QueryDialog extends JPanel {
         }
 		for(EngineSupportOptions engine : engineSupportOptions){
 		    if(engine.areOptionsSupported(queryOptions)){
-		        options.add(engine.getNameString());
+		        options.add(engine.nameString);
             }
         }
-        /*if (fastestTraceRadioButton.isSelected()) {
-        	options.add(name_DISCRETE);
-        } else if (queryHasDeadlock()) {
-            if (tapnNetwork.isNonStrict()) {
-                options.add(name_DISCRETE);
-                // disable timedarts if liveness and deadlock prop
-                if((getQuantificationSelection().equals("E[]") || 
-                        getQuantificationSelection().equals("A<>"))){
-                    if (useTimeDarts != null) {
-                    	if(useTimeDarts.isSelected()){
-                    		hasForcedDisabledTimeDarts = true;
-                    	}
-                        useTimeDarts.setEnabled(false);
-                        useTimeDarts.setSelected(false);
-                    }
-                }
-            }
-            if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-                if (isNetDegree2 && !hasInhibitorArcs) {
-                	options.add(name_COMBI);
-                	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
-                		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-                	}
-                }
-            }
-            
-		} else if(tapnNetwork.hasWeights()){
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.add(name_COMBI);
-		} else if(tapnNetwork.hasUrgentTransitions()){
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.add(name_COMBI);
-		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.add(name_COMBI);
-			if(isNetDegree2 && !hasInhibitorArcs)
-				options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
-			else
-				options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-		} else if(tapnNetwork.hasInhibitorArcs()) {
-			options.add( name_verifyTAPN );
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}					
-			options.addAll(Arrays.asList(name_COMBI, name_BROADCAST, name_BROADCASTDEG2 ));
-		} else {
-			options.add( name_verifyTAPN);
-			if(tapnNetwork.isNonStrict()){
-				options.add(name_DISCRETE);
-			}
-			options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
-		}*/
 
 		reductionOption.removeAllItems();
 
