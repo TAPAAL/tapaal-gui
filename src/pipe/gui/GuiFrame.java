@@ -61,7 +61,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
     private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
-    private boolean isTime;
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -470,8 +469,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
         public void actionPerformed(ActionEvent e) {
-            isTime = timeFeatureOptions.getSelectedIndex() != 0;
+            boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
+        }
+    };
+
+    private GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
+        public void actionPerformed(ActionEvent e) {
+            boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeGameFeature(isGame));
         }
     };
 
@@ -521,7 +527,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Status bar...
         statusBar = new StatusBar();
-        getContentPane().add(statusBar, BorderLayout.PAGE_END);
+
+        // Net Type
+        JPanel featurePanel = new JPanel();
+        featurePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        featurePanel.add(new JLabel("Timed: "));
+        featurePanel.add(timeFeatureOptions);
+        featurePanel.add(new JLabel("Game: "));
+        featurePanel.add(gameFeatureOptions);
+        timeFeatureOptions.addActionListener(changeTimeFeatureAction);
+        gameFeatureOptions.addActionListener(changeGameFeatureAction);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new GridLayout(1, 2));
+        bottomPanel.add(statusBar);
+        bottomPanel.add(featurePanel);
+        getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
 
         // Build menus
         buildToolbar();
@@ -901,14 +922,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.addSeparator();
         drawingToolBar.add(new ToggleButtonWithoutText(tokenAction));
         drawingToolBar.add(new ToggleButtonWithoutText(deleteTokenAction));
-
-        //Net Type
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(new JLabel("Timed: "));
-        drawingToolBar.add(timeFeatureOptions);
-        drawingToolBar.add(new JLabel("Game: "));
-        drawingToolBar.add(gameFeatureOptions);
-        timeFeatureOptions.addActionListener(changeTimeFeatureAction);
 
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();

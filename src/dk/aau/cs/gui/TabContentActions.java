@@ -91,7 +91,7 @@ public interface TabContentActions {
 
     void duplicateAndConvertUntimed();
 
-    void createNewAndConvertUntimed();
-
     void changeTimeFeature(boolean isTime);
+
+    void changeGameFeature(boolean isGame);
 }

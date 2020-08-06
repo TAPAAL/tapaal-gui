@@ -1420,10 +1420,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
         guiFrameControllerActions.ifPresent(o -> o.openTab(duplicate));
     }
 
-    @Override
-    public void createNewAndConvertUntimed() {
+    private void createNewAndConvertUntimed() {
 	    TabContent tab = duplicateTab(true, true, false);
         convertToUntimedTab(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    private void createNewAndConvertNonGame() {
+        TabContent tab = duplicateTab(true, false, false);
+        //TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
@@ -1443,6 +1448,29 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(true, true, isTime);
+                guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+            }
+            updateFeatureText();
+        }
+    }
+
+    @Override
+    public void changeGameFeature(boolean isGame) {
+        if (isGame != lens.isGame()) {
+            if (!isGame){
+                //todo change!
+                if (!network().isUntimed()){
+                    String removeTimeWarning = "The net contains game information, which will be removed. Do you still wish to make to remove the game semantics?";
+                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove game information",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                    if (choice == 0) {
+                        createNewAndConvertNonGame();
+                    }
+                } else {
+                    createNewAndConvertNonGame();
+                }
+            } else {
+                TabContent tab = duplicateTab(true, false, isGame);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
