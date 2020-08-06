@@ -50,6 +50,12 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
+    private MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
+
+    public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
+        this.guiFrameControllerActions.setReference(guiFrameControllerActions);
+    }
+
     static class TAPNLens {
         public boolean isTimed() {
             return timed;
@@ -875,7 +881,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	//XXX this is a temp solution while refactoring
 	// to keep the name of the net when the when a file is not set.
-	String initialName;
+	String initialName = "";
 	public void setInitialName(String name) {
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (CreateGui.getApp().getNameCounter()) + ".tapn";

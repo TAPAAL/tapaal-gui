@@ -106,6 +106,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     public void openTab(TabContent tab) {
         CreateGui.addTab(tab);
         tab.setSafeGuiFrameActions(guiFrameDirectAccess);
+        tab.setGuiFrameControllerActions(this);
 
         guiFrame.attachTabToGuiFrame(tab);
         guiFrame.changeToTab(tab);
@@ -124,6 +125,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
             if (closeNet) {
                 tab.setSafeGuiFrameActions(null);
+                tab.setGuiFrameControllerActions(null);
                 //Close the gui part first, else we get an error bug #826578
                 guiFrame.detachTabFromGuiFrame(tab);
                 CreateGui.removeTab(tab);
