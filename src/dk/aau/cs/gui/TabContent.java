@@ -2121,7 +2121,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                         transitionClicked(r.result, e);
                     }
                 }
-            } else { // Quick draw
+            } else if (e.isControlDown()){ // Quick draw
                 Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
                 var r = guiModelManager.addNewTimedPlace(getModel(), p);
 
