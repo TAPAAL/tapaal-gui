@@ -177,9 +177,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-        if (context.tabContent().isNetGame()) {
+        if (context.tabContent().getLens().isGame()) {
             transitionEditorPanel.add(uncontrollableCheckBox, gridBagConstraints);
-
 
             uncontrollableCheckBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {

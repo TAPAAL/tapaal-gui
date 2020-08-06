@@ -61,6 +61,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -244,7 +245,7 @@ public class QueryDialog extends JPanel {
 	private final boolean isNetDegree2;
 	private final boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
-	private boolean isGame;
+	private TabContent.TAPNLens lens;
 
 	private final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -352,10 +353,10 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
-			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean isGame) {
+                       TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
-		this.isGame = isGame;
+		this.lens = lens;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
@@ -505,7 +506,7 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 
-		if (CreateGui.getCurrentTab().isNetGame()) {
+		if (lens.isGame()) {
 		    fastestTraceRadioButton.setEnabled(false);
 		    someTraceRadioButton.setEnabled(false);
 		    noTraceRadioButton.setEnabled(true);
@@ -551,7 +552,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                              HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean isGame) {
+                                              HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
@@ -567,7 +568,7 @@ public class QueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, isGame);
+		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -765,7 +766,7 @@ public class QueryDialog extends JPanel {
             useGCD.setEnabled(true);     
         }
 
-		if (CreateGui.getCurrentTab().isNetGame()) {
+		if (lens.isGame()) {
 		    if (tapnNetwork.isNonStrict()) {
 		        options.add(name_DISCRETE);
             }
@@ -2442,7 +2443,7 @@ public class QueryDialog extends JPanel {
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
 			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-			    if (CreateGui.getCurrentTab().isNetGame()) {
+			    if (lens.isGame()) {
                     enableOnlyForAllBox();
                 } else {
                     enableOnlyPathButtons();
@@ -2495,7 +2496,7 @@ public class QueryDialog extends JPanel {
 			useOverApproximation.setEnabled(true);
 		}
 
-        if (CreateGui.getCurrentTab().isNetGame()) {
+        if (lens.isGame()) {
             noApproximationEnable.setEnabled(true);
             overApproximationEnable.setEnabled(false);
             underApproximationEnable.setEnabled(false);
@@ -2538,7 +2539,7 @@ public class QueryDialog extends JPanel {
 
 			// Disable GCD calculation for EG/AF or deadlock queries
 			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") ||
-                CreateGui.getCurrentTab().isNetGame()){
+               lens.isGame()){
 				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
 				useGCD.setSelected(false);
 				useGCD.setEnabled(false);

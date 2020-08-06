@@ -50,7 +50,7 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
-    static class TAPNLens {
+    public static class TAPNLens {
         public boolean isTimed() {
             return timed;
         }
@@ -2275,14 +2275,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                             ", Game: " + (lens.isGame() ? "Yes" : "No");
         app.ifPresent(o->o.setFeatureInfoText(properties));
 
-    }
-
-    public boolean isNetTimed() {
-        return lens.isTimed();
-    }
-
-    public boolean isNetGame() {
-        return lens.isGame();
     }
 
     public TAPNLens getLens() {

@@ -38,6 +38,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -220,7 +221,7 @@ public class CTLQueryDialog extends JPanel {
 	private boolean isNetDegree2;
 	private boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
-    private boolean isGame;
+    private TabContent.TAPNLens lens;
 
 	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -328,11 +329,11 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_QUERYTYPE = "Choose a query type";
 	
 	public CTLQueryDialog(EscapableDialog me, QueryDialogueOption option,
-			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean isGame) {
+			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
-		this.isGame = isGame;
+		this.lens = lens;
 
 		// Attempt to parse and possibly transform the string query using the manual edit parser
 		try {
@@ -460,7 +461,7 @@ public class CTLQueryDialog extends JPanel {
 			return;
 		}
 
-        if (isGame) {
+        if (lens.isGame()) {
             someTraceRadioButton.setEnabled(false);
             noTraceRadioButton.setEnabled(true);
         } else if(queryIsReachability()){
@@ -495,7 +496,7 @@ public class CTLQueryDialog extends JPanel {
 		return new IsReachabilityVisitor().isReachability(newProperty);
 	}
 
-	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean isGame) {
+	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
@@ -510,7 +511,7 @@ public class CTLQueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		CTLQueryDialog queryDialogue = new CTLQueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, isGame);
+		CTLQueryDialog queryDialogue = new CTLQueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -702,7 +703,7 @@ public class CTLQueryDialog extends JPanel {
 	
 	private void setEnabledReductionOptions(){
 		reductionOption.removeAllItems();
-        if (!isGame) {
+        if (!lens.isGame()) {
 		    reductionOption.addItem(name_UNTIMED);
         }
 	}
@@ -2321,7 +2322,7 @@ public class CTLQueryDialog extends JPanel {
 
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
-            if (isGame) {
+            if (lens.isGame()) {
                 enableOnlyForAllBox();
             } else {
                 enableOnlyStateButtons();
