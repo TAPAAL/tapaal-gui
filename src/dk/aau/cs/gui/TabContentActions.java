@@ -88,4 +88,10 @@ public interface TabContentActions {
     void showDelayEnabledTransitions(boolean showDelayEnabledTransitions);
 
     void setResizeingDefault();
+
+    void duplicateAndConvertUntimed();
+
+    void createNewAndConvertUntimed();
+
+    void changeTimeFeature(boolean isTime);
 }

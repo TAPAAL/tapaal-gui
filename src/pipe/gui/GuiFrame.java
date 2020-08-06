@@ -61,6 +61,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
     private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private boolean isTime;
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -245,7 +246,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            duplicateAndConvertUntimed();
+            currentTab.ifPresent(TabContentActions::duplicateAndConvertUntimed);
         }
     };
 
@@ -469,28 +470,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
         public void actionPerformed(ActionEvent e) {
-            boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
-            TabContent currentTab = getCurrentTab();
-
-            if (isTime != currentTab.isNetTimed()) {
-                if (!isTime){
-                    if (!currentTab.network().isUntimed()){
-                        String removeTimeWarning = "The net contains time information, which will be removed. Do you still wish to make the net untimed?";
-                        int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove time information",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
-                        if (choice == 0) {
-                            createNewAndConvertUntimed();
-                        }
-                    } else {
-                        createNewAndConvertUntimed();
-                    }
-                } else {
-                    TabContent tab = currentTab.createNewTabChangedLens(true, isTime);
-                    guiFrameController.ifPresent(o -> o.closeTab(currentTab));
-                    guiFrameController.ifPresent(o -> o.openTab(tab));
-                }
-                currentTab.updateFeatureText();
-            }
+            isTime = timeFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
         }
     };
 
@@ -848,19 +829,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         return toolsMenu;
     }
-
-    private void duplicateAndConvertUntimed() {
-        TabContent duplicate = ((TabContent) appTab.getSelectedComponent()).duplicateTab();
-        convertToUntimedTab(duplicate);
-        guiFrameController.ifPresent(o -> o.openTab(duplicate));
-    }
-
-    private void createNewAndConvertUntimed() {
-        TabContent tab = getCurrentTab().createNewTabChangedLens(true, false);
-        convertToUntimedTab(tab);
-        guiFrameController.ifPresent(o -> o.openTab(tab));
-    }
-
 
     private void buildToolbar() {
 
@@ -1290,11 +1258,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             setGUIMode(GUIMode.noNet);
         }
     }
-
-    private void convertToUntimedTab(TabContent tab) {
-        TabTransformer.removeTimingInformation(tab);
-    }
-
 
     /**
      * Set the current mode of the GUI, and changes possible actions
