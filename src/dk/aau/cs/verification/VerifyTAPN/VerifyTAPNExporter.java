@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -19,7 +20,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 
 public class VerifyTAPNExporter {
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL){
@@ -29,10 +30,10 @@ public class VerifyTAPNExporter {
 		}
 		
 
-		return export(model, query, modelFile, queryFile, null);
+		return export(model, query, modelFile, queryFile, null, lens);
 	}
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
@@ -46,7 +47,7 @@ public class VerifyTAPNExporter {
 			if (query.getCategory() == QueryCategory.CTL){
 			    CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
 			    queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-			} else if (model.hasUncontrollableTransitions()) {
+			} else if (lens != null && lens.isGame()) {
 			    queryStream.append("control: " + query.getProperty().toString());
             } else {
                 queryStream.append(query.getProperty().toString());
