@@ -1387,7 +1387,11 @@ public class QueryDialog extends JPanel {
 		doc.setParagraphAttributes(0, 0, standard, true);
 
 		queryField.setBackground(Color.white);
-		queryField.setText(newProperty.toString());
+		if (lens.isGame()) {
+            queryField.setText("control: " + newProperty.toString());
+        } else {
+            queryField.setText(newProperty.toString());
+        }
 		queryField.setEditable(false);
 		queryField.setToolTipText(TOOL_TIP_QUERY_FIELD); 
 
