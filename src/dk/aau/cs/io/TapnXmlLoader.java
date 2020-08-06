@@ -406,7 +406,7 @@ public class TapnXmlLoader {
 		
 		TimedTransition t = new TimedTransition(nameInput);
 		t.setUrgent(isUrgent);
-		t.setUncontrollable(isUncontrollable);
+		t.setUncontrollable(player.equals("1"));
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);
