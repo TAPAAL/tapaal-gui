@@ -1,6 +1,10 @@
 package pipe.gui;
 
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -173,7 +177,30 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    /*private GuiAction  copyAction, cutAction, pasteAction, */
+    private GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
+        public void actionPerformed(ActionEvent e) {
+            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+        }
+    };
+    //private GuiAction cutAction;
+    private GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            String s = "";
+            //odd: the Object param of getContents is not currently used
+            Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+            boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+            if (hasTransferableText) {
+                try {
+                    s = (String)contents.getTransferData(DataFlavor.stringFlavor);
+                }
+                catch (UnsupportedFlavorException | IOException ignored){}
+            }
+            CopyPastImportExport.past(s, getCurrentTab());
+        }
+    };
     private final GuiAction undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::undo);
@@ -821,6 +848,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         toolBar.add(printAction).setRequestFocusEnabled(false);
 
         // Copy/past
+        toolBar.add(copyAction);
+        toolBar.add(pasteAction);
         /*
          * Removed copy/past button toolBar.addSeparator();
          * toolBar.add(cutAction); toolBar.add(copyAction);
