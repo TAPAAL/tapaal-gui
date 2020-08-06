@@ -372,20 +372,11 @@ public class QueryPane extends JPanel implements SidePane {
 		TAPNQuery newQuery = null;
 
 		if(q.isActive()) {
-			if(netIsUntimed && q.getCategory() != TAPNQuery.QueryCategory.CTL){
-				openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Query Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-				if(openCTLDialog == JOptionPane.YES_OPTION){
-					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-				} else if(openCTLDialog == JOptionPane.NO_OPTION){
-					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-				}
-			} else {
-				if(q.getCategory() == TAPNQuery.QueryCategory.CTL) {
-					newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-				} else {
-					newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-				}
-			}
+            if(q.getCategory() == TAPNQuery.QueryCategory.CTL) {
+                newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
+            } else {
+                newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
+            }
 
 			if (newQuery != null)
 				updateQuery(q, newQuery);
