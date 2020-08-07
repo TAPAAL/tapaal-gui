@@ -15,17 +15,11 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
+import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MakeTransitionNewSharedCommand;
-import dk.aau.cs.gui.undo.MakeTransitionNewSharedMultiCommand;
-import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
-import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
-import dk.aau.cs.gui.undo.ToggleTransitionUrgent;
-import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -183,13 +177,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
             uncontrollableCheckBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     JCheckBox box = (JCheckBox) arg0.getSource();
-                    if (box.isSelected()) {
-                        uncontrollableCheckBox.setSelected(true);
-                        transition.setUncontrollable(true);
-                    } else {
-                        uncontrollableCheckBox.setSelected(false);
-                        transition.setUncontrollable(false);
-                    }
+                    uncontrollableCheckBox.setSelected(box.isSelected());
                 }
             });
         }
@@ -481,8 +469,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
-
-        transition.setUncontrollable(uncontrollableCheckBox.isSelected());
+        if(transition.isUncontrollable() != uncontrollableCheckBox.isSelected()){
+            context.undoManager().addEdit(new ToggleTransitionUncontrollable(transition.underlyingTransition()));
+            transition.setUncontrollable(uncontrollableCheckBox.isSelected());
+        }
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
