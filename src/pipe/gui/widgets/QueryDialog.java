@@ -1428,7 +1428,7 @@ public class QueryDialog extends JPanel {
 		});
 
         if (lens.isGame()) {
-            queryScrollPane.setColumnHeaderView( new JLabel("control: "));
+            queryScrollPane.setColumnHeaderView( new JLabel("control: ", SwingConstants.CENTER));
         }
 
 		GridBagConstraints gbc = new GridBagConstraints();

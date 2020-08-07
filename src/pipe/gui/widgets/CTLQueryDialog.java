@@ -1287,6 +1287,7 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridwidth = 4;
 
 		queryPanel.add(queryScrollPane, gbc);
