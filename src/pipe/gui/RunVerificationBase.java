@@ -84,7 +84,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		if(options.enabledStateequationsCheck()) {
 			if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() &&
-                !(options instanceof VerifyPNOptions) && !model.hasUncontrollableTransitions()) {
+                !(options instanceof VerifyPNOptions)) {
 
                 VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 				if (!verifypn.supportsModel(transformedModel.value1(), options)) {

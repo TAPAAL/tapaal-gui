@@ -1,15 +1,6 @@
 package pipe.gui.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -629,7 +620,7 @@ public class QueryDialog extends JPanel {
 	// If the query contains place holders we want to select
 	// the first placeholder to speed up query construction
 	private void updateSelection(TCTLAbstractProperty newSelection) {
-		queryField.setText(newProperty.toString());
+        queryField.setText(newProperty.toString());
 
 		StringPosition position;
 
@@ -882,7 +873,10 @@ public class QueryDialog extends JPanel {
 		}
 
 		String reductionOptionString = getReductionOptionAsString();
-		if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+		if (lens.isGame()) {
+		    heuristicSearch.setEnabled(false);
+		    breadthFirstSearch.setEnabled(false);
+        } else if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			breadthFirstSearch.setEnabled(false);
 			if(!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))){
 				heuristicSearch.setEnabled(false);
@@ -1387,13 +1381,9 @@ public class QueryDialog extends JPanel {
 		doc.setParagraphAttributes(0, 0, standard, true);
 
 		queryField.setBackground(Color.white);
-		if (lens.isGame()) {
-            queryField.setText("control: " + newProperty.toString());
-        } else {
-            queryField.setText(newProperty.toString());
-        }
 		queryField.setEditable(false);
-		queryField.setToolTipText(TOOL_TIP_QUERY_FIELD); 
+        queryField.setText(newProperty.toString());
+		queryField.setToolTipText(TOOL_TIP_QUERY_FIELD);
 
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
@@ -2535,7 +2525,7 @@ public class QueryDialog extends JPanel {
 			useStubbornReduction.setVisible(true);
 			useTimeDarts.setVisible(true);
 
-			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected()){
+			if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected() || lens.isGame()){
 				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
