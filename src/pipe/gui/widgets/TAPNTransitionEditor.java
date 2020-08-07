@@ -423,11 +423,13 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 			try{
 				String oldName = transition.underlyingTransition().name();
-				transition.underlyingTransition().setName(newName);
-				Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
-				context.undoManager().addEdit(renameCommand);
-				// set name
-				renameCommand.redo();
+				if (!oldName.equals(newName)) {
+                    transition.underlyingTransition().setName(newName);
+                    Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
+                    context.undoManager().addEdit(renameCommand);
+                    // set name
+                    renameCommand.redo();
+                }
 			}catch(RequireException e){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
@@ -470,7 +472,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
         if(transition.isUncontrollable() != uncontrollableCheckBox.isSelected()){
-            context.undoManager().addEdit(new ToggleTransitionUncontrollable(transition.underlyingTransition()));
+            context.undoManager().addEdit(new ToggleTransitionUncontrollable(transition.underlyingTransition(), context.tabContent()));
             transition.setUncontrollable(uncontrollableCheckBox.isSelected());
         }
 

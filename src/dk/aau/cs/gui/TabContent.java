@@ -1740,7 +1740,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
         if (!isInAnimationMode()) {
             getUndoManager().undo();
             network().buildConstraints();
-
         }
     }
 
