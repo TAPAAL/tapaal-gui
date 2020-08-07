@@ -1226,6 +1226,10 @@ public class CTLQueryDialog extends JPanel {
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
+		if (lens.isGame()) {
+		    queryScrollPane.setColumnHeaderView(new JLabel("control:"));
+        }
+
 		queryField.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {

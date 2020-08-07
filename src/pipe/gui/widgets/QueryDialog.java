@@ -17,26 +17,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -1374,7 +1355,7 @@ public class QueryDialog extends JPanel {
 
 		StyledDocument doc = queryField.getStyledDocument();
 
-		// Set alignment to be centered for all paragraphs
+        // Set alignment to be centered for all paragraphs
 		MutableAttributeSet standard = new SimpleAttributeSet();
 		StyleConstants.setAlignment(standard, StyleConstants.ALIGN_CENTER);
 		StyleConstants.setFontSize(standard, 14);
@@ -1446,12 +1427,15 @@ public class QueryDialog extends JPanel {
 			}
 		});
 
+        if (lens.isGame()) {
+            queryScrollPane.setColumnHeaderView( new JLabel("control: "));
+        }
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridwidth = 4;
-
 		queryPanel.add(queryScrollPane, gbc);
 	}
 
