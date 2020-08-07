@@ -856,7 +856,6 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 		if (lens.isGame()) {
 		    heuristicSearch.setEnabled(false);
-		    breadthFirstSearch.setEnabled(false);
         } else if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			breadthFirstSearch.setEnabled(false);
 			if(!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))){
