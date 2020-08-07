@@ -738,7 +738,6 @@ public class CTLQueryDialog extends JPanel {
 
         if (lens.isGame()) {
             heuristicSearch.setEnabled(false);
-            depthFirstSearch.setEnabled(false);
         }
 
 		if(!currentselected.isEnabled()){
