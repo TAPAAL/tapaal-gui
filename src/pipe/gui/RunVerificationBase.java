@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -82,9 +83,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		}
 		
 		if(options.enabledStateequationsCheck()) {
-			if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() && !(options instanceof VerifyPNOptions)) {
+			if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() &&
+                !(options instanceof VerifyPNOptions)) {
 
-				VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
+                VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 				if (!verifypn.supportsModel(transformedModel.value1(), options)) {
 					// Skip over-approximation if model is not supported.
 					// Prevents verification from displaying error.
@@ -154,7 +156,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						}
 					}
 				}
-
 			}
 		}
 		

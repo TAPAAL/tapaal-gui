@@ -66,7 +66,7 @@ public class Verifier {
 		
 		if(tapnNetwork.isUntimed()){
 			modelChecker = getVerifyPN();
-		} else if(tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions()){
+		} else if(tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()){
 			modelChecker = getVerifydTAPN();
 		} else {
 			modelChecker = getVerifyTAPN();
