@@ -1428,7 +1428,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     private void createNewAndConvertNonGame() {
         TabContent tab = duplicateTab(true, false, false);
-        //TabTransformer.removeGameInformation(tab);
+        TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
@@ -1458,8 +1458,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public void changeGameFeature(boolean isGame) {
         if (isGame != lens.isGame()) {
             if (!isGame){
-                //todo change!
-                if (!network().isUntimed()){
+                if (network().hasUncontrollableTransitions()){
                     String removeTimeWarning = "The net contains game information, which will be removed. Do you still wish to make to remove the game semantics?";
                     int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove game information",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
@@ -1977,9 +1976,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			String composedName = getTabTitle();
 			composedName = composedName.replace(".tapn", "");
 			if (isTimed || !netChanged) {
-			    composedName += "-untimed";
+			    composedName += isYes ? "-timed" : "-untimed";
             } else if (netChanged && !isTimed) {
-			    composedName += "-noGame";
+			    composedName += isYes ? "-game" : "-noGame";
             }
 			if (netChanged) {
 			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, isTimed, isYes);
