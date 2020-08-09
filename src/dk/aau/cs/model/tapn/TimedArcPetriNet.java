@@ -645,6 +645,16 @@ public class TimedArcPetriNet {
 		
 		return false;
 	}
+
+    public boolean hasUncontrollableTransitions() {
+        for(TimedTransition t : transitions){
+            if(t.isUncontrollable()){
+                return true;
+            }
+        }
+
+        return false;
+    }
 	
 	public boolean isNonStrict(){
 		for(TimedInputArc t : inputArcs){
