@@ -1574,10 +1574,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return appTab.getTitleAt(appTab.getSelectedIndex());
     }
 
+    //XXX: Needs further cleanup
+    @Deprecated
     public boolean isShowingDelayEnabledTransitions() {
-        //XXX:
-        return true;
-        //return showDelayEnabledTransitions;
+        return showDelayEnabledTransitionsAction.isSelected();
     }
 
     public boolean showZeroToInfinityIntervals() {
