@@ -67,21 +67,20 @@ public class GuardDialogue extends JPanel /*
 	private WidthAdjustingComboBox rightConstantsComboBox;
 	private JCheckBox weightUseConstant;
 	private WidthAdjustingComboBox weightConstantsComboBox;
-	private TabContent currentTab;
 	
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
-	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited, TabContent currentTab) {
+	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
 		myRootPane = rootPane;
 		setLayout(new GridBagLayout());
-		this.currentTab = currentTab;
 
 		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			initTimeGuardPanel();
 		}
-		if(!currentTab.isNetTimed()){
-		    guardEditPanel.setVisible(false);
+        if(!objectToBeEdited.isTimed() ){
+            guardEditPanel.setVisible(false);
         }
+
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 

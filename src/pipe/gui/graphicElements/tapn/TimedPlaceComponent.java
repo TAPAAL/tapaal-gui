@@ -51,11 +51,11 @@ public class TimedPlaceComponent extends Place {
 	private Window ageOfTokensWindow = new Window(new Frame());
 	private final Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
+	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, boolean isTimed) {
 		super(positionXInput, positionYInput);
 		this.place = place;
         this.place.addTimedPlaceListener(listener);
-
+        this.isTimed = isTimed;
 		attributesVisible = true;
 
     }
@@ -175,7 +175,7 @@ public class TimedPlaceComponent extends Place {
 				}
 			}
         }
-        if(!CreateGui.getCurrentTab().isNetTimed()){
+        if(!isTimed){
             drawDots = (marking > 0 && marking < 6);
         }
         // structure sees how many markings there are and fills the place in

@@ -79,7 +79,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void hideTimedInformation(){
-        if(!currentTab.isNetTimed()) {
+        if(!place.isTimed()) {
             timeInvariantPanel.setVisible(false);
         }
     }

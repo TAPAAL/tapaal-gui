@@ -23,13 +23,12 @@ public class TransitionFireingComponent extends JPanel {
 	private final EnabledTransitionsList enabledTransitionsList;
 	private final JButton fireButton;
 	private final JButton settingsButton;
-	private final boolean showTimedInformation;
+	private final TabContent.TAPNLens lens;
 
-	public TransitionFireingComponent(boolean showDelayEnabledTransitions, boolean showTimedInformation) {
+	public TransitionFireingComponent(boolean showDelayEnabledTransitions, TabContent.TAPNLens lens) {
 		super(new GridBagLayout());
-        this.showTimedInformation = showTimedInformation;
 		enabledTransitionsList = new EnabledTransitionsList();
-
+        this.lens = lens;
 		this.setBorder(
 		    BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Enabled Transitions"),
@@ -46,7 +45,7 @@ public class TransitionFireingComponent extends JPanel {
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
-		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings());
+		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings(lens));
 
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
@@ -128,7 +127,7 @@ public class TransitionFireingComponent extends JPanel {
 			}
 		} else { //If random simulation is not enabled.
 			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions()  ? "Delay & Fire" : "Fire");
-			if(!showTimedInformation){
+			if(!lens.isTimed()){
 			    fireButton.setText("Fire");
             }
 

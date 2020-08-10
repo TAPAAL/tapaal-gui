@@ -57,6 +57,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private StatusBar statusBar;
     private JMenuBar menuBar;
+    JMenu drawMenu;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> zoomComboBox;
@@ -289,45 +290,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(o -> o.setMode(ElementType.ANNOTATION));
         }
     };
-    private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.TAPNINHIBITOR_ARC));
-        }
-    };
-    private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.TAPNTRANS));
-        }
-    };
-    private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.ADDTOKEN));
-        }
-    };
+
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(o -> o.setMode(ElementType.SELECT));
-        }
-    };
-    private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.DELTOKEN));
-        }
-    };
-    private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.TAPNPLACE));
-        }
-    };
-
-    private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.TAPNARC));
-        }
-    };
-    private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.TRANSPORTARC));
         }
     };
 
@@ -608,7 +574,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         menuBar.add(buildMenuFiles(shortcutkey));
         menuBar.add(buildMenuEdit(shortcutkey));
         menuBar.add(buildMenuView(shortcutkey));
-        menuBar.add(buildMenuDraw());
+        buildMenuDraw();
+        menuBar.add(drawMenu);
         menuBar.add(buildMenuAnimation());
         menuBar.add(buildMenuTools());
         menuBar.add(buildMenuHelp());
@@ -644,32 +611,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return editMenu;
     }
 
-    private JMenu buildMenuDraw() {
+    private void buildMenuDraw() {
         /* Draw menu */
-        JMenu drawMenu = new JMenu("Draw");
+        drawMenu = new JMenu("Draw");
         drawMenu.setMnemonic('D');
-
-        drawMenu.add(selectAction);
-        drawMenu.addSeparator();
-
-        drawMenu.add(timedPlaceAction);
-
-        drawMenu.add(transAction);
-
-        drawMenu.add(timedArcAction);
-
-        drawMenu.add(transportArcAction);
-
-        drawMenu.add(inhibarcAction);
-
-        drawMenu.add(annotationAction);
-
-        drawMenu.addSeparator();
-
-        drawMenu.add(tokenAction);
-
-        drawMenu.add(deleteTokenAction);
-        return drawMenu;
     }
 
     private JMenu buildMenuView(int shortcutkey) {
@@ -880,29 +825,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.addSeparator();
         drawingToolBar.setRequestFocusEnabled(false);
 
-        // Normal arraw
-        drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
-
-
-        // Drawing elements
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(new ToggleButtonWithoutText(timedPlaceAction));
-        drawingToolBar.add(new ToggleButtonWithoutText(transAction));
-        drawingToolBar.add(new ToggleButtonWithoutText(timedArcAction));
-        drawingToolBar.add(new ToggleButtonWithoutText(transportArcAction));
-        drawingToolBar.add(new ToggleButtonWithoutText(inhibarcAction));
-
-        drawingToolBar.add(new ToggleButtonWithoutText(annotationAction));
-
-        // Tokens
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(new ToggleButtonWithoutText(tokenAction));
-        drawingToolBar.add(new ToggleButtonWithoutText(deleteTokenAction));
-
-        //Net Type
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(featureInfoText);
-
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -1009,18 +931,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 exportTraceAction.setEnabled(false);
                 importTraceAction.setEnabled(false);
 
-                timedPlaceAction.setEnabled(true);
-                timedArcAction.setEnabled(true);
-                inhibarcAction.setEnabled(true);
-                transportArcAction.setEnabled(true);
-
                 annotationAction.setEnabled(true);
-                transAction.setEnabled(true);
-                tokenAction.setEnabled(true);
                 deleteAction.setEnabled(true);
                 selectAllAction.setEnabled(true);
                 selectAction.setEnabled(true);
-                deleteTokenAction.setEnabled(true);
 
                 timeAction.setEnabled(false);
                 delayFireAction.setEnabled(false);
@@ -1053,18 +967,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             case animation:
                 enableAllActions(true);
 
-                timedPlaceAction.setEnabled(false);
-                timedArcAction.setEnabled(false);
-                inhibarcAction.setEnabled(false);
-                transportArcAction.setEnabled(false);
-
                 annotationAction.setEnabled(false);
-                transAction.setEnabled(false);
-                tokenAction.setEnabled(false);
                 deleteAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
                 selectAction.setEnabled(false);
-                deleteTokenAction.setEnabled(false);
 
                 alignToGrid.setEnabled(false);
 
@@ -1105,18 +1011,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 importTraceAction.setEnabled(false);
                 verifyAction.setEnabled(false);
 
-                timedPlaceAction.setEnabled(false);
-                timedArcAction.setEnabled(false);
-                inhibarcAction.setEnabled(false);
-                transportArcAction.setEnabled(false);
-
                 annotationAction.setEnabled(false);
-                transAction.setEnabled(false);
-                tokenAction.setEnabled(false);
-                deleteAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
                 selectAction.setEnabled(false);
-                deleteTokenAction.setEnabled(false);
 
                 timeAction.setEnabled(false);
                 delayFireAction.setEnabled(false);
@@ -1285,7 +1182,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Enable actions based on GUI mode
         enableGUIActions(mode);
-
+        if(currentTab != null){
+            currentTab.ifPresent(o -> o.updateEnabledActions(mode));
+        }
     }
 
     private void fixBug812694GrayMenuAfterSimulationOnMac() {
@@ -1320,15 +1219,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         mode = _mode;
 
         // deselect other actions
-        transAction.setSelected(mode == ElementType.TAPNTRANS);
-        timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
-        timedArcAction.setSelected(mode == ElementType.TAPNARC);
-        transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
-        inhibarcAction.setSelected(mode == ElementType.TAPNINHIBITOR_ARC);
-        tokenAction.setSelected(mode == ElementType.ADDTOKEN);
-        deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
         selectAction.setSelected(mode == ElementType.SELECT);
-        annotationAction.setSelected(mode == ElementType.ANNOTATION);
 
         statusBar.changeText(mode);
     }
@@ -1349,6 +1240,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             // create a tabChanged event loop.
             // Throw exception if tab is not found
             appTab.setSelectedComponent(tab);
+            updateGuiMenus();
         }
     }
 
@@ -1430,6 +1322,23 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomComboBox.removeActionListener(zoomComboListener);
         zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
         zoomComboBox.addActionListener(zoomComboListener);
+    }
+    @Override
+    public void updateGuiMenus(){
+        drawingToolBar.removeAll();
+        drawMenu.removeAll();
+        drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
+
+        drawMenu.add(selectAction);
+        drawMenu.addSeparator();
+
+        for(GuiAction action : getCurrentTab().getAvailableGuiActions()){
+            drawingToolBar.add(new ToggleButtonWithoutText(action));
+            drawMenu.add(action);
+        }
+        drawingToolBar.addSeparator();
+        drawingToolBar.add(featureInfoText);
+
     }
 
 
