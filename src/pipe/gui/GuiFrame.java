@@ -1332,7 +1332,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     @Override
     public void setShowToolTipsSelected(boolean b) {
-        showTokenAgeAction.setSelected(b);
+        showToolTipsAction.setSelected(b);
     }
 
     @Override
