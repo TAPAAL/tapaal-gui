@@ -1,5 +1,7 @@
 package dk.aau.cs.model.tapn.simulation;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +13,7 @@ public class UntimedTAPNNetworkTrace implements TAPNNetworkTrace {
 		steps.add(step);
 	}
 
-	public Iterator<TAPNNetworkTraceStep> iterator() {
+	public @NotNull Iterator<TAPNNetworkTraceStep> iterator() {
 		return steps.iterator();
 	}
 

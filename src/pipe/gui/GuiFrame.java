@@ -9,17 +9,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import com.apple.eawt.Application;
+import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
-import com.sun.jna.Platform;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
@@ -27,10 +26,6 @@ import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
@@ -45,7 +40,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     // for zoom combobox and dropdown
     private final int[] zoomLevels = {40, 60, 80, 100, 120, 140, 160, 180, 200, 300};
 
-    private String frameTitle;
+    private final String frameTitle;
 
     private Pipe.ElementType mode;
 
@@ -53,9 +48,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
-    private ExtendedJTabbedPane<TabContent> appTab;
+    private final ExtendedJTabbedPane<TabContent> appTab;
 
-    private StatusBar statusBar;
+    private final StatusBar statusBar;
     private JMenuBar menuBar;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
@@ -353,7 +348,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleQueries);
         }
     };
-    private GuiAction showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('4', shortcutkey), true) {
+    private final GuiAction showConstantsAction = new GuiAction("Display constants", "Show/hide global constants.", KeyStroke.getKeyStroke('4', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
         }
@@ -388,7 +383,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::showSimpleWorkspace);
         }
     };
-    private GuiAction saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
+    private final GuiAction saveWorkSpaceAction = new GuiAction("Save workspace", "Save the current workspace as the default one", false) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::saveWorkspace);
         }
@@ -446,22 +441,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::stepBackwards);
         }
     };
-    private GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
+    private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::timeDelay);
         }
     };
-    private GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
+    private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::delayAndFire);
         }
     };
-    private GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
+    private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::previousComponent);
         }
     };
-    private GuiAction nextcomponentAction = new GuiAction("Next component", "Next component", "pressed DOWN") {
+    private final GuiAction nextcomponentAction = new GuiAction("Next component", "Next component", "pressed DOWN") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::nextComponent);
         }
@@ -504,10 +499,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         this.setMinimumSize(new Dimension(825, 480));
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
-        //XXX: Moved appTab from creategui needs further refacotring
-        //kyrke 2018-05-20
-        appTab = new ExtendedJTabbedPane<TabContent>() {
+        appTab= new ExtendedJTabbedPane<TabContent>() {
             @Override
             public Component generator() {
                 return new TabComponent(this) {
@@ -587,23 +579,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Logger.log("Error loading L&F: " + exc);
         }
 
-        if (Platform.isMac()) {
 
-            try {
-                new SpecialMacHandler(guiFrameController);
-            } catch (NoClassDefFoundError e) {
-                //Failed loading special mac handler, ignore and run program without MacOS integration
-            }
-
-            //XXX Refactor to sperate function, only a test to see of this fixes issues for TAPAAL on Java9 bug #1764383
-            Application app = Application.getApplication();
-            try {
-                Image appImage;
-                appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(ResourceManager.imgPath + "icon.png"));
-                app.setDockIconImage(appImage);
-            } catch (IOException e) {
-                Logger.log("Error loading Image");
-            }
+        if (Platform.isMac()){
 
             //Set specific settings
             System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -634,11 +611,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private void buildMenus() {
         menuBar = new JMenuBar();
 
-        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-        menuBar.add(buildMenuFiles(shortcutkey));
-        menuBar.add(buildMenuEdit(shortcutkey));
-        menuBar.add(buildMenuView(shortcutkey));
+        menuBar.add(buildMenuFiles());
+        menuBar.add(buildMenuEdit());
+        menuBar.add(buildMenuView());
         menuBar.add(buildMenuDraw());
         menuBar.add(buildMenuAnimation());
         menuBar.add(buildMenuTools());
@@ -648,7 +623,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     }
 
-    private JMenu buildMenuEdit(int shortcutkey) {
+    private JMenu buildMenuEdit() {
 
         /* Edit Menu */
         JMenu editMenu = new JMenu("Edit");
@@ -703,7 +678,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return drawMenu;
     }
 
-    private JMenu buildMenuView(int shortcutkey) {
+    private JMenu buildMenuView() {
         /* ViewMenu */
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
@@ -817,8 +792,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         toolsMenu.add(netStatisticsAction).setMnemonic('i');
 
-
-        //JMenuItem batchProcessing = new JMenuItem("Batch processing");
         JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
         batchProcessing.setMnemonic('b');
         toolsMenu.add(batchProcessing);
@@ -831,7 +804,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         smartDrawDialog.setMnemonic('D');
         toolsMenu.add(smartDrawDialog);
 
-        //Stip off timing information
         JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction);
         stripTimeDialog.setMnemonic('e');
         toolsMenu.add(stripTimeDialog);
@@ -959,8 +931,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     currentTab.ifPresent(o -> o.zoomTo(zoomper));
                 }
             };
-
-            //JMenuItem newItem = new JMenuItem(a);
 
             zoomMenu.add(newZoomAction);
         }
@@ -1286,16 +1256,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 // Enable all draw actions
                 startAction.setSelected(false);
 
-                if (getCurrentTab().isInAnimationMode()) {
-                    getCurrentTab().getAnimator().restoreModel();
-                    hideComponentWindow();
-                }
-
-                getCurrentTab().switchToEditorComponents();
-
                 break;
             case animation:
-                getCurrentTab().switchToAnimationComponents(true);
                 startAction.setSelected(true);
 
                 break;
@@ -1321,20 +1283,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         a.setUndecorated(true);
         a.setVisible(true);
         a.dispose();
-    }
-
-    private void hideComponentWindow() {
-        ArrayList<PetriNetObject> selection = getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
-
-        for (PetriNetObject pn : selection) {
-            if (pn instanceof TimedPlaceComponent) {
-                TimedPlaceComponent place = (TimedPlaceComponent) pn;
-                place.showAgeOfTokens(false);
-            } else if (pn instanceof TimedTransitionComponent) {
-                TimedTransitionComponent transition = (TimedTransitionComponent) pn;
-                transition.showDInterval(false);
-            }
-        }
     }
 
     //XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
@@ -1408,7 +1356,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     @Override
     public void setShowToolTipsSelected(boolean b) {
-        showTokenAgeAction.setSelected(b);
+        showToolTipsAction.setSelected(b);
     }
 
     @Override
@@ -1468,7 +1416,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return false;
     }
 
-    private JMenu buildMenuFiles(int shortcutkey) {
+    private JMenu buildMenuFiles() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
 
@@ -1599,7 +1547,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 /* A JAR path */
                 String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); // strip out only the JAR
                 // file
-                JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+                JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8));
                 Enumeration<JarEntry> entries = jar.entries(); // gives ALL entries in jar
                 Set<String> result = new HashSet<String>(); // avoid duplicates in case it is a subdirectory
                 while (entries.hasMoreElements()) {
@@ -1650,10 +1598,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return appTab.getTitleAt(appTab.getSelectedIndex());
     }
 
+    //XXX: Needs further cleanup
+    @Deprecated
     public boolean isShowingDelayEnabledTransitions() {
-        //XXX:
-        return true;
-        //return showDelayEnabledTransitions;
+        return showDelayEnabledTransitionsAction.isSelected();
     }
 
     public boolean showZeroToInfinityIntervals() {

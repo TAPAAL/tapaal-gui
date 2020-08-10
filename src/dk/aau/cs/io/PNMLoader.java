@@ -275,10 +275,9 @@ public class PNMLoader {
 			Node text = getFirstDirectChild(inscription, "text");
 			if(text != null){
 				String weightString = text.getTextContent().trim();
-				try{
-					if(weightString != null)
-						weight = Integer.parseInt(weightString);
-					} catch(NumberFormatException e) {}
+                try {
+                    weight = Integer.parseInt(weightString);
+                } catch (NumberFormatException ignored) {} //Default values is 1
 			}
 		}
 		

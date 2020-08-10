@@ -10,7 +10,6 @@ import java.awt.event.MouseListener;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -25,7 +24,6 @@ import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
 
 import dk.aau.cs.gui.components.NonsearchableJList;
@@ -42,10 +40,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private static final String TRANSITIONS = "Transitions";
 	private static final String PLACES = "Places";
 
-	private final JList list = new NonsearchableJList();
+	//XXX contains a SharedTransition SharePlace based on what is displayed, should be a type param
+	private final JList<Object> list = new NonsearchableJList<>();
 	private final SharedPlacesListModel sharedPlacesListModel;
 	private final SharedTransitionsListModel sharedTransitionsListModel;
-	private final JComboBox placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
+	private final JComboBox<String> placesTransitionsComboBox = new JComboBox<>(new String[]{ PLACES, TRANSITIONS });
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
 	private final TabContent tab;
@@ -68,8 +67,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	//private static final String toolTipSharedPlacesPanel = "Here you can manage the shared places.<html><br/></html>Shared places can link different components.";
 	private static final String toolTipNewTransition = "Create a new transition";
 	private static final String toolTipRenameTransition = "Rename the selected transition";
-	//private static final String toolTipSharedTransitionsPanel = "Here you can manage the shared transitions.<html><br/></html>" +
-		//	"Shared transitions can link different components.";
+	//private static final String toolTipSharedTransitionsPanel = "Here you can manage the shared transitions.<html><br/></html>" + "Shared transitions can link different components.";
 	private static final String toolTipRemoveTransition ="Remove the selected transition";
 	private static final String toolTipChangeBetweenPlacesAndTransitions = "Switch between shared places and transitions";
 
@@ -129,7 +127,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
         list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){
-					JList source = (JList)e.getSource();
+					JList<Object> source = (JList<Object>)e.getSource();
 					if(source.getSelectedIndex() == -1){
 						removeButton.setEnabled(false);
 						renameButton.setEnabled(false);
@@ -143,31 +141,36 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 					}
 					
 					int index = list.getSelectedIndex();
-					if(index > 0 && list.getSelectedIndices().length == 1)
-						moveUpButton.setEnabled(true);
-					else
-						moveUpButton.setEnabled(false);
+					if(index > 0 && list.getSelectedIndices().length == 1) {
+                        moveUpButton.setEnabled(true);
+                    } else {
+                        moveUpButton.setEnabled(false);
+                    }
 								
 					if(isDisplayingTransitions()) {
-						if(index < sharedTransitionsListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
-							moveDownButton.setEnabled(true);
-						else
-							moveDownButton.setEnabled(false);
+						if(index < sharedTransitionsListModel.getSize() - 1 && list.getSelectedIndices().length == 1) {
+                            moveDownButton.setEnabled(true);
+                        } else {
+                            moveDownButton.setEnabled(false);
+                        }
 						
 						if (sharedTransitionsListModel.getSize() >=2) {
 							sortButton.setEnabled(true);
-						} else
-							sortButton.setEnabled(false);
+						} else {
+                            sortButton.setEnabled(false);
+                        }
 					} else {
-						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1)
-							moveDownButton.setEnabled(true);
-						else
-							moveDownButton.setEnabled(false);
+						if(index < sharedPlacesListModel.getSize() - 1 && list.getSelectedIndices().length == 1) {
+                            moveDownButton.setEnabled(true);
+                        } else {
+                            moveDownButton.setEnabled(false);
+                        }
 						
 						if (sharedPlacesListModel.getSize() >=2) {
 							sortButton.setEnabled(true);
-						} else
-							sortButton.setEnabled(false);
+						} else {
+                            sortButton.setEnabled(false);
+                        }
 					}
 				}
 			}

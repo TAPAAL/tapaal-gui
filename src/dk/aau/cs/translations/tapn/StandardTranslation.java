@@ -311,9 +311,9 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		StringBuilder builder = new StringBuilder();
 		
 		boolean lowerBoundAdded = false;
-		if(!(interval.lowerBound().value() == 0 && interval.IsLowerBoundNonStrict())) {
+		if(!(interval.lowerBound().value() == 0 && interval.isLowerBoundNonStrict())) {
 			builder.append(TOKEN_CLOCK_NAME);
-			if(interval.IsLowerBoundNonStrict())
+			if(interval.isLowerBoundNonStrict())
 				builder.append(" >= ");
 			else
 				builder.append(" > ");
@@ -326,7 +326,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 			if(lowerBoundAdded) builder.append(" && ");
 			builder.append(TOKEN_CLOCK_NAME);
 			
-			if(interval.IsUpperBoundNonStrict())
+			if(interval.isUpperBoundNonStrict())
 				builder.append(" <= ");
 			else
 				builder.append(" < ");

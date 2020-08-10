@@ -54,13 +54,13 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
 	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place is used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
 	
-	JList list;
-	SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel;
-	TabContent tab;
-	UndoManager undoManager;
-	SharedPlacesListModel sharedPlacesListModel;
-	SharedTransitionsListModel sharedTransitionsListModel;
-	NameGenerator nameGenerator;
+	final JList list;
+	final SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel;
+	final TabContent tab;
+	final UndoManager undoManager;
+	final SharedPlacesListModel sharedPlacesListModel;
+	final SharedTransitionsListModel sharedTransitionsListModel;
+	final NameGenerator nameGenerator;
 	boolean messageShown;
 	
 	public DeleteSharedPlaceOrTransition(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, TabContent tab, 
@@ -82,7 +82,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		JList listOfComponents = new JList(affectedComponents.toArray());
 		JScrollPane scrollPane = new JScrollPane(listOfComponents);
 		Object[] params = {label, checkBox, new JLabel("Components affected:"), scrollPane};
-		result = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
+		result = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.OK_CANCEL_OPTION);
 		boolean deleteFromTemplates = checkBox.isSelected();
 		return new DeleteSharedResult(result, deleteFromTemplates);
 	}
@@ -161,13 +161,17 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(placeToRemove.name());
 				if(place != null){
-					for(Arc arc : place.getPreset()){
-						deleteArc(arc, template);
-					}
+                    //XXX: we need to save arcs to delete, if we delete it while iterating pre/post set it can lead to errors
+                    ArrayList<Arc> arcsToDelete = new ArrayList<>();
 
-					for(Arc arc : place.getPostset()){
-						deleteArc(arc, template);
-					}
+                    for(Arc arc : place.getPreset()){
+                        arcsToDelete.add(arc);
+                    }
+
+                    for(Arc arc : place.getPostset()){
+                        arcsToDelete.add(arc);
+                    }
+                    arcsToDelete.forEach(arc->deleteArc(arc, template));
 
 					Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel());
 					cmd.redo();
@@ -280,13 +284,17 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transitionToBeRemoved.name());
 				if(transition != null){
+				    //XXX: we need to save arcs to delete, if we delete it while iterating pre/post set it can lead to errors
+				    ArrayList<Arc> arcsToDelete = new ArrayList<>();
+
 					for(Arc arc : transition.getPreset()){
-						deleteArc(arc, template);
+						arcsToDelete.add(arc);
 					}
 
 					for(Arc arc : transition.getPostset()){
-						deleteArc(arc, template);
+						arcsToDelete.add(arc);
 					}
+					arcsToDelete.forEach(arc->deleteArc(arc, template));
 
 					Command c = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel());
 					undoManager.addEdit(c);
@@ -321,8 +329,8 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	}
 	
 	private static class DeleteSharedResult{
-		public int choice;
-		public boolean deleteFromTemplates;
+		public final int choice;
+		public final boolean deleteFromTemplates;
 		
 		public DeleteSharedResult(int choice, boolean deleteFromTemplates) {
 			this.choice = choice;

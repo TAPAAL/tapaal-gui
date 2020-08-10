@@ -40,7 +40,7 @@ public class IntervalOperations {
 		TimeInterval lower = min(i1, i2, BoundToCheck.lower);
 		TimeInterval upper = max(i1, i2, BoundToCheck.upper);
 		
-		return new TimeInterval(lower.IsLowerBoundNonStrict(), lower.lowerBound(), upper.upperBound(), upper.IsUpperBoundNonStrict()); 
+		return new TimeInterval(lower.isLowerBoundNonStrict(), lower.lowerBound(), upper.upperBound(), upper.isUpperBoundNonStrict());
 	}
 	
 	
@@ -56,8 +56,8 @@ public class IntervalOperations {
 		BigDecimal iUp = getRatBound(upper.upperBound()).getBound();
 		BigDecimal iLow = getRatBound(lower.lowerBound()).getBound();
 		
-		if(iUp.compareTo(iLow) > 0 || iUp.compareTo(iLow) == 0 && lower.IsLowerBoundNonStrict() && upper.IsUpperBoundNonStrict() || (upper.upperBound().value() < 0)){
-			return new TimeInterval(lower.IsLowerBoundNonStrict(), lower.lowerBound(), upper.upperBound(), upper.IsUpperBoundNonStrict());
+		if(iUp.compareTo(iLow) > 0 || iUp.compareTo(iLow) == 0 && lower.isLowerBoundNonStrict() && upper.isUpperBoundNonStrict() || (upper.upperBound().value() < 0)){
+			return new TimeInterval(lower.isLowerBoundNonStrict(), lower.lowerBound(), upper.upperBound(), upper.isUpperBoundNonStrict());
 		} else {
 			return null;
 		}
@@ -75,7 +75,7 @@ public class IntervalOperations {
 			BigDecimal b1 = getRatBound(i1.lowerBound()).getBound();
 			BigDecimal b2 = getRatBound(i2.lowerBound()).getBound();
 			
-			if(b1.compareTo(b2) < 0 || b1.compareTo(b2) == 0 && i1.IsLowerBoundNonStrict() && !i2.IsLowerBoundNonStrict()){
+			if(b1.compareTo(b2) < 0 || b1.compareTo(b2) == 0 && i1.isLowerBoundNonStrict() && !i2.isLowerBoundNonStrict()){
 				return i1;
 			} else {
 				return i2;
@@ -84,7 +84,7 @@ public class IntervalOperations {
 			b1 = getRatBound(i1.upperBound()).getBound();
 			b2 = getRatBound(i2.upperBound()).getBound();
 			if(b1.compareTo(BigDecimal.ZERO) >= 0 && b2.compareTo(BigDecimal.ZERO) >= 0){
-				if(b1.compareTo(b2) < 0 || b1.compareTo(b2) == 0 && !i1.IsUpperBoundNonStrict() && i2.IsUpperBoundNonStrict()){
+				if(b1.compareTo(b2) < 0 || b1.compareTo(b2) == 0 && !i1.isUpperBoundNonStrict() && i2.isUpperBoundNonStrict()){
 					return i1;
 				} else {
 					return i2;
@@ -146,10 +146,10 @@ public class IntervalOperations {
 					output.add(intersection(IS1.get(i), IS2.get(j)));
 				}
 			
-				if(i1up.compareTo(i2up) == -1 || (i2up.compareTo(i1up) == 0 && (IS2.get(j).IsUpperBoundNonStrict() == IS1.get(i).IsUpperBoundNonStrict() || !IS1.get(i).IsUpperBoundNonStrict()))){
+				if(i1up.compareTo(i2up) == -1 || (i2up.compareTo(i1up) == 0 && (IS2.get(j).isUpperBoundNonStrict() == IS1.get(i).isUpperBoundNonStrict() || !IS1.get(i).isUpperBoundNonStrict()))){
 					incrementI = true;
 				}
-				if(i2up.compareTo(i1up) == -1 || (i2up.compareTo(i1up) == 0 && (IS2.get(j).IsUpperBoundNonStrict() == IS1.get(i).IsUpperBoundNonStrict() || !IS2.get(j).IsUpperBoundNonStrict()))){
+				if(i2up.compareTo(i1up) == -1 || (i2up.compareTo(i1up) == 0 && (IS2.get(j).isUpperBoundNonStrict() == IS1.get(i).isUpperBoundNonStrict() || !IS2.get(j).isUpperBoundNonStrict()))){
 					j++;
 				}
 			
@@ -196,14 +196,14 @@ public class IntervalOperations {
 				if(IS2.get(j).lowerBound() instanceof RatBound){ i2lo = ((RatBound)IS2.get(j).lowerBound());}
 				else{i2lo = new RatBound(new BigDecimal(IS2.get(j).lowerBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
 
-				if(intersection(IS1.get(i), IS2.get(j)) != null || (i1lo.compareTo(i2up)==0 && (IS1.get(i).IsLowerBoundNonStrict()||IS2.get(j).IsUpperBoundNonStrict()))
-				        || (i2lo.compareTo(i1up)==0 && (IS2.get(j).IsLowerBoundNonStrict()||IS1.get(i).IsUpperBoundNonStrict()))){
+				if(intersection(IS1.get(i), IS2.get(j)) != null || (i1lo.compareTo(i2up)==0 && (IS1.get(i).isLowerBoundNonStrict()||IS2.get(j).isUpperBoundNonStrict()))
+				        || (i2lo.compareTo(i1up)==0 && (IS2.get(j).isLowerBoundNonStrict()||IS1.get(i).isUpperBoundNonStrict()))){
 
 					temp = union(temp, union(IS1.get(i), IS2.get(j)));
 					
-					if(i1up.compareTo(i2up) == 1 || (i1up.compareTo(i2up) == 0 && !IS2.get(j).IsUpperBoundNonStrict() && IS1.get(i).IsUpperBoundNonStrict())){
+					if(i1up.compareTo(i2up) == 1 || (i1up.compareTo(i2up) == 0 && !IS2.get(j).isUpperBoundNonStrict() && IS1.get(i).isUpperBoundNonStrict())){
 						j++;
-					} else if(i2up.compareTo(i1up) == 1 || (i2up.compareTo(i1up) == 0 && !IS1.get(i).IsUpperBoundNonStrict() && IS2.get(j).IsUpperBoundNonStrict())){
+					} else if(i2up.compareTo(i1up) == 1 || (i2up.compareTo(i1up) == 0 && !IS1.get(i).isUpperBoundNonStrict() && IS2.get(j).isUpperBoundNonStrict())){
 						i++;
 					} else {
 						break;

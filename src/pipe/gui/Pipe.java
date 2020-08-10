@@ -62,19 +62,19 @@ public class Pipe {
 
 	public static final int NAMELABEL_OFFSET = 12;
 
-	public static int DEFAULT_BUFFER_CAPACITY = 50;
+	public static final int DEFAULT_BUFFER_CAPACITY = 50;
 
 	public static final int ZOOM_DELTA = 10;
 	public static final int ZOOM_MAX = 300;
 	public static final int ZOOM_MIN = 40;
 	public static final int ZOOM_DEFAULT = 100;
 
-	public static Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
-	public static Color ANIMATION_BACKGROUND_COLOR = new Color(246, 250, 255);
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
+	public static final Color ANIMATION_BACKGROUND_COLOR = new Color(246, 250, 255);
 	
-	public static Color QUERY_SATISFIED_COLOR = new Color(44, 103, 0);
-	public static Color QUERY_NOT_SATISFIED_COLOR = new Color(204, 0, 0);
-	public static Color QUERY_INCONCLUSIVE_COLOR = new Color(255, 153, 0);
+	public static final Color QUERY_SATISFIED_COLOR = new Color(44, 103, 0);
+	public static final Color QUERY_NOT_SATISFIED_COLOR = new Color(204, 0, 0);
+	public static final Color QUERY_INCONCLUSIVE_COLOR = new Color(255, 153, 0);
 
 	public static final String verifytaMinRev = "4.1.19";
 	public static final String verifytapnMinRev = "1.3.0";

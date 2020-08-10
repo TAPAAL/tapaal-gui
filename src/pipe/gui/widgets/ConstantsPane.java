@@ -18,7 +18,6 @@ import java.io.IOException;
 
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -51,7 +50,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	private JScrollPane constantsScroller;
 	private final JPanel buttonsPanel;
 
-	private final JList constantsList;
+	private final JList<Constant> constantsList;
 	private final ConstantsListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
@@ -95,7 +94,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			
 		});
 
-		constantsList = new NonsearchableJList(listModel);
+		constantsList = new NonsearchableJList<>(listModel);
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
@@ -141,7 +140,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 					highlightConstant(index);
 					
 					if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
-						showEditConstantDialog(c,index);						
+						showEditConstantDialog(c);
 					}
 				}
 			}
@@ -295,7 +294,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(e -> {
 			Constant c = (Constant) constantsList.getSelectedValue();
-			showEditConstantDialog(c,constantsList.getSelectedIndex());
+			showEditConstantDialog(c);
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -407,44 +406,9 @@ public class ConstantsPane extends JPanel implements SidePane {
 		constantsPanel.add(sortButton,gbc);
 	}
 
-	private void showEditConstantDialog(Constant constant) {	
-		ConstantsDialogPanel panel = null;
-		if (constant != null)
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network(), constant);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		else
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		panel.showDialog();
-		showConstants();
-	}
+	private void showEditConstantDialog(Constant constant) {
+		ConstantsDialogPanel panel = new ConstantsDialogPanel(parent.network(), constant);
 
-	private void showEditConstantDialog(Constant constant, int selectedIndex) {	
-		ConstantsDialogPanel panel = null;
-		if (constant != null)
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network(), constant);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		else
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		panel.showDialog();
 		showConstants();
 	}
@@ -457,8 +421,9 @@ public class ConstantsPane extends JPanel implements SidePane {
 					"You cannot remove a constant that is used in the net.\nRemove all references "
 							+ "to the constant in the net and try again.",
 							"Constant in use", JOptionPane.ERROR_MESSAGE);
-		} else
-			parent.getUndoManager().addNewEdit(edit);
+		} else {
+            parent.getUndoManager().addNewEdit(edit);
+        }
 
 		//showConstants();
 	}
@@ -485,7 +450,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
 
     @Override
-    public JList getJList() {
+    public JList<Constant> getJList() {
         return constantsList;
     }
 }

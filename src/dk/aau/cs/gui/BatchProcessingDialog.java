@@ -360,8 +360,8 @@ public class BatchProcessingDialog extends JDialog {
 		JPanel fileListPanel = new JPanel(new GridBagLayout());
 		fileListPanel.setBorder(BorderFactory.createTitledBorder("Models"));
 
-		listModel = new DefaultListModel();
-		fileList = new JList(listModel);
+		listModel = new DefaultListModel<>();
+		fileList = new JList<>(listModel);
 		fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		fileList.setSelectedIndex(0);
 		fileList.addKeyListener(new KeyAdapter() {
@@ -383,7 +383,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 
-		fileList.setCellRenderer(new FileNameCellRenderer());
+		fileList.setCellRenderer(new FileNameCellRenderer<>());
 
 		JScrollPane scrollpane = new JScrollPane(fileList);
 		scrollpane.setMinimumSize(new Dimension(175, 225));
@@ -529,7 +529,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		String[] options = new String[] { name_KeepQueryOption,
 				name_SEARCHWHOLESTATESPACE, name_EXISTDEADLOCK, name_SOUNDNESS, name_STRONGSOUNDNESS};
-		queryPropertyOption = new JComboBox(options);
+		queryPropertyOption = new JComboBox<>(options);
 		queryPropertyOption.setToolTipText(TOOL_TIP_Query_Property_Option);
 		
 		gbc = new GridBagConstraints();
@@ -559,7 +559,7 @@ public class BatchProcessingDialog extends JDialog {
 				name_OVER_APPROXIMATION,
 				name_UNDER_APPROXIMATION
 				};
-		approximationMethodOption = new JComboBox(options);
+		approximationMethodOption = new JComboBox<>(options);
 		approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
 		approximationMethodOption.addActionListener(new ActionListener() {
 			@Override
@@ -796,7 +796,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		String[] options = new String[] { name_KeepQueryOption, name_SYMMETRY,
 				name_NOSYMMETRY };
-		symmetryOption = new JComboBox(options);
+		symmetryOption = new JComboBox<>(options);
 		symmetryOption.setToolTipText(TOOL_TIP_SymmetryOption);
 
 		gbc = new GridBagConstraints();
@@ -821,7 +821,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		String[] options = new String[] { name_KeepQueryOption, name_STUBBORNREUDCTION,
 				name_NOSTUBBORNREDUCTION };
-		stubbornReductionOption = new JComboBox(options);
+		stubbornReductionOption = new JComboBox<>(options);
 		stubbornReductionOption.setToolTipText(TOOL_TIP_StubbornReductionOption);
 
 		gbc = new GridBagConstraints();
@@ -944,7 +944,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC,
 				name_BFS, name_DFS, name_Random };
-		searchOption = new JComboBox(options);
+		searchOption = new JComboBox<>(options);
 		searchOption.setToolTipText(TOOL_TIP_SearchOption);
 
 		gbc = new GridBagConstraints();

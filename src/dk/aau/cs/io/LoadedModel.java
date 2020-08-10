@@ -8,9 +8,9 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-
 public class LoadedModel implements LoadedBatchProcessingModel {
-	private final Collection<Template> templates;
+
+    private final Collection<Template> templates;
 	private final Collection<TAPNQuery> queries;
 	private final TimedArcPetriNetNetwork network;
     private final boolean isTimed;
@@ -20,9 +20,9 @@ public class LoadedModel implements LoadedBatchProcessingModel {
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages){
         this(network, templates, queries, messages, true, false);
     }
-    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries) {
-	    this(network, templates, queries, List.of());
-    }
+	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
+		this(network, templates, queries, List.of(), true, false);
+	}
 
     public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, boolean isTimed, boolean isGame){
         this.templates = templates;
@@ -36,8 +36,8 @@ public class LoadedModel implements LoadedBatchProcessingModel {
 	public Collection<Template> templates(){ return templates; }
 	public Collection<TAPNQuery> queries(){ return queries; }
 	public TimedArcPetriNetNetwork network(){ return network; }
-
     public Collection<String> getMessages() { return messages; }
+
 
 	public boolean isTimed() {
 	    return isTimed;

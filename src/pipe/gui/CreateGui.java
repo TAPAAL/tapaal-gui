@@ -1,16 +1,16 @@
 package pipe.gui;
 
+import java.awt.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.sun.jna.Platform;
+import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
-
 
 public class CreateGui {
 
@@ -21,13 +21,31 @@ public class CreateGui {
 
 	public static void init() {
 
-        if (Platform.isMac()){
-			try {
-				SpecialMacHandler.postprocess();
-			} catch (NoClassDefFoundError e) {
-				//Failed loading special mac handler, ignore and run program without MacOS integration
-			}
-		}
+	    try {
+            Desktop.getDesktop().setAboutHandler(e -> appGuiController.showAbout());
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+            Logger.log("Failed to set native about handler");
+        }
+
+	    try {
+	        Desktop.getDesktop().setQuitHandler(
+	            (e, response) -> {
+	                appGuiController.exit();
+	                response.cancelQuit(); //If we get here the request was canceled.
+	            }
+	        );
+
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+	        Logger.log("Failed to set native quit handler");
+        }
+
+        try {
+            Image appImage = ResourceManager.getIcon("icon.png").getImage();
+            Taskbar.getTaskbar().setIconImage(appImage);
+
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+            Logger.log("Failed to set DockIcon");
+        }
 
 		appGui.setVisible(true);
 		appGuiController.checkForUpdate(false);

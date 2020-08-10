@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import pipe.gui.*;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;

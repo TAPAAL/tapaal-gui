@@ -51,7 +51,7 @@ public class TabTransformer {
                     DataLayer guiModel = template.guiModel();
                     Place guiSource = guiModel.getPlaceByName(arc.getSource().getName());
                     Transition guiTarget = guiModel.getTransitionByName(arc.getTarget().getName());
-                    Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
+                    TimedInputArcComponent newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
                         guiSource,
                             guiTarget,
                             arc.getWeight().value(),
@@ -64,7 +64,7 @@ public class TabTransformer {
                     ArcPath newArcPath = createArcPath(guiModel, oldGuiSource, oldGuiTarget, newArc);
 
                     // Set arcPath, guiModel and connectors
-                    ((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
+                    newArc.setUnderlyingArc(addedArc);
                     newArc.setArcPath(newArcPath);
                     newArc.updateArcPosition();
                     guiModel.addPetriNetObject(newArc);

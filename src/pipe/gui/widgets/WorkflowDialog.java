@@ -58,7 +58,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
-import pipe.gui.GuiFrame.GUIMode;
 
 public class WorkflowDialog extends JDialog {
 
@@ -240,7 +239,6 @@ public class WorkflowDialog extends JDialog {
 	private void switchToTrace(TAPNNetworkTrace trace){
 		isInTraceMode = true;
 		setVisible(false);
-		CreateGui.getApp().setGUIMode(GUIMode.animation);
 		CreateGui.getAnimator().setTrace(trace);
 	}
 

@@ -1,18 +1,11 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
 import javax.swing.*;
 
 import net.tapaal.TAPAAL;
-import pipe.gui.CreateGui;
-import pipe.gui.Zoomer;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on arcs.

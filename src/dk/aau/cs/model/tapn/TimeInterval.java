@@ -25,8 +25,7 @@ public class TimeInterval {
 		this.upper = upper;
 		this.isUpperIncluded = isUpperIncluded;
 		
-		Require.that(isValidInterval(), "The constructed interval "
-				+ toString() + " is empty.");
+		Require.that(isValidInterval(), "The constructed interval " + toString() + " is empty.");
 	}
 
 	public TimeInterval(TimeInterval interval) {
@@ -101,11 +100,11 @@ public class TimeInterval {
 		this.upper = upper;
 	}
 
-	public boolean IsLowerBoundNonStrict() {
+	public boolean isLowerBoundNonStrict() {
 		return isLowerIncluded;
 	}
 
-	public boolean IsUpperBoundNonStrict() {
+	public boolean isUpperBoundNonStrict() {
 		return isUpperIncluded;
 	}
 
