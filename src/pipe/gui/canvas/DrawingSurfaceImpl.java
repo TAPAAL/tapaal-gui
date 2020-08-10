@@ -7,9 +7,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
-import javax.swing.JLayeredPane;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import dk.aau.cs.gui.TabContent;
@@ -417,7 +415,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				Pipe.ElementType mode = app.getMode();
 
 				switch (mode) {
-
 					case DRAG:
 						dragStart = new Point(clickPoint);
 						break;

@@ -196,6 +196,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			Element element = document.createElement("shared-transition");
 			element.setAttribute("name", transition.name());
 			element.setAttribute("urgent", transition.isUrgent()?"true":"false");
+            element.setAttribute("player", transition.isUncontrollable() ? "1" : "0");
 			root.appendChild(element);
 		}
 	}
@@ -452,6 +453,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
+        transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
 
 		return transitionElement;
 	}
