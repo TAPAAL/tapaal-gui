@@ -153,8 +153,8 @@ public class QueryDialog extends JPanel {
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
 	private JComboBox templateBox;
-	private JComboBox placesBox;
-	private JComboBox relationalOperatorBox;
+	private JComboBox<String> placesBox;
+	private JComboBox<String> relationalOperatorBox;
 	private CustomJSpinner placeMarking;
 	private JButton truePredicateButton;
 	private JButton falsePredicateButton;
@@ -1671,7 +1671,7 @@ public class QueryDialog extends JPanel {
 		items.addAll(tapnNetwork.activeTemplates());
 		if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
 
-		templateBox = new JComboBox(new DefaultComboBoxModel(items));
+		templateBox = new JComboBox<>(new DefaultComboBoxModel<>(items));
 		templateBox.addActionListener(new ActionListener() {
 			private Object currentlySelected = null;
 
@@ -1687,12 +1687,13 @@ public class QueryDialog extends JPanel {
 						}
 
 						placeNames.sort(String::compareToIgnoreCase);
-						placesBox.setModel(new DefaultComboBoxModel(placeNames));
+						placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
 						currentlySelected = tapn;
 						setEnablednessOfAddPredicateButton();
-						if (userChangedAtomicPropSelection && placeNames.size() > 0)
-							updateQueryOnAtomicPropositionChange();
+						if (userChangedAtomicPropSelection && placeNames.size() > 0) {
+                            updateQueryOnAtomicPropositionChange();
+                        }
 					}
 				}else{
 					Vector<String> placeNames = new Vector<String>();
@@ -1700,12 +1701,13 @@ public class QueryDialog extends JPanel {
 						placeNames.add(place.name());
 					}
 					placeNames.sort(String::compareToIgnoreCase);
-					placesBox.setModel(new DefaultComboBoxModel(placeNames));
+					placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
 					currentlySelected = SHARED;
 					setEnablednessOfAddPredicateButton();
-					if (userChangedAtomicPropSelection && placeNames.size() > 0)
-						updateQueryOnAtomicPropositionChange();
+					if (userChangedAtomicPropSelection && placeNames.size() > 0) {
+                        updateQueryOnAtomicPropositionChange();
+                    }
 				}
 			}
 		});
@@ -1728,7 +1730,7 @@ public class QueryDialog extends JPanel {
 		predicatePanel.add(placesBox, gbc);
 
 		String[] relationalSymbols = { "=", "<=", "<", ">=", ">" };
-		relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
+		relationalOperatorBox = new JComboBox<>(new DefaultComboBoxModel<>(relationalSymbols));
 
 		gbc.gridx = 1;
 		predicatePanel.add(relationalOperatorBox, gbc);

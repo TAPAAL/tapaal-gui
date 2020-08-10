@@ -13,7 +13,7 @@ import dk.aau.cs.gui.undo.Command;
  */
 public class ArcPathPointTypeEdit extends Command {
 
-	ArcPathPoint arcPathPoint;
+	final ArcPathPoint arcPathPoint;
 
 	/** Creates a new instance of placeWeightEdit */
 	public ArcPathPointTypeEdit(ArcPathPoint _arcPathPoint) {

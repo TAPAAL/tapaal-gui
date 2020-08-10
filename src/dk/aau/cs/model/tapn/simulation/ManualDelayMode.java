@@ -88,7 +88,7 @@ public class ManualDelayMode implements DelayMode{
 			JPanel buttonPanel = createButtonPanel();
 			BigDecimal value = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 
-			if(!dInterval.IsLowerBoundNonStrict()){
+			if(!dInterval.isLowerBoundNonStrict()){
 				value = value.add(delayGranularity);
 				value = value.stripTrailingZeros();
 			}

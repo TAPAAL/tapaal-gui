@@ -15,7 +15,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -25,7 +24,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -50,7 +48,8 @@ public class QueryPane extends JPanel implements SidePane {
 
 	private final JPanel queryCollectionPanel;
 	private final JPanel buttonsPanel;
-	private final DefaultListModel listModel;
+
+	private final DefaultListModel<TAPNQuery> listModel;
 	private final JList<TAPNQuery> queryList;
 	private List<TAPNQuery> selectedQueries;
 	private JScrollPane queryScroller;
@@ -101,7 +100,7 @@ public class QueryPane extends JPanel implements SidePane {
 			}
 		});
 
-		queryList = new NonsearchableJList(listModel);
+		queryList = new NonsearchableJList<>(listModel);
 		queryList.setCellRenderer(new QueryCellRenderer());
 		queryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		queryList.addListSelectionListener(e -> {
@@ -328,6 +327,7 @@ public class QueryPane extends JPanel implements SidePane {
 					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
 				}
                 if(q == null) return;
+
                 undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
                 addQuery(q);
 
@@ -343,7 +343,7 @@ public class QueryPane extends JPanel implements SidePane {
 	}
 
 	private void swapQueries(int currentIndex, int newIndex) {
-		TAPNQuery temp = (TAPNQuery)listModel.get(currentIndex);
+		TAPNQuery temp = listModel.get(currentIndex);
 		listModel.set(currentIndex, listModel.get(newIndex));
 		listModel.set(newIndex, temp);
 	}
@@ -396,7 +396,7 @@ public class QueryPane extends JPanel implements SidePane {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 
 		for (int i = 0; i < listModel.size(); ++i) {
-			queries.add((TAPNQuery) listModel.get(i));
+			queries.add(listModel.get(i));
 		}
 
 		return queries;

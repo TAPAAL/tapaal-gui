@@ -2,7 +2,6 @@ package net.tapaal.gui.DrawingSurfaceManager;
 
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.GraphicalElement;
-import pipe.gui.graphicElements.PetriNetObject;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -53,12 +52,18 @@ public abstract class AbstractDrawingSurfaceManager {
     private final Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
     private final AbstractDrawingSurfaceManager next = null;
 
-    public void registerManager(DrawingSurfaceImpl canvas){
+    public final void registerManager(DrawingSurfaceImpl canvas){
         this.canvas = canvas;
+        setupManager();
     }
-    public void deregisterManager(){
+
+    public final void deregisterManager(){
         this.canvas = null;
+        teardownManager();
     }
+
+    public void setupManager(){}
+    public void teardownManager(){}
 
     public AbstractDrawingSurfaceManager() {
 			registerEvents();

@@ -380,7 +380,7 @@ public class TAPNComposer implements ITAPNComposer {
 					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 					
-					Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
+					TimedInputArcComponent newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
                         guiSource,
 							guiTarget,
 							arc.getWeight().value(),
@@ -394,7 +394,7 @@ public class TAPNComposer implements ITAPNComposer {
 					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
 					
 					// Set arcPath, guiModel and connectors
-					((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
@@ -600,7 +600,7 @@ public class TAPNComposer implements ITAPNComposer {
 				if (this.guiModels != null) {
 					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
-					Arc newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
+					TimedInhibitorArcComponent newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
                         guiSource,
 							guiTarget,
 							arc.getWeight().value(),
@@ -612,7 +612,7 @@ public class TAPNComposer implements ITAPNComposer {
 					Transition oldGuiTarget = currentGuiModel.getTransitionByName(arc.destination().name());
 					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
 					
-					((TimedInhibitorArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);

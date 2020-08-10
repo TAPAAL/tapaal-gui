@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.SharedTransition;
 
 public class SortSharedTransitionsCommand extends Command {
 	
-	SharedTransitionsListModel listModel;
+	final SharedTransitionsListModel listModel;
 	SharedTransition[] oldOrder;
 	
 	public SortSharedTransitionsCommand(SharedTransitionsListModel listModel) {

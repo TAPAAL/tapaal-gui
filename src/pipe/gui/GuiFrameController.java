@@ -33,8 +33,8 @@ import java.util.List;
 
 public class GuiFrameController implements GuiFrameControllerActions{
 
-    GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
-    GuiFrameActions guiFrame;
+    final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
+    final GuiFrameActions guiFrame;
 
     final MutableReference<TabContentActions> currentTab = new MutableReference<>();
 
@@ -88,6 +88,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
 
         showToolTips = prefs.getShowToolTips();
+        setDisplayToolTips(showToolTips);
         guiFrame.setShowToolTipsSelected(showToolTips);
 
         showZeroToInfinityIntervals = prefs.getShowZeroInfIntervals();
@@ -109,6 +110,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.attachTabToGuiFrame(tab);
         guiFrame.changeToTab(tab);
+        //XXX fixes an issue where on first open of a net the time intervals are not shown
+        tab.drawingSurface().repaintAll();
 
     }
 
@@ -484,7 +487,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void showBatchProcessingDialog() {
         if (showSavePendingChangesDialogForAllTabs()) {
-            BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
+            BatchProcessingDialog.showBatchProcessingDialog(new JList<>(new DefaultListModel<>()));
         }
     }
 
@@ -670,7 +673,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void toggleDisplayToolTips() {
-        setDisplayToolTips(!showToolTips);
+        showToolTips = !showToolTips;
+        setDisplayToolTips(showToolTips);
     }
 
     private void setDisplayToolTips(boolean b) {

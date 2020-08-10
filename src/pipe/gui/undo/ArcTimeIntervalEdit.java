@@ -7,10 +7,10 @@ import dk.aau.cs.model.tapn.Weight;
 
 public class ArcTimeIntervalEdit extends Command {
 	private final TimedOutputArcComponent arc;
-	TimeInterval oldTimeInterval;
-	TimeInterval newTimeInterval;
-	Weight oldWeight;
-	Weight newWeight;
+	final TimeInterval oldTimeInterval;
+	final TimeInterval newTimeInterval;
+	final Weight oldWeight;
+	final Weight newWeight;
 
 	public ArcTimeIntervalEdit(TimedOutputArcComponent arc,
 			TimeInterval oldTimeInterval, TimeInterval newTimeInterval, Weight oldWeight, Weight newWeight) {

@@ -1,8 +1,10 @@
 package dk.aau.cs.util;
 
 import com.sun.jna.*;
+import dk.aau.cs.debug.Logger;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -14,14 +16,7 @@ import java.util.regex.Pattern;
 
 public class MemoryMonitor {
 
-	interface Kernel32 extends Library {
-
-		static Kernel32 INSTANCE = Native.loadLibrary("kernel32", Kernel32.class);
-
-		int GetProcessId(Long hProcess);
-	}
-
-	private static int PID = -1;
+	private static long PID = -1;
 	private static Semaphore busy = new Semaphore(1);
 	private static double peakMemory = -1;
 	private static Boolean cumulativePeakMemory = false;
@@ -37,7 +32,7 @@ public class MemoryMonitor {
 	}
 
 	public static void attach(Process p){
-		PID = getPid(p);
+		PID = p.pid();
 		
 		if( ! cumulativePeakMemory) {
 			peakMemory = -1;
@@ -79,17 +74,19 @@ public class MemoryMonitor {
 					if(m.matches()){
 						memory = Double.parseDouble(m.group(1).replace(".", "").replace(",", ""))/1024;
 					}
-				} catch (Exception e) { 
+				} catch (IOException e) {
+				    Logger.log(e);
 				} 
 			}else{
-				try { 
+				try {
 					Process p = Runtime.getRuntime().exec("ps -p "+PID+" -o rss"); 
 					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); 
-					
-					String s = input.readLine();
-					s = input.readLine();	//Actual memory usage is second line output
+
+					input.readLine(); //Actual memory usage is second line output
+                    String s = input.readLine();
 					memory = Double.parseDouble(s.replace(" ", ""))/1024;
-				} catch (Exception e) { 
+				} catch (IOException e) {
+                    Logger.log(e);
 				} 
 			}
 
@@ -105,24 +102,6 @@ public class MemoryMonitor {
 		}
 	}
 
-	private static int getPid(Process p) {
-		Field f;
-
-		try{
-			if (Platform.isWindows()) {
-				f = p.getClass().getDeclaredField("handle");
-				f.setAccessible(true);
-                return Kernel32.INSTANCE.GetProcessId((Long) f.get(p));
-			} else {
-				f = p.getClass().getDeclaredField("pid");
-				f.setAccessible(true);
-                return (int) (Integer) f.get(p);
-			}
-		}catch(Exception e){
-			return -1;
-		}
-	}
-	
 	public static String getPeakMemory(){
 		return peakMemory == -1? "N/A":getFormatter().format(Math.ceil(peakMemory)) + " MB";
 	}

@@ -13,9 +13,9 @@ import dk.aau.cs.gui.undo.Command;
  */
 public final class AnnotationTextEdit extends Command {
 
-	AnnotationNote annotationNote;
-	String oldText;
-	String newText;
+	final AnnotationNote annotationNote;
+	final String oldText;
+	final String newText;
 
 	/** Creates a new instance of placeRateEdit */
 	public AnnotationTextEdit(AnnotationNote _annotationNote, String _oldText,
