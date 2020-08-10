@@ -33,7 +33,7 @@ public class MakeTransitionSharedCommand extends Command {
 	
 	@Override
 	public void redo() {
-                updateQueries(timedTransition, sharedTransition);
+        updateQueries(timedTransition, sharedTransition);
 		sharedTransition.makeShared(timedTransition);
 	}
 
@@ -51,9 +51,9 @@ public class MakeTransitionSharedCommand extends Command {
 			BooleanResult isQueryAffected = new BooleanResult(false);
 			query.getProperty().accept(visitor, isQueryAffected);
 			
-			if(isQueryAffected.result())
-				newQueryToOldQueryMapping.put(query, oldCopy);
-				
+			if(isQueryAffected.result()) {
+                newQueryToOldQueryMapping.put(query, oldCopy);
+            }
 		}
 	}
 		

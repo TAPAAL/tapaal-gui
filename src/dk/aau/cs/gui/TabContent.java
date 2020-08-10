@@ -50,7 +50,7 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
-    static class TAPNLens {
+    public static class TAPNLens {
         public boolean isTimed() {
             return timed;
         }
@@ -1742,45 +1742,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		getTransitionFireingComponent().fireSelectedTransition();
 	}
 
-	@Override
-	public void undo() {
+    @Override
+    public void undo() {
+        if (!isInAnimationMode()) {
+            getUndoManager().undo();
+            network().buildConstraints();
+        }
+    }
 
-		if (!isInAnimationMode()) {
-
-			//If arc is being drawn delete it
-
-			if (editorMode == Pipe.ElementType.SELECT) {
-				getUndoManager().undo();
-				network().buildConstraints();
-
-			} else {
-
-				setMode(Pipe.ElementType.SELECT);
-
-			}
-		}
-
-
-	}
-
-	@Override
-	public void redo() {
-
-			if (!isInAnimationMode()) {
-
-				//If arc is being drawn delete it
-
-				if (editorMode == Pipe.ElementType.SELECT) {
-					getUndoManager().redo();
-					network().buildConstraints();
-
-				} else {
-
-                    setMode(Pipe.ElementType.SELECT);
-
-				}
-			}
-	}
+    @Override
+    public void redo() {
+        if (!isInAnimationMode()) {
+            getUndoManager().redo();
+            network().buildConstraints();
+        }
+    }
 
     final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
         @Override
@@ -2282,14 +2258,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                             ", Game: " + (lens.isGame() ? "Yes" : "No");
         app.ifPresent(o->o.setFeatureInfoText(properties));
 
-    }
-
-    public boolean isNetTimed() {
-        return lens.isTimed();
-    }
-
-    public boolean isNetGame() {
-        return lens.isGame();
     }
 
     public TAPNLens getLens() {

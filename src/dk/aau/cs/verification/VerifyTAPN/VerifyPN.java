@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
@@ -282,7 +284,7 @@ public class VerifyPN implements ModelChecker{
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 			
 			VerifyPNExporter exporter = new VerifyPNExporter();
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null);
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");
