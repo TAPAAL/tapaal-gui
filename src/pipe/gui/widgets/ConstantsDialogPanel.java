@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
@@ -23,68 +22,48 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-/*
- * LeftConstantsPane.java
- *
- * Created on 08-10-2009, 13:51:42
- */
-
-/**
- * 
- * @author Morten Jacobsen
- */
 public class ConstantsDialogPanel extends javax.swing.JPanel {
 
-	private JRootPane rootPane;
-	private TimedArcPetriNetNetwork model;
+    private final TimedArcPetriNetNetwork model;
 	private int lowerBound;
 	private int upperBound;
 	private int initialValue = 0;
 	private EscapableDialog dialog;
 
-	JPanel nameTextFieldPane;
-	JTextField nameTextField;
+    JTextField nameTextField;
 	Dimension size;
-	JLabel nameLabel;  
-	JPanel valueSpinnerPane;
-	JLabel valueLabel; 	
+	JLabel nameLabel;
+    JLabel valueLabel;
 	CustomJSpinner valueSpinner;
 	JPanel container;
 	JPanel buttonContainer;
 	JButton okButton;
 	JButton cancelButton;
 
-	private String oldName;
+	private final String oldName;
 
-	public ConstantsDialogPanel() throws IOException {
-		initComponents();		
+    public ConstantsDialogPanel(TimedArcPetriNetNetwork model) {
+		this(model, null);
 	}
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) throws IOException {
-		initComponents();
-		rootPane = pane;
-		this.model = model;		
-		oldName = "";
-		nameTextField.setText(oldName);
-	}
+	public ConstantsDialogPanel(TimedArcPetriNetNetwork model, Constant constant) {
+        this.model = model;
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model,
-			Constant constant) throws IOException {		
-		rootPane = pane;
-		this.model = model;	
-
-		initialValue = constant.value();		
+        if (constant != null) {
+            initialValue = constant.value();
+            oldName = constant.name();
+            lowerBound = constant.lowerBound();
+            upperBound = constant.upperBound();
+        } else {
+            oldName = "";
+        }
 		initComponents();
-		
-		oldName = constant.name();
-		lowerBound = constant.lowerBound();
-		upperBound = constant.upperBound();		 
+
 		nameTextField.setText(oldName);
 	}
 
 	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Constant", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Edit Constant", true);
 		dialog.add(container);
 		dialog.getRootPane().setDefaultButton(okButton);
 		dialog.setResizable(false);
@@ -93,7 +72,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		dialog.setVisible(true);
 	}
 
-	private void initComponents() throws IOException {						
+	private void initComponents() {
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
 		size = new Dimension(330, 25);

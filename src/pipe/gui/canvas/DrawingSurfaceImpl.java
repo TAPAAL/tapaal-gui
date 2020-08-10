@@ -7,20 +7,16 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
-import javax.swing.JLayeredPane;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.*;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -419,7 +415,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				Pipe.ElementType mode = app.getMode();
 
 				switch (mode) {
-
 					case DRAG:
 						dragStart = new Point(clickPoint);
 						break;

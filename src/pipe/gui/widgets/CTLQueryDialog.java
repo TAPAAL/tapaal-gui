@@ -38,6 +38,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -217,18 +218,21 @@ public class CTLQueryDialog extends JPanel {
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
-	private boolean isNetDegree2;
-	private boolean hasInhibitorArcs;
-	private InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
-	private String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
-	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
-	private String name_STANDARD = "UPPAAL: Standard Reduction";
+	private final boolean isNetDegree2;
+	private final boolean hasInhibitorArcs;
+	private final InclusionPlaces inclusionPlaces;
+    private final TabContent.TAPNLens lens;
+
+
+	private final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
+	private final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
+	private final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
+	private final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
+	private final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	
 	private boolean userChangedAtomicPropSelection = true;
 
@@ -327,11 +331,12 @@ public class CTLQueryDialog extends JPanel {
 	private final static String TOOL_TIP_QUERYTYPE = "Choose a query type";
 	
 	public CTLQueryDialog(EscapableDialog me, QueryDialogueOption option,
-			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
-		
+		this.lens = lens;
+
 		// Attempt to parse and possibly transform the string query using the manual edit parser
 		try {
 			newProperty = TAPAALCTLQueryParser.parse(queryToCreateFrom.getProperty().toString());
@@ -458,7 +463,10 @@ public class CTLQueryDialog extends JPanel {
 			return;
 		}
 
-		if(queryIsReachability()){
+        if (lens.isGame()) {
+            someTraceRadioButton.setEnabled(false);
+            noTraceRadioButton.setEnabled(true);
+        } else if(queryIsReachability()){
 			someTraceRadioButton.setEnabled(true);
 			noTraceRadioButton.setEnabled(true);
 
@@ -490,7 +498,7 @@ public class CTLQueryDialog extends JPanel {
 		return new IsReachabilityVisitor().isReachability(newProperty);
 	}
 
-	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
@@ -505,7 +513,7 @@ public class CTLQueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		CTLQueryDialog queryDialogue = new CTLQueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels);
+		CTLQueryDialog queryDialogue = new CTLQueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -697,7 +705,9 @@ public class CTLQueryDialog extends JPanel {
 	
 	private void setEnabledReductionOptions(){
 		reductionOption.removeAllItems();
-		reductionOption.addItem(name_UNTIMED);
+        if (!lens.isGame()) {
+		    reductionOption.addItem(name_UNTIMED);
+        }
 	}
 
 	private void updateSearchStrategies(){
@@ -727,7 +737,11 @@ public class CTLQueryDialog extends JPanel {
 			breadthFirstSearch.setEnabled(false);
 		}
 		 */
-		
+
+        if (lens.isGame()) {
+            heuristicSearch.setEnabled(false);
+        }
+
 		if(!currentselected.isEnabled()){
 			if(depthFirstSearch.isEnabled()){
 				depthFirstSearch.setSelected(true);
@@ -808,13 +822,37 @@ public class CTLQueryDialog extends JPanel {
 
 	}
 
+    private void enableOnlyForAllBox() {
+        existsBox.setEnabled(false);
+        existsDiamond.setEnabled(false);
+        forAllBox.setEnabled(true);
+        forAllDiamond.setEnabled(false);
+        existsUntil.setEnabled(false);
+        existsNext.setEnabled(false);
+        forAllUntil.setEnabled(false);
+        forAllNext.setEnabled(false);
+
+        conjunctionButton.setEnabled(true);
+        disjunctionButton.setEnabled(true);
+        negationButton.setEnabled(true);
+        templateBox.setEnabled(true);
+        placesTransitionsBox.setEnabled(true);
+        relationalOperatorBox.setEnabled(true);
+        placeMarking.setEnabled(true);
+        truePredicateButton.setEnabled(true);
+        falsePredicateButton.setEnabled(true);
+        deadLockPredicateButton.setEnabled(true);
+        setEnablednessOfAddPredicateButton();
+        setEnablednessOfOperatorAndMarkingBoxes();
+    }
+
 	private void setEnablednessOfAddPredicateButton() {
 		if (placesTransitionsBox.getSelectedItem() == null)
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
 	}
-	
+
 	private void setEnablednessOfOperatorAndMarkingBoxes(){
 		if (transitionIsSelected()){
 			placeMarking.setVisible(false);
@@ -1189,6 +1227,10 @@ public class CTLQueryDialog extends JPanel {
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
+		if (lens.isGame()) {
+		    queryScrollPane.setColumnHeaderView(new JLabel("control:"));
+        }
+
 		queryField.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -1247,6 +1289,7 @@ public class CTLQueryDialog extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridwidth = 4;
 
 		queryPanel.add(queryScrollPane, gbc);
@@ -2290,8 +2333,12 @@ public class CTLQueryDialog extends JPanel {
 
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
-			enableOnlyStateButtons();
-			updateQueryButtonsAccordingToSelection();
+            if (lens.isGame()) {
+                enableOnlyForAllBox();
+            } else {
+                enableOnlyStateButtons();
+                updateQueryButtonsAccordingToSelection();
+            }
 		}
 	}
 
@@ -2386,10 +2433,10 @@ public class CTLQueryDialog extends JPanel {
 
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens);
 						} else if(reduction == ReductionOption.VerifyPN){
 							VerifyPNExporter exporter = new VerifyPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens);
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
@@ -2530,8 +2577,8 @@ public class CTLQueryDialog extends JPanel {
 	
 	public class QueryConstructionEdit extends AbstractUndoableEdit {
 
-		private TCTLAbstractProperty original;
-		private TCTLAbstractProperty replacement;
+		private final TCTLAbstractProperty original;
+		private final TCTLAbstractProperty replacement;
 
 		public TCTLAbstractProperty getOriginal() {
 			return original;

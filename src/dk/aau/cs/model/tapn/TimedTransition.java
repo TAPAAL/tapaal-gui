@@ -23,6 +23,7 @@ public class TimedTransition extends TAPNElement {
 	private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	private TimeInterval dInterval = null;
 	private boolean isUrgent = false;
+	private boolean isUncontrollable = false;
 
 	private SharedTransition sharedTransition;
 
@@ -61,6 +62,21 @@ public class TimedTransition extends TAPNElement {
 			sharedTransition.setUrgent(value);
 		}
 	}
+
+	public boolean isUncontrollable() {
+	    return isUncontrollable;
+    }
+
+    public void setUncontrollable(boolean isUncontrollable) {
+	    setUncontrollable(isUncontrollable, true);
+    }
+
+	public void setUncontrollable(boolean isUncontrollable, boolean cascade) {
+	    this.isUncontrollable = isUncontrollable;
+	    if (isShared() && cascade) {
+	        sharedTransition.setUncontrollable(isUncontrollable);
+        }
+    }
 	
 	public boolean hasUntimedPreset(){
 		return hasUntimedPreset(true);

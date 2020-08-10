@@ -33,23 +33,23 @@ public class EngineDialogPanel {
 
 	JButton closeButton;
 
-	JLabel tapaalLocationLabel = new JLabel("Located: ");
-	JLabel tapaalVersionLabel = new JLabel("Version: ");
-	JLabel dtapaalLocationLabel = new JLabel("Located: ");
-	JLabel dtapaalVersionLabel = new JLabel("Version: ");
-	JLabel untimedLocationLabel = new JLabel("Located: ");
-	JLabel untimedVersionLabel = new JLabel("Version: ");
-	JLabel uppaalLocationLabel = new JLabel("Located: ");
-	JLabel uppaalVersionLabel = new JLabel("Version: ");
+	final JLabel tapaalLocationLabel = new JLabel("Located: ");
+	final JLabel tapaalVersionLabel = new JLabel("Version: ");
+	final JLabel dtapaalLocationLabel = new JLabel("Located: ");
+	final JLabel dtapaalVersionLabel = new JLabel("Version: ");
+	final JLabel untimedLocationLabel = new JLabel("Located: ");
+	final JLabel untimedVersionLabel = new JLabel("Version: ");
+	final JLabel uppaalLocationLabel = new JLabel("Located: ");
+	final JLabel uppaalVersionLabel = new JLabel("Version: ");
 
-	JLabel tapaalLocationLabelVal = new JLabel("Not setup");
-	JLabel tapaalVersionLabelVal = new JLabel("N/A");
-	JLabel dtapaalLocationLabelVal = new JLabel("Not setup");
-	JLabel dtapaalVersionLabelVal = new JLabel("N/A");
-	JLabel untimedLocationLabelVal = new JLabel("Not setup");
-	JLabel untimedVersionLabelVal = new JLabel("N/A");
-	JLabel uppaalLocationLabelVal = new JLabel("Not setup");
-	JLabel uppaalVersionLabelVal = new JLabel("N/A");
+	final JLabel tapaalLocationLabelVal = new JLabel("Not setup");
+	final JLabel tapaalVersionLabelVal = new JLabel("N/A");
+	final JLabel dtapaalLocationLabelVal = new JLabel("Not setup");
+	final JLabel dtapaalVersionLabelVal = new JLabel("N/A");
+	final JLabel untimedLocationLabelVal = new JLabel("Not setup");
+	final JLabel untimedVersionLabelVal = new JLabel("N/A");
+	final JLabel uppaalLocationLabelVal = new JLabel("Not setup");
+	final JLabel uppaalVersionLabelVal = new JLabel("N/A");
 
 	private final Dimension minimumSize = new Dimension(320,1);
 	private final Insets panelInsets = new Insets(5, 5, 5, 5);

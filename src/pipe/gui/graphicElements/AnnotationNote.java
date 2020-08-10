@@ -315,14 +315,18 @@ public class AnnotationNote extends Note {
 		public ResizePoint(Note obj, int type) {
 			myNote = obj;
 			setOpaque(false);
-			setBounds(-SIZE - 1, -SIZE - 1, 2 * SIZE
-					+ Pipe.ANNOTATION_SIZE_OFFSET + 1, 2 * SIZE
-					+ Pipe.ANNOTATION_SIZE_OFFSET + 1);
+			setBounds(
+			    -SIZE - 1, -SIZE - 1,
+                2 * SIZE + Pipe.ANNOTATION_SIZE_OFFSET + 1,
+                2 * SIZE + Pipe.ANNOTATION_SIZE_OFFSET + 1
+            );
 			typeMask = type;
 		}
 
-		public void setLocation(double x, double y) {
-			super.setLocation((int) (x - SIZE), (int) (y - SIZE));
+		//Adjust the point a bit to hit center on corner of box
+        @Override
+		public void setLocation(int x, int y) {
+			super.setLocation(x - SIZE, y - SIZE);
 		}
 
 		private void drag(int x, int y) {

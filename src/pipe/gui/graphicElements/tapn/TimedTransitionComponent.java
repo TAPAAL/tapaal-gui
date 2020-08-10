@@ -90,8 +90,7 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Transition", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Transition", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -156,7 +155,15 @@ public class TimedTransitionComponent extends Transition {
 	public void setUrgent(boolean value){
 		transition.setUrgent(value);
 	}
-	
+
+    public boolean isUncontrollable() {
+        return transition.isUncontrollable();
+    }
+
+    public void setUncontrollable(boolean isUncontrollable) {
+        transition.setUncontrollable(isUncontrollable);
+    }
+
 	public boolean hasUntimedPreset(){
 		return transition.hasUntimedPreset();
 	}
@@ -189,8 +196,11 @@ public class TimedTransitionComponent extends Transition {
 
 			graphics.setStroke(oldStroke);
 		}
-		if(isUrgent()){
-			g.setColor(Color.WHITE);
+        if(!isUncontrollable()){
+            super.fillTransition(g);
+        }
+		if (isUrgent()) {
+		    g.setColor(isUncontrollable() ? Color.BLACK : Color.WHITE);
 			g.fillOval(11, 11, 8,8);
 		}
 	}

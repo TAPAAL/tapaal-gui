@@ -35,6 +35,7 @@ import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
@@ -275,7 +276,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

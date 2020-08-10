@@ -75,7 +75,7 @@ public class TapnXmlLoader {
 
 	private boolean isTimed;
 	private boolean isGame;
-	private boolean hasUncontrollableTransitions = false;
+	private boolean isUncontrollable = false;
 
 	public TapnXmlLoader() {
 
@@ -136,7 +136,6 @@ public class TapnXmlLoader {
 		parseFeature(doc, network);
 
 		return new LoadedModel(network, templates, queries,messages, isTimed, isGame);
-
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -159,14 +158,14 @@ public class TapnXmlLoader {
                 isTimed = true;
                 Logger.log("The net contains time features. The entire net will be changed to include time features.");
             }
-            if (hasUncontrollableTransitions && !isGame) {
+            if (isUncontrollable && !isGame) {
                 isGame = true;
                 Logger.log("The net contains game features. The entire net will be changed to include game features.");
 
             }
         } else {
             isTimed = networkIsTimed;
-            isGame = hasUncontrollableTransitions;
+            isGame = isUncontrollable;
         }
     }
 
@@ -220,9 +219,11 @@ public class TapnXmlLoader {
 	private SharedTransition parseSharedTransition(Element element) {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
+        boolean isUncontrollable = element.getAttribute("player").equals("1");
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
+		st.setUncontrollable(isUncontrollable);
 		return st;
 	}
 
@@ -380,9 +381,9 @@ public class TapnXmlLoader {
 
 		String player = transition.getAttribute("player");
 		if (player.length() > 0 && player.equals("1")) {
-		    hasUncontrollableTransitions = true;
+		    isUncontrollable = true;
         }
-		
+
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
 		int nameOffsetXInput = (int)Double.parseDouble(transition.getAttribute("nameOffsetX"));
@@ -404,6 +405,7 @@ public class TapnXmlLoader {
 		
 		TimedTransition t = new TimedTransition(nameInput);
 		t.setUrgent(isUrgent);
+		t.setUncontrollable(player.equals("1"));
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);
@@ -644,15 +646,14 @@ public class TapnXmlLoader {
                                          String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                          PlaceTransitionObject targetIn,
                                          int _endx, int _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
-		Arc tempArc;
-		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
+        TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
 
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, interval, weight);
-		((TimedInputArcComponent) tempArc).setUnderlyingArc(inputArc);
+		tempArc.setUnderlyingArc(inputArc);
 
 		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");

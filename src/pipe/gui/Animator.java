@@ -314,7 +314,7 @@ public class Animator {
         BigDecimal delayGranularity = tab.getDelayEnabledTransitionControl().getValue();
         //Make sure the granularity is small enough
         BigDecimal lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
-        if(!dInterval.IsLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
+        if(!dInterval.isLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
             do{
                 delayGranularity = delayGranularity.divide(BigDecimal.TEN);
             } while (delayGranularity.compareTo(new BigDecimal("0.00001")) >= 0 && !dInterval.isIncluded(lowerBound.add(delayGranularity)));

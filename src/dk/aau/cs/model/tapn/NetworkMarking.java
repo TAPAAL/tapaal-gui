@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.CreateGui;
-import dk.aau.cs.model.tapn.TimedPlace.PlaceType;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
