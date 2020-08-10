@@ -1415,19 +1415,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     @Override
     public void duplicateAndConvertUntimed() {
-        TabContent duplicate = duplicateTab(false, false, false);
+        TabContent duplicate = duplicateTab(true, lens.timed);
         convertToUntimedTab(duplicate);
         guiFrameControllerActions.ifPresent(o -> o.openTab(duplicate));
     }
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(true, true, false);
+	    TabContent tab = duplicateTab(true, false);
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab(true, false, false);
+        TabContent tab = duplicateTab( false, false);
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1447,7 +1447,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab(true, true, isTime);
+                TabContent tab = duplicateTab( true, isTime);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1469,7 +1469,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(true, false, isGame);
+                TabContent tab = duplicateTab(false, isGame);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1963,7 +1963,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab(boolean netChanged, boolean isTimed, boolean isYes) {
+	public TabContent duplicateTab(boolean isTimed, boolean isYes) {
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				network(),
 				allTemplates(),
@@ -1971,13 +1971,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				network().constants()
 		);
 
+		boolean netChanged = isNetChanged(isTimed, isYes);
+
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 			String composedName = getTabTitle();
 			composedName = composedName.replace(".tapn", "");
 			if (isTimed || !netChanged) {
 			    composedName += isYes ? "-timed" : "-untimed";
-            } else if (netChanged && !isTimed) {
+            } else {
 			    composedName += isYes ? "-game" : "-noGame";
             }
 			if (netChanged) {
@@ -1991,6 +1993,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 		return null;
 	}
+
+	private boolean isNetChanged(boolean isTimed, boolean isYes) {
+        if (isTimed) {
+            return lens.isTimed() != isYes;
+        } else {
+            return lens.isGame() != isYes;
+        }
+    }
 
 	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
 
