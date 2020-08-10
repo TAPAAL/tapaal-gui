@@ -22,6 +22,7 @@ public class NewTAPNPanel extends JPanel {
 	private JTextField nameTextBox;
 	private JRadioButton timedNet;
 	private JRadioButton gameNet;
+	private JRadioButton coloredNet;
 
 	public NewTAPNPanel(JRootPane rootPane, GuiFrame frame) {
 		this.rootPane = rootPane;
@@ -65,7 +66,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected()));
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected()));
 
 		rootPane.setDefaultButton(okButton);
 		
@@ -83,7 +84,7 @@ public class NewTAPNPanel extends JPanel {
 		rootPane.getParent().setVisible(false);
 	}
 
-	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame) {
+	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame, boolean isColored) {
 		if (!name.endsWith(".tapn")) {
 			name = name + ".tapn";
 		}
@@ -96,7 +97,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame);
+			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame, isColored);
 			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
@@ -152,6 +153,7 @@ public class NewTAPNPanel extends JPanel {
 
         initTimeOptions(selectionPanel);
         initGameOptions(selectionPanel);
+        initColorOptions(selectionPanel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -245,5 +247,46 @@ public class NewTAPNPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isGamePanel, gbc);
+    }
+    private void initColorOptions(JPanel selectionPanel) {
+        JPanel isColorPanel = new JPanel(new GridBagLayout());
+        ButtonGroup isColorRadioButtonGroup = new ButtonGroup();
+
+        JLabel colorText = new JLabel("Use color semantics:");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isColorPanel.add(colorText, gbc);
+
+        JRadioButton nonColorNet = new JRadioButton("No");
+        nonColorNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isColorPanel.add(nonColorNet, gbc);
+        isColorRadioButtonGroup.add(nonColorNet);
+
+        coloredNet = new JRadioButton("Yes");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isColorPanel.add(coloredNet, gbc);
+        isColorRadioButtonGroup.add(coloredNet);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        selectionPanel.add(isColorPanel, gbc);
     }
 }

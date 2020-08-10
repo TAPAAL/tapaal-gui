@@ -58,13 +58,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public boolean isGame() {
             return game;
         }
+        public boolean isColored(){
+            return colored;
+        }
 
         private final boolean timed;
         private final boolean game;
+        private final boolean colored;
 
-        TAPNLens(boolean timed, boolean game) {
+        TAPNLens(boolean timed, boolean game, boolean colored) {
             this.timed = timed;
             this.game = game;
+            this.colored = colored;
         }
     }
     private final TAPNLens lens;
@@ -555,7 +560,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }).start();
             }
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame(), loadedModel.isColored());
 
             tab.setInitialName(name);
 
@@ -570,8 +575,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
-		TabContent tab = new TabContent(isTimed, isGame);
+	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
+		TabContent tab = new TabContent(isTimed, isGame, isColored);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -712,8 +717,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 
-	private TabContent(boolean isTimed, boolean isGame) {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
+	private TabContent(boolean isTimed, boolean isGame, boolean isColored) {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame, isColored));
     }
 
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
@@ -768,12 +773,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animationModeController = new CanvasAnimationController(getAnimator());
     }
 
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame) {
-        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame));
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame, boolean isColored) {
+        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame, isColored));
     }
 
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates, tapnqueries,  new TAPNLens(true, false));
+        this(network, templates, tapnqueries,  new TAPNLens(true, false, false));
     }
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);

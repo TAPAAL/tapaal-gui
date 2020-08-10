@@ -75,6 +75,7 @@ public class TapnXmlLoader {
 
 	private boolean isTimed;
 	private boolean isGame;
+	private boolean isColored;
 	private boolean isUncontrollable = false;
 
 	public TapnXmlLoader() {
@@ -135,7 +136,7 @@ public class TapnXmlLoader {
 
 		parseFeature(doc, network);
 
-		return new LoadedModel(network, templates, queries,messages, isTimed, isGame);
+		return new LoadedModel(network, templates, queries,messages, isTimed, isGame, isColored);
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -153,6 +154,7 @@ public class TapnXmlLoader {
 
             isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
             isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
+            isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
             if (networkIsTimed && !isTimed) {
                 isTimed = true;
@@ -161,6 +163,11 @@ public class TapnXmlLoader {
             if (isUncontrollable && !isGame) {
                 isGame = true;
                 Logger.log("The net contains game features. The entire net will be changed to include game features.");
+
+            }
+            if (!isColored) {
+                isColored = true;
+                Logger.log("The net contains color features. The entire net will be changed to include color features.");
 
             }
         } else {

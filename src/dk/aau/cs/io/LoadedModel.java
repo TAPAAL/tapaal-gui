@@ -15,21 +15,23 @@ public class LoadedModel implements LoadedBatchProcessingModel {
 	private final TimedArcPetriNetNetwork network;
     private final boolean isTimed;
     private final boolean isGame;
+    private final boolean isColored;
     private final Collection<String> messages;
 	
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages){
-        this(network, templates, queries, messages, true, false);
+        this(network, templates, queries, messages, true, false, false);
     }
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
-		this(network, templates, queries, List.of(), true, false);
+		this(network, templates, queries, List.of(), true, false, false);
 	}
 
-    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, boolean isTimed, boolean isGame){
+    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, boolean isTimed, boolean isGame, boolean isColored){
         this.templates = templates;
         this.network = network;
         this.queries = queries;
         this.isTimed = isTimed;
         this.isGame = isGame;
+        this.isColored = isColored;
         this.messages = messages;
     }
 
@@ -44,6 +46,9 @@ public class LoadedModel implements LoadedBatchProcessingModel {
     }
     public boolean isGame() {
 	    return isGame;
+    }
+    public boolean isColored(){
+	    return isColored;
     }
 
 }
