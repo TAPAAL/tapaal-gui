@@ -1,15 +1,10 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
-import pipe.gui.CreateGui;
-import pipe.gui.Zoomer;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.Transition;
 
@@ -21,24 +16,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 
 	public TransitionHandler(Transition obj) {
 		super(obj);
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected())) {
-			return;
-		}
-
-		int rotation = 0;
-		if (e.getWheelRotation() < 0) {
-			rotation = -e.getWheelRotation() * 135;
-		} else {
-			rotation = e.getWheelRotation() * 45;
-		}
-
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) myObject).rotate(rotation));
-
 	}
 
 	/**

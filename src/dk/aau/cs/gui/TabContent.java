@@ -12,9 +12,10 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
@@ -22,17 +23,21 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
-
-import pipe.dataLayer.*;
+import org.jetbrains.annotations.NotNull;
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.action.GuiAction;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -40,15 +45,21 @@ import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
 import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.undo.ChangeSpacingEdit;
-import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.*;
-
-import net.tapaal.swinghelpers.JSplitPaneFix;
-import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
-import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.util.Require;
+import pipe.gui.widgets.QueryPane;
+import pipe.gui.widgets.WorkflowDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.*;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
@@ -78,18 +89,74 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
 
+	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 
 
 	private final UndoManager undoManager = new UndoManager();
 
+    public final static class Result<T,R> {
+        private final T result;
+        private final boolean hasErrors;
+        private final List<R> errors;
+
+        public Result(T result) {
+            hasErrors = false;
+            this.result = result;
+            errors = new ArrayList<>(0);
+        }
+        public Result(Collection<R> errors) {
+            hasErrors = true;
+            this.errors = new ArrayList<>(errors);
+            result = null;
+        }
+    }
+    public final static class RequirementChecker<R> {
+        public final List<R> errors = new LinkedList<R>();
+
+        public final void Not(boolean b, R s) {
+            if (b) {
+                errors.add(s);
+            }
+        }
+
+        public final void notNull(Object c, R s) {
+            if (c == null) {
+                errors.add(s);
+            }
+        }
+
+        public final boolean failed() {
+            return errors.size() != 0;
+        }
+        public final List<R> getErrors() {
+            return Collections.unmodifiableList(errors);
+        }
+    }
+    private enum ModelViolation {
+        
+        //PlaceNotNull("Place can't be null"),
+        //TransitionNotNull("Transion can't be null"),
+        //ModelNotNull("Model can't be null"),
+        MaxOneArcBetweenPlaceAndTransition("There is already an arc between the selected place and transition"),
+        MaxOneArcBetweenTransitionAndPlace("There is already an arc between the selected transition and place"),
+        CantHaveArcBetweenSharedPlaceAndTransition("You are attempting to draw an arc between a shared transition and a shared place");
+
+        private final String errorMessage;
+
+        ModelViolation(String s) {
+            this.errorMessage = s;
+        }
+
+        public String getErrorMessage() { return this.errorMessage;}
+    }
 	public final GuiModelManager guiModelManager = new GuiModelManager();
 	public class GuiModelManager {
 	    public GuiModelManager(){
 
         }
 
-        public void addNewTimedPlace(DataLayer c, Point p){
+        public Result<TimedPlaceComponent, ModelViolation> addNewTimedPlace(DataLayer c, Point p){
 	        Require.notNull(c, "datalyer can't be null");
             Require.notNull(p, "Point can't be null");
 
@@ -99,10 +166,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             c.addPetriNetObject(pnObject);
 
             getUndoManager().addNewEdit(new AddTimedPlaceCommand(pnObject, guiModelToModel.get(c), c));
-
+            return new Result<>(pnObject);
         }
 
-        public void addNewTimedTransitions(DataLayer c, Point p) {
+        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens.isTimed());
@@ -111,6 +178,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             c.addPetriNetObject(pnObject);
 
             getUndoManager().addNewEdit(new AddTimedTransitionCommand(pnObject, guiModelToModel.get(c), c));
+            return new Result<>(pnObject);
         }
 
         public void addAnnotationNote(DataLayer c, Point p) {
@@ -124,134 +192,119 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        public void addTimedInputArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+        public Result<TimedInputArcComponent, ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+	        var require = new RequirementChecker<ModelViolation>();
+            require.Not(guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+            require.Not( (p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+
+            if (require.failed()) {
+                return new Result<>(require.getErrors());
+            }
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+            TimedInputArc tia = new TimedInputArc(
+                p.underlyingPlace(),
+                t.underlyingTransition(),
+                TimeInterval.ZERO_INF
+            );
+
+            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens.isTimed());
+
+            if (path != null) {
+                tiac.setArcPath(new ArcPath(tiac, path));
+            }
+
+            Command edit = new AddTimedInputArcCommand(
+                tiac,
+                modelNet,
+                c
+            );
+            edit.redo();
+
+            undoManager.addNewEdit(edit);
+
+            return new Result<>(tiac);
+        }
+
+        public Result<TimedOutputArcComponent, ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
+            Require.notNull(c, "DataLayer can't be null");
+            Require.notNull(p, "Place can't be null");
+            Require.notNull(t, "Transitions can't be null");
+
+            var require = new RequirementChecker<ModelViolation>();
+            require.Not(guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+            require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+
+            if (require.failed()) {
+                return new Result<>(require.getErrors());
+            }
+
+            TimedArcPetriNet modelNet = guiModelToModel.get(c);
+
+            TimedOutputArc toa = new TimedOutputArc(
+                t.underlyingTransition(),
+                p.underlyingPlace()
+            );
+
+            TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
+
+            if (path != null) {
+                toac.setArcPath(new ArcPath(toac, path));
+            }
+
+            Command edit = new AddTimedOutputArcCommand(
+                toac,
+                modelNet,
+                c
+            );
+            edit.redo();
+            undoManager.addNewEdit(edit);
+
+            return new Result<>(toac);
+        }
+
+        public Result<TimedInhibitorArcComponent, ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
             Require.notNull(c, "DataLayer can't be null");
             Require.notNull(p, "Place can't be null");
             Require.notNull(t, "Transitions can't be null");
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
 
-            if (!modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition())) {
+            var require = new RequirementChecker<ModelViolation>();
+            require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+            require.Not( (p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
-                TimedInputArc tia = new TimedInputArc(
-                    p.underlyingPlace(),
-                    t.underlyingTransition(),
-                    TimeInterval.ZERO_INF
-                );
-
-                TimedInputArcComponent tiac = new TimedInputArcComponent(p,t,tia, lens.isTimed());
-
-                if (path != null) {
-                    tiac.setArcPath(new ArcPath(tiac, path));
-                }
-
-                Command edit = new AddTimedInputArcCommand(
-                    tiac,
-                    modelNet,
-                    c
-                );
-                edit.redo();
-
-                undoManager.addNewEdit(edit);
-
-            }  else {
-                //TODO: can't have two arcs between place and transition
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "There was an error drawing the arc. Possible problems:\n"
-                        + " - There is already an arc between the selected place and transition\n"
-                        + " - You are attempting to draw an arc between a shared transition and a shared place",
-                    "Error", JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-
-        public void addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
-            Require.notNull(c, "DataLayer can't be null");
-            Require.notNull(p, "Place can't be null");
-            Require.notNull(t, "Transitions can't be null");
-
-            TimedArcPetriNet modelNet = guiModelToModel.get(c);
-
-            if (!modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace())) {
-
-                TimedOutputArc toa = new TimedOutputArc(
-                    t.underlyingTransition(),
-                    p.underlyingPlace()
-                );
-
-                TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
-
-                if (path != null) {
-                    toac.setArcPath(new ArcPath(toac, path));
-                }
-
-                Command edit = new AddTimedOutputArcCommand(
-                    toac,
-                    modelNet,
-                    c
-                );
-                edit.redo();
-                undoManager.addNewEdit(edit);
-
-            } else {
-
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "There was an error drawing the arc. Possible problems:\n"
-                        + " - There is already an arc between the selected place and transition\n"
-                        + " - You are attempting to draw an arc between a shared transition and a shared place",
-                    "Error", JOptionPane.ERROR_MESSAGE
-                );
-
+            if (require.failed()) {
+                return new Result<>(require.getErrors());
             }
 
+            TimedInhibitorArc tiha = new TimedInhibitorArc(
+                p.underlyingPlace(),
+                t.underlyingTransition()
+            );
 
-        }
+            TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
 
-        public void addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
-            Require.notNull(c, "DataLayer can't be null");
-            Require.notNull(p, "Place can't be null");
-            Require.notNull(t, "Transitions can't be null");
-
-            TimedArcPetriNet modelNet = guiModelToModel.get(c);
-
-            if (!modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition())) {
-
-                TimedInhibitorArc tiha = new TimedInhibitorArc(
-                    p.underlyingPlace(),
-                    t.underlyingTransition()
-                );
-
-                TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
-
-                if (path != null) {
-                    tihac.setArcPath(new ArcPath(tihac, path));
-                }
-
-                Command edit = new AddTimedInhibitorArcCommand(
-                    tihac,
-                    modelNet,
-                    c
-                );
-                edit.redo();
-                undoManager.addNewEdit(edit);
-
-            } else {
-
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "There was an error drawing the arc. Possible problems:\n"
-                        + " - There is already an arc between the selected place and transition\n"
-                        + " - You are attempting to draw an arc between a shared transition and a shared place",
-                    "Error", JOptionPane.ERROR_MESSAGE
-                );
-
+            if (path != null) {
+                tihac.setArcPath(new ArcPath(tihac, path));
             }
 
+            Command edit = new AddTimedInhibitorArcCommand(
+                tihac,
+                modelNet,
+                c
+            );
+            edit.redo();
+            undoManager.addNewEdit(edit);
+
+            return new Result<>(tihac);
         }
 
-        public void addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
+        public Result<TimedTransportArcComponent, ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
             Require.notNull(c, "DataLayer can't be null");
             Require.notNull(p1, "Place1 can't be null");
             Require.notNull(t, "Transitions can't be null");
@@ -259,48 +312,45 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
 
-            if (
-                !modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()) &&
-                !modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace())
-            ) {
+            var require = new RequirementChecker<ModelViolation>();
+            require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+            require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+            require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+            require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
-                int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
-
-                TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
-
-                TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr);
-                TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr);
-
-                ttac1.setConnectedTo(ttac2);
-                ttac2.setConnectedTo(ttac1);
-
-                if (path1 != null) {
-                    ttac1.setArcPath(new ArcPath(ttac1, path1));
-                }
-                if (path2 != null) {
-                    ttac2.setArcPath(new ArcPath(ttac2, path2));
-                }
-
-                //XXX: the Command should take both arcs
-                Command edit = new AddTransportArcCommand(
-                    ttac2,
-                    tta,
-                    modelNet,
-                    c
-                );
-                edit.redo();
-                undoManager.addNewEdit(edit);
-
-            } else {
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "There was an error drawing the arc. Possible problems:\n"
-                        + " - There is already an arc between the source place and transition\n"
-                        + " - There is already an arc between the transtion and the target place\n"
-                        + " - You are attempting to draw an arc between a shared transition and a shared place",
-                    "Error", JOptionPane.ERROR_MESSAGE
-                );
+            if (require.failed()) {
+                return new Result<>(require.getErrors());
             }
+
+
+            int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
+
+            TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
+
+            TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr);
+            TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr);
+
+            ttac1.setConnectedTo(ttac2);
+            ttac2.setConnectedTo(ttac1);
+
+            if (path1 != null) {
+                ttac1.setArcPath(new ArcPath(ttac1, path1));
+            }
+            if (path2 != null) {
+                ttac2.setArcPath(new ArcPath(ttac2, path2));
+            }
+
+            //XXX: the Command should take both arcs
+            Command edit = new AddTransportArcCommand(
+                ttac2,
+                tta,
+                modelNet,
+                c
+            );
+            edit.redo();
+            undoManager.addNewEdit(edit);
+
+            return new Result<>(ttac1);
 
         }
 
@@ -318,6 +368,31 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return groupMaxCounter+1;
         }
 
+        public void addToken(DataLayer d, TimedPlaceComponent p, int numberOfTokens) {
+	        Require.notNull(d, "Datalayer can't be null");
+	        Require.notNull(p, "TimedPlaceComponent can't be null");
+	        Require.that(numberOfTokens > 0, "Number of tokens to add must be strictly greater than 0");
+
+            Command command = new TimedPlaceMarkingEdit(p, numberOfTokens);
+            command.redo();
+            undoManager.addNewEdit(command);
+        }
+
+        public void removeToken(DataLayer d, TimedPlaceComponent p, int numberOfTokens) {
+            Require.notNull(d, "Datalayer can't be null");
+            Require.notNull(p, "TimedPlaceComponent can't be null");
+            Require.that(numberOfTokens > 0, "Number of tokens to remove must be strictly greater than 0");
+
+            //Can't remove more than the number of tokens
+            int tokensToRemove = Math.min(numberOfTokens, p.getNumberOfTokens());
+
+            //Ignore if number of tokens to remove is 0
+            if (tokensToRemove > 0) {
+                Command command = new TimedPlaceMarkingEdit(p, -tokensToRemove);
+                command.redo();
+                undoManager.addNewEdit(command);
+            }
+        }
 
         public void deleteSelection() {
             // check if queries need to be removed
@@ -1443,7 +1518,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
-				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.animation);
+				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
+                switchToAnimationComponents(true);
 
 				setManager(animationModeController);
 
@@ -1479,11 +1555,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 						"You need at least one active template to enter simulation mode",
 						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				animationmode = false;
-				CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+                app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			}
 		} else {
 			drawingSurface().getSelectionObject().clearSelection();
-			CreateGui.getApp().setGUIMode(GuiFrame.GUIMode.draw);
+            app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
+
+            if (isInAnimationMode()) {
+                getAnimator().restoreModel();
+            }
+
+            switchToEditorComponents();
+
 			setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
@@ -1517,14 +1600,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     public void registerEvents() {
                         registerEvent(
                             e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                            e -> guiModelManager.addToken(getModel(), (TimedPlaceComponent) e.pno, 1)
                         );
-                    }
-
-                    public void placeClicked(TimedPlaceComponent pno) {
-                        Command command = new TimedPlaceMarkingEdit(pno, 1);
-                        command.redo();
-                        undoManager.addNewEdit(command);
                     }
                 });
                 break;
@@ -1534,14 +1611,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     public void registerEvents() {
                         registerEvent(
                             e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                            e -> placeClicked((TimedPlaceComponent) e.pno)
+                            e -> guiModelManager.removeToken(getModel(), (TimedPlaceComponent) e.pno, 1)
                         );
-                    }
-
-                    public void placeClicked(TimedPlaceComponent pno) {
-                        Command command = new TimedPlaceMarkingEdit(pno, -1);
-                        command.redo();
-                        undoManager.addNewEdit(command);
                     }
                 });
                 break;
@@ -1670,12 +1741,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     /* GUI Model / Actions */
 
-	Optional<GuiFrameActions>  app = Optional.empty();
-	MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
+	private final MutableReference<GuiFrameActions> app = new MutableReference<>();
+	private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 	@Override
 	public void setApp(GuiFrameActions newApp) {
-		this.app = Optional.ofNullable(newApp);
-		undoManager.setApp(newApp);
+		app.setReference(newApp);
+		undoManager.setApp(app);
+
+		updateFeatureText();
 
 		updateFeatureText();
 
@@ -1928,21 +2001,61 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
 
-    class CanvasInhibitorarcDrawController extends AbstractDrawingSurfaceManager {
+    final class CanvasInhibitorarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
-        private Arc arc;
+
+        protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
+            if (place != null && transition == null) {
+                transition = pno;
+                CreateGui.getDrawingSurface().clearAllPrototype();
+                var result = guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
+                showPopupIfFailed(result);
+                clearPendingArc();
+            }
+        }
+
+        protected void placeClicked(TimedPlaceComponent pno, MouseEvent e) {
+            if (place == null && transition == null) {
+                place = pno;
+                connectsTo = 2;
+                arc = new TimedInhibitorArcComponent(pno);
+                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                //to avoid this we change the endpoint to set the end point to the same as the end point
+                //needs further refactorings //kyrke 2019-09-05
+                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                CreateGui.getDrawingSurface().addPrototype(arc);
+                arc.requestFocusInWindow();
+                arc.setSelectable(false);
+                arc.enableDrawingKeyBindings(this::clearPendingArc);
+            }
+        }
+
+        @Override
+        protected void clearPendingArc() {
+            super.clearPendingArc();
+            CreateGui.getDrawingSurface().clearAllPrototype();
+            place = null;
+            transition = null;
+            arc = null;
+        }
+
+    }
+
+    abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
+        protected Arc arc;
+        protected int connectsTo = 1; // 0 if nothing, 1 if place, 2 if transition
 
         @Override
         public void registerEvents() {
             registerEvent(
                 e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                e->placeClicked(((TimedPlaceComponent) e.pno))
+                e->placeClicked(((TimedPlaceComponent) e.pno), e.e)
             );
             registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
-                e->transitionClicked(((TimedTransitionComponent) e.pno))
+                e->transitionClicked(((TimedTransitionComponent) e.pno), e.e)
             );
             registerEvent(
                 e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
@@ -1958,71 +2071,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
         }
 
-        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
-            if (arc != null) {
-                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
-                    //Dispatch event to parent (drawing surface)
-                    e.translatePoint(pno.getX(),pno.getY());
-                    pno.getParent().dispatchEvent(e);
-                }
-            }
+        protected abstract void transitionClicked(TimedTransitionComponent pno, MouseEvent e);
+        protected abstract void placeClicked(TimedPlaceComponent pno, MouseEvent e);
+
+        protected void clearPendingArc() {
+            connectsTo = 0;
+        };
+
+        @Override
+        public void setupManager() {
+            CreateGui.useExtendedBounds = true;
         }
 
-        private void placetranstionMouseExited(PlaceTransitionObject pto) {
-            if (arc != null) {
-                arc.setTarget(null);
-                //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
-                // Relates to bug #1849786
-                if (pto instanceof Transition) {
-                    ((Transition)pto).removeArcCompareObject(arc);
-                }
-                arc.updateArcPosition();
-            }
-        }
-
-        private void placetranstionMouseOver(PlaceTransitionObject pno) {
-            if (arc != null) {
-                if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
-                    arc.setTarget(pno);
-                    arc.updateArcPosition();
-                }
-            }
-        }
-
-        private void transitionClicked(TimedTransitionComponent pno) {
-            if (place != null && transition == null) {
-                transition = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
-                guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
-                clearPendingArc();
-            }
-        }
-
-        private void placeClicked(TimedPlaceComponent pno) {
-            if (place == null && transition == null) {
-                place = pno;
-                arc = new TimedInhibitorArcComponent(pno);
-                //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
-                //to avoid this we change the endpoint to set the end point to the same as the end point
-                //needs further refactorings //kyrke 2019-09-05
-                arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
-                arc.requestFocusInWindow();
-                arc.setSelectable(false);
-                arc.enableDrawingKeyBindings(this::clearPendingArc);
-            } else if (transition != null && place == null) {
-                place = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
-                guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
-                clearPendingArc();
-            }
-        }
-
-        private void clearPendingArc() {
-            CreateGui.getDrawingSurface().clearAllPrototype();
-            place = null;
-            transition = null;
-            arc = null;
+        @Override
+        public void teardownManager() {
+            clearPendingArc();
+            CreateGui.useExtendedBounds = false;
         }
 
         @Override
@@ -2035,59 +2099,50 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             if (arc!=null) {
-                Point p = e.getPoint();
-                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
-                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+                if (!e.isControlDown()) {
+                    Point p = e.getPoint();
+                    int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
+                    int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
 
-                boolean shiftDown = e.isShiftDown();
-                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
-                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
+                    boolean shiftDown = e.isShiftDown();
+                    //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
+                    arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x, y, shiftDown);
+                } else if (connectsTo != 0) { // Quick draw
+                    Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+                    if (connectsTo == 1) { // Place
+                        var r = guiModelManager.addNewTimedPlace(getModel(), p);
+                        placeClicked(r.result, e);
+                    } else { //Transition
+                        var r = guiModelManager.addNewTimedTransitions(getModel(), p);
+                        transitionClicked(r.result, e);
+                    }
+                }
+            } else if (e.isControlDown()){ // Quick draw
+                Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+                var r = guiModelManager.addNewTimedPlace(getModel(), p);
+
+                placeClicked(r.result, e);
             }
         }
 
-        @Override
-        public void registerManager(DrawingSurfaceImpl canvas) {
-            CreateGui.useExtendedBounds = true;
+        protected void showPopupIfFailed(Result<?, ModelViolation> result) {
+            if (result.hasErrors) {
+                StringBuilder errorMessage = new StringBuilder();
+                errorMessage.append("There was an error drawing the arc. Possible problems:");
+                for (ModelViolation v : result.errors) {
+                    errorMessage.append("\n  - ").append(v.getErrorMessage());
+                }
+
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    errorMessage,
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+            }
         }
 
-        @Override
-        public void deregisterManager() {
-            clearPendingArc();
-            CreateGui.useExtendedBounds = false;
-        }
-
-
-    }
-    class CanvasArcDrawController extends  AbstractDrawingSurfaceManager {
-        private TimedTransitionComponent transition;
-        private TimedPlaceComponent place;
-        private Arc arc;
-
-        @Override
-        public void registerEvents() {
-            registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                e->placeClicked(((TimedPlaceComponent) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
-                e->transitionClicked(((TimedTransitionComponent) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
-                e->placetranstionMouseOver(((PlaceTransitionObject) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.exited,
-                e->placetranstionMouseExited(((PlaceTransitionObject) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
-                e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
-            );
-        }
-
-        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
+        protected void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
             if (arc != null) {
                 if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
                     //Dispatch event to parent (drawing surface)
@@ -2097,7 +2152,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void placetranstionMouseExited(PlaceTransitionObject pto) {
+        protected void placetranstionMouseExited(PlaceTransitionObject pto) {
             if (arc != null) {
                 arc.setTarget(null);
                 //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
@@ -2109,7 +2164,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void placetranstionMouseOver(PlaceTransitionObject pno) {
+        protected void placetranstionMouseOver(PlaceTransitionObject pno) {
             if (arc != null) {
                 if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
                     arc.setTarget(pno);
@@ -2117,10 +2172,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             }
         }
+    }
 
-        private void transitionClicked(TimedTransitionComponent pno) {
+    final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
+        private TimedTransitionComponent transition;
+        private TimedPlaceComponent place;
+
+        protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place == null && transition == null) {
                 transition = pno;
+                connectsTo = 1;
                 arc = new TimedOutputArcComponent(pno);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
@@ -2134,14 +2195,30 @@ public class TabContent extends JSplitPane implements TabContentActions{
             } else if (place != null && transition == null) {
                 transition = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
-                guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
+                var result = guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
+                showPopupIfFailed(result);
                 clearPendingArc();
+
+                if (e != null && e.isControlDown()) {
+                    transition = pno;
+                    connectsTo = 1;
+                    arc = new TimedOutputArcComponent(pno);
+                    //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                    //to avoid this we change the endpoint to set the end point to the same as the end point
+                    //needs further refactorings //kyrke 2019-09-05
+                    arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    arc.requestFocusInWindow();
+                    arc.setSelectable(false);
+                    arc.enableDrawingKeyBindings(this::clearPendingArc);
+                }
             }
         }
 
-        private void placeClicked(TimedPlaceComponent pno) {
+        protected void placeClicked(TimedPlaceComponent pno, MouseEvent e) {
             if (place == null && transition == null) {
                 place = pno;
+                connectsTo = 2;
                 arc = new TimedInputArcComponent(pno);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2154,48 +2231,35 @@ public class TabContent extends JSplitPane implements TabContentActions{
             } else if (transition != null && place == null) {
                 place = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
-                guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
+                var result = guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
+                showPopupIfFailed(result);
                 clearPendingArc();
+
+                if (e!= null && e.isControlDown()) {
+                    place = pno;
+                    connectsTo = 2;
+                    arc = new TimedInputArcComponent(pno);
+                    //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                    //to avoid this we change the endpoint to set the end point to the same as the end point
+                    //needs further refactorings //kyrke 2019-09-05
+                    arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    arc.requestFocusInWindow();
+                    arc.setSelectable(false);
+                    arc.enableDrawingKeyBindings(this::clearPendingArc);
+                }
             }
         }
 
-        private void clearPendingArc() {
+        @Override
+        protected void clearPendingArc() {
+            super.clearPendingArc();
             CreateGui.getDrawingSurface().clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
         }
 
-        @Override
-        public void drawingSurfaceMouseMoved(MouseEvent e) {
-            if(arc!=null) {
-                arc.setEndPoint(e.getX(), e.getY(), e.isShiftDown());
-            }
-        }
-
-        @Override
-        public void drawingSurfaceMousePressed(MouseEvent e) {
-            if (arc!=null) {
-                Point p = e.getPoint();
-                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
-                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
-
-                boolean shiftDown = e.isShiftDown();
-                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
-                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
-            }
-        }
-
-        @Override
-        public void registerManager(DrawingSurfaceImpl canvas) {
-            CreateGui.useExtendedBounds = true;
-        }
-
-        @Override
-        public void deregisterManager() {
-            clearPendingArc();
-            CreateGui.useExtendedBounds = false;
-        }
     }
 
 	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
@@ -2244,7 +2308,23 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				((TimedTransitionComponent) pto).showDInterval(false);
 			}
 		}
-	}
+
+        @Override
+        public void teardownManager() {
+            //Remove all mouse-over menus if we exit animation mode
+            ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
+
+            for (PetriNetObject pn : selection) {
+                if (pn instanceof TimedPlaceComponent) {
+                    TimedPlaceComponent place = (TimedPlaceComponent) pn;
+                    place.showAgeOfTokens(false);
+                } else if (pn instanceof TimedTransitionComponent) {
+                    TimedTransitionComponent transition = (TimedTransitionComponent) pn;
+                    transition.showDInterval(false);
+                }
+            }
+        }
+    }
 
 
     MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
@@ -2267,51 +2347,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
         return lens;
     }
 
-    private final class CanvasTransportarcDrawController extends AbstractDrawingSurfaceManager {
+
+    private final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place1;
         private TimedPlaceComponent place2;
-        private Arc arc;
         private Arc arc1;
         private Arc arc2;
 
-
-        @Override
-        public void registerEvents() {
-            registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
-                e->placeClicked(((TimedPlaceComponent) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.pressed,
-                e->transitionClicked(((TimedTransitionComponent) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.entered,
-                e->placetranstionMouseOver(((PlaceTransitionObject) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.exited,
-                e->placetranstionMouseExited(((PlaceTransitionObject) e.pno))
-            );
-            registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
-                e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
-            );
-        }
-
-        private void placetransitionMouseMoved(PlaceTransitionObject pno, MouseEvent e) {
-            if (arc != null) {
-                if (arc.getSource() == pno || !arc.getSource().areNotSameType(pno)) {
-                    //Dispatch event to parent (drawing surface)
-                    e.translatePoint(pno.getX(),pno.getY());
-                    pno.getParent().dispatchEvent(e);
-                }
-            }
-        }
-
-        private void placetranstionMouseExited(PlaceTransitionObject pto) {
+        protected void placetranstionMouseExited(PlaceTransitionObject pto) {
             if (arc != null) {
                 arc.setTarget(null);
                 //XXX this is bad, we have to clean up internal state manually, should be refactored //kyrke - 2019-11-14
@@ -2323,7 +2368,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void placetranstionMouseOver(PlaceTransitionObject pno) {
+        protected void placetranstionMouseOver(PlaceTransitionObject pno) {
             if (arc != null) {
                 if (arc.getSource() != pno && arc.getSource().areNotSameType(pno)) {
                     arc.setTarget(pno);
@@ -2332,9 +2377,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void transitionClicked(TimedTransitionComponent pno) {
+        protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place1 != null && transition == null) {
                 transition = pno;
+                connectsTo = 1;
                 arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
@@ -2348,9 +2394,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void placeClicked(TimedPlaceComponent pno) {
+        protected void placeClicked(TimedPlaceComponent pno, MouseEvent e) {
             if (place1 == null && transition == null) {
                 place1 = pno;
+                connectsTo = 2;
                 arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2363,48 +2410,35 @@ public class TabContent extends JSplitPane implements TabContentActions{
             } else if (transition != null && place2 == null) {
                 place2 = pno;
                 CreateGui.getDrawingSurface().clearAllPrototype();
-                guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
+                var result = guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
+                showPopupIfFailed(result);
                 clearPendingArc();
+
+                if (e != null && e.isControlDown()) {
+                    place1 = pno;
+                    connectsTo = 2;
+                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                    //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
+                    //to avoid this we change the endpoint to set the end point to the same as the end point
+                    //needs further refactorings //kyrke 2019-09-05
+                    arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
+                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    arc.requestFocusInWindow();
+                    arc.setSelectable(false);
+                    arc.enableDrawingKeyBindings(this::clearPendingArc);
+                }
             }
         }
 
-        private void clearPendingArc() {
+        @Override
+        protected void clearPendingArc() {
+            super.clearPendingArc();
             CreateGui.getDrawingSurface().clearAllPrototype();
             place1 = place2 = null;
             transition = null;
             arc = arc1 = arc2 = null;
         }
 
-        @Override
-        public void drawingSurfaceMouseMoved(MouseEvent e) {
-            if(arc!=null) {
-                arc.setEndPoint(e.getX(), e.getY(), e.isShiftDown());
-            }
-        }
-
-        @Override
-        public void drawingSurfaceMousePressed(MouseEvent e) {
-            if (arc!=null) {
-                Point p = e.getPoint();
-                int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
-                int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
-
-                boolean shiftDown = e.isShiftDown();
-                //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
-                arc.getArcPath().addPoint(arc.getArcPath().getEndIndex(), x,y, shiftDown);
-            }
-        }
-
-        @Override
-        public void registerManager(DrawingSurfaceImpl canvas) {
-            CreateGui.useExtendedBounds = true;
-        }
-
-        @Override
-        public void deregisterManager() {
-            clearPendingArc();
-            CreateGui.useExtendedBounds = false;
-        }
     }
 
     private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
@@ -2447,14 +2481,41 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e -> ((Arc)e.pno).getArcPath().hidePoints()
             );
             registerEvent(
+                e->e.pno instanceof TimedOutputArcComponent && e.a == MouseAction.doubleClicked && !e.e.isControlDown(),
+                e -> ((TimedOutputArcComponent) e.pno).showTimeIntervalEditor()
+            );
+            registerEvent(
                 e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
                 e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
             );
             registerEvent(
-                e->e.pno instanceof TimedOutputArcComponent && e.a == MouseAction.doubleClicked && !e.e.isControlDown(),
-                e -> ((TimedOutputArcComponent) e.pno).showTimeIntervalEditor()
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), ((MouseWheelEvent) e.e))
+            );
+            registerEvent(
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
             );
 
+        }
+
+        private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
+            int rotation = 0;
+            if (e.getWheelRotation() < 0) {
+                rotation = -e.getWheelRotation() * 135;
+            } else {
+                rotation = e.getWheelRotation() * 45;
+            }
+
+            CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+        }
+
+        private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
+            if (e.getWheelRotation() < 0) {
+                guiModelManager.addToken(getModel(), p, 1);
+            } else {
+                guiModelManager.removeToken(getModel(), p, 1);
+            }
         }
 
         private void arcDoubleClickedWithContrl(Arc arc, MouseEvent e) {

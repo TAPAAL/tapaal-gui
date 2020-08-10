@@ -63,7 +63,7 @@ public class AnimationControlSidePanel extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		firermodebox = new NonsearchableJComboBox<>(animator.FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(Animator.FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));

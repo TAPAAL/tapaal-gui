@@ -5,13 +5,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import pipe.gui.action.SplitArcAction;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TimedArcHandler extends ArcHandler {
 

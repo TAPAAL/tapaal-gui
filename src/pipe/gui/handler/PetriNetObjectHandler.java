@@ -11,11 +11,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
 
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on all
@@ -67,18 +63,6 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 		return popup;
 	}
 
-	/**
-	 * Displays the popup menu
-	 */
-	private void checkForPopup(MouseEvent e) {
-		if (SwingUtilities.isRightMouseButton(e) && CreateGui.getApp().getMode() == ElementType.SELECT) {
-			JPopupMenu m = getPopup(e);
-			if (m != null && !(myObject instanceof TimedPlaceComponent || myObject instanceof TimedTransitionComponent || myObject instanceof Arc || myObject instanceof AnnotationNote)) {
-				m.show(myObject, e.getX(), e.getY());
-			}
-		}
-	}
-
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
@@ -93,10 +77,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 			}
 			dragInit = e.getPoint();
 		}
-		
-		if (CreateGui.getApp().isEditionAllowed()) {
-			checkForPopup(e);
-		}
+
 	}
 
 	/**
@@ -106,10 +87,6 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
-		// Have to check for popup here as well as on pressed for crossplatform!!
-		if (CreateGui.getApp().isEditionAllowed()) {
-			checkForPopup(e);
-		}
 
 		if (!SwingUtilities.isLeftMouseButton(e)) {
 			return;

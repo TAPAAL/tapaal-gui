@@ -4,7 +4,6 @@ import java.util.Hashtable;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
-import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;

@@ -1,11 +1,7 @@
 package dk.aau.cs.gui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,20 +9,17 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
+import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
@@ -173,7 +166,7 @@ public class EnabledTransitionsList extends JPanel{
 			return template.model().getTransitionByName(transition.getName()).isShared();
 		}
 
-		public int compareTo(ListItem o) {
+		public int compareTo(@NotNull ListItem o) {
 			if(o instanceof TransitionListItem){
 				return compareTo((TransitionListItem)o);
 			} else {
@@ -188,8 +181,8 @@ public class EnabledTransitionsList extends JPanel{
 			//Sort according to lower bound
 			int result = thisLower.compareTo(otherLower);
 			//According to strict non strict
-			if(result == 0 && this.transition.getDInterval().IsLowerBoundNonStrict() != o.transition.getDInterval().IsLowerBoundNonStrict()){
-				if(this.transition.getDInterval().IsLowerBoundNonStrict()){
+			if(result == 0 && this.transition.getDInterval().isLowerBoundNonStrict() != o.transition.getDInterval().isLowerBoundNonStrict()){
+				if(this.transition.getDInterval().isLowerBoundNonStrict()){
 					result = -1;
 				} else {
 					result = 1;

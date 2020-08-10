@@ -5,11 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.function.Supplier;
 
 import javax.swing.*;
 
-import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -368,7 +366,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * Handles keyboard input when drawing arcs in the GUI. Keys are bound to action names,
 	 * and action names are mapped to action objects. The key bindings are disabled when the
 	 * arc object is deleted, or the arc is connected to a place/transition.
-     * @param action
      */
 	public void enableDrawingKeyBindings(Runnable action) {
 		InputMap iMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);

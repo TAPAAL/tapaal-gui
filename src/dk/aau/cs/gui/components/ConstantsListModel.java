@@ -8,7 +8,7 @@ import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 
-public class ConstantsListModel extends AbstractListModel {
+public class ConstantsListModel extends AbstractListModel<Constant> {
 	
 	private TimedArcPetriNetNetwork network;
 

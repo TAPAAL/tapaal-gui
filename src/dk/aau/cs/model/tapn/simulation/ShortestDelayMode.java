@@ -26,7 +26,7 @@ public class ShortestDelayMode implements DelayMode{
 	public BigDecimal GetDelay(TimedTransition transition,
 			TimeInterval dInterval, BigDecimal delayGranularity) {
 		
-		if(dInterval.IsLowerBoundNonStrict()){
+		if(dInterval.isLowerBoundNonStrict()){
 			return IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 		} else {
 			return IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(delayGranularity, new MathContext(Pipe.AGE_PRECISION));

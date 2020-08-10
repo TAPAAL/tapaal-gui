@@ -22,7 +22,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
@@ -62,8 +61,6 @@ public class RunVerification extends RunVerificationBase {
 				);
 	
 				if (result.getTrace() != null) {
-					CreateGui.getApp().setGUIMode(GUIMode.animation);
-	
 					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}
