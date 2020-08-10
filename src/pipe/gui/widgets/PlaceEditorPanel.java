@@ -1,31 +1,26 @@
 package pipe.gui.widgets;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
-import javax.swing.JSpinner;
-import javax.swing.event.ChangeListener;
+import javax.swing.*;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredToken;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
+import pipe.gui.ColorComboboxPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -96,6 +91,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		add(buttonPanel, gridBagConstraints);
+
+		initTokensPanel();
 	}
 
 	private void initButtonPanel() {
@@ -653,6 +650,102 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void exit() {
 		rootPane.getParent().setVisible(false);
 	}
+    private void initTokensPanel() {
+        tokenPanel = new JPanel();
+        tokenButtonPanel = new JPanel(new GridBagLayout());
+        tokenPanel.setLayout(new GridBagLayout());
+        tokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Tokens"));
+
+        tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        tokenPanel.add(tokenColorComboboxPanel, gbc);
+        //Logger.log(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(0).toString());
+
+
+        coloredTokenListModel = new DefaultListModel();
+        tokenList = new JList(coloredTokenListModel);
+        JScrollPane tokenListScrollPane = new JScrollPane(tokenList);
+        tokenListScrollPane.setViewportView(tokenList);
+        tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        Dimension tokenScrollPaneDim = new Dimension(375, 200);
+        tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
+        tokenListScrollPane.setMaximumSize(tokenScrollPaneDim);
+        tokenListScrollPane.setMinimumSize(tokenScrollPaneDim);
+        tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens"));
+
+
+
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(3, 3, 3,3);
+        //tokenPanel.add(tokenListScrollPane, gbc);
+        tokenPanel.add(tokenListScrollPane, gbc);
+
+        addColoredTokenButton = new JButton("Add");
+        Dimension buttonSize = new Dimension(100, 27);
+        addColoredTokenButton.setPreferredSize(buttonSize);
+        addColoredTokenButton.setMinimumSize(buttonSize);
+        addColoredTokenButton.setMaximumSize(buttonSize);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.SOUTHWEST;
+        gbc.insets = new Insets(3, 3, 3,3);
+        tokenButtonPanel.add(addColoredTokenButton, gbc);
+
+        addColoredTokenButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                //onAdd();
+            }
+        });
+
+        removeColoredTokenButton = new JButton("Remove");
+
+
+        removeColoredTokenButton.setPreferredSize(buttonSize);
+        removeColoredTokenButton.setMinimumSize(buttonSize);
+        removeColoredTokenButton.setMaximumSize(buttonSize);
+
+        removeColoredTokenButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                //onRemove();
+            }
+        });
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.SOUTHWEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        tokenButtonPanel.add(removeColoredTokenButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        tokenPanel.add(tokenButtonPanel, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        add(tokenPanel, gbc);
+    }
 
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
@@ -673,5 +766,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private JComboBox<String> invConstantsComboBox;
 	private JRadioButton normalInvRadioButton;
 	private JRadioButton constantInvRadioButton;
+    private JPanel tokenPanel;
+    private DefaultListModel<ColoredToken> coloredTokenListModel;
+    private JList tokenList;
+    private JPanel tokenButtonPanel;
+    private JButton addColoredTokenButton;
+    private JButton removeColoredTokenButton;
+    private ColorComboboxPanel tokenColorComboboxPanel;
+    private ColorType colorType;
+
+
 }
 
