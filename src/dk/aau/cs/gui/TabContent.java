@@ -602,7 +602,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (isTimed) {
                 tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, loadedModel.isGame());
             } else {
-                tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isGame(), isYes);
+                tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), isYes);
             }
 
             tab.setInitialName(name);

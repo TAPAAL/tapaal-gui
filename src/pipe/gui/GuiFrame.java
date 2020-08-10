@@ -525,7 +525,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         featurePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         featurePanel.add(new JLabel("Timed: "));
         featurePanel.add(timeFeatureOptions);
-        featurePanel.add(new JLabel("Game: "));
+        featurePanel.add(new JLabel("   Game: "));
         featurePanel.add(gameFeatureOptions);
         timeFeatureOptions.addActionListener(changeTimeFeatureAction);
         gameFeatureOptions.addActionListener(changeGameFeatureAction);
