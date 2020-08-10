@@ -79,7 +79,6 @@ public class MemoryMonitor {
 				} 
 			}else{
 				try {
-				    Logger.log("Memory monitor: " + "ps -p "+PID+" -o rss");
 					Process p = Runtime.getRuntime().exec("ps -p "+PID+" -o rss"); 
 					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); 
 
