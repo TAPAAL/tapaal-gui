@@ -58,6 +58,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private StatusBar statusBar;
     private JMenuBar menuBar;
     JMenu drawMenu;
+    JMenu animateMenu;
+    JMenu viewMenu;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> zoomComboBox;
@@ -410,16 +412,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::stepBackwards);
         }
     };
-    private GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::timeDelay);
-        }
-    };
-    private GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::delayAndFire);
-        }
-    };
+
     private GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::previousComponent);
@@ -437,6 +430,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
     private JCheckBoxMenuItem showTokenAgeCheckBox;
+    private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
 
     private JMenu zoomMenu;
 
@@ -619,7 +613,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private JMenu buildMenuView(int shortcutkey) {
         /* ViewMenu */
-        JMenu viewMenu = new JMenu("View");
+        viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
 
         zoomMenu = new JMenu("Zoom");
@@ -658,7 +652,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction);
 
-        addCheckboxMenuItem(viewMenu, showDelayEnabledTransitionsAction);
+        showDelayEnabledTransitionsCheckbox = addCheckboxMenuItem(viewMenu, showDelayEnabledTransitionsAction);
 
         showZeroToInfinityIntervalsCheckBox = addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction);
 
@@ -677,17 +671,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private JMenu buildMenuAnimation() {
         /* Simulator */
-        JMenu animateMenu = new JMenu("Simulator");
+        animateMenu = new JMenu("Simulator");
         animateMenu.setMnemonic('A');
         animateMenu.add(startAction);
 
 
         animateMenu.add(stepbackwardAction);
         animateMenu.add(stepforwardAction);
-
-        animateMenu.add(timeAction);
-
-        animateMenu.add(delayFireAction);
 
         animateMenu.add(prevcomponentAction);
 
@@ -936,8 +926,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 selectAllAction.setEnabled(true);
                 selectAction.setEnabled(true);
 
-                timeAction.setEnabled(false);
-                delayFireAction.setEnabled(false);
                 stepbackwardAction.setEnabled(false);
                 stepforwardAction.setEnabled(false);
                 prevcomponentAction.setEnabled(false);
@@ -978,9 +966,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 showConstantsAction.setEnabled(false);
                 showQueriesAction.setEnabled(false);
 
-                timeAction.setEnabled(true);
-
-                delayFireAction.setEnabled(true);
                 stepbackwardAction.setEnabled(true);
                 stepforwardAction.setEnabled(true);
                 prevcomponentAction.setEnabled(true);
@@ -1015,8 +1000,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 selectAllAction.setEnabled(false);
                 selectAction.setEnabled(false);
 
-                timeAction.setEnabled(false);
-                delayFireAction.setEnabled(false);
                 stepbackwardAction.setEnabled(false);
                 stepforwardAction.setEnabled(false);
 
@@ -1325,6 +1308,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
     @Override
     public void updateGuiMenus(){
+        updateDrawingMenu();
+        updateSimulationMenu();
+        updateViewMenu();
+
+
+
+    }
+    private void updateDrawingMenu(){
         drawingToolBar.removeAll();
         drawMenu.removeAll();
         drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
@@ -1332,13 +1323,44 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawMenu.add(selectAction);
         drawMenu.addSeparator();
 
-        for(GuiAction action : getCurrentTab().getAvailableGuiActions()){
+        for(GuiAction action : getCurrentTab().getAvailableDrawActions()){
             drawingToolBar.add(new ToggleButtonWithoutText(action));
             drawMenu.add(action);
         }
         drawingToolBar.addSeparator();
         drawingToolBar.add(featureInfoText);
+    }
+    private void updateSimulationMenu(){
+        animateMenu.removeAll();
+        animateMenu.add(startAction);
 
+        animateMenu.add(stepbackwardAction);
+        animateMenu.add(stepforwardAction);
+
+        for(GuiAction action : getCurrentTab().getAvailableSimActions()){
+            animateMenu.add(action);
+        }
+
+        animateMenu.add(prevcomponentAction);
+
+        animateMenu.add(nextcomponentAction);
+
+        animateMenu.addSeparator();
+
+        animateMenu.add(exportTraceAction);
+        animateMenu.add(importTraceAction);
+    }
+
+    private void updateViewMenu(){
+        if(!getCurrentTab().getLens().isTimed()){
+            showZeroToInfinityIntervalsCheckBox.setVisible(false);
+            showTokenAgeCheckBox.setVisible(false);
+            showDelayEnabledTransitionsCheckbox.setVisible(false);
+        } else{
+            showZeroToInfinityIntervalsCheckBox.setVisible(true);
+            showTokenAgeCheckBox.setVisible(true);
+            showDelayEnabledTransitionsCheckbox.setVisible(true);
+        }
     }
 
 

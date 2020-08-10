@@ -2469,11 +2469,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
         }
     }
-    public List<GuiAction> getAvailableGuiActions(){
+    public List<GuiAction> getAvailableDrawActions(){
         if(lens.isTimed()){
             return new ArrayList<GuiAction>(Arrays.asList(timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         } else{
             return new ArrayList<GuiAction>(Arrays.asList(timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        }
+    }
+
+    public List<GuiAction> getAvailableSimActions(){
+        if(lens.isTimed()){
+            return new ArrayList<GuiAction>(Arrays.asList(timeAction, delayFireAction));
+        } else{
+            delayFireAction.setName("Fire");
+            delayFireAction.setTooltip("Fire Selected Transition");
+            return new ArrayList<GuiAction>(Arrays.asList(delayFireAction));
         }
     }
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
@@ -2518,6 +2528,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.TRANSPORTARC);
         }
     };
+    private GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
+        public void actionPerformed(ActionEvent e) {
+            timeDelay();
+        }
+    };
+    private GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
+        public void actionPerformed(ActionEvent e) {
+            delayAndFire();
+        }
+    };
 
     public void updateMode() {
         // deselect other actions
@@ -2542,8 +2562,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 tokenAction.setEnabled(true);
                 deleteTokenAction.setEnabled(true);
                 annotationAction.setEnabled(true);
+                delayFireAction.setEnabled(false);
+                timeAction.setEnabled(false);
                 break;
             case noNet:
+                transAction.setEnabled(false);
+                timedPlaceAction.setEnabled(false);
+                timedArcAction.setEnabled(false);
+                transportArcAction.setEnabled(false);
+                inhibarcAction.setEnabled(false);
+                tokenAction.setEnabled(false);
+                deleteTokenAction.setEnabled(false);
+                annotationAction.setEnabled(false);
+                delayFireAction.setEnabled(false);
+                timeAction.setEnabled(false);
             case animation:
                 transAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
@@ -2553,6 +2585,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 tokenAction.setEnabled(false);
                 deleteTokenAction.setEnabled(false);
                 annotationAction.setEnabled(false);
+                delayFireAction.setEnabled(true);
+                if(lens.isTimed())
+                    timeAction.setEnabled(true);
                 break;
         }
     }
