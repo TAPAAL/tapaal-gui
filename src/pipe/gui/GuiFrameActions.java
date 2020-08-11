@@ -29,6 +29,8 @@ public interface GuiFrameActions {
     //XXX temp while refactoring, kyrke - 2019-07-25
     void updateMode(Pipe.ElementType mode);
 
+    void setStatusBarText(String s);
+
     void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab);
 
     void changeToTab(TabContent tab);

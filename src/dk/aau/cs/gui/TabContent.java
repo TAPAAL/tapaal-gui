@@ -49,17 +49,7 @@ import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.Point2D;
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.*;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
@@ -1550,6 +1540,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
+                app.ifPresent(o->o.setStatusBarText(textforAnimation));
+
 			} else {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"You need at least one active template to enter simulation mode",
@@ -1577,6 +1569,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			// Undo/Redo is enabled based on undo/redo manager
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
+            app.ifPresent(o->o.setStatusBarText(textforDrawing));
 		}
 		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
@@ -1588,6 +1581,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void setMode(Pipe.ElementType mode) {
 
 		app.ifPresent(o->o.updateMode(mode));
+        changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection
 		drawingSurface().getSelectionObject().clearSelection();
@@ -2652,4 +2646,84 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 break;
         }
     }
+
+
+    public static final String textforDrawing = "Drawing Mode: Click on a button to start adding components to the Editor";
+    public static final String textforPlace = "Place Mode: Right click on a place to see menu options ";
+    public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options ";
+    public static final String textforTrans = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
+    public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
+    public static final String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to fire it";
+    public static final String textforArc = "Arc Mode: Right click on an arc to see menu options ";
+    public static final String textforTransportArc = "Transport Arc Mode: Right click on an arc to see menu options ";
+    public static final String textforInhibArc = "Inhibitor Mode: Right click on an arc to see menu options ";
+    public static final String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
+    public static final String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; double click to edit";
+    public static final String textforDrag = "Drag Mode";
+
+    public void changeStatusbarText(Pipe.ElementType type) {
+        switch (type) {
+            case PLACE:
+                app.ifPresent(o13 -> o13.setStatusBarText(textforPlace));
+                break;
+
+            case TAPNPLACE:
+                app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
+                break;
+
+            case IMMTRANS:
+            case TAPNTRANS:
+                app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
+                break;
+
+            case TIMEDTRANS:
+                app.ifPresent(o10 -> o10.setStatusBarText(textforTimedTrans));
+                break;
+
+            case ARC:
+            case TAPNARC:
+                app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
+                break;
+
+            case TRANSPORTARC:
+                app.ifPresent(o8 -> o8.setStatusBarText(textforTransportArc));
+                break;
+
+            case TAPNINHIBITOR_ARC:
+            case INHIBARC:
+                app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
+                break;
+
+            case ADDTOKEN:
+                app.ifPresent(o6 -> o6.setStatusBarText(textforAddtoken));
+                break;
+
+            case DELTOKEN:
+                app.ifPresent(o5 -> o5.setStatusBarText(textforDeltoken));
+                break;
+
+            case SELECT:
+                app.ifPresent(o4 -> o4.setStatusBarText(textforMove));
+                break;
+
+            case DRAW:
+                app.ifPresent(o3 -> o3.setStatusBarText(textforDrawing));
+                break;
+
+            case ANNOTATION:
+                app.ifPresent(o2 -> o2.setStatusBarText(textforAnnotation));
+                break;
+
+            case DRAG:
+                app.ifPresent(o1 -> o1.setStatusBarText(textforDrag));
+                break;
+
+            default:
+                app.ifPresent(o->o.setStatusBarText("To-do (textfor" + type));
+                break;
+        }
+    }
+
 }

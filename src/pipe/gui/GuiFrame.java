@@ -442,7 +442,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         this.setMinimumSize(new Dimension(825, 480));
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        appTab= new ExtendedJTabbedPane<TabContent>() {
+        appTab = new ExtendedJTabbedPane<TabContent>() {
             @Override
             public Component generator() {
                 return new TabComponent(this) {
@@ -508,7 +508,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
 
 
-        if (Platform.isMac()){
+        if (Platform.isMac()) {
 
             //Set specific settings
             System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -915,7 +915,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     WorkflowDialog.showDialog();
                 }
 
-                statusBar.changeText(StatusBar.textforDrawing);
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
                 fixBug812694GrayMenuAfterSimulationOnMac();
@@ -955,7 +954,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 getCurrentTab().getAnimationController().requestFocusInWindow();
 
-                statusBar.changeText(StatusBar.textforAnimation);
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 
@@ -986,7 +984,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 enableAllActions(false);
 
                 // Disable All Actions
-                statusBar.changeText(StatusBar.textforNoNet);
+                statusBar.changeText("Open a net to start editing");
                 setFocusTraversalPolicy(null);
 
                 break;
@@ -1126,7 +1124,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Enable actions based on GUI mode
         enableGUIActions(mode);
-        if(currentTab != null){
+        if (currentTab != null) {
             currentTab.ifPresent(o -> o.updateEnabledActions(mode));
         }
     }
@@ -1152,7 +1150,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // deselect other actions
         selectAction.setSelected(CreateGui.guiMode == ElementType.SELECT);
 
-        statusBar.changeText(CreateGui.guiMode);
+    }
+
+    @Override
+    public void setStatusBarText(String s) {
+        if (s != null) {
+            statusBar.changeText(s);
+        } else {
+            statusBar.changeText("");
+        }
     }
 
 
@@ -1250,16 +1256,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
         zoomComboBox.addActionListener(zoomComboListener);
     }
+
     @Override
-    public void updateGuiMenus(){
+    public void updateGuiMenus() {
         updateDrawingMenu();
         updateSimulationMenu();
         updateViewMenu();
 
 
-
     }
-    private void updateDrawingMenu(){
+
+    private void updateDrawingMenu() {
         drawingToolBar.removeAll();
         drawMenu.removeAll();
         drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
@@ -1267,21 +1274,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawMenu.add(selectAction);
         drawMenu.addSeparator();
 
-        for(GuiAction action : getCurrentTab().getAvailableDrawActions()){
+        for (GuiAction action : getCurrentTab().getAvailableDrawActions()) {
             drawingToolBar.add(new ToggleButtonWithoutText(action));
             drawMenu.add(action);
         }
         drawingToolBar.addSeparator();
         drawingToolBar.add(featureInfoText);
     }
-    private void updateSimulationMenu(){
+
+    private void updateSimulationMenu() {
         animateMenu.removeAll();
         animateMenu.add(startAction);
 
         animateMenu.add(stepbackwardAction);
         animateMenu.add(stepforwardAction);
 
-        for(GuiAction action : getCurrentTab().getAvailableSimActions()){
+        for (GuiAction action : getCurrentTab().getAvailableSimActions()) {
             animateMenu.add(action);
         }
 
@@ -1295,12 +1303,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         animateMenu.add(importTraceAction);
     }
 
-    private void updateViewMenu(){
-        if(!getCurrentTab().getLens().isTimed()){
+    private void updateViewMenu() {
+        if (!getCurrentTab().getLens().isTimed()) {
             showZeroToInfinityIntervalsCheckBox.setVisible(false);
             showTokenAgeCheckBox.setVisible(false);
             showDelayEnabledTransitionsCheckbox.setVisible(false);
-        } else{
+        } else {
             showZeroToInfinityIntervalsCheckBox.setVisible(true);
             showTokenAgeCheckBox.setVisible(true);
             showDelayEnabledTransitionsCheckbox.setVisible(true);
