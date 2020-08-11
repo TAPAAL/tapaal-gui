@@ -30,6 +30,7 @@ import javax.swing.event.ChangeEvent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
+import pipe.gui.ColoredComponents.ColoredArcGuardPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -67,22 +68,23 @@ public class GuardDialogue extends JPanel /*
 	private WidthAdjustingComboBox<String> rightConstantsComboBox;
 	private JCheckBox weightUseConstant;
 	private WidthAdjustingComboBox<String> weightConstantsComboBox;
+	private ColoredArcGuardPanel coloredArcGuardPanel;
+    PetriNetObject objectToBeEdited;
 	
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
 		myRootPane = rootPane;
+		this.objectToBeEdited = objectToBeEdited;
 		setLayout(new GridBagLayout());
 
 		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			initTimeGuardPanel();
 		}
-        if(!objectToBeEdited.isTimed() ){
-            guardEditPanel.setVisible(false);
-        }
 
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
+		initColoredArcPanel();
 
 		myRootPane.setDefaultButton(okButton);
 		
@@ -99,8 +101,33 @@ public class GuardDialogue extends JPanel /*
 			
 			weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight().value());
 		}
+		hideIrrelevantInformation();
 	}
 
+	private void hideIrrelevantInformation(){
+        if(!objectToBeEdited.isTimed() ){
+            guardEditPanel.setVisible(false);
+        }
+        if(!objectToBeEdited.isColored()){
+            coloredArcGuardPanel.setVisible(false);
+        } else if (!objectToBeEdited.isTimed()){
+            weightEditPanel.setVisible(false);
+            coloredArcGuardPanel.hideColorInvariantPanel();
+        } else{
+            guardEditPanel.setVisible(false);
+            weightEditPanel.setVisible(false);
+        }
+    }
+
+    private void initColoredArcPanel(){
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        coloredArcGuardPanel = new ColoredArcGuardPanel();
+	    add(coloredArcGuardPanel, gridBagConstraints);
+    }
 
 	private void initButtonPanel(final PetriNetObject objectToBeEdited) {
 		buttonPanel = new JPanel(new GridBagLayout());
@@ -214,7 +241,7 @@ public class GuardDialogue extends JPanel /*
 		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridy = 4;
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
 		add(buttonPanel, gridBagConstraints);

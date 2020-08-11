@@ -926,7 +926,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridwidth = 3;
         nonDefaultColorPanel.add(colorComboboxPanel, gbc);
 
-        buttonPanel = new JPanel(new GridBagLayout());
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
