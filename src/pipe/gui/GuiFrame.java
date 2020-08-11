@@ -1597,12 +1597,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Arrays.sort(nets, (one, two) -> {
 
                 int toReturn = one.compareTo(two);
-                // Special hack to get intro-example first
+                // Special hack to get intro-example first and game-example last
                 if (one.equals("intro-example.tapn")) {
                     toReturn = -1;
+                } else if (one.equals("game-harddisk.tapn")) {
+                    toReturn = 1;
                 }
                 if (two.equals("intro-example.tapn")) {
                     toReturn = 1;
+                } else if (two.equals("game-harddisk.tapn")) {
+                    toReturn = -1;
                 }
                 return toReturn;
             });
