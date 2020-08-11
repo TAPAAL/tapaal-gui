@@ -17,18 +17,13 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
+
 import net.tapaal.swinghelpers.GridBagHelper;
+import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MakeTransitionNewSharedCommand;
-import dk.aau.cs.gui.undo.MakeTransitionNewSharedMultiCommand;
-import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
-import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
-import dk.aau.cs.gui.undo.ToggleTransitionUrgent;
-import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -76,15 +71,19 @@ public class TAPNTransitionEditor extends JPanel {
 		okButton = new JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		urgentCheckBox = new JCheckBox("Urgent");
+		uncontrollableCheckBox = new JCheckBox("Uncontrollable");
 		attributesCheckBox = new JCheckBox("Show transition name");
+
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
 		sharedTransitionsComboBox.addActionListener(e -> {
 			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
-				((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
 			}else{
-				urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+                urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+                uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
 			}
 		});
 
@@ -153,6 +152,22 @@ public class TAPNTransitionEditor extends JPanel {
 				urgentCheckBox.setSelected(false);
 			}
 		});
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        if (context.tabContent().getLens().isGame()) {
+            transitionEditorPanel.add(uncontrollableCheckBox, gridBagConstraints);
+
+            uncontrollableCheckBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    JCheckBox box = (JCheckBox) arg0.getSource();
+                    uncontrollableCheckBox.setSelected(box.isSelected());
+                }
+            });
+        }
 	
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = GridBagHelper.as(0,2, Anchor.NORTH, new Insets(3, 3, 3, 3));
@@ -225,7 +240,8 @@ public class TAPNTransitionEditor extends JPanel {
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel<>(sharedTransitions));
 		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		urgentCheckBox.setSelected(transition.isUrgent());
-		
+		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
+
 		if(transition.underlyingTransition().isShared()){
 			switchToNameDropDown();
 			sharedCheckBox.setSelected(true);
@@ -262,7 +278,8 @@ public class TAPNTransitionEditor extends JPanel {
 		transitionEditorPanel.remove(sharedTransitionsComboBox);
 		GridBagConstraints gbc = GridBagHelper.as(1,1, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
 		urgentCheckBox.setSelected(transition.isUrgent());
-		transitionEditorPanel.add(nameTextField, gbc);	
+		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
+		transitionEditorPanel.add(nameTextField, gbc);
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
@@ -273,11 +290,13 @@ public class TAPNTransitionEditor extends JPanel {
 
 		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);
 		if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
-			((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
-		}else{
-			urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
+        }else{
+            urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+            uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
 		}
-		transitionEditorPanel.validate();
+    		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
 
@@ -397,13 +416,18 @@ public class TAPNTransitionEditor extends JPanel {
 					}
 				}
 				transition.setUrgent(urgentCheckBox.isSelected());
-			}  
+				transition.setUncontrollable(uncontrollableCheckBox.isSelected());
+			}
 		}
 		
 		if(transition.isUrgent() != urgentCheckBox.isSelected()){
-			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
+			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition(), context.tabContent()));
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
+        if(transition.isUncontrollable() != uncontrollableCheckBox.isSelected()){
+            context.undoManager().addEdit(new ToggleTransitionUncontrollable(transition.underlyingTransition(), context.tabContent()));
+            transition.setUncontrollable(uncontrollableCheckBox.isSelected());
+        }
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
@@ -454,8 +478,12 @@ public class TAPNTransitionEditor extends JPanel {
 	private JPanel transitionEditorPanel;
 	private javax.swing.JCheckBox sharedCheckBox;
 	private javax.swing.JComboBox<SharedTransition> sharedTransitionsComboBox;
+
 	private javax.swing.JCheckBox urgentCheckBox;
     private Vector<SharedTransition> sharedTransitions;
+
+    private javax.swing.JCheckBox uncontrollableCheckBox;
+
 	private boolean makeNewShared = false;
 	private javax.swing.JCheckBox attributesCheckBox;
 }

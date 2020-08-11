@@ -33,7 +33,6 @@ public class MakeTransitionNewSharedCommand extends Command {
 		}
 		sharedPanel.addSharedTransition(sharedTransition, multiShare);			
 		sharedTransition.makeShared(timedTransition);
-		
 		tapn.add(timedTransition);
 		
 	}
