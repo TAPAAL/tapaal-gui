@@ -51,6 +51,5 @@ public interface GuiFrameActions {
     void setShowZeroToInfinityIntervalsSelected(boolean b);
     void setShowTokenAgeSelected(boolean b);
 
-    void setFeatureInfoText(String s);
-
+    void setFeatureInfoText(boolean[] features);
 }
