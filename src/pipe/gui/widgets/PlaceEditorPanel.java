@@ -71,12 +71,24 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		place = placeComponent;
 		this.context = context;
 		initComponents();
-		hideTimedInformation();
+		hideIrrelevantInformation();
 	}
 
-	private void hideTimedInformation(){
+	private void hideIrrelevantInformation(){
         if(!place.isTimed()) {
             timeInvariantPanel.setVisible(false);
+            timeInvariantColorPanel.setVisible(false);
+        }
+        if(!place.isColored()){
+            timeInvariantColorPanel.setVisible(false);
+            tokenPanel.setVisible(false);
+        }
+        if(place.isColored()){
+            markingLabel.setVisible(false);
+            markingSpinner.setVisible(false);
+            if(place.isTimed()){
+                timeInvariantPanel.setVisible(false);
+            }
         }
     }
 
@@ -756,7 +768,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     }
 
     public void initColorInvariantPanel(){
-        JPanel timeInvariantColorPanel = new JPanel(new GridBagLayout());
+	    timeInvariantColorPanel = new JPanel(new GridBagLayout());
         timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
 
         GridBagConstraints gbc = GridBagHelper.as(0,0);
@@ -982,6 +994,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     private JButton removeColoredTokenButton;
     private ColorComboboxPanel tokenColorComboboxPanel;
     private ColorType colorType;
+    JPanel timeInvariantColorPanel;
 
 
 }

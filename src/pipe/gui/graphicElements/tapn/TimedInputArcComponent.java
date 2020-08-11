@@ -2,6 +2,7 @@ package pipe.gui.graphicElements.tapn;
 
 import java.util.Hashtable;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -24,12 +25,13 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc, boolean isTimed){
+	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc, TabContent.TAPNLens lens){
 	    super(source);
 	    setTarget(target);
 	    setUnderlyingArc(modelArc);
 	    updateLabel(true);
-	    this.isTimed = isTimed;
+	    this.isTimed = lens.isTimed();
+	    this.isColored = lens.isColored();
 	    sealArc();
     }
 

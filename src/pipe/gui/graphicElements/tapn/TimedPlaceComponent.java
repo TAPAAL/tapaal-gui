@@ -23,6 +23,7 @@ import java.util.Locale;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -49,11 +50,12 @@ public class TimedPlaceComponent extends Place {
 	private Window ageOfTokensWindow = new Window(new Frame());
 	private final Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, boolean isTimed) {
+	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens) {
 		super(positionXInput, positionYInput);
 		this.place = place;
         this.place.addTimedPlaceListener(listener);
-        this.isTimed = isTimed;
+        this.isTimed = lens.isTimed();
+        this.isColored = lens.isColored();
 		attributesVisible = true;
 
     }
