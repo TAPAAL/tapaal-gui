@@ -1485,13 +1485,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
 	}
 
-    @Override
-    public void duplicateAndConvertUntimed() {
-        TabContent duplicate = duplicateTab(FeatureOption.TIME, lens.timed);
-        convertToUntimedTab(duplicate);
-        guiFrameControllerActions.ifPresent(o -> o.openTab(duplicate));
-    }
-
     private void createNewAndConvertUntimed() {
 	    TabContent tab = duplicateTab(FeatureOption.TIME, false);
         convertToUntimedTab(tab);

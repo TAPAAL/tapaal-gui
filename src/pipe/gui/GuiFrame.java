@@ -238,12 +238,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::mergeNetComponents);
         }
     };
-    private final GuiAction stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::duplicateAndConvertUntimed);
-        }
-    };
-
     private final GuiAction zoomOutAction = new GuiAction("Zoom out", "Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::zoomOut);
@@ -804,10 +798,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         smartDrawDialog.setMnemonic('D');
         toolsMenu.add(smartDrawDialog);
 
-        JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction);
-        stripTimeDialog.setMnemonic('e');
-        toolsMenu.add(stripTimeDialog);
-
         JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction);
         mergeComponentsDialog.setMnemonic('c');
         toolsMenu.add(mergeComponentsDialog);
@@ -1028,7 +1018,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 smartDrawAction.setEnabled(true);
                 mergeComponentsDialogAction.setEnabled(true);
                 workflowDialogAction.setEnabled(true);
-                stripTimeDialogAction.setEnabled(true);
 
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
@@ -1081,7 +1070,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 smartDrawAction.setEnabled(false);
                 mergeComponentsDialogAction.setEnabled(false);
                 workflowDialogAction.setEnabled(false);
-                stripTimeDialogAction.setEnabled(false);
 
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
@@ -1128,7 +1116,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 smartDrawAction.setEnabled(false);
                 mergeComponentsDialogAction.setEnabled(false);
                 workflowDialogAction.setEnabled(false);
-                stripTimeDialogAction.setEnabled(false);
 
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);

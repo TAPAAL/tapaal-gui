@@ -89,8 +89,6 @@ public interface TabContentActions {
 
     void setResizeingDefault();
 
-    void duplicateAndConvertUntimed();
-
     void changeTimeFeature(boolean isTime);
 
     void changeGameFeature(boolean isGame);
