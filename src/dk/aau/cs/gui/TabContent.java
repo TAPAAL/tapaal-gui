@@ -2526,19 +2526,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
     public List<GuiAction> getAvailableDrawActions(){
         if(lens.isTimed()){
-            return new ArrayList<GuiAction>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         } else{
-            return new ArrayList<GuiAction>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         }
     }
 
     public List<GuiAction> getAvailableSimActions(){
         if(lens.isTimed()){
-            return new ArrayList<GuiAction>(Arrays.asList(timeAction, delayFireAction));
+            return new ArrayList<>(Arrays.asList(timeAction, delayFireAction));
         } else{
             delayFireAction.setName("Fire");
             delayFireAction.setTooltip("Fire Selected Transition");
-            return new ArrayList<GuiAction>(Arrays.asList(delayFireAction));
+            return new ArrayList<>(Arrays.asList(delayFireAction));
         }
     }
 
