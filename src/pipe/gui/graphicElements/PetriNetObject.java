@@ -290,6 +290,9 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	public boolean isTimed(){
 	    return isTimed;
     }
+    public void setIsTimed(boolean newStatus){
+	    isTimed = newStatus;
+    }
 
     public boolean isColored(){
 	    return isColored;

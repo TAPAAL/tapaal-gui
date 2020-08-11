@@ -91,4 +91,9 @@ public interface TabContentActions {
     void setResizeingDefault();
 
     void updateEnabledActions(GuiFrame.GUIMode mode);
+
+    void changeTimeFeature(boolean isTime);
+
+    void changeGameFeature(boolean isGame);
+
 }

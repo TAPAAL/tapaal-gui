@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
@@ -24,6 +25,7 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
+import org.jetbrains.annotations.NotNull;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.WorkflowDialog;
@@ -42,8 +44,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final String frameTitle;
 
-    private Pipe.ElementType mode;
-
     private int newNameCounter = 1;
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
@@ -57,6 +57,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     JMenu viewMenu;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
+    private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -239,12 +241,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::mergeNetComponents);
         }
     };
-    private final GuiAction stripTimeDialogAction = new GuiAction("Remove timing information", "Remove all timing information from the net in the active tab and open it as a P/T net in a new tab.", KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)) {
-        public void actionPerformed(ActionEvent e) {
-            duplicateAndConvertUntimed();
-        }
-    };
-
     private final GuiAction zoomOutAction = new GuiAction("Zoom out", "Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::zoomOut);
@@ -285,12 +281,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(o -> o.setMode(ElementType.ANNOTATION));
-        }
-    };
-
-    private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.SELECT));
         }
     };
 
@@ -420,6 +410,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
+    private GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
+        public void actionPerformed(ActionEvent e) {
+            boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
+        }
+    };
+
+    private GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
+        public void actionPerformed(ActionEvent e) {
+            boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeGameFeature(isGame));
+        }
+    };
+
     public enum GUIMode {
         draw, animation, noNet
     }
@@ -444,7 +448,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         this.setMinimumSize(new Dimension(825, 480));
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        appTab= new ExtendedJTabbedPane<TabContent>() {
+        appTab = new ExtendedJTabbedPane<TabContent>() {
             @Override
             public Component generator() {
                 return new TabComponent(this) {
@@ -464,7 +468,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Status bar...
         statusBar = new StatusBar();
-        getContentPane().add(statusBar, BorderLayout.PAGE_END);
+
+        // Net Type
+        JPanel featurePanel = new JPanel();
+        featurePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        featurePanel.add(new JLabel("Timed: "));
+        featurePanel.add(timeFeatureOptions);
+        featurePanel.add(new JLabel("   Game: "));
+        featurePanel.add(gameFeatureOptions);
+        timeFeatureOptions.addActionListener(changeTimeFeatureAction);
+        gameFeatureOptions.addActionListener(changeGameFeatureAction);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new GridLayout(1, 2));
+        bottomPanel.add(statusBar);
+        bottomPanel.add(featurePanel);
+        getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
 
         // Build menus
         buildToolbar();
@@ -510,7 +529,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
 
 
-        if (Platform.isMac()){
+        if (Platform.isMac()) {
 
             //Set specific settings
             System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -709,10 +728,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         smartDrawDialog.setMnemonic('D');
         toolsMenu.add(smartDrawDialog);
 
-        JMenuItem stripTimeDialog = new JMenuItem(stripTimeDialogAction);
-        stripTimeDialog.setMnemonic('e');
-        toolsMenu.add(stripTimeDialog);
-
         JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction);
         mergeComponentsDialog.setMnemonic('c');
         toolsMenu.add(mergeComponentsDialog);
@@ -727,13 +742,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         return toolsMenu;
     }
-
-    private void duplicateAndConvertUntimed() {
-        TabContent duplicate = ((TabContent) appTab.getSelectedComponent()).duplicateTab();
-        convertToUntimedTab(duplicate);
-        guiFrameController.ifPresent(o -> o.openTab(duplicate));
-    }
-
 
     private void buildToolbar() {
 
@@ -895,7 +903,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 annotationAction.setEnabled(true);
                 deleteAction.setEnabled(true);
                 selectAllAction.setEnabled(true);
-                selectAction.setEnabled(true);
 
                 stepbackwardAction.setEnabled(false);
                 stepforwardAction.setEnabled(false);
@@ -911,13 +918,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 smartDrawAction.setEnabled(true);
                 mergeComponentsDialogAction.setEnabled(true);
                 workflowDialogAction.setEnabled(true);
-                stripTimeDialogAction.setEnabled(true);
+
+                timeFeatureOptions.setEnabled(true);
+                gameFeatureOptions.setEnabled(true);
 
                 if (getCurrentTab().restoreWorkflowDialog()) {
                     WorkflowDialog.showDialog();
                 }
 
-                statusBar.changeText(StatusBar.textforDrawing);
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
                 fixBug812694GrayMenuAfterSimulationOnMac();
@@ -929,7 +937,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 annotationAction.setEnabled(false);
                 deleteAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
-                selectAction.setEnabled(false);
 
                 alignToGrid.setEnabled(false);
 
@@ -950,14 +957,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 smartDrawAction.setEnabled(false);
                 mergeComponentsDialogAction.setEnabled(false);
                 workflowDialogAction.setEnabled(false);
-                stripTimeDialogAction.setEnabled(false);
+
+                timeFeatureOptions.setEnabled(false);
+                gameFeatureOptions.setEnabled(false);
 
                 // Remove constant highlight
                 getCurrentTab().removeConstantHighlights();
 
                 getCurrentTab().getAnimationController().requestFocusInWindow();
 
-                statusBar.changeText(StatusBar.textforAnimation);
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 
@@ -969,7 +977,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 annotationAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
-                selectAction.setEnabled(false);
 
                 stepbackwardAction.setEnabled(false);
                 stepforwardAction.setEnabled(false);
@@ -983,12 +990,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 smartDrawAction.setEnabled(false);
                 mergeComponentsDialogAction.setEnabled(false);
                 workflowDialogAction.setEnabled(false);
-                stripTimeDialogAction.setEnabled(false);
+
+                timeFeatureOptions.setEnabled(false);
+                gameFeatureOptions.setEnabled(false);
 
                 enableAllActions(false);
 
                 // Disable All Actions
-                statusBar.changeText(StatusBar.textforNoNet);
+                statusBar.changeText("Open a net to start editing");
                 setFocusTraversalPolicy(null);
 
                 break;
@@ -1094,11 +1103,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     }
 
-    private void convertToUntimedTab(TabContent tab) {
-        TabTransformer.removeTimingInformation(tab);
-    }
-
-
     /**
      * Set the current mode of the GUI, and changes possible actions
      *
@@ -1119,7 +1123,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 break;
             case noNet:
-                setFeatureInfoText("");
+                setFeatureInfoText(null);
+                registerDrawingActions(List.of());
+                registerAnimationActions(List.of());
+                //registerViewActions(List.of());
                 break;
 
             default:
@@ -1128,8 +1135,60 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Enable actions based on GUI mode
         enableGUIActions(mode);
-        if(currentTab != null){
+        if (currentTab != null) {
             currentTab.ifPresent(o -> o.updateEnabledActions(mode));
+        }
+    }
+
+    @Override
+    public void registerDrawingActions(@NotNull List<GuiAction> drawActions) {
+
+        drawingToolBar.removeAll();
+        drawMenu.removeAll();
+
+        drawingToolBar.addSeparator();
+
+        for (GuiAction action : drawActions) {
+            drawingToolBar.add(new ToggleButtonWithoutText(action));
+            drawMenu.add(action);
+        }
+        drawMenu.setEnabled(drawMenu.getItemCount() >0);
+        drawingToolBar.addSeparator();
+        drawingToolBar.add(featureInfoText);
+
+    }
+    @Override
+    public void registerAnimationActions(@NotNull List<GuiAction> animationActions) {
+        animateMenu.removeAll();
+        animateMenu.add(startAction);
+
+        animateMenu.add(stepbackwardAction);
+        animateMenu.add(stepforwardAction);
+
+        for (GuiAction action : animationActions) {
+            animateMenu.add(action);
+        }
+
+        animateMenu.add(prevcomponentAction);
+        animateMenu.add(nextcomponentAction);
+
+        animateMenu.addSeparator();
+        animateMenu.add(exportTraceAction);
+        animateMenu.add(importTraceAction);
+    }
+
+    @Override
+    public void registerViewActions(@NotNull List<GuiAction> viewActions) {
+        //TODO: This is a temporary implementation until view actions can be moved to tab content
+
+        if (!getCurrentTab().getLens().isTimed()) {
+            showZeroToInfinityIntervalsCheckBox.setVisible(false);
+            showTokenAgeCheckBox.setVisible(false);
+            showDelayEnabledTransitionsCheckbox.setVisible(false);
+        } else {
+            showZeroToInfinityIntervalsCheckBox.setVisible(true);
+            showTokenAgeCheckBox.setVisible(true);
+            showDelayEnabledTransitionsCheckbox.setVisible(true);
         }
     }
 
@@ -1144,16 +1203,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         a.dispose();
     }
 
-    //XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
     @Override
-    public void updateMode(Pipe.ElementType _mode) {
-
-        mode = _mode;
-
-        // deselect other actions
-        selectAction.setSelected(mode == ElementType.SELECT);
-
-        statusBar.changeText(mode);
+    public void setStatusBarText(String s) {
+        statusBar.changeText(Objects.requireNonNullElse(s, ""));
     }
 
 
@@ -1172,7 +1224,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             // create a tabChanged event loop.
             // Throw exception if tab is not found
             appTab.setSelectedComponent(tab);
-            updateGuiMenus();
         }
     }
 
@@ -1221,10 +1272,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showTokenAgeAction.setSelected(b);
     }
 
-    public Pipe.ElementType getMode() {
-        return mode;
-    }
-
     public void setTitle(String title) {
         super.setTitle((title == null) ? frameTitle : frameTitle + ": " + title);
     }
@@ -1255,63 +1302,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
         zoomComboBox.addActionListener(zoomComboListener);
     }
-    @Override
-    public void updateGuiMenus(){
-        updateDrawingMenu();
-        updateSimulationMenu();
-        updateViewMenu();
-
-
-
-    }
-    private void updateDrawingMenu(){
-        drawingToolBar.removeAll();
-        drawMenu.removeAll();
-        drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
-
-        drawMenu.add(selectAction);
-        drawMenu.addSeparator();
-
-        for(GuiAction action : getCurrentTab().getAvailableDrawActions()){
-            drawingToolBar.add(new ToggleButtonWithoutText(action));
-            drawMenu.add(action);
-        }
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(featureInfoText);
-    }
-    private void updateSimulationMenu(){
-        animateMenu.removeAll();
-        animateMenu.add(startAction);
-
-        animateMenu.add(stepbackwardAction);
-        animateMenu.add(stepforwardAction);
-
-        for(GuiAction action : getCurrentTab().getAvailableSimActions()){
-            animateMenu.add(action);
-        }
-
-        animateMenu.add(prevcomponentAction);
-
-        animateMenu.add(nextcomponentAction);
-
-        animateMenu.addSeparator();
-
-        animateMenu.add(exportTraceAction);
-        animateMenu.add(importTraceAction);
-    }
-
-    private void updateViewMenu(){
-        if(!getCurrentTab().getLens().isTimed()){
-            showZeroToInfinityIntervalsCheckBox.setVisible(false);
-            showTokenAgeCheckBox.setVisible(false);
-            showDelayEnabledTransitionsCheckbox.setVisible(false);
-        } else{
-            showZeroToInfinityIntervalsCheckBox.setVisible(true);
-            showTokenAgeCheckBox.setVisible(true);
-            showDelayEnabledTransitionsCheckbox.setVisible(true);
-        }
-    }
-
 
     private boolean canNetBeSavedAndShowMessage() {
         if (getCurrentTab().network().paintNet()) {
@@ -1477,12 +1467,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Arrays.sort(nets, (one, two) -> {
 
                 int toReturn = one.compareTo(two);
-                // Special hack to get intro-example first
+                // Special hack to get intro-example first and game-example last
                 if (one.equals("intro-example.tapn")) {
                     toReturn = -1;
+                } else if (one.equals("game-harddisk.tapn")) {
+                    toReturn = 1;
                 }
                 if (two.equals("intro-example.tapn")) {
                     toReturn = 1;
+                } else if (two.equals("game-harddisk.tapn")) {
+                    toReturn = -1;
                 }
                 return toReturn;
             });
@@ -1529,9 +1523,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void setFeatureInfoText(String s) {
-        if (s == null) s = "";
-        featureInfoText.setText(s);
+    public void setFeatureInfoText(boolean[] features) {
+        if (features != null) {
+            timeFeatureOptions.setSelectedIndex(features[0] ? 1 : 0);
+            gameFeatureOptions.setSelectedIndex(features[1] ? 1 : 0);
+        }
     }
 
 }

@@ -26,10 +26,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
@@ -135,6 +132,14 @@ public class TapnXmlLoader {
 		parseBound(doc, network);
 
 		parseFeature(doc, network);
+		//This is needed for nets which do not have a feature
+        //We can only know if the net is timed after we have loaded the objects
+        //but we need to set the property while loading the objects
+		if(isTimed){
+		    for(Template t : templates){
+		        t.guiModel().getPetriNetObjects().forEach(o -> o.setIsTimed(true));
+            }
+        }
 
 		return new LoadedModel(network, templates, queries,messages, isTimed, isGame, isColored);
 	}
