@@ -19,6 +19,7 @@ import javax.swing.event.CaretListener;
 import net.tapaal.swinghelpers.GridBagHelper;
 import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
+import pipe.gui.ColoredComponents.ColoredTransitionGuardPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
@@ -50,13 +51,16 @@ public class TAPNTransitionEditor extends JPanel {
 		transition = _transition;
 		this.context = context;
 		initComponents();
-        hideTimedInformation();
+        hideIrrelevantInformation();
 		rootPane.setDefaultButton(okButton);
 	}
 
-	private void hideTimedInformation(){
+	private void hideIrrelevantInformation(){
 	    if(!transition.isTimed()) {
             urgentCheckBox.setVisible(false);
+        }
+	    if(!transition.isColored()){
+	        coloredTransitionGuardPanel.setVisible(false);
         }
     }
 
@@ -217,7 +221,10 @@ public class TAPNTransitionEditor extends JPanel {
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 		gridBagConstraints = GridBagHelper.as(1,3, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
-		
+
+		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
+        coloredTransitionGuardPanel = new ColoredTransitionGuardPanel();
+		add(coloredTransitionGuardPanel, gridBagConstraints);
 		setupInitialState();
 
 	}	
@@ -490,4 +497,5 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private boolean makeNewShared = false;
 	private javax.swing.JCheckBox attributesCheckBox;
+    private ColoredTransitionGuardPanel coloredTransitionGuardPanel;
 }
