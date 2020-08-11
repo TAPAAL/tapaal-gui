@@ -1,9 +1,6 @@
 package pipe.gui.widgets;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -13,6 +10,8 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredToken;
@@ -91,7 +90,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		add(buttonPanel, gridBagConstraints);
-
+        initColorInvariantPanel();
 		initTokensPanel();
 	}
 
@@ -745,6 +744,206 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(3, 3, 3, 3);
         add(tokenPanel, gbc);
+    }
+
+    public void initColorInvariantPanel(){
+        JPanel timeInvariantColorPanel = new JPanel(new GridBagLayout());
+        timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
+
+        GridBagConstraints gbc = GridBagHelper.as(0,0);
+        timeInvariantColorPanel.add(initColorConstraintPanel(), gbc);
+
+        gbc = GridBagHelper.as(0,3, WEST, HORIZONTAL, new Insets(3, 3, 3, 3));
+        add(timeInvariantColorPanel, gbc);
+
+    }
+
+    private JPanel initColorConstraintPanel() {
+        JPanel nonDefaultColorPanel = new JPanel(new GridBagLayout());
+        ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors");
+
+        JButton addTimeConstraintButton = new JButton("Add");
+        JButton removeTimeConstraintButton = new JButton("Remove");
+        JButton editTimeConstraintButton = new JButton("Edit");
+
+        Dimension buttonSize = new Dimension(80, 27);
+
+        addTimeConstraintButton.setPreferredSize(buttonSize);
+        removeTimeConstraintButton.setPreferredSize(buttonSize);
+        editTimeConstraintButton.setPreferredSize(buttonSize);
+
+        ListModel timeConstraintListModel = new DefaultListModel();
+        JList timeConstraintList = new JList(timeConstraintListModel);
+        JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
+        timeConstraintScrollPane.setViewportView(timeConstraintList);
+        timeConstraintScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+
+        timeConstraintScrollPane.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.addColumn("Color");
+        tableModel.addColumn("Time Invariant");
+        //   ((DefaultTableModel) tableModel).addRow(test);
+
+        JTable table = new JTable(tableModel);
+        table.setPreferredSize(new Dimension(300, 150));
+        timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
+        //timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
+
+
+
+        /*addTimeConstraintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
+                AbstractTimeConstraint timeConstraint;
+
+                if (!(colorType instanceof ProductType)) {
+                    if (isInterval)
+                        timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
+                    else
+                        timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
+                } else {
+                    Vector<Color> colors = new Vector<Color>();
+                    for (int i = 0; i < comboBoxes.length; i++) {
+                        colors.add((Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
+                    }
+                    Color color = new Color(colorType, 0, colors);
+                    if (isInterval)
+                        timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
+                    else
+                        timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(color);
+                }
+                boolean alreadyExists = false;
+                for (int i = 0; i < timeConstraintListModel.size(); i++) {
+                    if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i)))
+                        alreadyExists = true;
+                }
+                if (alreadyExists) {
+                    JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
+                } else
+                    timeConstraintListModel.addElement(timeConstraint);
+
+            }
+
+        });*/
+
+        /*removeTimeConstraintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int index = timeConstraintList.getSelectedIndex();
+                Object star = timeConstraintListModel.elementAt(index);
+                if(star instanceof ColoredTimeInterval) {
+                    if(((ColoredTimeInterval) star).getColor().equals(Color.STAR_COLOR)) {
+                        JOptionPane.showMessageDialog(null, "Star interval cannot be removed");
+                    }else {
+                        timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
+                    }
+                }else if(star instanceof ColoredTimeInvariant) {
+                    if(((ColoredTimeInvariant) star).getColor().equals(Color.STAR_COLOR)) {
+                        JOptionPane.showMessageDialog(null, "Star invariant cannot be removed");
+                    }else{
+                        timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
+                    }
+                }
+            }
+        });*/
+
+        /*editTimeConstraintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (isInterval) {
+                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
+                    Container contentPane = guiDialog.getContentPane();
+
+                    // 1 Set layout
+                    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+                    ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
+                    contentPane.add(ctiPanel);
+
+                    guiDialog.setResizable(false);
+
+                    // Make window fit contents' preferred size
+                    guiDialog.pack();
+
+                    // Move window to the middle of the screen
+                    guiDialog.setLocationRelativeTo(null);
+                    guiDialog.setVisible(true);
+
+                    if (ctiPanel.isEditConfirmed())
+                        timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
+
+                } else {
+                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Invariant", true);
+                    Container contentPane = guiDialog.getContentPane();
+
+                    // 1 Set layout
+                    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+                    ColoredTimeInvariantDialogPanel ctiPanel = new ColoredTimeInvariantDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInvariant) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()), placeComp);
+                    contentPane.add(ctiPanel);
+
+                    guiDialog.setResizable(false);
+
+                    // Make window fit contents' preferred size
+                    guiDialog.pack();
+
+                    // Move window to the middle of the screen
+                    guiDialog.setLocationRelativeTo(null);
+                    guiDialog.setVisible(true);
+
+                    if (ctiPanel.didEdit)
+                        timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInvariant());
+                }
+            }
+        });*/
+
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridwidth = 3;
+        nonDefaultColorPanel.add(colorComboboxPanel, gbc);
+
+        buttonPanel = new JPanel(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(3, 3, 3,3);
+        buttonPanel.add(addTimeConstraintButton, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        buttonPanel.add(removeTimeConstraintButton, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        buttonPanel.add(editTimeConstraintButton, gbc);
+
+        Dimension dim;
+        dim = new Dimension(375, 200);
+        timeConstraintScrollPane.setPreferredSize(dim);
+        timeConstraintScrollPane.setMaximumSize(dim);
+        timeConstraintScrollPane.setMinimumSize(dim);
+
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        nonDefaultColorPanel.add(buttonPanel,gbc);
+
+
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridheight = 2;
+        nonDefaultColorPanel.add(timeConstraintScrollPane, gbc);
+
+        return nonDefaultColorPanel;
     }
 
 	private javax.swing.JCheckBox attributesCheckBox;
