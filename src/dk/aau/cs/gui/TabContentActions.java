@@ -88,4 +88,8 @@ public interface TabContentActions {
     void showDelayEnabledTransitions(boolean showDelayEnabledTransitions);
 
     void setResizeingDefault();
+
+    void changeTimeFeature(boolean isTime);
+
+    void changeGameFeature(boolean isGame);
 }
