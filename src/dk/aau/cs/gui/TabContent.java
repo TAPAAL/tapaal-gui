@@ -1500,13 +1500,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(FeatureOption.TIME, false);
+	    TabContent tab = duplicateTab(new TAPNLens(false, lens.isGame()), "-untimed");
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab(FeatureOption.GAME, false);
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), false), "-nongame");
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1526,7 +1526,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.TIME, isTime);
+                TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame()), "-timed");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1548,7 +1548,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.GAME, isGame);
+                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1971,8 +1971,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					allTemplates(),
 					queriesOverwrite,
 					network().constants(),
-                    lens.timed,
-					lens.game
+                    lens
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -2050,51 +2049,26 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab(FeatureOption option, boolean isYes) {
-		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-				network(),
-				allTemplates(),
-				queries(),
-				network().constants()
-		);
+	public TabContent duplicateTab(TAPNLens overwriteLens, String appendName) {
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+            network(),
+            allTemplates(),
+            queries(),
+            network().constants(),
+            overwriteLens
+        );
 
-		option = isNetChanged(option, isYes) ? option : FeatureOption.TIME;
-
-		try {
-			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-			String composedName = getTabTitle();
-			composedName = composedName.replace(".tapn", "");
-
-			switch (option) {
-                case TIME:
-                    composedName += isYes ? "-timed" : "-untimed";
-                    break;
-                case GAME:
-                    composedName += isYes ? "-game" : "-noGame";
-                    break;
-            }
-
-			if (isNetChanged(option, isYes)) {
-			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, option, isYes);
-            } else {
-                return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
-            }
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			System.console().printf(e1.getMessage());
-		}
-		return null;
-	}
-
-	private boolean isNetChanged(FeatureOption option, boolean isYes) {
-        switch (option) {
-            case TIME:
-                return lens.isTimed() != isYes;
-            case GAME:
-                return lens.isGame() != isYes;
-            default:
-                return false;
+        try {
+            ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+            String composedName = getTabTitle();
+            composedName = composedName.replace(".tapn", "");
+            composedName += appendName;
+            return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+        } catch (Exception e1) {
+            Logger.log("Could not load model");
+            e1.printStackTrace();
         }
+        return null;
     }
 
 	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
