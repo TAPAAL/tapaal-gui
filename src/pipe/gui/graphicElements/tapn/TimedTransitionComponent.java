@@ -16,6 +16,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
@@ -36,13 +37,13 @@ public class TimedTransitionComponent extends Transition {
 	private final dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
-	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition, boolean isTimed) {
+	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition, TabContent.TAPNLens lens) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 		attributesVisible = true;
-		this.isTimed = isTimed;
+		this.lens = lens;
 
 	}
 
@@ -55,7 +56,8 @@ public class TimedTransitionComponent extends Transition {
         boolean timedTransition,
         boolean infServer,
         int angleInput,
-        int priority
+        int priority,
+        TabContent.TAPNLens lens
     ) {
 		super(
 		    positionXInput,
@@ -67,6 +69,7 @@ public class TimedTransitionComponent extends Transition {
         );
 		listener = timedTransitionListener();
 		attributesVisible = true;
+        this.lens = lens;
 
 	}
 
@@ -223,7 +226,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0, lens);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;

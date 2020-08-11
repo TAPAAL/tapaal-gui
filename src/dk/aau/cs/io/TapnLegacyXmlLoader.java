@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -83,9 +84,10 @@ public class TapnLegacyXmlLoader {
 	private final IdResolver idResolver = new IdResolver();
 
     private final Collection<String> messages = new ArrayList<>(10);
+    private final TabContent.TAPNLens lens = new TabContent.TAPNLens(true, false);
 
 
-	public TapnLegacyXmlLoader() {}
+    public TapnLegacyXmlLoader() {}
 	
 	public LoadedModel load(InputStream file) throws FormatException {
 		Require.that(file != null, "file must be non-null and exist");
@@ -278,7 +280,7 @@ public class TapnLegacyXmlLoader {
                                          PlaceTransitionObject targetIn,
                                          int _endx, int _endy) throws FormatException {
 
-	    TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
+	    TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput), lens);
 
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
@@ -523,7 +525,7 @@ public class TapnLegacyXmlLoader {
 		TimedTransitionComponent transition = new TimedTransitionComponent(
 				positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput, timedTransition,
-				infiniteServer, angle, priority);
+				infiniteServer, angle, priority, lens);
 		transition.setUnderlyingTransition(t);
 		guiModel.addPetriNetObject(transition);
 		tapn.add(t);
@@ -556,7 +558,7 @@ public class TapnLegacyXmlLoader {
         }
         idResolver.add(tapn.name(), idInput, nameInput);
 
-        TimedPlaceComponent place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+        TimedPlaceComponent place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
 
         LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
         tapn.add(p);
@@ -615,9 +617,7 @@ public class TapnLegacyXmlLoader {
 
 		} else {
 			if (type.equals("timed")) {
-				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn,
-                    aEndx, aEndy);
+				tempArc = parseAndAddTimedInputArc(idInput, taggedArc, inscriptionTempStorage, sourceIn, targetIn, aEndx, aEndy);
 
 			} else if (type.equals("transport")) {
 				tempArc = parseAndAddTransportArc(idInput, taggedArc,

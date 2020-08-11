@@ -71,9 +71,7 @@ public class TapnXmlLoader {
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
 
-	private boolean isTimed;
-	private boolean isGame;
-	private boolean isUncontrollable = false;
+    private TabContent.TAPNLens lens;
 
 	public TapnXmlLoader() {
 
@@ -116,6 +114,8 @@ public class TapnXmlLoader {
 
 	private LoadedModel parse(Document doc) throws FormatException {
 		idResolver.clear();
+
+        parseFeature(doc);
 		
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
 
@@ -131,17 +131,9 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 
-		parseFeature(doc, network);
-		//This is needed for nets which do not have a feature
-        //We can only know if the net is timed after we have loaded the objects
-        //but we need to set the property while loading the objects
-		if(isTimed){
-		    for(Template t : templates){
-		        t.guiModel().getPetriNetObjects().forEach(o -> o.setIsTimed(true));
-            }
-        }
 
-		return new LoadedModel(network, templates, queries,messages, new TabContent.TAPNLens(isTimed, isGame));
+
+		return new LoadedModel(network, templates, queries,messages, lens);
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -151,27 +143,16 @@ public class TapnXmlLoader {
 		}
 	}
 
-    private void parseFeature(Document doc, TimedArcPetriNetNetwork network) {
-	    boolean networkIsTimed = !network.isUntimed();
-
+    private void parseFeature(Document doc) {
         if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");
 
-            isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
-            isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
+            var isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
+            var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
 
-            if (networkIsTimed && !isTimed) {
-                isTimed = true;
-                Logger.log("The net contains time features. The entire net will be changed to include time features.");
-            }
-            if (isUncontrollable && !isGame) {
-                isGame = true;
-                Logger.log("The net contains game features. The entire net will be changed to include game features.");
-
-            }
+            lens = new TabContent.TAPNLens(isTimed, isGame);
         } else {
-            isTimed = networkIsTimed;
-            isGame = isUncontrollable;
+            lens = new TabContent.TAPNLens(true, false);
         }
     }
 
@@ -386,9 +367,6 @@ public class TapnXmlLoader {
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
 
 		String player = transition.getAttribute("player");
-		if (player.length() > 0 && player.equals("1")) {
-		    isUncontrollable = true;
-        }
 
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
@@ -423,7 +401,7 @@ public class TapnXmlLoader {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
 				positionXInput, positionYInput, idInput,
 				nameOffsetXInput, nameOffsetYInput, true,
-				infiniteServer, angle, priority);
+				infiniteServer, angle, priority, lens);
 		transitionComponent.setUnderlyingTransition(t);
 		
 		if (!displayName){
@@ -474,7 +452,7 @@ public class TapnXmlLoader {
 			}
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
 		placeComponent.setUnderlyingPlace(p);
 		
 		if (!displayName){
@@ -652,7 +630,8 @@ public class TapnXmlLoader {
                                          String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                          PlaceTransitionObject targetIn,
                                          int _endx, int _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
-        TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
+
+	    TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput), lens);
 
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());

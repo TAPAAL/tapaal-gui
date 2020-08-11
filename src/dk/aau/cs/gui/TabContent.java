@@ -153,7 +153,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             Require.notNull(p, "Point can't be null");
 
             dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
-            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens.isTimed());
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
 
@@ -164,7 +164,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
-            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens.isTimed());
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
 
             guiModelToModel.get(c).add(transition);
             c.addPetriNetObject(pnObject);
@@ -204,7 +204,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 TimeInterval.ZERO_INF
             );
 
-            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens.isTimed());
+            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens);
 
             if (path != null) {
                 tiac.setArcPath(new ArcPath(tiac, path));
