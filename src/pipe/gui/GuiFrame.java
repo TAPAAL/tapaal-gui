@@ -1202,11 +1202,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     @Override
     public void setStatusBarText(String s) {
-        if (s != null) {
-            statusBar.changeText(s);
-        } else {
-            statusBar.changeText("");
-        }
+        statusBar.changeText(Objects.requireNonNullElse(s, ""));
     }
 
 
