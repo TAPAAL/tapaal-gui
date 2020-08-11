@@ -42,8 +42,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final String frameTitle;
 
-    private Pipe.ElementType mode;
-
     private int newNameCounter = 1;
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
@@ -1148,12 +1146,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public void updateMode(Pipe.ElementType _mode) {
 
-        mode = _mode;
+
+        CreateGui.guiMode = _mode;
 
         // deselect other actions
-        selectAction.setSelected(mode == ElementType.SELECT);
+        selectAction.setSelected(CreateGui.guiMode == ElementType.SELECT);
 
-        statusBar.changeText(mode);
+        statusBar.changeText(CreateGui.guiMode);
     }
 
 
@@ -1219,10 +1218,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public void setShowTokenAgeSelected(boolean b) {
         showTokenAgeAction.setSelected(b);
-    }
-
-    public Pipe.ElementType getMode() {
-        return mode;
     }
 
     public void setTitle(String title) {

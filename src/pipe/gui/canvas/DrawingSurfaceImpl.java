@@ -412,7 +412,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
-				Pipe.ElementType mode = app.getMode();
+                Pipe.ElementType mode = CreateGui.guiMode;
 
 				switch (mode) {
 					case DRAG:
@@ -443,7 +443,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				dragStart = null;
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
-			if (app.getMode() == ElementType.SELECT) {
+            if (CreateGui.guiMode == ElementType.SELECT) {
 				getSelectionObject().dispatchEvent(e);
 			}
 		}
@@ -461,9 +461,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseDragged(e);
 			}
-			if (dragStart != null) {
+            if (dragStart != null) {
 				view.drag(dragStart, e.getPoint());
-			} else if (app.getMode() == ElementType.SELECT) {
+			} else if (CreateGui.guiMode == ElementType.SELECT) {
 				getSelectionObject().dispatchEvent(e);
 			}
 		}

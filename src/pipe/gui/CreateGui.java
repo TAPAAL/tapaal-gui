@@ -157,4 +157,8 @@ public class CreateGui {
 
     public static boolean useExtendedBounds = false;
 
+	//XXX Moved from guiframe to static access, while refactoring.
+	@Deprecated
+    public static Pipe.ElementType guiMode;
+
 }

@@ -66,8 +66,8 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
-		
-		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
+
+        if (CreateGui.guiMode == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
 					myObject.getParent().getSelectionObject().clearSelection();
@@ -92,7 +92,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
+        if (CreateGui.guiMode == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
 				CreateGui.getDrawingSurface().translateSelection(myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
@@ -124,7 +124,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
+        if (CreateGui.guiMode == ElementType.SELECT) {
 			if (myObject.isDraggable()) {
 				if (!isDragging) {
 					isDragging = true;
