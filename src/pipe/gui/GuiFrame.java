@@ -1137,7 +1137,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             drawingToolBar.add(new ToggleButtonWithoutText(action));
             drawMenu.add(action);
         }
-
+        if(drawMenu.getItemCount() < 1){
+            drawMenu.setEnabled(false);
+        }
         drawingToolBar.addSeparator();
         drawingToolBar.add(featureInfoText);
 
