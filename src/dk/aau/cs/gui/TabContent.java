@@ -1580,7 +1580,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	@Override
 	public void setMode(Pipe.ElementType mode) {
 
-		app.ifPresent(o->o.updateMode(mode));
+        CreateGui.guiMode = mode;
         changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection

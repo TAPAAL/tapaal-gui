@@ -1188,18 +1188,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         a.dispose();
     }
 
-    //XXX temp while refactoring, kyrke - 2019-07-25, should only be called from TabContent
-    @Override
-    public void updateMode(Pipe.ElementType _mode) {
-
-
-        CreateGui.guiMode = _mode;
-
-        // deselect other actions
-
-
-    }
-
     @Override
     public void setStatusBarText(String s) {
         statusBar.changeText(Objects.requireNonNullElse(s, ""));
