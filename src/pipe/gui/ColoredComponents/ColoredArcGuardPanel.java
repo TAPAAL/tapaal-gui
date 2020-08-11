@@ -1,21 +1,14 @@
 package pipe.gui.ColoredComponents;
 
 import dk.aau.cs.model.CPN.ColorType;
-import pipe.gui.ColorComboboxPanel;
-import pipe.gui.CreateGui;
-import pipe.gui.widgets.EscapableDialog;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.Vector;
 
 public class ColoredArcGuardPanel extends JPanel {
     public ColoredArcGuardPanel(){

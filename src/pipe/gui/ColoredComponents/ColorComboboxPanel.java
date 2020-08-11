@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.ColoredComponents;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
