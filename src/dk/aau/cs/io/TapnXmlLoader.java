@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -140,7 +141,7 @@ public class TapnXmlLoader {
             }
         }
 
-		return new LoadedModel(network, templates, queries,messages, isTimed, isGame);
+		return new LoadedModel(network, templates, queries,messages, new TabContent.TAPNLens(isTimed, isGame));
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){

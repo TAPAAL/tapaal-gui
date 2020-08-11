@@ -53,7 +53,9 @@ import java.awt.event.MouseWheelEvent;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
-    public static class TAPNLens {
+    public static final class TAPNLens {
+        public static final TAPNLens Default = new TAPNLens(true, true);
+
         public boolean isTimed() {
             return timed;
         }
@@ -65,7 +67,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private final boolean timed;
         private final boolean game;
 
-        TAPNLens(boolean timed, boolean game) {
+        public TAPNLens(boolean timed, boolean game) {
             this.timed = timed;
             this.game = game;
         }
@@ -558,7 +560,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }).start();
             }
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
             tab.setInitialName(name);
 
@@ -778,7 +780,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
         this(network, templates, tapnqueries,  new TAPNLens(true, false));
     }
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
         setNetwork(network, templates);
