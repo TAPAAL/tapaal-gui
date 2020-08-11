@@ -1755,9 +1755,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
-        app.ifPresent(o->o.registerDrawingActions(getAvailableSimActions()));
+        app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
+
         //TODO: this is a temporary implementation untill actions can be moved
-        app.ifPresent(o->o.registerViewActions(null));
+        app.ifPresent(o->o.registerViewActions(List.of()));
 
 	}
 

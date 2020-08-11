@@ -25,6 +25,7 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
+import org.jetbrains.annotations.NotNull;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.WorkflowDialog;
@@ -1108,6 +1109,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 break;
             case noNet:
                 setFeatureInfoText("");
+                registerDrawingActions(List.of());
+                registerAnimationActions(List.of());
+                //registerViewActions(List.of());
                 break;
 
             default:
@@ -1122,14 +1126,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void registerDrawingActions(List<GuiAction> drawActions) {
+    public void registerDrawingActions(@NotNull List<GuiAction> drawActions) {
 
         drawingToolBar.removeAll();
         drawMenu.removeAll();
 
-        drawMenu.addSeparator();
+        drawingToolBar.addSeparator();
 
-        for (GuiAction action : getCurrentTab().getAvailableDrawActions()) {
+        for (GuiAction action : drawActions) {
             drawingToolBar.add(new ToggleButtonWithoutText(action));
             drawMenu.add(action);
         }
@@ -1139,14 +1143,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     }
     @Override
-    public void registerAnimationActions(List<GuiAction> animationActions) {
+    public void registerAnimationActions(@NotNull List<GuiAction> animationActions) {
         animateMenu.removeAll();
         animateMenu.add(startAction);
 
         animateMenu.add(stepbackwardAction);
         animateMenu.add(stepforwardAction);
 
-        for (GuiAction action : getCurrentTab().getAvailableSimActions()) {
+        for (GuiAction action : animationActions) {
             animateMenu.add(action);
         }
 
@@ -1159,7 +1163,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void registerViewActions(List<GuiAction> viewActions) {
+    public void registerViewActions(@NotNull List<GuiAction> viewActions) {
         //TODO: This is a temporary implementation until view actions can be moved to tab content
 
         if (!getCurrentTab().getLens().isTimed()) {
