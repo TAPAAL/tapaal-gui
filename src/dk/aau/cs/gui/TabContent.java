@@ -88,6 +88,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private final UndoManager undoManager = new UndoManager();
 
+	private enum FeatureOption { TIME, GAME, COLOR };
+
     public final static class Result<T,R> {
         private final T result;
         private final boolean hasErrors;
@@ -576,7 +578,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-    private TabContent createNewTabFromInputStream(InputStream file, String name, boolean isTimed, boolean isYes) throws Exception {
+    private TabContent createNewTabFromInputStream(InputStream file, String name, FeatureOption option, boolean isYes) throws Exception {
 
         try {
             ModelLoader loader = new ModelLoader();
@@ -599,10 +601,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TabContent tab;
 
-            if (isTimed) {
+            if (option == FeatureOption.TIME) {
                 tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame());
-            } else {
+            } else if (option == FeatureOption.GAME){
                 tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes);
+            } else {
+                tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame());
             }
 
             tab.setInitialName(name);
@@ -1479,19 +1483,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     @Override
     public void duplicateAndConvertUntimed() {
-        TabContent duplicate = duplicateTab(true, lens.timed);
+        TabContent duplicate = duplicateTab(FeatureOption.TIME, lens.timed);
         convertToUntimedTab(duplicate);
         guiFrameControllerActions.ifPresent(o -> o.openTab(duplicate));
     }
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(true, false);
+	    TabContent tab = duplicateTab(FeatureOption.TIME, false);
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab( false, false);
+        TabContent tab = duplicateTab(FeatureOption.GAME, false);
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1511,7 +1515,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab( true, isTime);
+                TabContent tab = duplicateTab( FeatureOption.TIME, isTime);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1533,7 +1537,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(false, isGame);
+                TabContent tab = duplicateTab(FeatureOption.GAME, isGame);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -2025,7 +2029,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab(boolean isTimed, boolean isYes) {
+	public TabContent duplicateTab(FeatureOption option, boolean isYes) {
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				network(),
 				allTemplates(),
@@ -2033,19 +2037,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				network().constants()
 		);
 
-		boolean netChanged = isNetChanged(isTimed, isYes);
+		boolean netChanged = isNetChanged(option, isYes);
 
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 			String composedName = getTabTitle();
 			composedName = composedName.replace(".tapn", "");
-			if (isTimed || !netChanged) {
+			if (option == FeatureOption.TIME || !netChanged) {
 			    composedName += isYes ? "-timed" : "-untimed";
-            } else {
+            } else if (option == FeatureOption.GAME) {
 			    composedName += isYes ? "-game" : "-noGame";
             }
 			if (netChanged) {
-			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, isTimed, isYes);
+			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, option, isYes);
             } else {
                 return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
             }
@@ -2056,11 +2060,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return null;
 	}
 
-	private boolean isNetChanged(boolean isTimed, boolean isYes) {
-        if (isTimed) {
+	private boolean isNetChanged(FeatureOption option, boolean isYes) {
+        if (option == FeatureOption.TIME) {
             return lens.isTimed() != isYes;
-        } else {
+        } else if (option == FeatureOption.GAME){
             return lens.isGame() != isYes;
+        } else {
+            return false;
         }
     }
 
