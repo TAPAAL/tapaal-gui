@@ -50,6 +50,12 @@ import java.util.*;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
+    private MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
+
+    public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
+        this.guiFrameControllerActions.setReference(guiFrameControllerActions);
+    }
+
     public static class TAPNLens {
         public boolean isTimed() {
             return timed;
@@ -81,6 +87,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 
 	private final UndoManager undoManager = new UndoManager();
+
+	private enum FeatureOption { TIME, GAME, COLOR };
 
     public final static class Result<T,R> {
         private final T result;
@@ -555,7 +563,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }).start();
             }
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+			TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
 
             tab.setInitialName(name);
 
@@ -569,6 +577,54 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 
 	}
+
+    private TabContent createNewTabFromInputStream(InputStream file, String name, FeatureOption option, boolean isYes) throws Exception {
+
+        try {
+            ModelLoader loader = new ModelLoader();
+            LoadedModel loadedModel = loader.load(file);
+
+            if (loadedModel.getMessages().size() != 0) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        String message = "While loading the net we found one or more warnings: \n\n";
+                        for (String s : loadedModel.getMessages()) {
+                            message += s + "\n\n";
+                        }
+
+                        new MessengerImpl().displayInfoMessage(message, "Warning");
+                    }
+                }).start();
+            }
+
+            TabContent tab;
+
+            switch (option) {
+                case TIME:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame());
+                    break;
+                case GAME:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes);
+                    break;
+                default:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame());
+                    break;
+            }
+
+            tab.setInitialName(name);
+
+            tab.selectFirstElements();
+
+            tab.setFile(null);
+
+            return tab;
+        } catch (Exception e) {
+            throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+        }
+
+    }
 
 	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
 		TabContent tab = new TabContent(isTimed, isGame);
@@ -939,7 +995,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	//XXX this is a temp solution while refactoring
 	// to keep the name of the net when the when a file is not set.
-	String initialName;
+	String initialName = "";
 	public void setInitialName(String name) {
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (CreateGui.getApp().getNameCounter()) + ".tapn";
@@ -1428,8 +1484,64 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		editorSplitPane.getMultiSplitLayout().layoutByWeight(editorSplitPane);
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
 	}
-	
-	public static Split getEditorModelRoot(){
+
+    private void createNewAndConvertUntimed() {
+	    TabContent tab = duplicateTab(FeatureOption.TIME, false);
+        convertToUntimedTab(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    private void createNewAndConvertNonGame() {
+        TabContent tab = duplicateTab(FeatureOption.GAME, false);
+        TabTransformer.removeGameInformation(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    @Override
+    public void changeTimeFeature(boolean isTime) {
+        if (isTime != lens.isTimed()) {
+            if (!isTime){
+                if (!network().isUntimed()){
+                    String removeTimeWarning = "The net contains time information, which will be removed. Do you still wish to make the net untimed?";
+                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove time information",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                    if (choice == 0) {
+                        createNewAndConvertUntimed();
+                    }
+                } else {
+                    createNewAndConvertUntimed();
+                }
+            } else {
+                TabContent tab = duplicateTab(FeatureOption.TIME, isTime);
+                guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+            }
+            updateFeatureText();
+        }
+    }
+
+    @Override
+    public void changeGameFeature(boolean isGame) {
+        if (isGame != lens.isGame()) {
+            if (!isGame){
+                if (network().hasUncontrollableTransitions()){
+                    String removeTimeWarning = "The net contains game information, which will be removed. Do you still wish to make to remove the game semantics?";
+                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove game information",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                    if (choice == 0) {
+                        createNewAndConvertNonGame();
+                    }
+                } else {
+                    createNewAndConvertNonGame();
+                }
+            } else {
+                TabContent tab = duplicateTab(FeatureOption.GAME, isGame);
+                guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+            }
+            updateFeatureText();
+        }
+    }
+
+    public static Split getEditorModelRoot(){
 		return editorModelroot;
 	}
 	
@@ -1914,7 +2026,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab() {
+	public TabContent duplicateTab(FeatureOption option, boolean isYes) {
 		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				network(),
 				allTemplates(),
@@ -1922,18 +2034,44 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				network().constants()
 		);
 
+		option = isNetChanged(option, isYes) ? option : FeatureOption.TIME;
+
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 			String composedName = getTabTitle();
 			composedName = composedName.replace(".tapn", "");
-			composedName += "-untimed";
-			return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+
+			switch (option) {
+                case TIME:
+                    composedName += isYes ? "-timed" : "-untimed";
+                    break;
+                case GAME:
+                    composedName += isYes ? "-game" : "-noGame";
+                    break;
+            }
+
+			if (isNetChanged(option, isYes)) {
+			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, option, isYes);
+            } else {
+                return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+            }
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.console().printf(e1.getMessage());
 		}
 		return null;
 	}
+
+	private boolean isNetChanged(FeatureOption option, boolean isYes) {
+        switch (option) {
+            case TIME:
+                return lens.isTimed() != isYes;
+            case GAME:
+                return lens.isGame() != isYes;
+            default:
+                return false;
+        }
+    }
 
 	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
 
@@ -2315,17 +2453,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     public void updateFeatureText() {
+        boolean[] features = {lens.isTimed(), lens.isGame()};
+        app.ifPresent(o->o.setFeatureInfoText(features));
+    }
 
-        String properties = "Timed: " + (lens.isTimed() ? "Yes" : "No") +
-                            ", Game: " + (lens.isGame() ? "Yes" : "No");
-        app.ifPresent(o->o.setFeatureInfoText(properties));
-
+    public boolean isNetTimed() {
+        return lens.isTimed();
     }
 
     public TAPNLens getLens() {
         return lens;
     }
 
+    private void convertToUntimedTab(TabContent tab) {
+        TabTransformer.removeTimingInformation(tab);
+    }
 
     private final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
 

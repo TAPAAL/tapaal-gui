@@ -145,4 +145,14 @@ public class TabTransformer {
 
         return newArcPath;
     }
+
+    static public void removeGameInformation(TabContent tab) {
+        for (Template template : tab.allTemplates()) {
+            for (TimedTransition transition : template.model().transitions()) {
+                if (transition.isUncontrollable()) {
+                    transition.setUncontrollable(false);
+                }
+            }
+        }
+    }
 }
