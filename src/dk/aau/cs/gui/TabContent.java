@@ -601,12 +601,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TabContent tab;
 
-            if (option == FeatureOption.TIME) {
-                tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame());
-            } else if (option == FeatureOption.GAME){
-                tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes);
-            } else {
-                tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame());
+            switch (option) {
+                case TIME:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame());
+                    break;
+                case GAME:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes);
+                    break;
+                default:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame());
+                    break;
             }
 
             tab.setInitialName(name);
@@ -1515,7 +1519,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab( FeatureOption.TIME, isTime);
+                TabContent tab = duplicateTab(FeatureOption.TIME, isTime);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -2037,18 +2041,23 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				network().constants()
 		);
 
-		boolean netChanged = isNetChanged(option, isYes);
+		option = isNetChanged(option, isYes) ? option : FeatureOption.TIME;
 
 		try {
 			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 			String composedName = getTabTitle();
 			composedName = composedName.replace(".tapn", "");
-			if (option == FeatureOption.TIME || !netChanged) {
-			    composedName += isYes ? "-timed" : "-untimed";
-            } else if (option == FeatureOption.GAME) {
-			    composedName += isYes ? "-game" : "-noGame";
+
+			switch (option) {
+                case TIME:
+                    composedName += isYes ? "-timed" : "-untimed";
+                    break;
+                case GAME:
+                    composedName += isYes ? "-game" : "-noGame";
+                    break;
             }
-			if (netChanged) {
+
+			if (isNetChanged(option, isYes)) {
 			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, option, isYes);
             } else {
                 return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
@@ -2061,12 +2070,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private boolean isNetChanged(FeatureOption option, boolean isYes) {
-        if (option == FeatureOption.TIME) {
-            return lens.isTimed() != isYes;
-        } else if (option == FeatureOption.GAME){
-            return lens.isGame() != isYes;
-        } else {
-            return false;
+        switch (option) {
+            case TIME:
+                return lens.isTimed() != isYes;
+            case GAME:
+                return lens.isGame() != isYes;
+            default:
+                return false;
         }
     }
 
