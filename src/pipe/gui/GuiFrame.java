@@ -1131,37 +1131,48 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.removeAll();
         drawMenu.removeAll();
 
-        drawingToolBar.addSeparator();
+        if (drawActions.size() > 0) {
+            drawMenu.setEnabled(true);
+            drawingToolBar.addSeparator();
 
-        for (GuiAction action : drawActions) {
-            drawingToolBar.add(new ToggleButtonWithoutText(action));
-            drawMenu.add(action);
-        }
-        if(drawMenu.getItemCount() < 1){
+            for (GuiAction action : drawActions) {
+                drawingToolBar.add(new ToggleButtonWithoutText(action));
+                drawMenu.add(action);
+            }
+
+            drawingToolBar.addSeparator();
+            drawingToolBar.add(featureInfoText);
+        } else {
             drawMenu.setEnabled(false);
         }
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(featureInfoText);
 
     }
     @Override
     public void registerAnimationActions(@NotNull List<GuiAction> animationActions) {
+
         animateMenu.removeAll();
-        animateMenu.add(startAction);
 
-        animateMenu.add(stepbackwardAction);
-        animateMenu.add(stepforwardAction);
+        if (animationActions.size() > 0) {
 
-        for (GuiAction action : animationActions) {
-            animateMenu.add(action);
+            animateMenu.setEnabled(true);
+            animateMenu.add(startAction);
+
+            animateMenu.add(stepbackwardAction);
+            animateMenu.add(stepforwardAction);
+
+            for (GuiAction action : animationActions) {
+                animateMenu.add(action);
+            }
+
+            animateMenu.add(prevcomponentAction);
+            animateMenu.add(nextcomponentAction);
+
+            animateMenu.addSeparator();
+            animateMenu.add(exportTraceAction);
+            animateMenu.add(importTraceAction);
+        } else {
+            animateMenu.setEnabled(false);
         }
-
-        animateMenu.add(prevcomponentAction);
-        animateMenu.add(nextcomponentAction);
-
-        animateMenu.addSeparator();
-        animateMenu.add(exportTraceAction);
-        animateMenu.add(importTraceAction);
     }
 
     @Override
