@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
@@ -1120,6 +1121,58 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     }
 
+    @Override
+    public void registerDrawingActions(List<GuiAction> drawActions) {
+
+        drawingToolBar.removeAll();
+        drawMenu.removeAll();
+
+        drawMenu.addSeparator();
+
+        for (GuiAction action : getCurrentTab().getAvailableDrawActions()) {
+            drawingToolBar.add(new ToggleButtonWithoutText(action));
+            drawMenu.add(action);
+        }
+
+        drawingToolBar.addSeparator();
+        drawingToolBar.add(featureInfoText);
+
+    }
+    @Override
+    public void registerAnimationActions(List<GuiAction> animationActions) {
+        animateMenu.removeAll();
+        animateMenu.add(startAction);
+
+        animateMenu.add(stepbackwardAction);
+        animateMenu.add(stepforwardAction);
+
+        for (GuiAction action : getCurrentTab().getAvailableSimActions()) {
+            animateMenu.add(action);
+        }
+
+        animateMenu.add(prevcomponentAction);
+        animateMenu.add(nextcomponentAction);
+
+        animateMenu.addSeparator();
+        animateMenu.add(exportTraceAction);
+        animateMenu.add(importTraceAction);
+    }
+
+    @Override
+    public void registerViewActions(List<GuiAction> viewActions) {
+        //TODO: This is a temporary implementation until view actions can be moved to tab content
+
+        if (!getCurrentTab().getLens().isTimed()) {
+            showZeroToInfinityIntervalsCheckBox.setVisible(false);
+            showTokenAgeCheckBox.setVisible(false);
+            showDelayEnabledTransitionsCheckbox.setVisible(false);
+        } else {
+            showZeroToInfinityIntervalsCheckBox.setVisible(true);
+            showTokenAgeCheckBox.setVisible(true);
+            showDelayEnabledTransitionsCheckbox.setVisible(true);
+        }
+    }
+
     private void fixBug812694GrayMenuAfterSimulationOnMac() {
         // XXX
         // This is a fix for bug #812694 where on mac some menues are gray after
@@ -1168,7 +1221,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             // create a tabChanged event loop.
             // Throw exception if tab is not found
             appTab.setSelectedComponent(tab);
-            updateGuiMenus();
         }
     }
 
@@ -1247,63 +1299,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
         zoomComboBox.addActionListener(zoomComboListener);
     }
-
-    @Override
-    public void updateGuiMenus() {
-        updateDrawingMenu();
-        updateSimulationMenu();
-        updateViewMenu();
-
-
-    }
-
-    private void updateDrawingMenu() {
-        drawingToolBar.removeAll();
-        drawMenu.removeAll();
-
-        drawMenu.addSeparator();
-
-        for (GuiAction action : getCurrentTab().getAvailableDrawActions()) {
-            drawingToolBar.add(new ToggleButtonWithoutText(action));
-            drawMenu.add(action);
-        }
-        drawingToolBar.addSeparator();
-        drawingToolBar.add(featureInfoText);
-    }
-
-    private void updateSimulationMenu() {
-        animateMenu.removeAll();
-        animateMenu.add(startAction);
-
-        animateMenu.add(stepbackwardAction);
-        animateMenu.add(stepforwardAction);
-
-        for (GuiAction action : getCurrentTab().getAvailableSimActions()) {
-            animateMenu.add(action);
-        }
-
-        animateMenu.add(prevcomponentAction);
-
-        animateMenu.add(nextcomponentAction);
-
-        animateMenu.addSeparator();
-
-        animateMenu.add(exportTraceAction);
-        animateMenu.add(importTraceAction);
-    }
-
-    private void updateViewMenu() {
-        if (!getCurrentTab().getLens().isTimed()) {
-            showZeroToInfinityIntervalsCheckBox.setVisible(false);
-            showTokenAgeCheckBox.setVisible(false);
-            showDelayEnabledTransitionsCheckbox.setVisible(false);
-        } else {
-            showZeroToInfinityIntervalsCheckBox.setVisible(true);
-            showTokenAgeCheckBox.setVisible(true);
-            showDelayEnabledTransitionsCheckbox.setVisible(true);
-        }
-    }
-
 
     private boolean canNetBeSavedAndShowMessage() {
         if (getCurrentTab().network().paintNet()) {

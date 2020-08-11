@@ -1754,6 +1754,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
 		}
+		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
+        app.ifPresent(o->o.registerDrawingActions(getAvailableSimActions()));
+        //TODO: this is a temporary implementation untill actions can be moved
+        app.ifPresent(o->o.registerViewActions(null));
 
 	}
 
@@ -2589,12 +2593,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.TRANSPORTARC);
         }
     };
-    private GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
+    private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
         public void actionPerformed(ActionEvent e) {
             timeDelay();
         }
     };
-    private GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
+    private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
         public void actionPerformed(ActionEvent e) {
             delayAndFire();
         }

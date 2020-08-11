@@ -3,8 +3,10 @@ package pipe.gui;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
 import net.tapaal.helpers.Reference.Reference;
+import pipe.gui.action.GuiAction;
 
 import java.awt.*;
+import java.util.List;
 
 /**
  * Used to delegate control of the state of AppGUI to tabs
@@ -25,6 +27,12 @@ public interface GuiFrameActions {
     void detachTabFromGuiFrame(TabContent tab);
 
     void setGUIMode(GuiFrame.GUIMode animation);
+
+    void registerDrawingActions(List<GuiAction> drawActions);
+
+    void registerAnimationActions(List<GuiAction> animationActions);
+
+    void registerViewActions(List<GuiAction> viewActions);
 
     //XXX temp while refactoring, kyrke - 2019-07-25
     void updateMode(Pipe.ElementType mode);
@@ -47,5 +55,5 @@ public interface GuiFrameActions {
     void setShowTokenAgeSelected(boolean b);
 
     void setFeatureInfoText(String s);
-    void updateGuiMenus();
+
 }
