@@ -286,12 +286,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
-        public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.SELECT));
-        }
-    };
-
     private final GuiAction showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('9', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleTokenAge);
@@ -893,7 +887,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 annotationAction.setEnabled(true);
                 deleteAction.setEnabled(true);
                 selectAllAction.setEnabled(true);
-                selectAction.setEnabled(true);
 
                 stepbackwardAction.setEnabled(false);
                 stepforwardAction.setEnabled(false);
@@ -926,7 +919,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 annotationAction.setEnabled(false);
                 deleteAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
-                selectAction.setEnabled(false);
 
                 alignToGrid.setEnabled(false);
 
@@ -965,7 +957,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 annotationAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
-                selectAction.setEnabled(false);
 
                 stepbackwardAction.setEnabled(false);
                 stepforwardAction.setEnabled(false);
@@ -1148,7 +1139,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         CreateGui.guiMode = _mode;
 
         // deselect other actions
-        selectAction.setSelected(CreateGui.guiMode == ElementType.SELECT);
+
 
     }
 
@@ -1269,9 +1260,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private void updateDrawingMenu() {
         drawingToolBar.removeAll();
         drawMenu.removeAll();
-        drawingToolBar.add(new ToggleButtonWithoutText(selectAction));
 
-        drawMenu.add(selectAction);
         drawMenu.addSeparator();
 
         for (GuiAction action : getCurrentTab().getAvailableDrawActions()) {

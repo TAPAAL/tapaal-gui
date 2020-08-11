@@ -2526,9 +2526,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
     public List<GuiAction> getAvailableDrawActions(){
         if(lens.isTimed()){
-            return new ArrayList<GuiAction>(Arrays.asList(timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<GuiAction>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         } else{
-            return new ArrayList<GuiAction>(Arrays.asList(timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<GuiAction>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         }
     }
 
@@ -2541,6 +2541,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return new ArrayList<GuiAction>(Arrays.asList(delayFireAction));
         }
     }
+
+    private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.SELECT);
+        }
+    };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.ANNOTATION);
@@ -2596,6 +2602,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public void updateMode() {
         // deselect other actions
+        selectAction.setSelected(CreateGui.guiMode == Pipe.ElementType.SELECT);
         transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
         timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
         timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
@@ -2609,6 +2616,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public void updateEnabledActions(GuiFrame.GUIMode mode){
         switch(mode){
             case draw:
+                selectAction.setEnabled(true);
                 transAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
@@ -2621,6 +2629,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 timeAction.setEnabled(false);
                 break;
             case noNet:
+                selectAction.setEnabled(false);
                 transAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
@@ -2632,6 +2641,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 delayFireAction.setEnabled(false);
                 timeAction.setEnabled(false);
             case animation:
+                selectAction.setEnabled(false);
                 transAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
