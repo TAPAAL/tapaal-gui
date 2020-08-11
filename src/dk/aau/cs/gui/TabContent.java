@@ -788,6 +788,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             addGuiModel(template.model(), template.guiModel());
             zoomLevels.put(template.model(), template.zoomer());
             hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+            for(PetriNetObject o : template.guiModel().getPetriNetObjects()){
+                o.setLens(this.lens);
+            }
         }
 
         drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);

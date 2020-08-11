@@ -292,6 +292,10 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	    return lens.isTimed();
     }
 
+    public void setLens(TabContent.TAPNLens lens){
+	    this.lens = lens;
+    }
+
     @Override
     public GraphicalElement getGraphicalElement() {
         return this;
