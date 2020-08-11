@@ -24,11 +24,12 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc){
+	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc, boolean isTimed){
 	    super(source);
 	    setTarget(target);
 	    setUnderlyingArc(modelArc);
 	    updateLabel(true);
+	    this.isTimed = isTimed;
 	    sealArc();
     }
 
@@ -82,7 +83,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
         if (inputArc == null)
             getNameLabel().setText("");
         else {
-            if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
+            if (!CreateGui.getApp().showZeroToInfinityIntervals() || !isTimed) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }

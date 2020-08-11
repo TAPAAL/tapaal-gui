@@ -45,4 +45,5 @@ public interface GuiFrameActions {
     void setShowTokenAgeSelected(boolean b);
 
     void setFeatureInfoText(String s);
+    void updateGuiMenus();
 }

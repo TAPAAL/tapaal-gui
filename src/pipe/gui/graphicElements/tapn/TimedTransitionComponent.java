@@ -36,12 +36,13 @@ public class TimedTransitionComponent extends Transition {
 	private final dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
-	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition) {
+	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition, boolean isTimed) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 		attributesVisible = true;
+		this.isTimed = isTimed;
 
 	}
 

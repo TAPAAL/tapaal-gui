@@ -11,10 +11,9 @@ import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredToken;
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
@@ -61,16 +60,25 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private final Context context;
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
+	private final TabContent currentTab;
 	
 	private Vector<TimedPlace> sharedPlaces;
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
+		currentTab = context.tabContent();
 		place = placeComponent;
 		this.context = context;
 		initComponents();
+		hideTimedInformation();
 	}
+
+	private void hideTimedInformation(){
+        if(!place.isTimed()) {
+            timeInvariantPanel.setVisible(false);
+        }
+    }
 
 	private void initComponents() {
 		setLayout(new java.awt.GridBagLayout());
@@ -83,6 +91,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		gridBagConstraints = GridBagHelper.as(0,1, WEST, HORIZONTAL, new Insets(0, 8, 0, 8));
 		add(timeInvariantPanel, gridBagConstraints);
+
 
 		initButtonPanel();
 

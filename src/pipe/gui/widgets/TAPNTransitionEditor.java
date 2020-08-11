@@ -16,8 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
-
-
 import net.tapaal.swinghelpers.GridBagHelper;
 import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
@@ -52,9 +50,15 @@ public class TAPNTransitionEditor extends JPanel {
 		transition = _transition;
 		this.context = context;
 		initComponents();
-
+        hideTimedInformation();
 		rootPane.setDefaultButton(okButton);
 	}
+
+	private void hideTimedInformation(){
+	    if(!transition.isTimed()) {
+            urgentCheckBox.setVisible(false);
+        }
+    }
 
 	private void initComponents() {
 		GridBagConstraints gridBagConstraints;

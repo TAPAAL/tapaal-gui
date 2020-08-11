@@ -19,6 +19,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	/** x/y position position on screen (zoomed) */
 	protected int positionX;
 	protected int positionY;
+	protected boolean isTimed;
 
 	// The x/y coordinate of object at 100% zoom.
 	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
@@ -284,6 +285,10 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	public int getPositionY() {
 		return positionY;
 	}
+
+	public boolean isTimed(){
+	    return isTimed;
+    }
 
     @Override
     public GraphicalElement getGraphicalElement() {

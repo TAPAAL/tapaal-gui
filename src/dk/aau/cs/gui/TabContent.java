@@ -1,5 +1,17 @@
 package dk.aau.cs.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -27,6 +39,7 @@ import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
+import pipe.gui.action.GuiAction;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
@@ -153,7 +166,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             Require.notNull(p, "Point can't be null");
 
             dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
-            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens.isTimed());
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
 
@@ -164,7 +177,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
-            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens.isTimed());
 
             guiModelToModel.get(c).add(transition);
             c.addPetriNetObject(pnObject);
@@ -204,7 +217,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 TimeInterval.ZERO_INF
             );
 
-            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia);
+            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens.isTimed());
 
             if (path != null) {
                 tiac.setArcPath(new ArcPath(tiac, path));
@@ -1082,8 +1095,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-
+        hideTimedInformation();
 	}
+
+	private void hideTimedInformation(){
+	    if(!lens.isTimed()){
+            animControlerBox.setVisible(false);
+        }
+
+    }
 
 	public void switchToEditorComponents() {
 		
@@ -1177,7 +1197,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createTransitionFireing() {
-		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions());
+		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions(), lens);
 	}
 
 	public TransitionFireingComponent getTransitionFireingComponent() {
@@ -1577,6 +1597,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		//Disable selection and deselect current selection
 		drawingSurface().getSelectionObject().clearSelection();
         editorMode = mode;
+        updateMode();
         switch (mode) {
             case ADDTOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
@@ -2512,6 +2533,128 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     e.isAltDown()
                 )
             );
+        }
+    }
+    public List<GuiAction> getAvailableDrawActions(){
+        if(lens.isTimed()){
+            return new ArrayList<GuiAction>(Arrays.asList(timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        } else{
+            return new ArrayList<GuiAction>(Arrays.asList(timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        }
+    }
+
+    public List<GuiAction> getAvailableSimActions(){
+        if(lens.isTimed()){
+            return new ArrayList<GuiAction>(Arrays.asList(timeAction, delayFireAction));
+        } else{
+            delayFireAction.setName("Fire");
+            delayFireAction.setTooltip("Fire Selected Transition");
+            return new ArrayList<GuiAction>(Arrays.asList(delayFireAction));
+        }
+    }
+    private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.ANNOTATION);
+        }
+    };
+    private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNINHIBITOR_ARC);
+        }
+    };
+    private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNTRANS);
+        }
+    };
+    private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.ADDTOKEN);
+        }
+    };
+
+    private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.DELTOKEN);
+        }
+    };
+    private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNPLACE);
+        }
+    };
+
+    private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNARC);
+        }
+    };
+    private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TRANSPORTARC);
+        }
+    };
+    private GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
+        public void actionPerformed(ActionEvent e) {
+            timeDelay();
+        }
+    };
+    private GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
+        public void actionPerformed(ActionEvent e) {
+            delayAndFire();
+        }
+    };
+
+    public void updateMode() {
+        // deselect other actions
+        transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
+        timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
+        timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
+        transportArcAction.setSelected(editorMode == Pipe.ElementType.TRANSPORTARC);
+        inhibarcAction.setSelected(editorMode == Pipe.ElementType.TAPNINHIBITOR_ARC);
+        tokenAction.setSelected(editorMode == Pipe.ElementType.ADDTOKEN);
+        deleteTokenAction.setSelected(editorMode == Pipe.ElementType.DELTOKEN);
+        annotationAction.setSelected(editorMode == Pipe.ElementType.ANNOTATION);
+    }
+    @Override
+    public void updateEnabledActions(GuiFrame.GUIMode mode){
+        switch(mode){
+            case draw:
+                transAction.setEnabled(true);
+                timedPlaceAction.setEnabled(true);
+                timedArcAction.setEnabled(true);
+                transportArcAction.setEnabled(true);
+                inhibarcAction.setEnabled(true);
+                tokenAction.setEnabled(true);
+                deleteTokenAction.setEnabled(true);
+                annotationAction.setEnabled(true);
+                delayFireAction.setEnabled(false);
+                timeAction.setEnabled(false);
+                break;
+            case noNet:
+                transAction.setEnabled(false);
+                timedPlaceAction.setEnabled(false);
+                timedArcAction.setEnabled(false);
+                transportArcAction.setEnabled(false);
+                inhibarcAction.setEnabled(false);
+                tokenAction.setEnabled(false);
+                deleteTokenAction.setEnabled(false);
+                annotationAction.setEnabled(false);
+                delayFireAction.setEnabled(false);
+                timeAction.setEnabled(false);
+            case animation:
+                transAction.setEnabled(false);
+                timedPlaceAction.setEnabled(false);
+                timedArcAction.setEnabled(false);
+                transportArcAction.setEnabled(false);
+                inhibarcAction.setEnabled(false);
+                tokenAction.setEnabled(false);
+                deleteTokenAction.setEnabled(false);
+                annotationAction.setEnabled(false);
+                delayFireAction.setEnabled(true);
+                if(lens.isTimed())
+                    timeAction.setEnabled(true);
+                break;
         }
     }
 }

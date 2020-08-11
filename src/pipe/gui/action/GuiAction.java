@@ -109,4 +109,12 @@ public abstract class GuiAction extends AbstractAction {
 
 	}
 
+	public void setName(String newName){
+	    putValue(NAME, newName);
+    }
+
+    public void setTooltip(String newTooltip){
+        putValue(SHORT_DESCRIPTION, newTooltip);
+    }
+
 }
