@@ -21,6 +21,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import net.tapaal.swinghelpers.RequestFocusListener;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
+import pipe.gui.Grid;
 import pipe.gui.MessengerImpl;
 
 public class EngineDialogPanel {	
@@ -30,6 +31,7 @@ public class EngineDialogPanel {
 	private JPanel tapaalDiscretePanel;
 	private JPanel untimedPanel;
 	private JPanel uppaalPanel;
+	private JPanel javaPanel;
 
 	JButton closeButton;
 
@@ -41,6 +43,7 @@ public class EngineDialogPanel {
 	final JLabel untimedVersionLabel = new JLabel("Version: ");
 	final JLabel uppaalLocationLabel = new JLabel("Located: ");
 	final JLabel uppaalVersionLabel = new JLabel("Version: ");
+    final JLabel javaVersion = new JLabel("Java version: ");
 
 	final JLabel tapaalLocationLabelVal = new JLabel("Not setup");
 	final JLabel tapaalVersionLabelVal = new JLabel("N/A");
@@ -68,6 +71,7 @@ public class EngineDialogPanel {
 		makeUppaalPanel();
 		makeDiscreteTapaalPanel();
 		makeUntimedPanel();
+		makeJavaPanel();
 		makeEnginePanel();
 		setPathsAndVersionNumbers();
 	}	
@@ -585,6 +589,12 @@ public class EngineDialogPanel {
 		uppaalPanel.add(uppaalButtonPanel,gbc);
 	}
 
+    private void makeJavaPanel() {
+        javaPanel = new JPanel(new FlowLayout());
+        javaPanel.add(javaVersion);
+        javaPanel.add(new JLabel("11"));
+    }
+
 	private void makeEnginePanel() {
 		enginePanel = new JPanel();
 		enginePanel.setLayout(new GridBagLayout());		
@@ -626,6 +636,15 @@ public class EngineDialogPanel {
 		gbc.insets = panelInsets;
 		enginePanel.add(uppaalPanel,gbc);
 
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = panelInsets;
+        enginePanel.add(javaPanel,gbc);
+
 		JPanel closeButtonPanel = new JPanel();
 		closeButtonPanel.setLayout(new GridBagLayout());
 		closeButton = new JButton("Close");
@@ -639,7 +658,7 @@ public class EngineDialogPanel {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(0,5,2,5);
 		enginePanel.add(closeButtonPanel,gbc);	
@@ -656,6 +675,5 @@ public class EngineDialogPanel {
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
-
 	}
 }
