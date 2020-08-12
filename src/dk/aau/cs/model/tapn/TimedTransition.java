@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -24,18 +26,24 @@ public class TimedTransition extends TAPNElement {
 	private TimeInterval dInterval = null;
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
 
 	private final List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
-		this(name, false);
+		this(name, false, null);
 	}
+
+    public TimedTransition(String name, GuardExpression guard) {
+        this(name, false, guard);
+    }
 	
-	public TimedTransition(String name, boolean isUrgent) {
+	public TimedTransition(String name, boolean isUrgent, GuardExpression guard) {
 		setName(name);
 		setUrgent(isUrgent);
+		this.guard = guard;
 	}
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
@@ -81,7 +89,9 @@ public class TimedTransition extends TAPNElement {
 	public boolean hasUntimedPreset(){
 		return hasUntimedPreset(true);
 	}
-	
+
+
+	//TODO: Add coloured properties to this
 	private boolean hasUntimedPreset(boolean cascade){
 		for(TimedInputArc arc : preset){
 			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
@@ -383,7 +393,7 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public TimedTransition copy() {
-		return new TimedTransition(name, isUrgent);
+		return new TimedTransition(name, isUrgent, guard.copy());
 	}
 
 	@Override
@@ -474,4 +484,8 @@ public class TimedTransition extends TAPNElement {
 
 		return biggestConstant;
 	}
+
+    public GuardExpression getGuard() {return guard;}
+
+    public void setGuard(GuardExpression guard) {this.guard = guard;}
 }

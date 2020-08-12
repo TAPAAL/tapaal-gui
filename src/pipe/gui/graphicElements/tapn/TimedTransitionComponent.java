@@ -176,6 +176,14 @@ public class TimedTransitionComponent extends Transition {
 		if(transition != null) {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
+			getNameLabel().zoomUpdate(getZoom());
+			if(underlyingTransition().getGuard() != null && isColored){
+                pnName.setText("");
+                super.update(displayConstantNames);
+                pnName.setText(pnName.getText() + "\n" + this.underlyingTransition().getGuard().toString());
+            } else {
+                getNameLabel().setText("");
+            }
 		}
 		else {
 			getNameLabel().setText("");

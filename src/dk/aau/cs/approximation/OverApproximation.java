@@ -140,7 +140,7 @@ public class OverApproximation implements ITAPNApproximation {
 						(((TAPNNetworkTimedTransitionStep) step).getTransition().sharedTransition() == null ? tmpStep.getTransition().model().name() : ""), 
 						tmpStep.getTransition().name()); 
 				TimedTransition firedTransition = net.getTransitionByName(nameMap.get(key));
-				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent());
+				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent(), null);
 				
 				net.add(copyTransition);
 				net.add(new TimedInputArc(currentPlace, copyTransition, TimeInterval.ZERO_INF));

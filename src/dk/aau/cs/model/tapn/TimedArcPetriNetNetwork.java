@@ -2,6 +2,11 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.Expression;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.CPN.Expressions.VariableExpression;
+import dk.aau.cs.model.CPN.Variable;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -21,7 +26,9 @@ public class TimedArcPetriNetNetwork {
 	
 	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
-	
+
+    private List<ColorType> colorTypes = new ArrayList<ColorType>();
+    private List<Variable> variables = new ArrayList<Variable>();
 	private int defaultBound = 3;
 	
 	private final List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
@@ -594,5 +601,154 @@ public class TimedArcPetriNetNetwork {
 	public void setPaintNet(boolean paintNet){
 		this.paintNet = paintNet;
 	}
+
+	//For colors
+
+    public List<ColorType> colorTypes() { return colorTypes;}
+
+    public List<Variable> variables() {return variables;}
+
+    public void updateColorType(String oldName, ColorType colorType) {
+        Integer index = getColorTypeIndex(oldName);
+        if (index != null) {
+            colorTypes.set(index, colorType);
+        }
+    }
+    public void updateVariable(String oldName, Variable variable) {
+        Integer index = getVariableIndex(oldName);
+        //TODO: We update our variable in any expressions it is used - does not work with the current equals method in expressions, will have to override with new equal and hash functions
+        Variable oldVar = getVariableByIndex(index);
+        VariableExpression oldVarExpr = new VariableExpression(oldVar);
+        VariableExpression newVarExpr = new VariableExpression(variable);
+        for (TimedArcPetriNet tapn : tapns) {
+            int i = 0;
+            for (TimedTransition transition : tapn.transitions()) {
+                Expression expr = transition.getGuard();
+                if (expr != null) {
+                    expr.replace(oldVarExpr, newVarExpr);
+                    transition.setGuard((GuardExpression) expr);
+                    tapn.replace(transition, i);
+
+                }
+                i++;
+            }
+        }
+        if (index != null) {
+            variables.set(index, variable);
+        }
+    }
+    public Integer getColorTypeIndex(String name) {
+        for (int i = 0; i < colorTypes.size(); i++) {
+            if (colorTypes.get(i).getName().equalsIgnoreCase(name)) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    public Integer getVariableIndex(String name) {
+        for (int i = 0; i < variables.size(); i++) {
+            if (variables.get(i).getName().equalsIgnoreCase(name)) {
+                return i;
+            }
+        }
+        return null;
+    }
+    public boolean isNameUsedForColorType(String name) {
+        for (ColorType element : colorTypes) {
+            if (element.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isNameUsedForVariable(String name) {
+        for (Variable element : variables) {
+            if (element.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public Variable getVariableByIndex(int index) {
+        return variables.get(index);
+    }
+    public int numberOfColorTypes() {
+        return colorTypes.size();
+    }
+
+    public ColorType getColorTypeByIndex(int index) {
+        return colorTypes.get(index);
+    }
+
+    public int numberOfVariables() {
+        return variables.size();
+    }
+    public void add(ColorType colorType) {
+        if (colorType.equals(ColorType.COLORTYPE_DOT) && isNameUsedForColorType(ColorType.COLORTYPE_DOT.getName()))
+            return;
+
+        Require.that(colorType != null, "colorType must not be null");
+        Require.that(!isNameUsedForColorType(colorType.getName()), "There is already a color type with that name"); //TODO:: When using load, a nullpointer exception is thrown here
+
+        colorTypes.add(colorType);
+    }
+
+    public void add(Variable variable) {
+        Require.that(variable != null, "variable must not be null");
+        Require.that(!isNameUsedForVariable(variable.getName()), "There is already a variable with that name");
+
+        variables.add(variable);
+    }
+
+    public void remove(ColorType colorType) {
+        if (colorType != null) {
+            colorTypes.remove(colorType);
+        }
+    }
+
+    public void remove(Variable variable) {
+        if (variable != null) {
+            variables.remove(variable);
+        }
+    }
+    //TODO: Refactor the all these functions
+    public ColorType[] sortColorTypes() {
+        ColorType[] oldorder = colorTypes.toArray(new ColorType[0]);
+        Collections.sort(colorTypes, new StringComparator());
+        return oldorder;
+    }
+    public void undoSort(ColorType[] oldorder) {
+        colorTypes.clear();
+        for (ColorType element: oldorder) {
+            colorTypes.add(element);
+        }
+    }
+    public void swapColorTypes(int currentIndex, int newIndex) {
+        ColorType temp = colorTypes.get(currentIndex);
+        colorTypes.set(currentIndex, colorTypes.get(newIndex));
+        colorTypes.set(newIndex, temp);
+    }
+
+    public void swapVariables(int currentIndex, int newIndex) {
+        Variable temp = variables.get(currentIndex);
+        variables.set(currentIndex, variables.get(newIndex));
+        variables.set(newIndex, temp);
+    }
+
+    public Variable[] sortVariables() {
+        Variable[] oldOrder = variables.toArray(new Variable[0]);
+        Collections.sort(variables, new StringComparator());
+        return oldOrder;
+    }
+
+    public void undoSort(Variable[] oldOrder) {
+        variables.clear();
+        for (Variable element: oldOrder) {
+            variables.add(element);
+        }
+    }
+
 
 }
