@@ -93,11 +93,14 @@ public class Degree2Converter {
 		retainedDegree2Transitions.add(t);
 		
 		for(TimedInputArc inputArc : transition.getInputArcs()) {
-			degree2Model.add(new TimedInputArc(degree2Model.getPlaceByName(inputArc.source().name()), t, inputArc.interval().copy()));
+			degree2Model.add(new TimedInputArc(degree2Model.getPlaceByName(inputArc.source().name()), t, inputArc.interval().copy(), inputArc.getArcExpression().copy()));
 			degree2Model.add(new TimedOutputArc(t, degree2Model.getPlaceByName(pairing.getOutputArcFor(inputArc).destination().name())));
 		}
 		
 		for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+		    TransportArc transArcCopy =new TransportArc(degree2Model.getPlaceByName(transArc.source().name()), t, degree2Model.getPlaceByName(transArc.destination().name()), transArc.interval().copy());
+		    transArcCopy.setInputExpression(transArc.getInputExpression().copy());
+		    transArcCopy.setOutputExpression(transArc.getOutputExpression().copy());
 			degree2Model.add(new TransportArc(degree2Model.getPlaceByName(transArc.source().name()), t, degree2Model.getPlaceByName(transArc.destination().name()), transArc.interval().copy()));
 		}
 		

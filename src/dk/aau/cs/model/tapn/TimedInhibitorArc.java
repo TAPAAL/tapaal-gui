@@ -12,7 +12,7 @@ public class TimedInhibitorArc extends TimedInputArc {
 	}
 	
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
-		super(source, destination, TimeInterval.ZERO_INF, weight);
+		super(source, destination, TimeInterval.ZERO_INF, weight, null);
 	}
 
     public TimedInhibitorArc(TimedPlace source, TimedTransition destination) {

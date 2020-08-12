@@ -44,7 +44,7 @@ public class TabTransformer {
                     TimedPlace source = template.model().getPlaceByName(arc.getSource().getName());
                     TimedTransition destination = template.model().getTransitionByName(arc.getTarget().getName());
 
-                    TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight());
+                    TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight(), arc.underlyingArc().getExpression());
 
 
                     // GUI
@@ -97,7 +97,7 @@ public class TabTransformer {
         TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
         TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
 
-        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight());
+        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight(), arc.underlyingArc().getExpression());
         //template.model().add(addedArc);
 
         // GUI

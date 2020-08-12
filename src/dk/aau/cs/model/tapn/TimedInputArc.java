@@ -21,11 +21,16 @@ public class TimedInputArc extends TAPNElement {
     private List<ColoredTimeInterval> colorTimeIntervals;
     private ArcExpression expression;
 
-
+    public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
+        this(source, destination, interval, new IntWeight(1), null);
+    }
 
     public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, ArcExpression expression){
 		this(source, destination, interval, new IntWeight(1), expression);
 	}
+    public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight){
+        this(source, destination, interval, weight, null);
+    }
 	
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
@@ -102,12 +107,13 @@ public class TimedInputArc extends TAPNElement {
 		Require.that(place != null, "place cannot be null");
 		source = place;		
 	}
-	
+
+	//TODO: Add color properties to this
 	@Override
 	public String toString() {
 		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString();
 	}
-	
+	//TODO: Add color properties to this
 	public List<TimeInterval> getDEnabledInterval(){
 		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();

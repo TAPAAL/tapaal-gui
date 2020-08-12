@@ -372,7 +372,7 @@ public class TAPNComposer implements ITAPNComposer {
                     }
                 }
 
-				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue());
+				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -423,7 +423,7 @@ public class TAPNComposer implements ITAPNComposer {
 				String destinationTemplate = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 
-				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeightValue());
+				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeightValue(), arc.getExpression());
 				constructedModel.add(addedArc);
 				
 				// Gui work

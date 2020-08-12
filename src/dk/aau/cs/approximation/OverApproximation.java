@@ -163,12 +163,12 @@ public class OverApproximation implements ITAPNApproximation {
 				
 				for (TimedInputArc arc : originalInput) {
 					if (arc.destination() == firedTransition) {
-						net.add(new TimedInputArc(arc.source(), copyTransition, arc.interval(), arc.getWeight()));
+						net.add(new TimedInputArc(arc.source(), copyTransition, arc.interval(), arc.getWeight(), arc.getArcExpression()));
 					}
 				}
 				for (TimedOutputArc arc : originalOutput) {
 					if (arc.source() == firedTransition) {
-						net.add(new TimedOutputArc(copyTransition, arc.destination(), arc.getWeight()));
+						net.add(new TimedOutputArc(copyTransition, arc.destination(), arc.getWeight(), arc.getExpression()));
 					}
 				}
 				for (TimedInhibitorArc arc : originalInhibitor) {
@@ -200,7 +200,7 @@ public class OverApproximation implements ITAPNApproximation {
 		
 		// An input arc from pBlock to all original transitions makes sure, that we can do deadlock checks.
 		for (TimedTransition transition : originalTransitions) {
-			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
+			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));
 		}           
 	}
 

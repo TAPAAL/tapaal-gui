@@ -28,6 +28,7 @@ public class TAPNToTimedConservativeTAPNConverter {
 			for(TimedInputArc ia : t.getInputArcs()){
 				if(placeNameToTimed.get(ia.source().name()) && ia.getWeight().value()>1){
 					for(int i = 1; i<ia.getWeight().value();i++){
+					    //what should color expression be here
 						TimedInputArc arc = new TimedInputArc(conservativeModel.getPlaceByName(ia.source().name()), conservativeModel.getTransitionByName(t.name()), TimeInterval.ZERO_INF);
 						arc.setTimeInterval(ia.interval());
 						conservativeModel.add(arc);
@@ -73,6 +74,7 @@ public class TAPNToTimedConservativeTAPNConverter {
 				}
 			} else if (difference > 0) {
 				for(int i = 0; i < difference; i++) {
+				    //what should color expression be here
 					TimedInputArc arc = new TimedInputArc(bottom, t, TimeInterval.ZERO_INF);
 					conservativeModel.add(arc);
 				}
