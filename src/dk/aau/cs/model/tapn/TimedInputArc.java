@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.util.IntervalOperations;
@@ -16,12 +18,16 @@ public class TimedInputArc extends TAPNElement {
 	private TimedPlace source;
 	private TimeInterval interval;
 	private final TimedTransition destination;
+    private List<ColoredTimeInterval> colorTimeIntervals;
+    private ArcExpression expression;
 
-	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
-		this(source, destination, interval, new IntWeight(1));
+
+
+    public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, ArcExpression expression){
+		this(source, destination, interval, new IntWeight(1), expression);
 	}
 	
-	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
@@ -30,6 +36,7 @@ public class TimedInputArc extends TAPNElement {
 		this.destination = destination;
 		setTimeInterval(interval);
 		this.weight = weight;
+		this.expression = expression;
 	}
 	
 	public Weight getWeight(){
@@ -87,7 +94,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public TimedInputArc copy(TimedArcPetriNet tapn) {
-		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy(), weight);
+		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy(), weight, expression.copy());
 	}
 
 	// This method should ONLY be called in relation to sharing/unsharing a place
@@ -146,4 +153,17 @@ public class TimedInputArc extends TAPNElement {
 		
 		return result;
 	}
+
+    public ArcExpression getArcExpression() {return this.expression;}
+
+
+    public void setExpression(ArcExpression expression) {this.expression = expression;}
+
+    public List<ColoredTimeInterval> getColorTimeIntervals() {
+        return colorTimeIntervals;
+    }
+
+    public void setColorTimeIntervals(List<ColoredTimeInterval> colorTimeIntervals) {
+        this.colorTimeIntervals = colorTimeIntervals;
+    }
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.Animator;
 
@@ -90,18 +91,22 @@ public class TimedTransition extends TAPNElement {
 		return hasUntimedPreset(true);
 	}
 
-
-	//TODO: Add coloured properties to this
 	private boolean hasUntimedPreset(boolean cascade){
 		for(TimedInputArc arc : preset){
 			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
+			for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
+                interval.getInterval().equals(TimeInterval.ZERO_INF);
+            }
 		}
 		for (TransportArc arc : transportArcsGoingThrough){
 			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
+            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
+                interval.getInterval().equals(TimeInterval.ZERO_INF);
+            }
 		}
 		
 		if(cascade && isShared()){

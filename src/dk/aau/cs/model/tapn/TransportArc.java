@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.util.IntervalOperations;
@@ -16,6 +19,11 @@ public class TransportArc extends TAPNElement {
 	private TimedPlace source;
 	private final TimedTransition transition;
 	private TimedPlace destination;
+    private ArcExpression inputExpression;
+    private ArcExpression outputExpression;
+    private List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>() {{
+        add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));
+    }};
 
 	private TimeInterval interval;
 	
@@ -177,4 +185,22 @@ public class TransportArc extends TAPNElement {
 	public String toString() {
 		return "From " + source.name() + " to " + destination.name() + " through " + transition.name() + " with interval " + interval().toString();
 	}
+    public ArcExpression getOutputExpression() {
+        return outputExpression;
+    }
+
+    public void setOutputExpression(ArcExpression outputExpression) {
+        this.outputExpression = outputExpression;
+    }
+
+    public ArcExpression getInputExpression() {
+        return inputExpression;
+    }
+
+    public void setInputExpression(ArcExpression inputExpression) {
+        this.inputExpression = inputExpression;
+    }
+
+    public List<ColoredTimeInterval> getColorTimeIntervals() {return ctiList;}
+    public void setCtiList(List<ColoredTimeInterval> ctiList) {this.ctiList = ctiList;}
 }
