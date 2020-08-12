@@ -43,7 +43,7 @@ public class EngineDialogPanel {
 	final JLabel untimedVersionLabel = new JLabel("Version: ");
 	final JLabel uppaalLocationLabel = new JLabel("Located: ");
 	final JLabel uppaalVersionLabel = new JLabel("Version: ");
-    final JLabel javaVersion = new JLabel("Java version: ");
+    final JLabel javaVersionLabel = new JLabel("Version: ");
 
 	final JLabel tapaalLocationLabelVal = new JLabel("Not setup");
 	final JLabel tapaalVersionLabelVal = new JLabel("N/A");
@@ -590,9 +590,37 @@ public class EngineDialogPanel {
 	}
 
     private void makeJavaPanel() {
-        javaPanel = new JPanel(new FlowLayout());
-        javaPanel.add(javaVersion);
-        javaPanel.add(new JLabel("11"));
+        String version = System.getProperty("java.version");
+
+        //make java panel
+        javaPanel = new JPanel();
+        javaPanel.setBorder(BorderFactory.createTitledBorder("Java"));
+        javaPanel.setLayout(new GridBagLayout());
+
+        //add info panel to java panel
+        JPanel javaInfoPanel = new JPanel();
+        javaInfoPanel.setLayout(new GridBagLayout());
+
+        JPanel p = new JPanel(new FlowLayout());
+        p.add(javaVersionLabel);
+        p.add(new JLabel(version));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        javaInfoPanel.add(p, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = panelInsets;
+        javaPanel.add(javaInfoPanel,gbc);
     }
 
 	private void makeEnginePanel() {
@@ -641,7 +669,7 @@ public class EngineDialogPanel {
         gbc.gridy = 4;
         gbc.weightx = 1;
         gbc.weighty = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = panelInsets;
         enginePanel.add(javaPanel,gbc);
 
