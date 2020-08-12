@@ -22,6 +22,7 @@ import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
@@ -163,7 +164,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	        Require.notNull(c, "datalyer can't be null");
             Require.notNull(p, "Point can't be null");
 
-            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
+            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)), ColorType.COLORTYPE_DOT);
             TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);

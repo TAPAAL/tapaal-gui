@@ -528,7 +528,7 @@ public class TapnLegacyXmlLoader {
 		guiModel.addPetriNetObject(transition);
 		tapn.add(t);
 	}
-
+    //TODO: implement color
     private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
         int positionXInput = (int) getPositionAttribute(element, "x");
         int positionYInput = (int) getPositionAttribute(element, "y");
@@ -558,7 +558,7 @@ public class TapnLegacyXmlLoader {
 
         TimedPlaceComponent place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
 
-        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), null);
         tapn.add(p);
 
         place.setUnderlyingPlace(p);

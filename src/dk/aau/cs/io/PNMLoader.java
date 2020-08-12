@@ -171,7 +171,7 @@ public class PNMLoader {
 			node = node.getNextSibling();
 		}
 	}
-
+    //TODO: implement color
 	private void parsePlace(Node node, TimedArcPetriNet tapn, Template template) {
 		if(!(node instanceof Element)){
 			return;
@@ -185,7 +185,7 @@ public class PNMLoader {
 		String id = NamePurifier.purify(((Element) node).getAttribute("id"));
 		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
 		
-		TimedPlace place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()));
+		TimedPlace place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()), null);
 		Require.that(places.put(id, place) == null && !transitions.containsKey(id), 
 				"The name: " + id + ", was already used");
 		tapn.add(place);

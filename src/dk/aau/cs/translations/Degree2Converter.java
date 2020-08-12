@@ -128,7 +128,8 @@ public class Degree2Converter {
 			}
 
 			String ptName = String.format(P_T_IN_FORMAT, transitionName, i);
-			LocalTimedPlace pt = new LocalTimedPlace(ptName, new TimeInvariant(true, new IntBound(0)));
+			//TODO: what should colored time invariant be here??
+			LocalTimedPlace pt = new LocalTimedPlace(ptName, new TimeInvariant(true, new IntBound(0)), null);
 			degree2Model.add(pt);
 
 			degree2Model.add(new TimedOutputArc(tiin, pt));
@@ -136,9 +137,9 @@ public class Degree2Converter {
 				degree2Model.add(new TimedInputArc(previousPlace, tiin, TimeInterval.ZERO_INF));
 			}
 			previousPlace = pt;
-
-			String holdingPlaceName = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
-			degree2Model.add(new LocalTimedPlace(holdingPlaceName, TimeInvariant.LESS_THAN_INFINITY));
+            //TODO: what should colored time invariant be here??
+            String holdingPlaceName = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
+			degree2Model.add(new LocalTimedPlace(holdingPlaceName, TimeInvariant.LESS_THAN_INFINITY, null));
 		}
 
 		// Create t^max(t)
@@ -160,7 +161,8 @@ public class Degree2Converter {
 			degree2Model.add(tiOut);
 
 			String ptOutName = String.format(P_T_OUT_FORMAT, transitionName, i);
-			TimedPlace ptOut = new LocalTimedPlace(ptOutName, new TimeInvariant(true, new IntBound(0)));
+            //TODO: what should colored time invariant be here??
+            TimedPlace ptOut = new LocalTimedPlace(ptOutName, new TimeInvariant(true, new IntBound(0)), null);
 			degree2Model.add(ptOut);
 
 			degree2Model.add(new TimedOutputArc(previousTransition, ptOut));

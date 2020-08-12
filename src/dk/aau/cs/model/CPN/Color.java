@@ -100,4 +100,16 @@ public class Color {
         else
             return colorName;
     }
+
+    public Color copy(){
+        if(this.tuple != null){
+            Vector<Color> newTuple = new Vector<Color>();
+            for(Color c : this.getTuple()){
+                newTuple.add(c.copy());
+            }
+            return new Color(this.colorType.copy(), this.id, newTuple);
+        } else{
+            return new Color(this.colorType.copy(), this.id, this.colorName);
+        }
+    }
 }

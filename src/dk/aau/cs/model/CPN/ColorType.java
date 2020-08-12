@@ -71,4 +71,8 @@ public class ColorType implements Iterable<Color> {
     public Color getFirstColor() {
         return colors.firstElement();
     }
+
+    public ColorType copy(){
+        return new ColorType(this.name);
+    }
 }

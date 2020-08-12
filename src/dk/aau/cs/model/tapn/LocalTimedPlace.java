@@ -1,18 +1,32 @@
 package dk.aau.cs.model.tapn;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.util.Tuple;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LocalTimedPlace  extends TimedPlace {
-
+    private ColorType colorType;
+    private List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>() {{
+        add(ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(Color.STAR_COLOR));
+    }};
 	private TimedArcPetriNet model;
+    public LocalTimedPlace(String name){
+        this(name, ColorType.COLORTYPE_DOT);
 
-    public LocalTimedPlace(String name) {
-		this(name, TimeInvariant.LESS_THAN_INFINITY);
+    }
+    public LocalTimedPlace(String name, ColorType colorType) {
+		this(name, TimeInvariant.LESS_THAN_INFINITY, ColoredTimeInvariant.LESS_THAN_INFINITY_AND_DOT);
+		this.colorType = colorType;
 	}
 
-	public LocalTimedPlace(String name, TimeInvariant invariant) {
+	public LocalTimedPlace(String name, TimeInvariant invariant, ColoredTimeInvariant CTinvariant) {
 		setName(name);
 		setInvariant(invariant);
+		setColorTimeInvariant(CTinvariant);
 	}
 	
 	public TimedArcPetriNet model() {
@@ -136,4 +150,23 @@ public class LocalTimedPlace  extends TimedPlace {
 		
 		return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 	}
+	@Override
+    public List<ColoredTimeInvariant> getCtiList() {
+        return ctiList;
+    }
+
+    public void setCtiList(List<ColoredTimeInvariant> ctiList) {
+        List<ColoredTimeInvariant> found = new ArrayList<ColoredTimeInvariant>();
+        for (ColoredTimeInvariant timeInvariant : ctiList) {
+            if (timeInvariant == null)
+                found.add(timeInvariant);
+        }
+        ctiList.removeAll(found);
+        this.ctiList = ctiList;
+    }
+    public void setColorType(ColorType colorType) {
+        this.colorType = colorType;
+    }
+    @Override
+    public ColorType getColorType() {return colorType;}
 }

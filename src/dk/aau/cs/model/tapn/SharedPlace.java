@@ -1,22 +1,30 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
-
+    private ColorType colorType;
+    private List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>() {{
+        add(ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(Color.STAR_COLOR));
+    }};
     private TimedArcPetriNetNetwork network;
 
     public SharedPlace(String name){
-		this(name, TimeInvariant.LESS_THAN_INFINITY);
+		this(name, TimeInvariant.LESS_THAN_INFINITY, ColoredTimeInvariant.LESS_THAN_INFINITY_AND_DOT);
 	}
 	
-	public SharedPlace(String name, TimeInvariant invariant){
+	public SharedPlace(String name, TimeInvariant invariant, ColoredTimeInvariant CTI){
 		setName(name);
 		setInvariant(invariant);
+		setColorTimeInvariant(CTI);
 	}
 
     public void setNetwork(TimedArcPetriNetNetwork network) {
@@ -28,9 +36,9 @@ public class SharedPlace extends TimedPlace{
 	}
 	
 
-
+    //TODO: check that colored time invariant is copied correctly
 	public TimedPlace copy() {
-		return new SharedPlace(this.name(), this.invariant().copy());
+		return new SharedPlace(this.name(), this.invariant().copy(), this.getColoredTimeInvariant().copy());
 	}
 
 	public boolean isShared() {
@@ -102,4 +110,26 @@ public class SharedPlace extends TimedPlace{
 		
 		return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 	}
+    @Override
+    public List<ColoredTimeInvariant> getCtiList() {
+        return ctiList;
+    }
+
+    //TODO: is this the right way to set this list
+    public void setCtiList(List<ColoredTimeInvariant> ctiList) {
+        List<ColoredTimeInvariant> found = new ArrayList<ColoredTimeInvariant>();
+        for (ColoredTimeInvariant timeInvariant : ctiList) {
+            if (timeInvariant == null) {
+                found.add(timeInvariant);
+            }
+        }
+        ctiList.removeAll(found);
+        this.ctiList = ctiList;
+    }
+
+    public void setColorType(ColorType colorType) {
+        this.colorType = colorType;
+    }
+    @Override
+    public ColorType getColorType() {return colorType;}
 }

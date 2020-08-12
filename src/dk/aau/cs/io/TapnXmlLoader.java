@@ -206,8 +206,8 @@ public class TapnXmlLoader {
 				firstPlaceRenameWarning = false;
 			}
 		}
-		
-		SharedPlace place = new SharedPlace(name, invariant);
+		//TODO: implements parsing of colors
+		SharedPlace place = new SharedPlace(name, invariant, null);
         place.setCurrentMarking(marking);
 		place.addTokens(numberOfTokens);
 
@@ -473,7 +473,8 @@ public class TapnXmlLoader {
 			p = network.getSharedPlaceByName(nameInput);
 			tapn.add(p);
 		}else{
-			p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+		    //TODO: implement parsing of colors
+			p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), null);
 			tapn.add(p);
 			for (int i = 0; i < initialMarkingInput; i++) {
 				network.marking().add(new TimedToken(p));

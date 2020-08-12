@@ -3,6 +3,7 @@ package dk.aau.cs.model.tapn;
 import java.util.*;
 
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.CPN.Expressions.VariableExpression;
@@ -555,7 +556,7 @@ public class TimedArcPetriNetNetwork {
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 		
 		for(SharedPlace p : sharedPlaces){
-			network.add(new SharedPlace(p.name(), p.invariant().copy()));
+			network.add(new SharedPlace(p.name(), p.invariant().copy(), p.getColoredTimeInvariant().copy()));
             
 			/* Copy markings for shared places */
 			for(TimedToken token : currentMarking.getTokensFor(p)){

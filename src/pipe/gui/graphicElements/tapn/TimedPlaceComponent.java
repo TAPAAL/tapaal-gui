@@ -24,6 +24,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -349,13 +351,26 @@ public class TimedPlaceComponent extends Place {
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
 			getNameLabel().setName(place.name());
+            if(this.isTimed() && !this.isColored()){
+                if (!(place.invariant().upperBound() instanceof InfBound)) {
+                    getNameLabel().setText("\nInv: " + place.invariant().toString(displayConstantNames));
+                }else{
+                    getNameLabel().setText("");
+                }
+            } else if (this.isColored()){
+                String placeColorType = "[" + place.getColorType().getName() +"]";
+                getNameLabel().setText("\n"+ placeColorType);
+                if(isTimed()){
+                    if(place.getCtiList() != null) {
+                        for (ColoredTimeInvariant cti : place.getCtiList()) {
+                            if (cti != null) {
+                                getNameLabel().setText(getNameLabel().getText() + "\n" + cti.toString() + "\n");
+                            }
+                        }
+                    }
+                }
+            }
 
-			if (!(place.invariant().upperBound() instanceof InfBound)) {
-				getNameLabel().setText("\nInv: " + place.invariant().toString(displayConstantNames));
-			}else{
-				getNameLabel().setText("");
-			}
-			
 			// Handle constant highlighting
 			boolean focusedConstant = false;
 			Bound bound = place.invariant().upperBound();
@@ -408,7 +423,14 @@ public class TimedPlaceComponent extends Place {
 		place.setName(nameInput);
 		super.setName(nameInput);
 	}
+    public ColoredTimeInvariant getColorTimeInvariant() {
+        return place.getColoredTimeInvariant();
+    }
 
+    public void setColorTimeInvariant(ColoredTimeInvariant inv) {
+        place.setColorTimeInvariant(inv);
+        update(true);
+	}
 	private static Shape createDashedOutline(){
 		return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
 	}
@@ -416,6 +438,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY());
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
+		placeComponent.setColorTimeInvariant(this.getColorTimeInvariant());
 
 		return placeComponent;
 	}

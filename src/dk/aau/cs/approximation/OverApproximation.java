@@ -79,7 +79,7 @@ public class OverApproximation implements ITAPNApproximation {
 		currentPlace.addToken(currentToken);
 		
 		// Block place, which secures the net makes at most one transition not in the trace.
-		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK", TimeInvariant.LESS_THAN_INFINITY);
+		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK");
 		TimedToken blockToken = new TimedToken(blockPlace);
 		net.add(blockPlace);
 		blockPlace.addToken(blockToken);

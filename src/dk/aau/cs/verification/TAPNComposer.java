@@ -163,10 +163,11 @@ public class TAPNComposer implements ITAPNComposer {
 			String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(place) : place.name(); 
 			
 			LocalTimedPlace constructedPlace = null;
+			//TODO: should colored time invariants be copied here??
 			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
-				constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant());
+				constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant(), place.getColoredTimeInvariant().copy());
 			} else {
-				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())));
+				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())), place.getColoredTimeInvariant().copy());
 			}
 			
 			constructedModel.add(constructedPlace);
@@ -213,9 +214,9 @@ public class TAPNComposer implements ITAPNComposer {
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
-						place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
+						place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant(),place.getColoredTimeInvariant().copy());
 					} else {
-						place = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(timedPlace.invariant().isUpperNonstrict(), new IntBound(timedPlace.invariant().upperBound().value())));
+						place = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(timedPlace.invariant().isUpperNonstrict(), new IntBound(timedPlace.invariant().upperBound().value())),place.getColoredTimeInvariant().copy());
 					}
 					constructedModel.add(place);
 					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
