@@ -559,7 +559,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         String version = System.getProperty("java.version");
 
         if (Integer.parseInt(version.split("\\.")[0]) < 11) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "You are using an older version of Java. Version 11 or newer is required.");
+            JOptionPane.showMessageDialog(CreateGui.getApp(), "You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
         }
     }
 
