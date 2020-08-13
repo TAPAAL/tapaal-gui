@@ -37,12 +37,12 @@ public class TimedArcPetriNetNetwork {
 	private boolean paintNet = true;
 	
 	public TimedArcPetriNetNetwork() {
-		this(new ConstantStore(), Arrays.asList(ColorType.COLORTYPE_DOT));
+		this(new ConstantStore(), List.of(ColorType.COLORTYPE_DOT));
 	}
 	
 	public TimedArcPetriNetNetwork(ConstantStore constants, List<ColorType> colorTypes){
 		this.constants = constants;
-		this.colorTypes = colorTypes;
+		this.colorTypes.addAll(colorTypes);
         buildConstraints();
 	}
 	
@@ -693,7 +693,7 @@ public class TimedArcPetriNetNetwork {
 
         Require.that(colorType != null, "colorType must not be null");
         Require.that(!isNameUsedForColorType(colorType.getName()), "There is already a color type with that name"); //TODO:: When using load, a nullpointer exception is thrown here
-
+        System.out.println(colorType);
         colorTypes.add(colorType);
     }
 

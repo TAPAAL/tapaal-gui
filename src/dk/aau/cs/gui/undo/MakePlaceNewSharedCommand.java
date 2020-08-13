@@ -30,7 +30,8 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final SharedPlacesAndTransitionsPanel sharedPanel;
 	private SharedPlace sharedPlace;
 	private final boolean multiShare;
-	
+
+	//TODO: Add color type to this probably
 	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multiShare){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(newSharedName != null, "newSharedName cannot be null");
