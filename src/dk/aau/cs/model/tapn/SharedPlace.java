@@ -18,9 +18,12 @@ public class SharedPlace extends TimedPlace{
     private TimedArcPetriNetNetwork network;
 
     public SharedPlace(String name){
-		this(name, TimeInvariant.LESS_THAN_INFINITY, ColoredTimeInvariant.LESS_THAN_INFINITY_AND_DOT);
+		this(name, ColorType.COLORTYPE_DOT);
 	}
-	
+    public SharedPlace(String name, ColorType colorType) {
+        this(name, TimeInvariant.LESS_THAN_INFINITY, ColoredTimeInvariant.LESS_THAN_INFINITY_AND_DOT);
+        this.colorType = colorType;
+    }
 	public SharedPlace(String name, TimeInvariant invariant, ColoredTimeInvariant CTI){
 		setName(name);
 		setInvariant(invariant);
