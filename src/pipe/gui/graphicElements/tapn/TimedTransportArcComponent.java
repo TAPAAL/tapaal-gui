@@ -3,6 +3,7 @@ package pipe.gui.graphicElements.tapn;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -23,43 +24,53 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private TimedTransportArcComponent connectedTo;
 	private TransportArc underlyingTransportArc;
 
-	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
+	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet, TabContent.TAPNLens lens) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
-
+        this.isTimed = lens.isTimed();
+        this.isColored = lens.isColored();
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);
 		isPrototype = true;
-	}
+        System.out.println("goddav2");
+
+    }
 
 	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
 		super(timedArc);
 		this.isInPreSet = isInPreSet;
-
+        System.out.println("goddav");
 		this.setGroup(group);
 		// hack to reprint the label of the arc
 		updateLabel(true);
 	}
 
-	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group){
+	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group,TabContent.TAPNLens lens){
 	    super(p);
 	    setTarget(t);
 	    this.isInPreSet = true;
 	    this.setGroup(group);
 	    setUnderlyingArc(model);
-
+        this.isColored= lens.isColored();
+        this.isTimed = lens.isTimed();
 	    updateLabel(true);
+        System.out.println("goddav3");
+
     }
 
-    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group){
+    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, TabContent.TAPNLens lens){
         super(t);
         setTarget(p);
         this.isInPreSet = false;
         this.setGroup(group);
+        this.isColored= lens.isColored();
+        this.isTimed = lens.isTimed();
         setUnderlyingArc(model);
 
         updateLabel(true);
+        System.out.println("goddav4");
+
     }
 
 

@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.CreateGui;
 
@@ -99,7 +100,7 @@ public class TimedOutputArcComponent extends Arc {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this));
+		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
 
 		guiDialog.setResizable(false);
 

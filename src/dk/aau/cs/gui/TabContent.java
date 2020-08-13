@@ -331,8 +331,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
 
-            TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr);
-            TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr);
+            TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr, lens);
+            TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr, lens);
 
             ttac1.setConnectedTo(ttac2);
             ttac2.setConnectedTo(ttac1);
@@ -2533,7 +2533,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (place1 != null && transition == null) {
                 transition = pno;
                 connectsTo = 1;
-                arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
+                arc2 = arc = new TimedTransportArcComponent(pno, -1, false, lens);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2550,7 +2550,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (place1 == null && transition == null) {
                 place1 = pno;
                 connectsTo = 2;
-                arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
@@ -2569,7 +2569,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 if (e != null && e.isControlDown()) {
                     place1 = pno;
                     connectsTo = 2;
-                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
                     //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05

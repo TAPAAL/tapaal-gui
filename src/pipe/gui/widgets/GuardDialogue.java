@@ -27,6 +27,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
@@ -70,11 +71,13 @@ public class GuardDialogue extends JPanel /*
 	private WidthAdjustingComboBox<String> weightConstantsComboBox;
 	private ColoredArcGuardPanel coloredArcGuardPanel;
     PetriNetObject objectToBeEdited;
+    Context context;
 	
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
-	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
+	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited, Context context) {
 		myRootPane = rootPane;
+		this.context = context;
 		this.objectToBeEdited = objectToBeEdited;
 		setLayout(new GridBagLayout());
 
@@ -124,7 +127,7 @@ public class GuardDialogue extends JPanel /*
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited);
+        coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context);
 	    add(coloredArcGuardPanel, gridBagConstraints);
     }
 

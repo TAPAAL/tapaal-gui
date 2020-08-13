@@ -1,8 +1,13 @@
 package pipe.gui.ColoredComponents;
 
-import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 import dk.aau.cs.model.tapn.TransportArc;
+import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
@@ -15,16 +20,22 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.util.Vector;
 
 public class ColoredArcGuardPanel extends JPanel {
     PetriNetObject objectToBeEdited;
     boolean isTransportArc = false;
     boolean isInputArc = false;
+    Context context;
+    private Integer transportWeight;
+    private ColorExpression transportInputExpr;
+    private ColorExpression transportOutputExpr;
 
-    public ColoredArcGuardPanel(PetriNetObject objectToBeEdited){
+    public ColoredArcGuardPanel(PetriNetObject objectToBeEdited, Context context){
         this.objectToBeEdited = objectToBeEdited;
         if(objectToBeEdited instanceof TimedTransportArcComponent){
             isTransportArc = true;
+            setTransportExpression();
         }
         if(((Arc)objectToBeEdited).getSource() instanceof Place){
             isInputArc = true;
@@ -39,42 +50,35 @@ public class ColoredArcGuardPanel extends JPanel {
             arcColorInvariantPanel.setVisible(false);
         }
         if(!isTransportArc){
+            System.out.println("hello");
             transportWeightPanel.setVisible(false);
+            transportExprTabbedPane.setVisible(false);
+        } else{
+            regularArcExprPanel.setVisible(false);
+        }
+    }
+
+    private void setTransportExpression() {
+        ArcExpression arcExprInput = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getInputExpression();
+        ArcExpression arcExprOutput = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getOutputExpression();
+
+        if (arcExprInput instanceof NumberOfExpression) {
+            transportWeight = arcExprInput.weight();
+            Vector<ColorExpression> vecColorExpr = ((NumberOfExpression) arcExprInput).getColor();
+            transportInputExpr = new TupleExpression(vecColorExpr);
+        }
+
+        if (arcExprOutput instanceof  NumberOfExpression) {
+            Vector<ColorExpression> vecColorExpr = ((NumberOfExpression) arcExprOutput).getColor();
+            transportOutputExpr = new TupleExpression(vecColorExpr);
         }
     }
 
     private void initPanels() {
-        initArcExpressionPanel();
+        initRegularArcExpressionPanel();
         initColoredTimedGuard();
         initWeightPanel();
-        /*if(input) {
-            if (transportArc) {
-                transportWeightPanel = new JPanel(new GridBagLayout());
-                int current = transportWeight;
-                int min = 1;
-                int max = 9999;
-                int step = 1;
-                SpinnerNumberModel numberModel = new SpinnerNumberModel(current, min, max, step);
-                colorExpressionWeightSpinner = new JSpinner(numberModel);
-                weightLabel = new JLabel("Weight:");
-                ColorExpressionDialogPanel inputPanel = new ColorExpressionDialogPanel(getRootPane(), context, transportInputExpr, true);
-                exprPanel.add(inputPanel, "input");
-            } else {
-                ArcExpressionPanel inputPanel = new ArcExpressionPanel(objectToBeEdited, context, true);
-                exprPanel.add(inputPanel, "input");
-            }
-        }else {
-            ArcExpressionPanel inputPanel = new ArcExpressionPanel(objectToBeEdited, context, true);
-            exprPanel.add(inputPanel, "output");
-        }
-        if (transportArc) {
-            ColorExpressionDialogPanel outputPanel = new ColorExpressionDialogPanel(getRootPane(), context, transportOutputExpr, true);
-            exprPanel.add(outputPanel, "output");
-        }
-        if (input)
-            initColoredTimedGuard();
-
-        */
+        initTransportArcExpressionPanel();
     }
 
     private void initWeightPanel(){
@@ -320,9 +324,23 @@ public class ColoredArcGuardPanel extends JPanel {
         return arcColorInvariantPanel;
     }
 
-    private void initArcExpressionPanel(){
-        exprPanel = new JPanel(new GridBagLayout());
-        exprPanel.setBorder(BorderFactory.createTitledBorder("Arc Expressions"));
+    private void initTransportArcExpressionPanel(){
+        transportExprTabbedPane = new JTabbedPane();
+        JPanel inputPanel = new ColorTransportArcExpressionPanel(context, transportInputExpr);
+        JPanel outputPanel = new ColorTransportArcExpressionPanel(context, transportOutputExpr);
+
+        transportExprTabbedPane.add(inputPanel, "input");
+        transportExprTabbedPane.add(outputPanel, "output");
+
+        GridBagConstraints gbc = GridBagHelper.as(0, 4, GridBagHelper.Anchor.WEST, new Insets(5, 10, 5, 10));
+        gbc.fill = GridBagConstraints.BOTH;
+        add(transportExprTabbedPane, gbc);
+
+    }
+
+    private void initRegularArcExpressionPanel(){
+        regularArcExprPanel = new JPanel(new GridBagLayout());
+        regularArcExprPanel.setBorder(BorderFactory.createTitledBorder("Arc Expressions"));
         initExprField();
         initNumberExpressionsPanel();
         initArithmeticPanel();
@@ -334,7 +352,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
-        add(exprPanel, gbc);
+        add(regularArcExprPanel, gbc);
     }
 
     private void initEditPanel() {
@@ -405,7 +423,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.VERTICAL;
 
-        exprPanel.add(editPanel, gbc);
+        regularArcExprPanel.add(editPanel, gbc);
     }
 
     private void initArithmeticPanel() {
@@ -547,7 +565,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.VERTICAL;
 
-        exprPanel.add(arithmeticPanel,gbc);
+        regularArcExprPanel.add(arithmeticPanel,gbc);
 
     }
 
@@ -693,7 +711,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.VERTICAL;
 
-        exprPanel.add(numberExprPanel, gbc);
+        regularArcExprPanel.add(numberExprPanel, gbc);
     }
 
     private void initExprField () {
@@ -758,7 +776,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 4;
-        exprPanel.add(exprScrollPane, gbc);
+        regularArcExprPanel.add(exprScrollPane, gbc);
     }
 
     public void hideColorInvariantPanel(){
@@ -766,7 +784,8 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private ColorType colorType;
-    private JPanel exprPanel;
+    private JPanel regularArcExprPanel;
     JPanel arcColorInvariantPanel;
     JPanel transportWeightPanel;
+    JTabbedPane transportExprTabbedPane;
 }

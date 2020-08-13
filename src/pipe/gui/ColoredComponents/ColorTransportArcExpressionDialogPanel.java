@@ -2,9 +2,8 @@ package pipe.gui.ColoredComponents;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
@@ -12,19 +11,17 @@ import dk.aau.cs.model.CPN.Variable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
 
-public class ColorExpressionDialogPanel extends JPanel {
+import dk.aau.cs.model.CPN.Color;
+
+class ColorTransportArcExpressionPanel extends JPanel {
 
     public boolean clickedOK;
 
-    JRootPane rootPane;
     Context context;
     ExprStringPosition currentSelection;
     ColorExpression expr;
@@ -38,7 +35,7 @@ public class ColorExpressionDialogPanel extends JPanel {
     JComboBox<Variable> variableCombobox;
     JLabel variableLabel;
     JButton addVariableButton;
-    JComboBox<dk.aau.cs.model.CPN.Color> colorCombobox;
+    JComboBox<Color> colorCombobox;
     JLabel colorLabel;
     JButton addColorButton;
 
@@ -59,23 +56,9 @@ public class ColorExpressionDialogPanel extends JPanel {
     JButton OKButton;
     ButtonGroup exitButtons;
 
-    private boolean transport;
-
-
-
-
-    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport) {
-        this.rootPane = rootPane;
+    public ColorTransportArcExpressionPanel(Context context, ColorExpression expr) {
         this.context = context;
         this.expr = expr;
-        this.transport = transport;
-        initComponents();
-    }
-
-    public ColorExpressionDialogPanel(JRootPane rootPane, Context context) {
-        this.rootPane = rootPane;
-        this.context = context;
-        this.transport = false;
         initComponents();
     }
 
@@ -95,7 +78,6 @@ public class ColorExpressionDialogPanel extends JPanel {
         initColorTypePanel();
         initButtonsPanel();
         initExprEditPanel();
-        initExitButtons();
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -213,7 +195,7 @@ public class ColorExpressionDialogPanel extends JPanel {
     }
 
     private void updateColorType() {
-        /*colorCombobox.removeAllItems();
+        colorCombobox.removeAllItems();
         variableCombobox.removeAllItems();
 
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
@@ -225,82 +207,18 @@ public class ColorExpressionDialogPanel extends JPanel {
             }
             if (ct instanceof ProductType) {
                 for (ColorType element: ((ProductType) ct).getColorTypes()) {
-                    for (dk.aau.cs.model.CPN.Color color : element) {
+                    for (Color color : element) {
                         colorCombobox.addItem(color);
                     }
                 }
             }
             else {
-                for (dk.aau.cs.model.CPN.Color element : ct) {
+                for (Color element : ct) {
                     colorCombobox.addItem(element);
                 }
             }
-        }*/
-
-    }
-
-    private void onExit() {
-        rootPane.getParent().setVisible(false);
-    }
-
-    private void onOK() {
-
-        onExit();
-    }
-
-    public void initExitButtons() {
-        exitPanel = new JPanel(new GridBagLayout());
-
-        cancelButton = new JButton("Cancel");
-        cancelButton.setMaximumSize(new Dimension(100, 25));
-        cancelButton.setMinimumSize(new Dimension(100, 25));
-        cancelButton.setPreferredSize(new Dimension(100, 25));
-
-        OKButton = new JButton("OK");
-        OKButton.setMaximumSize(new Dimension(100, 25));
-        OKButton.setMinimumSize(new Dimension(100, 25));
-        OKButton.setPreferredSize(new Dimension(100, 25));
-
-        exitButtons = new ButtonGroup();
-
-        exitButtons.add(cancelButton);
-        exitButtons.add(OKButton);
-
-        OKButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                clickedOK = true;
-                onOK();
-            }
-        });
-
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                clickedOK = false;
-                onExit();
-            }
-        });
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(15, 5,5 ,0 );
-        exitPanel.add(cancelButton, gbc);
-
-        if (!transport) {
-            gbc.gridx = 1;
-            gbc.gridy = 0;
-            gbc.anchor = GridBagConstraints.EAST;
-            exitPanel.add(OKButton, gbc);
-
-            gbc = new GridBagConstraints();
-            gbc.gridx = 2;
-            gbc.gridy = 2;
-            gbc.fill = GridBagConstraints.VERTICAL;
-            exprPanel.add(exitPanel, gbc);
         }
+
     }
 
     public void initButtonsPanel() {
@@ -342,7 +260,7 @@ public class ColorExpressionDialogPanel extends JPanel {
                 } else {
                     TupleExpression tupleExpr = (TupleExpression) expr;
                     tupleExpr.addColorExpression(new PlaceHolderColorExpression());
-                    expr = (ColorExpression)expr.replace(expr, tupleExpr);
+                    expr = expr.replace(expr, tupleExpr);
                     updateSelection(tupleExpr);
                 }
             }
@@ -480,10 +398,10 @@ public class ColorExpressionDialogPanel extends JPanel {
 
         /*for (ColorType element : context.network().colorTypes()) {
             colorTypeCombobox.addItem(element);
-        }*/
+        }
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
-        }
+        }*/
 
         colorTypeCombobox.setPreferredSize(new Dimension(300, 27));
         colorTypeCombobox.setMinimumSize(new Dimension(300, 27));
@@ -548,7 +466,7 @@ public class ColorExpressionDialogPanel extends JPanel {
         addColorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                dk.aau.cs.model.CPN.Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
+                Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
                 UserOperatorExpression colorExpr = null;
 
                 if (currentSelection.getObject() instanceof ColorExpression) {
@@ -616,7 +534,7 @@ public class ColorExpressionDialogPanel extends JPanel {
         StyleConstants.setFontSize(standard, 12);
         doc.setParagraphAttributes(0 , 0, standard, true);
 
-        exprField.setBackground(Color.white);
+        exprField.setBackground(java.awt.Color.white);
 
         exprField.setEditable(false);
         exprField.setToolTipText("Tooltip missing");
