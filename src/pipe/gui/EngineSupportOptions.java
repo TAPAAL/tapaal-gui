@@ -15,11 +15,12 @@ public class EngineSupportOptions {
     public final boolean supportTimedNets;
     public final boolean supportDeadlockNetdegreeGreaterThan2;
     public final boolean supportGames;
+    public final boolean supportEGorAFWithNetDegreeGreaterThan2;
 
     public final boolean[] optionsArray;
     public EngineSupportOptions(String nameString, boolean supportFastestTrace, boolean supportDeadlockNetdegree2EForAG, boolean supportDeadlockEGorAF, boolean supportDeadlockWithInhib,
                                 boolean supportWeights, boolean supportInhibArcs, boolean supportUrgentTransitions, boolean supportEGorAF, boolean supportStrictNets, boolean supportTimedNets,
-                                boolean supportDeadlockNetdegreeGreaterThan2, boolean supportGames){
+                                boolean supportDeadlockNetdegreeGreaterThan2, boolean supportGames, boolean supportEGorAFWithNetDegreeGreaterThan2){
         this.nameString = nameString;
         this.supportFastestTrace =  supportFastestTrace;
         this.supportDeadlockNetdegree2EForAG =  supportDeadlockNetdegree2EForAG;
@@ -32,13 +33,17 @@ public class EngineSupportOptions {
         this.supportTimedNets = supportTimedNets;
         this.supportDeadlockNetdegreeGreaterThan2 = supportDeadlockNetdegreeGreaterThan2;
         this.supportGames = supportGames;
+        this.supportEGorAFWithNetDegreeGreaterThan2 = supportEGorAFWithNetDegreeGreaterThan2;
         this.optionsArray = new boolean[]{supportFastestTrace, supportDeadlockNetdegree2EForAG, supportDeadlockEGorAF, supportDeadlockWithInhib,
-            supportWeights, supportInhibArcs, supportUrgentTransitions, supportEGorAF, supportStrictNets, supportTimedNets, supportDeadlockNetdegreeGreaterThan2, supportGames};
+            supportWeights, supportInhibArcs, supportUrgentTransitions, supportEGorAF, supportStrictNets, supportTimedNets, supportDeadlockNetdegreeGreaterThan2,
+            supportGames, supportEGorAFWithNetDegreeGreaterThan2};
     }
 
     public boolean areOptionsSupported(boolean[] queryOptions){
+        System.out.println(nameString);
         for(int i = 0; i < optionsArray.length; i++){
             if(queryOptions[i] == true && optionsArray[i] != true){
+                System.out.println(i);
                 return false;
             }
         }

@@ -241,7 +241,8 @@ public class QueryDialog extends JPanel {
         true, // support strict nets
         true, //  support timed nets/time intervals
         false,// support deadlock with net degree > 2
-        false);
+        false, //support games
+        false);//support EG or AF with net degree > 2
 
     private final static EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
         name_COMBI,//name of engine
@@ -256,7 +257,8 @@ public class QueryDialog extends JPanel {
         true,// support strict nets
         true,//  support timed nets/time intervals
         false,// support deadlock with net degree > 2
-        false);
+        false, //support games
+        true);//support EG or AF with net degree > 2);
 
     private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
         name_OPTIMIZEDSTANDARD,//name of engine
@@ -271,7 +273,8 @@ public class QueryDialog extends JPanel {
         true,// support strict nets
         true,//  support timed nets/time intervals
         false,// support deadlock with net degree > 2
-        false);
+        false, //support games
+        false);//support EG or AF with net degree > 2);
 
     private final static EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
         name_STANDARD,//name of engine
@@ -286,7 +289,8 @@ public class QueryDialog extends JPanel {
         true,// support strict nets
         true,//  support timed nets/time intervals
         false,// support deadlock with net degree > 2
-        false);
+        false, //support games
+        false);//support EG or AF with net degree > 2);
 
     private final static EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
         name_BROADCAST,//name of engine
@@ -301,7 +305,8 @@ public class QueryDialog extends JPanel {
         true,// support strict nets
         true,//  support timed nets/time intervals
         false,// support deadlock with net degree > 2
-        false);
+        false, //support games
+        true);//support EG or AF with net degree > 2);
 
     private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
         name_BROADCASTDEG2,//name of engine
@@ -316,7 +321,8 @@ public class QueryDialog extends JPanel {
         true,// support strict nets
         true,//  support timed nets/time intervals
         false,// support deadlock with net degree > 2
-        false);
+        false, //support games
+        true);//support EG or AF with net degree > 2);
 
     private final static EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
         name_DISCRETE,//name of engine
@@ -331,7 +337,8 @@ public class QueryDialog extends JPanel {
         false,// support strict nets
         true,//  support timed nets/time intervals
         true,// support deadlock with net degree > 2
-        true);
+        true, //support games
+        true);//support EG or AF with net degree > 2);
 
     //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
     private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
@@ -829,8 +836,21 @@ public class QueryDialog extends JPanel {
             //we want to know if it is timed
             lens.isTimed(),
             (queryHasDeadlock() && highestNetDegree > 2),
-            lens.isGame()
+            lens.isGame(),
+            (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) && highestNetDegree > 2
         };
+        System.out.println( (queryHasDeadlock() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && highestNetDegree <= 2));
+        System.out.println(     (queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))));
+        System.out.println(     (queryHasDeadlock() && hasInhibitorArcs));
+        System.out.println(    tapnNetwork.hasWeights());
+        System.out.println(     hasInhibitorArcs);
+        System.out.println(     tapnNetwork.hasUrgentTransitions());
+        System.out.println(     (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")));
+        System.out.println(     !tapnNetwork.isNonStrict());
+        System.out.println(     lens.isTimed());
+        System.out.println(     (queryHasDeadlock() && highestNetDegree > 2));
+        System.out.println(     lens.isGame());
+        System.out.println(     (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) && highestNetDegree > 2);
 		/* The untimed engine is disabled for now. It is used in the CTL query dialog
 		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
