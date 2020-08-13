@@ -112,7 +112,6 @@ public class GuardDialogue extends JPanel /*
             coloredArcGuardPanel.setVisible(false);
         } else if (!objectToBeEdited.isTimed()){
             weightEditPanel.setVisible(false);
-            coloredArcGuardPanel.hideColorInvariantPanel();
         } else{
             guardEditPanel.setVisible(false);
             weightEditPanel.setVisible(false);
@@ -125,7 +124,7 @@ public class GuardDialogue extends JPanel /*
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        coloredArcGuardPanel = new ColoredArcGuardPanel();
+        coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited);
 	    add(coloredArcGuardPanel, gridBagConstraints);
     }
 

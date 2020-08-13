@@ -1,6 +1,12 @@
 package pipe.gui.ColoredComponents;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.tapn.TransportArc;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,9 +17,30 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 
 public class ColoredArcGuardPanel extends JPanel {
-    public ColoredArcGuardPanel(){
+    PetriNetObject objectToBeEdited;
+    boolean isTransportArc = false;
+    boolean isInputArc = false;
+
+    public ColoredArcGuardPanel(PetriNetObject objectToBeEdited){
+        this.objectToBeEdited = objectToBeEdited;
+        if(objectToBeEdited instanceof TimedTransportArcComponent){
+            isTransportArc = true;
+        }
+        if(((Arc)objectToBeEdited).getSource() instanceof Place){
+            isInputArc = true;
+        }
         this.setLayout(new GridBagLayout());
         initPanels();
+        hideIrrelevantInformation();
+    }
+
+    public void hideIrrelevantInformation(){
+        if(!objectToBeEdited.isTimed()){
+            arcColorInvariantPanel.setVisible(false);
+        }
+        if(!isTransportArc){
+            transportWeightPanel.setVisible(false);
+        }
     }
 
     private void initPanels() {
@@ -51,7 +78,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void initWeightPanel(){
-        JPanel transportWeightPanel = new JPanel(new GridBagLayout());
+        transportWeightPanel = new JPanel(new GridBagLayout());
         //int current = transportWeight;
         int min = 1;
         int max = 9999;
@@ -741,4 +768,5 @@ public class ColoredArcGuardPanel extends JPanel {
     private ColorType colorType;
     private JPanel exprPanel;
     JPanel arcColorInvariantPanel;
+    JPanel transportWeightPanel;
 }
