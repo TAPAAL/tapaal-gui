@@ -17,6 +17,7 @@ import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
+import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
@@ -483,7 +484,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // HAK-arrange for frameTitle to be initialized and the default file
         // name to be appended to basic window title
 
-        checkVersion();
+        checkJavaVersion();
 
         frameTitle = title;
         setTitle(null);
@@ -555,11 +556,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     }
 
-    private void checkVersion() {
-        String version = System.getProperty("java.version");
+    private void checkJavaVersion() {
+        int version = JavaUtil.getJREMajorVersion();
 
-        if (Integer.parseInt(version.split("\\.")[0]) < 11) {
+        if (version < 11) {
             JOptionPane.showMessageDialog(CreateGui.getApp(), "You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
+            System.out.println("You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
         }
     }
 
