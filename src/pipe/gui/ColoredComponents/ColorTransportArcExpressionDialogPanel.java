@@ -65,6 +65,7 @@ class ColorTransportArcExpressionPanel extends JPanel {
     public void initComponents() {
         initPanels();
         updateColorType();
+        updateSelection();
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         editExprButton.setEnabled(false);
@@ -463,26 +464,18 @@ class ColorTransportArcExpressionPanel extends JPanel {
             }
         });
 
-        addColorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
-                UserOperatorExpression colorExpr = null;
+        addColorButton.addActionListener(actionEvent -> {
+            Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
+            UserOperatorExpression colorExpr = null;
 
-                if (currentSelection.getObject() instanceof ColorExpression) {
-                    colorExpr = new UserOperatorExpression(color);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), colorExpr);
-                    updateSelection(colorExpr);
-                }
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                colorExpr = new UserOperatorExpression(color);
+                expr = expr.replace(currentSelection.getObject(), colorExpr);
+                updateSelection(colorExpr);
             }
         });
 
-        colorTypeCombobox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                updateColorType();
-            }
-        });
+        colorTypeCombobox.addActionListener(actionEvent -> updateColorType());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
