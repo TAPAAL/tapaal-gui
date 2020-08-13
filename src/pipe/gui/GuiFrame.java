@@ -207,7 +207,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::showBatchProcessingDialog);
         }
     };
-    private final GuiAction engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines") {
+    private final GuiAction engineSelectionAction = new GuiAction("Engine selection", "View and modify the location of verification engines", KeyStroke.getKeyStroke('E', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::showEngineDialog);
         }
