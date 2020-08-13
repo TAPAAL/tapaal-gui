@@ -839,23 +839,6 @@ public class QueryDialog extends JPanel {
             lens.isGame(),
             (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) && highestNetDegree > 2
         };
-        System.out.println( (queryHasDeadlock() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && highestNetDegree <= 2));
-        System.out.println(     (queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))));
-        System.out.println(     (queryHasDeadlock() && hasInhibitorArcs));
-        System.out.println(    tapnNetwork.hasWeights());
-        System.out.println(     hasInhibitorArcs);
-        System.out.println(     tapnNetwork.hasUrgentTransitions());
-        System.out.println(     (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")));
-        System.out.println(     !tapnNetwork.isNonStrict());
-        System.out.println(     lens.isTimed());
-        System.out.println(     (queryHasDeadlock() && highestNetDegree > 2));
-        System.out.println(     lens.isGame());
-        System.out.println(     (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) && highestNetDegree > 2);
-		/* The untimed engine is disabled for now. It is used in the CTL query dialog
-		if(!fastestTraceRadioButton.isSelected() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
-			options.add(name_UNTIMED);
-		}
-		*/
 
 		
 		if(useTimeDarts != null){
