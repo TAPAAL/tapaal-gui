@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -13,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.model.CPN.ColorType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -134,7 +136,7 @@ public class TapnLegacyXmlLoader {
 			}
 		}
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
 		NodeList nets = tapnDoc.getElementsByTagName("net");
 		
 		if(nets.getLength() <= 0)

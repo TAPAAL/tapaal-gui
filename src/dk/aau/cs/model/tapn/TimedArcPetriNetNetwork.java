@@ -37,11 +37,12 @@ public class TimedArcPetriNetNetwork {
 	private boolean paintNet = true;
 	
 	public TimedArcPetriNetNetwork() {
-		this(new ConstantStore());
+		this(new ConstantStore(), Arrays.asList(ColorType.COLORTYPE_DOT));
 	}
 	
-	public TimedArcPetriNetNetwork(ConstantStore constants){
+	public TimedArcPetriNetNetwork(ConstantStore constants, List<ColorType> colorTypes){
 		this.constants = constants;
+		this.colorTypes = colorTypes;
         buildConstraints();
 	}
 	

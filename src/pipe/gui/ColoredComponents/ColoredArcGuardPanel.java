@@ -40,6 +40,7 @@ public class ColoredArcGuardPanel extends JPanel {
         if(((Arc)objectToBeEdited).getSource() instanceof Place){
             isInputArc = true;
         }
+        this.context = context;
         this.setLayout(new GridBagLayout());
         initPanels();
         hideIrrelevantInformation();
@@ -50,7 +51,6 @@ public class ColoredArcGuardPanel extends JPanel {
             arcColorInvariantPanel.setVisible(false);
         }
         if(!isTransportArc){
-            System.out.println("hello");
             transportWeightPanel.setVisible(false);
             transportExprTabbedPane.setVisible(false);
         } else{

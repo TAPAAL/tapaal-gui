@@ -278,7 +278,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		list.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
-				removeConstantHighlights();
+			    removeConstantHighlights();
 			}
 		});
 
@@ -352,6 +352,10 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
     }
 	private void highlightConstant(int index){
+        //TODO: Implement for these
+        if(isDisplayingColorTypes() || isDisplayingVariables()){
+	        return;
+        }
 		ListModel model = list.getModel();
 		Constant c = (Constant) model.getElementAt(index);
 		if(timer != null) {
@@ -371,6 +375,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 	
 	public void removeConstantHighlights(){
+	    //TODO: Implement for these
+        if(isDisplayingColorTypes() || isDisplayingVariables()){
+            return;
+        }
 		ListModel model = list.getModel();
 		for(int i = 0; i < model.getSize(); i++){
 			((Constant) model.getElementAt(i)).setFocused(false);

@@ -3,10 +3,7 @@ package dk.aau.cs.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
@@ -14,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.CPN.ColorType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -118,8 +116,8 @@ public class TapnXmlLoader {
 		idResolver.clear();
 		
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
-
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
+        //TODO: parse colors
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
 
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);

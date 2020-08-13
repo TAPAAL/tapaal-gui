@@ -396,12 +396,12 @@ class ColorTransportArcExpressionPanel extends JPanel {
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
 
-        /*for (ColorType element : context.network().colorTypes()) {
+        for (ColorType element : context.network().colorTypes()) {
             colorTypeCombobox.addItem(element);
         }
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
-        }*/
+        }
 
         colorTypeCombobox.setPreferredSize(new Dimension(300, 27));
         colorTypeCombobox.setMinimumSize(new Dimension(300, 27));

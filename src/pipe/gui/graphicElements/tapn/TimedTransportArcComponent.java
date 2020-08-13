@@ -33,14 +33,11 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		// hack to reprint the label of the arc
 		updateLabel(true);
 		isPrototype = true;
-        System.out.println("goddav2");
-
     }
 
 	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
 		super(timedArc);
 		this.isInPreSet = isInPreSet;
-        System.out.println("goddav");
 		this.setGroup(group);
 		// hack to reprint the label of the arc
 		updateLabel(true);
@@ -55,8 +52,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
         this.isColored= lens.isColored();
         this.isTimed = lens.isTimed();
 	    updateLabel(true);
-        System.out.println("goddav3");
-
     }
 
     public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, TabContent.TAPNLens lens){
@@ -69,8 +64,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
         setUnderlyingArc(model);
 
         updateLabel(true);
-        System.out.println("goddav4");
-
     }
 
 
