@@ -104,7 +104,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PRINTER, null);
         }
     };
-    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
+    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format") {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::importPNMLFile);
         }
@@ -176,6 +176,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
         public void actionPerformed(ActionEvent e) {
             ExportBatchDialog.ShowExportBatchDialog();
+        }
+    };
+
+    private GuiAction cutAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
+        public void actionPerformed(ActionEvent e) {
+            //TODO
         }
     };
 
@@ -655,6 +661,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         editMenu.add(redoAction);
         editMenu.addSeparator();
 
+        editMenu.add(cutAction);
         editMenu.add(copyAction);
         editMenu.add(pasteAction);
 
@@ -868,12 +875,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Copy/past
         toolBar.add(copyAction);
+        toolBar.add(cutAction);
         toolBar.add(pasteAction);
-        /*
-         * Removed copy/past button toolBar.addSeparator();
-         * toolBar.add(cutAction); toolBar.add(copyAction);
-         * toolBar.add(pasteAction);
-         */
 
         // Undo/redo
         toolBar.addSeparator();
