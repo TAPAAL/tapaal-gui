@@ -168,9 +168,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return new Result<>(pnObject);
         }
 
-        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
+        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
+            transition.setUncontrollable(isUncontrollable);
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
 
             guiModelToModel.get(c).add(transition);
@@ -1732,6 +1733,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case TAPNTRANS:
                 setManager(new CanvasTransitionDrawController());
                 break;
+            case UNCONTROLLABLETRANS:
+                setManager(new CanvasUncontrollableTransitionDrawController());
+                break;
             case ANNOTATION:
                 setManager(new CanvasAnnotationNoteDrawController());
                 break;
@@ -2092,7 +2096,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p);
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true);
         }
 
         @Override
@@ -2229,7 +2248,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                         var r = guiModelManager.addNewTimedPlace(getModel(), p);
                         placeClicked(r.result, e);
                     } else { //Transition
-                        var r = guiModelManager.addNewTimedTransitions(getModel(), p);
+                        var r = guiModelManager.addNewTimedTransitions(getModel(), p, false);
                         transitionClicked(r.result, e);
                     }
                 }
@@ -2650,10 +2669,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
     public List<GuiAction> getAvailableDrawActions(){
-        if(lens.isTimed()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
-        } else{
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        if (lens.isTimed() && !lens.isGame()) {
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        } else if (lens.isTimed()) {
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        } else if (lens.isGame()){
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        } else {
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         }
     }
 
@@ -2685,6 +2708,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.TAPNTRANS);
+        }
+    };
+    private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (U)", "U", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.UNCONTROLLABLETRANS);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
@@ -2729,6 +2757,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         // deselect other actions
         selectAction.setSelected(CreateGui.guiMode == Pipe.ElementType.SELECT);
         transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
+        uncontrollableTransAction.setSelected(editorMode == Pipe.ElementType.UNCONTROLLABLETRANS);
         timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
         timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
         transportArcAction.setSelected(editorMode == Pipe.ElementType.TRANSPORTARC);
@@ -2788,6 +2817,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options ";
     public static final String textforTrans = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforUncontrollableTrans = "Uncontrollable Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
     public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
     public static final String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to fire it";
@@ -2800,6 +2830,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public void changeStatusbarText(Pipe.ElementType type) {
         switch (type) {
+            case UNCONTROLLABLETRANS:
+                app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
+
             case PLACE:
                 app.ifPresent(o13 -> o13.setStatusBarText(textforPlace));
                 break;
