@@ -321,24 +321,8 @@ public class QueryDialog extends JPanel {
         true, //support games
         true);//support EG or AF with net degree > 2);
 
-    private final static EngineSupportOptions verifyPNOptions = new EngineSupportOptions(
-        name_UNTIMED,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        true,//  support deadlock with EG or AF
-        true,// support deadlock with inhibitor arcs
-        true, //support weights
-        true, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        false,// support strict nets
-        false,//  support timed nets/time intervals
-        true,// support deadlock with net degree > 2
-        false,//support games
-        true);//support EG or AF with net degree > 2);
-
     //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options, verifyPNOptions};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
@@ -1002,10 +986,14 @@ public class QueryDialog extends JPanel {
                 }
             }
         }
-		for(EngineSupportOptions engine : engineSupportOptions){
-		    if(engine.areOptionsSupported(queryOptions)){
-		        options.add(engine.nameString);
+        if (lens.isTimed()) {
+            for (EngineSupportOptions engine : engineSupportOptions) {
+                if (engine.areOptionsSupported(queryOptions)) {
+                    options.add(engine.nameString);
+                }
             }
+        } else if (!lens.isGame()) {
+            options.add(name_UNTIMED);
         }
 
 		reductionOption.removeAllItems();
@@ -1564,9 +1552,11 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
-		saveUppaalXMLButton.setVisible(advancedView);
+		if (lens.isTimed()) {
+		    saveUppaalXMLButton.setVisible(advancedView);
+		    overApproximationOptionsPanel.setVisible(advancedView);
+        }
 		mergeNetComponentsButton.setVisible(advancedView);
-		if (lens.isTimed()) overApproximationOptionsPanel.setVisible(advancedView);
 
 		if(advancedView){
 			advancedButton.setText("Simple view");
