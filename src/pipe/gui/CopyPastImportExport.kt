@@ -106,26 +106,28 @@ class CopyPastImportExport {
                 val to = node?.getAttribute("to")!!
 
                 if (node != null) {
-                    val from = nameToElementMap[from] as @NotNull TimedPlaceComponent
-                    val to = nameToElementMap[to] as @NotNull TimedTransitionComponent
+                    val from = nameToElementMap[from] as TimedPlaceComponent?
+                    val to = nameToElementMap[to] as TimedTransitionComponent?
 
-
-                    tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
+                    if (from != null && to != null) {
+                        tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
+                    }
                 }
             }
 
             val outputArc = document.getElementsByTagName("outputarc");
-            for (i in 0 until inputArc.length) {
+            for (i in 0 until outputArc.length) {
                 val node = outputArc.item(i) as? Element
                 val from = node?.getAttribute("from")!!
                 val to = node?.getAttribute("to")!!
 
                 if (node != null) {
-                    val from = nameToElementMap[from] as @NotNull TimedTransitionComponent
-                    val to = nameToElementMap[to] as @NotNull TimedPlaceComponent
+                    val from = nameToElementMap[from] as TimedTransitionComponent?
+                    val to = nameToElementMap[to] as TimedPlaceComponent?
 
-
-                    tab.guiModelManager.addTimedOutputArc(tab.model, from, to, null)
+                    if (from != null && to != null) {
+                        tab.guiModelManager.addTimedOutputArc(tab.model, from, to, null)
+                    }
                 }
             }
 
