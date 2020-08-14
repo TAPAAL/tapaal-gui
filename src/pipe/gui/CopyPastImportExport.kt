@@ -106,8 +106,8 @@ class CopyPastImportExport {
                 val to = node?.getAttribute("to")!!
 
                 if (node != null) {
-                    val from = nameToElementMap[from] as TimedPlaceComponent?
-                    val to = nameToElementMap[to] as TimedTransitionComponent?
+                    val from = nameToElementMap[from] as? TimedPlaceComponent
+                    val to = nameToElementMap[to] as? TimedTransitionComponent
 
                     if (from != null && to != null) {
                         tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
@@ -122,8 +122,8 @@ class CopyPastImportExport {
                 val to = node?.getAttribute("to")!!
 
                 if (node != null) {
-                    val from = nameToElementMap[from] as TimedTransitionComponent?
-                    val to = nameToElementMap[to] as TimedPlaceComponent?
+                    val from = nameToElementMap[from] as? TimedTransitionComponent
+                    val to = nameToElementMap[to] as? TimedPlaceComponent
 
                     if (from != null && to != null) {
                         tab.guiModelManager.addTimedOutputArc(tab.model, from, to, null)
