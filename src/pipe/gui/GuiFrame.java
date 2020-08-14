@@ -655,6 +655,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         editMenu.add(redoAction);
         editMenu.addSeparator();
 
+        editMenu.add(copyAction);
+        editMenu.add(pasteAction);
+
+        editMenu.addSeparator();
+
         editMenu.add(deleteAction);
 
         // Bind delete to backspace also
