@@ -181,7 +181,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private GuiAction cutAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            //TODO
+            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
+            getCurrentTab().deleteSelection();
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
         }
     };
 
