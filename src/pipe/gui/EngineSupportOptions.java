@@ -40,10 +40,8 @@ public class EngineSupportOptions {
     }
 
     public boolean areOptionsSupported(boolean[] queryOptions){
-        System.out.println(nameString);
         for(int i = 0; i < optionsArray.length; i++){
             if(queryOptions[i] == true && optionsArray[i] != true){
-                System.out.println(i);
                 return false;
             }
         }
