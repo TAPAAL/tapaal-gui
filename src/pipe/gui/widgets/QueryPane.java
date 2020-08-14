@@ -320,7 +320,6 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.addActionListener(new ActionListener() {
 
 		    public void actionPerformed(ActionEvent e) {
-                //TAPNQuery q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
 				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
 
                 if(q == null) return;
