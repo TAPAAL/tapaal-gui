@@ -321,8 +321,24 @@ public class QueryDialog extends JPanel {
         true, //support games
         true);//support EG or AF with net degree > 2);
 
+    private final static EngineSupportOptions verifyPNOptions = new EngineSupportOptions(
+        name_UNTIMED,//name of engine
+        false,//  support fastest trace
+        true,// support deadlock with net degree 2 and (EF or AG)
+        true,//  support deadlock with EG or AF
+        true,// support deadlock with inhibitor arcs
+        true, //support weights
+        true, //support inhibitor arcs
+        false,// support urgent transitions
+        true,// support EG or AF
+        false,// support strict nets
+        false,//  support timed nets/time intervals
+        true,// support deadlock with net degree > 2
+        false,//support games
+        true);//support EG or AF with net degree > 2);
+
     //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options, verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
@@ -930,7 +946,8 @@ public class QueryDialog extends JPanel {
 
 		disableSymmetryUpdate = true;
 		//The order here should be the same as in EngineSupportOptions
-        boolean[] queryOptions = new boolean[]{fastestTraceRadioButton.isSelected(),
+        boolean[] queryOptions = new boolean[]{
+            fastestTraceRadioButton.isSelected(),
             (queryHasDeadlock() && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) && highestNetDegree <= 2),
             (queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))),
             (queryHasDeadlock() && hasInhibitorArcs),
@@ -1233,8 +1250,8 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void updateQueryOnAtomicPropositionChange() {
-		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode ||
-            (currentSelection.getObject() instanceof TCTLTransitionNode && !lens.isTimed())) {
+		if (currentSelection != null && (currentSelection.getObject() instanceof TCTLAtomicPropositionNode ||
+            (!lens.isTimed() && currentSelection.getObject() instanceof TCTLTransitionNode))) {
 
 		    Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
@@ -2101,7 +2118,6 @@ public class QueryDialog extends JPanel {
 		placesBox.setMaximumSize(d);
 		placesBox.setPreferredSize(d);
 
-
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
 		if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
@@ -2211,13 +2227,6 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(2, 0, 2, 0);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		predicatePanel.add(separator,gbc);
-
-		truePredicateButton = new JButton("True");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -38, 0,0);
-		predicatePanel.add(truePredicateButton, gbc);
 
         truePredicateButton = new JButton("True");
         truePredicateButton.setPreferredSize(new Dimension(90, 27));
@@ -2503,6 +2512,7 @@ public class QueryDialog extends JPanel {
 		gbc.gridx = 3;
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.VERTICAL;
+		gbc.anchor = GridBagConstraints.WEST;
 		queryPanel.add(editingButtonPanel, gbc);
 	}
 
