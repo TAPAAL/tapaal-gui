@@ -59,9 +59,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenu viewMenu;
 
     private JToolBar drawingToolBar;
-    private final JLabel featureInfoText = new JLabel();
-    private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
-    private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+
+    private final JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private final JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -1168,9 +1169,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 drawingToolBar.add(new ToggleButtonWithoutText(action));
                 drawMenu.add(action);
             }
-
-            drawingToolBar.addSeparator();
-            drawingToolBar.add(featureInfoText);
         } else {
             drawMenu.setEnabled(false);
         }
