@@ -1532,7 +1532,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	@Override
 	public void setMode(Pipe.ElementType mode) {
 
-        CreateGui.guiMode = mode;
         changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection
@@ -2511,22 +2510,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 return;
             }
 
-            if (CreateGui.guiMode == Pipe.ElementType.SELECT) {
-                if (myObject.isDraggable()) {
-                    if (!isDragging) {
-                        isDragging = true;
-                    }
+            if (myObject.isDraggable()) {
+                if (!isDragging) {
+                    isDragging = true;
                 }
-
-                // Calculate translation in mouse
-                int transX = Grid.getModifiedX(e.getX() - dragInit.x);
-                int transY = Grid.getModifiedY(e.getY() - dragInit.y);
-                myObject.getParent().getSelectionObject().translateSelection(transX, transY);
-
-                //Only register the actual distance and direction moved (in case of dragging past edge)
-                totalX += myObject.getX() - previousX;
-                totalY += myObject.getY() - previousY;
             }
+
+            // Calculate translation in mouse
+            int transX = Grid.getModifiedX(e.getX() - dragInit.x);
+            int transY = Grid.getModifiedY(e.getY() - dragInit.y);
+            myObject.getParent().getSelectionObject().translateSelection(transX, transY);
+
+            //Only register the actual distance and direction moved (in case of dragging past edge)
+            totalX += myObject.getX() - previousX;
+            totalY += myObject.getY() - previousY;
         }
 
 
