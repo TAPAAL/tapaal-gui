@@ -60,8 +60,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private JToolBar drawingToolBar;
 
-    private final JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
-    private final JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
 
     private JComboBox<String> zoomComboBox;
 
