@@ -36,7 +36,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     final GuiFrameActions guiFrame;
 
-    final MutableReference<TabContentActions> currentTab = new MutableReference<>();
+    final MutableReference<TabContentActions> activeTab = new MutableReference<>();
 
     public GuiFrameController(GuiFrame appGui) {
         super();
@@ -45,12 +45,12 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrameDirectAccess = appGui;
 
         loadPrefrences();
-        appGui.registerController(this, currentTab);
+        appGui.registerController(this, activeTab);
 
 
     }
 
-    //XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
+    //XXX should be private //kyrke 2019-11-05
     boolean showComponents = true;
     boolean showSharedPT = true;
     boolean showConstants = true;
@@ -143,15 +143,15 @@ public class GuiFrameController implements GuiFrameControllerActions{
     public void changeToTab(TabContent tab) {
 
         //De-register old model
-        currentTab.ifPresent(t -> t.setApp(null));
+        activeTab.ifPresent(t -> t.setApp(null));
 
         //Set current tab
-        currentTab.setReference(tab);
+        activeTab.setReference(tab);
 
         guiFrame.changeToTab(tab);
 
-        currentTab.ifPresent(t -> t.setApp(guiFrame));
-        guiFrameDirectAccess.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
+        activeTab.ifPresent(t -> t.setApp(guiFrame));
+        guiFrameDirectAccess.setTitle(activeTab.map(TabContentActions::getTabTitle).orElse(null));
 
     }
 
@@ -479,11 +479,11 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void save() {
-        save(currentTab.get());
+        save(activeTab.get());
     }
     @Override
     public void saveAs(){
-        saveAs(currentTab.get());
+        saveAs(activeTab.get());
     }
 
     @Override
@@ -610,7 +610,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         Preferences.getInstance().setShowTokenAge(showTokenAge);
 
         guiFrame.setShowTokenAgeSelected(showTokenAge);
-        currentTab.ifPresent(TabContentActions::repaintAll);
+        activeTab.ifPresent(TabContentActions::repaintAll);
 
     }
 
@@ -624,7 +624,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowZeroToInfinityIntervalsSelected(showZeroToInfinityIntervals);
 
         Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals);
-        currentTab.ifPresent(TabContentActions::repaintAll);
+        activeTab.ifPresent(TabContentActions::repaintAll);
     }
 
     @Override
@@ -659,7 +659,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     private void setEnabledTransitionsList(boolean b){
         showEnabledTransitions = b;
         guiFrame.setShowEnabledTransitionsSelected(b);
-        currentTab.ifPresent(o->o.showEnabledTransitionsList(b));
+        activeTab.ifPresent(o->o.showEnabledTransitionsList(b));
     }
 
     @Override
@@ -670,7 +670,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     private void setDelayEnabledTransitions(boolean b) {
         showDelayEnabledTransitions = b;
         guiFrame.setShowDelayEnabledTransitionsSelected(b);
-        currentTab.ifPresent(o->o.showDelayEnabledTransitions(b));
+        activeTab.ifPresent(o->o.showDelayEnabledTransitions(b));
     }
 
     @Override
@@ -710,7 +710,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         setEnabledTransitionsList(true);
         setDisplayToolTips(true);
 
-        currentTab.ifPresent(TabContentActions::setResizeingDefault);
+        activeTab.ifPresent(TabContentActions::setResizeingDefault);
 
         if (advanced) {
 
