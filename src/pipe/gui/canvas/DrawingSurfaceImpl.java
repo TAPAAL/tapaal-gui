@@ -37,7 +37,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private final TabContent tabContent;
 	private final Reference<AbstractDrawingSurfaceManager> managerRef;
 	private TimedArcPetriNet model;
-    private final NameGenerator nameGenerator = new NameGenerator();
+
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
@@ -62,10 +62,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	}
 
-	public NameGenerator getNameGenerator() {
-		return nameGenerator;
-	}
-
 	public DataLayer getGuiModel() {
 		return guiModel;
 	}
@@ -79,8 +75,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		this.guiModel.removedFromView();
 		//Add the new model to view
 		guiModel.addedToView(this);
-
-		nameGenerator.add(model);
 
 		this.guiModel = guiModel;
 		this.model = model;

@@ -216,7 +216,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				makeSharedButton.setEnabled(false);
 			}else{
 				switchToNameTextField();
-				nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getDrawingSurface().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
+				nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getCurrentTab().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
 				makeSharedButton.setEnabled(true);
 			}
 		});

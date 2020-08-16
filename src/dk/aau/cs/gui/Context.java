@@ -43,6 +43,6 @@ public class Context { // TODO: consider having only currentTab as a field and h
 	}
 
 	public NameGenerator nameGenerator() {
-		return currentTab.drawingSurface().getNameGenerator();
+		return currentTab.getNameGenerator();
 	}
 }
