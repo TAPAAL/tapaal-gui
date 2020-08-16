@@ -1260,7 +1260,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		transitionFireing.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 		
-		CreateGui.getAnimator().updateFireableTransitions();
+		getAnimator().updateFireableTransitions();
 	}
 	
 	public void selectFirstElements() {
