@@ -53,6 +53,8 @@ import java.awt.event.MouseWheelEvent;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
+    public static final String FILE_FORMAT_CHANGED_MESSAGE = "We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+        + "Once you save the .tapn model, we recommend that you manually delete the .xml file.";
     private MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
 
     public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
@@ -665,8 +667,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				@Override
 				public void run() {
 					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
-							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+					new MessengerImpl().displayInfoMessage(FILE_FORMAT_CHANGED_MESSAGE, "FILE CHANGED");
 				}
 			}).start();
 		}
