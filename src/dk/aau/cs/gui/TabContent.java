@@ -2396,6 +2396,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+
         @Override
         public void registerEvents() {
             registerEvent(
@@ -2482,6 +2483,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     e.isAltDown()
                 )
             );
+        }
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            drawingSurface.getSelectionObject().dispatchEvent(e);
+        }
+
+        @Override
+        public void drawingSurfaceMouseDragged(MouseEvent e) {
+            drawingSurface.getSelectionObject().dispatchEvent(e);
+        }
+
+        @Override
+        public void drawingSurfaceMouseReleased(MouseEvent e) {
+            drawingSurface.getSelectionObject().dispatchEvent(e);
         }
     }
     public List<GuiAction> getAvailableDrawActions(){
