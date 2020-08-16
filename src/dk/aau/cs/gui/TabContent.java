@@ -92,8 +92,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private final UndoManager undoManager = new UndoManager();
 
-	private enum FeatureOption { TIME, GAME, COLOR };
-
     public static int getNameCounter() {
         return newNameCounter;
     }
