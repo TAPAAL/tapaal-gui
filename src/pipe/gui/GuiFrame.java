@@ -1415,8 +1415,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                         public void actionPerformed(ActionEvent arg0) {
                             InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
                             try {
-                                TabContent net = TabContent.createNewTabFromInputStream(file, netname);
-                                guiFrameController.ifPresent(o -> o.openTab(net));
+                                guiFrameController.ifPresent(o -> {
+                                    TabContent tab = o.createNewTabFromInputStream(file, netname);
+                                    o.openTab(tab);
+                                });
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();

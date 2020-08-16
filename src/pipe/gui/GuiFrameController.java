@@ -5,6 +5,9 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.ModelLoader;
+import dk.aau.cs.io.PNMLoader;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
@@ -22,9 +25,7 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -295,7 +296,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
-                        filesOpened.add(TabContent.createNewTabFromFile(f));
+                        filesOpened.add(createNewTabFromFile(f));
                     }
                 }
                 return filesOpened;
@@ -345,7 +346,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
-                        fileOpened.add(TabContent.createNewTabFromPNMLFile(f));
+                        fileOpened.add(createNewTabFromPNMLFile(f));
                     }
                 }
                 return fileOpened;
@@ -728,5 +729,125 @@ public class GuiFrameController implements GuiFrameControllerActions{
         DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
         DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
     }
+
+
+    /**
+     * Creates a new tab with the selected file, or a new file if filename==null
+     */
+    @Override
+    public TabContent createNewTabFromInputStream(InputStream file, String name) {
+
+        try {
+            ModelLoader loader = new ModelLoader();
+            LoadedModel loadedModel = loader.load(file);
+
+            if (loadedModel.getMessages().size() != 0) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        String message = "While loading the net we found one or more warnings: \n\n";
+                        for (String s : loadedModel.getMessages()) {
+                            message += s + "\n\n";
+                        }
+
+                        new MessengerImpl().displayInfoMessage(message, "Warning");
+                    }
+                }).start();
+            }
+
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
+
+            tab.setInitialName(name);
+
+            tab.selectFirstElements();
+
+            tab.setFile(null);
+
+            return tab;
+        } catch (Exception e) {
+            Logger.log("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+            System.err.println("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+            //throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+        }
+        return null;
+
+    }
+
+    /**
+     * Creates a new tab with the selected file, or a new file if filename==null
+     */
+
+    public TabContent createNewTabFromPNMLFile(File file) throws Exception {
+
+        if (file != null) {
+            try {
+
+                LoadedModel loadedModel;
+
+                PNMLoader loader = new PNMLoader();
+                loadedModel = loader.load(file);
+
+                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(),  new TabContent.TAPNLens(true, false));
+
+                String name = null;
+
+                if (file != null) {
+                    name = file.getName().replaceAll(".pnml", ".tapn");
+                }
+                tab.setInitialName(name);
+
+                tab.selectFirstElements();
+
+                tab.setMode(Pipe.ElementType.SELECT);
+
+                //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
+                name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
+                return tab;
+
+            } catch (Exception e) {
+                throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a new tab with the selected file, or a new file if filename==null
+     */
+    //XXX should properly be in controller?
+    public TabContent createNewTabFromFile(File file) throws Exception {
+        try {
+            String name = file.getName();
+            boolean showFileEndingChangedMessage = false;
+
+            if(name.toLowerCase().endsWith(".xml")){
+                name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
+                showFileEndingChangedMessage = true;
+            }
+
+            InputStream stream = new FileInputStream(file);
+            TabContent tab = createNewTabFromInputStream(stream, name);
+            if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
+
+            if(showFileEndingChangedMessage) {
+                //We thread this so it does not block the EDT
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        new MessengerImpl().displayInfoMessage(FILE_FORMAT_CHANGED_MESSAGE, "FILE CHANGED");
+                    }
+                }).start();
+            }
+
+            return tab;
+        }catch (FileNotFoundException e) {
+            throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
+        }
+    }
+
+    public static final String FILE_FORMAT_CHANGED_MESSAGE = "We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+        + "Once you save the .tapn model, we recommend that you manually delete the .xml file.";
 
 }

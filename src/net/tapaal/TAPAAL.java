@@ -101,7 +101,7 @@ public class TAPAAL {
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
 					try {
-                        CreateGui.getAppGuiController().openTab(TabContent.createNewTabFromFile(file));
+                        CreateGui.getAppGuiController().createNewTabFromFile(file);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -122,6 +122,7 @@ public class TAPAAL {
 
 	private static void batchProcessing(File batchFolder) throws Exception {
 		//Sadly needs to create the gui
+		/*
 		CreateGui.init();
 		CreateGui.getApp().setVisible(false);
 
@@ -177,6 +178,7 @@ public class TAPAAL {
 		BatchProcessingResultsExporter exporter = new BatchProcessingResultsExporter();
 		exporter.exportToCSV(results.getResults(), System.out);
 		System.out.println("Done" + results.getRowCount());
+		 */
 	}
 
 	public static File getInstallDir() {

@@ -53,8 +53,6 @@ import java.awt.event.MouseWheelEvent;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
-    public static final String FILE_FORMAT_CHANGED_MESSAGE = "We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
-        + "Once you save the .tapn model, we recommend that you manually delete the .xml file.";
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
 
     public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
@@ -544,46 +542,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
-
-    /**
-	 * Creates a new tab with the selected file, or a new file if filename==null
-	 */
-	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
-
-	    try {
-			ModelLoader loader = new ModelLoader();
-			LoadedModel loadedModel = loader.load(file);
-
-			if (loadedModel.getMessages().size() != 0) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                        String message = "While loading the net we found one or more warnings: \n\n";
-                        for (String s : loadedModel.getMessages()) {
-                            message += s + "\n\n";
-                        }
-
-                        new MessengerImpl().displayInfoMessage(message, "Warning");
-                    }
-                }).start();
-            }
-
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
-
-            tab.setInitialName(name);
-
-			tab.selectFirstElements();
-
-			tab.setFile(null);
-
-            return tab;
-		} catch (Exception e) {
-			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
-		}
-
-	}
-
     public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
 		TabContent tab = new TabContent(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed, isGame));
 		tab.setInitialName(name);
@@ -596,82 +554,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return tab;
 	}
 
-	/**
-	 * Creates a new tab with the selected file, or a new file if filename==null
-	 */
 
-	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
-
-		if (file != null) {
-			try {
-
-				LoadedModel loadedModel;
-
-				PNMLoader loader = new PNMLoader();
-				loadedModel = loader.load(file);
-
-                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(),  new TAPNLens(true, false));
-
-                String name = null;
-
-                if (file != null) {
-                    name = file.getName().replaceAll(".pnml", ".tapn");
-                }
-                tab.setInitialName(name);
-
-				tab.selectFirstElements();
-
-				tab.setMode(Pipe.ElementType.SELECT);
-
-                //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-                name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
-                return tab;
-
-			} catch (Exception e) {
-				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Creates a new tab with the selected file, or a new file if filename==null
-	 */
-	//XXX should properly be in controller?
-	public static TabContent createNewTabFromFile(File file) throws Exception {
-		try {
-			String name = file.getName();
-			boolean showFileEndingChangedMessage = false;
-
-			if(name.toLowerCase().endsWith(".xml")){
-				name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
-				showFileEndingChangedMessage = true;
-			}
-
-			InputStream stream = new FileInputStream(file);
-			TabContent tab = createNewTabFromInputStream(stream, name);
-			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
-
-			showFileEndingChangedMessage(showFileEndingChangedMessage);
-
-			return tab;
-		}catch (FileNotFoundException e) {
-			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
-		}
-	}
-
-	private static void showFileEndingChangedMessage(boolean showMessage) {
-		if(showMessage) {
-			//We thread this so it does not block the EDT
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					new MessengerImpl().displayInfoMessage(FILE_FORMAT_CHANGED_MESSAGE, "FILE CHANGED");
-				}
-			}).start();
-		}
-	}
 
 	public UndoManager getUndoManager() {
 		return undoManager;
@@ -2005,7 +1888,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
             String composedName = getTabTitle();
             composedName = composedName.replace(".tapn", "");
             composedName += appendName;
-            return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+            final String composedNameFinal = composedName;
+            return guiFrameControllerActions.map(o->o.createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedNameFinal)).get();
         } catch (Exception e1) {
             Logger.log("Could not load model");
             e1.printStackTrace();

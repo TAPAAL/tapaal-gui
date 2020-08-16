@@ -2,6 +2,8 @@ package pipe.gui;
 
 import dk.aau.cs.gui.TabContent;
 
+import java.io.InputStream;
+
 public interface GuiFrameControllerActions {
     void openTab(TabContent tab);
     default void openTab(Iterable<TabContent> tabs) {
@@ -54,4 +56,6 @@ public interface GuiFrameControllerActions {
     void showAdvancedWorkspace();
 
     void showSimpleWorkspace();
+
+    TabContent createNewTabFromInputStream(InputStream file, String name);
 }
