@@ -45,8 +45,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final String frameTitle;
 
-    private int newNameCounter = 1;
-
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
     private final ExtendedJTabbedPane<TabContent> appTab;
@@ -1437,14 +1435,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         } else {
             exampleMenu.setEnabled(false);
         }
-    }
-
-    public int getNameCounter() {
-        return newNameCounter;
-    }
-
-    public void incrementNameCounter() {
-        newNameCounter++;
     }
 
     public String getCurrentTabName() {

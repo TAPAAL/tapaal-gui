@@ -94,6 +94,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private enum FeatureOption { TIME, GAME, COLOR };
 
+    public static int getNameCounter() {
+        return newNameCounter;
+    }
+
+    public static void incrementNameCounter() {
+        newNameCounter++;
+    }
+    private static int newNameCounter = 1;
+
     public final static class Result<T,R> {
         private final T result;
         private final boolean hasErrors;
@@ -830,8 +839,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	String initialName = "";
 	public void setInitialName(String name) {
 		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (CreateGui.getApp().getNameCounter()) + ".tapn";
-			CreateGui.getApp().incrementNameCounter();
+			name = "New Petri net " + (getNameCounter()) + ".tapn";
+			incrementNameCounter();
 		} else if (!name.toLowerCase().endsWith(".tapn")){
 			name = name + ".tapn";
 		}
