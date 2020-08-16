@@ -2562,7 +2562,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public void updateMode() {
         // deselect other actions
-        selectAction.setSelected(CreateGui.guiMode == Pipe.ElementType.SELECT);
+        selectAction.setSelected(editorMode == Pipe.ElementType.SELECT);
         transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
         timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
         timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
