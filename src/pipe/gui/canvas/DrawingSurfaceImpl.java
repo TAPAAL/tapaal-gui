@@ -376,9 +376,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     class MouseHandler extends MouseInputAdapter {
 
-		private DrawingSurfaceImpl view;
-
-        private Point dragStart;
+		private final DrawingSurfaceImpl view;
 
 		public MouseHandler(DrawingSurfaceImpl _view) {
 			super();
@@ -397,41 +395,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMousePressed(e);
 			}
-			if(app.getCurrentTab().isInAnimationMode()) return;
-
-			// check for control down here enables it to attach the arc being drawn to an existing place/transition
-
-
-			Point clickPoint = e.getPoint();
-
-			if (SwingUtilities.isLeftMouseButton(e)) {
-
-                Pipe.ElementType mode = CreateGui.guiMode;
-
-				switch (mode) {
-					case DRAG:
-						dragStart = new Point(clickPoint);
-						break;
-
-					default:
-						break;
-				}
-			} else {
-				setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-				dragStart = new Point(clickPoint);
-			}
-			updatePreferredSize();
+			//updatePreferredSize();
 		}
 
         @Override
 		public void mouseReleased(MouseEvent e) {
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseReleased(e);
-			}
-			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-			if (dragStart != null) {
-				dragStart = null;
-				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		}
 
@@ -447,9 +417,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		public void mouseDragged(MouseEvent e) {
 			if (managerRef!=null && managerRef.get() != null) {
 				managerRef.get().drawingSurfaceMouseDragged(e);
-			}
-            if (dragStart != null) {
-				view.drag(dragStart, e.getPoint());
 			}
 		}
 
