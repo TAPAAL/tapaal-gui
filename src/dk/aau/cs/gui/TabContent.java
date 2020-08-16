@@ -2401,11 +2401,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void registerEvents() {
             registerEvent(
                 e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.pressed && SwingUtilities.isLeftMouseButton(e.e),
-                e-> placeTranstionObjectPressed(((PlaceTransitionObject) e.pno), e.e.isShiftDown())
+                e-> placeTranstionObjectPressed(((PlaceTransitionObject) e.pno), e.e.isShiftDown(), e.e)
             );
             registerEvent(
                 e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.released && SwingUtilities.isLeftMouseButton(e.e),
-                e-> placeTranstionObjectReleased(((PlaceTransitionObject) e.pno), e.e.isShiftDown())
+                e-> placeTranstionObjectReleased(((PlaceTransitionObject) e.pno), e.e.isShiftDown(), e.e)
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.dragged && SwingUtilities.isLeftMouseButton(e.e),
+                e-> placeTranstionObjectDragged(((PlaceTransitionObject) e.pno), e.e.isShiftDown(), e.e)
             );
             registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
@@ -2463,7 +2467,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         boolean justSelected = false;
-        private void placeTranstionObjectPressed(PlaceTransitionObject pno, boolean shiftDown) {
+        boolean isDragging = false;
+        Point dragInit;
+        private int totalX = 0;
+        private int totalY = 0;
+
+        private void placeTranstionObjectPressed(PlaceTransitionObject pno, boolean shiftDown, MouseEvent e) {
+            dragInit = e.getPoint();
             if (!pno.isSelected()) {
                 if (!shiftDown) {
                     pno.getParent().getSelectionObject().clearSelection();
@@ -2473,8 +2483,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void placeTranstionObjectReleased(PlaceTransitionObject pno, boolean shiftDown) {
-            if (!justSelected) {
+        private void placeTranstionObjectReleased(PlaceTransitionObject pno, boolean shiftDown, MouseEvent e) {
+            if (isDragging) {
+                isDragging = false;
+                CreateGui.getDrawingSurface().translateSelection(pno.getParent().getSelectionObject().getSelection(), totalX, totalY);
+                totalX = 0;
+                totalY = 0;
+            } else if (!justSelected) {
                 if (shiftDown) {
                     pno.deselect();
                 } else {
@@ -2483,6 +2498,35 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             }
             justSelected = false;
+            dragInit = null;
+            totalX = 0;
+            totalY = 0;
+        }
+
+        private void placeTranstionObjectDragged(PlaceTransitionObject myObject, boolean shiftDown, MouseEvent e) {
+            int previousX = myObject.getX();
+            int previousY = myObject.getY();
+
+            if (!SwingUtilities.isLeftMouseButton(e)) {
+                return;
+            }
+
+            if (CreateGui.guiMode == Pipe.ElementType.SELECT) {
+                if (myObject.isDraggable()) {
+                    if (!isDragging) {
+                        isDragging = true;
+                    }
+                }
+
+                // Calculate translation in mouse
+                int transX = Grid.getModifiedX(e.getX() - dragInit.x);
+                int transY = Grid.getModifiedY(e.getY() - dragInit.y);
+                myObject.getParent().getSelectionObject().translateSelection(transX, transY);
+
+                //Only register the actual distance and direction moved (in case of dragging past edge)
+                totalX += myObject.getX() - previousX;
+                totalY += myObject.getY() - previousY;
+            }
         }
 
 
