@@ -8,6 +8,7 @@ import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLoader;
+import dk.aau.cs.util.JavaUtil;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
@@ -39,6 +40,8 @@ import java.util.jar.JarFile;
 
 public class GuiFrameController implements GuiFrameControllerActions{
 
+    public static final String WARNING_OLD_JAVAVERSION = "You are using an older version of Java than 11. Some of the functionalities may not work or display correctly.";
+
     final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     final GuiFrameActions guiFrame;
 
@@ -50,11 +53,22 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame = appGui;
         guiFrameDirectAccess = appGui;
 
-        loadPrefrences();
-        loadAndRegisterExampleNets();
         appGui.registerController(this, activeTab);
 
+        loadPrefrences();
+        loadAndRegisterExampleNets();
+        checkJavaVersion();
 
+    }
+
+
+    private void checkJavaVersion() {
+        int version = JavaUtil.getJREMajorVersion();
+
+        if (version < TAPAAL.MINIMUM_SUPPORTED_JAVAVERSION) {
+            JOptionPane.showMessageDialog(CreateGui.getApp(), WARNING_OLD_JAVAVERSION);
+            System.out.println(WARNING_OLD_JAVAVERSION);
+        }
     }
 
     private void loadAndRegisterExampleNets() {

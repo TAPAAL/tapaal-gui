@@ -41,6 +41,8 @@ public class TAPAAL {
 	public static final String TOOLNAME = "TAPAAL";
 	public static final String VERSION = "DEV";
 
+    public static final int MINIMUM_SUPPORTED_JAVAVERSION = 11;
+
 	public static String getProgramName(){
 		return "" + TAPAAL.TOOLNAME + " " + TAPAAL.VERSION;
 	}

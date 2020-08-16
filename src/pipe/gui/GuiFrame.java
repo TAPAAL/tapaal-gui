@@ -442,8 +442,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // HAK-arrange for frameTitle to be initialized and the default file
         // name to be appended to basic window title
 
-        checkJavaVersion();
-
         frameTitle = title;
         setTitle(null);
         trySetLookAndFeel();
@@ -512,15 +510,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         VerifyTAPNDiscreteVerification.trySetup();
         VerifyPN.trySetup();
 
-    }
-
-    private void checkJavaVersion() {
-        int version = JavaUtil.getJREMajorVersion();
-
-        if (version < 11) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
-            System.out.println("You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
-        }
     }
 
     private void trySetLookAndFeel() {
