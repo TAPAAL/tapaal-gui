@@ -1363,7 +1363,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame()), "-timed");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
-            updateFeatureText();
         }
     }
 
@@ -1385,7 +1384,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
-            updateFeatureText();
         }
     }
 
@@ -1691,8 +1689,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void setApp(GuiFrameActions newApp) {
 		app.setReference(newApp);
 		undoManager.setApp(app);
-
-		updateFeatureText();
 
 		updateFeatureText();
 
