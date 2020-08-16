@@ -585,7 +585,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
-		TabContent tab = new TabContent(isTimed, isGame);
+		TabContent tab = new TabContent(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed, isGame));
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -610,7 +610,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
-                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
+                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(),  new TAPNLens(true, false));
 
                 String name = null;
 
@@ -725,11 +725,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 
-	private TabContent(boolean isTimed, boolean isGame) {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
-    }
-
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
 
         Require.that(network != null, "network cannot be null");
         Require.notNull(lens, "Lens can't be null");
@@ -784,14 +780,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animationModeController = new CanvasAnimationController(getAnimator());
     }
 
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame) {
-        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame));
-    }
-
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates, tapnqueries,  new TAPNLens(true, false));
-    }
-	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+    public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
         setNetwork(network, templates);
