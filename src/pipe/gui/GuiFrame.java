@@ -51,11 +51,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final StatusBar statusBar;
     private JMenuBar menuBar;
-    JMenu fileMenu;
+
+    private JMenu fileMenu;
     private JMenu exampleMenu;
-    JMenu drawMenu;
-    JMenu animateMenu;
-    JMenu viewMenu;
+    private JMenu drawMenu;
+    private JMenu animateMenu;
+    private JMenu viewMenu;
+
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
