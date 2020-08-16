@@ -29,8 +29,13 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class GuiFrameController implements GuiFrameControllerActions{
 
@@ -46,9 +51,87 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrameDirectAccess = appGui;
 
         loadPrefrences();
+        loadAndRegisterExampleNets();
         appGui.registerController(this, activeTab);
 
 
+    }
+
+    private void loadAndRegisterExampleNets() {
+        var testNets = loadTestNets();
+        guiFrame.registerExampleNets(Arrays.asList(testNets));
+    }
+    /**
+     * The function loads the example nets as InputStream from the resources
+     * Notice the check for if we are inside a jar file, as files inside a jar cant
+     * be listed in the normal way.
+     *
+     * @author Kenneth Yrke Joergensen <kenneth@yrke.dk>, 2011-06-27
+     */
+    private String[] loadTestNets() {
+
+        String[] nets = null;
+
+        try {
+            URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
+            if (dirURL != null && dirURL.getProtocol().equals("file")) {
+                /* A file path: easy enough */
+                nets = new File(dirURL.toURI()).list();
+            }
+
+            if (dirURL == null) {
+                /*
+                 * In case of a jar file, we can't actually find a directory. Have to assume the
+                 * same jar as clazz.
+                 */
+                String me = "TAPAAL.class";
+                dirURL = Thread.currentThread().getContextClassLoader().getResource(me);
+            }
+
+            if (dirURL.getProtocol().equals("jar")) {
+                /* A JAR path */
+                String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); // strip out only the JAR
+                // file
+                JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8));
+                Enumeration<JarEntry> entries = jar.entries(); // gives ALL entries in jar
+                Set<String> result = new HashSet<String>(); // avoid duplicates in case it is a subdirectory
+                while (entries.hasMoreElements()) {
+                    String name = entries.nextElement().getName();
+                    if (name.startsWith("resources/Example nets/")) { // filter according to the path
+                        String entry = name.substring("resources/Example nets/".length());
+                        int checkSubdir = entry.indexOf('/');
+                        if (checkSubdir >= 0) {
+                            // if it is a subdirectory, we just return the directory name
+                            entry = entry.substring(0, checkSubdir);
+                        }
+                        result.add(entry);
+                    }
+                }
+                nets = result.toArray(new String[result.size()]);
+                jar.close();
+            }
+
+            Arrays.sort(nets, (one, two) -> {
+
+                int toReturn = one.compareTo(two);
+                // Special hack to get intro-example first and game-example last
+                if (one.equals("intro-example.tapn")) {
+                    toReturn = -1;
+                } else if (one.equals("game-harddisk.tapn")) {
+                    toReturn = 1;
+                }
+                if (two.equals("intro-example.tapn")) {
+                    toReturn = 1;
+                } else if (two.equals("game-harddisk.tapn")) {
+                    toReturn = -1;
+                }
+                return toReturn;
+            });
+        } catch (Exception e) {
+            Logger.log("Error getting example files:" + e);
+            e.printStackTrace();
+        }
+        return nets;
     }
 
     //XXX should be private //kyrke 2019-11-05

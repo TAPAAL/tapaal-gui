@@ -51,5 +51,7 @@ public interface GuiFrameActions {
     void setShowZeroToInfinityIntervalsSelected(boolean b);
     void setShowTokenAgeSelected(boolean b);
 
+    void registerExampleNets(List<String> nets);
+
     void setFeatureInfoText(boolean[] features);
 }
