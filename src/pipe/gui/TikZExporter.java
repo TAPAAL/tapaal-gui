@@ -20,7 +20,9 @@ import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TikZExporter {
 
-	public enum TikZOutputOption {
+    private boolean showZeroToInfinityIntervals;
+
+    public enum TikZOutputOption {
 		FIGURE_ONLY, FULL_LATEX
 	}
 
@@ -33,10 +35,11 @@ public class TikZExporter {
             return Math.round(position * scale * 10)/10.0d;
         }
 
-	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option) {
+	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option, boolean showZeroToInfinityIntervals) {
 		this.net = net;
 		this.fullpath = fullpath;
 		this.option = option;
+		this.showZeroToInfinityIntervals = showZeroToInfinityIntervals;
 	}
 
 	public void ExportToTikZ() {
@@ -156,7 +159,7 @@ public class TikZExporter {
 	}
 
 	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
-        if (!CreateGui.getApp().showZeroToInfinityIntervals() &&  arc.getGuardAsString().equals("[0,inf)")){
+        if (!showZeroToInfinityIntervals &&  arc.getGuardAsString().equals("[0,inf)")){
 			return "";
 		} else {
 			return arc.getGuardAsString();
