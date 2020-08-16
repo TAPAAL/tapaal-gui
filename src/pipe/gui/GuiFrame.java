@@ -727,13 +727,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JMenu toolsMenu = new JMenu("Tools");
         toolsMenu.setMnemonic('t');
 
-        toolsMenu.add(verifyAction).setMnemonic('m');
-
-        toolsMenu.add(netStatisticsAction).setMnemonic('i');
-
         JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
         batchProcessing.setMnemonic('b');
         toolsMenu.add(batchProcessing);
+
+        toolsMenu.addSeparator();
+
+        toolsMenu.add(verifyAction).setMnemonic('m');
+
+        toolsMenu.add(netStatisticsAction).setMnemonic('i');
 
         JMenuItem workflowDialog = new JMenuItem(workflowDialogAction);
         workflowDialog.setMnemonic('f');
