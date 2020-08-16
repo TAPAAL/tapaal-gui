@@ -1511,8 +1511,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             switchToEditorComponents();
 
-			setManager(notingManager);
-
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 			setMode(Pipe.ElementType.SELECT);
 
