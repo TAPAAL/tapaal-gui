@@ -2400,6 +2400,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void registerEvents() {
             registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.pressed && SwingUtilities.isLeftMouseButton(e.e),
+                e-> placeTranstionObjectPressed(((PlaceTransitionObject) e.pno), e.e.isShiftDown())
+            );
+            registerEvent(
+                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.released && SwingUtilities.isLeftMouseButton(e.e),
+                e-> placeTranstionObjectReleased(((PlaceTransitionObject) e.pno), e.e.isShiftDown())
+            );
+            registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
                 e-> ((TimedTransitionComponent) e.pno).showEditor()
             );
@@ -2453,6 +2461,31 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
 
         }
+
+        boolean justSelected = false;
+        private void placeTranstionObjectPressed(PlaceTransitionObject pno, boolean shiftDown) {
+            if (!pno.isSelected()) {
+                if (!shiftDown) {
+                    pno.getParent().getSelectionObject().clearSelection();
+                }
+                pno.select();
+                justSelected = true;
+            }
+        }
+
+        private void placeTranstionObjectReleased(PlaceTransitionObject pno, boolean shiftDown) {
+            if (!justSelected) {
+                if (shiftDown) {
+                    pno.deselect();
+                } else {
+                    pno.getParent().getSelectionObject().clearSelection();
+                    pno.select();
+                }
+            }
+            justSelected = false;
+        }
+
+
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
             int rotation = 0;
