@@ -2,8 +2,10 @@ package pipe.gui.ColoredComponents;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
+import net.tapaal.swinghelpers.GridBagHelper;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.util.Iterator;
 
@@ -17,7 +19,9 @@ public class ColorComboboxPanel extends JPanel {
 
     public ColorComboboxPanel(ColorType colorType, String panelName) {
         this.colorType = colorType;
+        System.out.println(colorType);
         this.panelName = panelName;
+        this.setLayout(new GridBagLayout());
         initPanel();
     }
 
@@ -35,6 +39,7 @@ public class ColorComboboxPanel extends JPanel {
 
         Dimension comboSize = new Dimension(230, 30);
 
+        //This panel contains all comboboxes, there can be more than one with ProductTypes
         JPanel comboBoxPanel = new JPanel(new GridBagLayout());
         if (colorType instanceof ProductType) {
             colorTypeComboBoxesArray = new JComboBox[((ProductType) colorType).getColorTypes().size()];
@@ -74,7 +79,7 @@ public class ColorComboboxPanel extends JPanel {
             gbc.insets = new Insets(5 , 0,0,0);
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
         }
-
+        //In case it is a really large product type we have a scrollPane
         JScrollPane colorTypesScrollPane = new JScrollPane(comboBoxPanel);
         colorTypesScrollPane.setViewportView(comboBoxPanel);
         colorTypesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);

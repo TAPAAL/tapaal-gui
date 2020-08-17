@@ -1,25 +1,34 @@
 package pipe.gui.ColoredComponents;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
-import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
 import net.tapaal.swinghelpers.GridBagHelper;
+import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.graphicElements.tapn.*;
+import pipe.gui.widgets.EscapableDialog;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.Vector;
 
 public class ColoredArcGuardPanel extends JPanel {
@@ -39,10 +48,12 @@ public class ColoredArcGuardPanel extends JPanel {
         }
         if(((Arc)objectToBeEdited).getSource() instanceof Place){
             isInputArc = true;
+            this.colorType = ((TimedPlaceComponent) ((Arc)objectToBeEdited).getSource()).underlyingPlace().getColorType();
         }
         this.context = context;
         this.setLayout(new GridBagLayout());
         initPanels();
+        initExpr();
         hideIrrelevantInformation();
     }
 
@@ -50,10 +61,7 @@ public class ColoredArcGuardPanel extends JPanel {
         if(!objectToBeEdited.isTimed()){
             arcColorInvariantPanel.setVisible(false);
         }
-        if(!isTransportArc){
-            transportWeightPanel.setVisible(false);
-            transportExprTabbedPane.setVisible(false);
-        } else{
+        if(isTransportArc){
             regularArcExprPanel.setVisible(false);
         }
     }
@@ -78,7 +86,10 @@ public class ColoredArcGuardPanel extends JPanel {
         initRegularArcExpressionPanel();
         initColoredTimedGuard();
         initWeightPanel();
-        initTransportArcExpressionPanel();
+        if(isTransportArc){
+            initTransportArcExpressionPanel();
+        }
+
     }
 
     private void initWeightPanel(){
@@ -140,9 +151,9 @@ public class ColoredArcGuardPanel extends JPanel {
         arcColorInvariantPanel = new JPanel(new GridBagLayout());
         ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors");
 
-        JButton addTimeConstraintButton = new JButton("Add");
-        JButton removeTimeConstraintButton = new JButton("Remove");
-        JButton editTimeConstraintButton = new JButton("Edit");
+        addTimeConstraintButton = new JButton("Add");
+        removeTimeConstraintButton = new JButton("Remove");
+        editTimeConstraintButton = new JButton("Edit");
 
         Dimension buttonSize = new Dimension(80, 27);
 
@@ -150,8 +161,8 @@ public class ColoredArcGuardPanel extends JPanel {
         removeTimeConstraintButton.setPreferredSize(buttonSize);
         editTimeConstraintButton.setPreferredSize(buttonSize);
 
-        ListModel timeConstraintListModel = new DefaultListModel();
-        JList timeConstraintList = new JList(timeConstraintListModel);
+        timeConstraintListModel = new DefaultListModel();
+        timeConstraintList = new JList(timeConstraintListModel);
         JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
         timeConstraintScrollPane.setViewportView(timeConstraintList);
         timeConstraintScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -161,7 +172,6 @@ public class ColoredArcGuardPanel extends JPanel {
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.addColumn("Color");
         tableModel.addColumn("Time interval");
-        //   ((DefaultTableModel) tableModel).addRow(test);
 
         JTable table = new JTable(tableModel);
         table.setPreferredSize(new Dimension(300, 150));
@@ -170,110 +180,78 @@ public class ColoredArcGuardPanel extends JPanel {
 
 
 
-        /*addTimeConstraintButton.addActionListener(new ActionListener() {
+        addTimeConstraintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
-                AbstractTimeConstraint timeConstraint;
+                ColoredTimeInterval timeInterval;
 
                 if (!(colorType instanceof ProductType)) {
-                    if (isInterval)
-                        timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
-                    else
-                        timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
+                    timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR((dk.aau.cs.model.CPN.Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
                 } else {
-                    Vector<Color> colors = new Vector<Color>();
+                    Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<dk.aau.cs.model.CPN.Color>();
                     for (int i = 0; i < comboBoxes.length; i++) {
-                        colors.add((Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
+                        colors.add((dk.aau.cs.model.CPN.Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
                     }
-                    Color color = new Color(colorType, 0, colors);
-                    if (isInterval)
-                        timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
-                    else
-                        timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(color);
+                    dk.aau.cs.model.CPN.Color color = new dk.aau.cs.model.CPN.Color(colorType, 0, colors);
+
+                    timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
+
                 }
                 boolean alreadyExists = false;
                 for (int i = 0; i < timeConstraintListModel.size(); i++) {
-                    if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i)))
+                    if (timeInterval.equalsOnlyColor(timeConstraintListModel.get(i)))
                         alreadyExists = true;
                 }
                 if (alreadyExists) {
                     JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
                 } else
-                    timeConstraintListModel.addElement(timeConstraint);
+                    timeConstraintListModel.addElement(timeInterval);
 
             }
 
-        });*/
+        });
 
-        /*removeTimeConstraintButton.addActionListener(new ActionListener() {
+        removeTimeConstraintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int index = timeConstraintList.getSelectedIndex();
                 Object star = timeConstraintListModel.elementAt(index);
                 if(star instanceof ColoredTimeInterval) {
-                    if(((ColoredTimeInterval) star).getColor().equals(Color.STAR_COLOR)) {
+                    if(((ColoredTimeInterval) star).getColor().equals(dk.aau.cs.model.CPN.Color.STAR_COLOR)) {
                         JOptionPane.showMessageDialog(null, "Star interval cannot be removed");
                     }else {
                         timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
                     }
-                }else if(star instanceof ColoredTimeInvariant) {
-                    if(((ColoredTimeInvariant) star).getColor().equals(Color.STAR_COLOR)) {
-                        JOptionPane.showMessageDialog(null, "Star invariant cannot be removed");
-                    }else{
-                        timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
-                    }
                 }
             }
-        });*/
+        });
 
-        /*editTimeConstraintButton.addActionListener(new ActionListener() {
+        editTimeConstraintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (isInterval) {
-                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
-                    Container contentPane = guiDialog.getContentPane();
+                EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
+                Container contentPane = guiDialog.getContentPane();
 
-                    // 1 Set layout
-                    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-                    ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
-                    contentPane.add(ctiPanel);
+                // 1 Set layout
+                contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+                ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
+                contentPane.add(ctiPanel);
 
-                    guiDialog.setResizable(false);
+                guiDialog.setResizable(false);
 
-                    // Make window fit contents' preferred size
-                    guiDialog.pack();
+                // Make window fit contents' preferred size
+                guiDialog.pack();
 
-                    // Move window to the middle of the screen
-                    guiDialog.setLocationRelativeTo(null);
-                    guiDialog.setVisible(true);
+                // Move window to the middle of the screen
+                guiDialog.setLocationRelativeTo(null);
+                guiDialog.setVisible(true);
 
-                    if (ctiPanel.isEditConfirmed())
-                        timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
-
-                } else {
-                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Invariant", true);
-                    Container contentPane = guiDialog.getContentPane();
-
-                    // 1 Set layout
-                    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-                    ColoredTimeInvariantDialogPanel ctiPanel = new ColoredTimeInvariantDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInvariant) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()), placeComp);
-                    contentPane.add(ctiPanel);
-
-                    guiDialog.setResizable(false);
-
-                    // Make window fit contents' preferred size
-                    guiDialog.pack();
-
-                    // Move window to the middle of the screen
-                    guiDialog.setLocationRelativeTo(null);
-                    guiDialog.setVisible(true);
-
-                    if (ctiPanel.didEdit)
-                        timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInvariant());
+                if (ctiPanel.isEditConfirmed()){
+                    timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
                 }
             }
-        });*/
+        });
 
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -361,11 +339,11 @@ public class ColoredArcGuardPanel extends JPanel {
         editPanel.setPreferredSize(new Dimension(260, 190));
 
         ButtonGroup editButtonsGroup = new ButtonGroup();
-        JButton deleteExprSelectionButton = new JButton("Delete Selection");
-        JButton resetExprButton = new JButton("Reset Expression");
-        JButton undoButton = new JButton("Undo");
-        JButton redoButton = new JButton("Redo");
-        JButton editExprButton = new JButton("Edit Expression");
+        deleteExprSelectionButton = new JButton("Delete Selection");
+        resetExprButton = new JButton("Reset Expression");
+        undoButton = new JButton("Undo");
+        redoButton = new JButton("Redo");
+        editExprButton = new JButton("Edit Expression");
         editExprButton.setEnabled(true);
 
         //TODO: add tooltips to buttons
@@ -376,7 +354,7 @@ public class ColoredArcGuardPanel extends JPanel {
         editButtonsGroup.add(redoButton);
         editButtonsGroup.add(editExprButton);
 
-        /*deleteExprSelectionButton.addActionListener(new ActionListener() {
+        deleteExprSelectionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 deleteSelection();
@@ -390,7 +368,7 @@ public class ColoredArcGuardPanel extends JPanel {
                 arcExpression = arcExpression.replace(arcExpression, pHExpr);
                 updateSelection(pHExpr);
             }
-        });*/
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
@@ -430,10 +408,10 @@ public class ColoredArcGuardPanel extends JPanel {
         JPanel arithmeticPanel = new JPanel(new GridBagLayout());
         arithmeticPanel.setBorder(BorderFactory.createTitledBorder("Arithmetic Expressions"));
 
-        JButton additionButton = new JButton("Addition");
-        JButton addAdditionPlaceHolderButton = new JButton("Add Placeholder");
-        JButton subtractionButton = new JButton("Subtraction");
-        JButton scalarButton = new JButton("Scalar");
+        additionButton = new JButton("Addition");
+        addAdditionPlaceHolderButton = new JButton("Add Placeholder");
+        subtractionButton = new JButton("Subtraction");
+        scalarButton = new JButton("Scalar");
 
         final Integer current = 1;
         Integer min = 1;
@@ -461,7 +439,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
         addAdditionPlaceHolderButton.setPreferredSize(new Dimension(150, 30));
 
-        /*additionButton.addActionListener(new ActionListener() {
+        additionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 AddExpression addExpr;
@@ -527,7 +505,7 @@ public class ColoredArcGuardPanel extends JPanel {
                     updateSelection(addExpr);
                 }
             }
-        });*/
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -580,16 +558,16 @@ public class ColoredArcGuardPanel extends JPanel {
         SpinnerNumberModel numberModelNumber = new SpinnerNumberModel(current, min, max, step);
         SpinnerNumberModel numberModelAll = new SpinnerNumberModel(current, min, max, step);
 
-        JSpinner numberExpressionJSpinner = new JSpinner(numberModelNumber);
-        JButton numberExpressionButton = new JButton("Number Expr");
+        numberExpressionJSpinner = new JSpinner(numberModelNumber);
+        numberExpressionButton = new JButton("Number Expr");
 
 
 
-        JComboBox allExpressionComboBox = new JComboBox();
-        JSpinner allExpressionJSpinner = new JSpinner(numberModelAll);
-        JButton allExpressionButton = new JButton("All Expression");
+        allExpressionComboBox = new JComboBox();
+        allExpressionJSpinner = new JSpinner(numberModelAll);
+        allExpressionButton = new JButton("All Expression");
 
-        JButton addColorExpressionButton = new JButton("Edit Color Expr");
+        addColorExpressionButton = new JButton("Edit Color Expr");
 
         /*for (ColorType element : context.activeModel().parentNetwork().colorTypes()) {
             allExpressionComboBox.addItem(element);
@@ -620,7 +598,7 @@ public class ColoredArcGuardPanel extends JPanel {
         addColorExpressionButton.setPreferredSize(new Dimension(125, 27));
 
 
-       /* allExpressionButton.addActionListener(new ActionListener() {
+       allExpressionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 addAllExpression();
@@ -643,7 +621,7 @@ public class ColoredArcGuardPanel extends JPanel {
                     EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
                     Container contentPane = guiDialog.getContentPane();
 
-                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, colorExpr, false);
+                    ColorTransitionExpressionDialogPanel cep = new ColorTransitionExpressionDialogPanel(guiDialog.getRootPane(), context, colorExpr, false);
                     contentPane.add(cep);
 
                     guiDialog.setResizable(true);
@@ -662,7 +640,7 @@ public class ColoredArcGuardPanel extends JPanel {
                         "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        });*/
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -715,7 +693,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void initExprField () {
-        JTextPane exprField = new JTextPane();
+        exprField = new JTextPane();
 
         StyledDocument doc = exprField.getStyledDocument();
 
@@ -736,7 +714,7 @@ public class ColoredArcGuardPanel extends JPanel {
         exprScrollPane.setPreferredSize(d);
         exprScrollPane.setMinimumSize(d);
 
-        /*exprField.addMouseListener(new MouseAdapter() {
+        exprField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (!exprField.isEditable()) {
@@ -769,7 +747,7 @@ public class ColoredArcGuardPanel extends JPanel {
                     //TODO: see line 1232 in CTLQueryDialog for impl example.
                 }
             }
-        });*/
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -783,9 +761,232 @@ public class ColoredArcGuardPanel extends JPanel {
         arcColorInvariantPanel.setVisible(false);
     }
 
+    private void addAllExpression() {
+        AllExpression allExpr = new AllExpression((ColorType) allExpressionComboBox.getItemAt(allExpressionComboBox.getSelectedIndex()));
+        Integer value = (Integer)allExpressionJSpinner.getValue();
+        NumberOfExpression numbExpr = new NumberOfExpression(value, allExpr);
+        if (currentSelection.getObject() instanceof ArcExpression) {
+            arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
+            updateSelection(numbExpr);
+        }
+    }
+
+    private void addNumberExpression() {
+        Vector<ColorExpression> colorExprVec = new Vector();
+        colorExprVec.add(new PlaceHolderColorExpression());
+        Integer value = (Integer)numberExpressionJSpinner.getValue();
+        NumberOfExpression numbExpr;
+        if (currentSelection.getObject() instanceof NumberOfExpression) {
+            numbExpr = new NumberOfExpression(value, ((NumberOfExpression)currentSelection.getObject()).getColor());
+        } else {
+            numbExpr = new NumberOfExpression(value, colorExprVec);
+        }
+        arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
+        updateSelection(numbExpr);
+    }
+
+    private void parseExpression(ArcExpression expressionToParse) {
+        if (expressionToParse instanceof AddExpression) {
+            AddExpression addExpr = new AddExpression(((AddExpression) expressionToParse).getAddExpression());
+            arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
+            updateSelection(addExpr);
+        }
+        else if(expressionToParse instanceof SubtractExpression) {
+            SubtractExpression subExpr = new SubtractExpression(((SubtractExpression) expressionToParse).getLeftExpression(), ((SubtractExpression) expressionToParse).getRightExpression());
+            arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
+            updateSelection(subExpr);
+        }
+        else if (expressionToParse instanceof NumberOfExpression) {
+            NumberOfExpression expessionToParse = (NumberOfExpression) expressionToParse;
+            NumberOfExpression numbExpr = null;
+            if (expessionToParse.getAll() != null) {
+                numbExpr = new NumberOfExpression(((NumberOfExpression) expressionToParse).getNumber(), expessionToParse.getAll());
+            } else {
+                numbExpr = new NumberOfExpression(expessionToParse.getNumber(), expessionToParse.getColor());
+            }
+            arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
+            updateSelection(numbExpr);
+        }
+    }
+    private void deleteSelection() {
+        if (currentSelection != null) {
+            Expression replacement = null;
+            if (currentSelection.getObject() instanceof ArcExpression) {
+                replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
+            }
+            else if (currentSelection.getObject() instanceof ArcExpression) {
+                replacement = new PlaceHolderColorExpression();
+            }
+            if (replacement != null) {
+                arcExpression = arcExpression.replace(currentSelection.getObject(), replacement);
+                updateSelection(replacement);
+            }
+        }
+    }
+
+    private ArcExpression getSpecificChildOfProperty(int number, Expression property) {
+        ExprStringPosition[] children = property.getChildren();
+        int count = 0;
+        for (int i = 0; i < children.length; i++) {
+            Expression child = children[i].getObject();
+            if (child instanceof ArcExpression) {
+                count++;
+            }
+            if (count == number) {
+                return (ArcExpression) child;
+            }
+        }
+
+        return new PlaceHolderArcExpression();
+    }
+
+    private void initExpr() {
+        if (isInputArc != true) {
+            if ((((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression() != null) {
+                PlaceHolderArcExpression placeholderArc = new PlaceHolderArcExpression();
+                arcExpression = placeholderArc;
+                updateSelection(arcExpression);
+                parseExpression((((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression());
+            } else {
+                arcExpression = new PlaceHolderArcExpression();
+                exprField.setText(arcExpression.toString());
+            }
+        }
+        else {
+            if (isTransportArc != true) {
+                TimedInputArc inputArc = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc();
+                if (inputArc.getArcExpression() != null) {
+                    PlaceHolderArcExpression placeholderArc = new PlaceHolderArcExpression();
+                    arcExpression = placeholderArc;
+                    updateSelection(arcExpression);
+                    parseExpression(inputArc.getArcExpression());
+                } else {
+                    arcExpression = new PlaceHolderArcExpression();
+                    exprField.setText(arcExpression.toString());
+                }
+            } else {
+                TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
+                if (isInputArc) {
+                    if (transportArc.getInputExpression() != null) {
+                        PlaceHolderArcExpression placeHolderArcExpression = new PlaceHolderArcExpression();
+                        arcExpression = placeHolderArcExpression;
+                        updateSelection(arcExpression);
+                        parseExpression(transportArc.getInputExpression());
+                    } else {
+                        arcExpression = new PlaceHolderArcExpression();
+                        exprField.setText(arcExpression.toString());
+                    }
+                } else {
+                    if (transportArc.getOutputExpression() != null) {
+                        PlaceHolderArcExpression placeHolderArcExpression = new PlaceHolderArcExpression();
+                        arcExpression = placeHolderArcExpression;
+                        updateSelection(arcExpression);
+                        parseExpression(transportArc.getOutputExpression());
+                    } else {
+                        arcExpression = new PlaceHolderArcExpression();
+                        exprField.setText(arcExpression.toString());
+                    }
+                }
+            }
+
+        }
+    }
+    private void updateSelection() {
+        int index = exprField.getCaretPosition();
+        ExprStringPosition position = arcExpression.objectAt(index);
+        Logger.log(position.getObject().toString());
+        if (position == null) {
+            return;
+        }
+
+        exprField.select(position.getStart(), position.getEnd());
+        currentSelection = position;
+
+        if (currentSelection != null) {
+            toggleEnabledButtons();
+        } {
+            //TODO: disable all expr buttons
+        }
+
+        //TODO: updateexprButtonsAccordingToSelection; line 573
+    }
+    private void updateSelection(Expression newSelection) {
+        exprField.setText(arcExpression.toString());
+
+        ExprStringPosition position;
+        if (arcExpression.containsPlaceHolder()) {
+            Expression ae = arcExpression.findFirstPlaceHolder();
+            position = arcExpression.indexOf(ae);
+        }
+        else {
+            position = arcExpression.indexOf(newSelection);
+        }
+
+        exprField.select(position.getStart(), position.getEnd());
+        currentSelection = position;
+
+        if (currentSelection != null) {
+            toggleEnabledButtons();
+        }
+        else {
+            //TODO::
+        }
+    }
+    private void toggleEnabledButtons() {
+        if (currentSelection.getObject() instanceof ColorExpression) {
+            addAdditionPlaceHolderButton.setEnabled(false);
+            addColorExpressionButton.setVisible(true);
+        }
+        else if (currentSelection.getObject() instanceof AddExpression) {
+            allExpressionButton.setEnabled(false);
+            numberExpressionButton.setEnabled(false);
+            additionButton.setEnabled(false);
+            subtractionButton.setEnabled(false);
+            addAdditionPlaceHolderButton.setEnabled(false);
+            scalarButton.setEnabled(false);
+            addColorExpressionButton.setVisible(false);
+            addAdditionPlaceHolderButton.setEnabled(true);
+        }
+        else if (currentSelection.getObject() instanceof ArcExpression) {
+            allExpressionButton.setEnabled(true);
+            numberExpressionButton.setEnabled(true);
+            additionButton.setEnabled(true);
+            subtractionButton.setEnabled(true);
+            addAdditionPlaceHolderButton.setEnabled(true);
+            scalarButton.setEnabled(true);
+            addColorExpressionButton.setVisible(false);
+            addAdditionPlaceHolderButton.setEnabled(false);
+        }
+
+    }
+
     private ColorType colorType;
     private JPanel regularArcExprPanel;
     JPanel arcColorInvariantPanel;
     JPanel transportWeightPanel;
     JTabbedPane transportExprTabbedPane;
+    DefaultListModel timeConstraintListModel;
+    JList timeConstraintList;
+    private ExprStringPosition currentSelection = null;
+    JSpinner numberExpressionJSpinner;
+    JComboBox allExpressionComboBox;
+    JSpinner allExpressionJSpinner;
+    private ArcExpression arcExpression;
+    private JTextPane exprField;
+    JButton allExpressionButton;
+
+    JButton addColorExpressionButton;
+    JButton addTimeConstraintButton;
+    JButton removeTimeConstraintButton;
+    JButton editTimeConstraintButton;
+    JButton deleteExprSelectionButton;
+    JButton resetExprButton;
+    JButton undoButton;
+    JButton redoButton;
+    JButton editExprButton;
+    JButton additionButton;
+    JButton addAdditionPlaceHolderButton;
+    JButton subtractionButton;
+    JButton scalarButton;
+    JButton numberExpressionButton;
 }

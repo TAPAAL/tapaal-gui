@@ -452,12 +452,12 @@ class ColorTransportArcExpressionPanel extends JPanel {
 
                 else if (currentSelection.getObject() instanceof VariableExpression) {
                     varExpr = new VariableExpression(var);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), varExpr);
+                    expr = expr.replace(currentSelection.getObject(), varExpr);
                     updateSelection(varExpr);
                 }
                 else if (currentSelection.getObject() instanceof ColorExpression) {
                     varExpr = new VariableExpression(var);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), varExpr);
+                    expr = expr.replace(currentSelection.getObject(), varExpr);
                     updateSelection(varExpr);
                 }
 

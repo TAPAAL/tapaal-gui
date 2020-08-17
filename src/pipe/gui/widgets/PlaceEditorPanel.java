@@ -70,6 +70,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		currentTab = context.tabContent();
 		place = placeComponent;
 		this.context = context;
+		this.colorType = place.underlyingPlace().getColorType();
 		initComponents();
 		hideIrrelevantInformation();
 	}
@@ -923,6 +924,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = gbc.BOTH;
         gbc.gridwidth = 3;
         nonDefaultColorPanel.add(colorComboboxPanel, gbc);
 
