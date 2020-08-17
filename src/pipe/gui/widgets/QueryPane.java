@@ -372,7 +372,7 @@ public class QueryPane extends JPanel implements SidePane {
 		TAPNQuery newQuery = null;
 
 		if(q.isActive()) {
-            if(q.getCategory() == TAPNQuery.QueryCategory.CTL) {
+            if(!tabContent.getLens().isTimed()) {
                 newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
             } else {
                 newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
