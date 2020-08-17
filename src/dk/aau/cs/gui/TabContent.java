@@ -1526,10 +1526,26 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame()), "-timed");
+                findAndRemoveAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
         }
+    }
+
+    private void findAndRemoveAffectedQueries(TabContent tab){
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        for (TAPNQuery q : tab.queries()){
+            if(q.hasUntimedOnlyProperties()){
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            }
+        }
+        String message = "The following queries will be removed in the conversion:";
+        for(TAPNQuery q : queriesToRemove){
+            message += "\n" + q.getName();
+        }
+        JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override

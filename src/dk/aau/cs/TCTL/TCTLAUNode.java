@@ -105,8 +105,14 @@ public class TCTLAUNode extends TCTLAbstractPathProperty {
 		return left.containsPlaceHolder() 
 				|| right.containsPlaceHolder();
 	}
-	
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return left instanceof TCTLPathToStateConverter || right instanceof TCTLPathToStateConverter
+            || left.hasNestedPathQuantifiers() || right.hasNestedPathQuantifiers();
+    }
+
+    public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return left.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)
 				|| right.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}

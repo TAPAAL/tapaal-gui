@@ -194,7 +194,20 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		return placeHolderFound;
 	}
 
-	@Override
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        boolean foundNestedQuantifier = false;
+
+        for (TCTLAbstractStateProperty p : properties) {
+            foundNestedQuantifier = foundNestedQuantifier || p instanceof TCTLPathToStateConverter || p.hasNestedPathQuantifiers();
+            if(foundNestedQuantifier){
+                break;
+            }
+        }
+        return foundNestedQuantifier;
+    }
+
+    @Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		TCTLAbstractProperty ph = null;
 		for (TCTLAbstractStateProperty p : properties) {
