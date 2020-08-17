@@ -1140,7 +1140,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-        hideTimedInformation();
 	}
 
 	private void hideTimedInformation(){
@@ -1234,7 +1233,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createAnimationControlSidePanel() {
-		animControlerBox = new AnimationControlSidePanel(animator);
+		animControlerBox = new AnimationControlSidePanel(animator, lens);
 	}
 
 	public AnimationHistoryList getAnimationHistorySidePanel() {
