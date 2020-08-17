@@ -2772,6 +2772,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case draw:
                 selectAction.setEnabled(true);
                 transAction.setEnabled(true);
+                uncontrollableTransAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
                 transportArcAction.setEnabled(true);
@@ -2785,6 +2786,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case noNet:
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
+                uncontrollableTransAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -2797,6 +2799,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case animation:
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
+                uncontrollableTransAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
