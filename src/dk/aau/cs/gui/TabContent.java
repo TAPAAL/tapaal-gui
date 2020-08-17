@@ -1545,7 +1545,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
         for(TAPNQuery q : queriesToRemove){
             message += "\n" + q.getName();
         }
-        JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
+        if(!queriesToRemove.isEmpty()){
+            JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     @Override
