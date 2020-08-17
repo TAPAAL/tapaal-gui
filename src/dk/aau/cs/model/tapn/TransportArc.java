@@ -216,5 +216,5 @@ public class TransportArc extends TAPNElement {
     }
 
     public List<ColoredTimeInterval> getColorTimeIntervals() {return ctiList;}
-    public void setCtiList(List<ColoredTimeInterval> ctiList) {this.ctiList = ctiList;}
+    public void setColorTimeIntervals(List<ColoredTimeInterval> ctiList) {this.ctiList = ctiList;}
 }

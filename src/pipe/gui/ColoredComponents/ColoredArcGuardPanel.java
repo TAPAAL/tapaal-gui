@@ -29,6 +29,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class ColoredArcGuardPanel extends JPanel {
@@ -54,6 +56,7 @@ public class ColoredArcGuardPanel extends JPanel {
         this.setLayout(new GridBagLayout());
         initPanels();
         initExpr();
+        setTimeConstraints();
         hideIrrelevantInformation();
     }
 
@@ -160,39 +163,35 @@ public class ColoredArcGuardPanel extends JPanel {
         JTable table = new JTable(tableModel);
         table.setPreferredSize(new Dimension(300, 150));
         timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
-        //timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
+        timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
 
 
 
-        addTimeConstraintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
-                ColoredTimeInterval timeInterval;
+        addTimeConstraintButton.addActionListener(actionEvent -> {
+            JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
+            ColoredTimeInterval timeInterval;
 
-                if (!(colorType instanceof ProductType)) {
-                    timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR((dk.aau.cs.model.CPN.Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
-                } else {
-                    Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<dk.aau.cs.model.CPN.Color>();
-                    for (int i = 0; i < comboBoxes.length; i++) {
-                        colors.add((dk.aau.cs.model.CPN.Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
-                    }
-                    dk.aau.cs.model.CPN.Color color = new dk.aau.cs.model.CPN.Color(colorType, 0, colors);
-
-                    timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
-
+            if (!(colorType instanceof ProductType)) {
+                timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR((dk.aau.cs.model.CPN.Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
+            } else {
+                Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<dk.aau.cs.model.CPN.Color>();
+                for (int i = 0; i < comboBoxes.length; i++) {
+                    colors.add((dk.aau.cs.model.CPN.Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
                 }
-                boolean alreadyExists = false;
-                for (int i = 0; i < timeConstraintListModel.size(); i++) {
-                    if (timeInterval.equalsOnlyColor(timeConstraintListModel.get(i)))
-                        alreadyExists = true;
-                }
-                if (alreadyExists) {
-                    JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
-                } else
-                    timeConstraintListModel.addElement(timeInterval);
+                dk.aau.cs.model.CPN.Color color = new dk.aau.cs.model.CPN.Color(colorType, 0, colors);
+
+                timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
 
             }
+            boolean alreadyExists = false;
+            for (int i = 0; i < timeConstraintListModel.size(); i++) {
+                if (timeInterval.equalsOnlyColor(timeConstraintListModel.get(i)))
+                    alreadyExists = true;
+            }
+            if (alreadyExists) {
+                JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
+            } else
+                timeConstraintListModel.addElement(timeInterval);
 
         });
 
@@ -953,6 +952,7 @@ public class ColoredArcGuardPanel extends JPanel {
                 ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setInputExpression(inputExpression);
                 ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setOutputExpression(outputExpression);
                 ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setCtiList(getctiList());*/
+                transportArc.setColorTimeIntervals(getctiList());
                 ((TimedTransportArcComponent) objectToBeEdited).updateLabel(false);
             } else {
                 TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
@@ -961,6 +961,7 @@ public class ColoredArcGuardPanel extends JPanel {
                 /*objectToBeEditedInput.setUnderlyingArc(inputArc);
                 ((ColoredInputArc)((ColoredInputArcComponent)petriNetObject).underlyingTimedInputArc()).setExpression(arcExpression);
                 ((ColoredInputArc)((ColoredInputArcComponent)petriNetObject).underlyingTimedInputArc()).setColorTimeIntervals(getctiList());*/
+                inputArc.setColorTimeIntervals(getctiList());
                 ((TimedInputArcComponent) objectToBeEdited).updateLabel(false);
             }
         } else {
@@ -983,6 +984,62 @@ public class ColoredArcGuardPanel extends JPanel {
         vecColorExpr.add(colorExpr);
         expr = new NumberOfExpression(weight, vecColorExpr);
         return expr;
+    }
+
+    private void setTimeConstraints() {
+        List<ColoredTimeInterval> timeIntervals;
+        if(isInputArc){
+            if (isTransportArc){
+                timeIntervals = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals();
+            }
+            else{
+                timeIntervals = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals();
+            }
+            for (ColoredTimeInterval timeInterval : timeIntervals) {
+                timeConstraintListModel.addElement(timeInterval);
+            }
+        }
+    }
+
+    private MouseListener createDoubleClickMouseAdapter() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (!timeConstraintList.isSelectionEmpty()) {
+                    if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
+                        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
+                        Container contentPane = guiDialog.getContentPane();
+
+                        // 1 Set layout
+                        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+                        ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context, (ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
+                        contentPane.add(ctiPanel);
+
+                        guiDialog.setResizable(false);
+
+                        // Make window fit contents' preferred size
+                        guiDialog.pack();
+
+                        // Move window to the middle of the screen
+                        guiDialog.setLocationRelativeTo(null);
+                        guiDialog.setVisible(true);
+
+                        if (ctiPanel.isEditConfirmed())
+                            timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
+
+                    }
+                }
+            }
+        };
+    }
+
+    public DefaultListModel getTimeConstraintModel() {return timeConstraintListModel;}
+    private List<ColoredTimeInterval> getctiList() {
+        List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
+        for (int i = 0; i < getTimeConstraintModel().size(); i++) {
+            ctiList.add((ColoredTimeInterval) getTimeConstraintModel().get(i));
+        }
+        return ctiList;
     }
 
     private ColorType colorType;
