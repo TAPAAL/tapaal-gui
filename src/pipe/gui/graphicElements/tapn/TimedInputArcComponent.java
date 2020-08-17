@@ -1,8 +1,10 @@
 package pipe.gui.graphicElements.tapn;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -29,10 +31,10 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	    super(source);
 	    setTarget(target);
 	    setUnderlyingArc(modelArc);
-	    updateLabel(true);
 	    this.isTimed = lens.isTimed();
 	    this.isColored = lens.isColored();
-	    sealArc();
+        updateLabel(true);
+        sealArc();
     }
 
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
@@ -85,15 +87,30 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
         if (inputArc == null)
             getNameLabel().setText("");
         else {
-            if (!CreateGui.getApp().showZeroToInfinityIntervals() || !isTimed) {
+            if(isColored) {
+                String arcPrint = "";
+                if (inputArc.getArcExpression() != null) {
+                    arcPrint = inputArc.getArcExpression().toString();
+                }
+                if(isTimed){
+                    arcPrint += "\n";
+                    List<ColoredTimeInterval> ctiList;
+                    ctiList = this.underlyingTimedInputArc().getColorTimeIntervals();
+                    for (ColoredTimeInterval coloredTimeInterval : ctiList) {
+                        if (coloredTimeInterval != null){
+                            arcPrint += coloredTimeInterval.toString() + "\n";
+                        }
+                    }
+                }
+                getNameLabel().setText(arcPrint);
+            } else if (!CreateGui.getApp().showZeroToInfinityIntervals() || !isTimed) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }
                 else {
                     getNameLabel().setText(inputArc.interval().toString(showConstantNames));
                 }
-            }
-            else {
+            } else {
                 getNameLabel().setText(inputArc.interval().toString(showConstantNames));
             }
 

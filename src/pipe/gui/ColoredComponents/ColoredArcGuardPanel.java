@@ -1056,7 +1056,6 @@ public class ColoredArcGuardPanel extends JPanel {
     private ArcExpression arcExpression;
     private JTextPane exprField;
     JButton allExpressionButton;
-
     JButton addColorExpressionButton;
     JButton addTimeConstraintButton;
     JButton removeTimeConstraintButton;
