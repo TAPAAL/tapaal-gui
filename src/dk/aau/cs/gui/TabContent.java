@@ -23,6 +23,9 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
@@ -216,6 +219,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 TimeInterval.ZERO_INF
             );
 
+            //Init color
+            ColorType ct = tia.source().getColorType();
+            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(userOperatorExpression);
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tia.setExpression(numbExpr);
+
             TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens);
 
             if (path != null) {
@@ -253,6 +264,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 t.underlyingTransition(),
                 p.underlyingPlace()
             );
+
+            //Init color
+            ColorType ct = toa.destination().getColorType();
+            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(userOperatorExpression);
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            toa.setExpression(numbExpr);
+
 
             TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
 

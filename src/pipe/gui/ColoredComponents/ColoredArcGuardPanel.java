@@ -63,6 +63,8 @@ public class ColoredArcGuardPanel extends JPanel {
         }
         if(isTransportArc){
             regularArcExprPanel.setVisible(false);
+        } else{
+            transportWeightPanel.setVisible(false);
         }
     }
 
@@ -98,8 +100,8 @@ public class ColoredArcGuardPanel extends JPanel {
         int min = 1;
         int max = 9999;
         int step = 1;
-        SpinnerNumberModel numberModel = new SpinnerNumberModel(1, min, max, step);
-        JSpinner colorExpressionWeightSpinner = new JSpinner(numberModel);
+        numberModel = new SpinnerNumberModel(1, min, max, step);
+        colorExpressionWeightSpinner = new JSpinner(numberModel);
         JLabel weightLabel = new JLabel("Weight:");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -119,24 +121,6 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initColoredTimedGuard() {
         ColorType ct;
-        /*if (!transportArc) {
-            if(objectToBeEditedInput.underlyingTimedInputArc().source() instanceof SharedColoredPlace) {
-                ct = ((SharedColoredPlace)objectToBeEditedInput.underlyingTimedInputArc().source()).getColorType();
-                colorIntervalPanel = new ColorIntervalAndInvariantEditPanel(context, ct, true, objectToBeEditedInput);
-            }else {
-                ct = ((LocalColoredPlace) objectToBeEditedInput.underlyingTimedInputArc().source()).getColorType();
-                colorIntervalPanel = new ColorIntervalAndInvariantEditPanel(context, ct, true, objectToBeEditedInput);
-            }
-        }
-        else {
-            if(objectToBeEditedTransport.underlyingTransportArc().source() instanceof  SharedColoredPlace) {
-                ct = (((SharedColoredPlace) objectToBeEditedTransport.underlyingTransportArc().source()).getColorType());
-                colorIntervalPanel = new ColorIntervalAndInvariantEditPanel(context, ct, true, objectToBeEditedInput);
-            }else {
-                ct = ((LocalColoredPlace) objectToBeEditedTransport.underlyingTransportArc().source()).getColorType();
-                colorIntervalPanel = new ColorIntervalAndInvariantEditPanel(context, ct, true, objectToBeEditedTransport);
-            }
-        }*/
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -304,8 +288,8 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initTransportArcExpressionPanel(){
         transportExprTabbedPane = new JTabbedPane();
-        JPanel inputPanel = new ColorTransportArcExpressionPanel(context, transportInputExpr);
-        JPanel outputPanel = new ColorTransportArcExpressionPanel(context, transportOutputExpr);
+        inputPanel = new ColorTransportArcExpressionPanel(context, transportInputExpr);
+        outputPanel = new ColorTransportArcExpressionPanel(context, transportOutputExpr);
 
         transportExprTabbedPane.add(inputPanel, "input");
         transportExprTabbedPane.add(outputPanel, "output");
@@ -569,9 +553,9 @@ public class ColoredArcGuardPanel extends JPanel {
 
         addColorExpressionButton = new JButton("Edit Color Expr");
 
-        /*for (ColorType element : context.activeModel().parentNetwork().colorTypes()) {
+        for (ColorType element : context.activeModel().parentNetwork().colorTypes()) {
             allExpressionComboBox.addItem(element);
-        }*/
+        }
 
         numberExpressionJSpinner.setPreferredSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
@@ -757,10 +741,6 @@ public class ColoredArcGuardPanel extends JPanel {
         regularArcExprPanel.add(exprScrollPane, gbc);
     }
 
-    public void hideColorInvariantPanel(){
-        arcColorInvariantPanel.setVisible(false);
-    }
-
     private void addAllExpression() {
         AllExpression allExpr = new AllExpression((ColorType) allExpressionComboBox.getItemAt(allExpressionComboBox.getSelectedIndex()));
         Integer value = (Integer)allExpressionJSpinner.getValue();
@@ -910,6 +890,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
         //TODO: updateexprButtonsAccordingToSelection; line 573
     }
+
     private void updateSelection(Expression newSelection) {
         exprField.setText(arcExpression.toString());
 
@@ -959,6 +940,50 @@ public class ColoredArcGuardPanel extends JPanel {
         }
 
     }
+    public void onOkColored() {
+        if (isInputArc) {
+            if (isTransportArc) {
+                int weight =  Integer.parseInt(colorExpressionWeightSpinner.getValue().toString());
+                TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
+                ArcExpression inputExpression = getTransportExpression(inputPanel.getColorExpression(), weight);
+                ArcExpression outputExpression = getTransportExpression(outputPanel.getColorExpression(), weight);
+                transportArc.setInputExpression(inputExpression);
+                transportArc.setOutputExpression(outputExpression);
+                /*objectToBeEditedTransport.setUnderlyingArc(transportArc);
+                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setInputExpression(inputExpression);
+                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setOutputExpression(outputExpression);
+                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setCtiList(getctiList());*/
+                ((TimedTransportArcComponent) objectToBeEdited).updateLabel(false);
+            } else {
+                TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
+                ArcExpression arcExpression = this.arcExpression;
+                inputArc.setExpression(arcExpression);
+                /*objectToBeEditedInput.setUnderlyingArc(inputArc);
+                ((ColoredInputArc)((ColoredInputArcComponent)petriNetObject).underlyingTimedInputArc()).setExpression(arcExpression);
+                ((ColoredInputArc)((ColoredInputArcComponent)petriNetObject).underlyingTimedInputArc()).setColorTimeIntervals(getctiList());*/
+                ((TimedInputArcComponent) objectToBeEdited).updateLabel(false);
+            }
+        } else {
+            ArcExpression arcExpression = this.arcExpression;
+            TimedOutputArc outputArc = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc();
+            ((TimedOutputArcComponent) objectToBeEdited).setUnderlyingArc(outputArc);
+            outputArc.setExpression(arcExpression);
+        }
+
+    }
+
+    private ArcExpression getTransportExpression(ColorExpression colorExpr, int weight) {
+        ArcExpression expr;
+        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        if (colorExpr instanceof TupleExpression) { // we have to use TupleExpression if we want the colorExpressionPanel inside arcPanel when it is transport. IF the tuple only have one element we extract it to remove an unnecessary expression and parentheses
+            if (((TupleExpression) colorExpr).getColors().size() == 1) {
+                colorExpr = ((TupleExpression) colorExpr).getColors().firstElement();
+            }
+        }
+        vecColorExpr.add(colorExpr);
+        expr = new NumberOfExpression(weight, vecColorExpr);
+        return expr;
+    }
 
     private ColorType colorType;
     private JPanel regularArcExprPanel;
@@ -989,4 +1014,8 @@ public class ColoredArcGuardPanel extends JPanel {
     JButton subtractionButton;
     JButton scalarButton;
     JButton numberExpressionButton;
+    SpinnerNumberModel numberModel;
+    JSpinner colorExpressionWeightSpinner;
+    ColorTransportArcExpressionPanel inputPanel;
+    ColorTransportArcExpressionPanel outputPanel;
 }
