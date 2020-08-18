@@ -335,6 +335,9 @@ public class ArcPath implements Shape {
             arcpath.zoomUpdate(myArc.getZoom());
         }
 		pathPoints.add(index, arcpath);
+        if (myArc != null && myArc.getGuiModel() != null) {
+            myArc.getGuiModel().addPetriNetObject(arcpath);
+        }
 	}
 
 	public void addPoint(double x, double y, boolean type) {
@@ -345,15 +348,25 @@ public class ArcPath implements Shape {
             arcpath.zoomUpdate(myArc.getZoom());
         }
 		pathPoints.add(arcpath);
+        if (myArc != null && myArc.getGuiModel() != null) {
+            myArc.getGuiModel().addPetriNetObject(arcpath);
+        }
 	}
 
 
 	public void addPoint() {
-		pathPoints.add(new ArcPathPoint(this));
+	    var arcpath = new ArcPathPoint(this);
+		pathPoints.add(arcpath);
+        if (myArc != null && myArc.getGuiModel() != null) {
+            myArc.getGuiModel().addPetriNetObject(arcpath);
+        }
 	}
 
 	public void deletePoint(ArcPathPoint a) {
 		pathPoints.remove(a);
+		if (myArc != null && myArc.getGuiModel() != null) {
+		    myArc.getGuiModel().removePetriNetObject(a);
+        }
 	}
 
 	public void updateArc() {

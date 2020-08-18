@@ -19,21 +19,17 @@ public class DeleteArcPathPointEdit extends Command {
 	ArcPath arcPath;
 	ArcPathPoint point;
 	Integer index;
-	private final DataLayer guiModel;
 
 	/** Creates a new instance of placeWeightEdit */
 	public DeleteArcPathPointEdit(Arc _arc, ArcPathPoint _point, Integer _index, DataLayer guiModel) {
 		arcPath = _arc.getArcPath();
 		point = _point;
 		index = _index;
-		this.guiModel = guiModel;
 	}
 
 	/** */
 	@Override
 	public void undo() {
-
-		//guiModel.addPetriNetObject(point);
 		arcPath.insertPoint(index, point);
 		arcPath.updateArc();
 	}
@@ -41,8 +37,6 @@ public class DeleteArcPathPointEdit extends Command {
 	/** */
 	@Override
 	public void redo() {
-
-		guiModel.removePetriNetObject(point);
 		arcPath.deletePoint(point);
 		arcPath.updateArc();
 	}
