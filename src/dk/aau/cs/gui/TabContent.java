@@ -1955,7 +1955,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place != null && transition == null) {
                 transition = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                drawingSurface.clearAllPrototype();
                 var result = guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -1971,7 +1971,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                drawingSurface.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -1981,7 +1981,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            CreateGui.getDrawingSurface().clearAllPrototype();
+            drawingSurface.clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -2047,8 +2047,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (arc!=null) {
                 if (!e.isControlDown()) {
                     Point p = e.getPoint();
-                    int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
-                    int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+                    int x = Zoomer.getUnzoomedValue(p.x, drawingSurface.getZoom());
+                    int y = Zoomer.getUnzoomedValue(p.y, drawingSurface.getZoom());
 
                     boolean shiftDown = e.isShiftDown();
                     //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
@@ -2134,13 +2134,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                drawingSurface.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (place != null && transition == null) {
                 transition = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                drawingSurface.clearAllPrototype();
                 var result = guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2153,7 +2153,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    drawingSurface.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2170,13 +2170,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                drawingSurface.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                drawingSurface.clearAllPrototype();
                 var result = guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2189,7 +2189,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    drawingSurface.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2200,7 +2200,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            CreateGui.getDrawingSurface().clearAllPrototype();
+            drawingSurface.clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -2337,7 +2337,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                drawingSurface.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2353,13 +2353,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                drawingSurface.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place2 == null) {
                 place2 = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                drawingSurface.clearAllPrototype();
                 var result = guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2372,7 +2372,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    drawingSurface.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2383,7 +2383,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            CreateGui.getDrawingSurface().clearAllPrototype();
+            drawingSurface.clearAllPrototype();
             place1 = place2 = null;
             transition = null;
             arc = arc1 = arc2 = null;
@@ -2482,7 +2482,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private void placeTranstionObjectReleased(PetriNetObject pno, boolean shiftDown, MouseEvent e) {
             if (isDragging) {
                 isDragging = false;
-                CreateGui.getDrawingSurface().translateSelection(pno.getParent().getSelectionObject().getSelection(), totalX, totalY);
+                drawingSurface.translateSelection(pno.getParent().getSelectionObject().getSelection(), totalX, totalY);
                 totalX = 0;
                 totalY = 0;
             } else if (!justSelected) {
