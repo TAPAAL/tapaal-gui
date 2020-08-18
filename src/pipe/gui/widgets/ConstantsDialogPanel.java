@@ -63,7 +63,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	}
 
 	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(), "Edit Constant", true);
+		dialog = new EscapableDialog(CreateGui.getRootFrame(), "Edit Constant", true);
 		dialog.add(container);
 		dialog.getRootPane().setDefaultButton(okButton);
 		dialog.setResizable(false);
@@ -174,12 +174,13 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private void onOK() {
 		if (((JSpinner.NumberEditor)valueSpinner.getEditor()).getTextField().getText().equals("")){
 			JOptionPane.showMessageDialog(
-					CreateGui.getApp(),
-					"The specified value is invalid for the current net.\n"
-					+ "Updating the constant to the specified value invalidates the guard\n"
-					+ "on one or more arcs, or it sets the weight of an arc to 0.",
-					"Constant value invalid for current net",
-					JOptionPane.ERROR_MESSAGE);
+                CreateGui.getRootFrame(),
+                "The specified value is invalid for the current net.\n"
+                    + "Updating the constant to the specified value invalidates the guard\n"
+                    + "on one or more arcs, or it sets the weight of an arc to 0.",
+                "Constant value invalid for current net",
+                JOptionPane.ERROR_MESSAGE
+            );
 			valueSpinner.requestFocusInWindow();
 			return;
 		}
@@ -190,17 +191,19 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
 			JOptionPane
 			.showMessageDialog(
-					CreateGui.getApp(),
-					"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-					"Error", JOptionPane.ERROR_MESSAGE);
+                CreateGui.getRootFrame(),
+                "Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
 			nameTextField.requestFocusInWindow();
 			return;
 		}
 
 		if (newName.trim().isEmpty()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"You must specify a name.", "Missing name",
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE
+            );
 			nameTextField.requestFocusInWindow();
 			return;				
 		} else {				
@@ -208,12 +211,12 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			if (!oldName.equals("")) {
 				if (!oldName.equalsIgnoreCase(newName)
 						&& model.isConstantNameUsed(newName)) {
-					JOptionPane
-					.showMessageDialog(
-							CreateGui.getApp(),
-							"There is already another constant with the same name.\n\n"
-							+ "Choose a different name for the constant.",
-							"Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getRootFrame(),
+                        "There is already another constant with the same name.\n\n"
+                            + "Choose a different name for the constant.",
+                        "Error", JOptionPane.ERROR_MESSAGE
+                    );
 					nameTextField.requestFocusInWindow();
 					return;
 				}
@@ -221,26 +224,27 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				//Check that the value is within the allowed bounds
 				if (!( lowerBound <= val && val <= upperBound )){
 					JOptionPane.showMessageDialog(
-							CreateGui.getApp(),
-							"The specified value is invalid for the current net.\n"
-							+ "Updating the constant to the specified value invalidates the guard\n"
-							+ "on one or more arcs, or it sets the weight of an arc to 0.",
-							"Constant value invalid for current net",
-							JOptionPane.ERROR_MESSAGE);
+                        CreateGui.getRootFrame(),
+                        "The specified value is invalid for the current net.\n"
+                            + "Updating the constant to the specified value invalidates the guard\n"
+                            + "on one or more arcs, or it sets the weight of an arc to 0.",
+                        "Constant value invalid for current net",
+                        JOptionPane.ERROR_MESSAGE
+                    );
 					valueSpinner.requestFocusInWindow();
 					return;
 				}
 				Command edit = model.updateConstant(oldName, new Constant(
 						newName, val));
 				if (edit == null) {
-					JOptionPane
-					.showMessageDialog(
-							CreateGui.getApp(),
-							"The specified value is invalid for the current net.\n"
-							+ "Updating the constant to the specified value invalidates the guard\n"
-							+ "on one or more arcs, or it sets the weight of an arc to 0.",
-							"Constant value invalid for current net",
-							JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getRootFrame(),
+                        "The specified value is invalid for the current net.\n"
+                            + "Updating the constant to the specified value invalidates the guard\n"
+                            + "on one or more arcs, or it sets the weight of an arc to 0.",
+                        "Constant value invalid for current net",
+                        JOptionPane.ERROR_MESSAGE
+                    );
 					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
@@ -253,13 +257,13 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				Command edit = model.addConstant(newName, val);
 				
 				if (edit==null) {
-					JOptionPane
-					.showMessageDialog(
-							CreateGui.getApp(),
-							"A constant with the specified name already exists.",
-							"Constant exists",
-							JOptionPane.ERROR_MESSAGE);
-					nameTextField.requestFocusInWindow();
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getRootFrame(),
+                        "A constant with the specified name already exists.",
+                        "Constant exists",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    nameTextField.requestFocusInWindow();
 					return;
 				} else
 					CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);

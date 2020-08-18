@@ -112,6 +112,9 @@ public class CreateGui {
 		}
 		return getCurrentTab().getAnimator();
 	}
+
+	//Use this only when accessing the Root frame to open a dialog/popup
+    public static Frame getRootFrame() {return getApp(); }
 	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
 	@Deprecated

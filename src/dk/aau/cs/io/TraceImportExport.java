@@ -77,7 +77,7 @@ public class TraceImportExport {
         } catch (NullPointerException e) {
             // Aborted by user
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(CreateGui.getRootFrame(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -149,7 +149,7 @@ public class TraceImportExport {
 
     public static void importTrace() {
         if (pipe.gui.CreateGui.getCurrentTab().getAnimationHistorySidePanel().getListModel().size() > 1) {
-            int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+            int answer = JOptionPane.showConfirmDialog(CreateGui.getRootFrame(),
                     "You are about to import a trace. This removes the current trace.",
                     "Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if (answer != JOptionPane.OK_OPTION) {
@@ -181,7 +181,7 @@ public class TraceImportExport {
             // Will never happen
         } catch (Exception e) { //IOException
             CreateGui.getAnimator().reset(true);
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(CreateGui.getRootFrame(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
     }

@@ -57,10 +57,10 @@ public abstract class QueryLoader {
 		}
 		
 		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning && showErrorMessage) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		} else if(queryUsingNonexistentTransitionFound && firstQueryParsingWarning && showErrorMessage){
-			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		}
 		

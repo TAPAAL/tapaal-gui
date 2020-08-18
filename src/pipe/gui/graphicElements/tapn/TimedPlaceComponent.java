@@ -326,7 +326,7 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Place", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getRootFrame(), "Edit Place", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

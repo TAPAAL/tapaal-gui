@@ -168,7 +168,6 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     private void createDialogBox(String text, String header){
-        JOptionPane.showMessageDialog(CreateGui.getApp(), text, 
-            header, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(CreateGui.getRootFrame(), text, header, JOptionPane.ERROR_MESSAGE);
     }
 }

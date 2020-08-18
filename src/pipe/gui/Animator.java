@@ -95,7 +95,7 @@ public class Animator {
         tab.getUntimedAnimationHistory().setSelectedIndex(0);
         setFiringmode("Random");
 
-        JOptionPane.showMessageDialog(CreateGui.getApp(),
+        JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
             "The verification process returned an untimed trace.\n\n"
                 + "This means that with appropriate time delays the displayed\n"
                 + "sequence of discrete transitions can become a concrete trace.\n"
@@ -321,7 +321,7 @@ public class Animator {
         }
 
         if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
+            JOptionPane.showMessageDialog(CreateGui.getRootFrame(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
         } else {
             BigDecimal delay = tab.getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
             if(delay != null){
@@ -354,7 +354,7 @@ public class Animator {
                 next = new Tuple<NetworkMarking, List<TimedToken>> (currentMarking().fireTransition(transition, tokensToConsume), tokensToConsume);
             }
         }catch(RequireException e){
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(CreateGui.getRootFrame(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -369,7 +369,7 @@ public class Animator {
                 if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name()) || transition.isShared() && nextFromUntimedTrace.equals(transition.name())){
                     untimedAnimationHistory.stepForward();
                 }else{
-                    int fireTransition = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+                    int fireTransition = JOptionPane.showConfirmDialog(CreateGui.getRootFrame(),
                         "Are you sure you want to fire a transition which does not follow the untimed trace?\n"
                             + "Firing this transition will discard the untimed trace and revert to standard simulation.",
                         "Discrading Untimed Trace", JOptionPane.YES_NO_OPTION );
@@ -605,7 +605,7 @@ public class Animator {
     }
 
     private List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
-        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Select Tokens", true);
+        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getRootFrame(), "Select Tokens", true);
 
         Container contentPane = guiDialog.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
@@ -636,7 +636,7 @@ public class Animator {
 
     private boolean removeSetTrace(boolean askUser){
         if(askUser && isShowingTrace()){ //Warn about deleting trace
-            int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+            int answer = JOptionPane.showConfirmDialog(CreateGui.getRootFrame(),
                 "You are about to remove the current trace.",
                 "Removing Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if(answer != JOptionPane.OK_OPTION) return false;

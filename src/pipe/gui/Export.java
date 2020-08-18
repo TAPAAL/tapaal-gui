@@ -232,11 +232,12 @@ public class Export {
 			case TIKZ:
 				Object[] possibilities = { "Only the TikZ figure",
 				"Full compilable LaTex including your figure" };
-				String figureOptions = (String) JOptionPane.showInputDialog(
-						CreateGui.getApp(),
-						"Choose how you would like your TikZ figure outputted: \n",
-						"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
-						null, possibilities, "Only the TikZ figure");
+                String figureOptions = (String) JOptionPane.showInputDialog(
+                    CreateGui.getRootFrame(),
+                    "Choose how you would like your TikZ figure outputted: \n",
+                    "Export to TikZ", JOptionPane.PLAIN_MESSAGE,
+                    null, possibilities, "Only the TikZ figure"
+                );
 				TikZExporter.TikZOutputOption tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if (figureOptions == null)
 					break;
@@ -268,7 +269,7 @@ public class Export {
 			}
 		} catch (Exception e) {
 			// There was some problem with the action
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"There were errors performing the requested action:\n" + e,
 					"Error", JOptionPane.ERROR_MESSAGE);
 		}

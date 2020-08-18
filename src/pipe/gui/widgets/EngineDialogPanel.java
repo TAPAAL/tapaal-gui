@@ -694,8 +694,7 @@ public class EngineDialogPanel {
 	}
 
 	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Selection of Verification Engines", true);
+		dialog = new EscapableDialog(CreateGui.getRootFrame(), "Selection of Verification Engines", true);
 		dialog.add(enginePanel);
 		dialog.getRootPane().setDefaultButton(closeButton);
 		dialog.setResizable(false);

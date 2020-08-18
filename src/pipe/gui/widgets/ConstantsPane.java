@@ -417,10 +417,11 @@ public class ConstantsPane extends JPanel implements SidePane {
 		TimedArcPetriNetNetwork model = parent.network();
 		Command edit = model.removeConstant(name);
 		if (edit == null) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"You cannot remove a constant that is used in the net.\nRemove all references "
-							+ "to the constant in the net and try again.",
-							"Constant in use", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
+                "You cannot remove a constant that is used in the net.\nRemove all references "
+                    + "to the constant in the net and try again.",
+                "Constant in use", JOptionPane.ERROR_MESSAGE
+            );
 		} else {
             parent.getUndoManager().addNewEdit(edit);
         }

@@ -109,7 +109,7 @@ public class ExportBatchDialog extends JDialog {
 	
 	public static void ShowExportBatchDialog(){
 		if(exportBatchDialog == null){
-			exportBatchDialog = new ExportBatchDialog(CreateGui.getApp(), "Batch Export", true);
+			exportBatchDialog = new ExportBatchDialog(CreateGui.getRootFrame(), "Batch Export", true);
 			exportBatchDialog.pack();
 			exportBatchDialog.setPreferredSize(exportBatchDialog.getSize());
 			exportBatchDialog.setMinimumSize(new Dimension(exportBatchDialog.getWidth(), exportBatchDialog.getHeight()));

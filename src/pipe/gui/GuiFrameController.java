@@ -66,7 +66,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         int version = JavaUtil.getJREMajorVersion();
 
         if (version < TAPAAL.MINIMUM_SUPPORTED_JAVAVERSION) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), WARNING_OLD_JAVAVERSION);
+            JOptionPane.showMessageDialog(CreateGui.getRootFrame(), WARNING_OLD_JAVAVERSION);
             System.out.println(WARNING_OLD_JAVAVERSION);
         }
     }
@@ -404,7 +404,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     List<TabContent> tabs = get();
                     openTab(tabs);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
@@ -462,7 +462,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     }
 
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
@@ -633,7 +633,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
             //XXX: this cast should not be done, its a quick fix while refactoring //kyrke 2019-12-31
             changeToTab((TabContent) tab);
 
-            int result = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+            int result = JOptionPane.showConfirmDialog(CreateGui.getRootFrame(),
                     "The net has been modified. Save the current net?",
                     "Confirm Save Current File",
                     JOptionPane.YES_NO_CANCEL_OPTION,

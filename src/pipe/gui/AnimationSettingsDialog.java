@@ -63,12 +63,12 @@ public class AnimationSettingsDialog {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(closeDialogButton, gbc);
 		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Settings", true);
+		dialog = new EscapableDialog(CreateGui.getRootFrame(), "Settings", true);
 		dialog.getRootPane().setDefaultButton(closeDialogButton);
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(CreateGui.getApp());
+		dialog.setLocationRelativeTo(CreateGui.getRootFrame());
 		dialog.setVisible(true);
 	}
 

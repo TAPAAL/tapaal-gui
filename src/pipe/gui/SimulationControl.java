@@ -137,7 +137,7 @@ public class SimulationControl extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(stopSimulationButton, gbc);
 		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Simulation controls", true);
+		dialog = new EscapableDialog(CreateGui.getRootFrame(), "Simulation controls", true);
 		
 		dialog.addComponentListener(new ComponentAdapter() {
 			public void componentHidden(ComponentEvent e) {

@@ -23,12 +23,12 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
 			if (!result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
+				JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 						getAnswerNotBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
+				JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 						getAnswerBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE, ResourceManager.satisfiedIcon());
 			}

@@ -216,10 +216,10 @@ public class WorkflowDialog extends JDialog {
 
 	public static void showDialog() {
 		if(CreateGui.getCurrentTab().getWorkflowDialog() == null){
-			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true));
+			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getRootFrame(), "Workflow Analysis", true));
 		}else if(!CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode){
 			WorkflowDialog oldDialog = CreateGui.getCurrentTab().getWorkflowDialog();
-			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true));
+			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getRootFrame(), "Workflow Analysis", true));
 			WorkflowDialog newDialog = CreateGui.getCurrentTab().getWorkflowDialog();
 			newDialog.soundness.setSelected(oldDialog.soundness.isSelected());
 			newDialog.min.setSelected(oldDialog.min.isSelected());

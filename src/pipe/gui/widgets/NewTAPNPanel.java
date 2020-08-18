@@ -89,7 +89,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		if (name.isEmpty()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"You must provide a name for the net.", "Error",
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
@@ -99,11 +99,11 @@ public class NewTAPNPanel extends JPanel {
 			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame);
 			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
-			JOptionPane
-					.showMessageDialog(
-							CreateGui.getApp(),
-							"Something went wrong while creating a new model. Please try again.",
-							"Error", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(
+                CreateGui.getRootFrame(),
+                "Something went wrong while creating a new model. Please try again.",
+                "Error", JOptionPane.INFORMATION_MESSAGE
+            );
 			e.printStackTrace();
 			return;
 		}

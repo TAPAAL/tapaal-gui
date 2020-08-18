@@ -53,11 +53,11 @@ public class RunVerification extends RunVerificationBase {
 				callback.run(result);
 			}else{
 				JOptionPane.showMessageDialog(
-						CreateGui.getApp(),
-						createMessagePanel(result),
-						"Verification Result",
-						JOptionPane.INFORMATION_MESSAGE,
-						iconSelector.getIconFor(result)
+                    CreateGui.getRootFrame(),
+                    createMessagePanel(result),
+                    "Verification Result",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    iconSelector.getIconFor(result)
 				);
 	
 				if (result.getTrace() != null) {

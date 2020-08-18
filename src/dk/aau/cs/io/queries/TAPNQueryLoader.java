@@ -284,7 +284,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			if(firstQueryParsingWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(CreateGui.getRootFrame(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 				firstQueryParsingWarning = false;
 			}
 			System.err.println("No query was specified: ");

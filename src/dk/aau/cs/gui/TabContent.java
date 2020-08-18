@@ -440,7 +440,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
             int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-                CreateGui.getApp(), s.toString(), "Warning",
+                CreateGui.getRootFrame(), s.toString(), "Warning",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
                 : JOptionPane.YES_OPTION;
 
@@ -1349,7 +1349,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (!isTime){
                 if (!network().isUntimed()){
                     String removeTimeWarning = "The net contains time information, which will be removed. Do you still wish to make the net untimed?";
-                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove time information",
+                    int choice = JOptionPane.showOptionDialog(CreateGui.getRootFrame(), removeTimeWarning, "Remove time information",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
                     if (choice == 0) {
                         createNewAndConvertUntimed();
@@ -1370,7 +1370,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (!isGame){
                 if (network().hasUncontrollableTransitions()){
                     String removeTimeWarning = "The net contains game information, which will be removed. Do you still wish to make to remove the game semantics?";
-                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove game information",
+                    int choice = JOptionPane.showOptionDialog(CreateGui.getRootFrame(), removeTimeWarning, "Remove game information",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
                     if (choice == 0) {
                         createNewAndConvertNonGame();
@@ -1495,7 +1495,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 app.ifPresent(o->o.setStatusBarText(textforAnimation));
 
 			} else {
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
+				JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 						"You need at least one active template to enter simulation mode",
 						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				animationmode = false;
@@ -1651,7 +1651,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 "No"};
 
             String optionText = "Do you want to replace constants with values?";
-            openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getRootFrame(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             if(openCTLDialog == JOptionPane.YES_OPTION){
                 inlineConstants = true;
             } else if(openCTLDialog == JOptionPane.NO_OPTION){
@@ -1813,7 +1813,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		} catch (Exception e) {
 			Logger.log(e);
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(), e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -1834,7 +1834,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -2082,7 +2082,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
 
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    CreateGui.getRootFrame(),
                     errorMessage,
                     "Error", JOptionPane.ERROR_MESSAGE
                 );

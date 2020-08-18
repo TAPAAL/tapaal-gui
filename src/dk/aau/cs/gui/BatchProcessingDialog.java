@@ -295,7 +295,7 @@ public class BatchProcessingDialog extends JDialog {
 			batchProcessingDialog = null;
 		}
 		if(batchProcessingDialog == null){
-			batchProcessingDialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true, ListOfQueries);
+			batchProcessingDialog = new BatchProcessingDialog(CreateGui.getRootFrame(), "Batch Processing", true, ListOfQueries);
 			batchProcessingDialog.pack();
 			batchProcessingDialog.setPreferredSize(batchProcessingDialog.getSize());
 			//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
@@ -990,7 +990,7 @@ public class BatchProcessingDialog extends JDialog {
 						exporter.exportToCSV(tableModel.getResults(), exportFile);
 					} catch (Exception e1) {
 						JOptionPane.showMessageDialog(
-								CreateGui.getApp(),
+								CreateGui.getRootFrame(),
 								"An error occurred while trying to export the results. Please try again",
 								"Error Exporting Results",
 								JOptionPane.ERROR_MESSAGE

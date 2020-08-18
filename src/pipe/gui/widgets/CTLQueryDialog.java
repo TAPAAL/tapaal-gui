@@ -356,7 +356,7 @@ public class CTLQueryDialog extends JPanel {
 
 	private boolean checkIfSomeReductionOption() {
 		if (reductionOption.getSelectedItem() == null){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"No verification engine supports the combination of this query and the current model",
 					"No verification engine", JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -500,12 +500,12 @@ public class CTLQueryDialog extends JPanel {
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
 					"No reduction option", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
-		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit CTL Query", true);
+		guiDialog = new EscapableDialog(CreateGui.getRootFrame(),	"Edit CTL Query", true);
 
 		Container contentPane = guiDialog.getContentPane();
 		// 1 Set layout
@@ -1977,12 +1977,13 @@ public class CTLQueryDialog extends JPanel {
 					try {
 						newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
 					} catch (Throwable ex) {
-						int choice = JOptionPane.showConfirmDialog(
-								CreateGui.getApp(),
-								"TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
-								"Error Parsing Query",
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.ERROR_MESSAGE);
+                        int choice = JOptionPane.showConfirmDialog(
+                            CreateGui.getRootFrame(),
+                            "TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
+                            "Error Parsing Query",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.ERROR_MESSAGE
+                        );
 						if (choice == JOptionPane.NO_OPTION)
 							returnFromManualEdit(null);
 						else
@@ -2043,11 +2044,13 @@ public class CTLQueryDialog extends JPanel {
 							}
 
 							s.append("\nThe specified query has not been saved. Do you want to edit it again?");
-							int choice = JOptionPane.showConfirmDialog(
-									CreateGui.getApp(), s.toString(),
-									"Error Parsing Query",
-									JOptionPane.YES_NO_OPTION,
-									JOptionPane.ERROR_MESSAGE);
+                            int choice = JOptionPane.showConfirmDialog(
+                                CreateGui.getRootFrame(),
+                                s.toString(),
+                                "Error Parsing Query",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.ERROR_MESSAGE
+                            );
 							if (choice == JOptionPane.NO_OPTION) {
 								returnFromManualEdit(null);
 							}
@@ -2413,10 +2416,11 @@ public class CTLQueryDialog extends JPanel {
 						}
 
 					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(CreateGui.getApp(),
-								"There were errors performing the requested action:\n"
-										+ e, "Error",
-										JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(
+                            CreateGui.getRootFrame(),
+                            "There were errors performing the requested action:\n" + e, "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
 					}
 
 					if (xmlFile != null && queryFile != null) {
@@ -2453,7 +2457,7 @@ public class CTLQueryDialog extends JPanel {
 								else
 									s.append(NO_UPPAAL_XML_FILE_SAVED);
 
-								JOptionPane.showMessageDialog(CreateGui.getApp(), s.toString());
+								JOptionPane.showMessageDialog(CreateGui.getRootFrame(), s.toString());
 							}
 						}
 					}

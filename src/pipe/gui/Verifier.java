@@ -119,7 +119,7 @@ public class Verifier {
 			);
 			dialog.setVisible(true);
 		} else {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"There was an error converting the model.",
 					"Conversion error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -205,7 +205,7 @@ public class Verifier {
 			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);
 		} else {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getRootFrame(),
 					"There was an error converting the model.",
 					"Conversion error", JOptionPane.ERROR_MESSAGE);
 		}

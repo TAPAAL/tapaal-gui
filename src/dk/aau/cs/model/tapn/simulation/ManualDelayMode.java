@@ -62,7 +62,7 @@ public class ManualDelayMode implements DelayMode{
 
 		//Ask the user
 		ChooseDelayPanel panel;
-		dialog = new EscapableDialog(CreateGui.getApp(), "Choose delay", true);
+		dialog = new EscapableDialog(CreateGui.getRootFrame(), "Choose delay", true);
 		panel = new ChooseDelayPanel(transition, dInterval, delayGranularity);
 		dialog.setContentPane(panel);
 		dialog.pack();

@@ -20,7 +20,7 @@ class NativeFileBrowser extends FileBrowser {
 	}
 	
 	NativeFileBrowser(String filetype, final String ext, final String optionalExt, String path) {
-		fc = new FileDialog(CreateGui.getAppGui(), filetype);
+		fc = new FileDialog(CreateGui.getRootFrame(), filetype);
 		this.specifiedPath = path;
 
 		if (filetype == null) {
@@ -121,7 +121,7 @@ class NativeFileBrowser extends FileBrowser {
 			File destination = new File(newName);
 
 			if(destination.exists()){
-				int overRide = JOptionPane.showConfirmDialog(CreateGui.getAppGui(), newName + "\nDo you want to overwrite this file?");
+				int overRide = JOptionPane.showConfirmDialog(CreateGui.getRootFrame(), newName + "\nDo you want to overwrite this file?");
 				switch (overRide) {
 				case JOptionPane.NO_OPTION:
 					source.delete();
