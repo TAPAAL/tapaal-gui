@@ -11,6 +11,7 @@ import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import dk.aau.cs.gui.TabContent;
+import pipe.gui.undo.UndoManager;
 
 public class CreateGui {
 
@@ -155,4 +156,8 @@ public class CreateGui {
 
     public static boolean useExtendedBounds = false;
 
+	@Deprecated
+    public static UndoManager getUndoManager() {
+        return getCurrentTab().getUndoManager();
+    }
 }
