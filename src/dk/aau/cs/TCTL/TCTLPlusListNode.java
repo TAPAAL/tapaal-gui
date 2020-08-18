@@ -84,7 +84,12 @@ public class TCTLPlusListNode extends TCTLAbstractStateProperty {
 		return false;
 	}
 
-	@Override
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return false;
+    }
+
+    @Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		for(TCTLAbstractStateProperty term : terms){
 			TCTLAbstractProperty placeholder = term.findFirstPlaceHolder(); 

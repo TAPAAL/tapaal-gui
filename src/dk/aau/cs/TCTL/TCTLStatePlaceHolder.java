@@ -26,7 +26,12 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		return true;
 	}
 
-	@Override
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return false;
+    }
+
+    @Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLStatePlaceHolder) {
 			return true;
