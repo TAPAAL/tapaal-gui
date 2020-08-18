@@ -1,9 +1,13 @@
 package pipe.gui.graphicElements;
 
+import dk.aau.cs.model.tapn.TimedTransition;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 
@@ -21,6 +25,9 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
 	protected boolean attributesVisible = false;
 
+	private KeyListener keyListener;
+	private long when;
+
 	public PlaceTransitionObject(
 	        double componentWidth,
 			double componentHeight,
@@ -33,6 +40,9 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		super(idInput, positionXInput, positionYInput, nameOffsetXInput, nameOffsetYInput);
 		this.componentWidth = componentWidth;
 		this.componentHeight = componentHeight;
+		if (this instanceof TimedTransitionComponent) {
+		    keyListener = keyListener((TimedTransitionComponent)this);
+        }
 	}
 
 
@@ -208,9 +218,58 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 					arc.select();
 				}
 			}
+
+			if (this instanceof TimedTransitionComponent) {
+                addKeyListener(keyListener);
+                setFocusable(true);
+                requestFocus();
+            }
 			repaint();
 		}
 	}
+
+    @Override
+    public void deselect() {
+        if (selected) {
+            selected = false;
+
+            if (pnName != null) {
+                pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+            }
+            if (this instanceof TimedTransitionComponent) {
+                removeKeyListener(keyListener);
+            }
+
+            repaint();
+        }
+    }
+
+    private KeyListener keyListener(TimedTransitionComponent component) {
+        return new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getWhen() != when) {
+                    TimedTransition transition = component.underlyingTransition();
+                    if (e.getKeyChar() == 'E' || e.getKeyChar() == 'e') {
+                        transition.setUncontrollable(!transition.isUncontrollable());
+                        repaint();
+                    } else if (e.getKeyChar() == 'U' || e.getKeyChar() == 'u') {
+                        transition.setUrgent(!transition.isUrgent());
+                        repaint();
+                    }
+                    when = e.getWhen();
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) { }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        };
+    }
 
 	@Override
 	public void addedToGui() {
