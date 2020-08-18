@@ -2209,7 +2209,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
-	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+	class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
 
@@ -2259,7 +2259,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void teardownManager() {
             //Remove all mouse-over menus if we exit animation mode
-            ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
+            ArrayList<PetriNetObject> selection = drawingSurface().getGuiModel().getPNObjects();
 
             for (PetriNetObject pn : selection) {
                 if (pn instanceof TimedPlaceComponent) {
@@ -2540,7 +2540,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 rotation = e.getWheelRotation() * 45;
             }
 
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+            getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
         }
 
         private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
@@ -2552,7 +2552,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         private void arcDoubleClickedWithContrl(Arc arc, MouseEvent e) {
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+            getUndoManager().addNewEdit(
                 arc.getArcPath().insertPoint(
                     new Point2D.Double(
                         Zoomer.getUnzoomedValue(arc.getX() + e.getX(), arc.getZoom()),
