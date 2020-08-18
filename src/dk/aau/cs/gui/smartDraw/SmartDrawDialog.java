@@ -209,8 +209,20 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				initLoadingFrame();
-				worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
-						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
+				worker = new SmartDrawWorker(
+				    xSpacing,
+                    ySpacing,
+                    CreateGui.getDrawingSurface(),
+                    CreateGui.getUndoManager(),
+                    searchOption,
+					straightWeight,
+                    diagonalWeight,
+                    distanceWeight,
+                    overlappingArcWeight,
+                    startingObject,
+                    minimumIterations
+                );
+
 				worker.addSmartDrawListener(new SmartDrawListener() {
 					
 					@Override

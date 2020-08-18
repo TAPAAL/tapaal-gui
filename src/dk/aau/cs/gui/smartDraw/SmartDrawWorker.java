@@ -11,29 +11,31 @@ import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
-import pipe.gui.CreateGui;
 import pipe.gui.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.undo.DeleteArcPathPointEdit;
 import pipe.gui.undo.TransitionRotationEdit;
+import pipe.gui.undo.UndoManager;
 
 public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	List<SmartDrawListener> listeners = new ArrayList<SmartDrawListener>();
 	PlaceTransitionObject startingObject;
 	int xSpacing;
 	int ySpacing;
-	DrawingSurfaceImpl drawingSurface;
 	String searchOption;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
 	Boolean isDone = false;
-	
+
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Point> pointsReserved = new ArrayList<Point>();
-	pipe.gui.undo.UndoManager undoManager = CreateGui.getUndoManager();
-	
+
+
+	final DrawingSurfaceImpl drawingSurface;
+    final UndoManager undoManager;
+
 	//weights
 	int diagonalWeight;
 	int straightWeight;
@@ -53,6 +55,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
         int xSpacing,
         int ySpacing,
         DrawingSurfaceImpl drawingSurface,
+        UndoManager undoManager,
         String searchOption,
         int straightWeight,
         int diagonalWeight,
@@ -64,6 +67,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		this.xSpacing = xSpacing;
 		this.ySpacing = ySpacing;
 		this.drawingSurface = drawingSurface;
+		this.undoManager = undoManager;
 		this.searchOption = searchOption;
 		this.straightWeight = straightWeight;
 		this.diagonalWeight = diagonalWeight;
