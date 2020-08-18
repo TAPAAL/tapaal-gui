@@ -364,7 +364,7 @@ public class TimedPlaceComponent extends Place {
                     if(place.getCtiList() != null) {
                         for (ColoredTimeInvariant cti : place.getCtiList()) {
                             if (cti != null) {
-                                getNameLabel().setText(getNameLabel().getText() + "\n" + cti.toString() + "\n");
+                                getNameLabel().setText(getNameLabel().getText() + "\n" + cti.toString());
                             }
                         }
                     }

@@ -4,21 +4,23 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
-import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.ColoredToken;
+
+import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
 import pipe.gui.ColoredComponents.ColorComboboxPanel;
+import pipe.gui.ColoredComponents.ColoredTimeInvariantDialogPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -32,17 +34,6 @@ import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.model.tapn.Bound.InfBound;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
@@ -108,12 +99,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		initButtonPanel();
 
-		gridBagConstraints = GridBagHelper.as(0,2, new Insets(0, 8, 5, 8));
+		gridBagConstraints = GridBagHelper.as(0,5, new Insets(0, 8, 5, 8));
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		add(buttonPanel, gridBagConstraints);
+		initColorTypePanel();
         initColorInvariantPanel();
 		initTokensPanel();
+		setInitialComboBoxValue();
+		writeTokensToList();
+		setColoredTimeInvariants();
 	}
 
 	private void initButtonPanel() {
@@ -128,7 +123,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 
 		okButton.addActionListener(evt -> {
-			if(doOK()){
+			if(doOKColored() && doOK()){
 				exit();
 			}
 		});
@@ -627,12 +622,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				}	
 			}
 		}
-
-		if(newMarking != place.underlyingPlace().numberOfTokens()){
-			Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
-			command.redo();
-			context.undoManager().addEdit(command);
-		}
+		//TODO: Look at this
+        if(place.isTimed() && !place.isColored()){
+            if(newMarking != place.underlyingPlace().numberOfTokens()){
+                Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
+                command.redo();
+                context.undoManager().addEdit(command);
+            }
+        }
 
 		TimeInvariant newInvariant = constructInvariant();
 		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
@@ -725,11 +722,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.insets = new Insets(3, 3, 3,3);
         tokenButtonPanel.add(addColoredTokenButton, gbc);
 
-        addColoredTokenButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                //onAdd();
-            }
+        addColoredTokenButton.addActionListener(actionEvent -> {
+            addColoredToken();
         });
 
         removeColoredTokenButton = new JButton("Remove");
@@ -739,11 +733,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         removeColoredTokenButton.setMinimumSize(buttonSize);
         removeColoredTokenButton.setMaximumSize(buttonSize);
 
-        removeColoredTokenButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                //onRemove();
-            }
+        removeColoredTokenButton.addActionListener(actionEvent -> {
+            removeColoredToken();
         });
 
         gbc.gridx = 1;
@@ -794,8 +785,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         removeTimeConstraintButton.setPreferredSize(buttonSize);
         editTimeConstraintButton.setPreferredSize(buttonSize);
 
-        ListModel timeConstraintListModel = new DefaultListModel();
-        JList timeConstraintList = new JList(timeConstraintListModel);
+        timeConstraintListModel = new DefaultListModel();
+        timeConstraintList = new JList(timeConstraintListModel);
         JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
         timeConstraintScrollPane.setViewportView(timeConstraintList);
         timeConstraintScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -814,110 +805,69 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 
 
-        /*addTimeConstraintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
-                AbstractTimeConstraint timeConstraint;
+        addTimeConstraintButton.addActionListener(actionEvent -> {
+            JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
+            ColoredTimeInvariant timeConstraint;
 
-                if (!(colorType instanceof ProductType)) {
-                    if (isInterval)
-                        timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
-                    else
-                        timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
-                } else {
-                    Vector<Color> colors = new Vector<Color>();
-                    for (int i = 0; i < comboBoxes.length; i++) {
-                        colors.add((Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
-                    }
-                    Color color = new Color(colorType, 0, colors);
-                    if (isInterval)
-                        timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
-                    else
-                        timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(color);
+            if (!(colorType instanceof ProductType)) {
+                timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
+            } else {
+                Vector<Color> colors = new Vector<Color>();
+                for (int i = 0; i < comboBoxes.length; i++) {
+                    colors.add((Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
                 }
-                boolean alreadyExists = false;
-                for (int i = 0; i < timeConstraintListModel.size(); i++) {
-                    if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i)))
-                        alreadyExists = true;
-                }
-                if (alreadyExists) {
-                    JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
-                } else
-                    timeConstraintListModel.addElement(timeConstraint);
+                Color color = new Color(colorType, 0, colors);
 
+                timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(color);
             }
+            boolean alreadyExists = false;
+            for (int i = 0; i < timeConstraintListModel.size(); i++) {
+                if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i)))
+                    alreadyExists = true;
+            }
+            if (alreadyExists) {
+                JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
+            } else
+                timeConstraintListModel.addElement(timeConstraint);
 
-        });*/
+        });
 
-        /*removeTimeConstraintButton.addActionListener(new ActionListener() {
+        removeTimeConstraintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int index = timeConstraintList.getSelectedIndex();
                 Object star = timeConstraintListModel.elementAt(index);
-                if(star instanceof ColoredTimeInterval) {
-                    if(((ColoredTimeInterval) star).getColor().equals(Color.STAR_COLOR)) {
-                        JOptionPane.showMessageDialog(null, "Star interval cannot be removed");
-                    }else {
-                        timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
-                    }
-                }else if(star instanceof ColoredTimeInvariant) {
-                    if(((ColoredTimeInvariant) star).getColor().equals(Color.STAR_COLOR)) {
-                        JOptionPane.showMessageDialog(null, "Star invariant cannot be removed");
-                    }else{
-                        timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
-                    }
+                if(((ColoredTimeInvariant) star).getColor().equals(dk.aau.cs.model.CPN.Color.STAR_COLOR)) {
+                    JOptionPane.showMessageDialog(null, "Star invariant cannot be removed");
+                }else{
+                    timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
                 }
+
             }
-        });*/
+        });
 
-        /*editTimeConstraintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (isInterval) {
-                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
-                    Container contentPane = guiDialog.getContentPane();
+        editTimeConstraintButton.addActionListener(actionEvent -> {
+            EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Invariant", true);
+            Container contentPane = guiDialog.getContentPane();
 
-                    // 1 Set layout
-                    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-                    ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
-                    contentPane.add(ctiPanel);
+            // 1 Set layout
+            contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+            ColoredTimeInvariantDialogPanel ctiPanel = new ColoredTimeInvariantDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInvariant) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()), place);
+            contentPane.add(ctiPanel);
 
-                    guiDialog.setResizable(false);
+            guiDialog.setResizable(false);
 
-                    // Make window fit contents' preferred size
-                    guiDialog.pack();
+            // Make window fit contents' preferred size
+            guiDialog.pack();
 
-                    // Move window to the middle of the screen
-                    guiDialog.setLocationRelativeTo(null);
-                    guiDialog.setVisible(true);
+            // Move window to the middle of the screen
+            guiDialog.setLocationRelativeTo(null);
+            guiDialog.setVisible(true);
 
-                    if (ctiPanel.isEditConfirmed())
-                        timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
-
-                } else {
-                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Invariant", true);
-                    Container contentPane = guiDialog.getContentPane();
-
-                    // 1 Set layout
-                    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-                    ColoredTimeInvariantDialogPanel ctiPanel = new ColoredTimeInvariantDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInvariant) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()), placeComp);
-                    contentPane.add(ctiPanel);
-
-                    guiDialog.setResizable(false);
-
-                    // Make window fit contents' preferred size
-                    guiDialog.pack();
-
-                    // Move window to the middle of the screen
-                    guiDialog.setLocationRelativeTo(null);
-                    guiDialog.setVisible(true);
-
-                    if (ctiPanel.didEdit)
-                        timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInvariant());
-                }
+            if (ctiPanel.didEdit) {
+                timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInvariant());
             }
-        });*/
+        });
 
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -969,7 +919,147 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         return nonDefaultColorPanel;
     }
 
-	private javax.swing.JCheckBox attributesCheckBox;
+    private void initColorTypePanel() {
+	    colorTypePanel = new JPanel();
+        colorTypePanel.setLayout(new GridBagLayout());
+        colorTypePanel.setBorder(new TitledBorder("Color Type"));
+
+        JLabel colortypeLabel = new JLabel();
+        colortypeLabel.setText("Color Type:");
+
+        colorTypeComboBox = new JComboBox();
+        List<ColorType> colorTypes = context.network().colorTypes();
+
+        for (ColorType element : colorTypes) {
+            colorTypeComboBox.addItem(element);
+        }
+
+        colorTypeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (!coloredTokenListModel.isEmpty() && !timeConstraintListModel.isEmpty()) {
+                    int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the color type for this place?\n" +
+                        "All tokens and time invariants for colors will be deleted.","alert", JOptionPane.YES_NO_OPTION);
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        setNewColorType(colorTypeComboBox.getItemAt(colorTypeComboBox.getSelectedIndex()));
+                    }
+                    else { // NO.OPTION - we set the color type to the previous selected one
+                        for (int i = 0; i <  colorTypeComboBox.getItemCount(); i++) {
+                            if (colorType.getName().equals(colorTypeComboBox.getItemAt(i).getName())) {
+                                colorTypeComboBox.setSelectedIndex(i);
+                            }
+                        }
+                    }
+                } else {
+                    setNewColorType(colorTypeComboBox.getItemAt(colorTypeComboBox.getSelectedIndex()));
+                }
+            }
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        colorTypePanel.add(colortypeLabel, gbc);
+
+        Dimension colorTypeComboBoxSize = new Dimension(500, 30);
+        colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);
+        colorTypeComboBox.setMinimumSize(colorTypeComboBoxSize);
+        colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3,3 );
+        colorTypePanel.add(colorTypeComboBox, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        add(colorTypePanel, gbc);
+    }
+
+    private void addColoredToken() {
+        ColoredToken ct;
+        if (colorType instanceof ProductType) {
+            Vector<Color> colorVector = new Vector();
+            for (int i = 0; i < tokenColorComboboxPanel.getColorTypeComboBoxesArray().length ; i++) {
+                colorVector.add((Color)tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
+            }
+            Color tempColor = new Color(colorType, 0, colorVector);
+            ct = new ColoredToken(place.underlyingPlace(), tempColor);
+        }
+        else {
+            ct = new ColoredToken(place.underlyingPlace(), (dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
+        }
+        coloredTokenListModel.addElement(ct);
+    }
+    public boolean doOKColored() {
+        ArrayList<TimedToken> tokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+
+        for (TimedToken token : tokenList) {
+            context.activeModel().marking().remove(token);
+        }
+
+        for (int i = 0; i < coloredTokenListModel.size(); i++) {
+            context.activeModel().marking().add(coloredTokenListModel.get(i));
+        }
+        List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
+        for (int i = 0; i < timeConstraintListModel.size(); i++) {
+            ctiList.add((ColoredTimeInvariant) timeConstraintListModel.get(i));
+        }
+
+        place.underlyingPlace().setCtiList(ctiList);
+        place.underlyingPlace().setColorType(colorType);
+
+        return true;
+    }
+
+    private void removeColoredToken() {
+        coloredTokenListModel.removeElementAt(tokenList.getSelectedIndex());
+    }
+
+    private void writeTokensToList() {
+        coloredTokenListModel.clear();
+        for (TimedToken element : context.network().marking().getTokensFor(place.underlyingPlace())) {
+            ColoredToken token = (ColoredToken)element;
+            coloredTokenListModel.addElement(token);
+        }
+    }
+
+
+    private void setInitialComboBoxValue() {
+        List<ColorType> colorTypes = context.network().colorTypes();
+        if (colorType != null) {
+            colorTypeComboBox.setSelectedIndex(colorTypes.indexOf(colorType));
+        }
+        else if (colorTypes.size() != 0) {
+            colorTypeComboBox.setSelectedIndex(0);
+        }
+    }
+
+    private void setNewColorType(ColorType colorType) {
+        coloredTokenListModel.clear();
+        this.colorType = colorType;
+        remove(tokenPanel);
+        remove(timeInvariantColorPanel);
+        initTokensPanel();
+        initColorInvariantPanel();
+        revalidate();
+    }
+
+    private void setColoredTimeInvariants() {
+        for (ColoredTimeInvariant timeInvariant : place.underlyingPlace().getCtiList()) {
+            timeConstraintListModel.addElement(timeInvariant);
+        }
+    }
+
+    private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;
 	private javax.swing.JLabel markingLabel;
@@ -997,6 +1087,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     private ColorComboboxPanel tokenColorComboboxPanel;
     private ColorType colorType;
     JPanel timeInvariantColorPanel;
+    DefaultListModel timeConstraintListModel;
+    JList timeConstraintList;
+    JComboBox<ColorType>  colorTypeComboBox;
+    JPanel colorTypePanel;
 
 
 }

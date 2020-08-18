@@ -32,6 +32,8 @@ public abstract class TimedPlace {
 	}
     public abstract ColorType getColorType();
     public abstract List<ColoredTimeInvariant> getCtiList();
+    public abstract void setCtiList(List<ColoredTimeInvariant> list);
+    public abstract void setColorType(ColorType ct);
 
     public abstract boolean isShared();
 
