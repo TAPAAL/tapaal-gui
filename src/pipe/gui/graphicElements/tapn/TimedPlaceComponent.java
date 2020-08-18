@@ -229,7 +229,7 @@ public class TimedPlaceComponent extends Place {
                 case 0:
                     break;
             }
-        } else {	// print token age
+        } else if(!isColored()) {	// print token age
             switch (marking) {
                 case 2:
                     if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
@@ -266,6 +266,17 @@ public class TimedPlaceComponent extends Place {
                         g.drawString("#" + marking, x + 6, y + 20);
                     }
                     break;
+            }
+        } else{
+            if (marking > 999) {
+                // XXX could be better...
+                g.drawString("#" + marking, x, y + 20);
+            } else if (marking > 99) {
+                g.drawString("#" + marking, x, y + 20);
+            } else if (marking > 9) {
+                g.drawString("#" + marking, x + 2, y + 20);
+            } else if (marking > 0) {
+                g.drawString("#" + marking, x + 6, y + 20);
             }
         }
 	}
