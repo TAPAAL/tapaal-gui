@@ -30,7 +30,7 @@ public class MovePlaceTransitionObject extends Command {
 		
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
-		CreateGui.getDrawingSurface().updatePreferredSize();
+
 	}
 
 	@Override
@@ -41,7 +41,6 @@ public class MovePlaceTransitionObject extends Command {
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
-		CreateGui.getDrawingSurface().updatePreferredSize();
 
 	}
 
