@@ -49,8 +49,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	ArrayList<PlaceTransitionObject> unfinishedObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Arc> arcsVisited = new ArrayList<Arc>();
 	
-	public SmartDrawWorker(int xSpacing, int ySpacing, DrawingSurfaceImpl drawingSurface, String searchOption, 
-			int straightWeight, int diagonalWeight, int distanceWeight, int overlappingArcWeight, String startingObject, int minimumIterations) {
+	public SmartDrawWorker(
+        int xSpacing,
+        int ySpacing,
+        DrawingSurfaceImpl drawingSurface,
+        String searchOption,
+        int straightWeight,
+        int diagonalWeight,
+        int distanceWeight,
+        int overlappingArcWeight,
+        String startingObject,
+        int minimumIterations
+    ) {
 		this.xSpacing = xSpacing;
 		this.ySpacing = ySpacing;
 		this.drawingSurface = drawingSurface;
