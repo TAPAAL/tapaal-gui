@@ -67,7 +67,7 @@ public class Animator {
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
-        CreateGui.getCurrentTab().setAnimationMode(true);
+        tab.setAnimationMode(true);
 
         if (trace.isConcreteTrace()) {
             this.trace = trace;
@@ -685,7 +685,7 @@ public class Animator {
     public final GuiAction stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
 
     public void updateAnimationButtonsEnabled() {
-        AnimationHistoryList animationHistory = CreateGui.getCurrentTab().getAnimationHistorySidePanel();
+        AnimationHistoryList animationHistory = tab.getAnimationHistorySidePanel();
 
         setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
         setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
@@ -698,7 +698,7 @@ public class Animator {
      */
     private void updateMouseOverInformation() {
         // update mouseOverView
-        for (pipe.gui.graphicElements.Place p : CreateGui.getCurrentTab().getModel().getPlaces()) {
+        for (pipe.gui.graphicElements.Place p : tab.getModel().getPlaces()) {
             if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
                 ((TimedPlaceComponent) p).showAgeOfTokens(true);
             }
