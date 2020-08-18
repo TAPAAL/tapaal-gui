@@ -2727,7 +2727,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.TAPNTRANS);
         }
     };
-    private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (U)", "U", true) {
+    private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (E)", "E", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.UNCONTROLLABLETRANS);
         }
