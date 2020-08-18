@@ -118,7 +118,7 @@ public class GuardDialogue extends JPanel /*
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				TimedOutputArcComponent arc = (TimedOutputArcComponent) objectToBeEdited;
-				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+				UndoManager undoManager = CreateGui.getUndoManager();
 				undoManager.newEdit();
 
 				dk.aau.cs.model.tapn.TimeInterval guard  = null;

@@ -248,7 +248,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
-					CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+					CreateGui.getUndoManager().addNewEdit(edit);
 					CreateGui.getDrawingSurface().repaintAll();
 					exit();
 				}
@@ -264,8 +264,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
                     );
                     nameTextField.requestFocusInWindow();
 					return;
-				} else
-					CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+				} else {
+                    CreateGui.getUndoManager().addNewEdit(edit);
+                }
 				exit();
 			}
 			model.buildConstraints();

@@ -157,7 +157,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 							if (!(c.lowerBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()-1));
-								CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+								CreateGui.getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						}
@@ -165,7 +165,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 							if (!(c.upperBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()+1));
-								CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+								CreateGui.getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						} 
@@ -393,7 +393,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {
 			Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
-			CreateGui.getCurrentTab().getUndoManager().addNewEdit(sortConstantsCommand);
+			CreateGui.getUndoManager().addNewEdit(sortConstantsCommand);
 			sortConstantsCommand.redo();
 		});
 

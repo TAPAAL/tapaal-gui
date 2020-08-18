@@ -73,7 +73,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	public void mouseReleased(MouseEvent e) {
 
 	    if (originalOffsetX!=obj.getNameOffsetX() && originalOffsetY != obj.getNameOffsetY()) {
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+            CreateGui.getUndoManager().addNewEdit(
                 new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
             );
         }
