@@ -1536,6 +1536,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
+    private void createNewAndConvertNonColor(){
+	    //TODO
+    }
+
     @Override
     public void changeTimeFeature(boolean isTime) {
         if (isTime != lens.isTimed()) {
@@ -1574,6 +1578,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(FeatureOption.GAME, isGame);
+                guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+            }
+            updateFeatureText();
+        }
+    }
+
+    @Override
+    public void changeColorFeature(boolean isColor) {
+        if (isColor != lens.isColored()) {
+            if (!isColor){
+                if (network().hasUncontrollableTransitions()){
+                    String removeTimeWarning = "The net contains color information, which will be removed. Do you still wish to make to remove the color semantics?";
+                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove color information",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                    if (choice == 0) {
+                        createNewAndConvertNonColor();
+                    }
+                } else {
+                    createNewAndConvertNonColor();
+                }
+            } else {
+                TabContent tab = duplicateTab(FeatureOption.COLOR, isColor);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -2504,7 +2530,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     public void updateFeatureText() {
-        boolean[] features = {lens.isTimed(), lens.isGame()};
+        boolean[] features = {lens.isTimed(), lens.isGame(), lens.isColored()};
         app.ifPresent(o->o.setFeatureInfoText(features));
     }
 

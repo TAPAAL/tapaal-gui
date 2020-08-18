@@ -96,4 +96,6 @@ public interface TabContentActions {
 
     void changeGameFeature(boolean isGame);
 
+    void changeColorFeature(boolean isColor);
+
 }

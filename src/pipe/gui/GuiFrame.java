@@ -59,6 +59,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
     private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private JComboBox<String> colorFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -424,6 +425,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
+    private GuiAction changeColorFeatureAction = new GuiAction("Color", "Change color semantics") {
+        public void actionPerformed(ActionEvent e) {
+            boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeColorFeature(isColor));
+        }
+    };
+
     public enum GUIMode {
         draw, animation, noNet
     }
@@ -476,8 +484,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         featurePanel.add(timeFeatureOptions);
         featurePanel.add(new JLabel("   Game: "));
         featurePanel.add(gameFeatureOptions);
+        featurePanel.add(new JLabel("   Color: "));
+        featurePanel.add(colorFeatureOptions);
         timeFeatureOptions.addActionListener(changeTimeFeatureAction);
         gameFeatureOptions.addActionListener(changeGameFeatureAction);
+        colorFeatureOptions.addActionListener(changeColorFeatureAction);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1, 2));
@@ -921,6 +932,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
+                colorFeatureOptions.setEnabled(true);
 
                 if (getCurrentTab().restoreWorkflowDialog()) {
                     WorkflowDialog.showDialog();
@@ -960,6 +972,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
+                colorFeatureOptions.setEnabled(false);
+
 
                 // Remove constant highlight
                 getCurrentTab().removeConstantHighlights();
@@ -993,6 +1007,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
+                colorFeatureOptions.setEnabled(false);
+
 
                 enableAllActions(false);
 
@@ -1527,6 +1543,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         if (features != null) {
             timeFeatureOptions.setSelectedIndex(features[0] ? 1 : 0);
             gameFeatureOptions.setSelectedIndex(features[1] ? 1 : 0);
+            colorFeatureOptions.setSelectedIndex(features[2] ? 1 : 0);
         }
     }
 
