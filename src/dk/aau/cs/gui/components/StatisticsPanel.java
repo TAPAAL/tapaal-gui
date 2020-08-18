@@ -1,8 +1,6 @@
 package dk.aau.cs.gui.components;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -13,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import dk.aau.cs.model.tapn.TimedPlace;
-import pipe.gui.*;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.undo.DeleteTimedPlaceCommand;
@@ -63,7 +60,7 @@ public class StatisticsPanel extends JPanel{
 		dialog.setVisible(true);
 	}
 
-	private JPanel init() {
+	private void init() {
         addRow(headLines, 0, true);
 		
 		//Add the content - make space for separators (except the orphan transitions)
@@ -89,9 +86,7 @@ public class StatisticsPanel extends JPanel{
 		addOrphanButtons(gbc);
 
         this.setVisible(true);
-
-		return null;
-	}
+    }
 	
 	private void addRow(Object[] row, int rowNumber, boolean isHeadLine){
 		GridBagConstraints gbc;
