@@ -8,17 +8,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
-import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
@@ -570,8 +565,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         menuBar.add(buildMenuTools());
         menuBar.add(buildMenuHelp());
 
+        if (TAPAAL.debugEnabled()){
+            menuBar.add(buildMenuDebug());
+        }
+
         setJMenuBar(menuBar);
 
+    }
+
+    private JMenu buildMenuDebug() {
+        JMenu debugMenu = new JMenu("DEBUG");
+
+        return debugMenu;
     }
 
     private JMenu buildMenuEdit() {

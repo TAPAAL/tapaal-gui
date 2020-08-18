@@ -1,6 +1,5 @@
 package pipe.gui.handler;
 
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
@@ -8,8 +7,6 @@ import javax.swing.*;
 
 import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
-import pipe.gui.Pipe.ElementType;
 
 import pipe.gui.graphicElements.PetriNetObject;
 
@@ -38,7 +35,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 		menuItem.setText("Delete");
 		popup.add(menuItem);
 
-        if ("DEV".equals(TAPAAL.VERSION)){
+        if (TAPAAL.debugEnabled()){
             JTextArea pane = new JTextArea();
             pane.setEditable(false);
 

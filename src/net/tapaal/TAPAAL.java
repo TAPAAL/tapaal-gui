@@ -47,6 +47,11 @@ public class TAPAAL {
 		return "" + TAPAAL.TOOLNAME + " " + TAPAAL.VERSION;
 	}
 
+	//XXX: This values should never be change while running the program
+	private static boolean debug = false;
+	public static boolean debugEnabled() {
+	    return debug;
+    }
 	
 	public static void main(String[] args) throws Exception {
 		// Create a CommandLineParser using Posix Style
@@ -69,11 +74,13 @@ public class TAPAAL {
 		// Enable debug
 		if (commandline.hasOption("debug")) {
 			Logger.enableLogging(true);
+			debug = true;
 		}
 
 		if (TAPAAL.VERSION.equals("DEV")){
 			Logger.enableLogging(true);
 			Logger.log("Debug logging is enabled by default in DEV branch");
+            debug = true;
 		}
 
 		if (commandline.hasOption("batch")) {
