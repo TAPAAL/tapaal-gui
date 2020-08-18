@@ -63,29 +63,29 @@ public class Export {
 	public static final int PRINTER = 3;
 	public static final int TIKZ = 5;
 	public static final int PNML = 6;
-	public static final int QUERY = 7;	
+	public static final int QUERY = 7;
 
-	private static void toPnml(DrawingSurfaceImpl g, String filename)
-			throws NullPointerException, DOMException, TransformerConfigurationException, 
-			IOException, ParserConfigurationException, TransformerException {
-		TabContent currentTab = CreateGui.getCurrentTab();
-		NetworkMarking currentMarking = null;
-		if(CreateGui.getCurrentTab().isInAnimationMode()){
-			currentMarking = currentTab.network().marking();
-			currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
-		}
+    private static void toPnml(DrawingSurfaceImpl g, String filename) throws NullPointerException, DOMException, IOException, ParserConfigurationException, TransformerException {
 
-		NetWriter tapnWriter = new PNMLWriter(
-				currentTab.network(),
-				currentTab.getGuiModels()
-				);
+        TabContent currentTab = CreateGui.getCurrentTab();
+        NetworkMarking currentMarking = null;
 
-		tapnWriter.savePNML(new File(filename));
+        if (currentTab.isInAnimationMode()) {
+            currentMarking = currentTab.network().marking();
+            currentTab.network().setMarking(currentTab.getAnimator().getInitialMarking());
+        }
 
-		if(CreateGui.getCurrentTab().isInAnimationMode()){
-			currentTab.network().setMarking(currentMarking);
-		}
-	}
+        NetWriter tapnWriter = new PNMLWriter(
+            currentTab.network(),
+            currentTab.getGuiModels()
+        );
+
+        tapnWriter.savePNML(new File(filename));
+
+        if (currentTab.isInAnimationMode()) {
+            currentTab.network().setMarking(currentMarking);
+        }
+    }
 	
 	private static void toQueryXML(String filename){
 		toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries());
