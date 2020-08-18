@@ -4,7 +4,6 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
-import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ProductType;
@@ -287,8 +286,8 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initTransportArcExpressionPanel(){
         transportExprTabbedPane = new JTabbedPane();
-        inputPanel = new ColorTransportArcExpressionPanel(context, transportInputExpr);
-        outputPanel = new ColorTransportArcExpressionPanel(context, transportOutputExpr);
+        inputPanel = new ColorTransportArcExpressionDialogPanel(context, transportInputExpr);
+        outputPanel = new ColorTransportArcExpressionDialogPanel(context, transportOutputExpr);
 
         transportExprTabbedPane.add(inputPanel, "input");
         transportExprTabbedPane.add(outputPanel, "output");
@@ -1071,7 +1070,8 @@ public class ColoredArcGuardPanel extends JPanel {
     JButton scalarButton;
     JButton numberExpressionButton;
     SpinnerNumberModel numberModel;
+    ColorTransportArcExpressionDialogPanel inputPanel;
+    ColorTransportArcExpressionDialogPanel outputPanel;
     JSpinner colorExpressionWeightSpinner;
-    ColorTransportArcExpressionPanel inputPanel;
-    ColorTransportArcExpressionPanel outputPanel;
+
 }

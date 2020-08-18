@@ -213,7 +213,7 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
     }
 
     private void updateColorType() {
-        /*colorCombobox.removeAllItems();
+        colorCombobox.removeAllItems();
         variableCombobox.removeAllItems();
 
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
@@ -235,7 +235,7 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
                     colorCombobox.addItem(element);
                 }
             }
-        }*/
+        }
 
     }
 
@@ -289,18 +289,16 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         gbc.insets = new Insets(15, 5,5 ,0 );
         exitPanel.add(cancelButton, gbc);
 
-        if (!transport) {
-            gbc.gridx = 1;
-            gbc.gridy = 0;
-            gbc.anchor = GridBagConstraints.EAST;
-            exitPanel.add(OKButton, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        exitPanel.add(OKButton, gbc);
 
-            gbc = new GridBagConstraints();
-            gbc.gridx = 2;
-            gbc.gridy = 2;
-            gbc.fill = GridBagConstraints.VERTICAL;
-            exprPanel.add(exitPanel, gbc);
-        }
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        exprPanel.add(exitPanel, gbc);
     }
 
     public void initButtonsPanel() {
@@ -328,47 +326,38 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         expressionButtonsGroup.add(succButton);
         expressionButtonsGroup.add(addPlaceHolderButton);
 
-        addPlaceHolderButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (!(currentSelection.getObject() instanceof TupleExpression) || !(expr instanceof TupleExpression)) {
-                    ColorExpression currentObject = (ColorExpression) currentSelection.getObject();
-                    Vector<ColorExpression> colorExprVec = new Vector();
-                    colorExprVec.add(currentObject);
-                    TupleExpression tupleExpr = new TupleExpression(colorExprVec);
-                    tupleExpr.addColorExpression(new PlaceHolderColorExpression());
-                    expr = expr.replace(expr, tupleExpr);
-                    updateSelection(tupleExpr);
-                } else {
-                    TupleExpression tupleExpr = (TupleExpression) expr;
-                    tupleExpr.addColorExpression(new PlaceHolderColorExpression());
-                    expr = (ColorExpression)expr.replace(expr, tupleExpr);
-                    updateSelection(tupleExpr);
-                }
+        addPlaceHolderButton.addActionListener(actionEvent -> {
+            if (!(currentSelection.getObject() instanceof TupleExpression) || !(expr instanceof TupleExpression)) {
+                ColorExpression currentObject = (ColorExpression) currentSelection.getObject();
+                Vector<ColorExpression> colorExprVec = new Vector();
+                colorExprVec.add(currentObject);
+                TupleExpression tupleExpr = new TupleExpression(colorExprVec);
+                tupleExpr.addColorExpression(new PlaceHolderColorExpression());
+                expr = expr.replace(expr, tupleExpr);
+                updateSelection(tupleExpr);
+            } else {
+                TupleExpression tupleExpr = (TupleExpression) expr;
+                tupleExpr.addColorExpression(new PlaceHolderColorExpression());
+                expr = expr.replace(expr, tupleExpr);
+                updateSelection(tupleExpr);
             }
         });
 
-        predButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                PredecessorExpression predExpr = null;
-                if (currentSelection.getObject() instanceof ColorExpression) {
-                    predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), predExpr);
-                    updateSelection(predExpr);
-                }
+        predButton.addActionListener((ActionListener) actionEvent -> {
+            PredecessorExpression predExpr;
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
+                expr = expr.replace(currentSelection.getObject(), predExpr);
+                updateSelection(predExpr);
             }
         });
 
-        succButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                SuccessorExpression succExpr = null;
-                if (currentSelection.getObject() instanceof  ColorExpression) {
-                    succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), succExpr);
-                    updateSelection(succExpr);
-                }
+        succButton.addActionListener((ActionListener) actionEvent -> {
+            SuccessorExpression succExpr;
+            if (currentSelection.getObject() instanceof  ColorExpression) {
+                succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
+                expr = expr.replace(currentSelection.getObject(), succExpr);
+                updateSelection(succExpr);
             }
         });
 
@@ -419,20 +408,12 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         editButtonsGroup.add(editExprButton);
 
 
-        deleteExprSelectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                deleteSelection();
-            }
-        });
+        deleteExprSelectionButton.addActionListener(actionEvent -> deleteSelection());
 
-        resetExprButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                PlaceHolderColorExpression phColorExpr = new PlaceHolderColorExpression();
-                expr = expr.replace(expr, phColorExpr);
-                updateSelection(phColorExpr);
-            }
+        resetExprButton.addActionListener(actionEvent -> {
+            PlaceHolderColorExpression phColorExpr = new PlaceHolderColorExpression();
+            expr = expr.replace(expr, phColorExpr);
+            updateSelection(phColorExpr);
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -478,9 +459,9 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
 
-        /*for (ColorType element : context.network().colorTypes()) {
+        for (ColorType element : context.network().colorTypes()) {
             colorTypeCombobox.addItem(element);
-        }*/
+        }
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
         }
@@ -514,57 +495,46 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         addColorButton.setMinimumSize(addDim);
         addColorButton.setMaximumSize(addDim);
 
-        addVariableButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                VariableExpression varExpr = null;
-                Variable var = variableCombobox.getItemAt(variableCombobox.getSelectedIndex());
-                if (currentSelection.getObject() instanceof TupleExpression) {
-                    TupleExpression expr = (TupleExpression)currentSelection.getObject();
-                    if (expr.containsPlaceHolder()) {
-                        //expr.findFirstPlaceHolder().
-                    }
+        addVariableButton.addActionListener(actionEvent -> {
+            VariableExpression varExpr;
+            Variable var = variableCombobox.getItemAt(variableCombobox.getSelectedIndex());
+            if (currentSelection.getObject() instanceof TupleExpression) {
+                TupleExpression expr = (TupleExpression)currentSelection.getObject();
+                if (expr.containsPlaceHolder()) {
+                    //expr.findFirstPlaceHolder().
                 }
-                else if (currentSelection.getObject() instanceof PlaceHolderColorExpression) {
-                    varExpr = new VariableExpression(var);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), varExpr);
-                    updateSelection(varExpr);
-                }
+            }
+            else if (currentSelection.getObject() instanceof PlaceHolderColorExpression) {
+                varExpr = new VariableExpression(var);
+                expr = expr.replace(currentSelection.getObject(), varExpr);
+                updateSelection(varExpr);
+            }
 
-                else if (currentSelection.getObject() instanceof VariableExpression) {
-                    varExpr = new VariableExpression(var);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), varExpr);
-                    updateSelection(varExpr);
-                }
-                else if (currentSelection.getObject() instanceof ColorExpression) {
-                    varExpr = new VariableExpression(var);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), varExpr);
-                    updateSelection(varExpr);
-                }
+            else if (currentSelection.getObject() instanceof VariableExpression) {
+                varExpr = new VariableExpression(var);
+                expr = expr.replace(currentSelection.getObject(), varExpr);
+                updateSelection(varExpr);
+            }
+            else if (currentSelection.getObject() instanceof ColorExpression) {
+                varExpr = new VariableExpression(var);
+                expr = expr.replace(currentSelection.getObject(), varExpr);
+                updateSelection(varExpr);
+            }
 
+        });
+
+        addColorButton.addActionListener(actionEvent -> {
+            dk.aau.cs.model.CPN.Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
+            UserOperatorExpression colorExpr;
+
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                colorExpr = new UserOperatorExpression(color);
+                expr = expr.replace(currentSelection.getObject(), colorExpr);
+                updateSelection(colorExpr);
             }
         });
 
-        addColorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                dk.aau.cs.model.CPN.Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
-                UserOperatorExpression colorExpr = null;
-
-                if (currentSelection.getObject() instanceof ColorExpression) {
-                    colorExpr = new UserOperatorExpression(color);
-                    expr = (ColorExpression) expr.replace(currentSelection.getObject(), colorExpr);
-                    updateSelection(colorExpr);
-                }
-            }
-        });
-
-        colorTypeCombobox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                updateColorType();
-            }
-        });
+        colorTypeCombobox.addActionListener(actionEvent -> updateColorType());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

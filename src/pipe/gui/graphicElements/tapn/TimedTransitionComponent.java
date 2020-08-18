@@ -188,7 +188,7 @@ public class TimedTransitionComponent extends Transition {
 		else {
 			getNameLabel().setText("");
 		}
-		super.update(displayConstantNames);
+		//super.update(displayConstantNames);
 		repaint();
 	}
 

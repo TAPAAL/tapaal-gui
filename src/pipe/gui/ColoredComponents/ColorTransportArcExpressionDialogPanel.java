@@ -18,7 +18,7 @@ import java.util.Vector;
 
 import dk.aau.cs.model.CPN.Color;
 
-class ColorTransportArcExpressionPanel extends JPanel {
+class ColorTransportArcExpressionDialogPanel extends JPanel {
 
     public boolean clickedOK;
 
@@ -56,7 +56,7 @@ class ColorTransportArcExpressionPanel extends JPanel {
     JButton OKButton;
     ButtonGroup exitButtons;
 
-    public ColorTransportArcExpressionPanel(Context context, ColorExpression expr) {
+    public ColorTransportArcExpressionDialogPanel(Context context, ColorExpression expr) {
         this.context = context;
         this.expr = expr;
         initComponents();

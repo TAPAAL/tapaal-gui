@@ -3,8 +3,11 @@ package pipe.gui.ColoredComponents;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
-import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.EscapableDialog;
@@ -18,6 +21,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ColoredTransitionGuardPanel  extends JPanel {
@@ -61,19 +65,21 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private Context context;
     private TimedTransitionComponent transition;
-    private JRootPane rootPane;
     private List<Variable> variables;
 
     private GuardExpression newProperty;
 
     private ExprStringPosition currentSelection = null;
-    public ColoredTransitionGuardPanel(){
+    public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context){
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createTitledBorder("Guard Expression"));
+        this.transition = transition;
+        this.context = context;
         initExprField();
         initLogicPanel();
         initComparisonPanel();
         initExprEditPanel();
+        initExpr();
     }
 
     private void initLogicPanel() {
@@ -120,7 +126,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         add(logicPanel, gbc);
 
-        /*andButton.addActionListener(new ActionListener() {
+        andButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 AndExpression andExpr = null;
@@ -214,7 +220,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     updateSelection(notExpr);
                 }
             }
-        });*/
+        });
     }
 
     private void initComparisonPanel() {
@@ -318,7 +324,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         add(comparisonPanel, gbc);
 
 
-        /*addColorExpressionButton.addActionListener(new ActionListener() {
+        addColorExpressionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Logger.log(currentSelection.getObject());
@@ -328,7 +334,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
                     Container contentPane = guiDialog.getContentPane();
 
-                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
+                    ColorTransitionExpressionDialogPanel cep = new ColorTransitionExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
                     contentPane.add(cep);
 
                     guiDialog.setResizable(true);
@@ -604,7 +610,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     updateSelection(lessThanEqExpr);
                 }
             }
-        });*/
+        });
 
     }
 
@@ -629,7 +635,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         editButtonsGroup.add(redoButton);
         editButtonsGroup.add(editExprButton);
 
-        /*deleteExprSelectionButton.addActionListener(new ActionListener() {
+        deleteExprSelectionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 deleteSelection();
@@ -654,7 +660,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 newProperty = newProperty.replace(newProperty, phGuard);
                 updateSelection(phGuard);
             }
-        });*/
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
@@ -716,7 +722,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprScrollPane.setPreferredSize(d);
         exprScrollPane.setMinimumSize(d);
 
-        /*exprField.addMouseListener(new MouseAdapter() {
+        exprField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (!exprField.isEditable()) {
@@ -749,7 +755,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     //TODO: see line 1232 in CTLQueryDialog for impl example.
                 }
             }
-        });*/
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -757,5 +763,241 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 3;
         add(exprScrollPane, gbc);
+    }
+
+    private void initExpr() {
+        TimedTransition t = transition.underlyingTransition();
+        if (t.getGuard() != null) {
+            newProperty = new PlaceHolderGuardExpression();
+            updateSelection(newProperty);
+            parseExpression(t.getGuard());
+        }
+        else {
+            newProperty = new PlaceHolderGuardExpression();
+            exprField.setText(newProperty.toString());
+        }
+    }
+
+    private void addPropertyToExpr(Expression property) {
+
+        //TODO: add undo functionality - line 1447 in CTLQueryDialog
+        newProperty =  newProperty.replace(currentSelection.getObject(), property);
+
+    }
+
+    private void updateEnabledButtons() {
+        if (currentSelection.getObject() instanceof ColorExpression) {
+            andButton.setEnabled(false);
+            orButton.setEnabled(false);
+            notButton.setEnabled(false);
+            equalityButton.setEnabled(false);
+            inequalityButton.setEnabled(false);
+            greaterThanButton.setEnabled(false);
+            greaterThanEqButton.setEnabled(false);
+            lessThanEqButton.setEnabled(false);
+            lessThanButton.setEnabled(false);
+            addColorExpressionButton.setEnabled(true);
+        }
+        else if (currentSelection.getObject() instanceof GuardExpression) {
+            andButton.setEnabled(true);
+            orButton.setEnabled(true);
+            notButton.setEnabled(true);
+            equalityButton.setEnabled(true);
+            inequalityButton.setEnabled(true);
+            greaterThanButton.setEnabled(true);
+            greaterThanEqButton.setEnabled(true);
+            lessThanEqButton.setEnabled(true);
+            lessThanButton.setEnabled(true);
+            addColorExpressionButton.setEnabled(false);
+        }
+    }
+
+    private void updateSelection(Expression newSelection) {
+        exprField.setText(newProperty.toString());
+
+        ExprStringPosition position;
+        if (newProperty.containsPlaceHolder()) {
+            Expression ge = newProperty.findFirstPlaceHolder();
+            position = newProperty.indexOf(ge);
+        }
+        else {
+            position = newProperty.indexOf(newSelection);
+        }
+
+        exprField.select(position.getStart(), position.getEnd());
+        currentSelection = position;
+        if (currentSelection != null) {
+            updateEnabledButtons();
+        }
+        else {
+            //TODO: DISABLE all expr buttons
+        }
+    }
+
+    private void updateSelection() {
+        int index = exprField.getCaretPosition();
+        ExprStringPosition position = newProperty.objectAt(index);
+
+        if (position == null) {
+            return;
+        }
+
+        exprField.select(position.getStart(), position.getEnd());
+        currentSelection = position;
+        Logger.log(currentSelection.getObject());
+        if (currentSelection != null) {
+            updateEnabledButtons();
+        } {
+            //TODO: disable all expr buttons
+        }
+
+        //TODO: updateexprButtonsAccordingToSelection; line 573
+    }
+
+    private void deleteSelection() {
+        if (currentSelection != null) {
+            Expression replacement = null;
+            if (currentSelection.getObject() instanceof GuardExpression) {
+                replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
+            }
+            else if (currentSelection.getObject() instanceof ColorExpression) {
+                replacement = new PlaceHolderColorExpression();
+            }
+            if (replacement != null) {
+                newProperty = newProperty.replace(currentSelection.getObject(), replacement);
+                updateSelection(replacement);
+            }
+        }
+    }
+
+    private GuardExpression getSpecificChildOfProperty(int number, Expression property) {
+        ExprStringPosition[] children = property.getChildren();
+        int count = 0;
+        for (int i = 0; i < children.length; i++) {
+            Expression child = children[i].getObject();
+            if (child instanceof GuardExpression) {
+                count++;
+            }
+            if (count == number) {
+                return (GuardExpression) child;
+            }
+        }
+
+        return new PlaceHolderGuardExpression();
+    }
+    //TODO: implement properly
+    private void returnFromManualEdit(GuardExpression newExpr) {
+        setExprFieldEditable(false);
+        //  if (newExpr)
+    }
+
+    private void changeToEditMode() {
+        setExprFieldEditable(true);
+        resetExprButton.setText("Parse Query");
+        editExprButton.setText("Cancel");
+        clearSelection();
+        //TODO:disable buttons not needed in edit mode
+        exprField.setCaretPosition(exprField.getText().length());
+    }
+
+    private void clearSelection() {
+        exprField.select(0, 0);
+        currentSelection = null;
+
+    }
+
+    private void setExprFieldEditable(boolean isEditable) {
+        exprField.setEditable(isEditable);
+        exprField.setFocusable(false);
+        exprField.setFocusable(true);
+        exprField.requestFocus(true);
+    }
+
+    public void onOK() {
+        if (newProperty instanceof PlaceHolderGuardExpression) {
+            transition.underlyingTransition().setGuard(null);
+        } else {
+            transition.underlyingTransition().setGuard(newProperty);
+        }
+        /*if (urgentCheckBox.isSelected()) {
+            List<TimedInputArc> oldInputArcs = transition.underlyingTransition().getInputArcs();
+            List<TimedInputArc> newInputArcs = new ArrayList<TimedInputArc>();
+            List<TransportArc> oldTransportArcs = transition.underlyingTransition().getTransportArcsGoingThrough();
+            List<TransportArc> newTransportArcs = new ArrayList<TransportArc>();
+
+            for (TransportArc transportArc : oldTransportArcs) {
+                ColoredTransportArc coloredTransportArc = (ColoredTransportArc) transportArc;
+                coloredTransportArc.setCtiList(new ArrayList<ColoredTimeInterval>(){{add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));}});
+                newTransportArcs.add(coloredTransportArc);
+            }
+
+            for (TimedInputArc oldInputArc : oldInputArcs) {
+                ColoredInputArc coloredInputArc = (ColoredInputArc) oldInputArc;
+                List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>() {{add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));}};
+                coloredInputArc.setColorTimeIntervals(ctiList);
+                newInputArcs.add(coloredInputArc);
+            }
+
+            for (int i = 0; i < newTransportArcs.size(); i++) {
+                transition.underlyingTransition().removeTransportArcGoingThrough(oldTransportArcs.get(i));
+                transition.underlyingTransition().addTransportArcGoingThrough(newTransportArcs.get(i));
+            }
+
+            for (int i = 0; i <  newInputArcs.size(); i++) {
+                transition.underlyingTransition().removeFromPreset(oldInputArcs.get(i));
+                transition.underlyingTransition().addToPreset(newInputArcs.get(i));
+            }
+        }*/
+        //context.tabContent().network().paintNet();
+    }
+
+    private void parseExpression(GuardExpression expression) {
+        if (expression instanceof AndExpression) {
+            AndExpression andExpr = new AndExpression(((AndExpression) expression).getLeftExpression(), ((AndExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
+            updateSelection(andExpr);
+        }
+        else if (expression instanceof OrExpression) {
+            OrExpression orExpr = new OrExpression(((OrExpression) expression).getLeftExpression(), ((OrExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
+            updateSelection(orExpr);
+        }
+
+        else if (expression instanceof NotExpression) {
+            NotExpression notExpr = new NotExpression(((NotExpression) expression).getExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
+            updateSelection(notExpr);
+        }
+        else if (expression instanceof EqualityExpression) {
+            EqualityExpression eqExpr = new EqualityExpression(((EqualityExpression) expression).getLeftExpression(), ((EqualityExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+            updateSelection(eqExpr);
+        }
+        else if (expression instanceof InequalityExpression) {
+            InequalityExpression iqExpr = new InequalityExpression(((InequalityExpression) expression).getLeftExpression(), ((InequalityExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+            updateSelection(iqExpr);
+        }
+        else if (expression instanceof GreaterThanEqExpression) {
+            GreaterThanEqExpression gEQExpr = new GreaterThanEqExpression(((GreaterThanEqExpression) expression).getLeftExpression(), ((GreaterThanEqExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), gEQExpr);
+            updateSelection(gEQExpr);
+        }
+        else if (expression instanceof GreaterThanExpression) {
+            GreaterThanExpression greaterExpr = new GreaterThanExpression(((GreaterThanExpression) expression).getLeftExpression(), ((GreaterThanExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+            updateSelection(greaterExpr);
+        }
+        else if (expression instanceof LessThanEqExpression) {
+            LessThanEqExpression lesseQExpr = new LessThanEqExpression(((LessThanEqExpression) expression).getLeftExpression(), ((LessThanEqExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), lesseQExpr);
+            updateSelection(lesseQExpr);;
+        }
+        else if (expression instanceof LessThanExpression) {
+            LessThanExpression lessExpr = new LessThanExpression(((LessThanExpression) expression).getLeftExpression(), ((LessThanExpression) expression).getRightExpression());
+            newProperty = newProperty.replace(currentSelection.getObject(), lessExpr);
+            updateSelection(lessExpr);
+        }
+
     }
 }
