@@ -83,10 +83,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	// hacks - I use the weight to display the TimeInterval
 	@Override
 	public void updateLabel(boolean showConstantNames) {
-		//If there is no model we can't set the labels
-		if(CreateGui.getModel() == null) {
-			return;
-		}
         if (inputArc == null)
             getNameLabel().setText("");
         else {
