@@ -274,7 +274,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             toa.setExpression(numbExpr);
 
 
-            TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
+            TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa, lens);
 
             if (path != null) {
                 toac.setArcPath(new ArcPath(toac, path));

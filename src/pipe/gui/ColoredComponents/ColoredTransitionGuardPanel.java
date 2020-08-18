@@ -77,6 +77,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         initComparisonPanel();
         initExprEditPanel();
         initExpr();
+
+        //TODO: implement these
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        editExprButton.setEnabled(false);
     }
 
     private void initLogicPanel() {

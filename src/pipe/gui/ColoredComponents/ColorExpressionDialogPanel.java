@@ -106,7 +106,7 @@ public class ColorExpressionDialogPanel extends JPanel {
         initButtonsPanel();
         initExprEditPanel();
         initExitButtons();
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;

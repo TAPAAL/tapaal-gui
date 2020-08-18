@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import javax.swing.BoxLayout;
 
 import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.CreateGui;
 
@@ -52,14 +53,15 @@ public class TimedOutputArcComponent extends Arc {
 				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
 				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())))
         );
-
 	}
 
 
-    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc){
+    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc, TabContent.TAPNLens lens){
         super(source);
         setTarget(target);
         setUnderlyingArc(modelArc);
+        this.isTimed = lens.isTimed();
+        this.isColored = lens.isColored();
         updateLabel(true);
         sealArc();
     }
@@ -86,9 +88,24 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public void updateLabel(boolean displayConstantNames) {
-		getNameLabel().setText("");
-		getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
-		setLabelPosition();
+	    if(isColored()){
+            if (underlyingArc() != null) {
+                if (underlyingArc().getExpression() != null) {
+                    getNameLabel().setText(getWeight().toString(displayConstantNames) +
+                        "\n" + underlyingArc().getExpression().toString());
+                    setLabelPosition();
+                }
+
+            } else {
+                getNameLabel().setText("");
+                getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
+                setLabelPosition();
+            }
+        } else{
+            getNameLabel().setText("");
+            getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
+            setLabelPosition();
+        }
 	}
 
 	public void showTimeIntervalEditor() {

@@ -108,15 +108,19 @@ public class GuardDialogue extends JPanel /*
 	}
 
 	private void hideIrrelevantInformation(){
-        if(!objectToBeEdited.isTimed() ){
-            guardEditPanel.setVisible(false);
+        if(!objectToBeEdited.isTimed()){
+            if(guardEditPanel != null){
+                guardEditPanel.setVisible(false);
+            }
         }
         if(!objectToBeEdited.isColored()){
             coloredArcGuardPanel.setVisible(false);
         } else if (!objectToBeEdited.isTimed()){
             weightEditPanel.setVisible(false);
         } else{
-            guardEditPanel.setVisible(false);
+            if(guardEditPanel != null) {
+                guardEditPanel.setVisible(false);
+            }
             weightEditPanel.setVisible(false);
         }
     }

@@ -56,7 +56,13 @@ public class ColoredArcGuardPanel extends JPanel {
         initPanels();
         initExpr();
         setTimeConstraints();
+        updateSelection();
         hideIrrelevantInformation();
+
+        //TODO: implement these
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        editExprButton.setEnabled(false);
     }
 
     public void hideIrrelevantInformation(){
@@ -88,7 +94,9 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initPanels() {
         initRegularArcExpressionPanel();
-        initColoredTimedGuard();
+        if(isInputArc){
+            initColoredTimedGuard();
+        }
         initWeightPanel();
         if(isTransportArc){
             initTransportArcExpressionPanel();
@@ -880,13 +888,7 @@ public class ColoredArcGuardPanel extends JPanel {
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
-        if (currentSelection != null) {
-            toggleEnabledButtons();
-        } {
-            //TODO: disable all expr buttons
-        }
-
-        //TODO: updateexprButtonsAccordingToSelection; line 573
+        toggleEnabledButtons();
     }
 
     private void updateSelection(Expression newSelection) {
@@ -904,17 +906,29 @@ public class ColoredArcGuardPanel extends JPanel {
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
-        if (currentSelection != null) {
-            toggleEnabledButtons();
-        }
-        else {
-            //TODO::
-        }
+        toggleEnabledButtons();
+
     }
     private void toggleEnabledButtons() {
-        if (currentSelection.getObject() instanceof ColorExpression) {
+        if(currentSelection == null){
+            allExpressionButton.setEnabled(false);
+            numberExpressionButton.setEnabled(false);
+            additionButton.setEnabled(false);
+            subtractionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
-            addColorExpressionButton.setVisible(true);
+            scalarButton.setEnabled(false);
+            addColorExpressionButton.setEnabled(false);
+            addAdditionPlaceHolderButton.setEnabled(false);
+        }
+        if (currentSelection.getObject() instanceof ColorExpression) {
+            allExpressionButton.setEnabled(false);
+            numberExpressionButton.setEnabled(false);
+            additionButton.setEnabled(false);
+            subtractionButton.setEnabled(false);
+            addAdditionPlaceHolderButton.setEnabled(false);
+            scalarButton.setEnabled(false);
+            addAdditionPlaceHolderButton.setEnabled(false);
+            addColorExpressionButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof AddExpression) {
             allExpressionButton.setEnabled(false);
@@ -923,7 +937,7 @@ public class ColoredArcGuardPanel extends JPanel {
             subtractionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
-            addColorExpressionButton.setVisible(false);
+            addColorExpressionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof ArcExpression) {
@@ -933,7 +947,7 @@ public class ColoredArcGuardPanel extends JPanel {
             subtractionButton.setEnabled(true);
             addAdditionPlaceHolderButton.setEnabled(true);
             scalarButton.setEnabled(true);
-            addColorExpressionButton.setVisible(false);
+            addColorExpressionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
         }
 
