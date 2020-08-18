@@ -96,4 +96,5 @@ public interface TabContentActions {
 
     void changeGameFeature(boolean isGame);
 
+    void alignPNObjectsToGrid();
 }

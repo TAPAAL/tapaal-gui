@@ -18,6 +18,7 @@ import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
@@ -2787,6 +2788,25 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 app.ifPresent(o->o.setStatusBarText("To-do (textfor" + type));
                 break;
         }
+    }
+
+    @Override
+    public void alignPNObjectsToGrid() {
+        ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
+        pipe.gui.undo.UndoManager undoManager = getUndoManager();
+        undoManager.newEdit();
+
+        for(PetriNetObject object : petriNetObjects) {
+            PlaceTransitionObject ptobject = (PlaceTransitionObject)object;
+            int x = Grid.getModifiedX(ptobject.getPositionX());
+            int y = Grid.getModifiedY(ptobject.getPositionY());
+            Point point = new Point(x,y);
+            Command command = new MovePlaceTransitionObject(ptobject, point);
+            command.redo();
+            undoManager.addEdit(command);
+            ptobject.updateOnMoveOrZoom();
+        }
+
     }
 
 }
