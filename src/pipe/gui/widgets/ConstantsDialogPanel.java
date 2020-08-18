@@ -248,9 +248,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
-					CreateGui.getCurrentTab().getUndoManager()
-					.addNewEdit(edit);
-					CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+					CreateGui.getDrawingSurface().repaintAll();
 					exit();
 				}
 			} else {
