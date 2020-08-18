@@ -627,7 +627,7 @@ public class ArcPath implements Shape {
 		myArc.updateArcPosition();
         showPoints();
 
-		return new AddArcPathPointEdit(this.getArc(), newPoint, getArc().getGuiModel());
+		return new AddArcPathPointEdit(this.getArc(), newPoint);
 	}
 
 	private int findPoint(final Point2D.Double mouseposition) {

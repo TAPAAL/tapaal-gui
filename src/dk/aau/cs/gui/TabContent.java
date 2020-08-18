@@ -473,8 +473,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                         Command cmd = new DeleteArcPathPointEdit(
                             arcPathPoint.getArcPath().getArc(),
                             arcPathPoint,
-                            arcPathPoint.getIndex(),
-                            getModel()
+                            arcPathPoint.getIndex()
                         );
                         cmd.redo();
                         getUndoManager().addEdit(cmd);

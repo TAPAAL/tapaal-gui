@@ -21,7 +21,7 @@ public class AddArcPathPointEdit extends Command {
 	final Integer index;
 
 	/** Creates a new instance of AddArcPathPointEdit */
-	public AddArcPathPointEdit(Arc _arc, ArcPathPoint _point, DataLayer guiModel) {
+	public AddArcPathPointEdit(Arc _arc, ArcPathPoint _point) {
 		arcPath = _arc.getArcPath();
 		point = _point;
 		index = point.getIndex();

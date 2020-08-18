@@ -165,7 +165,7 @@ public class ArcPathPoint extends PetriNetObject {
 		ArcPathPoint newPoint = new ArcPathPoint(getPositionX() + DELTA, getPositionY(), pointType, myArcPath);
 		myArcPath.insertPoint(i + 1, newPoint);
 		myArcPath.getArc().updateArcPosition();
-		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
+		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint);
 	}
 
 	public Point2D.Double getMidPoint(ArcPathPoint target) {

@@ -390,7 +390,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
 		}
 		for(ArcPathPoint p : toRemove) {
-			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex(), CreateGui.getModel());
+			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex());
 			command.redo();
 			undoManager.addEdit(command);
 		}
