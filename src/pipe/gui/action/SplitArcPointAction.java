@@ -25,7 +25,7 @@ public class SplitArcPointAction extends javax.swing.AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(arcPathPoint.splitPoint());
+		CreateGui.getUndoManager().addNewEdit(arcPathPoint.splitPoint());
 	}
 
 }
