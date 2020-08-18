@@ -35,6 +35,14 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {
 
+    /*
+      DEBUG
+      Set a break point at line actionPerformed, to allow to break execution from the gui. Eg. for inspecting elements
+     */
+    private final GuiAction breakExecutionAction = new GuiAction("Break Execution", "This action can be used to set a break while debugging, the action has no function.", KeyStroke.getKeyStroke('B',InputEvent.CTRL_DOWN_MASK + InputEvent.ALT_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK)) {
+        public void actionPerformed(ActionEvent e) {}
+    };
+
     // for zoom combobox and dropdown
     private final int[] zoomLevels = {40, 60, 80, 100, 120, 140, 160, 180, 200, 300};
 
@@ -575,6 +583,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private JMenu buildMenuDebug() {
         JMenu debugMenu = new JMenu("DEBUG");
+
+        debugMenu.add(breakExecutionAction);
 
         return debugMenu;
     }
