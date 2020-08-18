@@ -160,11 +160,9 @@ public abstract class Note extends PetriNetObject {
 	// 
 	@Override
 	public void addedToGui() {
-		if (CreateGui.getDrawingSurface() != null) {
-			setDeleted(false);
-			updateBounds();
-		}
-	}
+        setDeleted(false);
+        updateBounds();
+    }
 
 	@Override
 	public void removedFromGui() {
