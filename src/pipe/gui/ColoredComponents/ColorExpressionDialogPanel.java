@@ -90,6 +90,8 @@ public class ColorExpressionDialogPanel extends JPanel {
     public void initComponents() {
         initPanels();
         updateColorType();
+        updateSelection();
+        //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         editExprButton.setEnabled(false);
@@ -104,7 +106,7 @@ public class ColorExpressionDialogPanel extends JPanel {
         initButtonsPanel();
         initExprEditPanel();
         initExitButtons();
-
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -160,9 +162,9 @@ public class ColorExpressionDialogPanel extends JPanel {
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
-        if (currentSelection != null) {
-            toggleEnabledButtons();
-        }
+
+        toggleEnabledButtons();
+
         Logger.log(currentSelection.getObject());
     }
 
@@ -189,22 +191,40 @@ public class ColorExpressionDialogPanel extends JPanel {
     }
 
     private void toggleEnabledButtons() {
-        if (currentSelection.getObject() instanceof TupleExpression) {
+        if (currentSelection == null){
+            toggleaddPlaceholderButton(false);
+            toggleColorExprButtons(false);
+            deleteExprSelectionButton.setEnabled(false);
+            resetExprButton.setEnabled(false);
+        }
+        else if (currentSelection.getObject() instanceof TupleExpression) {
             toggleaddPlaceholderButton(true);
             toggleColorExprButtons(false);
+            deleteExprSelectionButton.setEnabled(true);
+            resetExprButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof PlaceHolderColorExpression) {
             if (expr instanceof PlaceHolderColorExpression) {
                 toggleaddPlaceholderButton(true);
                 toggleColorExprButtons(true);
+                deleteExprSelectionButton.setEnabled(true);
+                resetExprButton.setEnabled(true);
             } else {
                 toggleaddPlaceholderButton(false);
                 toggleColorExprButtons(true);
+                deleteExprSelectionButton.setEnabled(true);
+                resetExprButton.setEnabled(true);
             }
         }
         else if (currentSelection.getObject() instanceof ColorExpression) {
             toggleaddPlaceholderButton(false);
             toggleColorExprButtons(true);
+            deleteExprSelectionButton.setEnabled(true);
+            resetExprButton.setEnabled(true);
+        }
+        if(variableCombobox.getItemCount() < 1){
+            variableCombobox.setEnabled(false);
+            addVariableButton.setEnabled(false);
         }
     }
 
