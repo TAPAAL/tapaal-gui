@@ -2397,16 +2397,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void registerEvents() {
             registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.pressed && SwingUtilities.isLeftMouseButton(e.e),
-                e-> placeTranstionObjectPressed(((PlaceTransitionObject) e.pno), e.e.isShiftDown(), e.e)
+                e->e.pno instanceof PetriNetObject && e.a == MouseAction.pressed && SwingUtilities.isLeftMouseButton(e.e),
+                e-> placeTranstionObjectPressed(((PetriNetObject) e.pno), e.e.isShiftDown(), e.e)
             );
             registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.released && SwingUtilities.isLeftMouseButton(e.e),
-                e-> placeTranstionObjectReleased(((PlaceTransitionObject) e.pno), e.e.isShiftDown(), e.e)
+                e->e.pno instanceof PetriNetObject && e.a == MouseAction.released && SwingUtilities.isLeftMouseButton(e.e),
+                e-> placeTranstionObjectReleased(((PetriNetObject) e.pno), e.e.isShiftDown(), e.e)
             );
             registerEvent(
-                e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.dragged && SwingUtilities.isLeftMouseButton(e.e),
-                e-> placeTranstionObjectDragged(((PlaceTransitionObject) e.pno), e.e.isShiftDown(), e.e)
+                e->e.pno instanceof PetriNetObject && e.a == MouseAction.dragged && SwingUtilities.isLeftMouseButton(e.e),
+                e-> placeTranstionObjectDragged(((PetriNetObject) e.pno), e.e.isShiftDown(), e.e)
             );
             registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
@@ -2469,7 +2469,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private int totalX = 0;
         private int totalY = 0;
 
-        private void placeTranstionObjectPressed(PlaceTransitionObject pno, boolean shiftDown, MouseEvent e) {
+        private void placeTranstionObjectPressed(PetriNetObject pno, boolean shiftDown, MouseEvent e) {
             dragInit = e.getPoint();
             if (!pno.isSelected()) {
                 if (!shiftDown) {
@@ -2480,7 +2480,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        private void placeTranstionObjectReleased(PlaceTransitionObject pno, boolean shiftDown, MouseEvent e) {
+        private void placeTranstionObjectReleased(PetriNetObject pno, boolean shiftDown, MouseEvent e) {
             if (isDragging) {
                 isDragging = false;
                 CreateGui.getDrawingSurface().translateSelection(pno.getParent().getSelectionObject().getSelection(), totalX, totalY);
@@ -2500,7 +2500,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
             totalY = 0;
         }
 
-        private void placeTranstionObjectDragged(PlaceTransitionObject myObject, boolean shiftDown, MouseEvent e) {
+        private void placeTranstionObjectDragged(PetriNetObject myObject, boolean shiftDown, MouseEvent e) {
+
+            if (myObject instanceof Arc) {
+                //XXX: Current implementation is buggy when dragging an arc, therefore we disable it
+                return;
+            }
+
             int previousX = myObject.getX();
             int previousY = myObject.getY();
 
