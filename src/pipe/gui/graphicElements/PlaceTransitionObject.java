@@ -250,10 +250,10 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
             public void keyTyped(KeyEvent e) {
                 if (e.getWhen() != when) {
                     TimedTransition transition = component.underlyingTransition();
-                    if (e.getKeyChar() == 'E' || e.getKeyChar() == 'e') {
+                    if (Character.toLowerCase(e.getKeyChar()) == 'e' && lens.isGame()) {
                         transition.setUncontrollable(!transition.isUncontrollable());
                         repaint();
-                    } else if (e.getKeyChar() == 'U' || e.getKeyChar() == 'u') {
+                    } else if (Character.toLowerCase(e.getKeyChar()) == 'u' && lens.isTimed()) {
                         transition.setUrgent(!transition.isUrgent());
                         repaint();
                     }
