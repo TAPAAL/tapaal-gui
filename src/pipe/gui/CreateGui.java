@@ -53,21 +53,6 @@ public class CreateGui {
 	}
 
 	@Deprecated
-	public static DataLayer getModel() {
-        return getModel(appGui.getSelectedTabIndex());
-	}
-
-	@Deprecated
-	public static DataLayer getModel(int index) {
-		if (index < 0) {
-			return null;
-		}
-
-		TabContent tab = (tabs.get(index));
-		return tab.getModel();
-	}
-
-	@Deprecated
 	public static DrawingSurfaceImpl getDrawingSurface() {
 		return getDrawingSurface(appGui.getSelectedTabIndex());
 	}
