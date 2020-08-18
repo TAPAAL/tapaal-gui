@@ -5,9 +5,7 @@ import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.TransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.EscapableDialog;
@@ -21,7 +19,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ColoredTransitionGuardPanel  extends JPanel {
@@ -334,7 +331,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
                     Container contentPane = guiDialog.getContentPane();
 
-                    ColorTransitionExpressionDialogPanel cep = new ColorTransitionExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
+                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
                     contentPane.add(cep);
 
                     guiDialog.setResizable(true);

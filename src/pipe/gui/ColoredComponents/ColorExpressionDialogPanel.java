@@ -20,7 +20,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
 
-public class ColorTransitionExpressionDialogPanel extends JPanel {
+public class ColorExpressionDialogPanel extends JPanel {
 
     public boolean clickedOK;
 
@@ -64,7 +64,7 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
 
 
 
-    public ColorTransitionExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport) {
+    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport) {
         this.rootPane = rootPane;
         this.context = context;
         this.expr = expr;
@@ -72,7 +72,15 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         initComponents();
     }
 
-    public ColorTransitionExpressionDialogPanel(JRootPane rootPane, Context context) {
+    public ColorExpressionDialogPanel(Context context, ColorExpression expr, boolean transport) {
+        this.rootPane = rootPane;
+        this.context = context;
+        this.expr = expr;
+        this.transport = transport;
+        initComponents();
+    }
+
+    public ColorExpressionDialogPanel(JRootPane rootPane, Context context) {
         this.rootPane = rootPane;
         this.context = context;
         this.transport = false;
@@ -288,17 +296,19 @@ public class ColorTransitionExpressionDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(15, 5,5 ,0 );
         exitPanel.add(cancelButton, gbc);
+        if(!transport){
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.EAST;
+            exitPanel.add(OKButton, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        exitPanel.add(OKButton, gbc);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 2;
+            gbc.gridy = 2;
+            gbc.fill = GridBagConstraints.VERTICAL;
+            exprPanel.add(exitPanel, gbc);
+        }
 
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        exprPanel.add(exitPanel, gbc);
     }
 
     public void initButtonsPanel() {

@@ -2,8 +2,10 @@ package pipe.gui.graphicElements.tapn;
 
 import java.awt.Polygon;
 import java.util.Hashtable;
+import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -104,69 +106,87 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
-		if (isInPreSet && underlyingTransportArc != null) {
-			if (CreateGui.getApp() != null && CreateGui.getApp().showZeroToInfinityIntervals()){
-				getNameLabel().setText(underlyingTransportArc.interval().toString(
-						displayConstantNames)
-						+ " : " + getGroup());
-			}
-			else {
-				if (underlyingTransportArc.interval().toString(
-						displayConstantNames).equals("[0,inf)")) {
+	    if(isTimed() && !isColored()) {
+            if (isInPreSet && underlyingTransportArc != null) {
+                if (CreateGui.getApp() != null && CreateGui.getApp().showZeroToInfinityIntervals()) {
+                    getNameLabel().setText(underlyingTransportArc.interval().toString(
+                        displayConstantNames)
+                        + " : " + getGroup());
+                } else {
+                    if (underlyingTransportArc.interval().toString(
+                        displayConstantNames).equals("[0,inf)")) {
 
-					getNameLabel().setText(" : " + getGroup());
+                        getNameLabel().setText(" : " + getGroup());
 
-				}
-				else {
-					getNameLabel().setText(underlyingTransportArc.interval().toString(
-							displayConstantNames)
-							+ " : " + getGroup());
-				}				
-			}
-			
-			// Handle constant highlighting
-			boolean focusedConstant = false;
-			boolean isvisible = true;
-			if(underlyingTransportArc.interval().lowerBound() instanceof ConstantBound){
-				if(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()){
-					focusedConstant = true;
-				}
-				if(!((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible()){
-					focusedConstant = false;
-				}
-			}
-			if(underlyingTransportArc.interval().upperBound() instanceof ConstantBound){
-				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()){
-					focusedConstant = true;
-				}
-				if(!((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()){
-					isvisible = false;
-				}
-			}
-			if(getWeight() instanceof ConstantWeight){
-				if(((ConstantWeight) getWeight()).constant().hasFocus()){
-					focusedConstant = true;
-				}
-				if(!((ConstantWeight) getWeight()).constant().hasFocus()){
-					isvisible = false;
-				}
-			}
-			if(focusedConstant){
-				getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-			}else{
-				getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
-			}
-			pnName.setVisible(isvisible);
-			
-		} else if (!isInPreSet) {
-			getNameLabel().setText(" : " + getGroup());
-		} else {
-			getNameLabel().setText("");
-		}
-		
-		if(underlyingTransportArc != null){
-			getNameLabel().setText(getWeight().toString(displayConstantNames)+" "+getNameLabel().getText());
-		}
+                    } else {
+                        getNameLabel().setText(underlyingTransportArc.interval().toString(
+                            displayConstantNames)
+                            + " : " + getGroup());
+                    }
+                }
+
+                // Handle constant highlighting
+                boolean focusedConstant = false;
+                boolean isvisible = true;
+                if (underlyingTransportArc.interval().lowerBound() instanceof ConstantBound) {
+                    if (((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()) {
+                        focusedConstant = true;
+                    }
+                    if (!((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible()) {
+                        focusedConstant = false;
+                    }
+                }
+                if (underlyingTransportArc.interval().upperBound() instanceof ConstantBound) {
+                    if (((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()) {
+                        focusedConstant = true;
+                    }
+                    if (!((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()) {
+                        isvisible = false;
+                    }
+                }
+                if (getWeight() instanceof ConstantWeight) {
+                    if (((ConstantWeight) getWeight()).constant().hasFocus()) {
+                        focusedConstant = true;
+                    }
+                    if (!((ConstantWeight) getWeight()).constant().hasFocus()) {
+                        isvisible = false;
+                    }
+                }
+                if (focusedConstant) {
+                    getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+                } else {
+                    getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+                }
+                pnName.setVisible(isvisible);
+
+            } else if (!isInPreSet) {
+                getNameLabel().setText(" : " + getGroup());
+            } else {
+                getNameLabel().setText("");
+            }
+
+            if (underlyingTransportArc != null) {
+                getNameLabel().setText(getWeight().toString(displayConstantNames) + " " + getNameLabel().getText());
+            }
+        } else{
+            String labelText = "";
+            if (isInPreSet() && underlyingTransportArc() != null) {
+                if (underlyingTransportArc().getInputExpression() != null)
+                    labelText += underlyingTransportArc().getInputExpression().toString() + "\n";
+
+                List<ColoredTimeInterval> ctiList = underlyingTransportArc().getColorTimeIntervals();
+                for (ColoredTimeInterval timeInterval : ctiList) {
+                    if (timeInterval != null)
+                        labelText += timeInterval.toString() + "\n";
+                }
+                getNameLabel().setText(labelText);
+            }
+            else if (!isInPreSet() && underlyingTransportArc() != null) {
+                if (underlyingTransportArc().getOutputExpression() != null)
+                    labelText += underlyingTransportArc().getOutputExpression().toString() + "\n";
+                getNameLabel().setText(labelText);
+            }
+        }
 		
 		this.setLabelPosition();
 	}
