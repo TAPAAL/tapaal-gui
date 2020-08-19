@@ -282,7 +282,7 @@ public class TimedPlaceComponent extends Place {
 		}
 		
 		// Build interface
-		if (show) {
+		if (show && isTimed()) {
 			ageOfTokensWindow = new Window(new Frame());
 			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
