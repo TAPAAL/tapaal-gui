@@ -109,9 +109,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendSharedTransitions(document, pnmlRootNode);
 		appendConstants(document, pnmlRootNode);
 		appendTemplates(document, pnmlRootNode);
-        System.out.println("Goddav");
         writeTACPN.appendDeclarations(document, pnmlRootNode);
-        System.out.println("asuibd");
         appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
 		appendFeature(document, pnmlRootNode);
