@@ -156,6 +156,11 @@ public class TapnXmlLoader {
 		        t.guiModel().getPetriNetObjects().forEach(o -> o.setIsTimed(true));
             }
         }
+		if(isColored){
+            for(Template t : templates){
+                t.guiModel().getPetriNetObjects().forEach(o -> o.setIsColored(true));
+            }
+        }
 
 		return new LoadedModel(network, templates, queries,messages, isTimed, isGame, isColored);
 	}
