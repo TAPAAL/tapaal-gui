@@ -701,7 +701,6 @@ public class TimedArcPetriNetNetwork {
 
         Require.that(colorType != null, "colorType must not be null");
         Require.that(!isNameUsedForColorType(colorType.getName()), "There is already a color type with that name"); //TODO:: When using load, a nullpointer exception is thrown here
-        System.out.println(colorType);
         colorTypes.add(colorType);
     }
 

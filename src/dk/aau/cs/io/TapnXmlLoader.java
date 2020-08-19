@@ -552,7 +552,7 @@ public class TapnXmlLoader {
 		if (!displayName){
 			placeComponent.setAttributesVisible(false);
 		}
-        System.out.println("hej");
+
         return placeComponent;
 	}
 

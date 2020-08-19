@@ -19,7 +19,6 @@ public class ColorComboboxPanel extends JPanel {
 
     public ColorComboboxPanel(ColorType colorType, String panelName) {
         this.colorType = colorType;
-        System.out.println(colorType);
         this.panelName = panelName;
         this.setLayout(new GridBagLayout());
         initPanel();
