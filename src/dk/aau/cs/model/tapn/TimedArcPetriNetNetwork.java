@@ -647,6 +647,14 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+    public ColorType getColorTypeByName(String name) {
+        for (ColorType element : colorTypes) {
+            if (element.getName().equalsIgnoreCase(name)) {
+                return element;
+            }
+        }
+        return null;
+    }
 
     public Integer getVariableIndex(String name) {
         for (int i = 0; i < variables.size(); i++) {

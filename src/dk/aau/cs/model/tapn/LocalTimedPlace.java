@@ -19,14 +19,13 @@ public class LocalTimedPlace  extends TimedPlace {
 
     }
     public LocalTimedPlace(String name, ColorType colorType) {
-		this(name, TimeInvariant.LESS_THAN_INFINITY, ColoredTimeInvariant.LESS_THAN_INFINITY_AND_DOT);
-		this.colorType = colorType;
+		this(name, TimeInvariant.LESS_THAN_INFINITY, colorType);
 	}
 
-	public LocalTimedPlace(String name, TimeInvariant invariant, ColoredTimeInvariant CTinvariant) {
+	public LocalTimedPlace(String name, TimeInvariant invariant, ColorType ct) {
 		setName(name);
 		setInvariant(invariant);
-		setColorTimeInvariant(CTinvariant);
+		colorType = ct;
 	}
 	
 	public TimedArcPetriNet model() {

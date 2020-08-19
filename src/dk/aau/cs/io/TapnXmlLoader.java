@@ -11,7 +11,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.*;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import kotlin.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -61,14 +65,18 @@ public class TapnXmlLoader {
 	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private final HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
 	private final HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
+    private final HashMap<TimedTransportArcComponent, List<ColoredTimeInterval>> coloredTransportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, List<ColoredTimeInterval>>();
+    private ArcExpression transportExpr;
 
-	private final NameGenerator nameGenerator = new NameGenerator();
+    private final NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
+    private LoadTACPN loadTACPN = new LoadTACPN();
 
-	private boolean isTimed;
+
+    private boolean isTimed;
 	private boolean isGame;
 	private boolean isColored;
 	private boolean isUncontrollable = false;
@@ -118,7 +126,17 @@ public class TapnXmlLoader {
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
         //TODO: parse colors
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
+        NodeList declarations = doc.getElementsByTagName("declaration");
 
+        if (declarations.getLength() <= 0)
+            throw new FormatException("File did not contain any declarations components.");
+
+        for (int i = 0; i < declarations.getLength(); i++) {
+            Node node = declarations.item(i);
+            if (node.getNodeName().equals("declaration")) {
+                loadTACPN.parseDeclarations(node, network);
+            }
+        }
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);
 		
@@ -314,7 +332,7 @@ public class TapnXmlLoader {
 			TimedTransitionComponent transition = parseTransition(element, network, template.model());
 			template.guiModel().addPetriNetObject(transition);
 		} else if ("arc".equals(element.getNodeName())) {
-            parseAndAddArc(element, template, constants);
+            parseAndAddArc(element, template, constants, network);
         }
 	}
 
@@ -411,9 +429,18 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+        GuardExpression guardExpr = null;
 
+        Element conditionNode = (Element)transition.getAttributeNode("condition");
+        if (conditionNode != null) {
+            try {
+                guardExpr = loadTACPN.parseGuardExpression(conditionNode.getAttributeNode("structure").getFirstChild());
+            } catch (FormatException e) {
+                e.printStackTrace();
+            }
+        }
 		
-		TimedTransition t = new TimedTransition(nameInput);
+		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
 		if(network.isNameUsedForShared(nameInput)){
@@ -463,20 +490,60 @@ public class TapnXmlLoader {
 				firstPlaceRenameWarning = false;
 			}
 		}
-		
-		idResolver.add(tapn.name(), idInput, nameInput);
+        List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
+        ColorType ct = ColorType.COLORTYPE_DOT;
+        ArcExpression colorMarking = null;
+        NodeList nodes = place.getElementsByTagName("colorinvariant");
+        if (nodes != null) {
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Pair<String, Vector<Color>> pair = parseColorInvariant((Element) nodes.item(i), network);
+                ColoredTimeInvariant cti = ColoredTimeInvariant.parse(pair.getFirst(), constants, pair.getSecond());
+                ctiList.add(cti);
+            }
+        }
+        ctiList.add(ColoredTimeInvariant.parse(place.getAttribute("inscription"), constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
+        Node hlInitialMarkingNode = place.getElementsByTagName("hlinitialMarking").item(0);
+        Node typeNode = place.getElementsByTagName("type").item(0);
+        if (typeNode != null) {
+            try {
+                ct = loadTACPN.parseUserSort(typeNode);
+            } catch (FormatException e) {
+                e.printStackTrace();
+            }
+        }
+        if (hlInitialMarkingNode != null && hlInitialMarkingNode instanceof Element) {
+            try {
+                colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
+            } catch (FormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
 			p = network.getSharedPlaceByName(nameInput);
 			tapn.add(p);
 		}else{
-		    //TODO: implement parsing of colors
-			p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), null);
-			tapn.add(p);
-			for (int i = 0; i < initialMarkingInput; i++) {
-				network.marking().add(new TimedToken(p));
-			}
+		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), ct);
+		    tapn.add(p);
+		    p.setCtiList(ctiList);
+		    ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
+		    if(colorMarking!= null){
+                ColorMultiset cm = colorMarking.eval(context);
+
+                //TODO: nasty with two types of tokens/markings
+                for (ColoredToken ctElement : cm.getTokens(p)) {
+                    network.marking().add(ctElement);
+                    //p.addToken(ctElement);
+                }
+                /*for (int i = 0; i < initialMarkingInput; i++) {
+                    network.marking().add(new TimedToken(p));
+                }*/
+            }
+
+
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
@@ -485,11 +552,11 @@ public class TapnXmlLoader {
 		if (!displayName){
 			placeComponent.setAttributesVisible(false);
 		}
-
-		return placeComponent;
+        System.out.println("hej");
+        return placeComponent;
 	}
 
-	private void parseAndAddArc(Element arc, Template template, ConstantStore constants) throws FormatException {
+	private void parseAndAddArc(Element arc, Template template, ConstantStore constants, TimedArcPetriNetNetwork network) throws FormatException {
 		String idInput = arc.getAttribute("id");
 		String sourceInput = arc.getAttribute("source");
 		String targetInput = arc.getAttribute("target");
@@ -526,6 +593,25 @@ public class TapnXmlLoader {
 		if(arc.hasAttribute("weight")){
 			weight = Weight.parseWeight(arc.getAttribute("weight"), constants);
 		}
+        ArcExpression arcExpr = null;
+        List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
+        Node hlInscription = getFirstDirectChild(arc, "hlinscription");
+        if (hlInscription != null)
+            hlInscription = getFirstDirectChild(hlInscription, "structure");
+        if (hlInscription != null)
+            arcExpr = loadTACPN.parseArcExpression(hlInscription);
+
+        NodeList intervalNodes = arc.getElementsByTagName("colorinterval");
+        if (intervalNodes != null) {
+            for (int i = 0; i < intervalNodes.getLength(); i++) {
+                if (intervalNodes.item(i) instanceof  Element) {
+                    Element interval = (Element) intervalNodes.item(i);
+                    Pair<String, Vector<Color>> pair =  parseColorInvariant(interval, network);
+                    ColoredTimeInterval coloredinterval = ColoredTimeInterval.parse(pair.getFirst(), constants, pair.getSecond());
+                    ctiList.add(coloredinterval);
+                }
+            }
+        }
 
 		Arc tempArc;
 
@@ -539,17 +625,17 @@ public class TapnXmlLoader {
 			if (type.equals("timed")) {
 				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
 						inscriptionTempStorage, sourceIn, targetIn,
-                    _endx, _endy, template, constants, weight);
+                    _endx, _endy, template, constants, weight, ctiList, arcExpr);
 
 			} else if (type.equals("transport")) {
 				tempArc = parseAndAddTransportArc(idInput, taggedArc,
 						inscriptionTempStorage, sourceIn, targetIn,
-                    _endx, _endy, template, constants, weight);
+                    _endx, _endy, template, constants, weight, ctiList, arcExpr);
 
 			} else {
 				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
 						inscriptionTempStorage, sourceIn, targetIn,
-                    _endx, _endy, template, weight);
+                    _endx, _endy, template, weight, arcExpr);
 			}
 
 		}
@@ -562,14 +648,14 @@ public class TapnXmlLoader {
 	private TimedOutputArcComponent parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
                                                               String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                                               PlaceTransitionObject targetIn,
-                                                              int _endx, int _endy, Template template, Weight weight) throws FormatException {
+                                                              int _endx, int _endy, Template template, Weight weight,ArcExpression expr) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.parseInt(inscriptionTempStorage) : 1), idInput);
 
 		TimedPlace place = template.model().getPlaceByName(targetIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(sourceIn.getName());
 
-		TimedOutputArc outputArc = new TimedOutputArc(transition, place, weight);
+		TimedOutputArc outputArc = new TimedOutputArc(transition, place, weight, expr);
 		tempArc.setUnderlyingArc(outputArc);
 
 		if(template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
@@ -585,7 +671,7 @@ public class TapnXmlLoader {
 	private TimedTransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
                                                                String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                                                PlaceTransitionObject targetIn,
-                                                               int _endx, int _endy, Template template, ConstantStore constants, Weight weight) {
+                                                               int _endx, int _endy, Template template, ConstantStore constants, Weight weight, List<ColoredTimeInterval> ctiList, ArcExpression expr) {
 
 		
 		String[] inscriptionSplit = {};
@@ -605,13 +691,17 @@ public class TapnXmlLoader {
 				TimedPlace sourcePlace = template.model().getPlaceByName(sourceIn.getName());
 				TimedTransition trans = template.model().getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
-				TimeInterval interval = TimeInterval.parse(inscriptionSplit[0],	constants);
+
+				//TODO: again nasty with two types of intervals
+				TimeInterval timeInterval = TimeInterval.parse(inscriptionSplit[0],	constants);
+                ctiList.add(ColoredTimeInterval.parse(inscriptionTempStorage, constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
 
 				assert (sourcePlace != null);
 				assert (trans != null);
 				assert (destPlace != null);
 
-				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight);
+				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, timeInterval, weight);
+				transArc.setColorTimeIntervals(ctiList);
 
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
@@ -621,9 +711,12 @@ public class TapnXmlLoader {
 
 				postsetArcs.remove(targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
+                transportExpr = expr;
+                presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
 				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
-			}
+                coloredTransportArcsTimeIntervals.put(tempArc, ctiList);
+
+            }
 		} else {
 			if (presetArcs.containsKey(sourceIn)) {
 				TimedTransportArcComponent presetTransportArc = presetArcs.get(sourceIn);
@@ -631,12 +724,18 @@ public class TapnXmlLoader {
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
 				TimeInterval interval = transportArcsTimeIntervals.get(presetTransportArc);
+                List<ColoredTimeInterval> timeIntervals = null;
+                timeIntervals = coloredTransportArcsTimeIntervals.get(presetTransportArc);
 
-				assert (sourcePlace != null);
+                assert (sourcePlace != null);
 				assert (trans != null);
 				assert (destPlace != null);
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight);
+				transArc.setColorTimeIntervals(timeIntervals);
+                transArc.setOutputExpression(expr);
+                transArc.setInputExpression(transportExpr);
+                transportExpr = null;
 
 				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
@@ -656,14 +755,21 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
                                          String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                          PlaceTransitionObject targetIn,
-                                         int _endx, int _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
+                                         int _endx, int _endy, Template template, ConstantStore constants, Weight weight,List<ColoredTimeInterval> ctiList, ArcExpression expr ) throws FormatException {
         TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput));
+
+
 
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
-		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 
-		TimedInputArc inputArc = new TimedInputArc(place, transition, interval, weight);
+		//TODO: Two types of intervals are nasty
+		TimeInterval timeInterval = TimeInterval.parse(inscriptionTempStorage, constants);
+        ctiList.add(ColoredTimeInterval.parse(inscriptionTempStorage, constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
+
+
+        TimedInputArc inputArc = new TimedInputArc(place, transition, timeInterval, weight, expr);
+        inputArc.setColorTimeIntervals(ctiList);
 		tempArc.setUnderlyingArc(inputArc);
 
 		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
@@ -736,5 +842,41 @@ public class TapnXmlLoader {
 
 		return new Constant(name, value);
 	}
+
+    private Pair<String, Vector<Color>> parseColorInvariant(Element colorinvariant, TimedArcPetriNetNetwork network)  {
+        String inscription, colorTypeName;
+        Vector<Color> colors = new Vector<Color>();
+        Element colorTypeELe = (Element) colorinvariant.getElementsByTagName("colortype").item(0);
+        inscription = colorinvariant.getElementsByTagName("inscription").item(0).getAttributes().getNamedItem("inscription").getNodeValue();
+        colorTypeName = colorTypeELe.getAttributes().getNamedItem("name").getNodeValue();
+        if (network.isNameUsedForColorType(colorTypeName)) {
+            NodeList colorNodeList = colorTypeELe.getElementsByTagName("color");
+            String colorName;
+            ColorType ct = network.getColorTypeByName(colorTypeName);
+            for (int i = 0; i < colorNodeList.getLength(); i++) {
+                colorName = colorNodeList.item(i).getAttributes().getNamedItem("value").getNodeValue();
+                colors.add(new Color(ct, 0, colorName));
+            }
+        } else {
+            try {
+                throw new FormatException("The color type used for an invariant does not exist");
+            } catch (FormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Pair<String, Vector<Color>> pair = new Pair<String, Vector<Color>>(inscription, colors);
+        return pair;
+    }
+
+    Node getFirstDirectChild(Node parent, String tagName){
+        NodeList children = parent.getChildNodes();
+        for(int i = 0; i < children.getLength(); i++){
+            if(children.item(i).getNodeName().equals(tagName)){
+                return children.item(i);
+            }
+        }
+        return null;
+    }
 
 }
