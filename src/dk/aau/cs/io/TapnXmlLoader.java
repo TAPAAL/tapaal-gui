@@ -436,10 +436,10 @@ public class TapnXmlLoader {
 		}
         GuardExpression guardExpr = null;
 
-        Element conditionNode = (Element)transition.getAttributeNode("condition");
+        Node conditionNode = getFirstDirectChild(transition, "condition");
         if (conditionNode != null) {
             try {
-                guardExpr = loadTACPN.parseGuardExpression(conditionNode.getAttributeNode("structure").getFirstChild());
+                guardExpr = loadTACPN.parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
             } catch (FormatException e) {
                 e.printStackTrace();
             }
