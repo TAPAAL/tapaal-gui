@@ -241,7 +241,7 @@ public class TimedTransitionComponent extends Transition {
 		}
 		
 		// Build interface
-		if (show && (transition.getdInterval() != null)) {
+		if (show && (transition.getdInterval() != null) && isTimed()) {
 			dIntervalWindow = new Window(new Frame());
 			dIntervalWindow.add(new JTextArea(transition.getdInterval().toString()));
 			
