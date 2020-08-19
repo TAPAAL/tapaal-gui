@@ -20,6 +20,7 @@ import dk.aau.cs.util.StringComparator;
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
@@ -63,7 +64,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void reInitDone(){
-		if(CreateGui.getCurrentTab().getDelayEnabledTransitionControl().isRandomTransitionMode()){
+		if(SimulationControl.getInstance().isRandomTransitionMode()){
 			selectRandom();
 			return;
 		}
@@ -125,7 +126,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null || !showIntervals ? "" : transition.getDInterval().toString() + " ";
+			String interval = transition.getDInterval() == null || !showIntervals || !transition.isTimed() ? "" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 
 			if(isShared()){

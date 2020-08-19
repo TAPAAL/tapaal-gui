@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,8 +52,10 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
-	
-	enum GraphicsType { Position, Offset }
+
+    private final TabContent.TAPNLens lens = new TabContent.TAPNLens(false, false);
+
+    enum GraphicsType { Position, Offset }
 
 	private final NameGenerator nameGenerator = new NameGenerator();
 	private final IdResolver idResolver = new IdResolver();
@@ -192,7 +195,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y);
+			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
 		}
@@ -236,8 +239,7 @@ public class PNMLoader {
 		if(isNetDrawable()){
 			TimedTransitionComponent transitionComponent = 
 				//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-				new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y,
-						true, false, 0, 0);
+				new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, true, false, 0, 0, lens);
 			transitionComponent.setUnderlyingTransition(transition);
 			template.guiModel().addPetriNetObject(transitionComponent);
 		}
@@ -423,7 +425,7 @@ public class PNMLoader {
 		TimedInputArcComponent arc = null;
 		
 		if(isNetDrawable()){
-			arc = new TimedInputArcComponent(new TimedOutputArcComponent(source, target, weight, arcId));
+			arc = new TimedInputArcComponent(new TimedOutputArcComponent(source, target, weight, arcId), lens);
 			arc.setUnderlyingArc(inputArc);
 
 			template.guiModel().addPetriNetObject(arc);

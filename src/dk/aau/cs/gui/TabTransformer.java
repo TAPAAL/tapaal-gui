@@ -51,12 +51,15 @@ public class TabTransformer {
                     DataLayer guiModel = template.guiModel();
                     Place guiSource = guiModel.getPlaceByName(arc.getSource().getName());
                     Transition guiTarget = guiModel.getTransitionByName(arc.getTarget().getName());
-                    TimedInputArcComponent newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-                        guiSource,
+                    TimedInputArcComponent newArc = new TimedInputArcComponent(
+                        new TimedOutputArcComponent(
+                            guiSource,
                             guiTarget,
                             arc.getWeight().value(),
                             arc.getSource().getName() + "_to_" + arc.getTarget().getName()
-                    ));
+                        ),
+                        tab.getLens()
+                    );
 
                     // Build ArcPath
                     Place oldGuiSource = guiModel.getPlaceByName(arc.getSource().getName());

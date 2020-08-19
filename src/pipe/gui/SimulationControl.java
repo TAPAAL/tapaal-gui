@@ -22,9 +22,10 @@ public class SimulationControl extends JPanel {
 	
 	final JSlider simulationSpeed = new JSlider();
 	final JCheckBox randomSimulation = new JCheckBox("Enable automatic random simulation");
-	final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
-	
-	private static SimulationControl instance;
+    final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
+    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
+    private static boolean defaultIsRandomTrasition;
+    private static SimulationControl instance;
 	
 	public static SimulationControl getInstance(){
 		if(instance == null){
@@ -62,13 +63,23 @@ public class SimulationControl extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(randomSimulation, gbc);
-		
+
 		gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(randomMode, gbc);
+
+        setRandomTransitionMode(defaultIsRandomTrasition);
+
+        gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		add(new JLabel("Set simulation speed:"), gbc);
 		
 		gbc = new GridBagConstraints();
@@ -76,7 +87,7 @@ public class SimulationControl extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 3;
 		add(simulationSpeed, gbc);
 		
 		setBorder(BorderFactory.createCompoundBorder(
@@ -159,4 +170,26 @@ public class SimulationControl extends JPanel {
 		dialog.setLocation(x, y);
 		dialog.setVisible(true);
 	}
+
+    public boolean isRandomTransitionMode(){
+        if(SimulationControl.getInstance().randomSimulation()){
+            return true;
+        } else {
+            return randomMode.isSelected();
+        }
+    }
+
+    public void setRandomTransitionMode(boolean randomTransition){
+        randomMode.setSelected(randomTransition);
+    }
+    public static boolean isRandomTransition(){
+        if(instance != null){
+            return getInstance().isRandomTransitionMode();
+        } else {
+            return defaultIsRandomTrasition;
+        }
+    }
+    public static void setDefaultIsRandomTransition(boolean delayEnabledTransitionIsRandomTransition) {
+        defaultIsRandomTrasition = delayEnabledTransitionIsRandomTransition;
+    }
 }
