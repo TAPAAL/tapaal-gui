@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,6 +18,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.tapn.*;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -42,11 +47,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements NetWriter {
@@ -57,8 +57,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private final TimedArcPetriNetNetwork network;
     private boolean isTimed;
     private boolean isGame;
+    private boolean isColored;
+    private writeTACPN writeTACPN;
 
-	public TimedArcPetriNetNetworkWriter(
+    public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
 			Iterable<Template> templates,
 			Iterable<TAPNQuery> queries,
@@ -75,13 +77,16 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         Iterable<TAPNQuery> queries,
         Iterable<Constant> constants,
         boolean isTimed,
-        boolean isGame) {
+        boolean isGame,
+        boolean isColored) {
         this.network = network;
         this.templates = templates;
         this.queries = queries;
         this.constants = constants;
         this.isTimed = isTimed;
         this.isGame = isGame;
+        this.isColored = isColored;
+        writeTACPN = new writeTACPN(network);
     }
 	
 	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
@@ -104,7 +109,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendSharedTransitions(document, pnmlRootNode);
 		appendConstants(document, pnmlRootNode);
 		appendTemplates(document, pnmlRootNode);
-		appendQueries(document, pnmlRootNode);
+        System.out.println("Goddav");
+        writeTACPN.appendDeclarations(document, pnmlRootNode);
+        System.out.println("asuibd");
+        appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
 		appendFeature(document, pnmlRootNode);
 
@@ -161,22 +169,27 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
     private void appendFeature(Document document, Element root) {
         String isTimed = "true";
         String isGame = "true";
+        String isColored = "true";
         if (!this.isTimed) {
             isTimed = "false";
         }
         if (!this.isGame) {
             isGame = "false";
         }
+        if(!this.isColored){
+            isColored = "false";
+        }
 
-        root.appendChild(createFeatureElement(isTimed, isGame, document));
+        root.appendChild(createFeatureElement(isTimed, isGame, isColored, document));
     }
 
-    private Element createFeatureElement(String isTimed, String isGame, Document document) {
+    private Element createFeatureElement(String isTimed, String isGame, String isColored, Document document) {
         Require.that(document != null, "Error: document was null");
         Element feature = document.createElement("feature");
 
         feature.setAttribute("isTimed", isTimed);
         feature.setAttribute("isGame", isGame);
+        feature.setAttribute("isColored", isColored);
 
         return feature;
     }
@@ -187,7 +200,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			element.setAttribute("invariant", place.invariant().toString());
 			element.setAttribute("name", place.name());
 			element.setAttribute("initialMarking", String.valueOf(place.numberOfTokens()));
-			root.appendChild(element);
+			createColoredInvariants(place, document, element);
+            writeTACPN.appendColoredPlaceDependencies(place, document, element);
+
+            root.appendChild(element);
 		}
 	}
 
@@ -413,9 +429,40 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		placeElement.setAttribute("nameOffsetY", String.valueOf(inputPlace.getNameOffsetY()));
 		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
 		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
-
-		return placeElement;
+		//TODO: Kind of nasty to have two types of invariants, needs more work
+        createColoredInvariants(inputPlace.underlyingPlace(), document, placeElement);
+        writeTACPN.appendColoredPlaceDependencies(inputPlace.underlyingPlace(), document, placeElement);
+        return placeElement;
 	}
+    private void createColoredInvariants(TimedPlace inputPlace, Document document, Element placeElement) {
+        List<ColoredTimeInvariant> ctiList = inputPlace.getCtiList();
+
+        for (ColoredTimeInvariant coloredTimeInvariant : ctiList) {
+            Element invariant = document.createElement("colorinvariant");
+            Element inscription = document.createElement("inscription");
+            Element colortype = document.createElement("colortype");
+            colortype.setAttribute("name", coloredTimeInvariant.getColor().getColorType().getName());
+            if (coloredTimeInvariant.equalsOnlyColor(ColoredTimeInvariant.LESS_THAN_INFINITY_AND_STAR)) {
+                placeElement.setAttribute("inscription", coloredTimeInvariant.getInvariantString());
+            } else {
+                if (coloredTimeInvariant.getColor().getTuple() != null) {
+                    for (Color color : coloredTimeInvariant.getColor().getTuple()) {
+                        Element colorEle = document.createElement("color");
+                        colorEle.setAttribute("value", color.getColorName());
+                        colortype.appendChild(colorEle);
+                    }
+                } else {
+                    Element colorEle = document.createElement("color");
+                    colorEle.setAttribute("value", coloredTimeInvariant.getColor().getColorName());
+                    colortype.appendChild(colorEle);
+                }
+                inscription.setAttribute("inscription", coloredTimeInvariant.getInvariantString());
+                invariant.appendChild(inscription);
+                invariant.appendChild(colortype);
+                placeElement.appendChild(invariant);
+            }
+        }
+    }
 
 
 	private Element createAnnotationNoteElement(AnnotationNote inputLabel, Document document) {
@@ -454,8 +501,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
+        writeTACPN.appendColoredTransitionDependencies(inputTransition, document, transitionElement);
 
-		return transitionElement;
+        return transitionElement;
 	}
 
 	private Element createArcElement(Arc inputArc, DataLayer guiModel, Document document) {
@@ -476,14 +524,56 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
+				//TODO: Same as with places and invariants, nasty to have two types of intervals
+				appendArcIntervals((TimedInputArcComponent)inputArc, document, arcElement);
 			} else {
 				arcElement.setAttribute("type", "normal");
 				arcElement.setAttribute("inscription", "1");
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 			}
-		} 
+		}
+        if (!(inputArc instanceof  TimedInhibitorArcComponent)){
+            writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
+        }
 		return arcElement;
 	}
+
+    private void appendArcIntervals(TimedInputArcComponent inputArc, Document document, Element arcElement) {
+        List<ColoredTimeInterval> ctiList;
+        if (inputArc instanceof TimedTransportArcComponent) {
+            TransportArc arc = ((TimedTransportArcComponent) inputArc).underlyingTransportArc();
+            ctiList = arc.getColorTimeIntervals();
+        } else {
+            ctiList = inputArc.underlyingTimedInputArc().getColorTimeIntervals();
+        }
+
+        for (ColoredTimeInterval cti : ctiList) {
+            if (cti.equalsOnlyColor(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR))) {
+                arcElement.setAttribute("inscription", cti.getInterval());
+            } else {
+                Element interval = document.createElement("colorinterval");
+                Element inscription = document.createElement("inscription");
+                Element colortype = document.createElement("colortype");
+                inscription.setAttribute("inscription", cti.getInterval());
+                colortype.setAttribute("name", cti.getColor().getColorType().getName());
+                if (cti.getColor().getTuple() != null) {
+                    for (Color color : cti.getColor().getTuple()) {
+                        Element colorEle = document.createElement("color");
+                        colorEle.setAttribute("value", color.getColorName());
+                        colortype.appendChild(colorEle);
+                    }
+                } else {
+                    Element colorEle = document.createElement("color");
+                    colorEle.setAttribute("value", cti.getColor().getColorName());
+                    colortype.appendChild(colorEle);
+                }
+                interval.appendChild(inscription);
+                interval.appendChild(colortype);
+                arcElement.appendChild(interval);
+            }
+
+        }
+    }
 
 	private String getInputArcTypeAsString(TimedInputArcComponent inputArc) {
 		if (inputArc instanceof TimedTransportArcComponent) {

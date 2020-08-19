@@ -2023,7 +2023,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					queriesOverwrite,
 					network().constants(),
                     lens.timed,
-					lens.game
+					lens.game,
+                    lens.colored
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -2709,10 +2710,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
-            if (e.getWheelRotation() < 0) {
-                guiModelManager.addToken(getModel(), p, 1);
-            } else {
-                guiModelManager.removeToken(getModel(), p, 1);
+            //TODO: how to handle if lens is colored??
+            if(!lens.isColored()){
+                if (e.getWheelRotation() < 0) {
+                    guiModelManager.addToken(getModel(), p, 1);
+                } else {
+                    guiModelManager.removeToken(getModel(), p, 1);
+                }
             }
         }
 
@@ -2729,7 +2733,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
     public List<GuiAction> getAvailableDrawActions(){
-        if(lens.isTimed()){
+        //TODO: I removed add token and remove token actions for colored nets. How should these be handled?
+        if(lens.isColored() && lens.isTimed()){
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction));
+        } else if(lens.isColored() && !lens.isTimed()){
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction));
+        } else if(lens.isTimed()){
             return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         } else{
             return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
