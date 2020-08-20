@@ -349,6 +349,8 @@ public class ConstantsPane extends JPanel implements SidePane {
             gbc = GridBagHelper.as(1,3, GridBagHelper.Anchor.NORTH);
             constantsPanel.add(sortButton, gbc);
 
+        } else {
+            constantsColorTypesVariablesComboBox.setVisible(true);
         }
     }
 	private void highlightConstant(int index){

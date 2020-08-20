@@ -1608,14 +1608,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public void changeColorFeature(boolean isColor) {
         if (isColor != lens.isColored()) {
             if (!isColor){
-                if (network().hasUncontrollableTransitions()){
-                    String removeTimeWarning = "The net contains color information, which will be removed. Do you still wish to make to remove the color semantics?";
-                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove color information",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
-                    if (choice == 0) {
-                        createNewAndConvertNonColor();
-                    }
-                } else {
+                String removeTimeWarning = "The net contains color information, which will be removed. Do you still wish to make to remove the color semantics?";
+                int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove color information",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                if (choice == 0) {
                     createNewAndConvertNonColor();
                 }
             } else {
