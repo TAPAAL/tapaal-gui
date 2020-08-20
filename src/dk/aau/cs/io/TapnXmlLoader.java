@@ -128,13 +128,14 @@ public class TapnXmlLoader {
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
         NodeList declarations = doc.getElementsByTagName("declaration");
 
-        if (declarations.getLength() <= 0)
-            throw new FormatException("File did not contain any declarations components.");
+        if (declarations.getLength() > 0) {
+            //throw new FormatException("File did not contain any declarations components.");
 
-        for (int i = 0; i < declarations.getLength(); i++) {
-            Node node = declarations.item(i);
-            if (node.getNodeName().equals("declaration")) {
-                loadTACPN.parseDeclarations(node, network);
+            for (int i = 0; i < declarations.getLength(); i++) {
+                Node node = declarations.item(i);
+                if (node.getNodeName().equals("declaration")) {
+                    loadTACPN.parseDeclarations(node, network);
+                }
             }
         }
 		parseSharedPlaces(doc, network, constants);
@@ -506,7 +507,11 @@ public class TapnXmlLoader {
                 ctiList.add(cti);
             }
         }
-        ctiList.add(ColoredTimeInvariant.parse(place.getAttribute("inscription"), constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
+        if (place.getAttribute("inscription").length() > 0) {
+            ctiList.add(ColoredTimeInvariant.parse(place.getAttribute("inscription"), constants, new Vector<Color>() {{
+                add(Color.STAR_COLOR);
+            }}));
+        }
         Node hlInitialMarkingNode = place.getElementsByTagName("hlinitialMarking").item(0);
         Node typeNode = place.getElementsByTagName("type").item(0);
         if (typeNode != null) {
