@@ -35,7 +35,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private DataLayer guiModel;
 	private final TabContent tabContent;
 	private final Reference<AbstractDrawingSurfaceManager> managerRef;
-	private TimedArcPetriNet model;
 
 	private static final boolean showDebugBounds = false;
 
@@ -65,18 +64,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		return guiModel;
 	}
 
-	public TimedArcPetriNet getModel() {
-		return model;
-	}
-
-	public void setModel(DataLayer guiModel, TimedArcPetriNet model, Zoomer zoomer) {
+	public void setModel(DataLayer guiModel, Zoomer zoomer) {
 		//Remove the old model from view
 		this.guiModel.removedFromView();
 		//Add the new model to view
 		guiModel.addedToView(this);
 
 		this.guiModel = guiModel;
-		this.model = model;
 		this.zoomControl = zoomer;
 
 		this.removeAll();
