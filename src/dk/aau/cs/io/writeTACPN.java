@@ -24,23 +24,23 @@ public class writeTACPN { // both export and save share some of the same syntax 
 
     public void appendColoredArcsDependencies(Arc arc, DataLayer guiModel, Document document, Element arcElement) {
         ArcExpression arcExpr = null;
-        if( arc instanceof TimedInputArcComponent) {
-            arcExpr = ((TimedInputArcComponent) arc).underlyingTimedInputArc().getArcExpression();
-            if (arcExpr != null) {
-                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
-            }
-        } else if (arc instanceof TimedOutputArcComponent) {
-            arcExpr = ((TimedOutputArcComponent) arc).underlyingArc().getExpression();
-            if (arcExpr != null) {
-                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
-            }
-        } else if (arc instanceof TimedTransportArcComponent) {
+        if (arc instanceof TimedTransportArcComponent) {
             Transition trans =guiModel.getTransitionByName(arc.getSource().getName());
             if (trans != null) { // we check if the source is a valid transition, if it is we know this is an output transport arc and we have to access the second expression
                 arcExpr = ((TimedTransportArcComponent) arc).underlyingTransportArc().getOutputExpression();
             } else {
                 arcExpr = ((TimedTransportArcComponent) arc).underlyingTransportArc().getInputExpression();
             }
+            if (arcExpr != null) {
+                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
+            }
+        } else if( arc instanceof TimedInputArcComponent) {
+            arcExpr = ((TimedInputArcComponent) arc).underlyingTimedInputArc().getArcExpression();
+            if (arcExpr != null) {
+                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
+            }
+        } else if (arc instanceof TimedOutputArcComponent) {
+            arcExpr = ((TimedOutputArcComponent) arc).underlyingArc().getExpression();
             if (arcExpr != null) {
                 arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
             }
@@ -381,7 +381,12 @@ public class writeTACPN { // both export and save share some of the same syntax 
             hlInitialMarking.appendChild(hlInitialMarkingText);
             String tokenNames = "";
             for (TimedToken token : inputPlace.tokens()) {
-                ColoredToken ct = (ColoredToken) token;
+                ColoredToken ct;
+                if (token instanceof ColoredToken) {
+                    ct = (ColoredToken) token;
+                } else {
+                    ct = new ColoredToken(token.place(), new DotConstant());
+                }
                 if (ct.getColor() instanceof DotConstant) {
                     tokenNames += 1 + "'" + "(dot)";
                 } else {

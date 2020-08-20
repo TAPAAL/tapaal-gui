@@ -520,9 +520,10 @@ public class TapnXmlLoader {
                     network.marking().add(ctElement);
                     //p.addToken(ctElement);
                 }
-                /*for (int i = 0; i < initialMarkingInput; i++) {
+            } else {
+                for (int i = 0; i < initialMarkingInput; i++) {
                     network.marking().add(new TimedToken(p));
-                }*/
+                }
             }
 
 

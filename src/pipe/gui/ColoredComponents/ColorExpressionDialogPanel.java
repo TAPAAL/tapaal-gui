@@ -153,6 +153,8 @@ public class ColorExpressionDialogPanel extends JPanel {
 
     public void updateSelection() {
         int index = exprField.getCaretPosition();
+
+        //todo fix null-pointer exception
         ExprStringPosition position = expr.objectAt(index);
 
         if (position == null) {
