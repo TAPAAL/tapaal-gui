@@ -2687,11 +2687,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
     public List<GuiAction> getAvailableDrawActions(){
         if (lens.isTimed() && !lens.isGame()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
         } else if (lens.isTimed()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
         } else if (lens.isGame()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUncontrollableAction));
         } else {
             return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         }
@@ -2757,6 +2757,30 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.TRANSPORTARC);
+        }
+    };
+    private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
+        public void actionPerformed(ActionEvent e) {
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+
+            for (PetriNetObject o : selection) {
+                if (o instanceof TimedTransitionComponent) {
+                    ((TimedTransitionComponent) o).setUncontrollable(!((TimedTransitionComponent) o).isUncontrollable());
+                }
+            }
+            repaint();
+        }
+    };
+    private final GuiAction toggleUrgentAction = new GuiAction("Toggle urgent transition", "Toggle between urgent/non-urgent transition", "U", true) {
+        public void actionPerformed(ActionEvent e) {
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+
+            for (PetriNetObject o : selection) {
+                if (o instanceof TimedTransitionComponent) {
+                    ((TimedTransitionComponent) o).setUrgent(!((TimedTransitionComponent) o).isUrgent());
+                }
+            }
+            repaint();
         }
     };
     private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
