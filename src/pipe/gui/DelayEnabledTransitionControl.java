@@ -23,14 +23,12 @@ public class DelayEnabledTransitionControl extends JPanel{
 
 	private static DelayMode defaultDelayMode = ShortestDelayMode.getInstance();
 	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
-	private static boolean defaultIsRandomTrasition;
-	
+
 	private final JLabel precitionLabel;
 	private final JSlider delayEnabledPrecision;
 	private final JLabel delayModeLabel;
 	private final JComboBox<DelayMode> delayMode;
-	final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
-	
+
 	private DelayEnabledTransitionControl() {
 		super(new GridBagLayout());
 		
@@ -57,8 +55,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 		delayMode = new JComboBox<>(items);
 		setDelayMode(defaultDelayMode);
 
-        setRandomTransitionMode(defaultIsRandomTrasition);
-        
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
@@ -92,13 +89,6 @@ public class DelayEnabledTransitionControl extends JPanel{
 		gbc.gridy = 2;
 		add(delayMode, gbc);
 		
-		gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.weightx = 1.0;
-		gbc.gridx = 0;
-		gbc.gridy = 3;
-		add(randomMode, gbc);
-		
 		setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Delay controller"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
@@ -130,19 +120,9 @@ public class DelayEnabledTransitionControl extends JPanel{
 	public void setDelayMode(DelayMode delayMode){
 		this.delayMode.setSelectedItem(delayMode);
 	}
-	
-	public boolean isRandomTransitionMode(){
-		if(SimulationControl.getInstance().randomSimulation()){
-			return true;
-		} else {
-			return randomMode.isSelected();
-		}
-	}
-	
-	public void setRandomTransitionMode(boolean randomTransition){
-		randomMode.setSelected(randomTransition);
-	}
-	
+
+
+
 	private static DelayEnabledTransitionControl instance;
 	
 	public static DelayEnabledTransitionControl getInstance(){
@@ -176,18 +156,6 @@ public class DelayEnabledTransitionControl extends JPanel{
 		}
 	}
 
-	public static void setDefaultIsRandomTransition(boolean delayEnabledTransitionIsRandomTransition) {
-		defaultIsRandomTrasition = delayEnabledTransitionIsRandomTransition;
-	}
-	
-	public static boolean isRandomTransition(){
-		if(instance != null){
-			return getInstance().isRandomTransitionMode();
-		} else {
-			return defaultIsRandomTrasition;
-		}
-	}
-	
 	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
@@ -195,6 +163,5 @@ public class DelayEnabledTransitionControl extends JPanel{
 		delayEnabledPrecision.setEnabled(enabled);
 		delayModeLabel.setEnabled(enabled);
 		delayMode.setEnabled(enabled);
-		randomMode.setEnabled(enabled);
 	}
 }

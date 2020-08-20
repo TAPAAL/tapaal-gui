@@ -27,6 +27,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
@@ -76,7 +77,10 @@ public class GuardDialogue extends JPanel /*
 		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			initTimeGuardPanel();
 		}
-		
+        if(!objectToBeEdited.isTimed() ){
+            guardEditPanel.setVisible(false);
+        }
+
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 

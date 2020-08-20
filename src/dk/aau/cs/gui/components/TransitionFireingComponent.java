@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.Template;
 import pipe.gui.AnimationSettingsDialog;
 import pipe.gui.DelayEnabledTransitionControl;
@@ -22,12 +23,12 @@ public class TransitionFireingComponent extends JPanel {
 	private final EnabledTransitionsList enabledTransitionsList;
 	private final JButton fireButton;
 	private final JButton settingsButton;
+	private final TabContent.TAPNLens lens;
 
-	public TransitionFireingComponent(boolean showDelayEnabledTransitions) {
+	public TransitionFireingComponent(boolean showDelayEnabledTransitions, TabContent.TAPNLens lens) {
 		super(new GridBagLayout());
-
 		enabledTransitionsList = new EnabledTransitionsList();
-
+        this.lens = lens;
 		this.setBorder(
 		    BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Enabled Transitions"),
@@ -44,7 +45,7 @@ public class TransitionFireingComponent extends JPanel {
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
-		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings());
+		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings(lens));
 
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
@@ -125,7 +126,10 @@ public class TransitionFireingComponent extends JPanel {
 				fireButton.setToolTipText(SIMULATE_ACTIVATED_TOOL_TIP);
 			}
 		} else { //If random simulation is not enabled.
-			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions() ? "Delay & Fire" : "Fire");
+			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions()  ? "Delay & Fire" : "Fire");
+			if(!lens.isTimed()){
+			    fireButton.setText("Fire");
+            }
 
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){
 				fireButton.setEnabled(false);

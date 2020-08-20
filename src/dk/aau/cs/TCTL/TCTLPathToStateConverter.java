@@ -76,8 +76,13 @@ public class TCTLPathToStateConverter extends TCTLAbstractStateProperty{
 	public boolean containsPlaceHolder() {
 		return property.containsPlaceHolder();
 	}
-	
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return false;
+    }
+
+    public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
 	

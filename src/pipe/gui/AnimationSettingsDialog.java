@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.widgets.EscapableDialog;
 
 public class AnimationSettingsDialog {
@@ -16,8 +17,8 @@ public class AnimationSettingsDialog {
 	private static JDialog dialog;
 	private static DelayEnabledTransitionControl delayEnabled;
 	private static SimulationControl simControl;
-	
-	private static JPanel getContent(){
+
+	private static JPanel getContent(TabContent.TAPNLens lens){
 		JPanel content = new JPanel(new BorderLayout());
 		 
 		delayEnabled = DelayEnabledTransitionControl.getInstance();
@@ -26,28 +27,32 @@ public class AnimationSettingsDialog {
 		
 		simControl.addRandomSimulationActionListener(e -> {
 			if(simControl.randomSimulation()){
-				delayEnabled.randomMode.setSelected(true);
+				simControl.randomMode.setSelected(true);
 			}
 			CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
 		});
 		
 		content.add(delayEnabled, BorderLayout.NORTH);
 		content.add(simControl, BorderLayout.SOUTH);
+		hideTimedInformation(lens);
 		return content;
 	}
+
+    private static void hideTimedInformation(TabContent.TAPNLens lens){
+	    delayEnabled.setVisible(lens.isTimed());
+    }
 	
-	
-	public static void showAnimationSettings(){
+	public static void showAnimationSettings(TabContent.TAPNLens lens){
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		JButton closeDialogButton = new JButton("Close");
 		closeDialogButton.addActionListener(o -> dialog.setVisible(false));
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 3, 0, 3);
 		gbc.fill = GridBagConstraints.BOTH;
-		contentPane.add(getContent(), gbc);
+		contentPane.add(getContent(lens), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;

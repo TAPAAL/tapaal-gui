@@ -1,5 +1,17 @@
 package dk.aau.cs.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -27,6 +39,7 @@ import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
+import pipe.gui.action.GuiAction;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
@@ -36,17 +49,7 @@ import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.Point2D;
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.*;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
@@ -56,7 +59,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         this.guiFrameControllerActions.setReference(guiFrameControllerActions);
     }
 
-    public static class TAPNLens {
+    public static final class TAPNLens {
+        public static final TAPNLens Default = new TAPNLens(true, true);
         public boolean isTimed() {
             return timed;
         }
@@ -68,7 +72,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private final boolean timed;
         private final boolean game;
 
-        TAPNLens(boolean timed, boolean game) {
+        public TAPNLens(boolean timed, boolean game) {
             this.timed = timed;
             this.game = game;
         }
@@ -156,7 +160,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             Require.notNull(p, "Point can't be null");
 
             dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
-            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp);
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
 
@@ -167,7 +171,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
-            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition);
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
 
             guiModelToModel.get(c).add(transition);
             c.addPetriNetObject(pnObject);
@@ -207,7 +211,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 TimeInterval.ZERO_INF
             );
 
-            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia);
+            TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens);
 
             if (path != null) {
                 tiac.setArcPath(new ArcPath(tiac, path));
@@ -563,7 +567,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }).start();
             }
 
-			TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame());
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
             tab.setInitialName(name);
 
@@ -784,6 +788,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             addGuiModel(template.model(), template.guiModel());
             zoomLevels.put(template.model(), template.zoomer());
             hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+            for(PetriNetObject o : template.guiModel().getPetriNetObjects()){
+                o.setLens(this.lens);
+            }
         }
 
         drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
@@ -831,7 +838,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
         this(network, templates, tapnqueries,  new TAPNLens(true, false));
     }
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
         setNetwork(network, templates);
@@ -1133,8 +1140,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-
 	}
+
+	private void hideTimedInformation(){
+	    if(!lens.isTimed()){
+            animControlerBox.setVisible(false);
+        }
+
+    }
 
 	public void switchToEditorComponents() {
 		
@@ -1220,7 +1233,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createAnimationControlSidePanel() {
-		animControlerBox = new AnimationControlSidePanel(animator);
+		animControlerBox = new AnimationControlSidePanel(animator, lens);
 	}
 
 	public AnimationHistoryList getAnimationHistorySidePanel() {
@@ -1228,7 +1241,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createTransitionFireing() {
-		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions());
+		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions(), lens);
 	}
 
 	public TransitionFireingComponent getTransitionFireingComponent() {
@@ -1486,13 +1499,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(FeatureOption.TIME, false);
+	    TabContent tab = duplicateTab(new TAPNLens(false, lens.isGame()), "-untimed");
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab(FeatureOption.GAME, false);
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), false), "-nongame");
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1512,10 +1525,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.TIME, isTime);
+                TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame()), "-timed");
+                findAndRemoveAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
+        }
+    }
+
+    private void findAndRemoveAffectedQueries(TabContent tab){
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        for (TAPNQuery q : tab.queries()){
+            if(q.hasUntimedOnlyProperties()){
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            }
+        }
+        String message = "The following queries will be removed in the conversion:";
+        for(TAPNQuery q : queriesToRemove){
+            message += "\n" + q.getName();
+        }
+        if(!queriesToRemove.isEmpty()){
+            JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1534,7 +1565,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.GAME, isGame);
+                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1642,6 +1673,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
+                app.ifPresent(o->o.setStatusBarText(textforAnimation));
+
 			} else {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"You need at least one active template to enter simulation mode",
@@ -1669,6 +1702,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			// Undo/Redo is enabled based on undo/redo manager
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
+            app.ifPresent(o->o.setStatusBarText(textforDrawing));
 		}
 		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
@@ -1679,11 +1713,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	@Override
 	public void setMode(Pipe.ElementType mode) {
 
-		app.ifPresent(o->o.updateMode(mode));
+        CreateGui.guiMode = mode;
+        changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection
 		drawingSurface().getSelectionObject().clearSelection();
         editorMode = mode;
+        updateMode();
         switch (mode) {
             case ADDTOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
@@ -1851,6 +1887,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
 		}
+		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
+        app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
+
+        //TODO: this is a temporary implementation untill actions can be moved
+        app.ifPresent(o->o.registerViewActions(List.of()));
 
 	}
 
@@ -1947,8 +1988,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					allTemplates(),
 					queriesOverwrite,
 					network().constants(),
-                    lens.timed,
-					lens.game
+                    lens
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -2026,51 +2066,26 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab(FeatureOption option, boolean isYes) {
-		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-				network(),
-				allTemplates(),
-				queries(),
-				network().constants()
-		);
+	public TabContent duplicateTab(TAPNLens overwriteLens, String appendName) {
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+            network(),
+            allTemplates(),
+            queries(),
+            network().constants(),
+            overwriteLens
+        );
 
-		option = isNetChanged(option, isYes) ? option : FeatureOption.TIME;
-
-		try {
-			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-			String composedName = getTabTitle();
-			composedName = composedName.replace(".tapn", "");
-
-			switch (option) {
-                case TIME:
-                    composedName += isYes ? "-timed" : "-untimed";
-                    break;
-                case GAME:
-                    composedName += isYes ? "-game" : "-noGame";
-                    break;
-            }
-
-			if (isNetChanged(option, isYes)) {
-			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, option, isYes);
-            } else {
-                return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
-            }
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			System.console().printf(e1.getMessage());
-		}
-		return null;
-	}
-
-	private boolean isNetChanged(FeatureOption option, boolean isYes) {
-        switch (option) {
-            case TIME:
-                return lens.isTimed() != isYes;
-            case GAME:
-                return lens.isGame() != isYes;
-            default:
-                return false;
+        try {
+            ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+            String composedName = getTabTitle();
+            composedName = composedName.replace(".tapn", "");
+            composedName += appendName;
+            return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+        } catch (Exception e1) {
+            Logger.log("Could not load model");
+            e1.printStackTrace();
         }
+        return null;
     }
 
 	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
@@ -2651,4 +2666,216 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
         }
     }
+    public List<GuiAction> getAvailableDrawActions(){
+        if(lens.isTimed()){
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        } else{
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        }
+    }
+
+    public List<GuiAction> getAvailableSimActions(){
+        if(lens.isTimed()){
+            return new ArrayList<>(Arrays.asList(timeAction, delayFireAction));
+        } else{
+            delayFireAction.setName("Fire");
+            delayFireAction.setTooltip("Fire Selected Transition");
+            return new ArrayList<>(Arrays.asList(delayFireAction));
+        }
+    }
+
+    private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.SELECT);
+        }
+    };
+    private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.ANNOTATION);
+        }
+    };
+    private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNINHIBITOR_ARC);
+        }
+    };
+    private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNTRANS);
+        }
+    };
+    private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.ADDTOKEN);
+        }
+    };
+
+    private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.DELTOKEN);
+        }
+    };
+    private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNPLACE);
+        }
+    };
+
+    private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNARC);
+        }
+    };
+    private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TRANSPORTARC);
+        }
+    };
+    private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
+        public void actionPerformed(ActionEvent e) {
+            timeDelay();
+        }
+    };
+    private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
+        public void actionPerformed(ActionEvent e) {
+            delayAndFire();
+        }
+    };
+
+    public void updateMode() {
+        // deselect other actions
+        selectAction.setSelected(CreateGui.guiMode == Pipe.ElementType.SELECT);
+        transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
+        timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
+        timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
+        transportArcAction.setSelected(editorMode == Pipe.ElementType.TRANSPORTARC);
+        inhibarcAction.setSelected(editorMode == Pipe.ElementType.TAPNINHIBITOR_ARC);
+        tokenAction.setSelected(editorMode == Pipe.ElementType.ADDTOKEN);
+        deleteTokenAction.setSelected(editorMode == Pipe.ElementType.DELTOKEN);
+        annotationAction.setSelected(editorMode == Pipe.ElementType.ANNOTATION);
+    }
+    @Override
+    public void updateEnabledActions(GuiFrame.GUIMode mode){
+        switch(mode){
+            case draw:
+                selectAction.setEnabled(true);
+                transAction.setEnabled(true);
+                timedPlaceAction.setEnabled(true);
+                timedArcAction.setEnabled(true);
+                transportArcAction.setEnabled(true);
+                inhibarcAction.setEnabled(true);
+                tokenAction.setEnabled(true);
+                deleteTokenAction.setEnabled(true);
+                annotationAction.setEnabled(true);
+                delayFireAction.setEnabled(false);
+                timeAction.setEnabled(false);
+                break;
+            case noNet:
+                selectAction.setEnabled(false);
+                transAction.setEnabled(false);
+                timedPlaceAction.setEnabled(false);
+                timedArcAction.setEnabled(false);
+                transportArcAction.setEnabled(false);
+                inhibarcAction.setEnabled(false);
+                tokenAction.setEnabled(false);
+                deleteTokenAction.setEnabled(false);
+                annotationAction.setEnabled(false);
+                delayFireAction.setEnabled(false);
+                timeAction.setEnabled(false);
+            case animation:
+                selectAction.setEnabled(false);
+                transAction.setEnabled(false);
+                timedPlaceAction.setEnabled(false);
+                timedArcAction.setEnabled(false);
+                transportArcAction.setEnabled(false);
+                inhibarcAction.setEnabled(false);
+                tokenAction.setEnabled(false);
+                deleteTokenAction.setEnabled(false);
+                annotationAction.setEnabled(false);
+                delayFireAction.setEnabled(true);
+                if(lens.isTimed())
+                    timeAction.setEnabled(true);
+                break;
+        }
+    }
+
+
+    public static final String textforDrawing = "Drawing Mode: Click on a button to start adding components to the Editor";
+    public static final String textforPlace = "Place Mode: Right click on a place to see menu options ";
+    public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options ";
+    public static final String textforTrans = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
+    public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
+    public static final String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to fire it";
+    public static final String textforArc = "Arc Mode: Right click on an arc to see menu options ";
+    public static final String textforTransportArc = "Transport Arc Mode: Right click on an arc to see menu options ";
+    public static final String textforInhibArc = "Inhibitor Mode: Right click on an arc to see menu options ";
+    public static final String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
+    public static final String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; double click to edit";
+    public static final String textforDrag = "Drag Mode";
+
+    public void changeStatusbarText(Pipe.ElementType type) {
+        switch (type) {
+            case PLACE:
+                app.ifPresent(o13 -> o13.setStatusBarText(textforPlace));
+                break;
+
+            case TAPNPLACE:
+                app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
+                break;
+
+            case IMMTRANS:
+            case TAPNTRANS:
+                app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
+                break;
+
+            case TIMEDTRANS:
+                app.ifPresent(o10 -> o10.setStatusBarText(textforTimedTrans));
+                break;
+
+            case ARC:
+            case TAPNARC:
+                app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
+                break;
+
+            case TRANSPORTARC:
+                app.ifPresent(o8 -> o8.setStatusBarText(textforTransportArc));
+                break;
+
+            case TAPNINHIBITOR_ARC:
+            case INHIBARC:
+                app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
+                break;
+
+            case ADDTOKEN:
+                app.ifPresent(o6 -> o6.setStatusBarText(textforAddtoken));
+                break;
+
+            case DELTOKEN:
+                app.ifPresent(o5 -> o5.setStatusBarText(textforDeltoken));
+                break;
+
+            case SELECT:
+                app.ifPresent(o4 -> o4.setStatusBarText(textforMove));
+                break;
+
+            case DRAW:
+                app.ifPresent(o3 -> o3.setStatusBarText(textforDrawing));
+                break;
+
+            case ANNOTATION:
+                app.ifPresent(o2 -> o2.setStatusBarText(textforAnnotation));
+                break;
+
+            case DRAG:
+                app.ifPresent(o1 -> o1.setStatusBarText(textforDrag));
+                break;
+
+            default:
+                app.ifPresent(o->o.setStatusBarText("To-do (textfor" + type));
+                break;
+        }
+    }
+
 }

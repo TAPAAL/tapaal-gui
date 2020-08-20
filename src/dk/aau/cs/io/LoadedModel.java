@@ -3,6 +3,7 @@ package dk.aau.cs.io;
 import java.util.Collection;
 import java.util.List;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -13,23 +14,21 @@ public class LoadedModel implements LoadedBatchProcessingModel {
     private final Collection<Template> templates;
 	private final Collection<TAPNQuery> queries;
 	private final TimedArcPetriNetNetwork network;
-    private final boolean isTimed;
-    private final boolean isGame;
     private final Collection<String> messages;
-	
-	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages){
-        this(network, templates, queries, messages, true, false);
+    private final TabContent.TAPNLens lens;
+
+    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages){
+        this(network, templates, queries, messages, TabContent.TAPNLens.Default);
     }
 	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
-		this(network, templates, queries, List.of(), true, false);
+		this(network, templates, queries, List.of(), TabContent.TAPNLens.Default);
 	}
 
-    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, boolean isTimed, boolean isGame){
+    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, TabContent.TAPNLens lens){
         this.templates = templates;
         this.network = network;
         this.queries = queries;
-        this.isTimed = isTimed;
-        this.isGame = isGame;
+        this.lens = lens;
         this.messages = messages;
     }
 
@@ -38,12 +37,15 @@ public class LoadedModel implements LoadedBatchProcessingModel {
 	public TimedArcPetriNetNetwork network(){ return network; }
     public Collection<String> getMessages() { return messages; }
 
+    public TabContent.TAPNLens getLens(){
+        return lens;
+    }
 
 	public boolean isTimed() {
-	    return isTimed;
+	    return lens.isTimed();
     }
     public boolean isGame() {
-	    return isGame;
+	    return lens.isGame();
     }
 
 }

@@ -1,5 +1,6 @@
 package dk.aau.cs.gui;
 
+import pipe.gui.GuiFrame;
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Pipe;
 import pipe.gui.SafeGuiFrameActions;
@@ -89,7 +90,10 @@ public interface TabContentActions {
 
     void setResizeingDefault();
 
+    void updateEnabledActions(GuiFrame.GUIMode mode);
+
     void changeTimeFeature(boolean isTime);
 
     void changeGameFeature(boolean isGame);
+
 }

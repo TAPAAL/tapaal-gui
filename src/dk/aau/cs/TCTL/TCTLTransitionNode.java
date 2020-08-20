@@ -57,7 +57,12 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 		return false;
 	}
 
-	@Override
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return false;
+    }
+
+    @Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return null;
 	}
