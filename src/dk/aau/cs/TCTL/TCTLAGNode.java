@@ -84,7 +84,12 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 		return property.containsPlaceHolder();
 	}
 
-	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return property instanceof TCTLPathToStateConverter || property.hasNestedPathQuantifiers();
+    }
+
+    public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
 		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
 	

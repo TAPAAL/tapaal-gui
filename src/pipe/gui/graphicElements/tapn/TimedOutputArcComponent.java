@@ -53,6 +53,7 @@ public class TimedOutputArcComponent extends Arc {
 				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
 				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())))
         );
+		this.lens = arc.lens;
 	}
 
 
@@ -60,8 +61,7 @@ public class TimedOutputArcComponent extends Arc {
         super(source);
         setTarget(target);
         setUnderlyingArc(modelArc);
-        this.isTimed = lens.isTimed();
-        this.isColored = lens.isColored();
+        this.lens = lens;
         updateLabel(true);
         sealArc();
     }

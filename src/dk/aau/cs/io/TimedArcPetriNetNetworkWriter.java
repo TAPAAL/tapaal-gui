@@ -22,6 +22,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -55,20 +56,20 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private final Iterable<TAPNQuery> queries;
 	private final Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
-    private boolean isTimed;
-    private boolean isGame;
-    private boolean isColored;
     private writeTACPN writeTACPN;
+    private final TabContent.TAPNLens lens;
 
     public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
 			Iterable<Template> templates,
 			Iterable<TAPNQuery> queries,
-			Iterable<Constant> constants) {
+			Iterable<Constant> constants
+    ) {
 		this.network = network;
 		this.templates = templates;
 		this.queries = queries;
 		this.constants = constants;
+		this.lens = TabContent.TAPNLens.Default;
 	}
 
     public TimedArcPetriNetNetworkWriter(
@@ -76,17 +77,14 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         Iterable<Template> templates,
         Iterable<TAPNQuery> queries,
         Iterable<Constant> constants,
-        boolean isTimed,
-        boolean isGame,
-        boolean isColored) {
+        TabContent.TAPNLens lens
+    ) {
         this.network = network;
         this.templates = templates;
         this.queries = queries;
         this.constants = constants;
-        this.isTimed = isTimed;
-        this.isGame = isGame;
-        this.isColored = isColored;
         writeTACPN = new writeTACPN(network);
+        this.lens = lens;
     }
 	
 	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
@@ -168,13 +166,13 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         String isTimed = "true";
         String isGame = "true";
         String isColored = "true";
-        if (!this.isTimed) {
+        if (!lens.isTimed()) {
             isTimed = "false";
         }
-        if (!this.isGame) {
+        if (!lens.isGame()) {
             isGame = "false";
         }
-        if(!this.isColored){
+        if(!lens.isColored()){
             isColored = "false";
         }
 

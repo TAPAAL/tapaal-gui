@@ -63,7 +63,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         this.guiFrameControllerActions.setReference(guiFrameControllerActions);
     }
 
-    public static class TAPNLens {
+    public static final class TAPNLens {
+        public static final TAPNLens Default = new TAPNLens(true, true, true);
         public boolean isTimed() {
             return timed;
         }
@@ -79,7 +80,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         private final boolean game;
         private final boolean colored;
 
-        TAPNLens(boolean timed, boolean game, boolean colored) {
+        public TAPNLens(boolean timed, boolean game, boolean colored) {
             this.timed = timed;
             this.game = game;
             this.colored = colored;
@@ -592,8 +593,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }).start();
             }
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.isTimed(), loadedModel.isGame(), loadedModel.isColored());
-
+            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
             tab.setInitialName(name);
 
@@ -816,6 +816,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             addGuiModel(template.model(), template.guiModel());
             zoomLevels.put(template.model(), template.zoomer());
             hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+            for(PetriNetObject o : template.guiModel().getPetriNetObjects()){
+                o.setLens(this.lens);
+            }
         }
 
         drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this, managerRef);
@@ -863,7 +866,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
         this(network, templates, tapnqueries,  new TAPNLens(true, false, false));
     }
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
         setNetwork(network, templates);
@@ -1165,7 +1168,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
-        hideTimedInformation();
 	}
 
 	private void hideTimedInformation(){
@@ -1259,7 +1261,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createAnimationControlSidePanel() {
-		animControlerBox = new AnimationControlSidePanel(animator);
+		animControlerBox = new AnimationControlSidePanel(animator, lens);
 	}
 
 	public AnimationHistoryList getAnimationHistorySidePanel() {
@@ -1525,13 +1527,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(FeatureOption.TIME, false);
+	    TabContent tab = duplicateTab(new TAPNLens(false, lens.isGame(), lens.isColored()), "-untimed");
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab(FeatureOption.GAME, false);
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), false, lens.isColored()), "-nongame");
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1555,10 +1557,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.TIME, isTime);
+                TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored()), "-timed");
+                findAndRemoveAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
+        }
+    }
+
+    private void findAndRemoveAffectedQueries(TabContent tab){
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        for (TAPNQuery q : tab.queries()){
+            if(q.hasUntimedOnlyProperties()){
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            }
+        }
+        String message = "The following queries will be removed in the conversion:";
+        for(TAPNQuery q : queriesToRemove){
+            message += "\n" + q.getName();
+        }
+        if(!queriesToRemove.isEmpty()){
+            JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1577,7 +1597,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.GAME, isGame);
+                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored()), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1599,7 +1619,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonColor();
                 }
             } else {
-                TabContent tab = duplicateTab(FeatureOption.COLOR, isColor);
+                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), isColor), "-colored");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -2022,9 +2042,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 					allTemplates(),
 					queriesOverwrite,
 					network().constants(),
-                    lens.timed,
-					lens.game,
-                    lens.colored
+                    lens
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -2102,53 +2120,26 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab(FeatureOption option, boolean isYes) {
-		NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-				network(),
-				allTemplates(),
-				queries(),
-				network().constants()
-		);
+	public TabContent duplicateTab(TAPNLens overwriteLens, String appendName) {
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+            network(),
+            allTemplates(),
+            queries(),
+            network().constants(),
+            overwriteLens
+        );
 
-		option = isNetChanged(option, isYes) ? option : FeatureOption.TIME;
-
-		try {
-			ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-			String composedName = getTabTitle();
-			composedName = composedName.replace(".tapn", "");
-
-			switch (option) {
-                case TIME:
-                    composedName += isYes ? "-timed" : "-untimed";
-                    break;
-                case GAME:
-                    composedName += isYes ? "-game" : "-noGame";
-                    break;
-                case COLOR:
-                    composedName += isYes ? "-color" : "-noColor";
-            }
-
-			if (isNetChanged(option, isYes)) {
-			    return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, option, isYes);
-            } else {
-                return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
-            }
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			System.console().printf(e1.getMessage());
-		}
-		return null;
-	}
-
-	private boolean isNetChanged(FeatureOption option, boolean isYes) {
-        switch (option) {
-            case TIME:
-                return lens.isTimed() != isYes;
-            case GAME:
-                return lens.isGame() != isYes;
-            default:
-                return false;
+        try {
+            ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+            String composedName = getTabTitle();
+            composedName = composedName.replace(".tapn", "");
+            composedName += appendName;
+            return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+        } catch (Exception e1) {
+            Logger.log("Could not load model");
+            e1.printStackTrace();
         }
+        return null;
     }
 
 	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {

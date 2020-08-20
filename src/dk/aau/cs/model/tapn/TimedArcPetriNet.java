@@ -1,13 +1,10 @@
 package dk.aau.cs.model.tapn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import java.util.HashSet;
 
 public class TimedArcPetriNet {
 	private String name;
@@ -371,6 +368,14 @@ public class TimedArcPetriNet {
 		}
 		return true;
 	}
+
+    public int getHighestNetDegree(){
+	    int currentHighestNetDegree = 0;
+        for (TimedTransition t : this.transitions()) {
+            currentHighestNetDegree = Collections.max(Arrays.asList(currentHighestNetDegree, t.presetSize(), t.postsetSize()));
+        }
+        return currentHighestNetDegree;
+    }
 	
 	public boolean isActive() {
 		return isActive;

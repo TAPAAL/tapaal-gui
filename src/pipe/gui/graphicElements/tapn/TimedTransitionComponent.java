@@ -43,8 +43,7 @@ public class TimedTransitionComponent extends Transition {
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 		attributesVisible = true;
-		this.isTimed = lens.isTimed();
-		this.isColored = lens.isColored();
+		this.lens = lens;
 
 	}
 
@@ -57,7 +56,8 @@ public class TimedTransitionComponent extends Transition {
         boolean timedTransition,
         boolean infServer,
         int angleInput,
-        int priority
+        int priority,
+        TabContent.TAPNLens lens
     ) {
 		super(
 		    positionXInput,
@@ -69,6 +69,7 @@ public class TimedTransitionComponent extends Transition {
         );
 		listener = timedTransitionListener();
 		attributesVisible = true;
+        this.lens = lens;
 
 	}
 
@@ -177,7 +178,7 @@ public class TimedTransitionComponent extends Transition {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
 			getNameLabel().zoomUpdate(getZoom());
-			if(underlyingTransition().getGuard() != null && isColored){
+			if(underlyingTransition().getGuard() != null && lens.isColored()){
                 pnName.setText("");
                 super.update(displayConstantNames);
                 pnName.setText(pnName.getText() + "\n" + this.underlyingTransition().getGuard().toString());
@@ -233,7 +234,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0, lens);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;
@@ -248,7 +249,7 @@ public class TimedTransitionComponent extends Transition {
 		}
 		
 		// Build interface
-		if (show && (transition.getdInterval() != null)) {
+		if (show && (transition.getdInterval() != null) && isTimed()) {
 			dIntervalWindow = new Window(new Frame());
 			dIntervalWindow.add(new JTextArea(transition.getdInterval().toString()));
 			

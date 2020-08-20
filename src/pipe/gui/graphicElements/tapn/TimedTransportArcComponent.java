@@ -29,8 +29,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet, TabContent.TAPNLens lens) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
-        this.isTimed = lens.isTimed();
-        this.isColored = lens.isColored();
+        this.lens = lens;
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);
@@ -51,8 +50,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	    this.isInPreSet = true;
 	    this.setGroup(group);
 	    setUnderlyingArc(model);
-        this.isColored= lens.isColored();
-        this.isTimed = lens.isTimed();
+        this.lens = lens;
 	    updateLabel(true);
     }
 
@@ -61,8 +59,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
         setTarget(p);
         this.isInPreSet = false;
         this.setGroup(group);
-        this.isColored= lens.isColored();
-        this.isTimed = lens.isTimed();
+        this.lens = lens;
         setUnderlyingArc(model);
 
         updateLabel(true);

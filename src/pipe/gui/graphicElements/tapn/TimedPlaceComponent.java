@@ -56,8 +56,7 @@ public class TimedPlaceComponent extends Place {
 		super(positionXInput, positionYInput);
 		this.place = place;
         this.place.addTimedPlaceListener(listener);
-        this.isTimed = lens.isTimed();
-        this.isColored = lens.isColored();
+        this.lens = lens;
 		attributesVisible = true;
 
     }
@@ -67,15 +66,17 @@ public class TimedPlaceComponent extends Place {
         int positionYInput,
         String idInput,
         int nameOffsetXInput,
-        int nameOffsetYInput
+        int nameOffsetYInput,
+        TabContent.TAPNLens lens
     ) {
 
 		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
         attributesVisible = true;
+        this.lens = lens;
 
     }
 
-	@Override
+    @Override
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
@@ -177,7 +178,7 @@ public class TimedPlaceComponent extends Place {
 				}
 			}
         }
-        if(!isTimed){
+        if(!lens.isTimed()){
             drawDots = (marking > 0 && marking < 6);
         }
         // structure sees how many markings there are and fills the place in
@@ -294,7 +295,7 @@ public class TimedPlaceComponent extends Place {
 		}
 		
 		// Build interface
-		if (show) {
+		if (show && isTimed()) {
 			ageOfTokensWindow = new Window(new Frame());
 			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
@@ -447,7 +448,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY());
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), lens);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 		placeComponent.setColorTimeInvariant(this.getColorTimeInvariant());
 

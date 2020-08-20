@@ -88,7 +88,12 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 		return property.containsPlaceHolder();
 	}
 
-	@Override
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return property instanceof TCTLPathToStateConverter || property.hasNestedPathQuantifiers();
+    }
+
+    @Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();
 

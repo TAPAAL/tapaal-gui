@@ -514,6 +514,13 @@ public class TimedArcPetriNetNetwork {
 		return composedModel.value1().isDegree2();
 	}
 
+    public int getHighestNetDegree(){
+        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
+
+        return composedModel.value1().getHighestNetDegree();
+    }
+
 	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
 		for(TimedArcPetriNet tapn : this.activeTemplates()){
 			for(TimedPlace timedPlace : tapn.places()){

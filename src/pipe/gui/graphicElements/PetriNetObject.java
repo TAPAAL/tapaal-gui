@@ -3,6 +3,8 @@ package pipe.gui.graphicElements;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
+
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
@@ -19,8 +21,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	/** x/y position position on screen (zoomed) */
 	protected int positionX;
 	protected int positionY;
-	protected boolean isTimed;
-	protected boolean isColored;
+	protected TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
 	// The x/y coordinate of object at 100% zoom.
 	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
@@ -288,17 +289,15 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	}
 
 	public boolean isTimed(){
-	    return isTimed;
+	    return lens.isTimed();
     }
-    public void setIsTimed(boolean newStatus){
-	    isTimed = newStatus;
-    }
-    public void setIsColored(boolean newStatus){
-	    isColored = newStatus;
+
+    public void setLens(TabContent.TAPNLens lens){
+	    this.lens = lens;
     }
 
     public boolean isColored(){
-	    return isColored;
+	    return lens.isColored();
     }
 
     @Override
