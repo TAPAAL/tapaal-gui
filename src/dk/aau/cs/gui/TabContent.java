@@ -2687,13 +2687,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
     public List<GuiAction> getAvailableDrawActions(){
         if (lens.isTimed() && !lens.isGame()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         } else if (lens.isTimed()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         } else if (lens.isGame()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         } else {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         }
     }
 
