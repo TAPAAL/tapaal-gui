@@ -1579,18 +1579,24 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private void findAndRemoveGameAffectedQueries(TabContent tab){
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         for (TAPNQuery q : tab.queries()) {
-            if (q.hasUntimedOnlyProperties()
-                || !(q.getProperty() instanceof TCTLAGNode)
-                || !q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)
-                || !q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)
-                || q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)
-                || q.isUnderApproximationEnabled()
-                || q.isOverApproximationEnabled()
-                || q.useTimeDarts()
-                || q.useGCD()
-            ) {
+            if (q.hasUntimedOnlyProperties() || !(q.getProperty() instanceof TCTLAGNode) || !lens.isTimed()) {
                 queriesToRemove.add(q);
                 tab.removeQuery(q);
+            } else {
+                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
+                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
+                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                } if (q.useTimeDarts()) {
+                    q.setUseTimeDarts(false);
+                } if (q.useGCD()) {
+                    q.setUseGCD(false);
+                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
+                    q.setUseOverApproximationEnabled(false);
+                    q.setUseUnderApproximationEnabled(false);
+                }
             }
         }
         String message = "The following queries will be removed in the conversion:";
