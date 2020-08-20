@@ -17,10 +17,7 @@ import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import kotlin.Pair;
 import dk.aau.cs.gui.TabContent;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import pipe.dataLayer.TAPNQuery;
@@ -159,10 +156,21 @@ public class TapnXmlLoader {
     private void parseFeature(Document doc) {
         if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");
+            var isTimed = false;
+            var isGame = false;
+            var isColored = false;
 
-            var isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
-            var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
-            var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
+	        NamedNodeMap node = nodeList.item(0).getAttributes();
+
+	        if (node.getNamedItem("isTimed") != null) {
+                isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
+            }
+            if (node.getNamedItem("isGame") != null) {
+                isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
+            }
+            if (node.getNamedItem("isColored") != null) {
+                isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
+            }
 
             lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
         } else {
