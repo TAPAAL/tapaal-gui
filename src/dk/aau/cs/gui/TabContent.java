@@ -16,9 +16,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.DeleteQueriesCommand;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
+import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -542,10 +540,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         public void toggleUncontrollableTrans() {
             ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+            TabContent currentTab = TabContent.this;
+            getUndoManager().newEdit();
 
             for (PetriNetObject o : selection) {
                 if (o instanceof TimedTransitionComponent) {
-                    ((TimedTransitionComponent) o).setUncontrollable(!((TimedTransitionComponent) o).isUncontrollable());
+                    TimedTransitionComponent transition = (TimedTransitionComponent) o;
+                    Command cmd = new ToggleTransitionUncontrollable(transition.underlyingTransition(), currentTab);
+
+                    cmd.redo();
+                    getUndoManager().addEdit(cmd);
                 }
             }
             repaint();
@@ -553,10 +557,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         public void toggleUrgentTrans() {
             ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+            TabContent currentTab = TabContent.this;
+            getUndoManager().newEdit();
 
             for (PetriNetObject o : selection) {
                 if (o instanceof TimedTransitionComponent) {
-                    ((TimedTransitionComponent) o).setUrgent(!((TimedTransitionComponent) o).isUrgent());
+                    TimedTransitionComponent transition = (TimedTransitionComponent) o;
+                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
+
+                    cmd.redo();
+                    getUndoManager().addEdit(cmd);
                 }
             }
             repaint();
