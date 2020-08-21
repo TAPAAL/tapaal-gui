@@ -24,7 +24,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.ColoredToken;
 import pipe.gui.CreateGui;
@@ -129,7 +128,7 @@ public class TimedPlaceComponent extends Place {
 		return buffer.toString();
 	}
 
-    private String getStringOfColoredTokens() {
+    private String getStringOfColoredTimedTokens() {
         StringBuilder buffer = new StringBuilder("{");
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
@@ -148,6 +147,28 @@ public class TimedPlaceComponent extends Place {
                 buffer.append(")");
             } else {
                 buffer.append(df.format(token.age()));
+            }
+
+            first = false;
+        }
+        buffer.append('}');
+
+        return buffer.toString();
+    }
+
+    private String getStringOfColoredTokens() {
+        StringBuilder buffer = new StringBuilder("{");
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+
+        boolean first = true;
+        for (TimedToken token : place.tokens()) {
+            if (!first) {
+                buffer.append(", ");
+            }
+            if (token instanceof ColoredToken) {
+                buffer.append(((ColoredToken)token).color().getColorName());
             }
 
             first = false;
@@ -324,12 +345,15 @@ public class TimedPlaceComponent extends Place {
 		}
 		
 		// Build interface
-		if (show && isTimed()) {
+		if (show && (isTimed() || isColored())) {
 			ageOfTokensWindow = new Window(new Frame());
-			if (isColored()) {
-			    ageOfTokensWindow.add(new JTextArea(getStringOfColoredTokens()));
-            } else {
+			if (isColored() && !isTimed()) {
+                ageOfTokensWindow.add(new JTextArea(getStringOfColoredTokens()));
+            } else if (!isColored() && isTimed()){
                 ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
+            } else {
+                ageOfTokensWindow.add(new JTextArea(getStringOfColoredTimedTokens()));
+
             }
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
 
@@ -366,7 +390,9 @@ public class TimedPlaceComponent extends Place {
 						+ 20 + numberOfTokens);
 			}
 			ageOfTokensWindow.setVisible(show);
-		}
+		} else if (show && isColored()) {
+
+        }
 	}
 
 	@Override
