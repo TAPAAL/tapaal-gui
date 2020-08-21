@@ -168,7 +168,11 @@ public class TimedPlaceComponent extends Place {
                 buffer.append(", ");
             }
             if (token instanceof ColoredToken) {
-                buffer.append(((ColoredToken)token).color().getColorName());
+                if (((ColoredToken)token).color().getColorName().equals("")) {
+                    buffer.append(((ColoredToken) token).color().toString());
+                } else {
+                    buffer.append(((ColoredToken) token).color().getColorName());
+                }
             }
 
             first = false;
