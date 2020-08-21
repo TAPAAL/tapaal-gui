@@ -204,7 +204,7 @@ public class TapnXmlLoader {
 			}
 		}
 		//TODO: implements parsing of colors
-		SharedPlace place = new SharedPlace(name, invariant, null);
+		SharedPlace place = new SharedPlace(name, invariant);
         place.setCurrentMarking(marking);
 		place.addTokens(numberOfTokens);
 

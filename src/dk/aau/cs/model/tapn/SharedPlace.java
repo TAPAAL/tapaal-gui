@@ -21,13 +21,12 @@ public class SharedPlace extends TimedPlace{
 		this(name, ColorType.COLORTYPE_DOT);
 	}
     public SharedPlace(String name, ColorType colorType) {
-        this(name, TimeInvariant.LESS_THAN_INFINITY, ColoredTimeInvariant.LESS_THAN_INFINITY_AND_DOT);
+        this(name, TimeInvariant.LESS_THAN_INFINITY);
         this.colorType = colorType;
     }
-	public SharedPlace(String name, TimeInvariant invariant, ColoredTimeInvariant CTI){
+	public SharedPlace(String name, TimeInvariant invariant){
 		setName(name);
 		setInvariant(invariant);
-		setColorTimeInvariant(CTI);
 	}
 
     public void setNetwork(TimedArcPetriNetNetwork network) {
@@ -41,7 +40,7 @@ public class SharedPlace extends TimedPlace{
 
     //TODO: check that colored time invariant is copied correctly
 	public TimedPlace copy() {
-		return new SharedPlace(this.name(), this.invariant().copy(), this.getColoredTimeInvariant().copy());
+		return new SharedPlace(this.name(), this.invariant().copy());
 	}
 
 	public boolean isShared() {

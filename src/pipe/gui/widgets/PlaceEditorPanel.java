@@ -1,9 +1,7 @@
 package pipe.gui.widgets;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -79,7 +77,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
             markingLabel.setVisible(false);
             markingSpinner.setVisible(false);
             if(place.isTimed()){
-                timeInvariantPanel.setVisible(false);
+                timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Default Age Invariant"));
             }
         }
     }
@@ -761,7 +759,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
     public void initColorInvariantPanel(){
 	    timeInvariantColorPanel = new JPanel(new GridBagLayout());
-        timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
+        timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariants for specific colors"));
 
         GridBagConstraints gbc = GridBagHelper.as(0,0);
         timeInvariantColorPanel.add(initColorConstraintPanel(), gbc);
@@ -801,7 +799,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         JTable table = new JTable(tableModel);
         table.setPreferredSize(new Dimension(300, 150));
         timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
-        //timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
+        timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
 
 
 
@@ -1057,6 +1055,38 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         for (ColoredTimeInvariant timeInvariant : place.underlyingPlace().getCtiList()) {
             timeConstraintListModel.addElement(timeInvariant);
         }
+    }
+
+    private MouseListener createDoubleClickMouseAdapter() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (!timeConstraintList.isSelectionEmpty()) {
+                    if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
+                        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Invariant", true);
+                        Container contentPane = guiDialog.getContentPane();
+
+                        // 1 Set layout
+                        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+                        ColoredTimeInvariantDialogPanel ctiPanel = new ColoredTimeInvariantDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInvariant) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()), place);
+                        contentPane.add(ctiPanel);
+
+                        guiDialog.setResizable(false);
+
+                        // Make window fit contents' preferred size
+                        guiDialog.pack();
+
+                        // Move window to the middle of the screen
+                        guiDialog.setLocationRelativeTo(null);
+                        guiDialog.setVisible(true);
+
+                        if (ctiPanel.didEdit){
+                            timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInvariant());
+                        }
+                    }
+                }
+            }
+        };
     }
 
     private javax.swing.JCheckBox attributesCheckBox;

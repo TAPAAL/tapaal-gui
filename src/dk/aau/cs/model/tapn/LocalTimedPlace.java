@@ -10,9 +10,7 @@ import java.util.List;
 
 public class LocalTimedPlace  extends TimedPlace {
     private ColorType colorType;
-    private List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>() {{
-        add(ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(Color.STAR_COLOR));
-    }};
+    private List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
 	private TimedArcPetriNet model;
     public LocalTimedPlace(String name){
         this(name, ColorType.COLORTYPE_DOT);

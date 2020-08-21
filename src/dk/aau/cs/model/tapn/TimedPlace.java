@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
@@ -19,7 +20,6 @@ public abstract class TimedPlace {
     protected Tuple<PlaceType, Integer> extrapolation = new Tuple<PlaceType, Integer>(PlaceType.Dead, -2);
     protected String name;
     protected TimeInvariant invariant;
-    protected ColoredTimeInvariant coloredTimeInvariant;
     protected TimedMarking currentMarking;
 
     private final List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
@@ -148,14 +148,6 @@ public abstract class TimedPlace {
         Require.that(invariant != null, "invariant must not be null");
         this.invariant = invariant;
         fireInvariantChanged();
-    }
-
-    public void setColorTimeInvariant(ColoredTimeInvariant cli){
-        coloredTimeInvariant = cli;
-    }
-
-    public ColoredTimeInvariant getColoredTimeInvariant(){
-	    return coloredTimeInvariant;
     }
 
     public void addTimedPlaceListener(TimedPlaceListener listener) {
