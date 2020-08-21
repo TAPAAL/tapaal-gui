@@ -26,6 +26,7 @@ import javax.swing.JTextArea;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.ColoredToken;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -127,6 +128,34 @@ public class TimedPlaceComponent extends Place {
 
 		return buffer.toString();
 	}
+
+    private String getStringOfColoredTokens() {
+        StringBuilder buffer = new StringBuilder("{");
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+
+        boolean first = true;
+        for (TimedToken token : place.tokens()) {
+            if (!first) {
+                buffer.append(", ");
+            }
+            if (token instanceof ColoredToken) {
+                buffer.append("(");
+                buffer.append(((ColoredToken)token).color().getColorName());
+                buffer.append(", ");
+                buffer.append(df.format(token.age()));
+                buffer.append(")");
+            } else {
+                buffer.append(df.format(token.age()));
+            }
+
+            first = false;
+        }
+        buffer.append('}');
+
+        return buffer.toString();
+    }
 
 	public boolean isAgeOfTokensShown() {
 		return ageOfTokensWindow.isVisible();
@@ -297,7 +326,11 @@ public class TimedPlaceComponent extends Place {
 		// Build interface
 		if (show && isTimed()) {
 			ageOfTokensWindow = new Window(new Frame());
-			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
+			if (isColored()) {
+			    ageOfTokensWindow.add(new JTextArea(getStringOfColoredTokens()));
+            } else {
+                ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
+            }
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
 
 			// Make window fit contents' preferred size
