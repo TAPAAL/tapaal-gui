@@ -183,7 +183,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         DelayEnabledTransitionControl.setDefaultDelayMode(prefs.getDelayEnabledTransitionDelayMode());
         DelayEnabledTransitionControl.setDefaultGranularity(prefs.getDelayEnabledTransitionGranularity());
-        DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
+        SimulationControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
 
         showToolTips = prefs.getShowToolTips();
         setDisplayToolTips(showToolTips);
@@ -319,7 +319,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         prefs.setShowTokenAge(guiFrameDirectAccess.showTokenAge());
         prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
         prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
-        prefs.setDelayEnabledTransitionIsRandomTransition(DelayEnabledTransitionControl.isRandomTransition());
+        prefs.setDelayEnabledTransitionIsRandomTransition(SimulationControl.isRandomTransition());
 
         JOptionPane.showMessageDialog(guiFrameDirectAccess,
                 "The workspace has now been saved into your preferences.\n"
@@ -824,7 +824,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //showDelayEnabledTransitions(advanced);
         DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
         DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
-        DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
+        SimulationControl.getInstance().setRandomTransitionMode(false);
     }
 
 

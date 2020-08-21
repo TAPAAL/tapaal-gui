@@ -57,7 +57,7 @@ public abstract class TCTLAbstractProperty {
 	public abstract boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName);
 
 	public abstract boolean containsPlaceHolder();
-
+    public abstract boolean hasNestedPathQuantifiers();
 	// This method assumes that a place holder exists in the current query
 	public abstract TCTLAbstractProperty findFirstPlaceHolder();
 

@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
@@ -48,6 +49,7 @@ public class AnimationControlSidePanel extends JPanel {
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
 	private JPanel sliderPanel;
 	private JPanel timedelayPanel;
+    JPanel firemode;
 
 
 
@@ -55,7 +57,7 @@ public class AnimationControlSidePanel extends JPanel {
 	JComboBox<String> firermodebox;
 
 
-	public AnimationControlSidePanel(Animator animator) {
+	public AnimationControlSidePanel(Animator animator, TabContent.TAPNLens lens) {
         Require.notNull(animator, "Animator can't be null");
 
         this.animator = animator;
@@ -82,7 +84,7 @@ public class AnimationControlSidePanel extends JPanel {
 		c.gridy = 2;
 		add(animationToolBar, c);
 
-        JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         JLabel label = new JLabel("Token selection: ");
 
@@ -106,7 +108,18 @@ public class AnimationControlSidePanel extends JPanel {
 		this.setMinimumSize(new Dimension(275, 180));
 		
 		initializeDocumentFilterForDelayInput();
+		hideIrrelevantInformation(lens);
 	}
+
+	private void hideIrrelevantInformation(TabContent.TAPNLens lens){
+        sliderPanel.setVisible(lens.isTimed());
+        timedelayPanel.setVisible(lens.isTimed());
+        firemode.setVisible(lens.isTimed());
+        if(!lens.isTimed()){
+            this.setPreferredSize(new Dimension(275, 50));
+            this.setMinimumSize(new Dimension(275, 50));
+        }
+    }
 
     private void initDelaySlider() {
 		sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

@@ -27,7 +27,7 @@ public class AnimationSettingsDialog {
 		
 		simControl.addRandomSimulationActionListener(e -> {
 			if(simControl.randomSimulation()){
-				delayEnabled.randomMode.setSelected(true);
+				simControl.randomMode.setSelected(true);
 			}
 			CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
 		});
@@ -39,9 +39,7 @@ public class AnimationSettingsDialog {
 	}
 
     private static void hideTimedInformation(TabContent.TAPNLens lens){
-	    if(!lens.isTimed()) {
-            delayEnabled.setVisible(false);
-        }
+	    delayEnabled.setVisible(lens.isTimed());
     }
 	
 	public static void showAnimationSettings(TabContent.TAPNLens lens){
@@ -49,7 +47,7 @@ public class AnimationSettingsDialog {
 		
 		JButton closeDialogButton = new JButton("Close");
 		closeDialogButton.addActionListener(o -> dialog.setVisible(false));
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 3, 0, 3);

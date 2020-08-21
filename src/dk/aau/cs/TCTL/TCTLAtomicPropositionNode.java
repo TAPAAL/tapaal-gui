@@ -83,7 +83,12 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		return left.containsPlaceHolder() || right.containsPlaceHolder();
 	}
 
-	@Override
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return false;
+    }
+
+    @Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		TCTLAbstractProperty rightP = right.findFirstPlaceHolder(); 
 		
