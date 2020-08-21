@@ -540,6 +540,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
+        public void toggleUncontrollableTrans() {
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+
+            for (PetriNetObject o : selection) {
+                if (o instanceof TimedTransitionComponent) {
+                    ((TimedTransitionComponent) o).setUncontrollable(!((TimedTransitionComponent) o).isUncontrollable());
+                }
+            }
+            repaint();
+        }
+
+        public void toggleUrgentTrans() {
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+
+            for (PetriNetObject o : selection) {
+                if (o instanceof TimedTransitionComponent) {
+                    ((TimedTransitionComponent) o).setUrgent(!((TimedTransitionComponent) o).isUrgent());
+                }
+            }
+            repaint();
+        }
+
 
     }
 
@@ -2761,26 +2783,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
     };
     private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
         public void actionPerformed(ActionEvent e) {
-            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
-
-            for (PetriNetObject o : selection) {
-                if (o instanceof TimedTransitionComponent) {
-                    ((TimedTransitionComponent) o).setUncontrollable(!((TimedTransitionComponent) o).isUncontrollable());
-                }
-            }
-            repaint();
+            guiModelManager.toggleUncontrollableTrans();
         }
     };
     private final GuiAction toggleUrgentAction = new GuiAction("Toggle urgent transition", "Toggle between urgent/non-urgent transition", "U", true) {
         public void actionPerformed(ActionEvent e) {
-            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
-
-            for (PetriNetObject o : selection) {
-                if (o instanceof TimedTransitionComponent) {
-                    ((TimedTransitionComponent) o).setUrgent(!((TimedTransitionComponent) o).isUrgent());
-                }
-            }
-            repaint();
+            guiModelManager.toggleUrgentTrans();
         }
     };
     private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
