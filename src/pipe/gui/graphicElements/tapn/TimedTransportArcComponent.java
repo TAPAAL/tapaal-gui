@@ -103,70 +103,69 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
-	    if(isTimed() && !isColored()) {
-            if (isInPreSet && underlyingTransportArc != null) {
-                if (CreateGui.getApp() != null && CreateGui.getApp().showZeroToInfinityIntervals()) {
+        if (isInPreSet && underlyingTransportArc != null) {
+            if (CreateGui.getApp() != null && CreateGui.getApp().showZeroToInfinityIntervals()) {
+                getNameLabel().setText(underlyingTransportArc.interval().toString(
+                    displayConstantNames)
+                    + " : " + getGroup());
+            } else {
+                if (underlyingTransportArc.interval().toString(
+                    displayConstantNames).equals("[0,inf)")) {
+
+                    getNameLabel().setText(" : " + getGroup());
+
+                } else {
                     getNameLabel().setText(underlyingTransportArc.interval().toString(
                         displayConstantNames)
                         + " : " + getGroup());
-                } else {
-                    if (underlyingTransportArc.interval().toString(
-                        displayConstantNames).equals("[0,inf)")) {
+                }
+            }
 
-                        getNameLabel().setText(" : " + getGroup());
-
-                    } else {
-                        getNameLabel().setText(underlyingTransportArc.interval().toString(
-                            displayConstantNames)
-                            + " : " + getGroup());
-                    }
+            // Handle constant highlighting
+            boolean focusedConstant = false;
+            boolean isvisible = true;
+            if (underlyingTransportArc.interval().lowerBound() instanceof ConstantBound) {
+                if (((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()) {
+                    focusedConstant = true;
                 }
-
-                // Handle constant highlighting
-                boolean focusedConstant = false;
-                boolean isvisible = true;
-                if (underlyingTransportArc.interval().lowerBound() instanceof ConstantBound) {
-                    if (((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()) {
-                        focusedConstant = true;
-                    }
-                    if (!((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible()) {
-                        focusedConstant = false;
-                    }
+                if (!((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().getVisible()) {
+                    focusedConstant = false;
                 }
-                if (underlyingTransportArc.interval().upperBound() instanceof ConstantBound) {
-                    if (((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()) {
-                        focusedConstant = true;
-                    }
-                    if (!((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()) {
-                        isvisible = false;
-                    }
+            }
+            if (underlyingTransportArc.interval().upperBound() instanceof ConstantBound) {
+                if (((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()) {
+                    focusedConstant = true;
                 }
-                if (getWeight() instanceof ConstantWeight) {
-                    if (((ConstantWeight) getWeight()).constant().hasFocus()) {
-                        focusedConstant = true;
-                    }
-                    if (!((ConstantWeight) getWeight()).constant().hasFocus()) {
-                        isvisible = false;
-                    }
+                if (!((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().getVisible()) {
+                    isvisible = false;
                 }
-                if (focusedConstant) {
-                    getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-                } else {
-                    getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+            }
+            if (getWeight() instanceof ConstantWeight) {
+                if (((ConstantWeight) getWeight()).constant().hasFocus()) {
+                    focusedConstant = true;
                 }
-                pnName.setVisible(isvisible);
-
-            } else if (!isInPreSet) {
-                getNameLabel().setText(" : " + getGroup());
+                if (!((ConstantWeight) getWeight()).constant().hasFocus()) {
+                    isvisible = false;
+                }
+            }
+            if (focusedConstant) {
+                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
             } else {
-                getNameLabel().setText("");
+                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
             }
+            pnName.setVisible(isvisible);
 
-            if (underlyingTransportArc != null) {
-                getNameLabel().setText(getWeight().toString(displayConstantNames) + " " + getNameLabel().getText());
-            }
-        } else{
-            String labelText = "";
+        } else if (!isInPreSet) {
+            getNameLabel().setText(" : " + getGroup());
+        } else {
+            getNameLabel().setText("");
+        }
+
+        if (underlyingTransportArc != null) {
+            getNameLabel().setText(getWeight().toString(displayConstantNames) + " " + getNameLabel().getText());
+        }
+        if(isColored()) {
+            String labelText = getNameLabel().getText() + "\n";
             if (isInPreSet() && underlyingTransportArc() != null) {
                 if (underlyingTransportArc().getInputExpression() != null)
                     labelText += underlyingTransportArc().getInputExpression().toString() + "\n";
