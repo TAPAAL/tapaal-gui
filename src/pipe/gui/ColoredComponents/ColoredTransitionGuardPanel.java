@@ -735,6 +735,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     updateSelection();
                 }
             }
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
+                    if(currentSelection.getObject() instanceof ColorExpression){
+                        editColorExpressionButton.doClick();
+                    }
+                }
+            }
         });
 
         exprField.getDocument().addDocumentListener(new DocumentListener() {
