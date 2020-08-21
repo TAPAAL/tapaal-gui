@@ -1759,6 +1759,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private Pipe.ElementType editorMode = Pipe.ElementType.SELECT;
 
+	public Pipe.ElementType getEditorMode() {
+	    return editorMode;
+    }
+
 	//XXX temp while refactoring, kyrke - 2019-07-25
 	@Override
 	public void setMode(Pipe.ElementType mode) {
@@ -1776,8 +1780,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     @Override
                     public void registerEvents() {
                         registerEvent(
-                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && !lens.isColored(),
                             e -> guiModelManager.addToken(getModel(), (TimedPlaceComponent) e.pno, 1)
+                        );
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && lens.isColored(),
+                            e -> ((TimedPlaceComponent) e.pno).showEditor()
                         );
                     }
                 });
@@ -1787,8 +1795,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     @Override
                     public void registerEvents() {
                         registerEvent(
-                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && !lens.isColored(),
                             e -> guiModelManager.removeToken(getModel(), (TimedPlaceComponent) e.pno, 1)
+                        );
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && lens.isColored(),
+                            e -> ((TimedPlaceComponent) e.pno).showEditor()
                         );
                     }
                 });
@@ -2739,12 +2751,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
     public List<GuiAction> getAvailableDrawActions(){
-        //TODO: I removed add token and remove token actions for colored nets. How should these be handled?
-        if(lens.isColored() && lens.isTimed()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction));
-        } else if(lens.isColored() && !lens.isTimed()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction));
-        } else if(lens.isTimed()){
+       if(lens.isTimed()){
             return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
         } else{
             return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
@@ -2786,7 +2793,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.ADDTOKEN);
         }
     };
-
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.DELTOKEN);

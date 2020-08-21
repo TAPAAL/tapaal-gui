@@ -110,6 +110,17 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		setInitialComboBoxValue();
 		writeTokensToList();
 		setColoredTimeInvariants();
+		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN) {
+            basicPropertiesPanel.setVisible(false);
+            timeInvariantPanel.setVisible(false);
+            colorTypePanel.setVisible(false);
+            timeInvariantColorPanel.setVisible(false);
+        } else {
+            basicPropertiesPanel.setVisible(true);
+            timeInvariantPanel.setVisible(true);
+            colorTypePanel.setVisible(true);
+            timeInvariantColorPanel.setVisible(true);
+        }
 	}
 
 	private void initButtonPanel() {
