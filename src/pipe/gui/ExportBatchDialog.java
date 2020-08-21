@@ -524,7 +524,7 @@ public class ExportBatchDialog extends JDialog {
 		for(pipe.dataLayer.Template template : loadedModel.templates()) {
 			guiModel.put(template.model(), template.guiModel());
 		}
-		PNMLWriter pnmlWriter = new PNMLWriter(loadedModel.network(), guiModel);
+		PNMLWriter pnmlWriter = new PNMLWriter(loadedModel.network(), guiModel, null);
 		pnmlWriter.savePNML(f);
 	}
 	

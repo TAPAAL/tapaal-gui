@@ -17,6 +17,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.TimedTransition;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -41,12 +43,14 @@ public class PNMLWriter implements NetWriter {
 	private final TimedArcPetriNetNetwork network;
 	private TimedArcPetriNet composedNetwork;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
+	private final TabContent.TAPNLens lens;
+	private writeTACPN writeTACPN;
 
-	public PNMLWriter(
-			TimedArcPetriNetNetwork network, 
-			HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+	public PNMLWriter(TimedArcPetriNetNetwork network, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		this.network = network;
 		this.guiModels = guiModels;
+		this.lens = lens;
+		writeTACPN = new writeTACPN(network);
 	}
 	
 	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
@@ -130,21 +134,36 @@ public class PNMLWriter implements NetWriter {
 	private void appendPlaces(Document document, DataLayer guiModel, Element NET) {
 		Place[] places = guiModel.getPlaces();
 		for (Place place : places) {
-			NET.appendChild(createPlaceElement((TimedPlaceComponent) place, guiModel, document));
+            if (lens.isColored()){
+                NET.appendChild(createColorPlaceElement((TimedPlaceComponent) place, guiModel, document));
+            }
+            else {
+                NET.appendChild(createPlaceElement((TimedPlaceComponent) place, guiModel, document));
+            }
 		}
 	}
 
 	private void appendTransitions(Document document, DataLayer guiModel, Element NET) {
 		Transition[] transitions = guiModel.getTransitions();
 		for (Transition transition : transitions) {
-			NET.appendChild(createTransitionElement((TimedTransitionComponent) transition, document));
+            if(lens.isColored()) {
+                NET.appendChild(createColoredTransitionElement((TimedTransitionComponent) transition, document));
+            }
+            else {
+                NET.appendChild(createTransitionElement((TimedTransitionComponent) transition, document));
+            }
 		}
 	}
 	
 	private void appendArcs(Document document, DataLayer guiModel, Element NET) {
 		Arc[] arcs = guiModel.getArcs();
 		for (Arc arc : arcs) {
-			NET.appendChild(createArcElement(arc, guiModel, document));
+            if(lens.isColored()) {
+                NET.appendChild(createColoredArcElement(arc,guiModel , document));
+            }
+            else {
+                NET.appendChild(createArcElement(arc, guiModel, document));
+            }
 		}
 	}
 
@@ -188,6 +207,38 @@ public class PNMLWriter implements NetWriter {
 		return placeElement;
 	}
 
+    private Element createColorPlaceElement(TimedPlaceComponent inputPlace, DataLayer guiModel, Document document) {
+        Require.that(inputPlace != null, "Error: inputPlace was null");
+        Require.that(guiModel != null, "Error: guiModel was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element placeElement = document.createElement("place");
+        placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : inputPlace.getName()));
+
+
+        Element name = document.createElement("name"); //Name
+        placeElement.appendChild(name);
+        Element nameText = document.createElement("text");
+        name.appendChild(nameText);
+        nameText.setTextContent(inputPlace.underlyingPlace().name());
+        Element nameGraphics = document.createElement("graphics");
+        name.appendChild(nameGraphics);
+        Element nameOffset = document.createElement("offset");
+        nameGraphics.appendChild(nameOffset);
+        nameOffset.setAttribute("x", String.valueOf(Math.round(inputPlace.getNameOffsetX())));
+        nameOffset.setAttribute("y", String.valueOf(Math.round(inputPlace.getNameOffsetY())));
+
+        Element graphics = document.createElement("graphics");
+        placeElement.appendChild(graphics);
+        Element offset = document.createElement("position");
+        graphics.appendChild(offset);
+        offset.setAttribute("x", String.valueOf(Math.round(inputPlace.getPositionX())));
+        offset.setAttribute("y", String.valueOf(Math.round(inputPlace.getPositionY())));
+
+        writeTACPN.appendColoredPlaceDependencies(inputPlace.underlyingPlace(), document, placeElement);
+        return placeElement;
+    }
+
 	private Element createTransitionElement(TimedTransitionComponent inputTransition, Document document) {
 		Require.that(inputTransition != null, "Error: inputTransition was null");
 		Require.that(document != null, "Error: document was null");
@@ -216,6 +267,36 @@ public class PNMLWriter implements NetWriter {
 
 		return transitionElement;
 	}
+
+    private Element createColoredTransitionElement (TimedTransitionComponent inputTransition, Document document) {
+        Require.that(inputTransition != null, "Error: inputTransition was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element transitionElement = document.createElement("transition");
+        transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
+
+        Element name = document.createElement("name"); //Name
+        transitionElement.appendChild(name);
+        Element nameGraphics = document.createElement("graphics");
+        name.appendChild(nameGraphics);
+        Element nameOffset = document.createElement("offset");
+        nameGraphics.appendChild(nameOffset);
+        nameOffset.setAttribute("x", String.valueOf(Math.round(inputTransition.getNameOffsetX())));
+        nameOffset.setAttribute("y", String.valueOf(Math.round(inputTransition.getNameOffsetY())));
+        Element nameText = document.createElement("text");
+        name.appendChild(nameText);
+        nameText.setTextContent(inputTransition.underlyingTransition().name());
+
+        Element graphics = document.createElement("graphics");
+        transitionElement.appendChild(graphics);
+        Element offset = document.createElement("position");
+        graphics.appendChild(offset);
+        offset.setAttribute("x", String.valueOf(Math.round(inputTransition.getPositionX())));
+        offset.setAttribute("y", String.valueOf(Math.round(inputTransition.getPositionY())));
+
+        writeTACPN.appendColoredTransitionDependencies(inputTransition, document, transitionElement);
+        return transitionElement;
+    }
 
 	private Element createArcElement(Arc arc, DataLayer guiModel, Document document) {
 		Require.that(arc != null, "Error: inputArc was null");
@@ -258,6 +339,47 @@ public class PNMLWriter implements NetWriter {
 		
 		return arcElement;
 	}
+
+    private Element createColoredArcElement(Arc arc, DataLayer guiModel, Document document) {
+        Require.that(arc != null, "Error: inputArc was null");
+        Require.that(guiModel != null, "Error: guiModel was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element arcElement = document.createElement("arc");
+        arcElement.setAttribute("id", (arc.getId() != null ? arc.getId() : "error"));
+        arcElement.setAttribute("source", (arc.getSource().getId() != null ? arc.getSource().getId() : ""));
+        arcElement.setAttribute("target", (arc.getTarget().getId() != null ? arc.getTarget().getId() : ""));
+
+        writeTACPN.appendColoredArcsDependencies(arc, guiModel, document, arcElement);
+
+        if (arc instanceof TimedOutputArcComponent && ((TimedOutputArcComponent)arc).getWeight().value() > 1 ) {
+            Element inscription = document.createElement("inscription");
+            arcElement.appendChild(inscription);
+            Element text = document.createElement("text");
+            inscription.appendChild(text);
+            text.setTextContent(((TimedOutputArcComponent)arc).getWeight().nameForSaving(false)+"");
+        }
+
+        if(arc instanceof TimedInhibitorArcComponent){
+            arcElement.setAttribute("type", "inhibitor");
+        } else {
+            arcElement.setAttribute("type", "normal");
+        }
+
+        //ArcPath
+        int arcPoints = arc.getArcPath().getArcPathDetails().length;
+        if (arcPoints > 2) {
+            Element graphics = document.createElement("graphics");
+            arcElement.appendChild(graphics);
+
+            String[][] point = arc.getArcPath().getArcPathDetails();
+            for (int j = 1; j < arcPoints-1; j++) { // Do not write the first and last point
+                graphics.appendChild(createArcPoint(point[j][0],
+                    point[j][1], point[j][2], document, j));
+            }
+        }
+        return arcElement;
+    }
 	
 	private Element createArcPoint(String x, String y, String type, Document document, int id) {
 		Require.that(document != null, "Error: document was null");

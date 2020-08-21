@@ -684,7 +684,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
-                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
+                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
                 String name = null;
 

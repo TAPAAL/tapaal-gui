@@ -77,7 +77,8 @@ public class Export {
 
 		NetWriter tapnWriter = new PNMLWriter(
 				currentTab.network(),
-				currentTab.getGuiModels()
+				currentTab.getGuiModels(),
+                currentTab.getLens()
 				);
 
 		tapnWriter.savePNML(new File(filename));

@@ -6,16 +6,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.*;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.util.Tuple;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,7 +53,7 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
 
-    private final TabContent.TAPNLens lens = new TabContent.TAPNLens(false, false, false);
+    private TabContent.TAPNLens lens;
 
     enum GraphicsType { Position, Offset }
 
@@ -62,7 +62,9 @@ public class PNMLoader {
 	private final HashSet<String> arcs = new HashSet<String>();
 	private final HashMap<String, TimedPlace> places = new HashMap<String, TimedPlace>();
 	private final HashMap<String, TimedTransition> transitions = new HashMap<String, TimedTransition>();
-	
+    private HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
+    private HashMap<String, Variable> variables = new HashMap<String, Variable>();
+
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
 	private final int maxNetSize = 4000;
@@ -104,8 +106,10 @@ public class PNMLoader {
 		//We assume there is only one net per file (this is what we call a TAPN Network) 
 		Node pnmlElement = doc.getElementsByTagName("pnml").item(0);
 		Node netNode = getFirstDirectChild(pnmlElement, "net");
-		
-		String name = getTAPNName(netNode);
+
+        lens = new TabContent.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
+
+        String name = getTAPNName(netNode);
 		
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		tapn.setCheckNames(false);
@@ -120,7 +124,7 @@ public class PNMLoader {
 		
 		network.setPaintNet(isNetDrawable());
 		tapn.setCheckNames(true);
-		return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>());
+		return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>(), null, lens);
 	}
 
 	private String getTAPNName(Node netNode) {
@@ -142,7 +146,12 @@ public class PNMLoader {
 	}
 
 	private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template) throws FormatException {
-		//We assume there is only one page pr. file (this is what we call a net) 
+        if (lens.isColored()) {
+            Node declarations = getFirstDirectChild(netNode, "declaration");
+            parseDeclarations(declarations, tapn, template);
+        }
+
+	    //We assume there is only one page pr. file (this is what we call a net)
 		Node node = getFirstDirectChild(netNode, "page").getFirstChild();
 		Node first = node;
 		
@@ -175,7 +184,7 @@ public class PNMLoader {
 		}
 	}
     //TODO: implement color
-	private void parsePlace(Node node, TimedArcPetriNet tapn, Template template) {
+	private void parsePlace(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
 		if(!(node instanceof Element)){
 			return;
 		}
@@ -186,28 +195,363 @@ public class PNMLoader {
 		}
 		Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
 		String id = NamePurifier.purify(((Element) node).getAttribute("id"));
-		InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking")); 
-		
-		TimedPlace place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()), null);
-		Require.that(places.put(id, place) == null && !transitions.containsKey(id), 
-				"The name: " + id + ", was already used");
-		tapn.add(place);
+
+        InitialMarking marking = null;
+        ArcExpression colorMarking = null;
+        Point markingOffset = null;
+        TimedPlace place;
+
+        if (lens.isColored()) {
+            Node typeNode = getFirstDirectChild(node, "type");
+            ColorType colorType = null;
+            if(typeNode != null) {
+                colorType = parseUserSort(typeNode);
+            }
+
+            Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
+            if (markingNode == null) {
+                markingOffset = new Point();
+                colorMarking = null;
+            } else {
+                markingOffset = parseGraphics(getFirstDirectChild(markingNode, "graphics"), GraphicsType.Offset);
+                Node markingExpression = getFirstDirectChild(markingNode, "structure");
+                colorMarking = parseArcExpression(markingExpression);
+            }
+            place = new LocalTimedPlace(id, colorType);
+
+        } else {
+            marking = parseMarking(getFirstDirectChild(node, "initialMarking"));
+
+            place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()), null);
+        }
+        Require.that(places.put(id, place) == null && !transitions.containsKey(id),
+            "The name: " + id + ", was already used");
+        tapn.add(place);
 		
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
-			placeComponent.setUnderlyingPlace(place);
+            TimedPlaceComponent placeComponent;
+            placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
+            placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
 		}
 		
 		idResolver.add(tapn.name(), id, id);
-		
-		for (int i = 0; i < marking.marking; i++) {
-			tapn.parentNetwork().marking().add(new TimedToken(place));
-		}
+
+        if (lens.isColored()) {
+            if (colorMarking != null) {
+                ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), colortypes);
+                ColorMultiset cm = colorMarking.eval(context);
+                for (ColoredToken ct : cm.getTokens(place)) {
+                    tapn.parentNetwork().marking().add(ct);
+                }
+            }
+        } else {
+            for (int i = 0; i < marking.marking; i++) {
+                tapn.parentNetwork().marking().add(new TimedToken(place));
+            }
+        }
 	}
-	
-	private InitialMarking parseMarking(Node node) {
+
+    private void parseDeclarations(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
+        if(node == null || !(node instanceof Element)){
+            return;
+        }
+
+        Node child = skipWS(node.getFirstChild());
+        while(child != null){
+            String childName = child.getNodeName();
+            if (childName.equals("namedsort")){
+                parseNamedSort(child, tapn, template);
+            } else if (childName.equals("variabledecl")){
+                String id = getAttribute(child, "id").getNodeValue();
+                String name = getAttribute(child, "name").getNodeValue();
+                ColorType ct = parseUserSort(child);
+                Variable var = new Variable(name, id, ct);
+                Require.that(variables.put(id, var) == null, "the id " + id + ", was already used");
+                tapn.parentNetwork().add(var);
+            } else {
+                parseDeclarations(child, tapn, template);
+            }
+
+            child = skipWS(child.getNextSibling());
+        }
+    }
+
+    private void parseNamedSort(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
+        Node type = skipWS(node.getFirstChild());
+        String typetag = type.getNodeName();
+
+        String id = getAttribute(node, "id").getNodeValue();
+        String name = getAttribute(node, "name").getNodeValue();
+        if (typetag.equals("productsort")) {
+            ProductType pt = new ProductType(name, id);
+            Node typechild = skipWS(type.getFirstChild());
+            while (typechild != null) {
+                if (typechild.getNodeName().equals("usersort")) {
+                    String constituent = getAttribute(typechild, "declaration").getNodeValue();
+                    pt.addType(colortypes.get(constituent));
+                }
+                typechild = skipWS(typechild.getNextSibling());
+            }
+            Require.that(colortypes.put(id, pt) == null, "the name " + name + ", was already used");
+            tapn.parentNetwork().add(pt);
+
+        } else {
+            ColorType ct = new ColorType(id, name);
+            if (typetag.equals("dot")) {
+                ct.addColor("dot");
+            } else {
+                Node typechild = skipWS(type.getFirstChild());
+                while (typechild != null) {
+                    Node dotId = getAttribute(typechild, "id");
+                    if (dotId != null) {
+                        ct.addColor(dotId.getNodeValue());
+                        typechild = skipWS(typechild.getNextSibling());
+                    } else {
+                        throw new FormatException(String.format("No id found on %s\n", typechild.getNodeName()));
+                    }
+                }
+            }
+            Require.that(colortypes.put(id, ct) == null, "the name " + name + ", was already used");
+            tapn.parentNetwork().add(ct);
+        }
+    }
+
+    private ColorType parseUserSort(Node node) throws FormatException {
+        if (node instanceof Element) {
+            Node child = skipWS(node.getFirstChild());
+            while (child != null) {
+                String name = child.getNodeName();
+                if (name.equals("usersort")) {
+                    Node decl = getAttribute(child, "declaration");
+                    return colortypes.get(decl.getNodeValue());
+                } else if (name.matches("structure|type|subterm")) {
+                    return parseUserSort(child);
+                }
+                child = skipWS(child.getNextSibling());
+            }
+        }
+        throw new FormatException(String.format("Could not parse %s as an usersort\n", node.getNodeName()));
+    }
+
+    private static Node skipWS(Node node) {
+        if (node != null && !(node instanceof Element)) {
+            return skipWS(node.getNextSibling());
+        } else {
+            return node;
+        }
+    }
+
+    private static Node getAttribute(Node node, String attribute) {
+        return node.getAttributes().getNamedItem(attribute);
+    }
+
+    private ArcExpression parseArcExpression(Node node) throws FormatException {
+        String name = node.getNodeName();
+        if (name.equals("numberof")) {
+            return parseNumberOfExpression(node);
+        } else if (name.equals("add")) {
+            Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+
+            Node child = skipWS(node.getFirstChild());
+            while (child != null) {
+                ArcExpression subterm = parseArcExpression(child);
+                constituents.add(subterm);
+                child = skipWS(child.getNextSibling());
+            }
+            return new AddExpression(constituents);
+        } else if (name.equals("subtract")) {
+            Node headchild = skipWS(node.getFirstChild());
+            ArcExpression headexp = parseArcExpression(headchild);
+
+            Node nextchild = skipWS(headchild.getNextSibling());
+            while (nextchild != null) {
+                ArcExpression nextexp = parseArcExpression(nextchild);
+                headexp = new SubtractExpression(headexp, nextexp);
+                nextchild = skipWS(nextchild.getNextSibling());
+            }
+            return headexp;
+        } else if (name.equals("scalarproduct")) {
+            Node scalar = skipWS(node.getFirstChild());
+            Integer scalarval = parseNumberConstantExpression(scalar);
+
+            Node child = skipWS(scalar.getNextSibling());
+            ArcExpression childexp = parseArcExpression(child);
+
+            return new ScalarProductExpression(scalarval, childexp);
+
+        } else if (name.equals("all")) {
+            Node parent = node.getParentNode();
+            return parseNumberOfExpression(parent);
+        } else if (name.matches("subterm|structure")) {
+            Node child = skipWS(node.getFirstChild());
+            return parseArcExpression(child);
+        } else {
+            throw new FormatException(String.format("Could not parse %s as an arc expression\n", name));
+        }
+    }
+
+    private NumberOfExpression parseNumberOfExpression(Node node) throws FormatException {
+        Node number = skipWS(node.getFirstChild());
+        //The number constant may be omitted.
+        //In that case, this parsing returns null.
+        Integer numberval = parseNumberConstantExpression(number);
+        Node subnode;
+        if (numberval != null) {
+            //The subexpression comes after the number constant.
+            subnode = skipWS(number.getNextSibling());
+        } else {
+            //The number we read was actually the subexpression.
+            subnode = number;
+            numberval = 1;
+        }
+        //Try to parse subexpression as all expression
+        AllExpression subexp = parseAllExpression(subnode);
+
+        if (subexp != null) {
+            return new NumberOfExpression(numberval, subexp);
+        } else {
+            Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
+            while (subnode != null) {
+                ColorExpression colorexp = parseColorExpression(subnode);
+                colorexps.add(colorexp);
+                subnode = skipWS(subnode.getNextSibling());
+            }
+            return new NumberOfExpression(numberval, colorexps);
+        }
+    }
+
+    private Integer parseNumberConstantExpression(Node node) {
+        String name = node.getNodeName();
+        if (name.equals("numberconstant")) {
+            String value = getAttribute(node, "value").getNodeValue();
+            return Integer.valueOf(value);
+        } else if (name.equals("subterm")) {
+            Node child = skipWS(node.getFirstChild());
+            return parseNumberConstantExpression(child);
+        } else {
+            return null;
+        }
+    }
+
+    private AllExpression parseAllExpression(Node node) throws FormatException {
+        String name = node.getNodeName();
+        if (name.equals("all")) {
+            ColorType ct = parseUserSort(node);
+            return new AllExpression(ct);
+        } else if (name.equals("subterm")) {
+            Node child = skipWS(node.getFirstChild());
+            return parseAllExpression(child);
+        } else {
+            return null;
+        }
+    }
+
+    private ColorExpression parseColorExpression(Node node) throws FormatException {
+        String name = node.getNodeName();
+        if (name.equals("dotconstant")) {
+            return new DotConstantExpression();
+        } else if (name.equals("variable")) {
+            String varname = getAttribute(node, "refvariable").getNodeValue();
+            Variable var = variables.get(varname);
+            return new VariableExpression(var);
+        } else if (name.equals("useroperator")) {
+            String colorname = getAttribute(node, "declaration").getNodeValue();
+            Color color = getColor(colorname);
+            return new UserOperatorExpression(color);
+        } else if (name.equals("successor")) {
+            Node child = skipWS(node.getFirstChild());
+            ColorExpression childexp = parseColorExpression(child);
+            return new SuccessorExpression(childexp);
+        } else if (name.equals("predecessor")) {
+            Node child = skipWS(node.getFirstChild());
+            ColorExpression childexp = parseColorExpression(child);
+            return new PredecessorExpression(childexp);
+        } else if (name.equals("tuple")) {
+            Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
+
+            Node child = skipWS(node.getFirstChild());
+            while (child != null) {
+                ColorExpression colorexp = parseColorExpression(child);
+                colorexps.add(colorexp);
+                child = skipWS(child.getNextSibling());
+            }
+            return new TupleExpression(colorexps);
+        } else if (name.matches("subterm|structure")) {
+            Node child = skipWS(node.getFirstChild());
+            return parseColorExpression(child);
+        } else {
+            throw new FormatException(String.format("Could not parse %s as an color expression\n", name));
+        }
+    }
+
+    private Color getColor(String colorname) throws FormatException {
+        for (ColorType ct : colortypes.values()) {
+            for (Color c : ct) {
+                if (c.getName().equals(colorname)) {
+                    return c;
+                }
+            }
+        }
+        throw new FormatException(String.format("The color \"%s\" was not declared\n", colorname));
+    }
+
+    private GuardExpression parseGuardExpression(Node node) throws FormatException {
+        String name = node.getNodeName();
+        if (name.matches("lt|lessthan")) {
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            return new LessThanExpression(subexps.value1(), subexps.value2());
+        } else if (name.matches("gt|greaterthan")) {
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            return new GreaterThanExpression(subexps.value1(), subexps.value2());
+        } else if (name.matches("leq|lessthanorequal")) {
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            return new LessThanEqExpression(subexps.value1(), subexps.value2());
+        } else if (name.matches("geq|greaterthanorequal")) {
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            return new GreaterThanEqExpression(subexps.value1(), subexps.value2());
+        } else if (name.matches("eq|equality")) {
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            return new EqualityExpression(subexps.value1(), subexps.value2());
+        } else if (name.matches("neq|inequality")) {
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            return new InequalityExpression(subexps.value1(), subexps.value2());
+        } else if (name.equals("not")) {
+            Node child = skipWS(node.getFirstChild());
+            GuardExpression childexp = parseGuardExpression(child);
+            return new NotExpression(childexp);
+        } else if (name.equals("and")) {
+            Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
+            return new AndExpression(subexps.value1(), subexps.value2());
+        } else if (name.equals("or")) {
+            Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
+            return new OrExpression(subexps.value1(), subexps.value2());
+        } else if (name.matches("subterm|structure")) {
+            Node child = skipWS(node.getFirstChild());
+            return parseGuardExpression(child);
+        } else {
+            throw new FormatException(String.format("Could not parse %s as a guard expression\n", name));
+        }
+    }
+
+    private Tuple<ColorExpression,ColorExpression> parseLRColorExpressions(Node node) throws FormatException {
+        Node left = skipWS(node.getFirstChild());
+        ColorExpression leftexp = parseColorExpression(left);
+        Node right = skipWS(left.getNextSibling());
+        ColorExpression rightexp = parseColorExpression(right);
+        return new Tuple<ColorExpression, ColorExpression>(leftexp, rightexp);
+    }
+
+    private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressions(Node node) throws FormatException {
+        Node left = skipWS(node.getFirstChild());
+        GuardExpression leftexp = parseGuardExpression(left);
+        Node right = skipWS(left.getNextSibling());
+        GuardExpression rightexp = parseGuardExpression(right);
+        return new Tuple<GuardExpression, GuardExpression>(leftexp, rightexp);
+    }
+
+    private InitialMarking parseMarking(Node node) {
 		if(!(node instanceof Element)){
 			return new InitialMarking();
 		}
