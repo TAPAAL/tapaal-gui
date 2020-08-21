@@ -147,7 +147,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
-        cyclicAndFiniteEnumerationPanel.setSize(container.getSize());
         container.add(cyclicAndFiniteEnumerationPanel, gbc);
 
         rangeOfIntegersPanel = createRangeOfIntegersPanel();
@@ -156,7 +155,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
-        rangeOfIntegersPanel.setSize(container.getSize());
         container.add(rangeOfIntegersPanel, gbc);
 
         productTypePanel = createProductTypePanel();
@@ -165,7 +163,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
-        productTypePanel.setSize(container.getSize());
         container.add(productTypePanel, gbc);
 
         JPanel buttonPanel = createButtonPanel();
