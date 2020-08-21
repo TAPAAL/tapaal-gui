@@ -172,7 +172,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         container.add(buttonPanel,gbc);
         rangeOfIntegersPanel.setVisible(false);
-        cyclicAndFiniteEnumerationPanel.setVisible(false);
+        productTypePanel.setVisible(false);
     }
 
     private JPanel createNameAndTypePanel() {
