@@ -105,7 +105,8 @@ public class ColorTypeDialogPanel extends JPanel {
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);
         dialog.pack();
-        dialog.setSize(570,430);
+        dialog.setPreferredSize(dialog.getSize());
+        dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()));
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -146,6 +147,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
+        cyclicAndFiniteEnumerationPanel.setSize(container.getSize());
         container.add(cyclicAndFiniteEnumerationPanel, gbc);
 
         rangeOfIntegersPanel = createRangeOfIntegersPanel();
@@ -154,6 +156,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
+        rangeOfIntegersPanel.setSize(container.getSize());
         container.add(rangeOfIntegersPanel, gbc);
 
         productTypePanel = createProductTypePanel();
@@ -162,6 +165,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
+        productTypePanel.setSize(container.getSize());
         container.add(productTypePanel, gbc);
 
         JPanel buttonPanel = createButtonPanel();
