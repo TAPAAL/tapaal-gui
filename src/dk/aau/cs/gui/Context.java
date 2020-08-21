@@ -7,7 +7,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
 
-public class Context { // TODO: consider having only currentTab as a field and have methods ask it for the things?
+public class Context {
 	private final TimedArcPetriNetNetwork network;
 	private final Template selectedTemplate;
 	
