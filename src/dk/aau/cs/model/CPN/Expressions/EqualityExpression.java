@@ -38,12 +38,18 @@ public class EqualityExpression extends GuardExpression {
 
     @Override   //Color expressions cannot hold a placeholder
     public boolean containsPlaceHolder() {
-        return false;
+        return left.containsPlaceHolder() || right.containsPlaceHolder();
     }
 
     @Override
-    public GuardExpression findFirstPlaceHolder() {
-        return null;
+    public Expression findFirstPlaceHolder() {
+        if(left.containsPlaceHolder()){
+            return left.findFirstPlaceHolder();
+        } else if(right.containsPlaceHolder()){
+            return right.findFirstPlaceHolder();
+        } else{
+            return null;
+        }
     }
 
     @Override

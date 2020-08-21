@@ -41,7 +41,7 @@ public class NotExpression extends GuardExpression {
     }
 
     @Override
-    public GuardExpression findFirstPlaceHolder() {
+    public Expression findFirstPlaceHolder() {
         return expr.findFirstPlaceHolder();
     }
 

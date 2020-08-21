@@ -80,12 +80,18 @@ public class InequalityExpression extends GuardExpression{
 
     @Override
     public boolean containsPlaceHolder() {
-        return false;
+        return left.containsPlaceHolder() || right.containsPlaceHolder();
     }
 
     @Override
-    public GuardExpression findFirstPlaceHolder() {
-        return null;
+    public Expression findFirstPlaceHolder() {
+        if(left.containsPlaceHolder()){
+            return left.findFirstPlaceHolder();
+        } else if(right.containsPlaceHolder()){
+            return right.findFirstPlaceHolder();
+        } else{
+            return null;
+        }
     }
 
     public void getVariables(Set<Variable> variables) {

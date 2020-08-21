@@ -83,8 +83,7 @@ public class OrExpression extends GuardExpression {
     }
 
     @Override
-    public GuardExpression findFirstPlaceHolder() {
-        GuardExpression ph = null;
+    public Expression findFirstPlaceHolder() {
         if (left.containsPlaceHolder()) {
             return left.findFirstPlaceHolder();
         }

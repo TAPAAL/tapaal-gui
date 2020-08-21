@@ -41,7 +41,7 @@ public class AndExpression extends GuardExpression {
     }
 
     @Override
-    public GuardExpression findFirstPlaceHolder() {
+    public Expression findFirstPlaceHolder() {
         if (left.containsPlaceHolder()) {
             return left.findFirstPlaceHolder();
         }

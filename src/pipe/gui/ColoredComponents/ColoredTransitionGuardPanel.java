@@ -9,6 +9,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.TAPNTransitionEditor;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -65,18 +66,21 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private List<Variable> variables;
 
     private GuardExpression newProperty;
+    TAPNTransitionEditor parent;
 
     private ExprStringPosition currentSelection = null;
-    public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context){
+    public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context, TAPNTransitionEditor parent){
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createTitledBorder("Guard Expression"));
         this.transition = transition;
         this.context = context;
+        this.parent = parent;
         initExprField();
         initLogicPanel();
         initComparisonPanel();
         initExprEditPanel();
         initExpr();
+        updateSelection();
 
         //TODO: implement these
         undoButton.setEnabled(false);
@@ -788,7 +792,19 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void updateEnabledButtons() {
-        if (currentSelection.getObject() instanceof ColorExpression) {
+        if(currentSelection == null){
+            andButton.setEnabled(false);
+            orButton.setEnabled(false);
+            notButton.setEnabled(false);
+            equalityButton.setEnabled(false);
+            inequalityButton.setEnabled(false);
+            greaterThanButton.setEnabled(false);
+            greaterThanEqButton.setEnabled(false);
+            lessThanEqButton.setEnabled(false);
+            lessThanButton.setEnabled(false);
+            addColorExpressionButton.setEnabled(false);
+        }
+        else if (currentSelection.getObject() instanceof ColorExpression) {
             andButton.setEnabled(false);
             orButton.setEnabled(false);
             notButton.setEnabled(false);
@@ -812,6 +828,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(true);
             addColorExpressionButton.setEnabled(false);
         }
+        if(newProperty.containsPlaceHolder()){
+            System.out.println("mojn");
+            parent.enableOKButton(false);
+        } else{
+            parent.enableOKButton(true);
+        }
     }
 
     private void updateSelection(Expression newSelection) {
@@ -828,12 +850,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
-        if (currentSelection != null) {
-            updateEnabledButtons();
-        }
-        else {
-            //TODO: DISABLE all expr buttons
-        }
+
+        updateEnabledButtons();
     }
 
     private void updateSelection() {
@@ -847,11 +865,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
         Logger.log(currentSelection.getObject());
-        if (currentSelection != null) {
-            updateEnabledButtons();
-        } {
-            //TODO: disable all expr buttons
-        }
+        updateEnabledButtons();
 
         //TODO: updateexprButtonsAccordingToSelection; line 573
     }
