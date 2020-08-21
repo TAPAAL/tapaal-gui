@@ -223,7 +223,7 @@ public class TAPNTransitionEditor extends JPanel {
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 
 		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
-        coloredTransitionGuardPanel = new ColoredTransitionGuardPanel(transition, context);
+        coloredTransitionGuardPanel = new ColoredTransitionGuardPanel(transition, context, this);
 		add(coloredTransitionGuardPanel, gridBagConstraints);
 		setupInitialState();
 
@@ -471,6 +471,10 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		return true;
 	}
+
+	public void enableOKButton(boolean enable){
+	    okButton.setEnabled(enable);
+    }
 
 	private void exit() {
 		rootPane.getParent().setVisible(false);

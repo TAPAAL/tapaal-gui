@@ -20,7 +20,7 @@ public abstract class GuardExpression extends Expression {
     public abstract GuardExpression copy();
 
     @Override
-    public abstract GuardExpression findFirstPlaceHolder();
+    public abstract Expression findFirstPlaceHolder();
 
 
     public abstract void getVariables(Set<Variable> variables);

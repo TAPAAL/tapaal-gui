@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
@@ -23,7 +21,6 @@ import org.xml.sax.SAXException;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.*;
