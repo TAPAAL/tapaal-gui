@@ -41,7 +41,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private JComboBox<Variable> variableComboBox;
     private JLabel variableValueLabel;
     private JComboBox<Color> variableValuesComboBox;
-    private JButton addColorExpressionButton;
+    private JButton editColorExpressionButton;
 
     //Logic buttons
     private JPanel logicPanel;
@@ -314,14 +314,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         comparisonPanel.add(seperator, gbc);
 
 
-        addColorExpressionButton = new JButton("Add color expression");
-        addColorExpressionButton.setPreferredSize(new Dimension(225, 30));
+        editColorExpressionButton = new JButton("Edit color expression");
+        editColorExpressionButton.setPreferredSize(new Dimension(225, 30));
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 3;
-        comparisonPanel.add(addColorExpressionButton, gbc);
+        comparisonPanel.add(editColorExpressionButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -330,7 +330,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         add(comparisonPanel, gbc);
 
 
-        addColorExpressionButton.addActionListener(new ActionListener() {
+        editColorExpressionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Logger.log(currentSelection.getObject());
@@ -802,7 +802,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             greaterThanEqButton.setEnabled(false);
             lessThanEqButton.setEnabled(false);
             lessThanButton.setEnabled(false);
-            addColorExpressionButton.setEnabled(false);
+            editColorExpressionButton.setEnabled(false);
         }
         else if (currentSelection.getObject() instanceof ColorExpression) {
             andButton.setEnabled(false);
@@ -814,7 +814,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             greaterThanEqButton.setEnabled(false);
             lessThanEqButton.setEnabled(false);
             lessThanButton.setEnabled(false);
-            addColorExpressionButton.setEnabled(true);
+            editColorExpressionButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof GuardExpression) {
             andButton.setEnabled(true);
@@ -826,7 +826,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             greaterThanEqButton.setEnabled(true);
             lessThanEqButton.setEnabled(true);
             lessThanButton.setEnabled(true);
-            addColorExpressionButton.setEnabled(false);
+            editColorExpressionButton.setEnabled(false);
         }
         if(newProperty.containsPlaceHolder()){
             System.out.println("mojn");
