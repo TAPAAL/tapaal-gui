@@ -19,9 +19,7 @@ public class TimedInputArc extends TAPNElement {
 	private TimedPlace source;
 	private TimeInterval interval;
 	private final TimedTransition destination;
-    private List<ColoredTimeInterval> colorTimeIntervals = new ArrayList<ColoredTimeInterval>() {{
-        add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));
-    }};
+    private List<ColoredTimeInterval> colorTimeIntervals = new ArrayList<ColoredTimeInterval>();
     private ArcExpression expression;
 
     public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){

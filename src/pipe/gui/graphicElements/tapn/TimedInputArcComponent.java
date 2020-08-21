@@ -98,6 +98,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                     arcPrint = inputArc.getArcExpression().toString();
                 }
                 if(lens.isTimed()){
+                    arcPrint += "\n" + inputArc.interval().toString(showConstantNames);
                     arcPrint += "\n";
                     List<ColoredTimeInterval> ctiList;
                     ctiList = this.underlyingTimedInputArc().getColorTimeIntervals();

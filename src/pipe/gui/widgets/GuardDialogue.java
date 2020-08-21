@@ -115,11 +115,9 @@ public class GuardDialogue extends JPanel /*
         }
         if(!objectToBeEdited.isColored()){
             coloredArcGuardPanel.setVisible(false);
-        } else if (!objectToBeEdited.isTimed()){
-            weightEditPanel.setVisible(false);
         } else{
-            if(guardEditPanel != null) {
-                guardEditPanel.setVisible(false);
+            if(objectToBeEdited.isTimed() && guardEditPanel != null){
+                guardEditPanel.setBorder(BorderFactory.createTitledBorder("Default Time Interval"));
             }
             weightEditPanel.setVisible(false);
         }

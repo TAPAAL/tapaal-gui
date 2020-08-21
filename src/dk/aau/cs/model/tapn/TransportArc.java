@@ -26,9 +26,7 @@ public class TransportArc extends TAPNElement {
 	private TimedPlace destination;
     private ArcExpression inputExpression;
     private ArcExpression outputExpression;
-    private List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>() {{
-        add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));
-    }};
+    private List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
 
 	private TimeInterval interval;
 	
