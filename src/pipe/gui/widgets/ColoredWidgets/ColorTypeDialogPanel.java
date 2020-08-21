@@ -244,7 +244,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbcCTL.anchor = GridBagConstraints.WEST;
         nameAndTypePanel.add(colorTypeLabel,gbcCTL);
 
-        colorTypeComboBox = new JXComboBox(new String[]{productColor, cyclicEnumeration, rangeOfIntegers});
+        colorTypeComboBox = new JXComboBox(new String[]{cyclicEnumeration, rangeOfIntegers, productColor});
         colorTypeComboBox.setToolTipText(toolTipColorComboBox);
 
         colorTypeComboBox.addActionListener(new ActionListener() {
