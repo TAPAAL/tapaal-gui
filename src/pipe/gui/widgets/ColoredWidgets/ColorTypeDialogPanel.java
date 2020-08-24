@@ -114,13 +114,14 @@ public class ColorTypeDialogPanel extends JPanel {
     private void initValues() {
         nameTextField.setText(oldName);
         if (!(oldColorType instanceof ProductType)) { // colortype is always either ProductType or Cyclic
-            colorTypeComboBox.setSelectedIndex(2);
+            colorTypeComboBox.setSelectedIndex(0);
             for (dk.aau.cs.model.CPN.Color element : oldColorType) {
                 cyclicModel.addElement(element);
             }
             enumList.setModel(cyclicModel);
         }
         else {
+            colorTypeComboBox.setSelectedIndex(2);
             for (ColorType type : ((ProductType) oldColorType).getColorTypes()) {
                 productModel.addElement(type);
             }
@@ -442,6 +443,13 @@ public class ColorTypeDialogPanel extends JPanel {
         nameTextField.requestFocusInWindow();
         firstRow.add(enumTextField, gbcNTF);
 
+        enumTextField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                enumAddButton.doClick();
+            }
+        });
+
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -460,7 +468,13 @@ public class ColorTypeDialogPanel extends JPanel {
                             CreateGui.getApp(), "You have to enter a name for the color",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     return;
-                }else {
+                } else if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getApp(),
+                        "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else {
                     cyclicModel.addElement(enumTextField.getText());
                     enumList.setModel(cyclicModel);
                     enumTextField.setText("");
@@ -670,13 +684,13 @@ public class ColorTypeDialogPanel extends JPanel {
                         CreateGui.getApp(), "You have to enter a name for the color",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
-            }else if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", name)) {
+            } else if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", name)) {
                 JOptionPane.showMessageDialog(
                                 CreateGui.getApp(),
                                 "Acceptable names for color types are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                                 "Error", JOptionPane.ERROR_MESSAGE);
                 return;
-            } else if(network.isNameUsedForColorType(name) && oldColorType == null) {
+            } else if (network.isNameUsedForColorType(name) && oldColorType == null) {
                 JOptionPane.showMessageDialog(
                                 CreateGui.getApp(),
                                 "There is already another color type with the same name.\n\n"
@@ -725,6 +739,13 @@ public class ColorTypeDialogPanel extends JPanel {
                  if(selectedColorType.equals(finiteEnumeration) || selectedColorType.equals(cyclicEnumeration)) {
                     for(int i = 0; i < enumList.getModel().getSize();i++) {
                         newColorType.addColor(enumList.getModel().getElementAt(i).toString());
+                    }
+                    if (newColorType.size() <= 0) {
+                        JOptionPane.showMessageDialog(
+                            CreateGui.getApp(),
+                            "You must specify at least one enumeration name",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                     if (oldColorType != null) {
                         network.updateColorType(oldColorType.getName(), newColorType);
