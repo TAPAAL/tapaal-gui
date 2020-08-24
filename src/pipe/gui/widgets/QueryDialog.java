@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -2341,20 +2342,22 @@ public class QueryDialog extends JPanel {
 		editingButtonsGroup.add(redoButton);
 		editingButtonsGroup.add(editQueryButton);
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		editingButtonPanel.add(undoButton, gbc);
+        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel row = new JPanel(new GridLayout(1, 2));
+        row.add(undoButton);
+        row.add(redoButton);
 
-		gbc.gridx = 1;
-		editingButtonPanel.add(redoButton, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        editingButtonPanel.add(row, gbc);
 
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.gridwidth = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		editingButtonPanel.add(deleteButton, gbc);
+        gbc.weightx = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        editingButtonPanel.add(deleteButton, gbc);
 
 		gbc.gridy = 2;
 		editingButtonPanel.add(resetButton, gbc);
@@ -2501,7 +2504,7 @@ public class QueryDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
 		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.VERTICAL;
+		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.WEST;
 		queryPanel.add(editingButtonPanel, gbc);
 	}
