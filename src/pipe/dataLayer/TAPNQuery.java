@@ -218,7 +218,15 @@ public class TAPNQuery {
 	public void setUseOverApproximation(boolean useOverApproximation){
 		overApproximation = useOverApproximation;
 	}
-	
+
+    public void setUseOverApproximationEnabled(boolean useOverApproximationEnabled){
+        this.enableOverApproximation = useOverApproximationEnabled;
+    }
+
+    public void setUseUnderApproximationEnabled(boolean useUnderApproximationEnabled){
+        this.enableUnderApproximation = useUnderApproximationEnabled;
+    }
+
 	public void setUseReduction(boolean useReduction){
 		this.useReduction = useReduction;
 	}

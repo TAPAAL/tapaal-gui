@@ -12,17 +12,18 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+
+import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.DeleteQueriesCommand;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
+import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
@@ -168,9 +169,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return new Result<>(pnObject);
         }
 
-        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
+        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
+            transition.setUncontrollable(isUncontrollable);
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
 
             guiModelToModel.get(c).add(transition);
@@ -537,6 +539,40 @@ public class TabContent extends JSplitPane implements TabContentActions{
             for (PetriNetObject pnObject : selection) {
                 deleteSelection(pnObject);
             }
+        }
+
+        public void toggleUncontrollableTrans() {
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+            TabContent currentTab = TabContent.this;
+            getUndoManager().newEdit();
+
+            for (PetriNetObject o : selection) {
+                if (o instanceof TimedTransitionComponent) {
+                    TimedTransitionComponent transition = (TimedTransitionComponent) o;
+                    Command cmd = new ToggleTransitionUncontrollable(transition.underlyingTransition(), currentTab);
+
+                    cmd.redo();
+                    getUndoManager().addEdit(cmd);
+                }
+            }
+            repaint();
+        }
+
+        public void toggleUrgentTrans() {
+            ArrayList<PetriNetObject> selection = drawingSurface().getSelectionObject().getSelection();
+            TabContent currentTab = TabContent.this;
+            getUndoManager().newEdit();
+
+            for (PetriNetObject o : selection) {
+                if (o instanceof TimedTransitionComponent) {
+                    TimedTransitionComponent transition = (TimedTransitionComponent) o;
+                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
+
+                    cmd.redo();
+                    getUndoManager().addEdit(cmd);
+                }
+            }
+            repaint();
         }
 
 
@@ -1566,9 +1602,42 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
+                findAndRemoveGameAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
+        }
+    }
+
+    private void findAndRemoveGameAffectedQueries(TabContent tab){
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        for (TAPNQuery q : tab.queries()) {
+            if (q.hasUntimedOnlyProperties() || !(q.getProperty() instanceof TCTLAGNode) || !lens.isTimed()) {
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            } else {
+                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
+                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
+                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                } if (q.useTimeDarts()) {
+                    q.setUseTimeDarts(false);
+                } if (q.useGCD()) {
+                    q.setUseGCD(false);
+                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
+                    q.setUseOverApproximationEnabled(false);
+                    q.setUseUnderApproximationEnabled(false);
+                }
+            }
+        }
+        String message = "The following queries will be removed in the conversion:";
+        for (TAPNQuery q : queriesToRemove) {
+            message += "\n" + q.getName();
+        }
+        if (!queriesToRemove.isEmpty()) {
+            JOptionPane.showMessageDialog(this, message, "Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1748,6 +1817,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 break;
             case TAPNTRANS:
                 setManager(new CanvasTransitionDrawController());
+                break;
+            case UNCONTROLLABLETRANS:
+                setManager(new CanvasUncontrollableTransitionDrawController());
                 break;
             case ANNOTATION:
                 setManager(new CanvasAnnotationNoteDrawController());
@@ -2109,7 +2181,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p);
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true);
         }
 
         @Override
@@ -2246,7 +2333,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                         var r = guiModelManager.addNewTimedPlace(getModel(), p);
                         placeClicked(r.result, e);
                     } else { //Transition
-                        var r = guiModelManager.addNewTimedTransitions(getModel(), p);
+                        var r = guiModelManager.addNewTimedTransitions(getModel(), p, false);
                         transitionClicked(r.result, e);
                     }
                 }
@@ -2667,10 +2754,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
     public List<GuiAction> getAvailableDrawActions(){
-        if(lens.isTimed()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction));
-        } else{
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction,transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction));
+        if (lens.isTimed() && !lens.isGame()) {
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
+        } else if (lens.isTimed()) {
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
+        } else if (lens.isGame()){
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUncontrollableAction));
+        } else {
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         }
     }
 
@@ -2704,6 +2795,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.TAPNTRANS);
         }
     };
+    private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.UNCONTROLLABLETRANS);
+        }
+    };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.ADDTOKEN);
@@ -2731,6 +2827,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.TRANSPORTARC);
         }
     };
+    private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
+        public void actionPerformed(ActionEvent e) {
+            guiModelManager.toggleUncontrollableTrans();
+        }
+    };
+    private final GuiAction toggleUrgentAction = new GuiAction("Toggle urgent transition", "Toggle between urgent/non-urgent transition", "U", true) {
+        public void actionPerformed(ActionEvent e) {
+            guiModelManager.toggleUrgentTrans();
+        }
+    };
     private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
         public void actionPerformed(ActionEvent e) {
             timeDelay();
@@ -2746,6 +2852,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         // deselect other actions
         selectAction.setSelected(CreateGui.guiMode == Pipe.ElementType.SELECT);
         transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
+        uncontrollableTransAction.setSelected(editorMode == Pipe.ElementType.UNCONTROLLABLETRANS);
         timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
         timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
         transportArcAction.setSelected(editorMode == Pipe.ElementType.TRANSPORTARC);
@@ -2760,6 +2867,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case draw:
                 selectAction.setEnabled(true);
                 transAction.setEnabled(true);
+                uncontrollableTransAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
                 transportArcAction.setEnabled(true);
@@ -2773,6 +2881,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case noNet:
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
+                uncontrollableTransAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -2785,6 +2894,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case animation:
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
+                uncontrollableTransAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -2805,6 +2915,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options ";
     public static final String textforTrans = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforUncontrollableTrans = "Uncontrollable Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
     public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
     public static final String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to fire it";
@@ -2817,6 +2928,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public void changeStatusbarText(Pipe.ElementType type) {
         switch (type) {
+            case UNCONTROLLABLETRANS:
+                app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
+
             case PLACE:
                 app.ifPresent(o13 -> o13.setStatusBarText(textforPlace));
                 break;
