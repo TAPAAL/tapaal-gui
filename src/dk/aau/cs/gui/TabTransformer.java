@@ -214,4 +214,37 @@ public class TabTransformer {
             }
         }
     }
+
+    static public void addColorInformation(TabContent tab){
+        for (Template template : tab.allTemplates()) {
+            for(TimedInputArc arc : template.model().inputArcs()){
+                arc.setColorTimeIntervals(new ArrayList<>());
+                ColorType ct = arc.source().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+            }
+
+            for(TimedOutputArc arc : template.model().outputArcs()){
+                ColorType ct = arc.destination().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+            }
+
+            for(TransportArc arc : template.model().transportArcs()){
+                ColorType ct = arc.source().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setInputExpression(numbExpr);
+                arc.setOutputExpression(numbExpr);
+            }
+        }
+    }
 }

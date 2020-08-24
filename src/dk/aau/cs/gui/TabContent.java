@@ -1580,6 +1580,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
+    private void createNewAndConvertColor(){
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false), "-noncolored");
+        TabTransformer.addColorInformation(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
     @Override
     public void changeTimeFeature(boolean isTime) {
         if (isTime != lens.isTimed()) {

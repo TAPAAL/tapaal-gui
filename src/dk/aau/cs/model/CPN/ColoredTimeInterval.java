@@ -42,6 +42,7 @@ public class ColoredTimeInterval extends TimeInterval {
         Pattern pattern = Pattern.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
         Matcher matcher = pattern.matcher(interval);
         matcher.find();
+
         String leftBracket = matcher.group(1);
         String lowerBoundAsString = matcher.group(2);
         String upperBoundAsString = matcher.group(3);
@@ -78,7 +79,7 @@ public class ColoredTimeInterval extends TimeInterval {
                             "A constant which was not declared was used in an time interval of an arc.");
             }
         }
-
+        System.out.println("what");
         return new ColoredTimeInterval(leftBracket.equals("[") ? true : false,
                 lowerBound, upperBound, rightBracket.equals("]") ? true : false, color);
     }

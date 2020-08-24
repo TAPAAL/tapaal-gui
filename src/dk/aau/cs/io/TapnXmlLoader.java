@@ -675,8 +675,8 @@ public class TapnXmlLoader {
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
 
 				//TODO: again nasty with two types of intervals
-				TimeInterval timeInterval = TimeInterval.parse(inscriptionSplit[0],	constants);
-                ctiList.add(ColoredTimeInterval.parse(inscriptionTempStorage, constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
+                TimeInterval timeInterval = TimeInterval.parse(inscriptionSplit[0],	constants);
+                ctiList.add(ColoredTimeInterval.parse(inscriptionSplit[0], constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -684,6 +684,8 @@ public class TapnXmlLoader {
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, timeInterval, weight);
 				transArc.setColorTimeIntervals(ctiList);
+                transArc.setOutputExpression(transportExpr);
+                transArc.setInputExpression(expr);
 
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
@@ -706,8 +708,7 @@ public class TapnXmlLoader {
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
 				TimeInterval interval = transportArcsTimeIntervals.get(presetTransportArc);
-                List<ColoredTimeInterval> timeIntervals = null;
-                timeIntervals = coloredTransportArcsTimeIntervals.get(presetTransportArc);
+                List<ColoredTimeInterval> timeIntervals = coloredTransportArcsTimeIntervals.get(presetTransportArc);
 
                 assert (sourcePlace != null);
 				assert (trans != null);
@@ -729,6 +730,7 @@ public class TapnXmlLoader {
 				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
 				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);
+				transportExpr = expr;
 			}
 		}
 		return tempArc;
