@@ -562,13 +562,11 @@ public class TapnLegacyXmlLoader {
 
         LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
         tapn.add(p);
+        p.addTokens(initialMarkingInput);
 
         place.setUnderlyingPlace(p);
         guiModel.addPetriNetObject(place);
 
-        for (int i = 0; i < initialMarkingInput; i++) {
-            marking.add(new TimedToken(p, new BigDecimal(0.0)));
-        }
     }
 
 	private void parseAndAddArcAsOldFormat(Element inputArcElement) throws FormatException {
