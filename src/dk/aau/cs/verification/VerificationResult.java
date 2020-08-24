@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -177,7 +178,8 @@ public class VerificationResult<TTrace> {
 			Tuple<String, String> originalName = nameMapping.map(token.value1());
 			TimedPlace p = (originalName.value1() == null || originalName.value1().isEmpty()) ? model.getSharedPlaceByName(originalName.value2()) : model.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
 			for(int i = 0; i < token.value2().value2(); i++){
-				m.add(new TimedToken(p, token.value2().value1()));
+			    //TODO add colors
+				m.add(new TimedToken(p, token.value2().value1(), ColorType.COLORTYPE_DOT.getFirstColor()));
 			}
 		}
 		

@@ -13,6 +13,7 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
 import dk.aau.cs.util.Tuple;
@@ -69,18 +70,18 @@ public class OverApproximation implements ITAPNApproximation {
 			 oldInterval.isUpperBoundNonStrict()
 			 );
 	}
-	
+	//TODO: how to handle colors
 	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
 		TimedArcPetriNet net = transformedModel.value1();
                 
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
-		TimedToken currentToken = new TimedToken(currentPlace);
+		TimedToken currentToken = new TimedToken(currentPlace, ColorType.COLORTYPE_DOT.getFirstColor());
 		net.add(currentPlace);
 		currentPlace.addToken(currentToken);
 		
 		// Block place, which secures the net makes at most one transition not in the trace.
 		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK");
-		TimedToken blockToken = new TimedToken(blockPlace);
+		TimedToken blockToken = new TimedToken(blockPlace, ColorType.COLORTYPE_DOT.getFirstColor());
 		net.add(blockPlace);
 		blockPlace.addToken(blockToken);
 		

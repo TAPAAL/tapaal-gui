@@ -291,8 +291,8 @@ public class TimedArcPetriNet {
 			if(!p.isShared()) {
 				TimedPlace copy = p.copy();
 				tapn.add(copy);
-				for (int i = 0; i < p.numberOfTokens(); i++) {
-					tapn.addToken(new TimedToken(copy));
+				for(TimedToken token : p.tokens()){
+					tapn.addToken(new TimedToken(copy, token.getColor()));
 				}
 			} else {
 				tapn.add(p);

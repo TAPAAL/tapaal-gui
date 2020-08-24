@@ -58,7 +58,6 @@ public class Color {
         if (!object.colorType.getName().equals(this.colorType.getName()))
             return false;
 
-
         if (object.tuple == null && this.tuple != null)
             return false;
 
@@ -99,17 +98,5 @@ public class Color {
         }
         else
             return colorName;
-    }
-
-    public Color copy(){
-        if(this.tuple != null){
-            Vector<Color> newTuple = new Vector<Color>();
-            for(Color c : this.getTuple()){
-                newTuple.add(c.copy());
-            }
-            return new Color(this.colorType.copy(), this.id, newTuple);
-        } else{
-            return new Color(this.colorType.copy(), this.id, this.colorName);
-        }
     }
 }

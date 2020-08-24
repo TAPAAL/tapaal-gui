@@ -569,7 +569,7 @@ public class TapnLegacyXmlLoader {
         guiModel.addPetriNetObject(place);
 
         for (int i = 0; i < initialMarkingInput; i++) {
-            marking.add(new TimedToken(p, new BigDecimal(0.0)));
+            marking.add(new TimedToken(p, new BigDecimal(0.0), ColorType.COLORTYPE_DOT.getFirstColor()));
         }
     }
 

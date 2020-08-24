@@ -3,6 +3,8 @@ package dk.aau.cs.translations;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -46,15 +48,15 @@ public class Degree2Converter {
 		for(TimedPlace p : conservativeModel.places()) {
 			TimedPlace copy = p.copy();
 			degree2Model.add(copy);
-			for(int i = 0; i < p.numberOfTokens(); i++) {
-				degree2Model.addToken(new TimedToken(copy));
+			for(TimedToken token : p.tokens()) {
+				degree2Model.addToken(new TimedToken(copy, token.color()));
 			}
 		}
 		
 		TimedPlace plock = new LocalTimedPlace(PLOCK);
 		degree2Model.add(plock);
-		
-		degree2Model.addToken(new TimedToken(plock));
+		//TODO: how to handle colors?
+		degree2Model.addToken(new TimedToken(plock, ColorType.COLORTYPE_DOT.getFirstColor()));
 
 		
 		for(TimedTransition t : conservativeModel.transitions())

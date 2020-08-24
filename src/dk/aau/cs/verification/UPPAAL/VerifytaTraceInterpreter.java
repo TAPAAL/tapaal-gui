@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.NTA.trace.Participant;
 import dk.aau.cs.model.NTA.trace.TAFiringAction;
 import dk.aau.cs.model.NTA.trace.TimeDelayFiringAction;
@@ -90,7 +91,7 @@ public class VerifytaTraceInterpreter {
 
 		return new TimedTransitionStep(transition,tokens);
 	}
-
+    //TODO: how to handle colors?
 	private List<TimedToken> parseConsumedTokens(List<TransitionFiring> actions) {
 		ArrayList<TimedToken> tokens = new ArrayList<TimedToken>();
 
@@ -104,7 +105,7 @@ public class VerifytaTraceInterpreter {
 				if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
 					TimedPlace place = tapn.getPlaceByName(sourceLocation);
 					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName()).lower();
-					TimedToken token = new TimedToken(place, clockValue);
+					TimedToken token = new TimedToken(place, clockValue, ColorType.COLORTYPE_DOT.getFirstColor());
 					tokens.add(token);
 				}
 			}
@@ -112,7 +113,7 @@ public class VerifytaTraceInterpreter {
 
 		return tokens;
 	}
-
+    //TODO: how to handle colors?
 	private List<TimedToken> parseConsumedTokens(TransitionFiring start, TransitionFiring end) {
 		ArrayList<TimedToken> tokens = new ArrayList<TimedToken>();
 
@@ -123,7 +124,7 @@ public class VerifytaTraceInterpreter {
 			if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
 				TimedPlace place = tapn.getPlaceByName(sourceLocation);
 				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName()).lower();
-				TimedToken token = new TimedToken(place, clockValue);
+				TimedToken token = new TimedToken(place, clockValue, ColorType.COLORTYPE_DOT.getFirstColor());
 				tokens.add(token);
 			}
 		}

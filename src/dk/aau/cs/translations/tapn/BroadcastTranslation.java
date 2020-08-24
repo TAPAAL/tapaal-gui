@@ -7,6 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.NTA.Edge;
 import dk.aau.cs.model.NTA.Location;
 import dk.aau.cs.model.NTA.NTA;
@@ -86,7 +88,8 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA434723_324"); 
 			model.add(extraPlace);
-			model.addToken(new TimedToken(extraPlace));
+            //TODO: how to handle colors
+            model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		
 		clearLocationMappings();
@@ -130,7 +133,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			for (int i = 0; i < extraTokens; i++) {
 				clearLocationMappings();
 				clearArcMappings();
-				TimedAutomaton tokenTemplate = createTokenTemplate(conservativeModel, new TimedToken(bottom));
+				TimedAutomaton tokenTemplate = createTokenTemplate(conservativeModel, new TimedToken(bottom, ColorType.COLORTYPE_DOT.getFirstColor()));
 				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
 				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + (conservativeModel.marking().size() + i));

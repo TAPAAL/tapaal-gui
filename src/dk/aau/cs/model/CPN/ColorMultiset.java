@@ -1,6 +1,7 @@
 package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 
 import java.util.*;
 
@@ -150,12 +151,12 @@ public class ColorMultiset implements Map<Color, Integer> {
         return result;
     }
 
-    public Vector<ColoredToken> getTokens(TimedPlace place) {
-        Vector<ColoredToken> result = new Vector<ColoredToken>();
+    public Vector<TimedToken> getTokens(TimedPlace place) {
+        Vector<TimedToken> result = new Vector<TimedToken>();
 
         for (Entry<Color, Integer> entry : entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                result.add(new ColoredToken(place, entry.getKey()));
+                result.add(new TimedToken(place, entry.getKey()));
             }
         }
         return result;

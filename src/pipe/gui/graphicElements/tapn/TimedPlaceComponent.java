@@ -25,7 +25,6 @@ import javax.swing.JTextArea;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
-import dk.aau.cs.model.CPN.ColoredToken;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -139,19 +138,16 @@ public class TimedPlaceComponent extends Place {
             if (!first) {
                 buffer.append(", ");
             }
-            if (token instanceof ColoredToken) {
-                buffer.append("(");
-                if (((ColoredToken)token).color().getColorName().equals("")) {
-                    buffer.append(((ColoredToken) token).color().toString());
-                } else {
-                    buffer.append(((ColoredToken) token).color().getColorName());
-                }
-                buffer.append(", ");
-                buffer.append(df.format(token.age()));
-                buffer.append(")");
+            buffer.append("(");
+            if (((TimedToken)token).color().getColorName().equals("")) {
+                buffer.append(((TimedToken) token).color().toString());
             } else {
-                buffer.append(df.format(token.age()));
+                buffer.append(((TimedToken) token).color().getColorName());
             }
+            buffer.append(", ");
+            buffer.append(df.format(token.age()));
+            buffer.append(")");
+
 
             first = false;
         }
@@ -171,11 +167,11 @@ public class TimedPlaceComponent extends Place {
             if (!first) {
                 buffer.append(", ");
             }
-            if (token instanceof ColoredToken) {
-                if (((ColoredToken)token).color().getColorName().equals("")) {
-                    buffer.append(((ColoredToken) token).color().toString());
+            if (token instanceof TimedToken) {
+                if (token.color().getColorName().equals("")) {
+                    buffer.append(token.color().toString());
                 } else {
-                    buffer.append(((ColoredToken) token).color().getColorName());
+                    buffer.append(token.color().getColorName());
                 }
             }
 

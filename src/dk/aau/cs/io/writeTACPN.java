@@ -381,16 +381,10 @@ public class writeTACPN { // both export and save share some of the same syntax 
             hlInitialMarking.appendChild(hlInitialMarkingText);
             String tokenNames = "";
             for (TimedToken token : inputPlace.tokens()) {
-                ColoredToken ct;
-                if (token instanceof ColoredToken) {
-                    ct = (ColoredToken) token;
-                } else {
-                    ct = new ColoredToken(token.place(), new DotConstant());
-                }
-                if (ct.getColor() instanceof DotConstant) {
+                if (token.getColor() instanceof DotConstant) {
                     tokenNames += 1 + "'" + "(dot)";
                 } else {
-                    String tokenName = ct.toStringForPNML();
+                    String tokenName = token.toStringForPNML();
                     tokenNames += 1 + "'" + tokenName + " + ";
                 }
             }
@@ -420,37 +414,36 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 Element rangeAdd = document.createElement("add");
                 hlStructure.appendChild(rangeAdd);
                 for (TimedToken token : inputPlace.tokens()) {
-                    if(token instanceof ColoredToken) {
-                        Element rangeSubTerm = document.createElement("subterm");
-                        rangeAdd.appendChild(rangeSubTerm);
-                        Element rangeNumberOf = document.createElement("numberof");
-                        rangeSubTerm.appendChild(rangeNumberOf);
-                        Element rangeSubTerm2 = document.createElement("subterm");
-                        rangeNumberOf.appendChild(rangeSubTerm2);
-                        Element rangeNumberConstant = document.createElement("numberconstant");
-                        rangeNumberConstant.setAttribute("value", "1");
-                        rangeSubTerm2.appendChild(rangeNumberConstant);
-                        Element rangePositive = document.createElement("positive");
-                        rangeNumberConstant.appendChild(rangePositive);
-                        Element rangeSubTerm3 = document.createElement("subterm");
-                        rangeNumberOf.appendChild(rangeSubTerm3);
+                    Element rangeSubTerm = document.createElement("subterm");
+                    rangeAdd.appendChild(rangeSubTerm);
+                    Element rangeNumberOf = document.createElement("numberof");
+                    rangeSubTerm.appendChild(rangeNumberOf);
+                    Element rangeSubTerm2 = document.createElement("subterm");
+                    rangeNumberOf.appendChild(rangeSubTerm2);
+                    Element rangeNumberConstant = document.createElement("numberconstant");
+                    rangeNumberConstant.setAttribute("value", "1");
+                    rangeSubTerm2.appendChild(rangeNumberConstant);
+                    Element rangePositive = document.createElement("positive");
+                    rangeNumberConstant.appendChild(rangePositive);
+                    Element rangeSubTerm3 = document.createElement("subterm");
+                    rangeNumberOf.appendChild(rangeSubTerm3);
 
-                        if (colorType instanceof ProductType) {
-                            Element rangeTuble = document.createElement("tuple");
-                            rangeSubTerm3.appendChild(rangeTuble);
-                            for (Color element : ((ColoredToken) token).getColor().getTuple()) {
-                                Element rangeSubTerm4 = document.createElement("subterm");
-                                rangeTuble.appendChild(rangeSubTerm4);
-                                Element rangeUseroperator = document.createElement("useroperator");
-                                rangeUseroperator.setAttribute("declaration", element.getColorName());
-                                rangeSubTerm4.appendChild(rangeUseroperator);
-                            }
-                        } else {
-                            Element useroperatorElement = document.createElement("useroperator");
-                            useroperatorElement.setAttribute("declaration", ((ColoredToken)token).color().getName());
-                            rangeSubTerm3.appendChild(useroperatorElement);
+                    if (colorType instanceof ProductType) {
+                        Element rangeTuble = document.createElement("tuple");
+                        rangeSubTerm3.appendChild(rangeTuble);
+                        for (Color element :  token.getColor().getTuple()) {
+                            Element rangeSubTerm4 = document.createElement("subterm");
+                            rangeTuble.appendChild(rangeSubTerm4);
+                            Element rangeUseroperator = document.createElement("useroperator");
+                            rangeUseroperator.setAttribute("declaration", element.getColorName());
+                            rangeSubTerm4.appendChild(rangeUseroperator);
                         }
+                    } else {
+                        Element useroperatorElement = document.createElement("useroperator");
+                        useroperatorElement.setAttribute("declaration", token.color().getName());
+                        rangeSubTerm3.appendChild(useroperatorElement);
                     }
+
                 }
                 return;
             }

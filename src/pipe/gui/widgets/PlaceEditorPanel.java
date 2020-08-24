@@ -75,6 +75,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         if(!place.isColored()){
             timeInvariantColorPanel.setVisible(false);
             tokenPanel.setVisible(false);
+            colorTypePanel.setVisible(false);
         }
         if(place.isColored()){
             markingLabel.setVisible(false);
@@ -1033,29 +1034,33 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     }
 
     private void addColoredToken() {
-        ColoredToken ct;
+        TimedToken ct;
         if (colorType instanceof ProductType) {
             Vector<Color> colorVector = new Vector();
             for (int i = 0; i < tokenColorComboboxPanel.getColorTypeComboBoxesArray().length ; i++) {
                 colorVector.add((Color)tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
             }
             Color tempColor = new Color(colorType, 0, colorVector);
-            ct = new ColoredToken(place.underlyingPlace(), tempColor);
+            ct = new TimedToken(place.underlyingPlace(), tempColor);
         }
         else {
-            ct = new ColoredToken(place.underlyingPlace(), (dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
+            ct = new TimedToken(place.underlyingPlace(), (dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
         }
         addColoredToken(ct);
 	}
 
-    private void addColoredToken(ColoredToken tokenToAdd) {
+    private void addColoredToken(TimedToken tokenToAdd) {
+	    boolean existsAlready = false;
         if(tableModel.getRowCount() > 0){
-            for(int i = 0; i < tableModel.getRowCount(); i++){
-                if(((ColoredToken) tokenTable.getValueAt(i,1)).color().equals(tokenToAdd.color())){
+            int currSize = tableModel.getRowCount();
+            for(int i = 0; i < currSize; i++){
+                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(tokenToAdd.color().toString())){
                     tableModel.setValueAt((int)tableModel.getValueAt(i,0) + 1,i,0);
-                } else{
-                    tableModel.addRow(new Object[]{1, tokenToAdd});
+                    existsAlready = true;
                 }
+            }
+            if(!existsAlready){
+                tableModel.addRow(new Object[]{1, tokenToAdd});
             }
         }else{
             tableModel.addRow(new Object[]{1, tokenToAdd});
@@ -1071,7 +1076,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         }
         for(int row = 0; row < tableModel.getRowCount(); row++){
             int numberToAdd = (int)tableModel.getValueAt(row,0);
-            ColoredToken tokenTypeToAdd = (ColoredToken) tableModel.getValueAt(row,1);
+            TimedToken tokenTypeToAdd = (TimedToken) tableModel.getValueAt(row,1);
             for (int i = 0; i < numberToAdd; i++) {
                 context.activeModel().marking().add(tokenTypeToAdd);
             }
@@ -1103,7 +1108,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     private void writeTokensToList() {
         coloredTokenListModel.clear();
         for (TimedToken element : context.network().marking().getTokensFor(place.underlyingPlace())) {
-            addColoredToken((ColoredToken)element);
+            addColoredToken(element);
         }
     }
 
@@ -1126,6 +1131,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         initTokensPanel();
         initColorInvariantPanel();
         revalidate();
+        this.updateUI();
+        hideIrrelevantInformation();
     }
 
     private void setColoredTimeInvariants() {
@@ -1186,7 +1193,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private JRadioButton normalInvRadioButton;
 	private JRadioButton constantInvRadioButton;
     private JPanel tokenPanel;
-    private DefaultListModel<ColoredToken> coloredTokenListModel;
+    private DefaultListModel<TimedToken> coloredTokenListModel;
     private JList tokenList;
     private JPanel tokenButtonPanel;
     private JButton addColoredTokenButton;

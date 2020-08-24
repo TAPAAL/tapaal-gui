@@ -1,6 +1,7 @@
 package pipe.gui.undo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -13,13 +14,13 @@ import dk.aau.cs.model.tapn.TimedToken;
 public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private final TimedPlaceComponent timedPlaceComponent;
 	private final TimedPlace timedPlace;
-	private final int numberOfTokens;
+	private final List<TimedToken> tokens;
 	private final ArrayList<TAPNQuery> queriesInclusion = new ArrayList<TAPNQuery>();
 
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.timedPlaceComponent = timedPlaceComponent;
-		numberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
+		tokens = timedPlaceComponent.underlyingPlace().tokens();
 		timedPlace = timedPlaceComponent.underlyingPlace();
 		
 		// queries this place is an inclusion place in 
@@ -49,8 +50,8 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		tapn.add(timedPlace);
 		
 		if(!timedPlace.isShared()){
-			for(int i = 0; i < numberOfTokens; i++) {
-				tapn.addToken(new TimedToken(timedPlace));
+			for(TimedToken token : tokens) {
+				tapn.addToken(token);
 			}
 		}
 		

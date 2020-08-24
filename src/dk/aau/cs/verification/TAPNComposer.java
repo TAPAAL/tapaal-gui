@@ -176,7 +176,7 @@ public class TAPNComposer implements ITAPNComposer {
 			mapping.addMappingForShared(place.name(), uniquePlaceName);
 			
 			for (TimedToken token : place.tokens()) {
-				constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
+				constructedPlace.addToken(new TimedToken(constructedPlace, token.age(), token.color()));
 			}
 			
 			// Gui work
@@ -225,7 +225,7 @@ public class TAPNComposer implements ITAPNComposer {
 					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
 
 					for (TimedToken token : timedPlace.tokens()) {
-						place.addToken(new TimedToken(place, token.age()));
+						place.addToken(new TimedToken(place, token.age(), token.color()));
 					}
 					
 					// Gui work

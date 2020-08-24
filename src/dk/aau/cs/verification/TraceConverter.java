@@ -2,6 +2,8 @@ package dk.aau.cs.verification;
 
 import java.util.ArrayList;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -64,7 +66,7 @@ public class TraceConverter {
 		}
 		return decomposedAction;
 	}
-
+    //TODO: how to handle colors?
 	private TAPNNetworkTraceStep decomposeTransitionFiring(TAPNNetworkTimedTransitionStep transitionFiring) {
 		TimedTransition transition = transitionFiring.getTransition().isShared() ? tapnNetwork.getSharedTransitionByName(transitionFiring.getTransition().name()).transitions().iterator().next() 
 				: tapnNetwork.getTAPNByName(transitionFiring.getTransition().model().name()).getTransitionByName(transitionFiring.getTransition().name());
@@ -74,9 +76,9 @@ public class TraceConverter {
 		for (TimedToken token : transitionFiring.getConsumedTokens()) {
 			TimedPlace place = token.place().isShared() ? tapnNetwork.getSharedPlaceByName(token.place().name()) : tapnNetwork.getTAPNByName(((LocalTimedPlace) token.place()).model().name()).getPlaceByName(token.place().name());
 			if(token instanceof TraceToken){
-				convertedTokens.add(new TraceToken(place, token.age(), ((TraceToken)token).isGreaterThanOrEqual()));
+				convertedTokens.add(new TraceToken(place, token.age(), ((TraceToken)token).isGreaterThanOrEqual(), ColorType.COLORTYPE_DOT.getFirstColor()));
 			} else {
-				convertedTokens.add(new TimedToken(place, token.age()));
+				convertedTokens.add(new TimedToken(place, token.age(), ColorType.COLORTYPE_DOT.getFirstColor()));
 			}
 		}
 

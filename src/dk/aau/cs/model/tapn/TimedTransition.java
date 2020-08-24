@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.Animator;
@@ -336,20 +337,22 @@ public class TimedTransition extends TAPNElement {
 		return true;
 	}
 
+	//TODO: parse arc expression and calculate new colors also
 	public List<TimedToken> calculateProducedTokensFrom(List<TimedToken> consumedTokens) {
 		// Assume that tokens enables transition
 
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
 		for (TimedOutputArc arc : postset) {
 			for(int i = 0; i < arc.getWeight().value(); i++){
-				producedTokens.add(new TimedToken(arc.destination()));
+
+				producedTokens.add(new TimedToken(arc.destination(), ColorType.COLORTYPE_DOT.getFirstColor()));
 			}
 		}
 
 		for (TransportArc transportArc : transportArcsGoingThrough) {
 			for (TimedToken token : consumedTokens) {
 				if (token.place().equals(transportArc.source())) {
-					producedTokens.add(new TimedToken(transportArc.destination(), token.age()));
+					producedTokens.add(new TimedToken(transportArc.destination(), token.age(), ColorType.COLORTYPE_DOT.getFirstColor()));
 				}
 			}
 		}

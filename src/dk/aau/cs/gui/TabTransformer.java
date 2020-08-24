@@ -1,5 +1,9 @@
 package dk.aau.cs.gui;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.*;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
@@ -9,6 +13,7 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class TabTransformer {
     static public void removeTimingInformation(TabContent tab){
@@ -155,6 +160,54 @@ public class TabTransformer {
                 if (transition.isUncontrollable()) {
                     transition.setUncontrollable(false);
                 }
+            }
+        }
+    }
+    static public void removeColorInformation(TabContent tab) {
+        for (Template template : tab.allTemplates()) {
+            for(TimedPlace place : template.model().places()){
+                place.setCtiList(new ArrayList<>());
+                place.setColorType(ColorType.COLORTYPE_DOT);
+                int numberOfTokens = place.tokens().size();
+
+                //kind of hack to convert from coloredTokens to uncolored
+                for(TimedToken token : place.tokens()){
+                    token.setColor(place.getColorType().getFirstColor());
+                }
+            }
+
+            for (TimedTransition transition : template.model().transitions()) {
+                //TODO: what is the default guard
+                transition.setGuard(null);
+            }
+
+            for(TimedInputArc arc : template.model().inputArcs()){
+                arc.setColorTimeIntervals(new ArrayList<>());
+                ColorType ct = arc.source().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                arc.setExpression(numbExpr);
+            }
+
+            for(TimedOutputArc arc : template.model().outputArcs()){
+                ColorType ct = arc.destination().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                arc.setExpression(numbExpr);
+            }
+
+            for(TransportArc arc : template.model().transportArcs()){
+                ColorType ct = arc.source().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                arc.setInputExpression(numbExpr);
+                arc.setOutputExpression(numbExpr);
             }
         }
     }

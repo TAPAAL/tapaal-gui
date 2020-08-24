@@ -115,6 +115,6 @@ public class ColoredTimeInvariant extends TimeInvariant {
 
     @Override
     public ColoredTimeInvariant copy(){
-        return new ColoredTimeInvariant(isUpperIncluded, upperBound().copy(), color.copy());
+        return new ColoredTimeInvariant(isUpperIncluded, upperBound().copy(), color);
     }
 }

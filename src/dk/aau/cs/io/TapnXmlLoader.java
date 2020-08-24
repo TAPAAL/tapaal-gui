@@ -512,14 +512,16 @@ public class TapnXmlLoader {
 		    if(colorMarking!= null){
                 ColorMultiset cm = colorMarking.eval(context);
 
+
                 //TODO: nasty with two types of tokens/markings
-                for (ColoredToken ctElement : cm.getTokens(p)) {
+                for (TimedToken ctElement : cm.getTokens(p)) {
                     network.marking().add(ctElement);
                     //p.addToken(ctElement);
                 }
             } else {
                 for (int i = 0; i < initialMarkingInput; i++) {
-                    network.marking().add(new TimedToken(p));
+                    //Regular tokens will just be dotconstant
+                    network.marking().add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
                 }
             }
 

@@ -242,13 +242,13 @@ public class PNMLoader {
             if (colorMarking != null) {
                 ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), colortypes);
                 ColorMultiset cm = colorMarking.eval(context);
-                for (ColoredToken ct : cm.getTokens(place)) {
+                for (TimedToken ct : cm.getTokens(place)) {
                     tapn.parentNetwork().marking().add(ct);
                 }
             }
         } else {
             for (int i = 0; i < marking.marking; i++) {
-                tapn.parentNetwork().marking().add(new TimedToken(place));
+                tapn.parentNetwork().marking().add(new TimedToken(place, ColorType.COLORTYPE_DOT.getFirstColor()));
             }
         }
 	}

@@ -73,6 +73,10 @@ public class ColorType implements Iterable<Color> {
     }
 
     public ColorType copy(){
-        return new ColorType(this.name);
+        ColorType ct = new ColorType(this.name);
+        for(Color color : this.colors){
+            ct.addColor(color.getName());
+        }
+        return ct;
     }
 }
