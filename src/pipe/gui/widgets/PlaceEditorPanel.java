@@ -94,7 +94,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		initTimeInvariantPanel();
 
-		gridBagConstraints = GridBagHelper.as(0,1, WEST, HORIZONTAL, new Insets(0, 8, 0, 8));
+		gridBagConstraints = GridBagHelper.as(0,2, WEST, HORIZONTAL, new Insets(0, 8, 0, 8));
 		add(timeInvariantPanel, gridBagConstraints);
 
 
