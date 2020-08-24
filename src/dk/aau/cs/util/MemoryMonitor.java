@@ -80,11 +80,14 @@ public class MemoryMonitor {
 			}else{
 				try {
 					Process p = Runtime.getRuntime().exec("ps -p "+PID+" -o rss"); 
-					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); 
+					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-					input.readLine(); //Actual memory usage is second line output
-                    String s = input.readLine();
-					memory = Double.parseDouble(s.replace(" ", ""))/1024;
+                    String s = input.readLine(); //Actual memory usage is second line output
+                    s = input.readLine();
+
+                    if (s!=null) { //Not sure why s would be null, but it seems to happen some time on MacOS
+                        memory = Double.parseDouble(s.replace(" ", "")) / 1024;
+                    }
 				} catch (IOException e) {
                     Logger.log(e);
 				} 
