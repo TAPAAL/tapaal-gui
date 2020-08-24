@@ -26,7 +26,7 @@ public class MakePlaceSharedCommand extends Command {
 	private final boolean multishare;
 	
 	private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
-	private final List<TimedToken> oldTokens;
+	private final int oldTokens;
 	private final TabContent currentTab;
 
 	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multishare){
@@ -41,7 +41,7 @@ public class MakePlaceSharedCommand extends Command {
 		this.place = place;
 		this.placeComponent = placeComponent;
 		this.multishare = multishare;
-		oldTokens = place.tokens();
+		oldTokens = place.numberOfTokens();
 		this.currentTab = currentTab;
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
