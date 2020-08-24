@@ -33,6 +33,10 @@ public class ColorType implements Iterable<Color> {
         return colors.iterator();
     }
 
+    public Vector<Color> getColors(){
+        return colors;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ColorType))

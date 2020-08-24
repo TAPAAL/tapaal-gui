@@ -676,7 +676,7 @@ public class TapnXmlLoader {
 
 				//TODO: again nasty with two types of intervals
                 TimeInterval timeInterval = TimeInterval.parse(inscriptionSplit[0],	constants);
-                ctiList.add(ColoredTimeInterval.parse(inscriptionSplit[0], constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
+                ctiList.add(ColoredTimeInterval.parse(inscriptionSplit[0], constants, sourcePlace.getColorType().getColors()));
 
 				assert (sourcePlace != null);
 				assert (trans != null);

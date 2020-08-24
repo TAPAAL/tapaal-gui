@@ -79,7 +79,7 @@ public class ColoredTimeInterval extends TimeInterval {
                             "A constant which was not declared was used in an time interval of an arc.");
             }
         }
-        System.out.println("what");
+
         return new ColoredTimeInterval(leftBracket.equals("[") ? true : false,
                 lowerBound, upperBound, rightBracket.equals("]") ? true : false, color);
     }
