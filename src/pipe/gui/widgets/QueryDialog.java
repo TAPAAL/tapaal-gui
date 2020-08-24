@@ -2897,7 +2897,12 @@ public class QueryDialog extends JPanel {
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
             if (lens.isGame()) {
-                enableOnlyForAllBox();
+                if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+                    forAllBox.setSelected(false);
+                    enableOnlyForAllBox();
+                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    enableOnlyStateButtons();
+                }
             } else if (lens.isTimed()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     enableOnlyPathButtons();
@@ -3038,7 +3043,7 @@ public class QueryDialog extends JPanel {
 
 
 	private void queryChanged(){
-		setEnabledReductionOptions();
+    		setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
 	}
 
