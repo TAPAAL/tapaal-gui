@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+
+import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -23,6 +25,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
@@ -1566,9 +1569,42 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
+                findAndRemoveGameAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
+        }
+    }
+
+    private void findAndRemoveGameAffectedQueries(TabContent tab){
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        for (TAPNQuery q : tab.queries()) {
+            if (q.hasUntimedOnlyProperties() || !(q.getProperty() instanceof TCTLAGNode) || !lens.isTimed()) {
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            } else {
+                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
+                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
+                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                } if (q.useTimeDarts()) {
+                    q.setUseTimeDarts(false);
+                } if (q.useGCD()) {
+                    q.setUseGCD(false);
+                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
+                    q.setUseOverApproximationEnabled(false);
+                    q.setUseUnderApproximationEnabled(false);
+                }
+            }
+        }
+        String message = "The following queries will be removed in the conversion:";
+        for (TAPNQuery q : queriesToRemove) {
+            message += "\n" + q.getName();
+        }
+        if (!queriesToRemove.isEmpty()) {
+            JOptionPane.showMessageDialog(this, message, "Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
