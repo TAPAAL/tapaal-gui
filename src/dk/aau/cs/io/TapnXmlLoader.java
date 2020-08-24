@@ -447,9 +447,7 @@ public class TapnXmlLoader {
 		}else{
 			p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
-			for (int i = 0; i < initialMarkingInput; i++) {
-				network.marking().add(new TimedToken(p));
-			}
+			p.addTokens(initialMarkingInput);
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
