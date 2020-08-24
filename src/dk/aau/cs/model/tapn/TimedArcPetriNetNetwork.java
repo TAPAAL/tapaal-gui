@@ -614,8 +614,12 @@ public class TimedArcPetriNetNetwork {
 	//For colors
 
     public List<ColorType> colorTypes() { return colorTypes;}
+    public void setColorTypes(List<ColorType> cts) { colorTypes = cts;}
+
 
     public List<Variable> variables() {return variables;}
+    public void setVariables(List<Variable> newVariables) { variables = newVariables;}
+
 
     public void updateColorType(String oldName, ColorType colorType) {
         Integer index = getColorTypeIndex(oldName);

@@ -4,6 +4,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
@@ -164,6 +165,8 @@ public class TabTransformer {
         }
     }
     static public void removeColorInformation(TabContent tab) {
+        tab.network().setColorTypes(new ArrayList<ColorType>());
+        tab.network().setVariables(new ArrayList<Variable>());
         for (Template template : tab.allTemplates()) {
             for(TimedPlace place : template.model().places()){
                 place.setCtiList(new ArrayList<>());
