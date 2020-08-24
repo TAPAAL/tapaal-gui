@@ -50,6 +50,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	    setUnderlyingArc(model);
 
 	    updateLabel(true);
+	    sealArc();
     }
 
     public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group){
@@ -60,6 +61,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
         setUnderlyingArc(model);
 
         updateLabel(true);
+        sealArc();
     }
 
 
