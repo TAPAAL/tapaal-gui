@@ -11,10 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -346,7 +343,7 @@ public class QueryDialog extends JPanel {
         false, //dunno
         true);
 
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
@@ -467,7 +464,7 @@ public class QueryDialog extends JPanel {
 	    boolean hasBeenChanged = false;
         if (lens.isTimed()) {
             if (newProperty instanceof TCTLAUNode || newProperty instanceof TCTLEUNode || newProperty instanceof TCTLEXNode || newProperty instanceof TCTLAXNode) {
-                messages.add("The query property is not supported by the time feature and can not be verified");
+                messages.add("The query property is not supported by the time feature and can not be verified.");
             }
         } if (lens.isGame()) {
             if (heuristicSearch.isSelected()) {
