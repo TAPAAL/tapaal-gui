@@ -228,4 +228,8 @@ public abstract class InvariantEditorPanel extends JPanel{
         }
         invRelationConstant.setSelectedItem(selected);
     }
+
+    public void removeBorder(){
+        this.setBorder(null);
+    }
 }

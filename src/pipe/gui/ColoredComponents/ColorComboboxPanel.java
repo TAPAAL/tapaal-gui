@@ -16,6 +16,7 @@ public class ColorComboboxPanel extends JPanel {
 
     private JPanel colorcomboBoxPanel;
     private JComboBox[] colorTypeComboBoxesArray;
+    JScrollPane colorTypesScrollPane;
 
     public ColorComboboxPanel(ColorType colorType, String panelName) {
         this.colorType = colorType;
@@ -79,7 +80,7 @@ public class ColorComboboxPanel extends JPanel {
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
         }
         //In case it is a really large product type we have a scrollPane
-        JScrollPane colorTypesScrollPane = new JScrollPane(comboBoxPanel);
+        colorTypesScrollPane = new JScrollPane(comboBoxPanel);
         colorTypesScrollPane.setViewportView(comboBoxPanel);
         colorTypesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         colorTypesScrollPane.setBorder(BorderFactory.createTitledBorder("Color Type elements"));
@@ -96,5 +97,9 @@ public class ColorComboboxPanel extends JPanel {
         gbc.anchor = GridBagConstraints.SOUTH;
         colorcomboBoxPanel.add(colorTypesScrollPane, gbc);
         add(colorcomboBoxPanel, gbc);
+    }
+
+    public void removeScrollPaneBorder(){
+        colorTypesScrollPane.setBorder(null);
     }
 }

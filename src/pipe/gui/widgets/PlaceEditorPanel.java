@@ -817,10 +817,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         JPanel nonDefaultColorInvariantPanel = new JPanel(new GridBagLayout());
         //this panel holds the buttons, the invariant editor panel and the color combobox
         JPanel colorInvariantEditPanel = new JPanel(new GridBagLayout());
-        colorInvariantEditPanel.setBorder(BorderFactory.createTitledBorder("Edit color specific invariant"));
+        //colorInvariantEditPanel.setBorder(BorderFactory.createTitledBorder("Edit color specific invariant"));
 
         ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors");
-
+        colorComboboxPanel.removeScrollPaneBorder();
         JButton addTimeConstraintButton = new JButton("Add");
         JButton removeTimeConstraintButton = new JButton("Remove");
 
@@ -907,12 +907,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        colorInvariantEditPanel.add(new InvariantEditorPanel(context, place) {
+        InvariantEditorPanel invariantEditorPanel = new InvariantEditorPanel(context, place) {
             @Override
             public void placeHolder() {
 
             }
-        },gbc);
+        };
+        invariantEditorPanel.removeBorder();
+        colorInvariantEditPanel.add(invariantEditorPanel,gbc);
 
 
         gbc.gridx = 2;
@@ -929,6 +931,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridy = 1;
         //gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
         nonDefaultColorInvariantPanel.add(timeConstraintScrollPane, gbc);
 
         return nonDefaultColorInvariantPanel;
