@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
@@ -33,6 +32,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
@@ -42,25 +42,6 @@ import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.*;
-import dk.aau.cs.TCTL.StringPosition;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLFalseNode;
-import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
@@ -454,7 +435,57 @@ public class QueryDialog extends JPanel {
 
 		init(option, queryToCreateFrom);
 		toggleAdvancedSimpleView(false);
+        checkQueryCompatibility();
 	}
+
+	private void checkQueryCompatibility() {
+	    ArrayList<String> messages = new ArrayList<>();
+	    boolean hasBeenChanged = false;
+        if (lens.isTimed()) {
+            if (newProperty instanceof TCTLAUNode || newProperty instanceof TCTLEUNode || newProperty instanceof TCTLEXNode || newProperty instanceof TCTLAXNode) {
+                messages.add("The query property is not supported by the time feature and can not be verified");
+            }
+        } if (lens.isGame()) {
+            if (heuristicSearch.isSelected()) {
+                heuristicSearch.setSelected(false);
+                hasBeenChanged = true;
+            } if (useGCD.isSelected()) {
+                useGCD.setSelected(false);
+                hasBeenChanged = true;
+            } if (useTimeDarts.isSelected()) {
+                useTimeDarts.setSelected(false);
+                hasBeenChanged = true;
+            } if (!noTraceRadioButton.isSelected()) {
+                noTraceRadioButton.setSelected(true);
+                hasBeenChanged = true;
+            } if (!noApproximationEnable.isSelected()) {
+                noApproximationEnable.setSelected(true);
+                hasBeenChanged = true;
+            } if (!reductionOption.getSelectedItem().equals(name_DISCRETE)) {
+                if (lens.isTimed()) {
+                    reductionOption.setSelectedItem(name_DISCRETE);
+                    hasBeenChanged = true;
+                } else {
+                    messages.add("There are no engines that support untimed-game queries");
+                }
+            } if (newProperty.toString().contains("AF") || newProperty.toString().contains("EF") || newProperty.toString().contains("EG")) {
+                messages.add("The query property is not supported by the game feature and can not be verified");
+            }
+        }
+        if (reductionOption.getItemCount() <= 0) {
+            messages.add("There are no engines that support this query");
+        }
+        if (hasBeenChanged) {
+           messages.add("Some options have been changed to make the query compatible.");
+        }
+        if (!messages.isEmpty()) {
+            String message = "";
+            for (String s : messages) {
+                message += s + "\n\n";
+            }
+            JOptionPane.showMessageDialog(CreateGui.getApp(), message);
+        }
+    }
 
 	private boolean checkIfSomeReductionOption() {
 		if (reductionOption.getSelectedItem() == null){
@@ -639,7 +670,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                              HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
+                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
@@ -656,7 +687,7 @@ public class QueryDialog extends JPanel {
 
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
-		contentPane.add(queryDialogue);
+        contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
 
