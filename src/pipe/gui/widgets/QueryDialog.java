@@ -2926,7 +2926,7 @@ public class QueryDialog extends JPanel {
 		}
 		else if(reductionOption.getSelectedItem().equals(name_DISCRETE) || reductionOption.getSelectedItem().equals(name_UNTIMED)) {
 			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(true);
+			symmetryReduction.setSelected(false);
 			symmetryReduction.setEnabled(false);
 		}
 		else if((reductionOption.getSelectedItem().equals(name_COMBI) ||
@@ -2940,6 +2940,7 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(false);
 			symmetryReduction.setEnabled(false);
+			symmetryReduction.setSelected(false);
 		} else {
 			symmetryReduction.setVisible(true);
 			if(!symmetryReduction.isEnabled())	symmetryReduction.setSelected(true);
@@ -3012,6 +3013,8 @@ public class QueryDialog extends JPanel {
 				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
+				symmetryReduction.setSelected(false);
+				symmetryReduction.setEnabled(false);
 			}
 
 			// Disable stubborn reduction for EG/AF queries
