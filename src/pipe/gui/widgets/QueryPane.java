@@ -320,12 +320,8 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.addActionListener(new ActionListener() {
 
 		    public void actionPerformed(ActionEvent e) {
-				TAPNQuery q;
-				if (!tabContent.getLens().isTimed()){
-                    q = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-				} else {
-					q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-				}
+				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
+
                 if(q == null) return;
 
                 undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
@@ -359,24 +355,11 @@ public class QueryPane extends JPanel implements SidePane {
 	}
 
 	public void showEditDialog() {
-		int openCTLDialog = JOptionPane.YES_OPTION;
-		boolean netIsUntimed = tabContent.network().isUntimed();
-		String optionText = "The net is untimed and the query can be converted for the use with untimed CTL engine.\nDo you want to convert the query (recommended answer is yes if you plan to use only untimed net)?";
-
-		// YES_OPTION = CTL dialog, NO_OPTION = Reachability dialog
-		Object[] options = {
-				"yes",
-				"no"};
-
 		TAPNQuery q = queryList.getSelectedValue();
-		TAPNQuery newQuery = null;
+		TAPNQuery newQuery;
 
 		if(q.isActive()) {
-            if(!tabContent.getLens().isTimed()) {
-                newQuery = CTLQueryDialog.showQueryDialogue(CTLQueryDialog.QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-            } else {
-                newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
-            }
+            newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
 
 			if (newQuery != null)
 				updateQuery(q, newQuery);

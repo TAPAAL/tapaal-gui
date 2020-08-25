@@ -52,6 +52,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	    setUnderlyingArc(model);
         this.lens = lens;
 	    updateLabel(true);
+	    sealArc();
     }
 
     public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, TabContent.TAPNLens lens){
@@ -63,6 +64,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
         setUnderlyingArc(model);
 
         updateLabel(true);
+        sealArc();
     }
 
 
