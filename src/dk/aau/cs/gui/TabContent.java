@@ -13,7 +13,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -605,6 +605,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
+            checkQueries(tab);
+
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
@@ -616,6 +618,208 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
 		}
 
+	}
+
+	private static void checkQueries(TabContent tab) {
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
+            "name_verifyTAPN", //name of engine
+            false, //  support fastest trace
+            false, // support deadlock with net degree 2 and (EF or AG)
+            false, //  support deadlock with EG or AF
+            false, // support deadlock with inhibitor arcs
+            false,  //support weights
+            true,  //support inhibitor arcs
+            false, // support urgent transitions
+            false, // support EG or AF
+            true, // support strict nets
+            true, //  support timed nets/time intervals
+            false,// support deadlock with net degree > 2
+            false, //support games
+            false, //support EG or AF with net degree > 2
+            false); //support nested quantification
+
+       EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
+            "name_COMBI",//name of engine
+            false,//  support fastest trace
+            true,// support deadlock with net degree 2 and (EF or AG)
+            false,//  support deadlock with EG or AF
+            false,// support deadlock with inhibitor arcs
+            true, //support weights
+            true, //support inhibitor arcs
+            true,// support urgent transitions
+            true,// support EG or AF
+            true,// support strict nets
+            true,//  support timed nets/time intervals
+            false,// support deadlock with net degree > 2
+            false, //support games
+            true, //support EG or AF with net degree > 2);
+            false); //support nested quantification
+
+       EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
+            "name_OPTIMIZEDSTANDARD",//name of engine
+            false,//  support fastest trace
+            false,// support deadlock with net degree 2 and (EF or AG)
+            false,//  support deadlock with EG or AF
+            false,// support deadlock with inhibitor arcs
+            false, //support weights
+            false, //support inhibitor arcs
+            false,// support urgent transitions
+            true,// support EG or AF
+            true,// support strict nets
+            true,//  support timed nets/time intervals
+            false,// support deadlock with net degree > 2
+            false, //support games
+            false,//support EG or AF with net degree > 2);
+            false); //support nested quantification
+
+        EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
+            "name_STANDARD",//name of engine
+            false,//  support fastest trace
+            false,// support deadlock with net degree 2 and (EF or AG)
+            false,//  support deadlock with EG or AF
+            false,// support deadlock with inhibitor arcs
+            false, //support weights
+            false, //support inhibitor arcs
+            false,// support urgent transitions
+            false,// support EG or AF
+            true,// support strict nets
+            true,//  support timed nets/time intervals
+            false,// support deadlock with net degree > 2
+            false, //support games
+            false, //support EG or AF with net degree > 2);
+            false); //support nested quantification
+
+
+        EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
+            "name_BROADCAST",//name of engine
+            false,//  support fastest trace
+            true,// support deadlock with net degree 2 and (EF or AG)
+            false,//  support deadlock with EG or AF
+            false,// support deadlock with inhibitor arcs
+            false, //support weights
+            true, //support inhibitor arcs
+            false,// support urgent transitions
+            true,// support EG or AF
+            true,// support strict nets
+            true,//  support timed nets/time intervals
+            false,// support deadlock with net degree > 2
+            false, //support games
+            true, //support EG or AF with net degree > 2);
+            false); //support nested quantification
+
+        EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
+            "name_BROADCASTDEG2",//name of engine
+            false,//  support fastest trace
+            true,// support deadlock with net degree 2 and (EF or AG)
+            false,//  support deadlock with EG or AF
+            false,// support deadlock with inhibitor arcs
+            false, //support weights
+            true, //support inhibitor arcs
+            false,// support urgent transitions
+            true,// support EG or AF
+            true,// support strict nets
+            true,//  support timed nets/time intervals
+            false,// support deadlock with net degree > 2
+            false, //support games
+            true,//support EG or AF with net degree > 2);
+            false); //support nested quantification
+
+        EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
+            "name_DISCRETE",//name of engine
+            true,//  support fastest trace
+            true,// support deadlock with net degree 2 and (EF or AG)
+            true,//  support deadlock with EG or AF
+            true,// support deadlock with inhibitor arcs
+            true, //support weights
+            true, //support inhibitor arcs
+            true,// support urgent transitions
+            true,// support EG or AF
+            false,// support strict nets
+            true,//  support timed nets/time intervals
+            true,// support deadlock with net degree > 2
+            true, //support games
+            true, //support EG or AF with net degree > 2);
+            false); //support nested quantification
+
+        EngineSupportOptions verifyPNOptions = new EngineSupportOptions(
+            "name_UNTIMED",
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true);
+
+        EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
+        TimedArcPetriNetNetwork net = tab.network();
+        for (TAPNQuery q : tab.queries()) {
+            boolean hasEngine = false;
+            boolean[] queryOptions = new boolean[]{
+                q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
+                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
+                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)),
+                (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()),
+                net.hasWeights(),
+                net.hasInhibitorArcs(),
+                net.hasUrgentTransitions(),
+                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode),
+                !net.isNonStrict(),
+                tab.lens.isTimed(),
+                (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
+                tab.lens.isGame(),
+                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
+                q.getProperty().hasNestedPathQuantifiers()
+            };
+            //todo check AU, AX, etc
+            for(EngineSupportOptions engine : engineSupportOptions){
+                if(engine.areOptionsSupported(queryOptions)){
+                    hasEngine = true;
+                    break;
+                }
+            }
+            if (!hasEngine) {
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            } else if (tab.lens.isGame()) {
+                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
+                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
+                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                } if (q.useTimeDarts()) {
+                    q.setUseTimeDarts(false);
+                } if (q.useGCD()) {
+                    q.setUseGCD(false);
+                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
+                    q.setUseOverApproximationEnabled(false);
+                    q.setUseUnderApproximationEnabled(false);
+                }
+            }
+        }
+        String message = "";
+        if (!queriesToRemove.isEmpty()) {
+            message = "The following queries will be removed in the conversion:";
+            for (TAPNQuery q : queriesToRemove) {
+                message += "\n" + q.getName();
+            }
+        }
+        if (tab.lens.isGame()) {
+            message += (message.length() == 0 ? "" : "\n\n");
+            message += "Some options may have been changed to make the query compatible with the net features.";
+        }
+        if(message.length() > 0){
+            JOptionPane.showMessageDialog(tab, message,"Information", JOptionPane.INFORMATION_MESSAGE);
+        }
 	}
 
     private TabContent createNewTabFromInputStream(InputStream file, String name, FeatureOption option, boolean isYes) throws Exception {

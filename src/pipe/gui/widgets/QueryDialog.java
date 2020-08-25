@@ -338,9 +338,9 @@ public class QueryDialog extends JPanel {
         true,
         false,
         false,
-        false, //dunno
+        true,
         false,
-        false, //dunno
+        true,
         true);
 
     private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
@@ -456,57 +456,7 @@ public class QueryDialog extends JPanel {
 
 		init(option, queryToCreateFrom);
 		toggleAdvancedSimpleView(false);
-        checkQueryCompatibility();
 	}
-
-	private void checkQueryCompatibility() {
-	    ArrayList<String> messages = new ArrayList<>();
-	    boolean hasBeenChanged = false;
-        if (lens.isTimed()) {
-            if (newProperty instanceof TCTLAUNode || newProperty instanceof TCTLEUNode || newProperty instanceof TCTLEXNode || newProperty instanceof TCTLAXNode) {
-                messages.add("The query property is not supported by the time feature and can not be verified.");
-            }
-        } if (lens.isGame()) {
-            if (heuristicSearch.isSelected()) {
-                heuristicSearch.setSelected(false);
-                hasBeenChanged = true;
-            } if (useGCD.isSelected()) {
-                useGCD.setSelected(false);
-                hasBeenChanged = true;
-            } if (useTimeDarts.isSelected()) {
-                useTimeDarts.setSelected(false);
-                hasBeenChanged = true;
-            } if (!noTraceRadioButton.isSelected()) {
-                noTraceRadioButton.setSelected(true);
-                hasBeenChanged = true;
-            } if (!noApproximationEnable.isSelected()) {
-                noApproximationEnable.setSelected(true);
-                hasBeenChanged = true;
-            } if (!reductionOption.getSelectedItem().equals(name_DISCRETE)) {
-                if (lens.isTimed()) {
-                    reductionOption.setSelectedItem(name_DISCRETE);
-                    hasBeenChanged = true;
-                } else {
-                    messages.add("There are no engines that support untimed-game queries");
-                }
-            } if (newProperty.toString().contains("AF") || newProperty.toString().contains("EF") || newProperty.toString().contains("EG")) {
-                messages.add("The query property is not supported by the game feature and can not be verified");
-            }
-        }
-        if (reductionOption.getItemCount() <= 0) {
-            messages.add("There are no engines that support this query");
-        }
-        if (hasBeenChanged) {
-           messages.add("Some options have been changed to make the query compatible.");
-        }
-        if (!messages.isEmpty()) {
-            String message = "";
-            for (String s : messages) {
-                message += s + "\n\n";
-            }
-            JOptionPane.showMessageDialog(CreateGui.getApp(), message);
-        }
-    }
 
 	private boolean checkIfSomeReductionOption() {
 		if (reductionOption.getSelectedItem() == null){
