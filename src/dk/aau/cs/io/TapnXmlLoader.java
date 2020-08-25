@@ -674,9 +674,9 @@ public class TapnXmlLoader {
 				TimedTransition trans = template.model().getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
 
-				//TODO: again nasty with two types of intervals
                 TimeInterval timeInterval = TimeInterval.parse(inscriptionSplit[0],	constants);
-                ctiList.add(ColoredTimeInterval.parse(inscriptionSplit[0], constants, sourcePlace.getColorType().getColors()));
+                //TODO:this parsing needs serious work
+                //ctiList.add(ColoredTimeInterval.parse(inscriptionSplit[0], constants, sourcePlace.getColorType().getColors()));
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -748,9 +748,8 @@ public class TapnXmlLoader {
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
 
-		//TODO: Two types of intervals are nasty
 		TimeInterval timeInterval = TimeInterval.parse(inscriptionTempStorage, constants);
-        ctiList.add(ColoredTimeInterval.parse(inscriptionTempStorage, constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
+        //ctiList.add(ColoredTimeInterval.parse(inscriptionTempStorage, constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
 
 
         TimedInputArc inputArc = new TimedInputArc(place, transition, timeInterval, weight, expr);
