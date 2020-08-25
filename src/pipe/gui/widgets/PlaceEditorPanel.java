@@ -7,6 +7,10 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import dk.aau.cs.model.CPN.*;
@@ -861,6 +865,33 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
         timeConstraintListModel = new DefaultListModel();
         timeConstraintList = new JList(timeConstraintListModel);
+        timeConstraintList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        timeConstraintListModel.addListDataListener(new ListDataListener() {
+            public void contentsChanged(ListDataEvent arg0) {
+            }
+
+            public void intervalAdded(ListDataEvent arg0) {
+                timeConstraintList.setSelectedIndex(arg0.getIndex0());
+                timeConstraintList.ensureIndexIsVisible(arg0.getIndex0());
+            }
+
+            public void intervalRemoved(ListDataEvent arg0) {
+                int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+                timeConstraintList.setSelectedIndex(index);
+                timeConstraintList.ensureIndexIsVisible(index);
+            }
+
+        });
+        timeConstraintList.addListSelectionListener(listSelectionEvent -> {
+            if (!listSelectionEvent.getValueIsAdjusting()) {
+                JList source = (JList) listSelectionEvent.getSource();
+                if(source.getSelectedIndex() >= 0){
+                    ColoredTimeInvariant cti = (ColoredTimeInvariant) source.getModel().getElementAt(source.getSelectedIndex());
+                    invariantEditorPanel.setInvariant(cti);
+                    colorComboboxPanel.updateSelection(cti.getColor());
+                }
+            }
+        });
         JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
         timeConstraintScrollPane.setViewportView(timeConstraintList);
         timeConstraintScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -878,8 +909,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
             for (int i = 0; i < timeConstraintListModel.size(); i++) {
                 if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
                     alreadyExists = true;
-                    timeConstraintListModel.removeElementAt(i);
-                    timeConstraintListModel.addElement(timeConstraint);
+                    timeConstraintListModel.setElementAt(timeConstraint, i);
+                    /*timeConstraintListModel.removeElementAt(i);
+                    timeConstraintListModel.add(i, timeConstraint);
+                    timeConstraintList.setSelectedIndex(i);*/
                 }
             }
             if (!alreadyExists){
@@ -1140,6 +1173,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         for (ColoredTimeInvariant timeInvariant : place.underlyingPlace().getCtiList()) {
             timeConstraintListModel.addElement(timeInvariant);
         }
+        timeConstraintList.setSelectedIndex(0);
     }
 
 

@@ -108,4 +108,16 @@ public abstract class ColorComboboxPanel extends JPanel {
     }
 
     public abstract void changedColor(JComboBox[] comboBoxes);
+    public void updateSelection(Color color){
+        if (colorType instanceof ProductType) {
+
+            for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
+                colorTypeComboBoxesArray[i].setSelectedItem(color);
+
+            }
+        }
+        else if (colorType != null){
+            colorTypeComboBoxesArray[0].setSelectedItem(color);
+        }
+    }
 }

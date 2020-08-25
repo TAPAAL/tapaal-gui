@@ -59,8 +59,8 @@ public class ColoredTimeInvariant extends TimeInvariant {
             bound = Bound.Infinity;
         else {
             try {
-                BigDecimal intBound = BigDecimal.valueOf(Double.parseDouble(boundAsString));
-                bound = new RatBound(intBound);
+                int intBound = Integer.parseInt(boundAsString);
+                bound = new IntBound(intBound);
             } catch (NumberFormatException e) {
                 if (constants.containsConstantByName(boundAsString)) {
                     bound = new ConstantBound(constants.getConstantByName(boundAsString));
