@@ -232,4 +232,8 @@ public abstract class InvariantEditorPanel extends JPanel{
     public void removeBorder(){
         this.setBorder(null);
     }
+
+    public void getInvariantRelation(){
+
+    }
 }

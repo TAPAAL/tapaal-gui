@@ -7,9 +7,11 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 
-public class ColorComboboxPanel extends JPanel {
+public abstract class ColorComboboxPanel extends JPanel {
 
     private ColorType colorType;
     private String panelName;
@@ -53,6 +55,7 @@ public class ColorComboboxPanel extends JPanel {
                 colorTypeComboBoxesArray[i].setPreferredSize(comboSize);
                 colorTypeComboBoxesArray[i].setMinimumSize(comboSize);
                 colorTypeComboBoxesArray[i].setMaximumSize(comboSize);
+                colorTypeComboBoxesArray[i].addActionListener(actionEvent -> changedColor(colorTypeComboBoxesArray));
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.gridx = 0;
                 gbc.gridy = i;
@@ -71,6 +74,7 @@ public class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[0].setPreferredSize(comboSize);
             colorTypeComboBoxesArray[0].setMinimumSize(comboSize);
             colorTypeComboBoxesArray[0].setMaximumSize(comboSize);
+            colorTypeComboBoxesArray[0].addActionListener(actionEvent -> changedColor(colorTypeComboBoxesArray));
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
@@ -102,4 +106,6 @@ public class ColorComboboxPanel extends JPanel {
     public void removeScrollPaneBorder(){
         colorTypesScrollPane.setBorder(null);
     }
+
+    public abstract void changedColor(JComboBox[] comboBoxes);
 }

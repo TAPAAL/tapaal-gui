@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Set;
 
-public class ColoredTimeInvariantDialogPanel extends JPanel {
+public abstract class ColoredTimeInvariantDialogPanel extends JPanel {
 
     private JPanel timeInvariantPanel;
     private JPanel invariantGroup;
@@ -57,7 +57,6 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
     private void initPanel() {
         initInvariantPanel();
         setTimeInvariantVariables();
-        initButtonPanel();
     }
 
     public ColoredTimeInvariant getNewTimeInvariant() {return newTimeInvariant;}
@@ -125,64 +124,6 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
             }
         }
         return true;
-    }
-
-    private void initButtonPanel() {
-        buttonPanel = new JPanel(new GridBagLayout());
-
-        okButton = new JButton("OK");
-        cancelButton = new JButton("Cancel");
-
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                ColoredTimeInvariant cti;
-                double spinnerValue = (Integer) invariantSpinner.getValue();
-                Bound bound = new RatBound(BigDecimal.valueOf(spinnerValue));
-                if(constantInvRadioButton.isSelected()) {
-                    boolean nonStrict = "<=".equals(invRelationConstant.getSelectedItem());
-                    Constant constant = context.network().getConstant((String)invConstantsComboBox.getSelectedItem());
-                    cti = new ColoredTimeInvariant(nonStrict, new ConstantBound(constant), oldTimeInvariant.getColor());
-                }else {
-                    if (invariantInf.isSelected())
-                        cti = new ColoredTimeInvariant(false, Bound.Infinity, oldTimeInvariant.getColor());
-                    else {
-                        if ("<=".equals(invRelationNormal.getSelectedItem()))
-                            cti = new ColoredTimeInvariant(true, bound, oldTimeInvariant.getColor());
-                        else
-                            cti = new ColoredTimeInvariant(false, bound, oldTimeInvariant.getColor());
-                    }
-
-                }
-                newTimeInvariant = cti;
-                didEdit = true;
-                rootPane.getParent().setVisible(false);
-            }
-        });
-
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                didEdit = false;
-                rootPane.getParent().setVisible(false);
-            }
-        });
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        gbc.insets = new Insets(3, 3, 3,3);
-        buttonPanel.add(okButton, gbc);
-
-        gbc.gridx = 1;
-        buttonPanel.add(cancelButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        add(buttonPanel, gbc);
     }
 
     private void invariantCheckedEvent() {
@@ -328,9 +269,48 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         invariantGroup.add(constantInvRadioButton, gbc);
 
+        setInvariant(oldTimeInvariant);
 
-        ColoredTimeInvariant invariantToSet = oldTimeInvariant;
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        timeInvariantPanel.add(invariantGroup, gridBagConstraints);
 
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        add(timeInvariantPanel, gridBagConstraints);
+    }
+
+    public abstract void placeHolder();
+
+    public ColoredTimeInvariant getInvariant(){
+        ColoredTimeInvariant cti;
+        double spinnerValue = (Integer) invariantSpinner.getValue();
+        Bound bound = new IntBound((int)spinnerValue);
+        if(constantInvRadioButton.isSelected()) {
+            boolean nonStrict = "<=".equals(invRelationConstant.getSelectedItem());
+            Constant constant = context.network().getConstant((String)invConstantsComboBox.getSelectedItem());
+            cti = new ColoredTimeInvariant(nonStrict, new ConstantBound(constant), oldTimeInvariant.getColor());
+        }else {
+            if (invariantInf.isSelected())
+                cti = new ColoredTimeInvariant(false, Bound.Infinity, oldTimeInvariant.getColor());
+            else {
+                if ("<=".equals(invRelationNormal.getSelectedItem()))
+                    cti = new ColoredTimeInvariant(true, bound, oldTimeInvariant.getColor());
+                else
+                    cti = new ColoredTimeInvariant(false, bound, oldTimeInvariant.getColor());
+            }
+
+        }
+        return cti;
+    }
+
+    public void setInvariant(ColoredTimeInvariant invariantToSet){
+        oldTimeInvariant = invariantToSet;
         if (invariantToSet.isUpperNonstrict()) {
             invRelationNormal.setSelectedItem("<=");
         } else {
@@ -365,18 +345,5 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
                 invariantInf.setSelected(false);
             }
         }
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        timeInvariantPanel.add(invariantGroup, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(timeInvariantPanel, gridBagConstraints);
     }
 }

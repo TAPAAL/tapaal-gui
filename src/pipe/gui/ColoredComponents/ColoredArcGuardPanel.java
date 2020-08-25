@@ -145,7 +145,12 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private JPanel initColorConstraintPanel() {
         arcColorInvariantPanel = new JPanel(new GridBagLayout());
-        ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors");
+        ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
+            @Override
+            public void changedColor(JComboBox[] comboBoxes) {
+
+            }
+        };
 
         addTimeConstraintButton = new JButton("Add");
         removeTimeConstraintButton = new JButton("Remove");
