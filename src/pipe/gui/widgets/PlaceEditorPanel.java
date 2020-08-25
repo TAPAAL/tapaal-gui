@@ -7,10 +7,7 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
@@ -23,6 +20,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.ColoredComponents.ColorComboboxPanel;
 import pipe.gui.ColoredComponents.ColoredTimeInvariantDialogPanel;
 import pipe.gui.CreateGui;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
@@ -807,26 +805,29 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariants for specific colors"));
 
         GridBagConstraints gbc = GridBagHelper.as(0,0);
-        timeInvariantColorPanel.add(initColorConstraintPanel(), gbc);
+        timeInvariantColorPanel.add(initNonDefaultColorInvariantPanel(), gbc);
 
         gbc = GridBagHelper.as(0,3, WEST, HORIZONTAL, new Insets(3, 3, 3, 3));
         add(timeInvariantColorPanel, gbc);
 
     }
 
-    private JPanel initColorConstraintPanel() {
-        JPanel nonDefaultColorPanel = new JPanel(new GridBagLayout());
+    private JPanel initNonDefaultColorInvariantPanel() {
+	    //This panel holds the edit panel and the scrollpane
+        JPanel nonDefaultColorInvariantPanel = new JPanel(new GridBagLayout());
+        //this panel holds the buttons, the invariant editor panel and the color combobox
+        JPanel colorInvariantEditPanel = new JPanel(new GridBagLayout());
+        colorInvariantEditPanel.setBorder(BorderFactory.createTitledBorder("Edit color specific invariant"));
+
         ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors");
 
         JButton addTimeConstraintButton = new JButton("Add");
         JButton removeTimeConstraintButton = new JButton("Remove");
-        JButton editTimeConstraintButton = new JButton("Edit");
 
         Dimension buttonSize = new Dimension(80, 27);
 
         addTimeConstraintButton.setPreferredSize(buttonSize);
         removeTimeConstraintButton.setPreferredSize(buttonSize);
-        editTimeConstraintButton.setPreferredSize(buttonSize);
 
         timeConstraintListModel = new DefaultListModel();
         timeConstraintList = new JList(timeConstraintListModel);
@@ -836,14 +837,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 
         timeConstraintScrollPane.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("Color");
-        tableModel.addColumn("Time Invariant");
-        //   ((DefaultTableModel) tableModel).addRow(test);
-
-        JTable table = new JTable(tableModel);
-        table.setPreferredSize(new Dimension(300, 150));
-        timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
         timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
 
 
@@ -889,37 +882,13 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
             }
         });
 
-        editTimeConstraintButton.addActionListener(actionEvent -> {
-            EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Invariant", true);
-            Container contentPane = guiDialog.getContentPane();
-
-            // 1 Set layout
-            contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-            ColoredTimeInvariantDialogPanel ctiPanel = new ColoredTimeInvariantDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInvariant) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()), place);
-            contentPane.add(ctiPanel);
-
-            guiDialog.setResizable(false);
-
-            // Make window fit contents' preferred size
-            guiDialog.pack();
-
-            // Move window to the middle of the screen
-            guiDialog.setLocationRelativeTo(null);
-            guiDialog.setVisible(true);
-
-            if (ctiPanel.didEdit) {
-                timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInvariant());
-            }
-        });
-
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = gbc.BOTH;
-        gbc.gridwidth = 3;
-        nonDefaultColorPanel.add(colorComboboxPanel, gbc);
+        colorInvariantEditPanel.add(colorComboboxPanel, gbc);
 
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -929,37 +898,40 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.insets = new Insets(3, 3, 3,3);
         buttonPanel.add(addTimeConstraintButton, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(3, 3, 3, 3);
         buttonPanel.add(removeTimeConstraintButton, gbc);
 
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        colorInvariantEditPanel.add(new InvariantEditorPanel(context, place) {
+            @Override
+            public void placeHolder() {
+
+            }
+        },gbc);
+
+
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        buttonPanel.add(editTimeConstraintButton, gbc);
+        colorInvariantEditPanel.add(buttonPanel,gbc);
 
-        Dimension dim;
-        dim = new Dimension(375, 200);
-        timeConstraintScrollPane.setPreferredSize(dim);
-        timeConstraintScrollPane.setMaximumSize(dim);
-        timeConstraintScrollPane.setMinimumSize(dim);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        nonDefaultColorInvariantPanel.add(colorInvariantEditPanel,gbc);
 
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        nonDefaultColorPanel.add(buttonPanel,gbc);
+        //gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        nonDefaultColorInvariantPanel.add(timeConstraintScrollPane, gbc);
 
-
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.gridheight = 2;
-        nonDefaultColorPanel.add(timeConstraintScrollPane, gbc);
-
-        return nonDefaultColorPanel;
+        return nonDefaultColorInvariantPanel;
     }
 
     private void initColorTypePanel() {

@@ -50,8 +50,8 @@ public class TimedToken {
 	public TimedToken delay(BigDecimal delay) {
 		return new TimedToken(place, age.add(delay), color);
 	}
-
-	public String toString(boolean colored) {
+    @Override
+	public String toString() {
         /*String token = "<";
         if (color.getTuple() != null &&  color.getTuple().size() != 0) {
             for (Color element : color.getTuple()) {
