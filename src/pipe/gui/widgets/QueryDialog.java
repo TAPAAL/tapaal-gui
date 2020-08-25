@@ -12,13 +12,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -1162,11 +1160,11 @@ public class QueryDialog extends JPanel {
         setEnablednessOfAddPredicateButton();
     }
 
-    private void enableOnlyForAllBox() {
+    private void enableOnlyForAll() {
         existsBox.setEnabled(false);
         existsDiamond.setEnabled(false);
         forAllBox.setEnabled(true);
-        forAllDiamond.setEnabled(false);
+        forAllDiamond.setEnabled(true);
         if (!lens.isTimed()) {
             existsUntil.setEnabled(false);
             existsNext.setEnabled(false);
@@ -2899,7 +2897,7 @@ public class QueryDialog extends JPanel {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     forAllBox.setSelected(false);
-                    enableOnlyForAllBox();
+                    enableOnlyForAll();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }
