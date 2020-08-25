@@ -2884,7 +2884,9 @@ public class QueryDialog extends JPanel {
 
 	private void refreshExportButtonText() {
 		ReductionOption reduction = getReductionOption();
-		if (reduction == null) {saveUppaalXMLButton.setEnabled(false);}
+		if (reduction == null) {
+		    saveUppaalXMLButton.setEnabled(false);
+		}
 		else {
 			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
 			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
