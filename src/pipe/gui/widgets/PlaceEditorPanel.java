@@ -846,17 +846,19 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 for (int i = 0; i < timeConstraintListModel.size(); i++) {
                     if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
                         invariantEditorPanel.setInvariant((ColoredTimeInvariant) timeConstraintListModel.get(i));
+                        addTimeConstraintButton.setText("Modify");
                         alreadyExists = true;
                     }
                 }
                 if(!alreadyExists){
                     invariantEditorPanel.setInvariant(timeConstraint);
+                    addTimeConstraintButton.setText("Add");
                 }
             }
         };
         colorComboboxPanel.removeScrollPaneBorder();
-        JButton addTimeConstraintButton = new JButton("Add");
-        JButton removeTimeConstraintButton = new JButton("Remove");
+        addTimeConstraintButton = new JButton("Add");
+        removeTimeConstraintButton = new JButton("Remove");
 
         Dimension buttonSize = new Dimension(80, 27);
 
@@ -889,6 +891,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                     ColoredTimeInvariant cti = (ColoredTimeInvariant) source.getModel().getElementAt(source.getSelectedIndex());
                     invariantEditorPanel.setInvariant(cti);
                     colorComboboxPanel.updateSelection(cti.getColor());
+                    addTimeConstraintButton.setText("Modify");
+                }
+                if(timeConstraintList.isSelectionEmpty()){
+                    removeTimeConstraintButton.setEnabled(false);
+                } else{
+                    removeTimeConstraintButton.setEnabled(true);
                 }
             }
         });
@@ -899,8 +907,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
         timeConstraintScrollPane.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
 
-
-
         addTimeConstraintButton.addActionListener(actionEvent -> {
             JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
             ColoredTimeInvariant timeConstraint = invariantEditorPanel.getInvariant();
@@ -910,9 +916,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
                     alreadyExists = true;
                     timeConstraintListModel.setElementAt(timeConstraint, i);
-                    /*timeConstraintListModel.removeElementAt(i);
-                    timeConstraintListModel.add(i, timeConstraint);
-                    timeConstraintList.setSelectedIndex(i);*/
                 }
             }
             if (!alreadyExists){
@@ -920,18 +923,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
             }
         });
 
-        removeTimeConstraintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                int index = timeConstraintList.getSelectedIndex();
-                Object star = timeConstraintListModel.elementAt(index);
-                if(((ColoredTimeInvariant) star).getColor().equals(dk.aau.cs.model.CPN.Color.STAR_COLOR)) {
-                    JOptionPane.showMessageDialog(null, "Star invariant cannot be removed");
-                }else{
-                    timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
-                }
-
+        removeTimeConstraintButton.addActionListener(actionEvent -> {
+            timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
+            if(timeConstraintListModel.isEmpty()){
+                addTimeConstraintButton.setText("Add");
+            } else{
+                timeConstraintList.setSelectedIndex(0);
             }
+
         });
 
 
@@ -1214,5 +1213,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     DefaultTableModel tableModel;
     JTable tokenTable;
     ColoredTimeInvariantDialogPanel invariantEditorPanel;
+    JButton addTimeConstraintButton;
+    JButton removeTimeConstraintButton;
 }
 
