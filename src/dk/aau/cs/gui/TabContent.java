@@ -777,9 +777,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
                 tab.lens.isGame(),
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
-                q.getProperty().hasNestedPathQuantifiers()
+                q.hasUntimedOnlyProperties()
             };
-            //todo check AU, AX, etc
             for(EngineSupportOptions engine : engineSupportOptions){
                 if(engine.areOptionsSupported(queryOptions)){
                     hasEngine = true;
@@ -790,20 +789,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 queriesToRemove.add(q);
                 tab.removeQuery(q);
             } else if (tab.lens.isGame()) {
-                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
-                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
-                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
-                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
-                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
                     q.setSearchOption(TAPNQuery.SearchOption.DFS);
-                } if (q.useTimeDarts()) {
-                    q.setUseTimeDarts(false);
-                } if (q.useGCD()) {
-                    q.setUseGCD(false);
-                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
-                    q.setUseOverApproximationEnabled(false);
-                    q.setUseUnderApproximationEnabled(false);
                 }
+                q.setUseGCD(false);
+                q.setUseTimeDarts(false);
+                q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                q.setUseOverApproximationEnabled(false);
+                q.setUseUnderApproximationEnabled(false);
             }
         }
         String message = "";
