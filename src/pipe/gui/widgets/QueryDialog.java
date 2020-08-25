@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -33,7 +34,10 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -42,39 +46,10 @@ import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.*;
-import dk.aau.cs.TCTL.StringPosition;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLFalseNode;
-import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
-import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
-import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
-import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantStore;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -97,7 +72,7 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Merge net components";
-	
+
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SOME_TRACE_STRING = "Some trace       ";
 	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
@@ -125,11 +100,15 @@ public class QueryDialog extends JPanel {
 	private JPanel queryPanel;
 
 	private JPanel quantificationPanel;
-	private ButtonGroup quantificationRadioButtonGroup;
-	private JRadioButton existsDiamond;
-	private JRadioButton existsBox;
-	private JRadioButton forAllDiamond;
-	private JRadioButton forAllBox;
+	private ButtonGroup quantificationButtonGroup;
+    private JButton existsDiamond;
+    private JButton existsBox;
+    private JButton existsNext;
+    private JButton existsUntil;
+    private JButton forAllDiamond;
+    private JButton forAllBox;
+    private JButton forAllNext;
+    private JButton forAllUntil;
 
 	private JTextPane queryField;
 
@@ -152,7 +131,8 @@ public class QueryDialog extends JPanel {
 	private JComboBox templateBox;
 	private JComboBox<String> placesBox;
 	private JComboBox<String> relationalOperatorBox;
-	private CustomJSpinner placeMarking;
+    private JLabel transitionIsEnabledLabel;
+    private CustomJSpinner placeMarking;
 	private JButton truePredicateButton;
 	private JButton falsePredicateButton;
 	private JButton deadLockPredicateButton;
@@ -174,7 +154,7 @@ public class QueryDialog extends JPanel {
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
 	private JRadioButton fastestTraceRadioButton;
-	
+
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox<String> reductionOption;
@@ -185,9 +165,11 @@ public class QueryDialog extends JPanel {
 	private JCheckBox usePTrie;
 	private JCheckBox useGCD;
 	private JCheckBox useOverApproximation;
-	private JCheckBox useReduction;
+    private JCheckBox useSiphonTrap;
+    private JCheckBox useQueryReduction;
+    private JCheckBox useReduction;
 	private JCheckBox useStubbornReduction;
-	
+
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
 	private ButtonGroup approximationRadioButtonGroup;
@@ -195,7 +177,7 @@ public class QueryDialog extends JPanel {
 	private JRadioButton overApproximationEnable;
 	private JRadioButton underApproximationEnable;
 	private CustomJSpinner overApproximationDenominator;
-	
+
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -341,13 +323,13 @@ public class QueryDialog extends JPanel {
         true);//support EG or AF with net degree > 2);
 
     //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,/*verifyPNOptions*/};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 
 	private static Boolean advancedView = false;
-	
+
 	private static boolean hasForcedDisabledTimeDarts = false;
 	private static boolean hasForcedDisabledStubbornReduction = false;
 	private static boolean hasForcedDisabledGCD = false;
@@ -368,10 +350,14 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
 	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Available only for some verification engines.)";
 	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maxiaml trace there is marking that satisfies the given property. (Available only for some verification engines.)";
-
 	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
 
-	//Tool tips for logic panel
+    private static final String TOOL_TIP_EXISTS_UNTIL = "There is a computation where the first formula holds until the second one holds.";
+    private static final String TOOL_TIP_EXISTS_NEXT = "There is a transition firing after which the reached marking satisfies the given property.";
+    private static final String TOOL_TIP_FORALL_UNTIL = "On every computation the first formula holds until the second one holds";
+    private static final String TOOL_TIP_FORALL_NEXT = "After any transition firing the reached marking satisfies the given property.";
+
+    //Tool tips for logic panel
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
 	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
 	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
@@ -403,13 +389,16 @@ public class QueryDialog extends JPanel {
 	//Tool tips for reduction options panel
 	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose a verification engine.";
 	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "Apply automatic symmetry reduction.";
-	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform a more advanced inclusion check."; 
+	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform a more advanced inclusion check.";
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
 	private final static String TOOL_TIP_STUBBORN_REDUCTION = "Apply partial order reduction (only for EF and AG queries and when Time Darts are disabled).";
 	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
+    private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "Apply structural reductions to reduce the size of the net.";
+    private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freeness by using siphon-trap analysis via linear programming.";
+    private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
@@ -431,13 +420,13 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
-	
+
 	//Tool tips for approximation panel
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
-	
+
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
                        TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
@@ -484,11 +473,18 @@ public class QueryDialog extends JPanel {
 		int capacity = getCapacity();
 
 		TAPNQuery.TraceOption traceOption = getTraceOption();
-
 		TAPNQuery.SearchOption searchOption = getSearchOption();
-
 		ReductionOption reductionOptionToSet = getReductionOption();
-		boolean symmetry = getSymmetry();
+
+        if (lens.isTimed()) {
+            return getTimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
+        } else {
+            return getUntimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
+        }
+    }
+
+    private TAPNQuery getTimedQuery(String name, int capacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
+        boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
 		boolean gcd = useGCD.isSelected();
@@ -524,6 +520,36 @@ public class QueryDialog extends JPanel {
 		return query;
 	}
 
+    private TAPNQuery getUntimedQuery(String name, int capacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
+        boolean reduction = useReduction.isSelected();
+
+        TAPNQuery query = new TAPNQuery(
+            name,
+            capacity,
+            newProperty.copy(),
+            traceOption,
+            searchOption,
+            reductionOptionToSet,
+            /* symmetry */false,
+            /* gcd */false,
+            /* timeDart */false,
+            /* pTrie */false,
+            /* overApproximation */false,
+            reduction,
+            /* hashTableSizeToSet */ null,
+            /* extrapolationOptionToSet */null,
+            inclusionPlaces,
+            /* enableOverApproximation */false,
+            /* enableUnderApproximation */false,
+            0
+        );
+        query.setCategory(TAPNQuery.QueryCategory.CTL);
+        query.setUseSiphontrap(useSiphonTrap.isSelected());
+        query.setUseQueryReduction(useQueryReduction.isSelected());
+        query.setUseStubbornReduction(useStubbornReduction.isSelected());
+        return query;
+    }
+
 	private boolean getSymmetry() {
 		return symmetryReduction.isSelected();
 	}
@@ -549,7 +575,7 @@ public class QueryDialog extends JPanel {
 		if(fastestTraceRadioButton.isSelected()){
 			return SearchOption.DEFAULT;
 		}
-			
+
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
 		else if(randomSearch.isSelected())
@@ -578,8 +604,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_DISCRETE))
 			return ReductionOption.VerifyTAPNdiscreteVerification;
-//		else if (reductionOptionString.equals(name_UNTIMED))
-//			return ReductionOption.VerifyPN;
+		else if (reductionOptionString.equals(name_UNTIMED))
+			return ReductionOption.VerifyPN;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -597,41 +623,43 @@ public class QueryDialog extends JPanel {
 		    fastestTraceRadioButton.setEnabled(false);
 		    someTraceRadioButton.setEnabled(false);
 		    noTraceRadioButton.setEnabled(true);
-        } else {
-            fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && !queryHasDeadlock() && !(newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode));
+        } else if (lens.isTimed()) {
+            fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && !queryHasDeadlock() &&
+                !(newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode));
             someTraceRadioButton.setEnabled(true);
             noTraceRadioButton.setEnabled(true);
+        } else if (queryIsReachability()) {
+            fastestTraceRadioButton.setEnabled(false);
+            someTraceRadioButton.setEnabled(true);
+            noTraceRadioButton.setEnabled(true);
+        } else {
+            fastestTraceRadioButton.setEnabled(false);
+            someTraceRadioButton.setEnabled(false);
+            noTraceRadioButton.setEnabled(false);
+            noTraceRadioButton.setSelected(true);
         }
 
 		if(getTraceOption() == TraceOption.FASTEST) {
 			if(fastestTraceRadioButton.isEnabled()){
 				fastestTraceRadioButton.setSelected(true);
-			} else {
-				someTraceRadioButton.setSelected(true);
-			}
+			} else if (someTraceRadioButton.isEnabled()) {
+                someTraceRadioButton.setSelected(true);
+            } else {
+                noTraceRadioButton.setSelected(true);
+            }
 		}
 	}
 
-	private void resetQuantifierSelectionButtons() {
-		quantificationRadioButtonGroup.clearSelection();
+    private boolean queryIsReachability() {
+        return new IsReachabilityVisitor().isReachability(newProperty);
+    }
+
+    private void resetQuantifierSelectionButtons() {
+		quantificationButtonGroup.clearSelection();
 	}
 
 	private void exit() {
 		rootPane.getParent().setVisible(false);
-	}
-
-	public String getQuantificationSelection() {
-		if (existsDiamond.isSelected()) {
-			return "E<>";
-		} else if (existsBox.isSelected()) {
-			return "E[]";
-		} else if (forAllDiamond.isSelected()) {
-			return "A<>";
-		} else if (forAllBox.isSelected()) {
-			return "A[]";
-		} else {
-			return "";
-		}
 	}
 
 	public boolean queryHasDeadlock(){
@@ -642,7 +670,7 @@ public class QueryDialog extends JPanel {
                                               HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"No reduction option supports both strict intervals and weigthed arcs", 
+					"No reduction option supports both strict intervals and weigthed arcs",
 					"No reduction option", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
@@ -678,6 +706,14 @@ public class QueryDialog extends JPanel {
 		}
 	}
 
+    private TCTLAbstractPathProperty getPathProperty(TCTLAbstractProperty property) {
+        if (property instanceof TCTLAbstractPathProperty) {
+            return (TCTLAbstractPathProperty) property.copy();
+        } else {
+            return new TCTLPathPlaceHolder();
+        }
+    }
+
 	private TCTLAbstractStateProperty getSpecificChildOfProperty(int number, TCTLAbstractProperty property) {
 		StringPosition[] children = property.getChildren();
 		int count = 0;
@@ -698,8 +734,10 @@ public class QueryDialog extends JPanel {
 	private void updateSelection() {
 		int index = queryField.getCaretPosition();
 		StringPosition position = newProperty.objectAt(index);
+
 		if (position == null)
 			return;
+
 		queryField.select(position.getStart(), position.getEnd());
 		currentSelection = position;
 		if(currentSelection != null) {
@@ -738,36 +776,106 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void updateQueryButtonsAccordingToSelection() {
-		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
+        TCTLAbstractProperty current = currentSelection.getObject();
+        if (current instanceof TCTLStateToPathConverter && !lens.isTimed()) {
+            current = ((TCTLStateToPathConverter) current).getProperty();
+        }
+        if (current instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
-			if(!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode)){
-				return;
-			}
-			TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
-			TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
-			
+
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
 			// because a different atomic proposition was selected
 			userChangedAtomicPropSelection = false;
-			if(placeNode.getTemplate().equals(""))
-				templateBox.setSelectedItem(SHARED);
-			else
-				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
-			placesBox.setSelectedItem(placeNode.getPlace());
-			relationalOperatorBox.setSelectedItem(node.getOp());
-			placeMarking.setValue(placeMarkingNode.getConstant());
-			userChangedAtomicPropSelection = true;
-		} else if (currentSelection.getObject() instanceof TCTLEFNode) {
-			existsDiamond.setSelected(true);
-		} else if (currentSelection.getObject() instanceof TCTLEGNode) {
-			existsBox.setSelected(true);
-		} else if (currentSelection.getObject() instanceof TCTLAGNode) {
-			forAllBox.setSelected(true);
-		} else if (currentSelection.getObject() instanceof TCTLAFNode) {
-			forAllDiamond.setSelected(true);
-		}
+            if (node.getLeft() instanceof TCTLPlaceNode) {
+                TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+                if (placeNode.getTemplate().equals("")) {
+                    templateBox.setSelectedItem(SHARED);
+                } else {
+                    templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
+                }
+            }
+            if (lens.isTimed()) {
+                updateTimedQueryButtons(node);
+            } else {
+                updateUntimedQueryButtons(node);
+            }
+        } else if (current instanceof TCTLTransitionNode) {
+            TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
+            userChangedAtomicPropSelection = false;
+            if (transitionNode.getTemplate().equals("")) {
+                templateBox.setSelectedItem(SHARED);
+            } else {
+                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
+            }
+            placesBox.setSelectedItem(transitionNode.getTransition());
+            userChangedAtomicPropSelection = true;
+        }
+        if (!lens.isTimed()) {
+            setEnablednessOfOperatorAndMarkingBoxes();
+        }
 	}
+
+    private void updateTimedQueryButtons(TCTLAtomicPropositionNode node) {
+        if (!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode)) {
+            return;
+        }
+        TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+        TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+
+        placesBox.setSelectedItem(placeNode.getPlace());
+        relationalOperatorBox.setSelectedItem(node.getOp());
+        placeMarking.setValue(placeMarkingNode.getConstant());
+        userChangedAtomicPropSelection = true;
+    }
+
+    private void updateUntimedQueryButtons(TCTLAtomicPropositionNode node) {
+        userChangedAtomicPropSelection = false;
+        if (node.getLeft() instanceof TCTLPlaceNode) {
+            TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
+            placesBox.setSelectedItem(placeNode.getPlace());
+        } else {
+            if (placesBox.getItemCount() > 0) {
+                placesBox.setSelectedIndex(0);
+            }
+        }
+        relationalOperatorBox.setSelectedItem(node.getOp());
+
+        if (node.getRight() instanceof TCTLConstNode) {
+            TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
+            placeMarking.setValue(placeMarkingNode.getConstant());
+        }
+        userChangedAtomicPropSelection = true;
+    }
+
+    private void setEnablednessOfOperatorAndMarkingBoxes() {
+        if (transitionIsSelected()) {
+            placeMarking.setVisible(false);
+            relationalOperatorBox.setVisible(false);
+            transitionIsEnabledLabel.setVisible(true);
+        } else {
+            transitionIsEnabledLabel.setVisible(false);
+            placeMarking.setVisible(true);
+            relationalOperatorBox.setVisible(true);
+        }
+    }
+
+    private boolean transitionIsSelected() {
+        String itemName = (String) placesBox.getSelectedItem();
+        if (itemName == null) return false;
+        boolean transitionSelected = false;
+        boolean sharedTransitionSelected = false;
+        for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
+            if (tapn.getTransitionByName(itemName) != null) {
+                transitionSelected = true;
+                break;
+            }
+        }
+        if (!transitionSelected) {
+            sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName) != null;
+        }
+        return transitionSelected || sharedTransitionSelected;
+    }
 
 	private void deleteSelection() {
 		if (currentSelection != null) {
@@ -820,33 +928,34 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 
 		ArrayList<String> options = new ArrayList<String>();
-		
+
 		disableSymmetryUpdate = true;
 		//The order here should be the same as in EngineSupportOptions
-        boolean[] queryOptions = new boolean[]{fastestTraceRadioButton.isSelected(),
-            (queryHasDeadlock() && (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && highestNetDegree <= 2),
-            (queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))),
+        boolean[] queryOptions = new boolean[]{
+            fastestTraceRadioButton.isSelected(),
+            (queryHasDeadlock() && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) && highestNetDegree <= 2),
+            (queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))),
             (queryHasDeadlock() && hasInhibitorArcs),
             tapnNetwork.hasWeights(),
             hasInhibitorArcs,
             tapnNetwork.hasUrgentTransitions(),
-            (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")),
+            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")),
             //we want to know if it is strict
             !tapnNetwork.isNonStrict(),
             //we want to know if it is timed
             lens.isTimed(),
             (queryHasDeadlock() && highestNetDegree > 2),
             lens.isGame(),
-            (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) && highestNetDegree > 2
+            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2
         };
 
-		
+
 		if(useTimeDarts != null){
 			if(hasForcedDisabledTimeDarts){
 				hasForcedDisabledTimeDarts = false;
 				useTimeDarts.setSelected(true);
 			}
-            useTimeDarts.setEnabled(true);     
+            useTimeDarts.setEnabled(true);
         }
 
         if(useStubbornReduction != null){
@@ -856,19 +965,19 @@ public class QueryDialog extends JPanel {
 			}
 			useStubbornReduction.setEnabled(true);
 		}
-		
+
 		if(useGCD != null){
 			if(hasForcedDisabledGCD){
 				hasForcedDisabledGCD = false;
 				useGCD.setSelected(true);
 			}
-            useGCD.setEnabled(true);     
+            useGCD.setEnabled(true);
         }
 
         if (tapnNetwork.isNonStrict()) {
             // disable timedarts if liveness and deadlock prop
-            if((getQuantificationSelection().equals("E[]") ||
-                getQuantificationSelection().equals("A<>"))){
+            if((newProperty.toString().contains("EG") ||
+                newProperty.toString().contains("AF"))){
                 if (useTimeDarts != null) {
                     if(useTimeDarts.isSelected()){
                         hasForcedDisabledTimeDarts = true;
@@ -878,15 +987,19 @@ public class QueryDialog extends JPanel {
                 }
             }
         }
-		for(EngineSupportOptions engine : engineSupportOptions){
-		    if(engine.areOptionsSupported(queryOptions)){
-		        options.add(engine.nameString);
+        if (lens.isTimed()) {
+            for (EngineSupportOptions engine : engineSupportOptions) {
+                if (engine.areOptionsSupported(queryOptions)) {
+                    options.add(engine.nameString);
+                }
             }
+        } else if (!lens.isGame()) {
+            options.add(name_UNTIMED);
         }
 
 		reductionOption.removeAllItems();
 
-		boolean selectedOptionStillAvailable = false;	
+		boolean selectedOptionStillAvailable = false;
 		TraceOption trace = getTraceOption();
 		for (String s : options) {
 			reductionOption.addItem(s);
@@ -903,7 +1016,7 @@ public class QueryDialog extends JPanel {
 				fastestTraceRadioButton.setSelected(true);
 			}
 		}
-		
+
 		disableSymmetryUpdate = false;
 	}
 
@@ -922,7 +1035,7 @@ public class QueryDialog extends JPanel {
 		}else{
 			currentselected = randomSearch;
 		}
-		
+
 		if(fastestTraceRadioButton.isSelected()){
 			breadthFirstSearch.setEnabled(false);
 			depthFirstSearch.setEnabled(false);
@@ -939,7 +1052,7 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 		if (lens.isGame()) {
 		    heuristicSearch.setEnabled(false);
-        } else if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+        } else if (lens.isTimed() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))){
 			breadthFirstSearch.setEnabled(false);
 			if(!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))){
 				heuristicSearch.setEnabled(false);
@@ -960,7 +1073,12 @@ public class QueryDialog extends JPanel {
 		existsDiamond.setEnabled(false);
 		forAllBox.setEnabled(false);
 		forAllDiamond.setEnabled(false);
-		conjunctionButton.setEnabled(false);
+        existsUntil.setEnabled(false);
+        existsNext.setEnabled(false);
+        forAllUntil.setEnabled(false);
+        forAllNext.setEnabled(false);
+
+        conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
@@ -978,7 +1096,14 @@ public class QueryDialog extends JPanel {
 		existsDiamond.setEnabled(true);
 		forAllBox.setEnabled(true);
 		forAllDiamond.setEnabled(true);
-		conjunctionButton.setEnabled(false);
+        if (!lens.isTimed()) {
+            existsUntil.setEnabled(true);
+            existsNext.setEnabled(true);
+            forAllUntil.setEnabled(true);
+            forAllNext.setEnabled(true);
+        }
+
+        conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
@@ -996,7 +1121,12 @@ public class QueryDialog extends JPanel {
 		existsDiamond.setEnabled(false);
 		forAllBox.setEnabled(false);
 		forAllDiamond.setEnabled(false);
-		conjunctionButton.setEnabled(true);
+        existsUntil.setEnabled(false);
+        existsNext.setEnabled(false);
+        forAllUntil.setEnabled(false);
+        forAllNext.setEnabled(false);
+
+        conjunctionButton.setEnabled(true);
 		disjunctionButton.setEnabled(true);
 		negationButton.setEnabled(true);
 		templateBox.setEnabled(true);
@@ -1009,11 +1139,41 @@ public class QueryDialog extends JPanel {
 		setEnablednessOfAddPredicateButton();
 	}
 
+    private void enableOnlyUntimedStateButtons() {
+        existsBox.setEnabled(true);
+        existsDiamond.setEnabled(true);
+        forAllBox.setEnabled(true);
+        forAllDiamond.setEnabled(true);
+        existsUntil.setEnabled(true);
+        existsNext.setEnabled(true);
+        forAllUntil.setEnabled(true);
+        forAllNext.setEnabled(true);
+
+        conjunctionButton.setEnabled(true);
+        disjunctionButton.setEnabled(true);
+        negationButton.setEnabled(true);
+        templateBox.setEnabled(true);
+        placesBox.setEnabled(true);
+        relationalOperatorBox.setEnabled(true);
+        placeMarking.setEnabled(true);
+        truePredicateButton.setEnabled(true);
+        falsePredicateButton.setEnabled(true);
+        deadLockPredicateButton.setEnabled(true);
+        setEnablednessOfAddPredicateButton();
+    }
+
     private void enableOnlyForAllBox() {
         existsBox.setEnabled(false);
         existsDiamond.setEnabled(false);
         forAllBox.setEnabled(true);
         forAllDiamond.setEnabled(false);
+        if (!lens.isTimed()) {
+            existsUntil.setEnabled(false);
+            existsNext.setEnabled(false);
+            forAllUntil.setEnabled(false);
+            forAllNext.setEnabled(false);
+        }
+
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
@@ -1073,19 +1233,28 @@ public class QueryDialog extends JPanel {
 		disableAllQueryButtons();
 		disableEditingButtons();
 		setSaveButtonsEnabled();
-		
+
 		// Set default caret location to end of query
 		queryField.setCaretPosition(queryField.getText().length());
 	}
 
 	private void updateQueryOnAtomicPropositionChange() {
-		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
-			Object item = templateBox.getSelectedItem();
+		if (currentSelection != null && (currentSelection.getObject() instanceof TCTLAtomicPropositionNode ||
+            (!lens.isTimed() && currentSelection.getObject() instanceof TCTLTransitionNode))) {
+
+		    Object item = templateBox.getSelectedItem();
 			String template = item.equals(SHARED) ? "" : item.toString();
-			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-					new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
-					(String) relationalOperatorBox.getSelectedItem(),
-					new TCTLConstNode((Integer) placeMarking.getValue()));
+			TCTLAbstractStateProperty property;
+
+            if (!lens.isTimed() && transitionIsSelected()) {
+                property = new TCTLTransitionNode(template, (String) placesBox.getSelectedItem());
+            } else {
+                property = new TCTLAtomicPropositionNode(
+                    new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()),
+                    (String) relationalOperatorBox.getSelectedItem(),
+                    new TCTLConstNode((Integer) placeMarking.getValue()));
+            }
+
 			if (!property.equals(currentSelection.getObject())) {
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
@@ -1113,10 +1282,10 @@ public class QueryDialog extends JPanel {
 
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
-		
+
 		refreshTraceOptions();
 		setEnabledReductionOptions();
-		
+
 		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
@@ -1134,13 +1303,15 @@ public class QueryDialog extends JPanel {
 		queryName.setText(queryToCreateFrom.getName());
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 
-		setupQuantificationFromQuery(queryToCreateFrom);
-		setupSearchOptionsFromQuery(queryToCreateFrom);		
+        if (lens.isTimed()) {
+            setupQuantificationFromQuery(queryToCreateFrom);
+            setupApproximationOptionsFromQuery(queryToCreateFrom);
+        }
+		setupSearchOptionsFromQuery(queryToCreateFrom);
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
-		setupApproximationOptionsFromQuery(queryToCreateFrom);
 	}
-	
+
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.isOverApproximationEnabled())
 			overApproximationEnable.setSelected(true);
@@ -1148,7 +1319,7 @@ public class QueryDialog extends JPanel {
 			underApproximationEnable.setSelected(true);
 		else
 			noApproximationEnable.setSelected(true);
-		
+
 		if (queryToCreateFrom.approximationDenominator() > 0) {
 			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
 		}
@@ -1164,11 +1335,11 @@ public class QueryDialog extends JPanel {
 			reduction = name_BROADCASTDEG2;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			reduction = name_DISCRETE;
-//		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
-//			reduction = name_UNTIMED;
+		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
+			reduction = name_UNTIMED;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.COMBI){
 			reduction = name_COMBI;
-		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+		} else if (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
@@ -1182,18 +1353,37 @@ public class QueryDialog extends JPanel {
 			}
 		}
 
-		reductionOption.addItem(reduction); 
-		reductionOption.setSelectedItem(reduction);
-		symmetryReduction.setSelected(symmetry);
-		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
-		usePTrie.setSelected(queryToCreateFrom.usePTrie());
-		useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
-		useGCD.setSelected(queryToCreateFrom.useGCD());
-		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
-		useReduction.setSelected(queryToCreateFrom.useReduction());
-		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
-		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
+        reductionOption.addItem(reduction);
+        reductionOption.setSelectedItem(reduction);
+
+        if (lens.isTimed()) {
+            setupTimedReductionOptions(queryToCreateFrom);
+        } else {
+            setupUntimedReductionOptions(queryToCreateFrom);
+        }
 	}
+
+    private void setupTimedReductionOptions(TAPNQuery queryToCreateFrom) {
+        symmetryReduction.setSelected(queryToCreateFrom.useSymmetry());
+        useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
+        usePTrie.setSelected(queryToCreateFrom.usePTrie());
+        useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
+        useGCD.setSelected(queryToCreateFrom.useGCD());
+        useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
+        useReduction.setSelected(queryToCreateFrom.useReduction());
+        discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
+
+        if (queryToCreateFrom.discreteInclusion()) {
+            selectInclusionPlacesButton.setEnabled(true);
+        }
+    }
+
+    private void setupUntimedReductionOptions(TAPNQuery queryToCreateFrom) {
+        useSiphonTrap.setSelected(queryToCreateFrom.isSiphontrapEnabled());
+        useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
+        useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
+        useReduction.setSelected(queryToCreateFrom.useReduction());
+    }
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
@@ -1219,7 +1409,7 @@ public class QueryDialog extends JPanel {
 
 	private void setupQuantificationFromQuery(TAPNQuery queryToCreateFrom) {
 		// bit of a hack, possible because quantifier node is always the first
-		// node (we cant have nested quantifiers)	
+		// node (we cant have nested quantifiers)
 		if (queryToCreateFrom.getProperty() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
@@ -1267,7 +1457,7 @@ public class QueryDialog extends JPanel {
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
-		JButton infoButton = new JButton("Help on the query options");	
+		JButton infoButton = new JButton("Help on the query options");
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
 		infoButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -1284,11 +1474,11 @@ public class QueryDialog extends JPanel {
 					pane.removeMouseListener(listener);
 				}
 				Dimension dim = new Dimension(500,400);
-				pane.setPreferredSize(dim);  
-				pane.setMargin(new Insets(5,5,5,5));  
-				JScrollPane scrollPane = new JScrollPane(pane);  
-				scrollPane.setPreferredSize(dim);  
-				return scrollPane;  
+				pane.setPreferredSize(dim);
+				pane.setMargin(new Insets(5,5,5,5));
+				JScrollPane scrollPane = new JScrollPane(pane);
+				scrollPane.setPreferredSize(dim);
+				return scrollPane;
 			}
 
 			private String getHelpMessage(){
@@ -1363,10 +1553,12 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
-		saveUppaalXMLButton.setVisible(advancedView);
+		if (lens.isTimed()) {
+		    saveUppaalXMLButton.setVisible(advancedView);
+		    overApproximationOptionsPanel.setVisible(advancedView);
+        }
 		mergeNetComponentsButton.setVisible(advancedView);
-		overApproximationOptionsPanel.setVisible(advancedView);
-		
+
 		if(advancedView){
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
@@ -1376,7 +1568,7 @@ public class QueryDialog extends JPanel {
 		}
 
 		guiDialog.pack();
-		guiDialog.setLocation(location);		
+		guiDialog.setLocation(location);
 	}
 
 	private void initBoundednessCheckPanel() {
@@ -1387,7 +1579,7 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
 
-		numberOfExtraTokensInNet = new CustomJSpinner(4, 0, Integer.MAX_VALUE);	
+		numberOfExtraTokensInNet = new CustomJSpinner(4, 0, Integer.MAX_VALUE);
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
@@ -1451,7 +1643,7 @@ public class QueryDialog extends JPanel {
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		Dimension d = new Dimension(750, 80);
+        Dimension d = new Dimension(900, 80);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
@@ -1517,47 +1709,76 @@ public class QueryDialog extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridwidth = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridwidth = 4;
 		queryPanel.add(queryScrollPane, gbc);
 	}
 
 	private void initQuantificationPanel() {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
-		quantificationRadioButtonGroup = new ButtonGroup();
+        quantificationButtonGroup = new ButtonGroup();
 		approximationRadioButtonGroup = new ButtonGroup();
 
-		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
-		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
-		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
-		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
+        // Instantiate buttons
+        existsDiamond = new JButton("EF");
+        existsBox = new JButton("EG");
+        forAllDiamond = new JButton("AF");
+        forAllBox = new JButton("AG");
+        existsUntil = new JButton("EU");
+        existsNext = new JButton("EX");
+        forAllUntil = new JButton("AU");
+        forAllNext = new JButton("AX");
 
-		//Add tool tips 
-		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
-		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
-		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
-		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
+        // Add tool-tips
+        existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
+        existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
+        forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
+        forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
+        existsUntil.setToolTipText(TOOL_TIP_EXISTS_UNTIL);
+        existsNext.setToolTipText(TOOL_TIP_EXISTS_NEXT);
+        forAllUntil.setToolTipText(TOOL_TIP_FORALL_UNTIL);
+        forAllNext.setToolTipText(TOOL_TIP_FORALL_NEXT);
 
-		quantificationRadioButtonGroup.add(existsDiamond);
-		quantificationRadioButtonGroup.add(existsBox);
-		quantificationRadioButtonGroup.add(forAllDiamond);
-		quantificationRadioButtonGroup.add(forAllBox);
+        // Add buttons to panel
+        quantificationButtonGroup.add(existsDiamond);
+        quantificationButtonGroup.add(existsBox);
+        quantificationButtonGroup.add(forAllDiamond);
+        quantificationButtonGroup.add(forAllBox);
+        quantificationButtonGroup.add(existsUntil);
+        quantificationButtonGroup.add(existsNext);
+        quantificationButtonGroup.add(forAllUntil);
+        quantificationButtonGroup.add(forAllNext);
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		quantificationPanel.add(existsDiamond, gbc);
+        // Place buttons in GUI
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
 
-		gbc.gridy = 1;
-		quantificationPanel.add(existsBox, gbc);
+        // First column of buttons
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        quantificationPanel.add(existsDiamond, gbc);
+        gbc.gridy = 1;
+        quantificationPanel.add(existsBox, gbc);
+        gbc.gridy = 2;
+        quantificationPanel.add(existsUntil, gbc);
+        gbc.gridy = 3;
+        quantificationPanel.add(existsNext, gbc);
 
-		gbc.gridy = 2;
-		quantificationPanel.add(forAllDiamond, gbc);
+        // Second column of buttons
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        quantificationPanel.add(forAllDiamond, gbc);
+        gbc.gridy = 1;
+        quantificationPanel.add(forAllBox, gbc);
+        gbc.gridy = 2;
+        quantificationPanel.add(forAllUntil, gbc);
+        gbc.gridy = 3;
+        quantificationPanel.add(forAllNext, gbc);
 
-		gbc.gridy = 3;
-		quantificationPanel.add(forAllBox, gbc);
-
+        // Add quantification panel to query panel
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -1565,43 +1786,144 @@ public class QueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(quantificationPanel, gbc);
 
+		if (lens.isTimed()) {
+            addTimedQuantificationListeners();
+        } else {
+            addUntimedQuantificationListeners();
+        }
+    }
+
+    private void addTimedQuantificationListeners() {
 		// Add action listeners to the query options
 		existsBox.addActionListener(e -> {
 			TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-			newProperty = newProperty.replace(currentSelection.getObject(),	property);
-			updateSelection(property);
-			undoSupport.postEdit(edit);
-			queryChanged();
+            existsBox.setSelected(true);
+            addPropertyToQuery(property);
+            unselectButtons();
 		});
 
 		existsDiamond.addActionListener(e -> {
 			TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-			newProperty = newProperty.replace(currentSelection.getObject(),	property);
-			updateSelection(property);
-			undoSupport.postEdit(edit);
-			queryChanged();
+            existsDiamond.setSelected(true);
+            addPropertyToQuery(property);
+            unselectButtons();
 		});
 
 		forAllBox.addActionListener(e -> {
 			TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-			newProperty = newProperty.replace(currentSelection.getObject(),	property);
-			updateSelection(property);
-			undoSupport.postEdit(edit);
-			queryChanged();
+            forAllBox.setSelected(true);
+            addPropertyToQuery(property);
+            unselectButtons();
 		});
 
 		forAllDiamond.addActionListener(e -> {
 			TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-			newProperty = newProperty.replace(currentSelection.getObject(),	property);
-			updateSelection(property);
-			undoSupport.postEdit(edit);
-			queryChanged();
+            forAllDiamond.setSelected(true);
+            addPropertyToQuery(property);
+            unselectButtons();
 		});
 	}
+
+    private void unselectButtons() {
+        existsDiamond.setSelected(false);
+        existsBox.setSelected(false);
+        forAllBox.setSelected(false);
+        forAllDiamond.setSelected(false);
+    }
+
+    private void addUntimedQuantificationListeners() {
+        addTimedQuantificationListeners();
+
+        existsNext.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractPathProperty property;
+                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLEXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+                } else {
+                    property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
+                addPropertyToQuery(property);
+            }
+        });
+
+        existsUntil.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractPathProperty property;
+                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLEUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                        new TCTLStatePlaceHolder());
+                } else {
+                    property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                        getSpecificChildOfProperty(2, currentSelection.getObject()));
+                }
+                addPropertyToQuery(property);
+            }
+        });
+
+        forAllNext.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractPathProperty property;
+                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+                } else {
+                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
+                addPropertyToQuery(property);
+            }
+        });
+
+        forAllUntil.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractPathProperty property;
+                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                        new TCTLStatePlaceHolder());
+                } else {
+                    property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                        getSpecificChildOfProperty(2, currentSelection.getObject()));
+                }
+                addPropertyToQuery(property);
+            }
+        });
+    }
+
+    private void addPropertyToQuery(TCTLAbstractPathProperty property) {
+        if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+            addPropertyToQuery(ConvertToStateProperty(property));
+            return;
+        }
+
+        UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+        newProperty = newProperty.replace(currentSelection.getObject(), property);
+        updateSelection(property);
+        undoSupport.postEdit(edit);
+        queryChanged();
+    }
+
+    private void addPropertyToQuery(TCTLAbstractStateProperty property) {
+        if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+            addPropertyToQuery(ConvertToPathProperty(property));
+            return;
+        }
+
+        UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+        newProperty = newProperty.replace(currentSelection.getObject(), property);
+        updateSelection(property);
+        undoSupport.postEdit(edit);
+        queryChanged();
+    }
+
+    private TCTLAbstractStateProperty ConvertToStateProperty(TCTLAbstractPathProperty p) {
+        if (p instanceof TCTLStateToPathConverter) {
+            return ((TCTLStateToPathConverter) p).getProperty();
+        } else return new TCTLPathToStateConverter(p);
+    }
+
+    private TCTLAbstractPathProperty ConvertToPathProperty(TCTLAbstractStateProperty p) {
+        if (p instanceof TCTLPathToStateConverter) {
+            return ((TCTLPathToStateConverter) p).getProperty();
+        } else return new TCTLStateToPathConverter(p);
+    }
 
 	private void initLogicPanel() {
 		logicButtonPanel = new JPanel(new GridBagLayout());
@@ -1647,16 +1969,10 @@ public class QueryDialog extends JPanel {
 				if (currentSelection.getObject() instanceof TCTLAndListNode) {
 					andListNode = new TCTLAndListNode((TCTLAndListNode) currentSelection.getObject());
 					andListNode.addConjunct(new TCTLStatePlaceHolder());
-					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
-					newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
-					updateSelection(andListNode);
-					undoSupport.postEdit(edit);
+					addPropertyToQuery(andListNode);
 				} else if (currentSelection.getObject() instanceof TCTLOrListNode) {
 					andListNode = new TCTLAndListNode(((TCTLOrListNode) currentSelection.getObject()).getProperties());
-					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
-					newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
-					updateSelection(andListNode);
-					undoSupport.postEdit(edit);
+					addPropertyToQuery(andListNode);
 				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
 					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
 							.getObject();
@@ -1667,25 +1983,18 @@ public class QueryDialog extends JPanel {
 						// new placeholder conjunct to it
 						andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
 						andListNode.addConjunct(new TCTLStatePlaceHolder());
-						UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
-						newProperty = newProperty.replace(parentNode, andListNode);
-						updateSelection(andListNode);
-						undoSupport.postEdit(edit);
+						addPropertyToQuery(andListNode);
 					} else {
 						TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 						andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()),	ph);
-						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
-						newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
-						updateSelection(andListNode);
-						undoSupport.postEdit(edit);
+						addPropertyToQuery(andListNode);
 					}
-				}
-				queryChanged();
+				} else if (!lens.isTimed()) {
+                    checkUntimedAndNode();
+                }
 			}
 
-		}
-
-				);
+		});
 
 		disjunctionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1693,17 +2002,11 @@ public class QueryDialog extends JPanel {
 				if (currentSelection.getObject() instanceof TCTLOrListNode) {
 					orListNode = new TCTLOrListNode((TCTLOrListNode) currentSelection.getObject());
 					orListNode.addDisjunct(new TCTLStatePlaceHolder());
-					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
-					newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
-					updateSelection(orListNode);
-					undoSupport.postEdit(edit);
-				} else if (currentSelection.getObject() instanceof TCTLAndListNode) {
+                    addPropertyToQuery(orListNode);
+                } else if (currentSelection.getObject() instanceof TCTLAndListNode) {
 					orListNode = new TCTLOrListNode(((TCTLAndListNode) currentSelection.getObject()).getProperties());
-					UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
-					newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
-					updateSelection(orListNode);
-					undoSupport.postEdit(edit);
-				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    addPropertyToQuery(orListNode);
+                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
 					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection.getObject();
 					TCTLAbstractProperty parentNode = prop.getParent();
 
@@ -1712,33 +2015,90 @@ public class QueryDialog extends JPanel {
 						// new placeholder disjunct to it
 						orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
 						orListNode.addDisjunct(new TCTLStatePlaceHolder());
-						UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
-						newProperty = newProperty.replace(parentNode, orListNode);
-						updateSelection(orListNode);
-						undoSupport.postEdit(edit);
-					} else {
+                        addPropertyToQuery(orListNode);
+                    } else {
 						TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 						orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()),	ph);
-						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
-						newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
-						updateSelection(orListNode);
-						undoSupport.postEdit(edit);
-					}
-				}
-				queryChanged();
+                        addPropertyToQuery(orListNode);
+                    }
+				} else if (!lens.isTimed()) {
+                    checkUntimedOrNode();
+                }
 			}
-
 		});
 
 		negationButton.addActionListener(e -> {
-			TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
-			UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-			newProperty = newProperty.replace(currentSelection.getObject(), property);
-			updateSelection(property);
-			undoSupport.postEdit(edit);
-			queryChanged();
+            if (lens.isTimed()) {
+                TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
+                addPropertyToQuery(property);
+            } else {
+                TCTLAbstractStateProperty root;
+                if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+                    root = ConvertToStateProperty(getPathProperty(currentSelection.getObject()));
+                } else {
+                    root = getStateProperty(currentSelection.getObject());
+                }
+                TCTLNotNode property = new TCTLNotNode(root);
+                addPropertyToQuery(property);
+            }
 		});
 	}
+
+    private void checkUntimedAndNode() {
+        TCTLAndListNode andListNode;
+        if (currentSelection.getObject() instanceof TCTLStateToPathConverter) {
+            TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+
+            TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter) currentSelection.getObject()).getProperty();
+
+            if (prop instanceof TCTLAndListNode) {
+                andListNode = new TCTLAndListNode((TCTLAndListNode) prop);
+                andListNode.addConjunct(new TCTLStatePlaceHolder());
+            } else if (prop instanceof TCTLOrListNode) {
+                andListNode = new TCTLAndListNode(((TCTLOrListNode) prop).getProperties());
+            } else {
+                andListNode = new TCTLAndListNode(getStateProperty(prop), ph);
+            }
+
+            TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
+            addPropertyToQuery(property);
+        } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+            TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+            andListNode = new TCTLAndListNode(getStateProperty(
+                new TCTLPathToStateConverter((TCTLAbstractPathProperty) currentSelection.getObject())), ph);
+
+            TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
+            addPropertyToQuery(property);
+        }
+    }
+
+    private void checkUntimedOrNode() {
+        TCTLOrListNode orListNode;
+        if (currentSelection.getObject() instanceof TCTLStateToPathConverter) {
+            TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+
+            TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter) currentSelection.getObject()).getProperty();
+
+            if (prop instanceof TCTLOrListNode) {
+                orListNode = new TCTLOrListNode((TCTLOrListNode) prop);
+                orListNode.addDisjunct(new TCTLStatePlaceHolder());
+            } else if (prop instanceof TCTLAndListNode) {
+                orListNode = new TCTLOrListNode(((TCTLAndListNode) prop).getProperties());
+            } else {
+                orListNode = new TCTLOrListNode(getStateProperty(prop), ph);
+            }
+
+            TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
+            addPropertyToQuery(property);
+        } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+            TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+            orListNode = new TCTLOrListNode(getStateProperty(
+                new TCTLPathToStateConverter((TCTLAbstractPathProperty) currentSelection.getObject())), ph);
+
+            TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
+            addPropertyToQuery(property);
+        }
+    }
 
 	private void initPredicationConstructionPanel() {
 		predicatePanel = new JPanel(new GridBagLayout());
@@ -1748,7 +2108,6 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(125, 27);
 		placesBox.setMaximumSize(d);
 		placesBox.setPreferredSize(d);
-
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
@@ -1768,6 +2127,13 @@ public class QueryDialog extends JPanel {
 								placeNames.add(place.name());
 							}
 						}
+                        if (!lens.isTimed()) {
+                            for (TimedTransition transition : tapn.transitions()) {
+                                if (!transition.isShared()) {
+                                    placeNames.add(transition.name());
+                                }
+                            }
+                        }
 
 						placeNames.sort(String::compareToIgnoreCase);
 						placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
@@ -1783,6 +2149,11 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 						placeNames.add(place.name());
 					}
+                    if (lens.isTimed()) {
+                        for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
+                            placeNames.add(transition.name());
+                        }
+                    }
 					placeNames.sort(String::compareToIgnoreCase);
 					placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
@@ -1792,6 +2163,8 @@ public class QueryDialog extends JPanel {
                         updateQueryOnAtomicPropositionChange();
                     }
 				}
+                if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
+
 			}
 		});
 		Dimension dim = new Dimension(235, 27);
@@ -1806,31 +2179,35 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		predicatePanel.add(templateBox, gbc);
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		predicatePanel.add(placesBox, gbc);
+        JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        predicatePanel.add(templateRow, gbc);
+        templateBox.setPreferredSize(new Dimension(292, 27));
+        templateRow.add(templateBox);
 
-		String[] relationalSymbols = { "=", "<=", "<", ">=", ">" };
-		relationalOperatorBox = new JComboBox<>(new DefaultComboBoxModel<>(relationalSymbols));
+        JPanel placeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        gbc.gridy = 1;
+        predicatePanel.add(placeRow, gbc);
+        placeRow.add(placesBox);
 
-		gbc.gridx = 1;
-		predicatePanel.add(relationalOperatorBox, gbc);
+        String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
+        relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
+        relationalOperatorBox.setPreferredSize(new Dimension(80, 27));
+        placeRow.add(relationalOperatorBox);
 
-		placeMarking = new CustomJSpinner(0);
-		placeMarking.setMaximumSize(new Dimension(60, 30));
-		placeMarking.setMinimumSize(new Dimension(60, 30));
-		placeMarking.setPreferredSize(new Dimension(60, 30));
+        placeMarking = new CustomJSpinner(0);
+        placeMarking.setPreferredSize(new Dimension(80, 27));
+        placeRow.add(placeMarking);
 
-		gbc.gridx = 2;
-		predicatePanel.add(placeMarking, gbc);
+        transitionIsEnabledLabel = new JLabel(" is enabled");
+        transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
+        if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
 
-		addPredicateButton = new JButton("Add predicate to the query");
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.gridwidth = 3;
-		predicatePanel.add(addPredicateButton, gbc);
+        JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        gbc.gridy = 2;
+        predicatePanel.add(addPredicateRow, gbc);
+        addPredicateButton = new JButton("Add predicate to the query");
+        addPredicateButton.setPreferredSize(new Dimension(292, 27));
+        addPredicateRow.add(addPredicateButton);
 
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
 		separator.setEnabled(true);
@@ -1842,27 +2219,25 @@ public class QueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		predicatePanel.add(separator,gbc);
 
-		truePredicateButton = new JButton("True");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -38, 0,0);
-		predicatePanel.add(truePredicateButton, gbc);
+        truePredicateButton = new JButton("True");
+        truePredicateButton.setPreferredSize(new Dimension(90, 27));
 
-		falsePredicateButton = new JButton("False");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 4;
-		gbc.insets = new Insets(0, -88, 0,0);
-		predicatePanel.add(falsePredicateButton, gbc);
+        falsePredicateButton = new JButton("False");
+        falsePredicateButton.setPreferredSize(new Dimension(90, 27));
 
-		deadLockPredicateButton = new JButton("Deadlock");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 4;
-		gbc.gridwidth = 3;
-		gbc.insets = new Insets(0, -35, 0,0);
-		predicatePanel.add(deadLockPredicateButton, gbc);
+        deadLockPredicateButton = new JButton("Deadlock");
+        deadLockPredicateButton.setPreferredSize(new Dimension(103, 27));
+
+        JPanel trueFalseDeadlock = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        trueFalseDeadlock.add(truePredicateButton);
+        trueFalseDeadlock.add(falsePredicateButton);
+        trueFalseDeadlock.add(deadLockPredicateButton);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
+        predicatePanel.add(trueFalseDeadlock, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -1886,51 +2261,38 @@ public class QueryDialog extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
-				TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-						new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()), 
-						(String) relationalOperatorBox.getSelectedItem(),
-						new TCTLConstNode((Integer) placeMarking.getValue()));
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(), property);
-				updateSelection(property);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
-		}
 
-				);
+                if (lens.isTimed() && transitionIsSelected()) {
+                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placesBox.getSelectedItem()));
+                } else {
+                    TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
+                        new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()),
+                        (String) relationalOperatorBox.getSelectedItem(),
+                        new TCTLConstNode((Integer) placeMarking.getValue()));
+                    addPropertyToQuery(property);
+                }
+			}
+		});
 
 		truePredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLTrueNode trueNode = new TCTLTrueNode();
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), trueNode);
-				newProperty = newProperty.replace(currentSelection.getObject(), trueNode);
-				updateSelection(trueNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+                addPropertyToQuery(trueNode);
+            }
 		});
 
 		falsePredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLFalseNode falseNode = new TCTLFalseNode();
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), falseNode);
-				newProperty = newProperty.replace(currentSelection.getObject(), falseNode);
-				updateSelection(falseNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+                addPropertyToQuery(falseNode);
+            }
 		});
 
 		deadLockPredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLDeadlockNode deadLockNode = new TCTLDeadlockNode();
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), deadLockNode);
-				newProperty = newProperty.replace(currentSelection.getObject(), deadLockNode);
-				updateSelection(deadLockNode);
-				undoSupport.postEdit(edit);
-				queryChanged();
-			}
+                addPropertyToQuery(deadLockNode);
+            }
 		});
 
 		placesBox.addActionListener(e -> {
@@ -1980,20 +2342,22 @@ public class QueryDialog extends JPanel {
 		editingButtonsGroup.add(redoButton);
 		editingButtonsGroup.add(editQueryButton);
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		editingButtonPanel.add(undoButton, gbc);
+        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel row = new JPanel(new GridLayout(1, 2));
+        row.add(undoButton);
+        row.add(redoButton);
 
-		gbc.gridx = 1;
-		editingButtonPanel.add(redoButton, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        editingButtonPanel.add(row, gbc);
 
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.gridwidth = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		editingButtonPanel.add(deleteButton, gbc);
+        gbc.weightx = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        editingButtonPanel.add(deleteButton, gbc);
 
 		gbc.gridy = 2;
 		editingButtonPanel.add(resetButton, gbc);
@@ -2033,7 +2397,9 @@ public class QueryDialog extends JPanel {
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
 						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
 							for(TimedPlace p : tapn.places()) {
-								templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+                                if (lens.isTimed() || !p.isShared()) {
+                                    templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+                                }
 							}
 						}
 
@@ -2041,15 +2407,22 @@ public class QueryDialog extends JPanel {
 							templatePlaceNames.add(new Tuple<String, String>("", p.name()));
 						}
 
-                                                FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery);
-                                                
+						FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery);
 						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
-
 						VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(newQuery);
 
-						if (!c.getResult()) {
+                        boolean isResultFalse;
+
+                        if (lens.isTimed()) {
+                            isResultFalse = !c.getResult();
+                        } else {
+                            isResultFalse = checkUntimedResult(newQuery) && !c.getResult();
+                        }
+
+						if (isResultFalse) {
 							StringBuilder s = new StringBuilder();
-							s.append("The following places were used in the query, but are not present in your model:\n\n");
+							s.append("The following places" + (lens.isTimed() ? "" : " or transitions") +
+                                "were used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
@@ -2131,9 +2504,31 @@ public class QueryDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
 		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.VERTICAL;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.WEST;
 		queryPanel.add(editingButtonPanel, gbc);
 	}
+
+    private boolean checkUntimedResult(TCTLAbstractProperty newQuery) {
+        // check correct transition names are used in atomic propositions
+        ArrayList<Tuple<String, String>> templateTransitionNames = new ArrayList<Tuple<String, String>>();
+        for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
+            for (TimedTransition t : tapn.transitions()) {
+                if (!t.isShared()) {
+                    templateTransitionNames.add(new Tuple<String, String>(tapn.name(), t.name()));
+                }
+            }
+        }
+
+        for (SharedTransition t : tapnNetwork.sharedTransitions()) {
+            templateTransitionNames.add(new Tuple<String, String>("", t.name()));
+        }
+
+        FixAbbrivTransitionNames.fixAbbrivTransitionNames(templateTransitionNames, newQuery);
+        VerifyTransitionNamesVisitor transitionNameChecker = new VerifyTransitionNamesVisitor(templateTransitionNames);
+        VerifyTransitionNamesVisitor.Context c2 = transitionNameChecker.verifyTransitionNames(newQuery);
+        return !c2.getResult();
+    }
 
 	private void initUppaalOptionsPanel() {
 
@@ -2205,9 +2600,11 @@ public class QueryDialog extends JPanel {
 		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
 		noTraceRadioButton = new JRadioButton("No trace");
 		fastestTraceRadioButton = new JRadioButton("Fastest trace");
+
 		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
 		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
 		fastestTraceRadioButton.setToolTipText(TOOL_TIP_FASTEST_TRACE);
+
 		traceRadioButtonGroup.add(fastestTraceRadioButton);
 		traceRadioButtonGroup.add(someTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
@@ -2215,11 +2612,11 @@ public class QueryDialog extends JPanel {
 		fastestTraceRadioButton.setEnabled(false);
 		someTraceRadioButton.setEnabled(false);
 		noTraceRadioButton.setSelected(true);
-		
-		Enumeration<AbstractButton> buttons = traceRadioButtonGroup.getElements(); 
-		
+
+		Enumeration<AbstractButton> buttons = traceRadioButtonGroup.getElements();
+
 		while(buttons.hasMoreElements()){
-			AbstractButton button = buttons.nextElement(); 
+			AbstractButton button = buttons.nextElement();
 			button.addActionListener(e -> {
 				setEnabledReductionOptions();
 				setEnabledOptionsAccordingToCurrentReduction();
@@ -2236,11 +2633,18 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
-		
+
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
+
+		if (lens.isTimed()) {
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.weightx = 1;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
+        }
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -2251,26 +2655,22 @@ public class QueryDialog extends JPanel {
 		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
-	
-	
-	
-	
-	
+
 	private void initOverApproximationPanel() {
 		overApproximationOptionsPanel = new JPanel(new GridBagLayout());
 		overApproximationOptionsPanel.setVisible(false);
 		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Approximation Options"));
 		approximationRadioButtonGroup = new ButtonGroup();
-		
+
 		noApproximationEnable = new JRadioButton("Exact analysis");
 		noApproximationEnable.setVisible(true);
 		noApproximationEnable.setSelected(true);
 		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
-		
+
 		overApproximationEnable = new JRadioButton("Over-approximation");
 		overApproximationEnable.setVisible(true);
 		overApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
-		
+
 		underApproximationEnable = new JRadioButton("Under-approximation");
 		underApproximationEnable.setVisible(true);
 		underApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_UNDER);
@@ -2278,40 +2678,40 @@ public class QueryDialog extends JPanel {
 		approximationRadioButtonGroup.add(noApproximationEnable);
 		approximationRadioButtonGroup.add(overApproximationEnable);
 		approximationRadioButtonGroup.add(underApproximationEnable);
-		
-		Enumeration<AbstractButton> buttons = approximationRadioButtonGroup.getElements(); 
-		
+
+		Enumeration<AbstractButton> buttons = approximationRadioButtonGroup.getElements();
+
 		while(buttons.hasMoreElements()){
-			AbstractButton button = buttons.nextElement(); 
+			AbstractButton button = buttons.nextElement();
 			button.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 		}
-		
+
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		
-		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
-		
-		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
+
+		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");
+
+		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);
 		overApproximationDenominator.setMaximumSize(new Dimension(65, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(65, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(65, 30));
 		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
-		
+
 		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(approximationDenominatorLabel, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
-	
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 5;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.insets = new Insets(5,10,5,10);
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		
+
 		add(overApproximationOptionsPanel, gridBagConstraints);
 	}
 
@@ -2319,7 +2719,7 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-		Dimension d = new Dimension(898, 100);
+        Dimension d = lens.isTimed() ? new Dimension(898, 100) : new Dimension(810, 130);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
@@ -2339,122 +2739,47 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 
-		symmetryReduction = new JCheckBox("Use symmetry reduction");
-		symmetryReduction.setSelected(true);
-		symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
+        useReduction = new JCheckBox("Apply net reductions");
+        useSiphonTrap = new JCheckBox("Use siphon-trap analysis");
+        useQueryReduction = new JCheckBox("Use query reduction");
+        useStubbornReduction = new JCheckBox("Use stubborn reduction");
+        symmetryReduction = new JCheckBox("Use symmetry reduction");
+        discreteInclusion = new JCheckBox("Use discrete inclusion");
+        selectInclusionPlacesButton = new JButton("Select Inclusion Places");
+        useTimeDarts = new JCheckBox("Use Time Darts");
+        useGCD = new JCheckBox("Use GCD");
+        usePTrie = new JCheckBox("Use PTrie");
+        useOverApproximation = new JCheckBox("Use untimed state-equations check");
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(symmetryReduction, gbc);
+        useReduction.setSelected(true);
+        useSiphonTrap.setSelected(false);
+        useQueryReduction.setSelected(true);
+        useStubbornReduction.setSelected(true);
+        symmetryReduction.setSelected(true);
+        discreteInclusion.setVisible(true);
+        selectInclusionPlacesButton.setEnabled(false);
+        useTimeDarts.setSelected(false);
+        useGCD.setSelected(true);
+        usePTrie.setSelected(true);
+        useOverApproximation.setSelected(true);
 
-		discreteInclusion = new JCheckBox("Use discrete inclusion");
-		discreteInclusion.setVisible(true);
-		discreteInclusion.setToolTipText(TOOL_TIP_DISCRETE_INCLUSION);
-		discreteInclusion.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
-			}
-		});
+        useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
+        useSiphonTrap.setToolTipText(TOOL_TIP_USE_SIPHONTRAP);
+        useQueryReduction.setToolTipText(TOOL_TIP_USE_QUERY_REDUCTION);
+        useStubbornReduction.setToolTipText(TOOL_TIP_STUBBORN_REDUCTION);
+        symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
+        discreteInclusion.setToolTipText(TOOL_TIP_DISCRETE_INCLUSION);
+        selectInclusionPlacesButton.setToolTipText(TOOL_TIP_SELECT_INCLUSION_PLACES);
+        useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
+        useGCD.setToolTipText(TOOL_TIP_GCD);
+        usePTrie.setToolTipText(TOOL_TIP_PTRIE);
+        useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(discreteInclusion, gbc);
-
-		selectInclusionPlacesButton = new JButton("Select Inclusion Places");
-		selectInclusionPlacesButton.setEnabled(false);
-		selectInclusionPlacesButton.setToolTipText(TOOL_TIP_SELECT_INCLUSION_PLACES);
-		selectInclusionPlacesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
-			}
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-
-		useTimeDarts = new JCheckBox("Use Time Darts");
-		useTimeDarts.setSelected(false);
-		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
-		useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useTimeDarts, gbc);
-		
-		useGCD = new JCheckBox("Use GCD");
-		useGCD.setSelected(true);
-		useGCD.setToolTipText(TOOL_TIP_GCD);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useGCD, gbc);
-		
-		usePTrie = new JCheckBox("Use PTrie");
-		usePTrie.setSelected(true);
-		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-
-		useReduction = new JCheckBox("Apply net reductions");
-		useReduction.setSelected(true);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);	
-		reductionOptionsPanel.add(useReduction, gbc);
-		
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(usePTrie, gbc);
-
-		useStubbornReduction = new JCheckBox("Use stubborn reduction");
-		useStubbornReduction.setSelected(true);
-		useStubbornReduction.setToolTipText(TOOL_TIP_STUBBORN_REDUCTION);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useStubbornReduction, gbc);
-
-		useOverApproximation = new JCheckBox("Use untimed state-equations check");
-		useOverApproximation.setSelected(true);
-		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(useOverApproximation, gbc);
+        if (lens.isTimed()) {
+            initTimedReductionOptions();
+        } else {
+            initUntimedReductionOptions();
+        }
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -2464,14 +2789,81 @@ public class QueryDialog extends JPanel {
 		add(reductionOptionsPanel, gbc);
 	}
 
+    private void initTimedReductionOptions() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0,5,0,5);
+        reductionOptionsPanel.add(symmetryReduction, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(discreteInclusion, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(useStubbornReduction, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        reductionOptionsPanel.add(useOverApproximation, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 2;
+        reductionOptionsPanel.add(useTimeDarts, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        reductionOptionsPanel.add(useGCD, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(usePTrie, gbc);
+
+        discreteInclusion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
+            }
+        });
+
+        selectInclusionPlacesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
+            }
+        });
+
+        useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+    }
+
+    private void initUntimedReductionOptions() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0,5,0,5);
+        reductionOptionsPanel.add(useReduction, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(useSiphonTrap, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        reductionOptionsPanel.add(useQueryReduction, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        reductionOptionsPanel.add(useStubbornReduction, gbc);
+    }
+
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
-		refreshSymmetryReduction();
-		refreshStubbornReduction();
-		refreshDiscreteOptions();
-		refreshDiscreteInclusion();
-		refreshOverApproximationOption();
+        if (lens.isTimed()) {
+            refreshSymmetryReduction();
+            refreshStubbornReduction();
+            refreshDiscreteOptions();
+            refreshDiscreteInclusion();
+            refreshOverApproximationOption();
+        }
 		updateSearchStrategies();
 		refreshExportButtonText();
 	}
@@ -2504,16 +2896,24 @@ public class QueryDialog extends JPanel {
 
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
-			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-			    if (lens.isGame()) {
+            if (lens.isGame()) {
+                if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+                    forAllBox.setSelected(false);
                     enableOnlyForAllBox();
-                } else {
-                    enableOnlyPathButtons();
+                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    enableOnlyStateButtons();
                 }
-			} else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				enableOnlyStateButtons();
-			}
-			updateQueryButtonsAccordingToSelection();
+            } else if (lens.isTimed()) {
+                if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+                    enableOnlyPathButtons();
+                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    enableOnlyStateButtons();
+                }
+                updateQueryButtonsAccordingToSelection();
+            } else {
+                enableOnlyUntimedStateButtons();
+                updateQueryButtonsAccordingToSelection();
+            }
 		}
 	}
 
@@ -2523,10 +2923,9 @@ public class QueryDialog extends JPanel {
 		}
 		else if(reductionOption.getSelectedItem() == null){
 			symmetryReduction.setVisible(false);
-		} 
+		}
 		else if(reductionOption.getSelectedItem().equals(name_DISCRETE) || reductionOption.getSelectedItem().equals(name_UNTIMED)) {
 			symmetryReduction.setVisible(true);
-			symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(false);
 		}
 		else if((reductionOption.getSelectedItem().equals(name_COMBI) ||
@@ -2535,7 +2934,7 @@ public class QueryDialog extends JPanel {
 				reductionOption.getSelectedItem().equals(name_BROADCAST) ||
 				reductionOption.getSelectedItem().equals(name_BROADCASTDEG2)) &&
 				(!noApproximationEnable.isSelected() ||
-				someTraceRadioButton.isSelected()) 
+				someTraceRadioButton.isSelected())
 				){
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(false);
@@ -2548,7 +2947,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshOverApproximationOption() {
-	    if (queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+	    if (queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);
 		} else {
@@ -2580,13 +2979,13 @@ public class QueryDialog extends JPanel {
 
 	private void refreshDiscreteOptions(){
 		useReduction.setVisible(false);
-		
+
 		if(reductionOption.getSelectedItem() == null){
 			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
 			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
-		} 
+		}
 		else if(reductionOption.getSelectedItem().equals(name_DISCRETE)) {
 			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
@@ -2600,7 +2999,7 @@ public class QueryDialog extends JPanel {
 			}
 
 			// Disable GCD calculation for EG/AF or deadlock queries
-			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") ||
+			if(queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF") ||
                lens.isGame()){
 				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
 				useGCD.setSelected(false);
@@ -2608,14 +3007,16 @@ public class QueryDialog extends JPanel {
 			}
 
 			// Disable time darts for EG/AF with deadlock
-			if(queryHasDeadlock() && (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>"))){
+			if(queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))){
 				hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
+				symmetryReduction.setSelected(false);
+				symmetryReduction.setEnabled(false);
 			}
 
 			// Disable stubborn reduction for EG/AF queries
-			if(getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+			if(newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
 				if(useStubbornReduction.isSelected())	hasForcedDisabledStubbornReduction = true;
 				useStubbornReduction.setSelected(false);
 				useStubbornReduction.setEnabled(false);
@@ -2643,35 +3044,35 @@ public class QueryDialog extends JPanel {
 
 
 	private void queryChanged(){
-		setEnabledReductionOptions();
-		refreshOverApproximationOption();
+    		setEnabledReductionOptions();
+        if (lens.isTimed()) refreshOverApproximationOption();
 	}
 
-	
+
 	private void initButtonPanel(QueryDialogueOption option) {
 		buttonPanel = new JPanel(new BorderLayout());
 		if (option == QueryDialogueOption.Save) {
 			saveButton = new JButton("Save");
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
-			
+
 			mergeNetComponentsButton = new JButton(EXPORT_COMPOSED_BTN_TEXT);
 			mergeNetComponentsButton.setVisible(false);
-			
+
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 			//Only show in advanced mode
 			saveUppaalXMLButton.setVisible(false);
-			
+
 			//Add tool tips
 			saveButton.setToolTipText(TOOL_TIP_SAVE_BUTTON);
 			saveAndVerifyButton.setToolTipText(TOOL_TIP_SAVE_AND_VERIFY_BUTTON);
 			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
 			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			mergeNetComponentsButton.setToolTipText(TOOL_TIP_SAVE_COMPOSED_BUTTON);
-			
+
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
-					// TODO make save 
+					// TODO make save
 					// save();
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
@@ -2722,7 +3123,7 @@ public class QueryDialog extends JPanel {
 					if (xmlFile != null && queryFile != null) {
 						ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-						
+
 						if (overApproximationEnable.isSelected())
 						{
 							OverApproximation overaprx = new OverApproximation();
@@ -2732,14 +3133,17 @@ public class QueryDialog extends JPanel {
 						{
 							UnderApproximation underaprx = new UnderApproximation();
 							underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-						}						
+						}
 
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
 
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
-
+                        if (!lens.isTimed()) {
+                            RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(transformedModel.value2());
+                            clonedQuery.getProperty().accept(transitionVisitor, null);
+                        }
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens);
@@ -2768,12 +3172,12 @@ public class QueryDialog extends JPanel {
 					}
 				}
 			});
-			
+
 			mergeNetComponentsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, true);
 					Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
-					
+
 					ArrayList<Template> templates = new ArrayList<Template>(1);
 					querySaved = true;	//Setting this to true will make sure that new values will be used.
 					if (overApproximationEnable.isSelected())
@@ -2787,17 +3191,17 @@ public class QueryDialog extends JPanel {
 						underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), composer.getGuiModel());
 					}
 					templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
-					
+
 					// Create a constant store
 					ConstantStore newConstantStore = new ConstantStore();
 
-					
+
 					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(newConstantStore);
-					
+
 					network.add(transformedModel.value1());
-					
+
 					NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
-			
+
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
@@ -2809,8 +3213,8 @@ public class QueryDialog extends JPanel {
 					}
 				}
 			});
-			
-			
+
+
 		} else if (option == QueryDialogueOption.Export) {
 			saveButton = new JButton("export");
 			cancelButton = new JButton("Cancel");
@@ -2827,8 +3231,8 @@ public class QueryDialog extends JPanel {
 			JPanel rightButtomPanel = new JPanel(new FlowLayout());
 			leftButtomPanel.add(mergeNetComponentsButton, FlowLayout.LEFT);
 			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
-			
-			
+
+
 			rightButtomPanel.add(cancelButton);
 
 			rightButtomPanel.add(saveButton);
