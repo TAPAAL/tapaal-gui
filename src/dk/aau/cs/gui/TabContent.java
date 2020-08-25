@@ -1581,7 +1581,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     private void createNewAndConvertColor(){
-        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false), "-noncolored");
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
         TabTransformer.addColorInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1660,8 +1660,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonColor();
                 }
             } else {
-                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
-                guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+                createNewAndConvertColor();
             }
             updateFeatureText();
         }

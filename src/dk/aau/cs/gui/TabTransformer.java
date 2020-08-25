@@ -1,6 +1,7 @@
 package dk.aau.cs.gui;
 
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
@@ -186,31 +187,37 @@ public class TabTransformer {
 
             for(TimedInputArc arc : template.model().inputArcs()){
                 arc.setColorTimeIntervals(new ArrayList<>());
+                int expressionWeight = arc.getArcExpression().weight();
                 ColorType ct = arc.source().getColorType();
                 UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
                 arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(expressionWeight));
             }
 
             for(TimedOutputArc arc : template.model().outputArcs()){
                 ColorType ct = arc.destination().getColorType();
+                int expressionWeight = arc.getExpression().weight();
                 UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
                 arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(expressionWeight));
             }
 
             for(TransportArc arc : template.model().transportArcs()){
                 ColorType ct = arc.source().getColorType();
+                ArcExpression oldInputExpr = arc.getInputExpression();
                 UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
                 arc.setInputExpression(numbExpr);
                 arc.setOutputExpression(numbExpr);
+                arc.setWeight(new IntWeight(oldInputExpr.weight()));
             }
         }
     }
@@ -225,6 +232,7 @@ public class TabTransformer {
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
                 arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(0));
             }
 
             for(TimedOutputArc arc : template.model().outputArcs()){
@@ -234,6 +242,7 @@ public class TabTransformer {
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
                 arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(0));
             }
 
             for(TransportArc arc : template.model().transportArcs()){
@@ -244,6 +253,8 @@ public class TabTransformer {
                 NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
                 arc.setInputExpression(numbExpr);
                 arc.setOutputExpression(numbExpr);
+                arc.setWeight(new IntWeight(0));
+
             }
         }
     }
