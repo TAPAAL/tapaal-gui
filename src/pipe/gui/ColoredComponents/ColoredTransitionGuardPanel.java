@@ -837,7 +837,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             editColorExpressionButton.setEnabled(false);
         }
         if(newProperty.containsPlaceHolder()){
-            System.out.println("mojn");
             parent.enableOKButton(false);
         } else{
             parent.enableOKButton(true);
