@@ -693,7 +693,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-
+                updateSpinnerValue(comboBoxes);
             }
         };
         tokenColorComboboxPanel.removeScrollPaneBorder();
@@ -719,6 +719,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
             if(tokenTable.getSelectedRow() < 0){
                 removeColoredTokenButton.setEnabled(false);
             } else{
+                updateSpinnerValue();
+                tokenColorComboboxPanel.updateSelection(((TimedToken)tokenTable.getValueAt(tokenTable.getSelectedRow(), 1)).color());
                 removeColoredTokenButton.setEnabled(true);
             }
         });
@@ -1146,8 +1148,30 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         for (TimedToken element : context.network().marking().getTokensFor(place.underlyingPlace())) {
             addColoredToken(element);
         }
+        updateSpinnerValue();
     }
 
+    private void updateSpinnerValue(){
+	    updateSpinnerValue(tokenColorComboboxPanel.getColorTypeComboBoxesArray());
+    }
+
+    private void updateSpinnerValue(JComboBox[] comboBoxes){
+        boolean existsAlready = false;
+        if(tableModel.getRowCount() > 0){
+            int currSize = tableModel.getRowCount();
+            for(int i = 0; i < currSize; i++){
+                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex())).toString())){
+                    addTokenSpinner.setValue(tokenTable.getValueAt(i,0));
+                    existsAlready = true;
+                }
+            }
+            if(!existsAlready){
+                addTokenSpinner.setValue(0);
+            }
+        }else{
+            addTokenSpinner.setValue(0);
+        }
+    }
 
     private void setInitialComboBoxValue() {
         List<ColorType> colorTypes = context.network().colorTypes();
