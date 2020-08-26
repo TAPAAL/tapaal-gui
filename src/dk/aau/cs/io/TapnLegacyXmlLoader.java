@@ -84,7 +84,7 @@ public class TapnLegacyXmlLoader {
 	private final IdResolver idResolver = new IdResolver();
 
     private final Collection<String> messages = new ArrayList<>(10);
-    private final TabContent.TAPNLens lens = new TabContent.TAPNLens(true, false);
+    private final TabContent.TAPNLens lens = null;
 
 
     public TapnLegacyXmlLoader() {}
@@ -146,7 +146,7 @@ public class TapnLegacyXmlLoader {
 		
 		checkThatQueriesUseExistingPlaces(network);
 		
-		return new LoadedModel(network, templates, queries, messages);
+		return new LoadedModel(network, templates, queries, messages, null);
 	}
 
 	private void checkThatQueriesUseExistingPlaces(TimedArcPetriNetNetwork network) {

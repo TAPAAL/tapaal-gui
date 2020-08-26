@@ -71,7 +71,7 @@ public class TapnXmlLoader {
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
 
-    private TabContent.TAPNLens lens;
+    private TabContent.TAPNLens lens = null;
 
 	public TapnXmlLoader() {
 
@@ -151,8 +151,6 @@ public class TapnXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
 
             lens = new TabContent.TAPNLens(isTimed, isGame);
-        } else {
-            lens = new TabContent.TAPNLens(true, false);
         }
     }
 

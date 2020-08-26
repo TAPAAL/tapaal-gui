@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 
 public class ModelLoader {
@@ -17,19 +18,31 @@ public class ModelLoader {
 	public LoadedModel load(File file) throws Exception{		
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader();
 		try{
-			return newFormatLoader.load(file);
+			return checkLens(newFormatLoader.load(file));
 		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
-				return oldFormatLoader.load(file);
+				return checkLens(oldFormatLoader.load(file));
 			} catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());
 			}
 		}
 	}
-	
-	
-	public LoadedModel load(InputStream file) throws Exception{
+
+    private LoadedModel checkLens(LoadedModel model) {
+        if (model.getLens()==null) {
+
+	        boolean isTimed = !model.network().isUntimed();
+            boolean isGame =  model.network().hasUncontrollableTransitions();
+            return new LoadedModel(model.network(), model.templates(), model.queries(), model.getMessages(), new TabContent.TAPNLens(isTimed, isGame));
+
+        }else {
+            return model;
+        }
+    }
+
+
+    public LoadedModel load(InputStream file) throws Exception{
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
@@ -43,13 +56,13 @@ public class ModelLoader {
 		}
 		try{
 
-            return newFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
+            return checkLens(newFormatLoader.load(new ByteArrayInputStream(baos.toByteArray())));
 
 		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
 
-                return oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
+                return checkLens(oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray())));
 
 			} catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());
