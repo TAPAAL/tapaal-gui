@@ -54,6 +54,8 @@ public class ColoredArcGuardPanel extends JPanel {
             this.colorType = ((TimedPlaceComponent) ((Arc)objectToBeEdited).getSource()).underlyingPlace().getColorType();
         } else if(isTransportArc){
             this.colorType = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().source().getColorType();
+        } else{
+            this.colorType = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc().destination().getColorType();
         }
         this.context = context;
         this.setLayout(new GridBagLayout());
