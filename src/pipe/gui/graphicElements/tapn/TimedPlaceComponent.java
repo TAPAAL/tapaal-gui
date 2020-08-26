@@ -410,7 +410,7 @@ public class TimedPlaceComponent extends Place {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new PlaceEditorPanel(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
+		contentPane.add(new PlaceEditorPanel(guiDialog, guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
 
 		guiDialog.setResizable(false);
 

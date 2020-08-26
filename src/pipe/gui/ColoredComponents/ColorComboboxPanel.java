@@ -19,6 +19,7 @@ public abstract class ColorComboboxPanel extends JPanel {
     private JPanel colorcomboBoxPanel;
     private JComboBox[] colorTypeComboBoxesArray;
     JScrollPane colorTypesScrollPane;
+    JPanel comboBoxPanel;
 
     public ColorComboboxPanel(ColorType colorType, String panelName) {
         this.colorType = colorType;
@@ -39,10 +40,50 @@ public abstract class ColorComboboxPanel extends JPanel {
         colorcomboBoxPanel = new JPanel();
         colorcomboBoxPanel.setLayout(new GridBagLayout());
 
-        Dimension comboSize = new Dimension(230, 30);
 
         //This panel contains all comboboxes, there can be more than one with ProductTypes
-        JPanel comboBoxPanel = new JPanel(new GridBagLayout());
+        comboBoxPanel = new JPanel(new GridBagLayout());
+        //In case it is a really large product type we have a scrollPane
+        colorTypesScrollPane = new JScrollPane(comboBoxPanel);
+        colorTypesScrollPane.setViewportView(comboBoxPanel);
+        colorTypesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        colorTypesScrollPane.setBorder(BorderFactory.createTitledBorder("Color Type elements"));
+        updateColorType(colorType);
+
+        Dimension scrollPaneSize = new Dimension(260, 150);
+        colorTypesScrollPane.setMaximumSize(scrollPaneSize);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        colorcomboBoxPanel.add(colorTypesScrollPane, gbc);
+        add(colorcomboBoxPanel, gbc);
+    }
+
+    public void removeScrollPaneBorder(){
+        colorTypesScrollPane.setBorder(null);
+    }
+
+    public abstract void changedColor(JComboBox[] comboBoxes);
+    public void updateSelection(Color color){
+        if (colorType instanceof ProductType) {
+            for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
+                for (Color element : ((ProductType) colorType).getColorTypes().get(i)) {
+                    colorTypeComboBoxesArray[i].setSelectedItem(element);
+                }
+            }
+        }
+        else if (colorType != null){
+            colorTypeComboBoxesArray[0].setSelectedItem(color);
+        }
+    }
+
+    public void updateColorType(ColorType ct){
+        removeOldComboBoxes();
+        colorType = ct;
+        Dimension comboSize = new Dimension(230, 30);
         if (colorType instanceof ProductType) {
             colorTypeComboBoxesArray = new JComboBox[((ProductType) colorType).getColorTypes().size()];
 
@@ -83,40 +124,11 @@ public abstract class ColorComboboxPanel extends JPanel {
             gbc.insets = new Insets(5 , 0,0,0);
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
         }
-        //In case it is a really large product type we have a scrollPane
-        colorTypesScrollPane = new JScrollPane(comboBoxPanel);
-        colorTypesScrollPane.setViewportView(comboBoxPanel);
-        colorTypesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        colorTypesScrollPane.setBorder(BorderFactory.createTitledBorder("Color Type elements"));
-
-        Dimension scrollPaneSize = new Dimension(260, 150);
         colorTypesScrollPane.setPreferredSize(new Dimension(260,colorTypeComboBoxesArray.length*40));
-        colorTypesScrollPane.setMaximumSize(scrollPaneSize);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        colorcomboBoxPanel.add(colorTypesScrollPane, gbc);
-        add(colorcomboBoxPanel, gbc);
+        colorTypesScrollPane.setMinimumSize(new Dimension(260, 40));
+        revalidate();
     }
-
-    public void removeScrollPaneBorder(){
-        colorTypesScrollPane.setBorder(null);
-    }
-
-    public abstract void changedColor(JComboBox[] comboBoxes);
-    public void updateSelection(Color color){
-        if (colorType instanceof ProductType) {
-
-            for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
-                colorTypeComboBoxesArray[i].setSelectedItem(color);
-
-            }
-        }
-        else if (colorType != null){
-            colorTypeComboBoxesArray[0].setSelectedItem(color);
-        }
+    private void removeOldComboBoxes(){
+        comboBoxPanel.removeAll();
     }
 }
