@@ -317,8 +317,8 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initTransportArcExpressionPanel(){
         transportExprTabbedPane = new JTabbedPane();
-        inputPanel = new ColorExpressionDialogPanel(context, transportInputExpr, true);
-        outputPanel = new ColorExpressionDialogPanel(context, transportOutputExpr, true);
+        inputPanel = new ColorExpressionDialogPanel(context, transportInputExpr, true, true);
+        outputPanel = new ColorExpressionDialogPanel(context, transportOutputExpr, true, true);
 
         transportExprTabbedPane.add(inputPanel, "input");
         transportExprTabbedPane.add(outputPanel, "output");
@@ -367,20 +367,12 @@ public class ColoredArcGuardPanel extends JPanel {
         editButtonsGroup.add(redoButton);
         editButtonsGroup.add(editExprButton);
 
-        deleteExprSelectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                deleteSelection();
-            }
-        });
+        deleteExprSelectionButton.addActionListener(actionEvent -> deleteSelection());
 
-        resetExprButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                PlaceHolderArcExpression pHExpr = new PlaceHolderArcExpression();
-                arcExpression = arcExpression.replace(arcExpression, pHExpr);
-                updateSelection(pHExpr);
-            }
+        resetExprButton.addActionListener(actionEvent -> {
+            PlaceHolderArcExpression pHExpr = new PlaceHolderArcExpression();
+            arcExpression = arcExpression.replace(arcExpression, pHExpr);
+            updateSelection(pHExpr);
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -573,18 +565,11 @@ public class ColoredArcGuardPanel extends JPanel {
 
         numberExpressionJSpinner = new JSpinner(numberModelNumber);
         numberExpressionButton = new JButton("Number Expr");
-
-
-
-        allExpressionComboBox = new JComboBox();
+        JLabel colorTypeLabel = new JLabel("<html>Color type is: " + colorType.toString());
         allExpressionJSpinner = new JSpinner(numberModelAll);
         allExpressionButton = new JButton("All Expression");
 
         editColorExpressionButton = new JButton("Edit Color Expr");
-
-        for (ColorType element : context.activeModel().parentNetwork().colorTypes()) {
-            allExpressionComboBox.addItem(element);
-        }
 
         numberExpressionJSpinner.setPreferredSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
@@ -593,10 +578,6 @@ public class ColoredArcGuardPanel extends JPanel {
         allExpressionJSpinner.setPreferredSize(new Dimension(50, 27));
         allExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
         allExpressionJSpinner.setMaximumSize(new Dimension(50, 27));
-
-        allExpressionComboBox.setPreferredSize(new Dimension(150, 27));
-        allExpressionComboBox.setMinimumSize(new Dimension(150, 27));
-        allExpressionComboBox.setMaximumSize(new Dimension(150, 27));
 
         numberExpressionButton.setPreferredSize(new Dimension(125, 27));
         numberExpressionButton.setMinimumSize(new Dimension(125, 27));
@@ -611,87 +592,65 @@ public class ColoredArcGuardPanel extends JPanel {
         editColorExpressionButton.setPreferredSize(new Dimension(125, 27));
 
 
-       allExpressionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                addAllExpression();
-            }
-        });
+       allExpressionButton.addActionListener(actionEvent -> addAllExpression());
 
-        numberExpressionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                addNumberExpression();
-            }
-        });
+        numberExpressionButton.addActionListener(actionEvent -> addNumberExpression());
 
-        editColorExpressionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (currentSelection.getObject() instanceof ColorExpression) {
-                    ColorExpression colorExpr = (ColorExpression)currentSelection.getObject();
+        editColorExpressionButton.addActionListener(actionEvent -> {
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                ColorExpression colorExpr = (ColorExpression)currentSelection.getObject();
 
-                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
-                    Container contentPane = guiDialog.getContentPane();
+                EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
+                Container contentPane = guiDialog.getContentPane();
 
-                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, colorExpr, false);
-                    contentPane.add(cep);
+                ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, colorExpr, false, true);
+                contentPane.add(cep);
 
-                    guiDialog.setResizable(true);
-                    guiDialog.pack();
-                    guiDialog.setLocationRelativeTo(null);
-                    guiDialog.setVisible(true);
+                guiDialog.setResizable(true);
+                guiDialog.pack();
+                guiDialog.setLocationRelativeTo(null);
+                guiDialog.setVisible(true);
 
-                    if (cep.clickedOK == true) {
-                        ColorExpression expr = cep.getColorExpression();
-                        arcExpression = arcExpression.replace(currentSelection.getObject(), expr);
-                        updateSelection(expr);
-                    }
+                if (cep.clickedOK == true) {
+                    ColorExpression expr = cep.getColorExpression();
+                    arcExpression = arcExpression.replace(currentSelection.getObject(), expr);
+                    updateSelection(expr);
                 }
-                else {
-                    JOptionPane.showMessageDialog(CreateGui.getApp(), "You have to select a colored placeholder location <+> or a color expression already added in the expression to add a color expression.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                }
+            }
+            else {
+                JOptionPane.showMessageDialog(CreateGui.getApp(), "You have to select a colored placeholder location <+> or a color expression already added in the expression to add a color expression.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.WEST;
+        numberExprPanel.add(colorTypeLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0, 0,5 ,5 );
         numberExprPanel.add(allExpressionJSpinner, gbc);
 
         gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.WEST;
-        numberExprPanel.add(allExpressionComboBox, gbc);
-
-        gbc.gridx = 2;
         numberExprPanel.add(allExpressionButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0, 0,5 ,5 );
         numberExprPanel.add(numberExpressionJSpinner, gbc);
 
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         numberExprPanel.add(numberExpressionButton, gbc);
 
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setEnabled(true);
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 3;
-        gbc.insets = new Insets(2, 0, 2, 0);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        numberExprPanel.add(separator,gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         numberExprPanel.add(editColorExpressionButton, gbc);
@@ -779,7 +738,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void addAllExpression() {
-        AllExpression allExpr = new AllExpression((ColorType) allExpressionComboBox.getItemAt(allExpressionComboBox.getSelectedIndex()));
+        AllExpression allExpr = new AllExpression(colorType);
         Integer value = (Integer)allExpressionJSpinner.getValue();
         NumberOfExpression numbExpr = new NumberOfExpression(value, allExpr);
         if (currentSelection.getObject() instanceof ArcExpression) {
@@ -795,7 +754,11 @@ public class ColoredArcGuardPanel extends JPanel {
         NumberOfExpression numbExpr;
         if (currentSelection.getObject() instanceof NumberOfExpression) {
             numbExpr = new NumberOfExpression(value, ((NumberOfExpression)currentSelection.getObject()).getColor());
-        } else {
+            if (numbExpr.getColor() == null){
+                numbExpr = new NumberOfExpression(value, colorExprVec);
+            }
+
+        } else{
             numbExpr = new NumberOfExpression(value, colorExprVec);
         }
         arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
@@ -861,8 +824,7 @@ public class ColoredArcGuardPanel extends JPanel {
         if (!isTransportArc && isInputArc) {
             TimedInputArc inputArc = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc();
             if (inputArc.getArcExpression() != null) {
-                PlaceHolderArcExpression placeholderArc = new PlaceHolderArcExpression();
-                arcExpression = placeholderArc;
+                arcExpression = new PlaceHolderArcExpression();
                 updateSelection(arcExpression);
                 parseExpression(inputArc.getArcExpression());
             } else {
@@ -871,8 +833,7 @@ public class ColoredArcGuardPanel extends JPanel {
             }
         } else if (!isTransportArc) {
             if ((((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression() != null) {
-                PlaceHolderArcExpression placeholderArc = new PlaceHolderArcExpression();
-                arcExpression = placeholderArc;
+                arcExpression = new PlaceHolderArcExpression();
                 updateSelection(arcExpression);
                 parseExpression((((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression());
             } else {
@@ -883,8 +844,7 @@ public class ColoredArcGuardPanel extends JPanel {
             TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
             if (isInputArc) {
                 if (transportArc.getInputExpression() != null) {
-                    PlaceHolderArcExpression placeHolderArcExpression = new PlaceHolderArcExpression();
-                    arcExpression = placeHolderArcExpression;
+                    arcExpression = new PlaceHolderArcExpression();
                     updateSelection(arcExpression);
                     parseExpression(transportArc.getInputExpression());
                 } else {
@@ -893,8 +853,7 @@ public class ColoredArcGuardPanel extends JPanel {
                 }
             } else {
                 if (transportArc.getOutputExpression() != null) {
-                    PlaceHolderArcExpression placeHolderArcExpression = new PlaceHolderArcExpression();
-                    arcExpression = placeHolderArcExpression;
+                    arcExpression = new PlaceHolderArcExpression();
                     updateSelection(arcExpression);
                     parseExpression(transportArc.getOutputExpression());
                 } else {
@@ -908,9 +867,6 @@ public class ColoredArcGuardPanel extends JPanel {
         int index = exprField.getCaretPosition();
         ExprStringPosition position = arcExpression.objectAt(index);
         Logger.log(position.getObject().toString());
-        if (position == null) {
-            return;
-        }
 
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
@@ -1074,7 +1030,6 @@ public class ColoredArcGuardPanel extends JPanel {
     JList timeConstraintList;
     private ExprStringPosition currentSelection = null;
     JSpinner numberExpressionJSpinner;
-    JComboBox allExpressionComboBox;
     JSpinner allExpressionJSpinner;
     private ArcExpression arcExpression;
     private JTextPane exprField;

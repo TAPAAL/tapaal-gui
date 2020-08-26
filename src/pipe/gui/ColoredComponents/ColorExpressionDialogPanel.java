@@ -60,23 +60,26 @@ public class ColorExpressionDialogPanel extends JPanel {
     ButtonGroup exitButtons;
 
     private boolean transport;
+    private boolean isArc;
 
 
 
 
-    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport) {
+    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport, boolean isArc) {
         this.rootPane = rootPane;
         this.context = context;
         this.expr = expr;
         this.transport = transport;
+        this.isArc = isArc;
         initComponents();
     }
 
-    public ColorExpressionDialogPanel(Context context, ColorExpression expr, boolean transport) {
+    public ColorExpressionDialogPanel(Context context, ColorExpression expr, boolean transport, boolean isArc) {
         this.rootPane = rootPane;
         this.context = context;
         this.expr = expr;
         this.transport = transport;
+        this.isArc = isArc;
         initComponents();
     }
 
@@ -84,6 +87,7 @@ public class ColorExpressionDialogPanel extends JPanel {
         this.rootPane = rootPane;
         this.context = context;
         this.transport = false;
+        this.isArc = false;
         initComponents();
     }
 
