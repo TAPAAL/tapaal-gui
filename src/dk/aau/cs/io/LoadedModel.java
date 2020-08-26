@@ -23,10 +23,6 @@ public class LoadedModel implements LoadedBatchProcessingModel {
         this.queries = queries;
         this.lens = lens;
         this.messages = messages;
-
-        if (lens == null) {
-            messages.add("Net did not contain feature information, it has been auto-detected.");
-        }
     }
 
 	public Collection<Template> templates(){ return templates; }
@@ -38,7 +34,7 @@ public class LoadedModel implements LoadedBatchProcessingModel {
         if (lens != null) {
             return lens;
         } else {
-            boolean isNetTimed = network().isUntimed();
+            boolean isNetTimed = !network().isUntimed();
             boolean isNetGame = network().hasUncontrollableTransitions();
 
             return new TabContent.TAPNLens(isNetTimed, isNetGame);

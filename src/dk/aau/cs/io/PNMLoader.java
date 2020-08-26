@@ -53,7 +53,7 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
 
-    private final TabContent.TAPNLens lens = new TabContent.TAPNLens(false, false);
+    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
     enum GraphicsType { Position, Offset }
 

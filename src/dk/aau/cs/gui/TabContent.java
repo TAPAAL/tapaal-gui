@@ -613,60 +613,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             return tab;
 		} catch (Exception e) {
-			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+			//throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+            throw e;
 		}
 
 	}
 
-    private TabContent createNewTabFromInputStream(InputStream file, String name, FeatureOption option, boolean isYes) throws Exception {
-
-        try {
-            ModelLoader loader = new ModelLoader();
-            LoadedModel loadedModel = loader.load(file);
-
-            if (loadedModel.getMessages().size() != 0) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                        String message = "While loading the net we found one or more warnings: \n\n";
-                        for (String s : loadedModel.getMessages()) {
-                            message += s + "\n\n";
-                        }
-
-                        new MessengerImpl().displayInfoMessage(message, "Warning");
-                    }
-                }).start();
-            }
-
-            TabContent tab;
-
-            switch (option) {
-                case TIME:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame());
-                    break;
-                case GAME:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes);
-                    break;
-                default:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame());
-                    break;
-            }
-
-            tab.setInitialName(name);
-
-            tab.selectFirstElements();
-
-            tab.setFile(null);
-
-            return tab;
-        } catch (Exception e) {
-            throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
-        }
-
-    }
-
-	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
+    public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
 		TabContent tab = new TabContent(isTimed, isGame);
 		tab.setInitialName(name);
 
@@ -692,7 +645,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
-                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries());
+                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
                 String name = null;
 
@@ -816,8 +769,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         Require.that(network != null, "network cannot be null");
         Require.notNull(lens, "Lens can't be null");
-        this.lens = lens;
+
         tapnNetwork = network;
+        this.lens = lens;
 
         guiModels.clear();
         for (Template template : templates) {
@@ -868,13 +822,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animationModeController = new CanvasAnimationController(getAnimator());
     }
 
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame) {
-        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame));
-    }
-
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates, tapnqueries,  new TAPNLens(true, false));
-    }
 	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
