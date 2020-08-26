@@ -622,142 +622,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
-        EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
-            "name_verifyTAPN", //name of engine
-            false, //  support fastest trace
-            false, // support deadlock with net degree 2 and (EF or AG)
-            false, //  support deadlock with EG or AF
-            false, // support deadlock with inhibitor arcs
-            false,  //support weights
-            true,  //support inhibitor arcs
-            false, // support urgent transitions
-            false, // support EG or AF
-            true, // support strict nets
-            true, //  support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            false, //support EG or AF with net degree > 2
-            false); //support nested quantification
+        EngineSupportOptions verifyTAPNOptions= new VerifyTAPNOptions();
 
-       EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
-            "name_COMBI",//name of engine
-            false,//  support fastest trace
-            true,// support deadlock with net degree 2 and (EF or AG)
-            false,//  support deadlock with EG or AF
-            false,// support deadlock with inhibitor arcs
-            true, //support weights
-            true, //support inhibitor arcs
-            true,// support urgent transitions
-            true,// support EG or AF
-            true,// support strict nets
-            true,//  support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            true, //support EG or AF with net degree > 2);
-            false); //support nested quantification
-
-       EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
-            "name_OPTIMIZEDSTANDARD",//name of engine
-            false,//  support fastest trace
-            false,// support deadlock with net degree 2 and (EF or AG)
-            false,//  support deadlock with EG or AF
-            false,// support deadlock with inhibitor arcs
-            false, //support weights
-            false, //support inhibitor arcs
-            false,// support urgent transitions
-            true,// support EG or AF
-            true,// support strict nets
-            true,//  support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            false,//support EG or AF with net degree > 2);
-            false); //support nested quantification
-
-        EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
-            "name_STANDARD",//name of engine
-            false,//  support fastest trace
-            false,// support deadlock with net degree 2 and (EF or AG)
-            false,//  support deadlock with EG or AF
-            false,// support deadlock with inhibitor arcs
-            false, //support weights
-            false, //support inhibitor arcs
-            false,// support urgent transitions
-            false,// support EG or AF
-            true,// support strict nets
-            true,//  support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            false, //support EG or AF with net degree > 2);
-            false); //support nested quantification
-
-
-        EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
-            "name_BROADCAST",//name of engine
-            false,//  support fastest trace
-            true,// support deadlock with net degree 2 and (EF or AG)
-            false,//  support deadlock with EG or AF
-            false,// support deadlock with inhibitor arcs
-            false, //support weights
-            true, //support inhibitor arcs
-            false,// support urgent transitions
-            true,// support EG or AF
-            true,// support strict nets
-            true,//  support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            true, //support EG or AF with net degree > 2);
-            false); //support nested quantification
-
-        EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
-            "name_BROADCASTDEG2",//name of engine
-            false,//  support fastest trace
-            true,// support deadlock with net degree 2 and (EF or AG)
-            false,//  support deadlock with EG or AF
-            false,// support deadlock with inhibitor arcs
-            false, //support weights
-            true, //support inhibitor arcs
-            false,// support urgent transitions
-            true,// support EG or AF
-            true,// support strict nets
-            true,//  support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            true,//support EG or AF with net degree > 2);
-            false); //support nested quantification
-
-        EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
-            "name_DISCRETE",//name of engine
-            true,//  support fastest trace
-            true,// support deadlock with net degree 2 and (EF or AG)
-            true,//  support deadlock with EG or AF
-            true,// support deadlock with inhibitor arcs
-            true, //support weights
-            true, //support inhibitor arcs
-            true,// support urgent transitions
-            true,// support EG or AF
-            false,// support strict nets
-            true,//  support timed nets/time intervals
-            true,// support deadlock with net degree > 2
-            true, //support games
-            true, //support EG or AF with net degree > 2);
-            false); //support nested quantification
-
-        EngineSupportOptions verifyPNOptions = new EngineSupportOptions(
-            "name_UNTIMED",
-            false,
-            true,
-            true,
-            true,
-            true,
-            true,
-            false,
-            true,
-            false,
-            false,
-            true,
-            false,
-            true,
-            true);
+        EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
+        EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
+        EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+        EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
+        EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options(); //support nested quantification
+        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNOptions(); //support nested quantification
+        EngineSupportOptions verifyPNOptions = new VerifyPNOptions();
 
         EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
         TimedArcPetriNetNetwork net = tab.network();
