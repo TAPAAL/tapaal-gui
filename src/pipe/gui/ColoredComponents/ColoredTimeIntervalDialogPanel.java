@@ -11,7 +11,6 @@ import pipe.gui.widgets.WidthAdjustingComboBox;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,8 +22,7 @@ import java.util.*;
 public class ColoredTimeIntervalDialogPanel extends JPanel {
 
     Context context;
-    ColoredTimeInterval oldTimeInvariant;
-    ColoredTimeInterval newTimeInvariant;
+    ColoredTimeInterval coloredTimeInterval;
     JRootPane rootPane;
 
     JPanel buttonPanel;
@@ -33,8 +31,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
     JPanel guardEditPanel;
     JLabel label;
-    JComboBox leftDelimiter;
-    JComboBox rightDelimiter;
+    JComboBox<String> leftDelimiter;
+    JComboBox<String> rightDelimiter;
     JCheckBox inf;
     JSpinner secondIntervalNumber;
     JSpinner firstIntervalNumber;
@@ -43,26 +41,22 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     JComboBox rightConstantsComboBox;
     JCheckBox rightUseConstant;
     int maxNumberOfPlacesToShowAtOnce = 20;
-    boolean editConfirmed = false;
-
-
-
 
     public ColoredTimeIntervalDialogPanel(JRootPane rootPane, Context context, ColoredTimeInterval cti) {
         this.context = context;
-        this.oldTimeInvariant = cti;
+        this.coloredTimeInterval = cti;
         this.rootPane = rootPane;
         initPanel();
 
         setTimeInterval(cti);
     }
     public ColoredTimeInterval getInterval() {
-        return composeGuard(oldTimeInvariant);
+        return composeGuard(coloredTimeInterval);
     }
 
     public void setTimeInterval(ColoredTimeInterval cti) {
         String intervalAsString = cti.getInterval();
-        oldTimeInvariant = cti;
+        coloredTimeInterval = cti;
 
         String[] partedTimeInterval = intervalAsString.split(",");
         String firstNumber = partedTimeInterval[0].substring(1,
@@ -162,7 +156,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
                 || leftInterval.value() <= rightInterval.value()) {
             return new ColoredTimeInterval(
                     (leftDelim.equals("[") ? true : false), leftInterval,
-                    rightInterval, (rightDelim.equals("]") ? true : false), oldTimeInvariant.getColor());
+                    rightInterval, (rightDelim.equals("]") ? true : false), coloredTimeInterval.getColor());
         } else {
             return oldGuard;
         }
@@ -182,38 +176,36 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         guardEditPanel.add(label, gridBagConstraints);
 
         String[] left = { "[", "(" };
-        leftDelimiter = new JComboBox();
+        leftDelimiter = new JComboBox<>();
         Dimension dims = new Dimension(55, 25);
         leftDelimiter.setPreferredSize(dims);
         leftDelimiter.setMinimumSize(dims);
         leftDelimiter.setMaximumSize(dims);
-        leftDelimiter.setModel(new DefaultComboBoxModel(left));
+        leftDelimiter.setModel(new DefaultComboBoxModel<>(left));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         guardEditPanel.add(leftDelimiter, gridBagConstraints);
 
         String[] right = { "]", ")" };
-        rightDelimiter = new JComboBox();
+        rightDelimiter = new JComboBox<>();
         rightDelimiter.setPreferredSize(dims);
         rightDelimiter.setMinimumSize(dims);
         rightDelimiter.setMaximumSize(dims);
-        rightDelimiter.setModel(new DefaultComboBoxModel(right));
+        rightDelimiter.setModel(new DefaultComboBoxModel<>(right));
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 1;
         guardEditPanel.add(rightDelimiter, gridBagConstraints);
 
         inf = new JCheckBox("inf", true);
-        inf.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if (inf.isSelected()) {
-                    secondIntervalNumber.setEnabled(false);
-                    rightDelimiter.setEnabled(false);
-                } else {
-                    secondIntervalNumber.setEnabled(true);
-                    rightDelimiter.setEnabled(true);
-                }
-                setDelimiterModels();
+        inf.addActionListener(evt -> {
+            if (inf.isSelected()) {
+                secondIntervalNumber.setEnabled(false);
+                rightDelimiter.setEnabled(false);
+            } else {
+                secondIntervalNumber.setEnabled(true);
+                rightDelimiter.setEnabled(true);
             }
+            setDelimiterModels();
         });
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 1;
@@ -237,11 +229,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         //	firstIntervalNumber.setMaximumSize(intervalBoxDims);
         //	firstIntervalNumber.setMinimumSize(intervalBoxDims);
         firstIntervalNumber.setPreferredSize(intervalBoxDims);
-        firstIntervalNumber.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent evt) {
-                firstSpinnerStateChanged(evt);
-            }
-        });
+        firstIntervalNumber.addChangeListener(this::firstSpinnerStateChanged);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -257,11 +245,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         secondIntervalNumber.setMaximumSize(intervalBoxDims);
         secondIntervalNumber.setMinimumSize(intervalBoxDims);
         secondIntervalNumber.setPreferredSize(intervalBoxDims);
-        secondIntervalNumber.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent evt) {
-                secondSpinnerStateChanged(evt);
-            }
-        });
+        secondIntervalNumber.addChangeListener(this::secondSpinnerStateChanged);
 
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
@@ -276,12 +260,10 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         boolean enableConstantsCheckBoxes = !constants.isEmpty();
         leftUseConstant = new JCheckBox("Use Constant                    ");
         leftUseConstant.setEnabled(enableConstantsCheckBoxes);
-        leftUseConstant.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateLeftComponents();
-                updateRightConstantComboBox();
-                setDelimiterModels();
-            }
+        leftUseConstant.addActionListener(e -> {
+            updateLeftComponents();
+            updateRightConstantComboBox();
+            setDelimiterModels();
         });
 
         gridBagConstraints = new GridBagConstraints();
@@ -291,7 +273,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
 
         leftConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-        leftConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+        leftConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
         //	leftConstantsComboBox = new JComboBox(constants.toArray());
         leftConstantsComboBox.setMaximumRowCount(20);
         leftConstantsComboBox.setVisible(false);
@@ -314,12 +296,10 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         rightUseConstant = new JCheckBox("Use Constant                    ");
         rightUseConstant.setEnabled(enableConstantsCheckBoxes);
-        rightUseConstant.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateRightComponents();
-                updateRightConstantComboBox();
-                setDelimiterModels();
-            }
+        rightUseConstant.addActionListener(e -> {
+            updateRightComponents();
+            updateRightConstantComboBox();
+            setDelimiterModels();
         });
 
         gridBagConstraints = new GridBagConstraints();
@@ -328,18 +308,16 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
         rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-        rightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+        rightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
         rightConstantsComboBox.setMaximumRowCount(20);
         rightConstantsComboBox.setVisible(false);
         //	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
         //	rightConstantsComboBox.setMinimumSize(intervalBoxDims);
         rightConstantsComboBox.setPreferredSize(intervalBoxDims);
         gridBagConstraints = new GridBagConstraints();
-        rightConstantsComboBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    setDelimiterModels();
-                }
+        rightConstantsComboBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                setDelimiterModels();
             }
         });
 
@@ -352,15 +330,15 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         int firstValue = getFirstValue();
         int secondValue = getSecondValue();
 
-        DefaultComboBoxModel modelRightIncludedOnly = new DefaultComboBoxModel(
+        DefaultComboBoxModel<String> modelRightIncludedOnly = new DefaultComboBoxModel<>(
                 new String[] { "]" });
-        DefaultComboBoxModel modelLeftIncludedOnly = new DefaultComboBoxModel(
+        DefaultComboBoxModel<String> modelLeftIncludedOnly = new DefaultComboBoxModel<>(
                 new String[] { "[" });
-        DefaultComboBoxModel modelRightBoth = new DefaultComboBoxModel(
+        DefaultComboBoxModel<String> modelRightBoth = new DefaultComboBoxModel<>(
                 new String[] { "]", ")" });
-        DefaultComboBoxModel modelLeftBoth = new DefaultComboBoxModel(
+        DefaultComboBoxModel<String> modelLeftBoth = new DefaultComboBoxModel<>(
                 new String[] { "[", "(" });
-        DefaultComboBoxModel modelRightExcludedOnly = new DefaultComboBoxModel(
+        DefaultComboBoxModel<String> modelRightExcludedOnly = new DefaultComboBoxModel<>(
                 new String[] { ")" });
 
         if (firstValue > secondValue) {
@@ -455,14 +433,9 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
                 .constants();
 
         //List <Constant> constantList = new ArrayList(constants);
-        List<Constant> constantList = new ArrayList<Constant>();
-        constantList.addAll(constants);
+        List<Constant> constantList = new ArrayList<Constant>(constants);
 
-        Collections.sort(constantList,new Comparator<Constant>() {
-            public int compare(Constant o1, Constant o2) {
-                return o1.name().compareToIgnoreCase(o2.name());
-            }
-        });
+        constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
 
         for (Constant c : constantList) {
