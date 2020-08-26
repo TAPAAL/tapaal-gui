@@ -64,11 +64,13 @@ public class ColoredArcGuardPanel extends JPanel {
         setTimeConstraints();
         updateSelection();
         hideIrrelevantInformation();
+        initColorExpressionEditPanel();
 
         //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         editExprButton.setEnabled(false);
+
     }
 
     public void hideIrrelevantInformation(){
@@ -333,19 +335,27 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initRegularArcExpressionPanel(){
         regularArcExprPanel = new JPanel(new GridBagLayout());
-        regularArcExprPanel.setBorder(BorderFactory.createTitledBorder("Arc Expressions"));
         initExprField();
         initNumberExpressionsPanel();
         initArithmeticPanel();
         initEditPanel();
 
+        expressionPanel = new JPanel(new GridBagLayout());
+        expressionPanel.setBorder(BorderFactory.createTitledBorder("Arc Expression"));
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        expressionPanel.add(regularArcExprPanel, gbc);
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
-        add(regularArcExprPanel, gbc);
+        add(expressionPanel, gbc);
     }
 
     private void initEditPanel() {
@@ -735,8 +745,19 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 3;
         regularArcExprPanel.add(exprScrollPane, gbc);
+    }
+
+    private void initColorExpressionEditPanel(){
+        ColorExpressionDialogPanel colorExpressionDialogPanel = new ColorExpressionDialogPanel(context,  new PlaceHolderColorExpression(), false, colorType);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        colorExpressionDialogPanel.hideExprField();
+        expressionPanel.add(colorExpressionDialogPanel, gbc);
+
     }
 
     private void addAllExpression() {
@@ -1056,6 +1077,7 @@ public class ColoredArcGuardPanel extends JPanel {
     JSpinner colorExpressionWeightSpinner;
     ColorComboboxPanel colorIntervalComboboxPanel;
     ColoredTimeIntervalDialogPanel intervalEditorPanel;
+    JPanel expressionPanel;
 
 
 }

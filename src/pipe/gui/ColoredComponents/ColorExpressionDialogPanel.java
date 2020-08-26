@@ -702,4 +702,11 @@ public class ColorExpressionDialogPanel extends JPanel {
         gbc.gridwidth = 4;
         exprPanel.add(exprScrollPane, gbc);
     }
+
+    public void hideExprField(){
+        exprScrollPane.setVisible(false);
+        exprPanel.setBorder(null);
+        editPanel.setVisible(false);
+        exitPanel.setVisible(false);
+    }
 }
