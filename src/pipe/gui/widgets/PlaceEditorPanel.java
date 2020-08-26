@@ -9,9 +9,6 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import dk.aau.cs.model.CPN.*;
@@ -25,7 +22,6 @@ import pipe.dataLayer.Template;
 import pipe.gui.ColoredComponents.ColorComboboxPanel;
 import pipe.gui.ColoredComponents.ColoredTimeInvariantDialogPanel;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
@@ -49,7 +45,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	
 	private JCheckBox sharedCheckBox;
 	private JCheckBox makeNewSharedCheckBox;
-	private WidthAdjustingComboBox<TimedPlace> sharedPlacesComboBox;
+	private WidthAdjustingComboBox sharedPlacesComboBox;
 
 	private final TimedPlaceComponent place;
 	private final Context context;
@@ -742,7 +738,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = 3;
         gbc.insets = new Insets(3, 3, 3,3);
-        //tokenPanel.add(tokenListScrollPane, gbc);
         tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
         tokenPanel.add(tokenListScrollPane, gbc);
 
@@ -989,7 +984,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridy = 1;
         //gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
         nonDefaultColorInvariantPanel.add(timeConstraintScrollPane, gbc);
 
         return nonDefaultColorInvariantPanel;
@@ -1147,7 +1141,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         if(tableModel.getRowCount() > 0){
             int currSize = tableModel.getRowCount();
             for(int i = 0; i < currSize; i++){
-                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex())).toString())){
+                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()).toString())){
                     addTokenSpinner.setValue(tokenTable.getValueAt(i,0));
                     existsAlready = true;
                 }
@@ -1216,8 +1210,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     private ColorComboboxPanel tokenColorComboboxPanel;
     private ColorType colorType;
     JPanel timeInvariantColorPanel;
-    DefaultListModel timeConstraintListModel;
-    JList timeConstraintList;
+    DefaultListModel<ColoredTimeInvariant> timeConstraintListModel;
+    JList<ColoredTimeInvariant> timeConstraintList;
     JComboBox<ColorType>  colorTypeComboBox;
     JPanel colorTypePanel;
     JSpinner addTokenSpinner;

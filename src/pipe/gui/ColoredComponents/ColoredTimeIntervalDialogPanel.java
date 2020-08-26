@@ -53,15 +53,16 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         this.oldTimeInvariant = cti;
         this.rootPane = rootPane;
         initPanel();
-        initButtonPanel();
 
-        setOldTimeInterval(cti);
+        setTimeInterval(cti);
     }
-    public boolean isEditConfirmed() {return editConfirmed;}
-    public ColoredTimeInterval getNewTimeInterval() {return newTimeInvariant;}
+    public ColoredTimeInterval getInterval() {
+        return composeGuard(oldTimeInvariant);
+    }
 
-    private void setOldTimeInterval(ColoredTimeInterval cti) {
+    public void setTimeInterval(ColoredTimeInterval cti) {
         String intervalAsString = cti.getInterval();
+        oldTimeInvariant = cti;
 
         String[] partedTimeInterval = intervalAsString.split(",");
         String firstNumber = partedTimeInterval[0].substring(1,
@@ -95,6 +96,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
                     Integer.MAX_VALUE, 1);
         } else {
             inf.setSelected(false);
+            secondIntervalNumber.setEnabled(true);
+            rightDelimiter.setEnabled(true);
             spinnerModelForSecondNumber = new SpinnerNumberModel(second, 0,
                     Integer.MAX_VALUE, 1);
         }
@@ -163,105 +166,6 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         } else {
             return oldGuard;
         }
-    }
-
-    private void exit() {
-        rootPane.getParent().setVisible(false);
-    }
-
-    private void initButtonPanel() {
-        buttonPanel = new JPanel(new GridBagLayout());
-        okButton = new JButton("OK");
-        cancelButton = new JButton("Cancel");
-
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                editConfirmed = true;
-                boolean isLowerIncluded;
-                boolean isUpperIncluded;
-
-
-                /*
-                if (leftDelimiter.getItemAt(leftDelimiter.getSelectedIndex()).toString().equals("["))
-                    isLowerIncluded = true;
-                else
-                    isLowerIncluded = false;
-
-                if (rightDelimiter.getItemAt(rightDelimiter.getSelectedIndex()).toString().equals("]"))
-                    isUpperIncluded = true;
-                else
-                    isUpperIncluded = false;
-                    */
-
-                ColoredTimeInterval cti;
-                cti = composeGuard(oldTimeInvariant);
-                newTimeInvariant = cti;
-                exit();
-
-                /*
-                Bound lowerBound = new RatBound(new BigDecimal(Double.valueOf(firstIntervalNumber.getValue().toString())));
-                Bound upperBound = new RatBound(new BigDecimal(Double.valueOf(secondIntervalNumber.getValue().toString())));
-                if(inf.isSelected()) {
-                    upperBound = new RatBound(new BigDecimal(-1));
-                }
-                if(leftUseConstant.isSelected()) {
-                    Constant leftConstant = context.network().getConstant((String)leftConstantsComboBox.getSelectedItem());
-                    if(rightUseConstant.isSelected()) {
-                        Constant rightConstant = context.network().getConstant((String)rightConstantsComboBox.getSelectedItem());
-                        cti = new ColoredTimeInterval(isLowerIncluded, new ConstantBound(leftConstant), new ConstantBound(rightConstant),
-                                isUpperIncluded, oldTimeInvariant.getColor());
-                    }else if (upperBound.value() == -1) {
-                        cti = new ColoredTimeInterval(isLowerIncluded, new ConstantBound(leftConstant), Bound.Infinity,
-                                isUpperIncluded, oldTimeInvariant.getColor());
-                    }else {
-                        cti = new ColoredTimeInterval(isLowerIncluded, new ConstantBound(leftConstant), upperBound,
-                                isUpperIncluded, oldTimeInvariant.getColor());
-                    }
-                }
-                else if (rightUseConstant.isSelected()) {
-                    Constant rightConstant = context.network().getConstant((String)rightConstantsComboBox.getSelectedItem());
-                    cti = new ColoredTimeInterval(isLowerIncluded, lowerBound, new ConstantBound(rightConstant), isUpperIncluded, oldTimeInvariant.getColor());
-                }else {
-                    if (upperBound.value() == -1)
-                        cti = new ColoredTimeInterval(isLowerIncluded, lowerBound, Bound.Infinity, isUpperIncluded, oldTimeInvariant.getColor());
-                    else
-                        cti = new ColoredTimeInterval(isLowerIncluded, lowerBound, upperBound, isUpperIncluded, oldTimeInvariant.getColor());
-                }
-                newTimeInvariant = cti;
-                exit();
-
-                 */
-            }
-        });
-
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                editConfirmed = false;
-                exit();
-            }
-        });
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        buttonPanel.add(cancelButton, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        buttonPanel.add(okButton, gridBagConstraints);
-
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 10);
-        add(buttonPanel, gridBagConstraints);
     }
 
     private void initPanel() {

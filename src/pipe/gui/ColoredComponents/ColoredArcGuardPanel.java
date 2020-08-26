@@ -21,6 +21,8 @@ import pipe.gui.widgets.EscapableDialog;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -69,7 +71,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
     public void hideIrrelevantInformation(){
         if(!objectToBeEdited.isTimed()){
-            arcColorInvariantPanel.setVisible(false);
+            nonDefaultArcColorIntervalPanel.setVisible(false);
         }
         if(isTransportArc){
             regularArcExprPanel.setVisible(false);
@@ -140,113 +142,115 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
-        add(initColorConstraintPanel(), gbc);
+        add(initNonDefaultColorIntervalPanel(), gbc);
     }
 
-    private JPanel initColorConstraintPanel() {
-        arcColorInvariantPanel = new JPanel(new GridBagLayout());
-        ColorComboboxPanel colorComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
+    private JPanel initNonDefaultColorIntervalPanel() {
+        nonDefaultArcColorIntervalPanel = new JPanel(new GridBagLayout());
+        JPanel colorIntervalEditPanel = new JPanel(new GridBagLayout());
+        nonDefaultArcColorIntervalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Color specific time intervals"));
+
+        colorIntervalComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-
+                ColoredTimeInterval timeConstraint;
+                if (!(colorType instanceof ProductType)) {
+                    timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR((dk.aau.cs.model.CPN.Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
+                } else {
+                    Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<dk.aau.cs.model.CPN.Color>();
+                    for (int i = 0; i < comboBoxes.length; i++) {
+                        colors.add((dk.aau.cs.model.CPN.Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
+                    }
+                    dk.aau.cs.model.CPN.Color color = new dk.aau.cs.model.CPN.Color(colorType, 0, colors);
+                    timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
+                }
+                boolean alreadyExists = false;
+                for (int i = 0; i < timeConstraintListModel.size(); i++) {
+                    if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
+                        intervalEditorPanel.setTimeInterval((ColoredTimeInterval) timeConstraintListModel.get(i));
+                        addTimeConstraintButton.setText("Modify");
+                        alreadyExists = true;
+                    }
+                }
+                if(!alreadyExists){
+                    intervalEditorPanel.setTimeInterval(timeConstraint);
+                    addTimeConstraintButton.setText("Add");
+                }
             }
         };
+        colorIntervalComboboxPanel.removeScrollPaneBorder();
 
         addTimeConstraintButton = new JButton("Add");
         removeTimeConstraintButton = new JButton("Remove");
-        editTimeConstraintButton = new JButton("Edit");
 
         Dimension buttonSize = new Dimension(80, 27);
 
         addTimeConstraintButton.setPreferredSize(buttonSize);
         removeTimeConstraintButton.setPreferredSize(buttonSize);
-        editTimeConstraintButton.setPreferredSize(buttonSize);
 
         timeConstraintListModel = new DefaultListModel();
         timeConstraintList = new JList(timeConstraintListModel);
+        timeConstraintList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        timeConstraintListModel.addListDataListener(new ListDataListener() {
+            public void contentsChanged(ListDataEvent arg0) {
+            }
+
+            public void intervalAdded(ListDataEvent arg0) {
+                timeConstraintList.setSelectedIndex(arg0.getIndex0());
+                timeConstraintList.ensureIndexIsVisible(arg0.getIndex0());
+            }
+
+            public void intervalRemoved(ListDataEvent arg0) {
+                int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+                timeConstraintList.setSelectedIndex(index);
+                timeConstraintList.ensureIndexIsVisible(index);
+            }
+
+        });
+        timeConstraintList.addListSelectionListener(listSelectionEvent -> {
+            if (!listSelectionEvent.getValueIsAdjusting()) {
+                JList source = (JList) listSelectionEvent.getSource();
+                if(source.getSelectedIndex() >= 0){
+                    ColoredTimeInterval cti = (ColoredTimeInterval) source.getModel().getElementAt(source.getSelectedIndex());
+                    intervalEditorPanel.setTimeInterval(cti);
+                    colorIntervalComboboxPanel.updateSelection(cti.getColor());
+                    addTimeConstraintButton.setText("Modify");
+                }
+                if(timeConstraintList.isSelectionEmpty()){
+                    removeTimeConstraintButton.setEnabled(false);
+                } else{
+                    removeTimeConstraintButton.setEnabled(true);
+                }
+            }
+        });
         JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
         timeConstraintScrollPane.setViewportView(timeConstraintList);
         timeConstraintScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-
         timeConstraintScrollPane.setBorder(BorderFactory.createTitledBorder("Time interval for colors"));
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("Color");
-        tableModel.addColumn("Time interval");
-
-        JTable table = new JTable(tableModel);
-        table.setPreferredSize(new Dimension(300, 150));
-        timeConstraintScrollPane.setPreferredSize(new Dimension(300, 150));
-        timeConstraintList.addMouseListener(createDoubleClickMouseAdapter());
-
 
 
         addTimeConstraintButton.addActionListener(actionEvent -> {
-            JComboBox[] comboBoxes = colorComboboxPanel.getColorTypeComboBoxesArray();
-            ColoredTimeInterval timeInterval;
-
-            if (!(colorType instanceof ProductType)) {
-                timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR((dk.aau.cs.model.CPN.Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
-            } else {
-                Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<dk.aau.cs.model.CPN.Color>();
-                for (int i = 0; i < comboBoxes.length; i++) {
-                    colors.add((dk.aau.cs.model.CPN.Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
-                }
-                dk.aau.cs.model.CPN.Color color = new dk.aau.cs.model.CPN.Color(colorType, 0, colors);
-
-                timeInterval = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
-
-            }
+            ColoredTimeInterval timeConstraint = intervalEditorPanel.getInterval();
             boolean alreadyExists = false;
+
             for (int i = 0; i < timeConstraintListModel.size(); i++) {
-                if (timeInterval.equalsOnlyColor(timeConstraintListModel.get(i)))
+                if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
                     alreadyExists = true;
+                    timeConstraintListModel.setElementAt(timeConstraint, i);
+                }
             }
-            if (alreadyExists) {
-                JOptionPane.showMessageDialog(null, "A time constraint for this color is already active and can be found in the list.");
-            } else
-                timeConstraintListModel.addElement(timeInterval);
+            if (!alreadyExists){
+                timeConstraintListModel.addElement(timeConstraint);
+            }
 
         });
 
-        removeTimeConstraintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                int index = timeConstraintList.getSelectedIndex();
-                Object star = timeConstraintListModel.elementAt(index);
-                if(star instanceof ColoredTimeInterval) {
-                    if(((ColoredTimeInterval) star).getColor().equals(dk.aau.cs.model.CPN.Color.STAR_COLOR)) {
-                        JOptionPane.showMessageDialog(null, "Star interval cannot be removed");
-                    }else {
-                        timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
-                    }
-                }
-            }
-        });
-
-        editTimeConstraintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
-                Container contentPane = guiDialog.getContentPane();
-
-                // 1 Set layout
-                contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-                ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context,(ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
-                contentPane.add(ctiPanel);
-
-                guiDialog.setResizable(false);
-
-                // Make window fit contents' preferred size
-                guiDialog.pack();
-
-                // Move window to the middle of the screen
-                guiDialog.setLocationRelativeTo(null);
-                guiDialog.setVisible(true);
-
-                if (ctiPanel.isEditConfirmed()){
-                    timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
-                }
+        removeTimeConstraintButton.addActionListener(actionEvent -> {
+            timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
+            if(timeConstraintListModel.isEmpty()){
+                addTimeConstraintButton.setText("Add");
+            } else{
+                timeConstraintList.setSelectedIndex(0);
             }
         });
 
@@ -255,8 +259,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 3;
-        arcColorInvariantPanel.add(colorComboboxPanel, gbc);
+        colorIntervalEditPanel.add(colorIntervalComboboxPanel, gbc);
 
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -266,37 +269,50 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3,3);
         buttonPanel.add(addTimeConstraintButton, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(3, 3, 3, 3);
         buttonPanel.add(removeTimeConstraintButton, gbc);
 
+        ColoredTimeInterval cti = null;
+        if(isInputArc && !isTransportArc){
+            if(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().isEmpty()) {
+                cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().source().getColorType().getFirstColor());
+            } else{
+                cti = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().get(0);
+            }
+        } else if(isInputArc && isTransportArc){
+            if(((TimedTransportArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().isEmpty()) {
+                cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedTransportArcComponent)objectToBeEdited).underlyingTimedInputArc().source().getColorType().getFirstColor());
+            } else{
+                cti = ((TimedTransportArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().get(0);
+            }
+        }
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        intervalEditorPanel = new ColoredTimeIntervalDialogPanel(getRootPane(),context, cti);
+        colorIntervalEditPanel.add(intervalEditorPanel, gbc);
+
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        buttonPanel.add(editTimeConstraintButton, gbc);
+        colorIntervalEditPanel.add(buttonPanel,gbc);
 
-        Dimension dim;
-        dim = new Dimension(375, 200);
-        timeConstraintScrollPane.setPreferredSize(dim);
-        timeConstraintScrollPane.setMaximumSize(dim);
-        timeConstraintScrollPane.setMinimumSize(dim);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        nonDefaultArcColorIntervalPanel.add(colorIntervalEditPanel, gbc);
 
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        arcColorInvariantPanel.add(buttonPanel,gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth =3;
+        nonDefaultArcColorIntervalPanel.add(timeConstraintScrollPane, gbc);
 
-
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.gridheight = 2;
-        arcColorInvariantPanel.add(timeConstraintScrollPane, gbc);
-
-        return arcColorInvariantPanel;
+        return nonDefaultArcColorIntervalPanel;
     }
 
     private void initTransportArcExpressionPanel(){
@@ -1040,38 +1056,6 @@ public class ColoredArcGuardPanel extends JPanel {
         }
     }
 
-    private MouseListener createDoubleClickMouseAdapter() {
-        return new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                if (!timeConstraintList.isSelectionEmpty()) {
-                    if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
-                        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Time Interval", true);
-                        Container contentPane = guiDialog.getContentPane();
-
-                        // 1 Set layout
-                        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-                        ColoredTimeIntervalDialogPanel ctiPanel = new ColoredTimeIntervalDialogPanel(guiDialog.getRootPane(), context, (ColoredTimeInterval) timeConstraintListModel.getElementAt(timeConstraintList.getSelectedIndex()));
-                        contentPane.add(ctiPanel);
-
-                        guiDialog.setResizable(false);
-
-                        // Make window fit contents' preferred size
-                        guiDialog.pack();
-
-                        // Move window to the middle of the screen
-                        guiDialog.setLocationRelativeTo(null);
-                        guiDialog.setVisible(true);
-
-                        if (ctiPanel.isEditConfirmed())
-                            timeConstraintListModel.set(timeConstraintList.getSelectedIndex(), ctiPanel.getNewTimeInterval());
-
-                    }
-                }
-            }
-        };
-    }
-
     public DefaultListModel getTimeConstraintModel() {return timeConstraintListModel;}
     private List<ColoredTimeInterval> getctiList() {
         List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
@@ -1083,7 +1067,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private ColorType colorType;
     private JPanel regularArcExprPanel;
-    JPanel arcColorInvariantPanel;
+    JPanel nonDefaultArcColorIntervalPanel;
     JPanel transportWeightPanel;
     JTabbedPane transportExprTabbedPane;
     DefaultListModel timeConstraintListModel;
@@ -1113,5 +1097,8 @@ public class ColoredArcGuardPanel extends JPanel {
     ColorExpressionDialogPanel inputPanel;
     ColorExpressionDialogPanel outputPanel;
     JSpinner colorExpressionWeightSpinner;
+    ColorComboboxPanel colorIntervalComboboxPanel;
+    ColoredTimeIntervalDialogPanel intervalEditorPanel;
+
 
 }

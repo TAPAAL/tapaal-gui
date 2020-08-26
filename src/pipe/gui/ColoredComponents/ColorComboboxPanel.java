@@ -125,7 +125,7 @@ public abstract class ColorComboboxPanel extends JPanel {
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
         }
         colorTypesScrollPane.setPreferredSize(new Dimension(260,colorTypeComboBoxesArray.length*40));
-        colorTypesScrollPane.setMinimumSize(new Dimension(260, 40));
+        colorTypesScrollPane.setMinimumSize(new Dimension(260, 60));
         revalidate();
     }
     private void removeOldComboBoxes(){
