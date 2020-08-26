@@ -61,25 +61,36 @@ public class ColorExpressionDialogPanel extends JPanel {
 
     private boolean transport;
     private boolean isArc;
+    private ColorType arcColorType;
 
 
-
-
-    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport, boolean isArc) {
+    public ColorExpressionDialogPanel(Context context, ColorExpression expr, boolean transport, ColorType ct) {
         this.rootPane = rootPane;
         this.context = context;
         this.expr = expr;
         this.transport = transport;
-        this.isArc = isArc;
+        arcColorType = ct;
+        this.isArc = true;
         initComponents();
     }
 
-    public ColorExpressionDialogPanel(Context context, ColorExpression expr, boolean transport, boolean isArc) {
+    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport, ColorType ct) {
         this.rootPane = rootPane;
         this.context = context;
         this.expr = expr;
         this.transport = transport;
-        this.isArc = isArc;
+        arcColorType = ct;
+        this.isArc = true;
+        initComponents();
+    }
+
+    public ColorExpressionDialogPanel(JRootPane rootPane, Context context, ColorExpression expr, boolean transport) {
+        this.rootPane = rootPane;
+        this.context = context;
+        this.expr = expr;
+        this.transport = transport;
+        this.isArc = false;
+        arcColorType = null;
         initComponents();
     }
 
@@ -249,8 +260,12 @@ public class ColorExpressionDialogPanel extends JPanel {
     private void updateColorType() {
         colorCombobox.removeAllItems();
         variableCombobox.removeAllItems();
-
-        ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
+        ColorType ct;
+        if(!isArc){
+            ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
+        } else{
+            ct = arcColorType;
+        }
         if (ct != null) {
             for (Variable element : context.network().variables()) {
                 if (element.getColorType().getName().equals(ct.getName())) {
@@ -501,6 +516,10 @@ public class ColorExpressionDialogPanel extends JPanel {
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
         }
+        JLabel colorTypeLabel = new JLabel();
+        if(isArc){
+            colorTypeLabel.setText("<html>Colortype is: " + arcColorType.toString());
+        }
 
         colorTypeCombobox.setPreferredSize(new Dimension(300, 27));
         colorTypeCombobox.setMinimumSize(new Dimension(300, 27));
@@ -577,7 +596,11 @@ public class ColorExpressionDialogPanel extends JPanel {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3,3,3,3);
-        colortypePanel.add(colorTypeCombobox, gbc);
+        if(!isArc){
+            colortypePanel.add(colorTypeCombobox, gbc);
+        } else{
+            colortypePanel.add(colorTypeLabel, gbc);
+        }
 
         gbc.gridy  = 0;
         gbc.gridx = 0;

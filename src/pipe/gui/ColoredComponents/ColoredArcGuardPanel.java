@@ -317,8 +317,8 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initTransportArcExpressionPanel(){
         transportExprTabbedPane = new JTabbedPane();
-        inputPanel = new ColorExpressionDialogPanel(context, transportInputExpr, true, true);
-        outputPanel = new ColorExpressionDialogPanel(context, transportOutputExpr, true, true);
+        inputPanel = new ColorExpressionDialogPanel(context, transportInputExpr, true, colorType);
+        outputPanel = new ColorExpressionDialogPanel(context, transportOutputExpr, true, colorType);
 
         transportExprTabbedPane.add(inputPanel, "input");
         transportExprTabbedPane.add(outputPanel, "output");
@@ -603,7 +603,7 @@ public class ColoredArcGuardPanel extends JPanel {
                 EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
                 Container contentPane = guiDialog.getContentPane();
 
-                ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, colorExpr, false, true);
+                ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, colorExpr, false, colorType);
                 contentPane.add(cep);
 
                 guiDialog.setResizable(true);

@@ -340,7 +340,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
                     Container contentPane = guiDialog.getContentPane();
 
-                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false, false);
+                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
                     contentPane.add(cep);
 
                     guiDialog.setResizable(true);
