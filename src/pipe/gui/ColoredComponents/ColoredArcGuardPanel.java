@@ -283,10 +283,10 @@ public class ColoredArcGuardPanel extends JPanel {
                 cti = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().get(0);
             }
         } else if(isInputArc && isTransportArc){
-            if(((TimedTransportArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().isEmpty()) {
-                cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedTransportArcComponent)objectToBeEdited).underlyingTimedInputArc().source().getColorType().getFirstColor());
+            if(((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals().isEmpty()) {
+                cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().source().getColorType().getFirstColor());
             } else{
-                cti = ((TimedTransportArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().get(0);
+                cti = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals().get(0);
             }
         }
         gbc.gridx = 1;
