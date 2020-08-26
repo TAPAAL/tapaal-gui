@@ -11,6 +11,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import dk.aau.cs.model.CPN.*;
@@ -695,8 +696,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
             }
         };
+        tokenColorComboboxPanel.removeScrollPaneBorder();
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.SOUTH;
@@ -720,29 +722,28 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 removeColoredTokenButton.setEnabled(true);
             }
         });
+        tokenTable.setDefaultRenderer(Object.class, new TokenTableCellRenderer());
+
 
         JScrollPane tokenListScrollPane = new JScrollPane(tokenTable);
         tokenListScrollPane.setViewportView(tokenTable);
         tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension tokenScrollPaneDim = new Dimension(375, 200);
-        tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
-        tokenListScrollPane.setMaximumSize(tokenScrollPaneDim);
-        tokenListScrollPane.setMinimumSize(tokenScrollPaneDim);
+        Dimension tokenScrollPaneDim = new Dimension(750, 200);
         tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens"));
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        gbc.gridheight = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = 3;
         gbc.insets = new Insets(3, 3, 3,3);
         //tokenPanel.add(tokenListScrollPane, gbc);
+        tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
         tokenPanel.add(tokenListScrollPane, gbc);
 
-        addColoredTokenButton = new JButton("Add");
-        Dimension buttonSize = new Dimension(100, 27);
+        addColoredTokenButton = new JButton("Set");
+        Dimension buttonSize = new Dimension(100, 30);
         addColoredTokenButton.setPreferredSize(buttonSize);
         addColoredTokenButton.setMinimumSize(buttonSize);
         addColoredTokenButton.setMaximumSize(buttonSize);
@@ -755,16 +756,17 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         tokenButtonPanel.add(addColoredTokenButton, gbc);
 
         addColoredTokenButton.addActionListener(actionEvent -> {
-            addNumberOfColoredTokens((int) addTokenSpinner.getValue());
+            addColoredTokens((int) addTokenSpinner.getValue());
         });
         SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
-        gbc.gridx = 1;
+        addTokenSpinner.setPreferredSize(buttonSize);
+        gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.SOUTHWEST;
         gbc.insets = new Insets(3, 3, 3,3);
-        tokenButtonPanel.add(addTokenSpinner, gbc);
+        tokenPanel.add(addTokenSpinner, gbc);
 
         removeColoredTokenButton = new JButton("Remove");
 
@@ -774,7 +776,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         removeColoredTokenButton.setMaximumSize(buttonSize);
 
         removeColoredTokenButton.addActionListener(actionEvent -> {
-            removeNumberOfTokens((int)removeTokenSpinner.getValue());
+            if(tokenTable.getSelectedRow() > -1){
+                tableModel.removeRow(tokenTable.getSelectedRow());
+            }
+
         });
         removeColoredTokenButton.setEnabled(false);
 
@@ -785,18 +790,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
         tokenButtonPanel.add(removeColoredTokenButton, gbc);
 
-        SpinnerModel removeTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
-        removeTokenSpinner = new JSpinner(removeTokenSpinnerModel);
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.SOUTHWEST;
-        gbc.insets = new Insets(3, 3, 3,3);
-        tokenButtonPanel.add(removeTokenSpinner, gbc);
-
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         tokenPanel.add(tokenButtonPanel, gbc);
 
@@ -1060,13 +1056,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         add(colorTypePanel, gbc);
     }
 
-    private void addNumberOfColoredTokens(int numberOfTokens){
-	    for(int i = 0; i<numberOfTokens;i++){
-	        addColoredToken();
-        }
-    }
-
-    private void addColoredToken() {
+    private void addColoredTokens(int numberOfTokens) {
         TimedToken ct;
         if (colorType instanceof ProductType) {
             Vector<Color> colorVector = new Vector();
@@ -1079,16 +1069,29 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         else {
             ct = new TimedToken(place.underlyingPlace(), (dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
         }
-        addColoredToken(ct);
+        boolean existsAlready = false;
+        if(tableModel.getRowCount() > 0){
+            int currSize = tableModel.getRowCount();
+            for(int i = 0; i < currSize; i++){
+                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(ct.color().toString())){
+                    tableModel.setValueAt(numberOfTokens,i,0);
+                    existsAlready = true;
+                }
+            }
+            if(!existsAlready){
+                tableModel.addRow(new Object[]{numberOfTokens, ct});
+            }
+        }else{
+            tableModel.addRow(new Object[]{numberOfTokens, ct});
+        }
 	}
-
     private void addColoredToken(TimedToken tokenToAdd) {
-	    boolean existsAlready = false;
+        boolean existsAlready = false;
         if(tableModel.getRowCount() > 0){
             int currSize = tableModel.getRowCount();
             for(int i = 0; i < currSize; i++){
                 if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(tokenToAdd.color().toString())){
-                    tableModel.setValueAt((int)tableModel.getValueAt(i,0) + 1,i,0);
+                    tableModel.setValueAt((int)tokenTable.getValueAt(i,0) +1,i,0);
                     existsAlready = true;
                 }
             }
@@ -1098,7 +1101,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         }else{
             tableModel.addRow(new Object[]{1, tokenToAdd});
         }
-	}
+    }
 
 
     public boolean doOKColored() {
@@ -1215,5 +1218,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     ColoredTimeInvariantDialogPanel invariantEditorPanel;
     JButton addTimeConstraintButton;
     JButton removeTimeConstraintButton;
+
 }
 

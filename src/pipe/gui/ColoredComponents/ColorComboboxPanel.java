@@ -90,8 +90,7 @@ public abstract class ColorComboboxPanel extends JPanel {
         colorTypesScrollPane.setBorder(BorderFactory.createTitledBorder("Color Type elements"));
 
         Dimension scrollPaneSize = new Dimension(260, 150);
-        colorTypesScrollPane.setPreferredSize(scrollPaneSize);
-        colorTypesScrollPane.setMinimumSize(scrollPaneSize);
+        colorTypesScrollPane.setPreferredSize(new Dimension(260,colorTypeComboBoxesArray.length*40));
         colorTypesScrollPane.setMaximumSize(scrollPaneSize);
 
         GridBagConstraints gbc = new GridBagConstraints();
