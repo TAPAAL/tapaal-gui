@@ -88,6 +88,15 @@ public class PNMLWriter implements NetWriter {
 		appendTransitions(document, composer.getGuiModel(), pageNode);
 		appendArcs(document, composer.getGuiModel(), pageNode);
 
+        if(lens.isColored()) {
+            Element nameElement = document.createElement("name");
+            netNode.appendChild(nameElement);
+            Element nameTextElement = document.createElement("text");
+            nameTextElement.setTextContent(composedNetwork.name());
+            nameElement.appendChild(nameTextElement);
+            writeTACPN.appendDeclarations(document, netNode);
+        }
+
 		document.normalize();
 		// Create Transformer with XSL Source File
 		transformer = TransformerFactory.newInstance().newTransformer();

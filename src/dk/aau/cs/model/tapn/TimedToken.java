@@ -70,14 +70,14 @@ public class TimedToken {
 	}
     //This is for colors
     public String toStringForPNML() {
-        String token = "[";
+        String token = "";
         if (color.getTuple() != null && color.getTuple().size() != 0) {
             for (Color element : color.getTuple()) {
                 token += "(" + element.getColorName() + ")";
             }
-            return token + "]";
+            return token + "";
         } else {
-            return token += "(" + color.getColorName() + ")]";
+            return token += "(" + color.getColorName() + ")";
         }
     }
 
