@@ -1,8 +1,8 @@
 package pipe.gui;
 
-public class VerifyPNOptions extends EngineSupportOptions {
+public class VerifyPNEngineOptions extends EngineSupportOptions {
 
-    public VerifyPNOptions() {
+    public VerifyPNEngineOptions() {
         super(
             "TAPAAL: Untimed Engine (verifypn)",
             false,

@@ -1,8 +1,8 @@
 package pipe.gui;
 
-public class VerifyTAPNOptions extends EngineSupportOptions {
+public class VerifyTAPNEngineOptions extends EngineSupportOptions {
 
-    public VerifyTAPNOptions() {
+    public VerifyTAPNEngineOptions() {
         super(
             "TAPAAL: Continous Engine (verifytapn)", //name of engine
             false, //  support fastest trace

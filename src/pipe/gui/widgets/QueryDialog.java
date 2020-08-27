@@ -206,14 +206,14 @@ public class QueryDialog extends JPanel {
 
 	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
-	private final static EngineSupportOptions verifyTAPNOptions= new VerifyPNOptions();
+	private final static EngineSupportOptions verifyTAPNOptions= new VerifyPNEngineOptions();
     private final static EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
     private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
     private final static EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
     private final static EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
     private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
-    private final static EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNOptions();
-    private final static EngineSupportOptions verifyPNOptions = new VerifyPNOptions();
+    private final static EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
+    private final static EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
 
     private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 

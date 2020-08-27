@@ -622,15 +622,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
-        EngineSupportOptions verifyTAPNOptions= new VerifyTAPNOptions();
+        EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
 
         EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
         EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
         EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
         EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
         EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options(); //support nested quantification
-        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNOptions(); //support nested quantification
-        EngineSupportOptions verifyPNOptions = new VerifyPNOptions();
+        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions(); //support nested quantification
+        EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
 
         EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
         TimedArcPetriNetNetwork net = tab.network();

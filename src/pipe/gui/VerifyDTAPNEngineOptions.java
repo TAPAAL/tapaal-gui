@@ -1,8 +1,8 @@
 package pipe.gui;
 
-public class VerifyDTAPNOptions extends EngineSupportOptions {
+public class VerifyDTAPNEngineOptions extends EngineSupportOptions {
 
-    public VerifyDTAPNOptions() {
+    public VerifyDTAPNEngineOptions() {
         super(
             "TAPAAL: Discrete Engine (verifydtapn)",
             true,//  support fastest trace
