@@ -64,7 +64,6 @@ public class ColoredArcGuardPanel extends JPanel {
         setTimeConstraints();
         updateSelection();
         hideIrrelevantInformation();
-        initColorExpressionEditPanel();
 
         //TODO: implement these
         undoButton.setEnabled(false);
@@ -339,6 +338,7 @@ public class ColoredArcGuardPanel extends JPanel {
         initNumberExpressionsPanel();
         initArithmeticPanel();
         initEditPanel();
+        initColorExpressionButtonsPanel();
 
         expressionPanel = new JPanel(new GridBagLayout());
         expressionPanel.setBorder(BorderFactory.createTitledBorder("Arc Expression"));
@@ -414,7 +414,7 @@ public class ColoredArcGuardPanel extends JPanel {
         //TODO: Actionlisteners
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.VERTICAL;
 
@@ -745,19 +745,8 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         regularArcExprPanel.add(exprScrollPane, gbc);
-    }
-
-    private void initColorExpressionEditPanel(){
-        ColorExpressionDialogPanel colorExpressionDialogPanel = new ColorExpressionDialogPanel(context,  new PlaceHolderColorExpression(), false, colorType);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        colorExpressionDialogPanel.hideExprField();
-        expressionPanel.add(colorExpressionDialogPanel, gbc);
-
     }
 
     private void addAllExpression() {
@@ -841,6 +830,92 @@ public class ColoredArcGuardPanel extends JPanel {
         }
 
         return new PlaceHolderArcExpression();
+    }
+
+    public void initColorExpressionButtonsPanel() {
+        colorExpressionButtons = new JPanel(new GridBagLayout());
+        colorExpressionButtons.setBorder(BorderFactory.createTitledBorder("Misc"));
+        colorExpressionButtons.setPreferredSize(new Dimension(300 ,158 ));
+
+        ButtonGroup expressionButtonsGroup = new ButtonGroup();
+        predButton = new JButton("Add Pred");
+        succButton = new JButton("Add Succ");
+        addPlaceHolderButton = new JButton("Add placeholder");
+
+        predButton.setPreferredSize(new Dimension(130 , 27));
+        predButton.setMinimumSize(new Dimension(130 , 27));
+        predButton.setMaximumSize(new Dimension(130 , 27));
+        succButton.setPreferredSize(new Dimension(130 , 27));
+        succButton.setMinimumSize(new Dimension(130 , 27));
+        succButton.setMaximumSize(new Dimension(130 , 27));
+        addPlaceHolderButton.setPreferredSize(new Dimension(260 , 27));
+        addPlaceHolderButton.setMinimumSize(new Dimension(260 , 27));
+        addPlaceHolderButton.setMaximumSize(new Dimension(260 , 27));
+
+
+        expressionButtonsGroup.add(predButton);
+        expressionButtonsGroup.add(succButton);
+        expressionButtonsGroup.add(addPlaceHolderButton);
+
+        addPlaceHolderButton.addActionListener(actionEvent -> {
+            ColorExpression expr = (ColorExpression) currentSelection.getObject();
+            if (!(expr instanceof TupleExpression)) {
+                ColorExpression currentObject = (ColorExpression) currentSelection.getObject();
+                Vector<ColorExpression> colorExprVec = new Vector();
+                colorExprVec.add(currentObject);
+                TupleExpression tupleExpr = new TupleExpression(colorExprVec);
+                tupleExpr.addColorExpression(new PlaceHolderColorExpression());
+                arcExpression = arcExpression.replace(expr, tupleExpr);
+                updateSelection(tupleExpr);
+            } else {
+                TupleExpression tupleExpr = (TupleExpression) expr;
+                tupleExpr.addColorExpression(new PlaceHolderColorExpression());
+                arcExpression = arcExpression.replace(expr, tupleExpr);
+                updateSelection(tupleExpr);
+            }
+        });
+
+        predButton.addActionListener(actionEvent -> {
+            PredecessorExpression predExpr;
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
+                arcExpression = arcExpression.replace(currentSelection.getObject(), predExpr);
+                updateSelection(predExpr);
+            }
+        });
+
+        succButton.addActionListener(actionEvent -> {
+            SuccessorExpression succExpr;
+            if (currentSelection.getObject() instanceof  ColorExpression) {
+                succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
+                arcExpression = arcExpression.replace(currentSelection.getObject(), succExpr);
+                updateSelection(succExpr);
+            }
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5,5,5,5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        colorExpressionButtons.add(predButton, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(0, 10, 0 , 0);
+        colorExpressionButtons.add(succButton, gbc);
+
+        gbc.insets = new Insets(0, 0, 5 , 0);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        colorExpressionButtons.add(addPlaceHolderButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        regularArcExprPanel.add(colorExpressionButtons, gbc);
     }
 
     private void initExpr() {
@@ -1078,6 +1153,12 @@ public class ColoredArcGuardPanel extends JPanel {
     ColorComboboxPanel colorIntervalComboboxPanel;
     ColoredTimeIntervalDialogPanel intervalEditorPanel;
     JPanel expressionPanel;
+
+
+    JPanel colorExpressionButtons;
+    JButton predButton;
+    JButton succButton;
+    JButton addPlaceHolderButton;
 
 
 }
