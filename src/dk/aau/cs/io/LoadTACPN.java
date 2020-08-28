@@ -216,7 +216,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             subnode = number;
             numberval = 1;
         }
-        //Try to parse subexpression as all expression
         Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
         while (subnode != null) {
             ColorExpression colorexp = parseColorExpression(subnode);
@@ -239,7 +238,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return null;
         }
     }
-    
+
     private ColorExpression parseColorExpression(Node node) throws FormatException {
         String name = node.getNodeName();
         if (name.equals("dotconstant")) {

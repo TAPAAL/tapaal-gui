@@ -130,9 +130,6 @@ public class NumberOfExpression extends ArcExpression {
         int end = 0;
         boolean wasPrevSimple = false;
         for (ColorExpression p : color) {
-
-
-
             if (i == 0) {
                 end = start + p.toString().length();
                 endPrev = end;

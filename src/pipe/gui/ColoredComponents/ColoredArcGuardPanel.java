@@ -7,23 +7,21 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
 import net.tapaal.swinghelpers.GridBagHelper;
-import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.widgets.EscapableDialog;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -62,6 +60,7 @@ public class ColoredArcGuardPanel extends JPanel {
         initPanels();
         initExpr();
         setTimeConstraints();
+        getVariables();
         updateSelection();
         hideIrrelevantInformation();
 
@@ -567,33 +566,51 @@ public class ColoredArcGuardPanel extends JPanel {
         Integer max = 999;
         Integer step = 1;
         SpinnerNumberModel numberModelNumber = new SpinnerNumberModel(current, min, max, step);
-
+        variableCombobox = new JComboBox();
+        useVariableCheckBox = new JCheckBox("Use variable");
+        useVariableCheckBox.addItemListener(e -> {
+            if(e.getStateChange() == ItemEvent.SELECTED){
+                colorExpressionComboBoxPanel.setVisible(false);
+                variableCombobox.setVisible(true);
+            } else{
+                colorExpressionComboBoxPanel.setVisible(true);
+                variableCombobox.setVisible(false);
+            }
+        });
         numberExpressionJSpinner = new JSpinner(numberModelNumber);
-        numberExpressionButton = new JButton("Add Expression");
+        addExpressionButton = new JButton("Add Expression");
 
         numberExpressionJSpinner.setPreferredSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMaximumSize(new Dimension(50, 27));
 
-        numberExpressionButton.setPreferredSize(new Dimension(125, 27));
-        numberExpressionButton.setMinimumSize(new Dimension(125, 27));
-        numberExpressionButton.setMaximumSize(new Dimension(125, 27));
+        addExpressionButton.setPreferredSize(new Dimension(125, 27));
+        addExpressionButton.setMinimumSize(new Dimension(125, 27));
+        addExpressionButton.setMaximumSize(new Dimension(125, 27));
 
-        numberExpressionButton.addActionListener(actionEvent -> addNumberExpression());
+        addExpressionButton.addActionListener(actionEvent -> addNumberExpression());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0, 0,5 ,5 );
+        numberExprPanel.add(useVariableCheckBox, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0, 0,5 ,5 );
         numberExprPanel.add(numberExpressionJSpinner, gbc);
 
         gbc.gridx = 1;
         numberExprPanel.add(colorExpressionComboBoxPanel, gbc);
+        numberExprPanel.add(variableCombobox, gbc);
+        variableCombobox.setVisible(false);
 
         gbc.gridx = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        numberExprPanel.add(numberExpressionButton, gbc);
+        numberExprPanel.add(addExpressionButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -679,35 +696,39 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void addNumberExpression() {
         Vector<ColorExpression> exprVec = new Vector();
-        TupleExpression tupleExpression;
-        if(colorType instanceof ProductType){
-            Vector<ColorExpression> tempVec = new Vector();
-            for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length ; i++) {
-                ColorExpression expr;
-                if(colorExpressionComboBoxPanel.getAllCheckBoxesArray()[i].isSelected()){
-                    expr = new AllExpression(((dk.aau.cs.model.CPN.Color)colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem()).getColorType());
-                }else{
-                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color)colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i]
-                        .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
+        if (!useVariableCheckBox.isSelected()){
+            TupleExpression tupleExpression;
+            if (colorType instanceof ProductType) {
+                Vector<ColorExpression> tempVec = new Vector();
+                for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
+                    ColorExpression expr;
+                    if (colorExpressionComboBoxPanel.getAllCheckBoxesArray()[i].isSelected()) {
+                        expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem()).getColorType());
+                    } else {
+                        expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i]
+                            .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
+                    }
+                    tempVec.add(expr);
                 }
-                tempVec.add(expr);
+                tupleExpression = new TupleExpression(tempVec);
+                exprVec.add(tupleExpression);
+            } else {
+                ColorExpression expr;
+                if (colorExpressionComboBoxPanel.getAllCheckBoxesArray()[0].isSelected()) {
+                    expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem()).getColorType());
+                } else {
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0]
+                        .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
+                }
+                exprVec.add(expr);
             }
-            tupleExpression = new TupleExpression(tempVec);
-            exprVec.add(tupleExpression);
         } else{
-            ColorExpression expr;
-            if(colorExpressionComboBoxPanel.getAllCheckBoxesArray()[0].isSelected()){
-                expr = new AllExpression(((dk.aau.cs.model.CPN.Color)colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem()).getColorType());
-            }else{
-                expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color)colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0]
-                    .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
-            }
-            exprVec.add(expr);
+            Variable var = variableCombobox.getItemAt(variableCombobox.getSelectedIndex());
+            VariableExpression varExpr = new VariableExpression(var);
+            exprVec.add(varExpr);
         }
-        Integer value = (Integer)numberExpressionJSpinner.getValue();
+        Integer value = (Integer) numberExpressionJSpinner.getValue();
         NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
-
-
         arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
         updateSelection(numbExpr);
     }
@@ -894,7 +915,7 @@ public class ColoredArcGuardPanel extends JPanel {
     private void toggleEnabledButtons() {
         if(currentSelection == null){
             allExpressionButton.setEnabled(false);
-            numberExpressionButton.setEnabled(false);
+            addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
@@ -904,7 +925,7 @@ public class ColoredArcGuardPanel extends JPanel {
             addAdditionPlaceHolderButton.setEnabled(false);
         }
         if (currentSelection.getObject() instanceof ColorExpression) {
-            numberExpressionButton.setEnabled(false);
+            addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
@@ -914,7 +935,7 @@ public class ColoredArcGuardPanel extends JPanel {
             predButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof AddExpression) {
-            numberExpressionButton.setEnabled(false);
+            addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
@@ -924,7 +945,7 @@ public class ColoredArcGuardPanel extends JPanel {
             addAdditionPlaceHolderButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof ArcExpression) {
-            numberExpressionButton.setEnabled(true);
+            addExpressionButton.setEnabled(true);
             additionButton.setEnabled(true);
             subtractionButton.setEnabled(true);
             scalarButton.setEnabled(true);
@@ -1020,6 +1041,14 @@ public class ColoredArcGuardPanel extends JPanel {
         return ctiList;
     }
 
+    private void getVariables(){
+        for (Variable element : context.network().variables()) {
+            if (element.getColorType().getName().equals(colorType.getName())) {
+                variableCombobox.addItem(element);
+            }
+        }
+    }
+
     private ColorType colorType;
     private JPanel regularArcExprPanel;
     JPanel nonDefaultArcColorIntervalPanel;
@@ -1046,7 +1075,7 @@ public class ColoredArcGuardPanel extends JPanel {
     JButton addAdditionPlaceHolderButton;
     JButton subtractionButton;
     JButton scalarButton;
-    JButton numberExpressionButton;
+    JButton addExpressionButton;
     SpinnerNumberModel numberModel;
     ColorExpressionDialogPanel inputPanel;
     ColorExpressionDialogPanel outputPanel;
@@ -1061,5 +1090,7 @@ public class ColoredArcGuardPanel extends JPanel {
     JButton succButton;
     ColorComboboxPanel colorExpressionComboBoxPanel;
 
+    JCheckBox useVariableCheckBox;
+    JComboBox<Variable> variableCombobox;
 
 }
