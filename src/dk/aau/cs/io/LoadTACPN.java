@@ -194,9 +194,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
             return new ScalarProductExpression(scalarval, childexp);
 
-        } else if (name.equals("all")) {
-            Node parent = node.getParentNode();
-            return parseNumberOfExpression(parent);
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseArcExpression(child);
@@ -220,19 +217,14 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             numberval = 1;
         }
         //Try to parse subexpression as all expression
-        AllExpression subexp = parseAllExpression(subnode);
-
-        if (subexp != null) {
-            return new NumberOfExpression(numberval, new Vector<ColorExpression>(Arrays.asList(subexp)));
-        } else {
-            Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
-            while (subnode != null) {
-                ColorExpression colorexp = parseColorExpression(subnode);
-                colorexps.add(colorexp);
-                subnode = skipWS(subnode.getNextSibling());
-            }
-            return new NumberOfExpression(numberval, colorexps);
+        Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
+        while (subnode != null) {
+            ColorExpression colorexp = parseColorExpression(subnode);
+            colorexps.add(colorexp);
+            subnode = skipWS(subnode.getNextSibling());
         }
+        return new NumberOfExpression(numberval, colorexps);
+
     }
 
     private Integer parseNumberConstantExpression(Node node) {
@@ -247,20 +239,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return null;
         }
     }
-
-    private AllExpression parseAllExpression(Node node) throws FormatException {
-        String name = node.getNodeName();
-        if (name.equals("all")) {
-            ColorType ct = parseUserSort(node);
-            return new AllExpression(ct);
-        } else if (name.equals("subterm")) {
-            Node child = skipWS(node.getFirstChild());
-            return parseAllExpression(child);
-        } else {
-            return null;
-        }
-    }
-
+    
     private ColorExpression parseColorExpression(Node node) throws FormatException {
         String name = node.getNodeName();
         if (name.equals("dotconstant")) {
@@ -281,7 +260,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             Node child = skipWS(node.getFirstChild());
             ColorExpression childexp = parseColorExpression(child);
             return new PredecessorExpression(childexp);
-        } else if (name.equals("tuple")) {
+        } else if(name.equals("all")){
+            ColorType ct = parseUserSort(node);
+            return new AllExpression(ct);
+        }
+        else if (name.equals("tuple")) {
             Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
 
             Node child = skipWS(node.getFirstChild());
