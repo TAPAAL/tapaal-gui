@@ -1047,6 +1047,9 @@ public class ColoredArcGuardPanel extends JPanel {
                 variableCombobox.addItem(element);
             }
         }
+        if(variableCombobox.getItemCount() < 1){
+            useVariableCheckBox.setEnabled(false);
+        }
     }
 
     private ColorType colorType;

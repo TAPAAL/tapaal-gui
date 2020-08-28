@@ -9,7 +9,7 @@
         </structure>
       </type>
       <hlinitialMarking>
-        <text>1'[(qwe)] + 1'[(qwe)] + 1'[(qwe)] + 1'[(qwe)] + 1'[(qwe)] + 1'[(qwe)] + 1'[(qwe)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + 1'[(yui)] + </text>
+        <text>1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(yui) + 1'(qwe) + 1'(qwe) + 1'(qwe) + 1'(qwe) + 1'(qwe) + 1'(qwe) + 1'(qwe) + </text>
         <structure>
           <add>
             <subterm>
@@ -20,6 +20,126 @@
                   </numberconstant>
                 </subterm>
                 <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="yui"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
                   <useroperator declaration="qwe"/>
                 </subterm>
               </numberof>
@@ -93,126 +213,6 @@
                 </subterm>
                 <subterm>
                   <useroperator declaration="qwe"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
-                </subterm>
-              </numberof>
-            </subterm>
-            <subterm>
-              <numberof>
-                <subterm>
-                  <numberconstant value="1">
-                    <positive/>
-                  </numberconstant>
-                </subterm>
-                <subterm>
-                  <useroperator declaration="yui"/>
                 </subterm>
               </numberof>
             </subterm>
@@ -361,6 +361,9 @@
             <usersort declaration="zxc"/>
           </productsort>
         </namedsort>
+        <variabledecl id="Varvariable" name="variable">
+          <usersort declaration="zxc"/>
+        </variabledecl>
       </declarations>
     </structure>
   </declaration>
