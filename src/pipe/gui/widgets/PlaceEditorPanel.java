@@ -741,7 +741,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
         tokenPanel.add(tokenListScrollPane, gbc);
 
-        addColoredTokenButton = new JButton("Set");
+        addColoredTokenButton = new JButton("Add");
         Dimension buttonSize = new Dimension(100, 30);
         addColoredTokenButton.setPreferredSize(buttonSize);
         addColoredTokenButton.setMinimumSize(buttonSize);
@@ -756,6 +756,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
         addColoredTokenButton.addActionListener(actionEvent -> {
             addColoredTokens((int) addTokenSpinner.getValue());
+            addColoredTokenButton.setText("Modify");
         });
         SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
@@ -777,6 +778,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         removeColoredTokenButton.addActionListener(actionEvent -> {
             if(tokenTable.getSelectedRow() > -1){
                 tableModel.removeRow(tokenTable.getSelectedRow());
+                addColoredTokenButton.setText("Add");
             }
 
         });
@@ -1144,13 +1146,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()).toString())){
                     addTokenSpinner.setValue(tokenTable.getValueAt(i,0));
                     existsAlready = true;
+                    addColoredTokenButton.setText("Modify");
                 }
             }
             if(!existsAlready){
                 addTokenSpinner.setValue(1);
+                addColoredTokenButton.setText("Add");
             }
         }else{
             addTokenSpinner.setValue(1);
+            addColoredTokenButton.setText("Add");
         }
     }
 
