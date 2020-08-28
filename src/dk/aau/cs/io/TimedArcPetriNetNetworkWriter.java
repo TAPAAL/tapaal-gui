@@ -69,6 +69,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		this.templates = templates;
 		this.queries = queries;
 		this.constants = constants;
+        writeTACPN = new writeTACPN(network);
 		this.lens = TabContent.TAPNLens.Default;
 	}
 

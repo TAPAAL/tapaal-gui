@@ -1,20 +1,47 @@
 package dk.aau.cs.gui;
 
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
+import dk.aau.cs.debug.Logger;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.FormatException;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.ProcessRunner;
+import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.MessengerImpl;
+import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class TabTransformer {
+    private static String unfoldpath = "";
+
     static public void removeTimingInformation(TabContent tab){
         for(Template template : tab.allTemplates()){
             ArrayList<TimedTransportArcComponent> transportArcComponents = new ArrayList<TimedTransportArcComponent>();
@@ -253,6 +280,167 @@ public class TabTransformer {
                 arc.setWeight(new IntWeight(0));
 
             }
+        }
+    }
+
+    public static TabContent unfoldTab(TabContent oldTab) {
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), oldTab.getGuiModels(), true, true);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(oldTab.network());
+
+        File modelFile = null;
+        File queryFile = null;
+        File modelOut = null;
+        File queryOut = null;
+        try {
+            modelFile = File.createTempFile("modelInUnfold", ".tapn");
+            queryFile = File.createTempFile("queryInUnfold", ".q");
+            modelOut = File.createTempFile("modelOut", ".tapn");
+            queryOut = File.createTempFile("queryOut", ".xml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+            ArrayList<Template> templates = new ArrayList<Template>(1);
+            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+
+
+            network.add(transformedModel.value1());
+            for (ColorType ct :oldTab.network().colorTypes()) {
+                network.add(ct);
+            }
+            for (Variable variable: oldTab.network().variables()) {
+                network.add(variable);
+            }
+            templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
+            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, oldTab.network().constants());
+
+
+            writerTACPN.savePNML(modelFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
+        List<TAPNQuery> clonedQueries = new Vector<dk.aau.cs.model.tapn.TAPNQuery>();
+        if (oldTab.queries().iterator().hasNext()) {
+            for (pipe.dataLayer.TAPNQuery query : oldTab.queries()) {
+                dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty().copy(), query.getCapacity());
+                mapQueryToNewNames(clonedQuery, transformedModel.value2());
+                clonedQueries.add(clonedQuery);
+            }
+        }
+        else {
+            String templateName = oldTab.network().activeTemplates().get(0).name();
+            String placeName = oldTab.network().activeTemplates().get(0).places().get(0).name();
+            TCTLAtomicPropositionNode atomicStartNode = new TCTLAtomicPropositionNode(new TCTLPlaceNode(templateName, placeName), ">=", new TCTLConstNode(1));
+            TCTLEFNode efNode = new TCTLEFNode(atomicStartNode);
+            dk.aau.cs.model.tapn.TAPNQuery test = new dk.aau.cs.model.tapn.TAPNQuery(efNode, 1000);
+            mapQueryToNewNames(test, transformedModel.value2());
+            clonedQueries.add(test);
+        }
+
+        ProcessRunner runner;
+        //TODO::  implement possibility of there not being any queries, and make it possible to send all queries to the engine (requires the engine to be modified)
+        OutputStream os;
+        try {
+            os = new FileOutputStream(queryFile);
+            os.write(clonedQueries.get(0).toString().getBytes(), 0, clonedQueries.get(0).toString().length());
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff");
+        runner = new ProcessRunner(getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+        runner.run();
+
+        //String errorOutput = readOutput(runner.errorOutput());
+        //String standardOutput = readOutput(runner.standardOutput());
+       // Logger.log(errorOutput);
+
+        TapnXmlLoader tapnLoader = new TapnXmlLoader();
+        File fileOut = new File(modelOut.getAbsolutePath());
+        TabContent newTab;
+        try {
+            LoadedModel loadedModel = tapnLoader.load(fileOut);
+            newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab.addQuery(getQuery(queryOut, loadedModel.network()));
+            return newTab;
+        } catch (FormatException e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    private static pipe.dataLayer.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
+        XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
+        List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
+        queries.addAll(queryLoader.parseQueries());
+        return queries.get(0);
+    }
+
+    public static void mapQueryToNewNames(dk.aau.cs.model.tapn.TAPNQuery query, NameMapping mapping) {
+        RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
+        RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);
+        query.getProperty().accept(placeVisitor, null);
+        query.getProperty().accept(transitionVisitor, null);
+    }
+
+    public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(modelFile);
+        buffer.append(" ");
+        buffer.append(queryFile);
+        buffer.append(" ");
+        buffer.append(options.toString());
+        return buffer.toString();
+    }
+
+    @SuppressWarnings("Duplicates")
+    public static String readOutput(BufferedReader reader) {
+        try {
+            if (!reader.ready())
+                return "";
+        } catch (IOException e1) {
+            return "";
+        }
+        StringBuffer buffer = new StringBuffer();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+                buffer.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+        }
+
+        return buffer.toString();
+    }
+
+    public static String getunfoldPath() {
+        if (unfoldpath.isEmpty()) {
+            File f = new File(new File(System.getProperty("user.dir")).getParent() + File.separator + "bin" + File.separator + "UnfoldTACPN");
+            File f2 = new File(System.getProperty("user.dir") + File.separator + "bin"+ File.separator + "UnfoldTACPN");
+            if (f.exists()) {
+                unfoldpath = f.getAbsolutePath();
+                return unfoldpath;
+            }
+            else if (f2.exists()) {
+                unfoldpath = f2.getAbsolutePath();
+                return unfoldpath;
+            }
+            else {
+                FileDialog dialog = new FileDialog((Frame)null, "Select File to Open");
+                dialog.setMode(FileDialog.LOAD);
+                dialog.setVisible(true);
+                unfoldpath = dialog.getDirectory() + dialog.getFile();
+                return unfoldpath;
+            }
+        } else {
+            return unfoldpath;
         }
     }
 }

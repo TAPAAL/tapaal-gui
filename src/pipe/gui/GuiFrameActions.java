@@ -34,6 +34,8 @@ public interface GuiFrameActions {
 
     void registerViewActions(List<GuiAction> viewActions);
 
+    void registerToolsActions(List<GuiAction> toolsActions);
+
     void setStatusBarText(String s);
 
     void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab);

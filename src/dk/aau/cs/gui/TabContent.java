@@ -1587,6 +1587,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
+    private void createNewAndUnfoldColor(){
+	    TabContent tab = TabTransformer.unfoldTab(this);
+	    guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+
+    }
+
     @Override
     public void changeTimeFeature(boolean isTime) {
         if (isTime != lens.isTimed()) {
@@ -2031,6 +2037,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
         app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
+        app.ifPresent(o->o.registerToolsActions(getAvailableToolActions()));
 
         //TODO: this is a temporary implementation untill actions can be moved
         app.ifPresent(o->o.registerViewActions(List.of()));
@@ -2867,6 +2874,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
 
+    public List<GuiAction> getAvailableToolActions(){
+        if(lens.isColored()){
+            return new ArrayList<>(Arrays.asList(unfoldTabAction));
+        } else {
+            return new ArrayList<>(Arrays.asList());
+        }
+    }
+
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.SELECT);
@@ -2936,6 +2951,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
         public void actionPerformed(ActionEvent e) {
             delayAndFire();
+        }
+    };
+
+    private final GuiAction unfoldTabAction = new GuiAction("Unfold tab", "Unfold the colors in the tab") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            createNewAndUnfoldColor();
         }
     };
 

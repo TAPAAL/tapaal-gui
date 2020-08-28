@@ -787,7 +787,7 @@ public class ColoredArcGuardPanel extends JPanel {
     public void initColorExpressionButtonsPanel() {
         colorExpressionButtons = new JPanel(new GridBagLayout());
         colorExpressionButtons.setBorder(BorderFactory.createTitledBorder("Misc"));
-        colorExpressionButtons.setPreferredSize(new Dimension(300 ,158 ));
+        colorExpressionButtons.setPreferredSize(new Dimension(140 ,158 ));
 
         ButtonGroup expressionButtonsGroup = new ButtonGroup();
         predButton = new JButton("Add Pred");
@@ -829,8 +829,8 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         colorExpressionButtons.add(predButton, gbc);
 
-        gbc.gridx = 1;
-        gbc.insets = new Insets(0, 10, 0 , 0);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 5, 0 , 0);
         colorExpressionButtons.add(succButton, gbc);
 
         gbc = new GridBagConstraints();

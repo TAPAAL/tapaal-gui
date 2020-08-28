@@ -56,6 +56,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     JMenu drawMenu;
     JMenu animateMenu;
     JMenu viewMenu;
+    JMenu toolsMenu;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
     private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
@@ -732,7 +733,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 
     private JMenu buildMenuTools() {
-        JMenu toolsMenu = new JMenu("Tools");
+        toolsMenu = new JMenu("Tools");
         toolsMenu.setMnemonic('t');
 
         toolsMenu.add(verifyAction).setMnemonic('m');
@@ -1187,6 +1188,44 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         } else {
             drawMenu.setEnabled(false);
         }
+
+    }
+
+    @Override
+    public void registerToolsActions(@NotNull List<GuiAction> toolsActions){
+        toolsMenu.removeAll();
+        toolsMenu.setEnabled(true);
+        toolsMenu.add(verifyAction).setMnemonic('m');
+
+        toolsMenu.add(netStatisticsAction).setMnemonic('i');
+
+        JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
+        batchProcessing.setMnemonic('b');
+        toolsMenu.add(batchProcessing);
+
+        JMenuItem workflowDialog = new JMenuItem(workflowDialogAction);
+        workflowDialog.setMnemonic('f');
+        toolsMenu.add(workflowDialog);
+
+        JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction);
+        smartDrawDialog.setMnemonic('D');
+        toolsMenu.add(smartDrawDialog);
+
+        JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction);
+        mergeComponentsDialog.setMnemonic('c');
+        toolsMenu.add(mergeComponentsDialog);
+
+        for(GuiAction action : toolsActions){
+            toolsMenu.add(action);
+        }
+
+        toolsMenu.addSeparator();
+
+        JMenuItem engineSelection = new JMenuItem(engineSelectionAction);
+        toolsMenu.add(engineSelection);
+
+        JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction);
+        toolsMenu.add(clearPreferences);
 
     }
     @Override
