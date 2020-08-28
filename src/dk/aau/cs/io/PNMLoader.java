@@ -410,9 +410,9 @@ public class PNMLoader {
         AllExpression subexp = parseAllExpression(subnode);
 
         if (subexp != null) {
-            return new NumberOfExpression(numberval, subexp);
+            return new NumberOfExpression(numberval, new Vector<>(Arrays.asList(subexp)));
         } else {
-            Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
+            Vector<ColorExpression> colorexps = new Vector<>();
             while (subnode != null) {
                 ColorExpression colorexp = parseColorExpression(subnode);
                 colorexps.add(colorexp);

@@ -24,6 +24,7 @@ import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.*;
@@ -225,7 +226,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             //Init color
             ColorType ct = tia.source().getColorType();
             UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
-            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            Vector<ColorExpression> vecColorExpr = new Vector<>();
             vecColorExpr.add(userOperatorExpression);
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             tia.setExpression(numbExpr);
@@ -271,7 +272,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             //Init color
             ColorType ct = toa.destination().getColorType();
             UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
-            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            Vector<ColorExpression> vecColorExpr = new Vector<>();
             vecColorExpr.add(userOperatorExpression);
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             toa.setExpression(numbExpr);

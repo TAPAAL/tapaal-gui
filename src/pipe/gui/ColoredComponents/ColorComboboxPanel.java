@@ -43,6 +43,10 @@ public abstract class ColorComboboxPanel extends JPanel {
         return colorTypeComboBoxesArray;
     }
 
+    public JCheckBox[] getAllCheckBoxesArray(){
+        return allCheckBoxesArray;
+    }
+
     private void initPanel() {
         colorcomboBoxPanel = new JPanel();
         colorcomboBoxPanel.setLayout(new GridBagLayout());

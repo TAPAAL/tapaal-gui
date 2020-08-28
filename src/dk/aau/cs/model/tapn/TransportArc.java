@@ -10,10 +10,7 @@ import java.util.Vector;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.util.IntervalOperations;

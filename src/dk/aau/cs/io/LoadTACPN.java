@@ -16,6 +16,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -221,7 +223,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         AllExpression subexp = parseAllExpression(subnode);
 
         if (subexp != null) {
-            return new NumberOfExpression(numberval, subexp);
+            return new NumberOfExpression(numberval, new Vector<ColorExpression>(Arrays.asList(subexp)));
         } else {
             Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
             while (subnode != null) {

@@ -1,10 +1,7 @@
 package dk.aau.cs.gui;
 
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import pipe.dataLayer.DataLayer;

@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
@@ -7,7 +8,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Set;
 
-public class AllExpression extends Expression {
+public class AllExpression extends ColorExpression {
 
     private ColorType sort;
 
@@ -19,8 +20,9 @@ public class AllExpression extends Expression {
         this.sort = sort;
     }
 
-    public ColorType eval(ExpressionContext context) {
-        return sort;
+    //TODO unsure about this
+    public Color eval(ExpressionContext context) {
+        return null;
     }
 
     public Integer size() {

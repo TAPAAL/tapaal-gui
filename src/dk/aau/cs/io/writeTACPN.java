@@ -130,21 +130,20 @@ public class writeTACPN { // both export and save share some of the same syntax 
             numberConstantElement.appendChild(positiveElement);
             Element subtermElement2 = document.createElement("subterm");
 
-            if(((NumberOfExpression) expression).getAllExpression() == null) {
-                NumberOfExpression expr = (NumberOfExpression) expression;
-                for (Expression colorExpression : expr.getNumberOfExpression()) {
-                    numberOfElement.appendChild(parseArcExpression(colorExpression, document, subtermElement2));
-                }
+
+            NumberOfExpression expr = (NumberOfExpression) expression;
+            for (Expression colorExpression : expr.getNumberOfExpression()) {
+                numberOfElement.appendChild(parseArcExpression(colorExpression, document, subtermElement2));
             }
-            else {
-                Element allElement = document.createElement("all");
-                subtermElement2.appendChild(allElement);
-                Element usersortElement = document.createElement("usersort");
-                allElement.appendChild(usersortElement);
-                usersortElement.setAttribute("declaration", ((NumberOfExpression) expression).getAllExpression().getColorType().getName());
-                numberOfElement.appendChild(allElement);
-            }
+
             structureElement.appendChild(numberOfElement);
+        }
+        else if(expression instanceof AllExpression){
+            Element allElement = document.createElement("all");
+            structureElement.appendChild(allElement);
+            Element usersortElement = document.createElement("usersort");
+            allElement.appendChild(usersortElement);
+            usersortElement.setAttribute("declaration", ((AllExpression) expression).getColorType().getName());
         }
 
         else if(expression instanceof UserOperatorExpression) {
