@@ -567,7 +567,13 @@ public class ColoredArcGuardPanel extends JPanel {
     private void initNumberExpressionsPanel() {
         JPanel numberExprPanel = new JPanel(new GridBagLayout());
         numberExprPanel.setBorder(BorderFactory.createTitledBorder("Numerical Expressions"));
+        ColorComboboxPanel colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, "colors", true) {
+            @Override
+            public void changedColor(JComboBox[] comboBoxes) {
 
+            }
+        };
+        colorExpressionComboBoxPanel.removeScrollPaneBorder();
         Integer current = 1;
         Integer min = 1;
         Integer max = 999;
@@ -638,34 +644,16 @@ public class ColoredArcGuardPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.WEST;
-        numberExprPanel.add(colorTypeLabel, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0,5 ,5 );
-        numberExprPanel.add(allExpressionJSpinner, gbc);
-
-        gbc.gridx = 1;
-        numberExprPanel.add(allExpressionButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0, 0,5 ,5 );
         numberExprPanel.add(numberExpressionJSpinner, gbc);
 
         gbc.gridx = 1;
+        numberExprPanel.add(colorExpressionComboBoxPanel, gbc);
+
+        gbc.gridx = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         numberExprPanel.add(numberExpressionButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        numberExprPanel.add(editColorExpressionButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
