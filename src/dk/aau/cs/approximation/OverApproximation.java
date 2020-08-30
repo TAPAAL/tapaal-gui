@@ -74,15 +74,13 @@ public class OverApproximation implements ITAPNApproximation {
 		TimedArcPetriNet net = transformedModel.value1();
                 
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
-		TimedToken currentToken = new TimedToken(currentPlace);
-		net.add(currentPlace);
-		currentPlace.addToken(currentToken);
+        net.add(currentPlace);
+		currentPlace.addTokens(1);
 		
 		// Block place, which secures the net makes at most one transition not in the trace.
 		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK", TimeInvariant.LESS_THAN_INFINITY);
-		TimedToken blockToken = new TimedToken(blockPlace);
-		net.add(blockPlace);
-		blockPlace.addToken(blockToken);
+        net.add(blockPlace);
+		blockPlace.addTokens(1);
 		
 		// Copy the original transitions
 		ArrayList<TimedTransition> originalTransitions = new ArrayList<TimedTransition>();

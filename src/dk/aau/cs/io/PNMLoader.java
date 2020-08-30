@@ -192,6 +192,7 @@ public class PNMLoader {
 		Require.that(places.put(id, place) == null && !transitions.containsKey(id), 
 				"The name: " + id + ", was already used");
 		tapn.add(place);
+		place.addTokens(marking.marking);
 		
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
@@ -201,10 +202,6 @@ public class PNMLoader {
 		}
 		
 		idResolver.add(tapn.name(), id, id);
-		
-		for (int i = 0; i < marking.marking; i++) {
-			tapn.parentNetwork().marking().add(new TimedToken(place));
-		}
 	}
 	
 	private InitialMarking parseMarking(Node node) {

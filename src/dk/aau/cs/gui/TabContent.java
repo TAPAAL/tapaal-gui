@@ -1514,12 +1514,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		netChanged = _netChanged;
 	}
 
-	//XXX the currently displayed template
-    Template currentlyDisplayedTemplate = null;
     public void changeToTemplate(Template tapn) {
 		Require.notNull(tapn, "Can't change to a Template that is null");
 
-		currentlyDisplayedTemplate = tapn;
 		drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 		nameGenerator.add(tapn.model());
 
@@ -1688,9 +1685,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void showStatistics() {
-	    if (currentlyDisplayedTemplate != null) {
-            StatisticsPanel.showStatisticsPanel(currentlyDisplayedTemplate.model().getStatistics(), this);
-        }
+	    StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics(), this);
 	}
 
 	@Override

@@ -163,13 +163,12 @@ public class TapnXmlLoader {
 			Node node = sharedPlaceNodes.item(i);
 
 			if(node instanceof Element){
-				SharedPlace place = parseSharedPlace((Element)node, network.marking(), constants);
-				network.add(place);
+				parseSharedPlace((Element)node, network, constants);
 			}
 		}
 	}
 
-	private SharedPlace parseSharedPlace(Element element, TimedMarking marking, ConstantStore constants) {
+	private SharedPlace parseSharedPlace(Element element, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
@@ -183,7 +182,7 @@ public class TapnXmlLoader {
 		}
 		
 		SharedPlace place = new SharedPlace(name, invariant);
-        place.setCurrentMarking(marking);
+        network.add(place);
 		place.addTokens(numberOfTokens);
 
 
@@ -447,9 +446,7 @@ public class TapnXmlLoader {
 		}else{
 			p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
-			for (int i = 0; i < initialMarkingInput; i++) {
-				network.marking().add(new TimedToken(p));
-			}
+			p.addTokens(initialMarkingInput);
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);

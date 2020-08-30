@@ -53,7 +53,8 @@ public abstract class TimedPlace {
         return tokens().size();
     }
 
-    public void addToken(TimedToken timedToken) {
+    //Removed usage of this function, pending removeal
+    private void addToken(TimedToken timedToken) {
         Require.that(timedToken != null, "timedToken cannot be null");
         Require.that(timedToken.place().equals(this), "token is located in a different place");
 
@@ -61,7 +62,8 @@ public abstract class TimedPlace {
         fireMarkingChanged();
     }
 
-    public void addTokens(Iterable<TimedToken> tokens) {
+    //Removed usage of this function, pending removeal
+    private void addTokens(Iterable<TimedToken> tokens) {
         Require.that(tokens != null, "tokens cannot be null");
 
         for(TimedToken token : tokens){
