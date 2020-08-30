@@ -36,17 +36,16 @@ public class AnimationHistorySidePanel extends JPanel {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     int selected = animBox.getSelectedIndex();
                     int clicked = animBox.locationToIndex(e.getPoint());
+
                     if (clicked != -1) {
                         int steps = clicked - selected;
                         Animator anim = CreateGui.getAnimator();
                         if (steps < 0) {
                             for (int i = 0; i < Math.abs(steps); i++) {
-                                animBox.stepBackwards();
                                 anim.stepBack();
                             }
                         } else {
                             for (int i = 0; i < Math.abs(steps); i++) {
-                                animBox.stepForward();
                                 anim.stepForward();
                             }
                         }
