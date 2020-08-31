@@ -757,6 +757,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         addColoredTokenButton.addActionListener(actionEvent -> {
             addColoredTokens((int) addTokenSpinner.getValue());
             addColoredTokenButton.setText("Modify");
+            System.out.println("skrr4");
+
         });
         SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
@@ -764,7 +766,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.SOUTHWEST;
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3,3);
         tokenPanel.add(addTokenSpinner, gbc);
 
@@ -907,7 +909,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         timeConstraintScrollPane.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
 
         addTimeConstraintButton.addActionListener(actionEvent -> {
-            JComboBox[] comboBoxes = colorInvariantComboboxPanel.getColorTypeComboBoxesArray();
             ColoredTimeInvariant timeConstraint = invariantEditorPanel.getInvariant();
             boolean alreadyExists = false;
 
@@ -915,19 +916,22 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
                     alreadyExists = true;
                     timeConstraintListModel.setElementAt(timeConstraint, i);
+                    timeConstraintList.setSelectedIndex(i);
                 }
             }
             if (!alreadyExists){
                 timeConstraintListModel.addElement(timeConstraint);
+                timeConstraintList.setSelectedIndex(timeConstraintListModel.size()-1);
             }
         });
 
         removeTimeConstraintButton.addActionListener(actionEvent -> {
-            timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
+            int index = timeConstraintList.getSelectedIndex();
+            timeConstraintListModel.removeElementAt(index);
             if(timeConstraintListModel.isEmpty()){
                 addTimeConstraintButton.setText("Add");
             } else{
-                timeConstraintList.setSelectedIndex(0);
+                timeConstraintList.setSelectedIndex(index);
             }
 
         });
@@ -1179,7 +1183,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         timeConstraintListModel.clear();
         tokenColorComboboxPanel.updateColorType(colorType);
         colorInvariantComboboxPanel.updateColorType(colorType);
-        addTokenSpinner.setValue(1);
+        tokenColorComboboxPanel.changedColor(tokenColorComboboxPanel.getColorTypeComboBoxesArray());
+        colorInvariantComboboxPanel.changedColor(colorInvariantComboboxPanel.getColorTypeComboBoxesArray());
         parent.pack();
     }
 
