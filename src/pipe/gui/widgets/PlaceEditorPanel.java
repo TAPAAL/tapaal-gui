@@ -728,7 +728,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         JScrollPane tokenListScrollPane = new JScrollPane(tokenTable);
         tokenListScrollPane.setViewportView(tokenTable);
         tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension tokenScrollPaneDim = new Dimension(750, 200);
+        Dimension tokenScrollPaneDim = new Dimension(850, 200);
         tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens"));
 
         gbc = new GridBagConstraints();
@@ -811,9 +811,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariants for specific colors"));
 
         GridBagConstraints gbc = GridBagHelper.as(0,0);
+        gbc.fill = GridBagConstraints.BOTH;
         timeInvariantColorPanel.add(initNonDefaultColorInvariantPanel(), gbc);
 
         gbc = GridBagHelper.as(0,3, WEST, HORIZONTAL, new Insets(3, 3, 3, 3));
+
         add(timeInvariantColorPanel, gbc);
 
     }
@@ -954,6 +956,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.EAST;
         ColoredTimeInvariant cti;
         if(place.underlyingPlace().getCtiList().isEmpty()) {
@@ -968,15 +971,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
             }
         };
-        //invariantEditorPanel.removeBorder();
         colorInvariantEditPanel.add(invariantEditorPanel,gbc);
 
-
+        gbc=new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
         colorInvariantEditPanel.add(buttonPanel,gbc);
 
+        gbc=new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -986,6 +989,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridy = 1;
         //gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        timeConstraintScrollPane.setPreferredSize(new Dimension(700,200));
         nonDefaultColorInvariantPanel.add(timeConstraintScrollPane, gbc);
 
         return nonDefaultColorInvariantPanel;
