@@ -846,7 +846,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 boolean alreadyExists = false;
                 for (int i = 0; i < timeConstraintListModel.size(); i++) {
                     if (timeConstraint.equalsOnlyColor(timeConstraintListModel.get(i))){
-                        invariantEditorPanel.setInvariant((ColoredTimeInvariant) timeConstraintListModel.get(i));
+                        invariantEditorPanel.setInvariant(timeConstraintListModel.get(i));
+                        timeConstraintList.setSelectedIndex(i);
                         addTimeConstraintButton.setText("Modify");
                         alreadyExists = true;
                     }
