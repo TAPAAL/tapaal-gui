@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
-import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 
 public class ModelLoader {
 
@@ -17,19 +16,19 @@ public class ModelLoader {
 	public LoadedModel load(File file) throws Exception{		
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader();
 		try{
-			return newFormatLoader.load(file);
-		}catch(Throwable e1){
+            return newFormatLoader.load(file);
+        }catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
-				return oldFormatLoader.load(file);
-			} catch(Throwable e2) {
+                return oldFormatLoader.load(file);
+            } catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());
 			}
 		}
 	}
-	
-	
-	public LoadedModel load(InputStream file) throws Exception{
+
+
+    public LoadedModel load(InputStream file) throws Exception{
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
@@ -45,13 +44,13 @@ public class ModelLoader {
 
             return newFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
-		}catch(Throwable e1){
+        }catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
 
                 return oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
-			} catch(Throwable e2) {
+            } catch(Throwable e2) {
 				throw new ParseException(e1.getMessage());
 			}
 		}
