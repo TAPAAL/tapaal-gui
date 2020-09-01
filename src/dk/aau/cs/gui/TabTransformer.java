@@ -367,6 +367,7 @@ public class TabTransformer {
         try {
             LoadedModel loadedModel = tapnLoader.load(fileOut);
             newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             newTab.addQuery(getQuery(queryOut, loadedModel.network()));
             return newTab;
         } catch (FormatException e) {
