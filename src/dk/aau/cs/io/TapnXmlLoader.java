@@ -68,6 +68,7 @@ public class TapnXmlLoader {
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
+    int groupPlaceHolder = 1;
     private LoadTACPN loadTACPN = new LoadTACPN();
     private TabContent.TAPNLens lens;
 
@@ -659,12 +660,15 @@ public class TapnXmlLoader {
 		String[] inscriptionSplit = {};
 		if (inscriptionTempStorage.contains(":")) {
 			inscriptionSplit = inscriptionTempStorage.split(":");
-		}
+		} else{
+		    inscriptionSplit = new String[]{inscriptionTempStorage};
+        }
 		boolean isInPreSet = false;
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
+
+		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput)), -1, isInPreSet);
 
 
 		if (isInPreSet) {
@@ -681,6 +685,20 @@ public class TapnXmlLoader {
 				assert (sourcePlace != null);
 				assert (trans != null);
 				assert (destPlace != null);
+				int groupNr = 1;
+                if(inscriptionSplit.length < 2){
+                    for (Object pt : tempArc.getTarget().getPostset()) {
+                        if (pt instanceof TimedTransportArcComponent) {
+                            if (((TimedTransportArcComponent) pt).getGroupNr() > groupNr) {
+                                groupNr = ((TimedTransportArcComponent) pt).getGroupNr();
+                            }
+                        }
+                    }
+                } else {
+                    groupNr = Integer.parseInt(inscriptionSplit[1]);
+                }
+                tempArc.setGroupNr(groupNr);
+                postsetTransportArc.setGroupNr(groupNr);
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, timeInterval, weight);
 				transArc.setColorTimeIntervals(ctiList);
@@ -713,6 +731,20 @@ public class TapnXmlLoader {
                 assert (sourcePlace != null);
 				assert (trans != null);
 				assert (destPlace != null);
+                int groupNr = 1;
+                if(inscriptionSplit.length < 2){
+                    for (Object pt : tempArc.getSource().getPostset()) {
+                        if (pt instanceof TimedTransportArcComponent) {
+                            if (((TimedTransportArcComponent) pt).getGroupNr() > groupNr) {
+                                groupNr = ((TimedTransportArcComponent) pt).getGroupNr();
+                            }
+                        }
+                    }
+                } else {
+                    groupNr = Integer.parseInt(inscriptionSplit[1]);
+                }
+                tempArc.setGroupNr(groupNr);
+                presetTransportArc.setGroupNr(groupNr);
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight);
 				transArc.setColorTimeIntervals(timeIntervals);

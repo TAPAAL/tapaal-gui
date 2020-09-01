@@ -496,6 +496,8 @@ public class TAPNComposer implements ITAPNComposer {
                     }
                 }
 				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
+				addedArc.setOutputExpression(arc.getOutputExpression());
+				addedArc.setInputExpression(arc.getInputExpression());
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
