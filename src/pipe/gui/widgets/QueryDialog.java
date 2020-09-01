@@ -11,14 +11,9 @@ import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -208,122 +203,19 @@ public class QueryDialog extends JPanel {
 	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
+
 	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
-	private final static EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
-	    name_verifyTAPN, //name of engine
-        false, //  support fastest trace
-        false, // support deadlock with net degree 2 and (EF or AG)
-        false, //  support deadlock with EG or AF
-        false, // support deadlock with inhibitor arcs
-        false,  //support weights
-        true,  //support inhibitor arcs
-        false, // support urgent transitions
-        false, // support EG or AF
-        true, // support strict nets
-        true, //  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        false);//support EG or AF with net degree > 2
+	private final static EngineSupportOptions verifyTAPNOptions= new VerifyPNEngineOptions();
+    private final static EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
+    private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
+    private final static EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+    private final static EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
+    private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
+    private final static EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
+    private final static EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
 
-    private final static EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
-        name_COMBI,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        true, //support weights
-        true, //support inhibitor arcs
-        true,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        true);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
-        name_OPTIMIZEDSTANDARD,//name of engine
-        false,//  support fastest trace
-        false,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        false, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        false);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
-        name_STANDARD,//name of engine
-        false,//  support fastest trace
-        false,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        false, //support inhibitor arcs
-        false,// support urgent transitions
-        false,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        false);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
-        name_BROADCAST,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        true, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        true);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
-        name_BROADCASTDEG2,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        true, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        true);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
-        name_DISCRETE,//name of engine
-        true,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        true,//  support deadlock with EG or AF
-        true,// support deadlock with inhibitor arcs
-        true, //support weights
-        true, //support inhibitor arcs
-        true,// support urgent transitions
-        true,// support EG or AF
-        false,// support strict nets
-        true,//  support timed nets/time intervals
-        true,// support deadlock with net degree > 2
-        true, //support games
-        true);//support EG or AF with net degree > 2);
-
-    //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
@@ -667,7 +559,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                              HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
+                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs",
@@ -684,7 +576,7 @@ public class QueryDialog extends JPanel {
 
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
-		contentPane.add(queryDialogue);
+        contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
 
@@ -946,7 +838,8 @@ public class QueryDialog extends JPanel {
             lens.isTimed(),
             (queryHasDeadlock() && highestNetDegree > 2),
             lens.isGame(),
-            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2
+            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2,
+            newProperty.hasNestedPathQuantifiers()
         };
 
 
