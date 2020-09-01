@@ -1,17 +1,6 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,8 +9,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 
-import javax.swing.BoxLayout;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -410,14 +398,15 @@ public class TimedPlaceComponent extends Place {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new PlaceEditorPanel(guiDialog, guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
-
-		guiDialog.setResizable(false);
+        JPanel placeEditorPanel = new PlaceEditorPanel(guiDialog, guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab()));
+		contentPane.add(placeEditorPanel);
+		guiDialog.setResizable(true);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
+        guiDialog.setMinimumSize(new Dimension(placeEditorPanel.getWidth(), 200));
 
-		// Move window to the middle of the screen
+        // Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 	}

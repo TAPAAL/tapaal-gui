@@ -39,7 +39,7 @@ import dk.aau.cs.util.RequireException;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
 
-public class PlaceEditorPanel extends javax.swing.JPanel {
+public class PlaceEditorPanel extends JPanel {
 
 	private final JRootPane rootPane;
 	
@@ -53,6 +53,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private boolean doNewEdit = true;
 	private final TabContent currentTab;
 	private final EscapableDialog parent;
+	private JPanel mainPanel;
+	private JScrollPane scrollPane;
 	
 	private Vector<TimedPlace> sharedPlaces;
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
@@ -64,8 +66,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		this.context = context;
         this.parent = parent;
 		this.colorType = place.underlyingPlace().getColorType();
+		setLayout(new BorderLayout());
+		mainPanel = new JPanel(new GridBagLayout());
+		scrollPane = new JScrollPane();
 		initComponents();
 		hideIrrelevantInformation();
+		scrollPane.setViewportView(mainPanel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		add(scrollPane, BorderLayout.CENTER);
 	}
 
 	private void hideIrrelevantInformation(){
@@ -88,16 +97,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
     }
 
 	private void initComponents() {
-		setLayout(new java.awt.GridBagLayout());
-
 		initBasicPropertiesPanel();
 		GridBagConstraints gridBagConstraints = GridBagHelper.as(0,0, WEST, HORIZONTAL, new Insets(5, 8, 0, 8));
-		add(basicPropertiesPanel, gridBagConstraints);
+		gridBagConstraints.weightx = 1.0;
+		mainPanel.add(basicPropertiesPanel, gridBagConstraints);
 
 		initTimeInvariantPanel();
 
 		gridBagConstraints = GridBagHelper.as(0,2, WEST, HORIZONTAL, new Insets(0, 8, 0, 8));
-		add(timeInvariantPanel, gridBagConstraints);
+		mainPanel.add(timeInvariantPanel, gridBagConstraints);
 
 
 		initButtonPanel();
@@ -105,7 +113,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints = GridBagHelper.as(0,5, new Insets(0, 8, 5, 8));
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		add(buttonPanel, gridBagConstraints);
+		mainPanel.add(buttonPanel, gridBagConstraints);
 		initColorTypePanel();
         initColorInvariantPanel();
 		initTokensPanel();
@@ -724,7 +732,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         });
         tokenTable.setDefaultRenderer(Object.class, new TokenTableCellRenderer());
 
-
         JScrollPane tokenListScrollPane = new JScrollPane(tokenTable);
         tokenListScrollPane.setViewportView(tokenTable);
         tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -736,9 +743,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         gbc.gridwidth = 3;
         gbc.insets = new Insets(3, 3, 3,3);
         tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
+        //tokenListScrollPane.setMinimumSize(new Dimension(700,100));
         tokenPanel.add(tokenListScrollPane, gbc);
 
         addColoredTokenButton = new JButton("Add");
@@ -757,8 +766,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         addColoredTokenButton.addActionListener(actionEvent -> {
             addColoredTokens((int) addTokenSpinner.getValue());
             addColoredTokenButton.setText("Modify");
-            System.out.println("skrr4");
-
         });
         SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
@@ -796,6 +803,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         tokenPanel.add(tokenButtonPanel, gbc);
 
@@ -805,7 +813,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(3, 3, 3, 3);
-        add(tokenPanel, gbc);
+        mainPanel.add(tokenPanel, gbc);
     }
 
     public void initColorInvariantPanel(){
@@ -817,8 +825,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         timeInvariantColorPanel.add(initNonDefaultColorInvariantPanel(), gbc);
 
         gbc = GridBagHelper.as(0,3, WEST, HORIZONTAL, new Insets(3, 3, 3, 3));
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
 
-        add(timeInvariantColorPanel, gbc);
+        mainPanel.add(timeInvariantColorPanel, gbc);
 
     }
 
@@ -906,7 +916,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         timeConstraintScrollPane.setViewportView(timeConstraintList);
         timeConstraintScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-
         timeConstraintScrollPane.setBorder(BorderFactory.createTitledBorder("Time invariant for colors"));
 
         addTimeConstraintButton.addActionListener(actionEvent -> {
@@ -987,14 +996,19 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc=new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.EAST;
         nonDefaultColorInvariantPanel.add(colorInvariantEditPanel,gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         //gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         timeConstraintScrollPane.setPreferredSize(new Dimension(700,200));
+        //timeConstraintScrollPane.setMinimumSize(new Dimension(500, 100));
         nonDefaultColorInvariantPanel.add(timeConstraintScrollPane, gbc);
 
         return nonDefaultColorInvariantPanel;
@@ -1059,7 +1073,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(3, 3, 3, 3);
-        add(colorTypePanel, gbc);
+        mainPanel.add(colorTypePanel, gbc);
     }
 
     private void addColoredTokens(int numberOfTokens) {
