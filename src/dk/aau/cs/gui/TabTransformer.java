@@ -12,6 +12,7 @@ import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
@@ -48,14 +49,21 @@ public class TabTransformer {
             // Make place token age invariant infinite
             for(TimedPlace place : template.model().places()){
                 place.setInvariant(TimeInvariant.LESS_THAN_INFINITY);
+                place.getCtiList().clear();
             }
             // Make transitions non-urgent
             for(TimedTransition transition : template.model().transitions()){
                 transition.setUrgent(false);
+                //TODO: what is default guard?
+                transition.setGuard(null);
             }
 
             for(Arc arc : template.guiModel().getArcs()){
                 // Make output arc guards infinite
+                if(arc instanceof TimedInputArcComponent && !(arc instanceof TimedTransportArcComponent)){
+                    TimedInputArcComponent arcComp = (TimedInputArcComponent) arc;
+                    arcComp.underlyingTimedInputArc().setColorTimeIntervals(new ArrayList<ColoredTimeInterval>());
+                }
                 if(arc instanceof TimedOutputArcComponent) {
                     TimedOutputArcComponent arcComp = (TimedOutputArcComponent) arc;
                     arcComp.setGuardAndWeight(TimeInterval.ZERO_INF, arcComp.getWeight());
@@ -64,6 +72,7 @@ public class TabTransformer {
                 // Add and process transport arcs in separate list to avoid delete errors
                 if(arc instanceof TimedTransportArcComponent){
                     TimedTransportArcComponent arcComp = (TimedTransportArcComponent) arc;
+                    arcComp.underlyingTransportArc().setColorTimeIntervals(new ArrayList<ColoredTimeInterval>());
                     transportArcComponents.add(arcComp);
                 }
             }
@@ -75,7 +84,7 @@ public class TabTransformer {
                     TimedPlace source = template.model().getPlaceByName(arc.getSource().getName());
                     TimedTransition destination = template.model().getTransitionByName(arc.getTarget().getName());
 
-                    TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight(), arc.underlyingArc().getExpression());
+                    TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight(), arc.underlyingTransportArc().getInputExpression());
 
 
                     // GUI
@@ -106,6 +115,7 @@ public class TabTransformer {
                     //Change the partner
 
                     TimedOutputArcComponent arc2 = convertPartner(arc.getConnectedTo(), template, guiModel);
+
                     removeTransportArc(arc, guiModel);
 
                     //Add arc to model and GUI
@@ -131,7 +141,7 @@ public class TabTransformer {
         TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
         TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
 
-        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight(), arc.underlyingArc().getExpression());
+        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight(), arc.underlyingTransportArc().getOutputExpression());
         //template.model().add(addedArc);
 
         // GUI
