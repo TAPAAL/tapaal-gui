@@ -35,7 +35,12 @@ public class TCTLDeadlockNode extends TCTLAbstractStateProperty {
 		return false;
 	}
 
-	public TCTLAbstractProperty findFirstPlaceHolder() {
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return false;
+    }
+
+    public TCTLAbstractProperty findFirstPlaceHolder() {
 		return null;
 	}
 	

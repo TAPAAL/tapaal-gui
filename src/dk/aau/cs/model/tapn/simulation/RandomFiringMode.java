@@ -8,7 +8,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.util.Require;
 
 public class RandomFiringMode implements FiringMode {
-	private Random random = new Random();
+	private final Random random = new Random();
 
 	public List<TimedToken> pickTokensFrom(List<TimedToken> elligibleTokens, int numberOfTokensToPick) {
 		Require.that(elligibleTokens.size() > 0,

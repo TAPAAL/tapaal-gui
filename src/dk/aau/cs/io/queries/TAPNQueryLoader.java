@@ -40,7 +40,7 @@ import dk.aau.cs.translations.ReductionOption;
 
 public class TAPNQueryLoader extends QueryLoader{
 
-	private Document doc;
+	private final Document doc;
 	
 	public TAPNQueryLoader(Document doc, TimedArcPetriNetNetwork network) {
 		super(network);
@@ -52,7 +52,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 		
 		for (int i = 0; i < queryNodes.getLength(); i++) {
-			Node q = queryNodes.item(i);
+            Node q = queryNodes.item(i);
 
 			if (q instanceof Element) {
 				TAPNQuery query = parseTAPNQuery((Element) q, network);

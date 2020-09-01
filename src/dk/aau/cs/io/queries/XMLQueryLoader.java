@@ -33,13 +33,12 @@ import org.w3c.dom.Node;
 
 public class XMLQueryLoader extends QueryLoader{
 
-    private File file;
-    private ArrayList<QueryWrapper> faultyQueries;
+    private final File file;
+    private final ArrayList<QueryWrapper> faultyQueries = new ArrayList<QueryWrapper>();
 
     public XMLQueryLoader(File file, TimedArcPetriNetNetwork network){
         super(network);
         this.file = file;
-        this.faultyQueries = new ArrayList<QueryWrapper>();
     }
 
     @Override

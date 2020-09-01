@@ -1,6 +1,6 @@
 package pipe.gui.canvas;
 
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.GraphicalElement;
 
 /**
  * ProtypeCanvas is used by controllers to draw objects that are not (yet) committed to the medel
@@ -8,8 +8,8 @@ import pipe.gui.graphicElements.PetriNetObject;
  */
 public interface PrototypeCanvas {
 
-    void addPrototype(PetriNetObject pno);
-    void removePrototype(PetriNetObject pno);
+    void addPrototype(GraphicalElement pno);
+    void removePrototype(GraphicalElement pno);
 
     void clearAllPrototype();
 

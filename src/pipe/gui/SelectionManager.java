@@ -11,7 +11,9 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -27,12 +29,12 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	private Point startPoint;
 
-	private Point upperLeftCorner = new Point(0,0);
-	private Rectangle selectionRectangle = new Rectangle(-1, -1);
+	private final Point upperLeftCorner = new Point(0,0);
+	private final Rectangle selectionRectangle = new Rectangle(-1, -1);
 	private boolean isSelecting;
 	private static final Color selectionColor = new Color(0, 0, 255, 30);
 	private static final Color selectionColorOutline = new Color(0, 0, 100);
-	private DrawingSurfaceImpl drawingSurface;
+	private final DrawingSurfaceImpl drawingSurface;
 
 	public SelectionManager(DrawingSurfaceImpl _view) {
 		addMouseListener(this);
@@ -102,28 +104,12 @@ public class SelectionManager extends javax.swing.JComponent implements
 			return;
 		}
 
-		// First see if translation will put anything at a negative location
-		Point point = null;
-		Point topleft = null;
+		//Find selection
+        List<PetriNetObject> selection = getSelection();
 
-		// Get all the objects in the current window, ignoring Arcs
-		ArrayList<PetriNetObject> pnObjects = drawingSurface.getGuiModel().getPNObjects();
-		for (PetriNetObject pnObject : pnObjects) {
-			if (pnObject.isSelected() && !(pnObject instanceof Arc)) {
-				point = pnObject.getLocation();
-				if (topleft == null) {
-					topleft = point;
-				} else {
-					if (point.x < topleft.x) {
-						topleft.x = point.x;
-					}
-					if (point.y < topleft.y) {
-						topleft.y = point.y;
-					}
-				}
-			}
-		}
+        Point topleft = getTopLeftMostPoint(selection);
 
+        //Adjust the translate distance to avoid exceeding 0,0
 		if (topleft != null) {
 			topleft.translate(transX, transY);
 			if (topleft.x < 0) {
@@ -137,15 +123,44 @@ public class SelectionManager extends javax.swing.JComponent implements
 			}
 		}
 
-		for (PetriNetObject pnObject : pnObjects) {
-			if (pnObject.isSelected()) {
-				pnObject.translate(transX, transY);
-			}
+		for (PetriNetObject pnObject : selection) {
+		    pnObject.translate(transX, transY);
 		}
 		drawingSurface.updatePreferredSize();
 	}
 
-	public ArrayList<PetriNetObject> getSelection() {
+    @Nullable
+    private Point getTopLeftMostPoint(List<PetriNetObject> selection) {
+        // First see if translation will put anything at a negative location
+        Point topleft = null;
+
+        // Get all the objects in the current window, ignoring Arcs
+        for (PetriNetObject pnObject : selection) {
+            if (pnObject.isSelected() && !(pnObject instanceof Arc)) {
+                Point point = pnObject.getLocation();
+                if (topleft == null) {
+                    topleft = point;
+                } else {
+                    if (point.x < topleft.x) {
+                        topleft.x = point.x;
+                    }
+                    if (point.y < topleft.y) {
+                        topleft.y = point.y;
+                    }
+                }
+            }
+        }
+        return topleft;
+    }
+
+    public ArrayList<PetriNetObject> getSelection() {
+	    /*
+	       Alternative stream implementation
+	       drawingSurface.getGuiModel().getPNObjects().stream()
+            .filter(PetriNetObject::isSelected)
+            .collect(Collectors.toList());
+	     */
+
 		ArrayList<PetriNetObject> selection = new ArrayList<PetriNetObject>();
 
 		// Get all the objects in the current window

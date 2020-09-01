@@ -13,8 +13,8 @@ import dk.aau.cs.util.Require;
 
 public class TimeInvariant {
 	public static final TimeInvariant LESS_THAN_INFINITY = new TimeInvariant(false, Bound.Infinity);
-	private boolean isUpperIncluded;
-	private Bound upper;
+	private final boolean isUpperIncluded;
+	private final Bound upper;
 
 	public TimeInvariant(boolean isUpperIncluded, Bound upper) {
 		Require.that(upper != null, "bound cannot be null");

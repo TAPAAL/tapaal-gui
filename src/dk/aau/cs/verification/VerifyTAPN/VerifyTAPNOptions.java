@@ -14,8 +14,8 @@ import dk.aau.cs.verification.VerificationOptions;
 public class VerifyTAPNOptions extends VerificationOptions{
 
 	protected int tokensInModel;
-	private boolean symmetry;
-	private boolean discreteInclusion;
+	private final boolean symmetry;
+	private final boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
 	
 	//only used for boundedness analysis

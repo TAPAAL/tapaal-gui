@@ -27,6 +27,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
@@ -42,7 +43,7 @@ public class GuardDialogue extends JPanel /*
  * PropertyChangeListener
  */
 {
-	private JRootPane myRootPane;
+	private final JRootPane myRootPane;
 	private JPanel guardEditPanel;
 	private JPanel weightEditPanel;
 	private JPanel buttonPanel;
@@ -61,13 +62,13 @@ public class GuardDialogue extends JPanel /*
 	private JComboBox<String> rightDelimiter;
 
 	private JCheckBox leftUseConstant;
-	private WidthAdjustingComboBox leftConstantsComboBox;
+	private WidthAdjustingComboBox<String> leftConstantsComboBox;
 	private JCheckBox rightUseConstant;
-	private WidthAdjustingComboBox rightConstantsComboBox;
+	private WidthAdjustingComboBox<String> rightConstantsComboBox;
 	private JCheckBox weightUseConstant;
-	private WidthAdjustingComboBox weightConstantsComboBox;
+	private WidthAdjustingComboBox<String> weightConstantsComboBox;
 	
-	private int maxNumberOfPlacesToShowAtOnce = 20;
+	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
 		myRootPane = rootPane;
@@ -76,7 +77,10 @@ public class GuardDialogue extends JPanel /*
 		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			initTimeGuardPanel();
 		}
-		
+        if(!objectToBeEdited.isTimed() ){
+            guardEditPanel.setVisible(false);
+        }
+
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 
@@ -261,8 +265,8 @@ public class GuardDialogue extends JPanel /*
 		
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 	    
-	    weightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		weightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+	    weightConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
+		weightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 		weightConstantsComboBox.setMaximumRowCount(20);
 		weightConstantsComboBox.setVisible(false);
 		weightConstantsComboBox.setPreferredSize(intervalBoxDims);
@@ -320,22 +324,22 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(label, gridBagConstraints);
 
 		String[] left = { "[", "(" };
-		leftDelimiter = new JComboBox();
+		leftDelimiter = new JComboBox<>();
 		Dimension dims = new Dimension(55, 25);
 		leftDelimiter.setPreferredSize(dims);
 		leftDelimiter.setMinimumSize(dims);
 		leftDelimiter.setMaximumSize(dims);
-		leftDelimiter.setModel(new DefaultComboBoxModel(left));
+		leftDelimiter.setModel(new DefaultComboBoxModel<>(left));
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(leftDelimiter, gridBagConstraints);
 
 		String[] right = { "]", ")" };
-		rightDelimiter = new JComboBox();
+		rightDelimiter = new JComboBox<>();
 		rightDelimiter.setPreferredSize(dims);
 		rightDelimiter.setMinimumSize(dims);
 		rightDelimiter.setMaximumSize(dims);
-		rightDelimiter.setModel(new DefaultComboBoxModel(right));
+		rightDelimiter.setModel(new DefaultComboBoxModel<>(right));
 		gridBagConstraints.gridx = 5;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(rightDelimiter, gridBagConstraints);
@@ -417,8 +421,8 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(leftUseConstant, gridBagConstraints);
 
 	
-		leftConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		leftConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+		leftConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
+		leftConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 	//	leftConstantsComboBox = new JComboBox(constants.toArray());
 		leftConstantsComboBox.setMaximumRowCount(20);
 		leftConstantsComboBox.setVisible(false);
@@ -450,8 +454,8 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 0;
 		guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
-		rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		rightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+		rightConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
+		rightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
 	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);

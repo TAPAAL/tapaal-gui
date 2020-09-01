@@ -20,11 +20,12 @@ import pipe.gui.widgets.EscapableDialog;
 
 public class SimulationControl extends JPanel {
 	
-	JSlider simulationSpeed;
-	JCheckBox randomSimulation;
-	Timer timer;
-	
-	private static SimulationControl instance;
+	final JSlider simulationSpeed = new JSlider();
+	final JCheckBox randomSimulation = new JCheckBox("Enable automatic random simulation");
+    final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
+    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
+    private static boolean defaultIsRandomTrasition;
+    private static SimulationControl instance;
 	
 	public static SimulationControl getInstance(){
 		if(instance == null){
@@ -43,9 +44,8 @@ public class SimulationControl extends JPanel {
 	
 	private SimulationControl() {
 		super(new GridBagLayout());
-		
-		simulationSpeed = new JSlider();
-		simulationSpeed.setSnapToTicks(false);
+
+        simulationSpeed.setSnapToTicks(false);
 		simulationSpeed.setMajorTickSpacing(10);
 		simulationSpeed.setPaintLabels(false);
 		simulationSpeed.setPaintTicks(true);
@@ -53,27 +53,33 @@ public class SimulationControl extends JPanel {
 		simulationSpeed.setPreferredSize(new Dimension(340, simulationSpeed.getPreferredSize().height));
 		
 		simulationSpeed.addChangeListener(e -> {
-			if(timer != null){
-				setDelay((100 - simulationSpeed.getValue())*20);
-			}
-		});
-		
-		randomSimulation = new JCheckBox("Enable automatic random simulation");
-		
-		GridBagConstraints gbc = new GridBagConstraints();
+            setDelay((100 - simulationSpeed.getValue())*20);
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(randomSimulation, gbc);
-		
+
 		gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(randomMode, gbc);
+
+        setRandomTransitionMode(defaultIsRandomTrasition);
+
+        gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		add(new JLabel("Set simulation speed:"), gbc);
 		
 		gbc = new GridBagConstraints();
@@ -81,7 +87,7 @@ public class SimulationControl extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 3;
 		add(simulationSpeed, gbc);
 		
 		setBorder(BorderFactory.createCompoundBorder(
@@ -99,15 +105,10 @@ public class SimulationControl extends JPanel {
 	}
 	
 	private void initTimer(){
-		timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
-		timer.setRepeats(true);
+        timer.setRepeats(true);
 	}
 
-	public JSlider getSimulationSpeedSlider(){
-		return simulationSpeed;
-	}
-	
-	public boolean randomSimulation(){
+    public boolean randomSimulation(){
 		return randomSimulation.isSelected();
 	}
 	
@@ -169,4 +170,26 @@ public class SimulationControl extends JPanel {
 		dialog.setLocation(x, y);
 		dialog.setVisible(true);
 	}
+
+    public boolean isRandomTransitionMode(){
+        if(SimulationControl.getInstance().randomSimulation()){
+            return true;
+        } else {
+            return randomMode.isSelected();
+        }
+    }
+
+    public void setRandomTransitionMode(boolean randomTransition){
+        randomMode.setSelected(randomTransition);
+    }
+    public static boolean isRandomTransition(){
+        if(instance != null){
+            return getInstance().isRandomTransitionMode();
+        } else {
+            return defaultIsRandomTrasition;
+        }
+    }
+    public static void setDefaultIsRandomTransition(boolean delayEnabledTransitionIsRandomTransition) {
+        defaultIsRandomTrasition = delayEnabledTransitionIsRandomTransition;
+    }
 }

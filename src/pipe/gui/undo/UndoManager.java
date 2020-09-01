@@ -4,12 +4,13 @@
 package pipe.gui.undo;
 
 import java.util.ArrayList;
-import java.util.Optional;
+
 import dk.aau.cs.gui.undo.Command;
+import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Pipe;
-import pipe.gui.handler.PlaceTransitionObjectHandler;
 
 /**
  * Class to handle undo & redo functionality
@@ -18,18 +19,18 @@ import pipe.gui.handler.PlaceTransitionObjectHandler;
  */
 public class UndoManager {
 
-	private static int UNDO_BUFFER_CAPACITY = Pipe.DEFAULT_BUFFER_CAPACITY;
+	private static final int UNDO_BUFFER_CAPACITY = Pipe.DEFAULT_BUFFER_CAPACITY;
 
 	private int indexOfNextAdd = 0;
 	private int sizeOfBuffer = 0;
 	private int startOfBuffer = 0;
 	private int undoneEdits = 0;
 
-	private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
+	private final ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private Optional<GuiFrameActions> app = Optional.empty();
-	public void setApp(GuiFrameActions app) {
-		this.app = Optional.ofNullable(app);
+	private Reference<GuiFrameActions> app = new MutableReference<>();
+	public void setApp(Reference<GuiFrameActions> app) {
+		this.app = app;
 
 		// Undo/Redo is enabled based on undo/redo manager
 		setUndoRedoStatus();
@@ -40,8 +41,7 @@ public class UndoManager {
 	 */
 	public UndoManager() {
 
-		app.ifPresent(a -> a.setUndoActionEnabled(false));
-		app.ifPresent(a -> a.setRedoActionEnabled(false));
+	    // Initialize the buffer
 		for (int i = 0; i < UNDO_BUFFER_CAPACITY; i++) {
 			edits.add(null);
 		}
@@ -50,7 +50,6 @@ public class UndoManager {
 	public void redo() {
 
 		if (undoneEdits > 0) {
-			checkArcBeingDrawn();
 
 			// The currentEdit to redo
 			for (Command command : edits.get(indexOfNextAdd)) {
@@ -79,7 +78,6 @@ public class UndoManager {
 	public void undo() {
 
 		if (sizeOfBuffer > 0) {
-			checkArcBeingDrawn();
 
 			if (--indexOfNextAdd < 0) {
 				indexOfNextAdd += UNDO_BUFFER_CAPACITY;
@@ -152,12 +150,4 @@ public class UndoManager {
 		return lastAdd;
 	}
 
-	// removes the arc currently being drawn if any
-	private void checkArcBeingDrawn() {
-        if(CreateGui.getDrawingSurface() != null) {
-            if (CreateGui.getDrawingSurface().createArc != null) {
-                PlaceTransitionObjectHandler.cleanupArc(CreateGui.getDrawingSurface().createArc, CreateGui.getDrawingSurface());
-            }
-        }
-	}
 }

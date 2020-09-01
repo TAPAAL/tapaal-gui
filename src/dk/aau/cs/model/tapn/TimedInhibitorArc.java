@@ -14,8 +14,12 @@ public class TimedInhibitorArc extends TimedInputArc {
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
 		super(source, destination, TimeInterval.ZERO_INF, weight);
 	}
-	
-	public List<TimeInterval> getDEnabledInterval(){
+
+    public TimedInhibitorArc(TimedPlace source, TimedTransition destination) {
+        this(source, destination, TimeInterval.ZERO_INF, new IntWeight(1));
+    }
+
+    public List<TimeInterval> getDEnabledInterval(){
 		if(source().tokens().size() < getWeight().value()){
 			return Arrays.asList(new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false));
 		} else {

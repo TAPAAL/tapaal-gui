@@ -7,6 +7,7 @@ import java.util.List;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import org.jetbrains.annotations.NotNull;
 
 public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	private boolean nextIsLoop;	
@@ -14,8 +15,8 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	private TraceType traceType;
 	
 	
-	private List<TimedArcPetriNetStep> steps = new ArrayList<TimedArcPetriNetStep>();
-	private boolean isTimedTrace = true;
+	private final List<TimedArcPetriNetStep> steps = new ArrayList<TimedArcPetriNetStep>();
+	private final boolean isTimedTrace;
 	
 	public TimedArcPetriNetTrace(boolean isTimedTrace) {
 		this.isTimedTrace = isTimedTrace;
@@ -31,7 +32,7 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 		steps.add(step);
 	}
 
-	public Iterator<TimedArcPetriNetStep> iterator() {
+	public @NotNull Iterator<TimedArcPetriNetStep> iterator() {
 		return steps.iterator();
 	}
 

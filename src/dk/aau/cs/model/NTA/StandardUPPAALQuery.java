@@ -6,7 +6,7 @@ public class StandardUPPAALQuery implements UPPAALQuery {
 	private String pathQuantifier;
 	private String nodeQuantifier;
 
-	private String query; // TODO: make this more object oriented
+	private final String query; // TODO: make this more object oriented
 
 	public StandardUPPAALQuery(String inputQuery) {
 		String query = inputQuery.trim();

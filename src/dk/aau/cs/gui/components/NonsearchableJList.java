@@ -19,7 +19,7 @@ public class NonsearchableJList<E> extends JList<E>{
 		removeKeyListener();
 	}
 
-	public NonsearchableJList(ListModel dataModel){
+	public NonsearchableJList(ListModel<E> dataModel){
 		super (dataModel);
 		removeKeyListener();
 	}

@@ -1,35 +1,51 @@
 package pipe.gui;
 
+import java.awt.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.sun.jna.Platform;
+import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.handler.SpecialMacHandler;
 import dk.aau.cs.gui.TabContent;
-
 
 public class CreateGui {
 
-	private static GuiFrame appGui;
-    private static GuiFrameController appGuiController;
+	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
+    private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
 
-	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
+	private static final ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 
 	public static void init() {
-		appGui = new GuiFrame(TAPAAL.getProgramName());
-        appGuiController = new GuiFrameController(appGui);
 
-		if (Platform.isMac()){
-			try {
-				SpecialMacHandler.postprocess();
-			} catch (NoClassDefFoundError e) {
-				//Failed loading special mac handler, ignore and run program without MacOS integration
-			}
-		}
+	    try {
+            Desktop.getDesktop().setAboutHandler(e -> appGuiController.showAbout());
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+            Logger.log("Failed to set native about handler");
+        }
+
+	    try {
+	        Desktop.getDesktop().setQuitHandler(
+	            (e, response) -> {
+	                appGuiController.exit();
+	                response.cancelQuit(); //If we get here the request was canceled.
+	            }
+	        );
+
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+	        Logger.log("Failed to set native quit handler");
+        }
+
+        try {
+            Image appImage = ResourceManager.getIcon("icon.png").getImage();
+            Taskbar.getTaskbar().setIconImage(appImage);
+
+        } catch (SecurityException | UnsupportedOperationException ignored) {
+            Logger.log("Failed to set DockIcon");
+        }
 
 		appGui.setVisible(true);
 		appGuiController.checkForUpdate(false);
@@ -37,8 +53,7 @@ public class CreateGui {
 
 	@Deprecated
 	public static DataLayer getModel() {
-	    if (appGui==null) return null;
-		return getModel(appGui.getSelectedTabIndex());
+        return getModel(appGui.getSelectedTabIndex());
 	}
 
 	@Deprecated
@@ -139,5 +154,11 @@ public class CreateGui {
         return appGuiController;
     }
 
+
+    public static boolean useExtendedBounds = false;
+
+	//XXX Moved from guiframe to static access, while refactoring.
+	@Deprecated
+    public static Pipe.ElementType guiMode;
 
 }

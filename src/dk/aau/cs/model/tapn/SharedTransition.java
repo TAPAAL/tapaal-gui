@@ -14,8 +14,9 @@ public class SharedTransition {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
-	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
+	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
+	private boolean isUncontrollable = false;
 
 	private TimedArcPetriNetNetwork network;
 	
@@ -42,6 +43,17 @@ public class SharedTransition {
 		}
 	}
 
+	public boolean isUncontrollable() {
+	    return isUncontrollable;
+    }
+
+	public void setUncontrollable(boolean isUncontrollable) {
+	    this.isUncontrollable = isUncontrollable;
+	    for (TimedTransition transition : transitions) {
+	        transition.setUncontrollable(isUncontrollable, false);
+        }
+    }
+
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
@@ -60,7 +72,7 @@ public class SharedTransition {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(templateDoesNotContainSharedTransition(transition.model()), "Another transition in the same template is already shared under that name");
 		transition.makeShared(this); // this will unshare first if part of another shared transition
-		transitions.add(transition);
+        transitions.add(transition);
 	}
 
 	private boolean templateDoesNotContainSharedTransition(TimedArcPetriNet model) {

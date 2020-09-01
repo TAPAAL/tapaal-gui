@@ -8,7 +8,7 @@ import dk.aau.cs.util.StringComparator;
 
 public class SortQueriesCommand extends Command {
 	
-	DefaultListModel listModel;
+	final DefaultListModel listModel;
 	Object[] oldOrder;
 	
 	public SortQueriesCommand(DefaultListModel listModel) {

@@ -9,12 +9,11 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
-	public static final TimeInterval ZERO_INF = new TimeInterval(true,
-			new IntBound(0), Bound.Infinity, false);
-	private boolean isLowerIncluded;
+	public static final TimeInterval ZERO_INF = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+	private final boolean isLowerIncluded;
 	private Bound lower;
 	private Bound upper;
-	private boolean isUpperIncluded;
+	private final boolean isUpperIncluded;
 
 	public TimeInterval(boolean isLowerIncluded, Bound lower, Bound upper,
 			boolean isUpperIncluded) {
@@ -26,8 +25,7 @@ public class TimeInterval {
 		this.upper = upper;
 		this.isUpperIncluded = isUpperIncluded;
 		
-		Require.that(isValidInterval(), "The constructed interval "
-				+ toString() + " is empty.");
+		Require.that(isValidInterval(), "The constructed interval " + toString() + " is empty.");
 	}
 
 	public TimeInterval(TimeInterval interval) {
@@ -102,11 +100,11 @@ public class TimeInterval {
 		this.upper = upper;
 	}
 
-	public boolean IsLowerBoundNonStrict() {
+	public boolean isLowerBoundNonStrict() {
 		return isLowerIncluded;
 	}
 
-	public boolean IsUpperBoundNonStrict() {
+	public boolean isUpperBoundNonStrict() {
 		return isUpperIncluded;
 	}
 

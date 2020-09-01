@@ -78,9 +78,9 @@ public class ExportBatchDialog extends JDialog {
 	private JButton exportFilesButton;
 	private JPanel chooserPanel;
 	private JTextField destinationPathField;
-	private JList fileList;
-	private DefaultListModel listModel;
-	private List<File> files = new ArrayList<File>();
+	private JList<File> fileList;
+	private DefaultListModel<File> listModel;
+	private final List<File> files = new ArrayList<File>();
 	private String lastExportPath;
 	private String lastSelectPath;
 	private JCheckBox uniqueQueryNames;
@@ -287,8 +287,8 @@ public class ExportBatchDialog extends JDialog {
 		JPanel fileListPanel = new JPanel(new GridBagLayout());
 		fileListPanel.setBorder(BorderFactory.createTitledBorder("Files"));
 
-		listModel = new DefaultListModel();
-		fileList = new JList(listModel);
+		listModel = new DefaultListModel<>();
+		fileList = new JList<>(listModel);
 		fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		fileList.setSelectedIndex(0);
 		fileList.addKeyListener(new KeyAdapter() {
@@ -300,7 +300,7 @@ public class ExportBatchDialog extends JDialog {
 			}
 		});
 
-		fileList.setCellRenderer(new FileNameCellRenderer());
+		fileList.setCellRenderer(new FileNameCellRenderer<>());
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		JScrollPane scrollpane = new JScrollPane(fileList);

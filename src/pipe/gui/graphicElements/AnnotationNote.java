@@ -15,6 +15,7 @@ import java.util.EnumMap;
 
 import javax.swing.JDialog;
 
+import net.tapaal.swinghelpers.DispatchEventsToParentHandler;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
@@ -28,7 +29,7 @@ public class AnnotationNote extends Note {
 
 	private boolean fillNote = true;
 
-	private EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
+	private final EnumMap<dragPoint, ResizePoint> dragPoints = new EnumMap<>(dragPoint.class);
 
 	private AffineTransform prova = new AffineTransform();
 
@@ -36,16 +37,16 @@ public class AnnotationNote extends Note {
 		super(x, y);
 		setDragPoints();
 
-        getNote().addMouseListener(getMouseHandler());
-        getNote().addMouseMotionListener(getMouseHandler());
+        getNote().addMouseListener(new DispatchEventsToParentHandler());
+        getNote().addMouseMotionListener(new DispatchEventsToParentHandler());
 	}
 
 	public AnnotationNote(String text, int x, int y, int w, int h, boolean border) {
 		super(text, x, y, w, h, border);
 		setDragPoints();
 
-        getNote().addMouseListener(getMouseHandler());
-        getNote().addMouseMotionListener(getMouseHandler());
+        getNote().addMouseListener(new DispatchEventsToParentHandler());
+        getNote().addMouseMotionListener(new DispatchEventsToParentHandler());
 	}
 
 	@Override
@@ -252,7 +253,7 @@ public class AnnotationNote extends Note {
 	private class ResizePointHandler extends
 			javax.swing.event.MouseInputAdapter {
 
-		private ResizePoint myPoint;
+		private final ResizePoint myPoint;
 		private Point start;
 
 		public ResizePointHandler(ResizePoint point) {
@@ -308,20 +309,24 @@ public class AnnotationNote extends Note {
 
 		private Rectangle shape;
 		private boolean isPressed = false;
-		private Note myNote;
+		private final Note myNote;
 		public int typeMask;
 
 		public ResizePoint(Note obj, int type) {
 			myNote = obj;
 			setOpaque(false);
-			setBounds(-SIZE - 1, -SIZE - 1, 2 * SIZE
-					+ Pipe.ANNOTATION_SIZE_OFFSET + 1, 2 * SIZE
-					+ Pipe.ANNOTATION_SIZE_OFFSET + 1);
+			setBounds(
+			    -SIZE - 1, -SIZE - 1,
+                2 * SIZE + Pipe.ANNOTATION_SIZE_OFFSET + 1,
+                2 * SIZE + Pipe.ANNOTATION_SIZE_OFFSET + 1
+            );
 			typeMask = type;
 		}
 
-		public void setLocation(double x, double y) {
-			super.setLocation((int) (x - SIZE), (int) (y - SIZE));
+		//Adjust the point a bit to hit center on corner of box
+        @Override
+		public void setLocation(int x, int y) {
+			super.setLocation(x - SIZE, y - SIZE);
 		}
 
 		private void drag(int x, int y) {

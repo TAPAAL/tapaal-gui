@@ -58,7 +58,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	protected static final String LOCK_BOOL = "lock";
 
-	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
 	protected Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
 	protected Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
@@ -188,7 +188,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		}
 
 		for (TimedTransition t : model.transitions()) {
-			if(t.presetSize() == 0 && !t.hasInhibitorArcs()) {
+			if(t.presetSizeWithoutInhibitorArcs() == 0 && !t.hasInhibitorArcs()) {
 				continue;
 			} else if (isTransitionDegree1(t) && !t.hasInhibitorArcs()) {
 				builder.append("broadcast chan ");
@@ -221,11 +221,11 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 
 	private boolean isTransitionDegree1(TimedTransition t) {
-		return t.presetSize() == 1 && t.postsetSize() == 1;
+		return t.presetSizeWithoutInhibitorArcs() == 1 && t.postsetSize() == 1;
 	}
 	
 	private boolean isTransitionDegree2(TimedTransition t) {
-		return t.presetSize() == 2 && t.postsetSize() == 2;
+		return t.presetSizeWithoutInhibitorArcs() == 2 && t.postsetSize() == 2;
 	}
 
 	private TimedAutomaton createControlTemplate(TimedArcPetriNet model) {
@@ -256,7 +256,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	protected void createTransitionSimulations(TimedAutomaton control, Location lock, TimedArcPetriNet model) {
 
 		for (TimedTransition transition : model.transitions()) {
-			if(transition.presetSize() == 0 && !transition.hasInhibitorArcs())
+			if(transition.presetSizeWithoutInhibitorArcs() == 0 && !transition.hasInhibitorArcs())
 				continue;
 			
 			if (!(isTransitionDegree1(transition) || isTransitionDegree2(transition)) || transition.hasInhibitorArcs()) {
@@ -430,7 +430,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		ta.setLocations(CreateLocationsFromModel(model));
 
 		for (TimedTransition t : model.transitions()) {
-			int presetSize = t.presetSize() + t.getInhibitorArcs().size();
+			int presetSize = t.presetSizeWithoutInhibitorArcs() + t.getInhibitorArcs().size();
 			
 			if(presetSize == 0)
 				continue;
@@ -644,9 +644,9 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		
 		StringBuilder builder = new StringBuilder();
 		boolean lowerBoundAdded = false;
-		if(!(interval.lowerBound().value() == 0 && interval.IsLowerBoundNonStrict())) {
+		if(!(interval.lowerBound().value() == 0 && interval.isLowerBoundNonStrict())) {
 			builder.append(TOKEN_CLOCK_NAME);
-			if(interval.IsLowerBoundNonStrict())
+			if(interval.isLowerBoundNonStrict())
 				builder.append(" >= ");
 			else
 				builder.append(" > ");
@@ -659,7 +659,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			if(lowerBoundAdded) builder.append(" && ");
 			builder.append(TOKEN_CLOCK_NAME);
 			
-			if(interval.IsUpperBoundNonStrict())
+			if(interval.isUpperBoundNonStrict())
 				builder.append(" <= ");
 			else
 				builder.append(" < ");
@@ -713,8 +713,8 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		private final String TAU = "tau";
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(_test)?$";
 		private final String END_OF_SEQUENCE_PATTERN = "^(\\w+?)_fire$";
-		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-		private Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
+		private final Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
 		private final SequenceInfo seqInfo = SequenceInfo.END;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {

@@ -2,6 +2,7 @@ package pipe.gui.graphicElements.tapn;
 
 import java.util.Hashtable;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -24,10 +25,25 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
+	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc, TabContent.TAPNLens lens){
+	    super(source);
+	    setTarget(target);
+	    setUnderlyingArc(modelArc);
+	    updateLabel(true);
+	    this.lens = lens;
+	    sealArc();
+    }
+
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
 		updateLabel(true);
 	}
+
+    public TimedInputArcComponent(TimedOutputArcComponent arc, TabContent.TAPNLens lens) {
+        super(arc);
+        updateLabel(true);
+        this.lens = lens;
+    }
 
     @Override
 	protected void addMouseHandler() {
@@ -74,7 +90,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
         if (inputArc == null)
             getNameLabel().setText("");
         else {
-            if (!CreateGui.getApp().showZeroToInfinityIntervals()) {
+            if (!CreateGui.getApp().showZeroToInfinityIntervals() || !lens.isTimed()) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }

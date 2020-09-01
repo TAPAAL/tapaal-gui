@@ -1,11 +1,8 @@
 package pipe.dataLayer;
 
+import dk.aau.cs.TCTL.*;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.widgets.InclusionPlaces;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 
@@ -221,7 +218,15 @@ public class TAPNQuery {
 	public void setUseOverApproximation(boolean useOverApproximation){
 		overApproximation = useOverApproximation;
 	}
-	
+
+    public void setUseOverApproximationEnabled(boolean useOverApproximationEnabled){
+        this.enableOverApproximation = useOverApproximationEnabled;
+    }
+
+    public void setUseUnderApproximationEnabled(boolean useUnderApproximationEnabled){
+        this.enableUnderApproximation = useUnderApproximationEnabled;
+    }
+
 	public void setUseReduction(boolean useReduction){
 		this.useReduction = useReduction;
 	}
@@ -415,5 +420,14 @@ public class TAPNQuery {
     
     public AlgorithmOption getAlgorithmOption(){
     	return this.algorithmOption;
+    }
+
+    public boolean hasUntimedOnlyProperties(){
+        if(!(property instanceof TCTLAFNode || property instanceof TCTLAGNode || property instanceof TCTLEFNode || property instanceof  TCTLEGNode)){
+            return true;
+        } else if(property.hasNestedPathQuantifiers()){
+            return true;
+        }
+        return false;
     }
 }

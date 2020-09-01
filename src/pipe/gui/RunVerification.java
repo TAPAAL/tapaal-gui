@@ -27,19 +27,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
-import dk.aau.cs.approximation.OverApproximation;
-import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantStore;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.verification.*;
-import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.Template;
-import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
@@ -48,8 +37,8 @@ import dk.aau.cs.util.VerificationCallback;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class RunVerification extends RunVerificationBase {	
-	private IconSelector iconSelector;
-	private VerificationCallback callback;
+	private final IconSelector iconSelector;
+	private final VerificationCallback callback;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
 		super(modelChecker, messenger);
 		iconSelector = selector;
@@ -75,8 +64,6 @@ public class RunVerification extends RunVerificationBase {
 				);
 	
 				if (result.getTrace() != null) {
-					CreateGui.getApp().setGUIMode(GUIMode.animation);
-	
 					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}

@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.model.tapn.*;
 import pipe.gui.CreateGui;
 
 import pipe.gui.Grid;
@@ -13,13 +14,11 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.ArcHandler;
+import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.Weight;
 
 public class TimedOutputArcComponent extends Arc {
 
@@ -52,14 +51,25 @@ public class TimedOutputArcComponent extends Arc {
 				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
 				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())))
         );
+		this.lens = arc.lens;
 
 	}
+
+
+    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc){
+        super(source);
+        setTarget(target);
+        setUnderlyingArc(modelArc);
+        updateLabel(true);
+        sealArc();
+    }
+
 
 	@Override
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new ArcHandler(this);
+		mouseHandler = new TimedArcHandler(this);
 	}
 
 

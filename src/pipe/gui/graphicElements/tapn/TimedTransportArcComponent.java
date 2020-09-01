@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.handler.TransportArcHandler;
+import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -19,8 +19,8 @@ import dk.aau.cs.model.tapn.Weight;
 public class TimedTransportArcComponent extends TimedInputArcComponent {
 
 	private int group;
-	private boolean isInPreSet;
-	private TimedTransportArcComponent connectedTo = null;
+	private final boolean isInPreSet;
+	private TimedTransportArcComponent connectedTo;
 	private TransportArc underlyingTransportArc;
 
 	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
@@ -42,11 +42,34 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		updateLabel(true);
 	}
 
+	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group){
+	    super(p);
+	    setTarget(t);
+	    this.isInPreSet = true;
+	    this.setGroup(group);
+	    setUnderlyingArc(model);
+
+	    updateLabel(true);
+	    sealArc();
+    }
+
+    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group){
+        super(t);
+        setTarget(p);
+        this.isInPreSet = false;
+        this.setGroup(group);
+        setUnderlyingArc(model);
+
+        updateLabel(true);
+        sealArc();
+    }
+
+
 	@Override
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TransportArcHandler(this);
+		mouseHandler = new TimedArcHandler(this);
 	}
 
 	public void setUnderlyingArc(TransportArc arc) {

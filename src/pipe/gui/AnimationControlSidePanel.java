@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
@@ -46,14 +47,17 @@ public class AnimationControlSidePanel extends JPanel {
 	private int delayScale = 10;
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
+	private JPanel sliderPanel;
+	private JPanel timedelayPanel;
+    JPanel firemode;
 
 
 
-	JTextField TimeDelayField = new JTextField();
+    JTextField TimeDelayField = new JTextField();
 	JComboBox<String> firermodebox;
 
 
-	public AnimationControlSidePanel(Animator animator) {
+	public AnimationControlSidePanel(Animator animator, TabContent.TAPNLens lens) {
         Require.notNull(animator, "Animator can't be null");
 
         this.animator = animator;
@@ -61,7 +65,7 @@ public class AnimationControlSidePanel extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		firermodebox = new NonsearchableJComboBox<>(animator.FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox<>(Animator.FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));
@@ -80,7 +84,7 @@ public class AnimationControlSidePanel extends JPanel {
 		c.gridy = 2;
 		add(animationToolBar, c);
 
-        JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         JLabel label = new JLabel("Token selection: ");
 
@@ -104,10 +108,21 @@ public class AnimationControlSidePanel extends JPanel {
 		this.setMinimumSize(new Dimension(275, 180));
 		
 		initializeDocumentFilterForDelayInput();
+		hideIrrelevantInformation(lens);
 	}
 
+	private void hideIrrelevantInformation(TabContent.TAPNLens lens){
+        sliderPanel.setVisible(lens.isTimed());
+        timedelayPanel.setVisible(lens.isTimed());
+        firemode.setVisible(lens.isTimed());
+        if(!lens.isTimed()){
+            this.setPreferredSize(new Dimension(275, 50));
+            this.setMinimumSize(new Dimension(275, 50));
+        }
+    }
+
     private void initDelaySlider() {
-		JPanel sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		sliderPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton decrese = new JButton("-");
 		decrese.setPreferredSize(new Dimension(20, 30));
 		decrese.addActionListener(e -> {
@@ -174,7 +189,7 @@ public class AnimationControlSidePanel extends JPanel {
 
 
 	private void initDelayTimePanel(JToolBar animationToolBar) {
-		JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 		okButton = new javax.swing.JButton();
 

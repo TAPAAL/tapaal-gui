@@ -48,8 +48,8 @@ public class VerifyTAPN implements ModelChecker {
 	
 	private static String verifytapnpath = "";
 	
-	private FileFinder fileFinder;
-	private Messenger messenger;
+	private final FileFinder fileFinder;
+	private final Messenger messenger;
 
 	private ProcessRunner runner;
 	
@@ -272,7 +272,7 @@ public class VerifyTAPN implements ModelChecker {
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null);
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

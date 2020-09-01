@@ -1,18 +1,16 @@
 package dk.aau.cs.gui.undo;
 
 import dk.aau.cs.gui.BatchProcessingDialog;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
-import dk.aau.cs.model.tapn.SharedPlace;
 
 import javax.swing.*;
 import java.io.File;
 import java.util.List;
 
 public class RemoveFileBatchProcessingCommand extends Command{
-    private DefaultListModel<File> listModel;
-    List<File> files;
-    File file;
-    private BatchProcessingDialog dialog;
+    private final DefaultListModel<File> listModel;
+    final List<File> files;
+    final File file;
+    private final BatchProcessingDialog dialog;
     public RemoveFileBatchProcessingCommand(DefaultListModel<File> listModel, File file, List<File> files, BatchProcessingDialog dialog){
         this.listModel = listModel;
         this.file = file;

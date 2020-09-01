@@ -23,15 +23,14 @@ import java.util.Locale;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.handler.PlaceHandler;
-import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.Bound;
@@ -46,38 +45,36 @@ import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 public class TimedPlaceComponent extends Place {
 
 	private dk.aau.cs.model.tapn.TimedPlace place;
-	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
+	private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-	private Window ageOfTokensWindow;
-	private Shape dashedOutline = createDashedOutline();
+	private Window ageOfTokensWindow = new Window(new Frame());
+	private final Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
+	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens) {
 		super(positionXInput, positionYInput);
 		this.place = place;
-		listener = timedPlaceListener();		
-		this.place.addTimedPlaceListener(listener);
-
+        this.place.addTimedPlaceListener(listener);
+        this.lens = lens;
 		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
 
-	}
+    }
 
 	public TimedPlaceComponent(
 	    int positionXInput,
         int positionYInput,
         String idInput,
         int nameOffsetXInput,
-        int nameOffsetYInput
+        int nameOffsetYInput,
+        TabContent.TAPNLens lens
     ) {
 
 		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
-		listener = timedPlaceListener();
-		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
+        attributesVisible = true;
+        this.lens = lens;
 
-	}
+    }
 
-	@Override
+    @Override
 	protected void addMouseHandler() {
 		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
 		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
@@ -114,11 +111,12 @@ public class TimedPlaceComponent extends Place {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-		Iterable<TimedToken> tokens = place.tokens();
+
 		boolean first = true;
-		for (TimedToken token : tokens) {
-			if (!first)
-				buffer.append(", ");
+		for (TimedToken token : place.tokens()) {
+			if (!first) {
+                buffer.append(", ");
+            }
 			buffer.append(df.format(token.age()));
 
 			first = false;
@@ -178,7 +176,9 @@ public class TimedPlaceComponent extends Place {
 				}
 			}
         }
-
+        if(!lens.isTimed()){
+            drawDots = (marking > 0 && marking < 6);
+        }
         // structure sees how many markings there are and fills the place in
         // with the appropriate number or tokens.
         if(drawDots) {
@@ -269,13 +269,10 @@ public class TimedPlaceComponent extends Place {
         }
 	}
 
-	public Command setInvariant(TimeInvariant inv) {
-		TimeInvariant old = place.invariant();
+	public void setInvariant(TimeInvariant inv) {
 		place.setInvariant(inv);
 
 		update(true);
-
-		return new TimedPlaceInvariantEdit(this, old, inv);
 	}
 
 	public void showAgeOfTokens(boolean show) {
@@ -285,7 +282,7 @@ public class TimedPlaceComponent extends Place {
 		}
 		
 		// Build interface
-		if (show) {
+		if (show && isTimed()) {
 			ageOfTokensWindow = new Window(new Frame());
 			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
@@ -403,18 +400,6 @@ public class TimedPlaceComponent extends Place {
 		this.update(true);
 	}
 
-	public void addTokens(int numberOfTokensToAdd) {
-		for (int i = 0; i < numberOfTokensToAdd; i++) {
-			place.addToken(new TimedToken(place, BigDecimal.ZERO));
-		}
-	}
-
-	public void removeTokens(int numberOfTokensToRemove) {
-		for (int i = 0; i < numberOfTokensToRemove; i++) {
-			place.removeToken();
-		}
-	}
-
 	public int getNumberOfTokens() {
 		return place.numberOfTokens(); 
 	}
@@ -430,7 +415,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY());
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), lens);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		return placeComponent;

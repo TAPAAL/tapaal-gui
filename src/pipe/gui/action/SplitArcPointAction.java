@@ -18,15 +18,14 @@ import pipe.gui.graphicElements.ArcPathPoint;
  */
 public class SplitArcPointAction extends javax.swing.AbstractAction {
 
-	private ArcPathPoint arcPathPoint;
+	private final ArcPathPoint arcPathPoint;
 
 	public SplitArcPointAction(ArcPathPoint _arcPathPoint) {
 		arcPathPoint = _arcPathPoint;
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-				arcPathPoint.splitPoint());
+		CreateGui.getCurrentTab().getUndoManager().addNewEdit(arcPathPoint.splitPoint());
 	}
 
 }

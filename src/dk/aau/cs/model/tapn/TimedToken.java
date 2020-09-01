@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import pipe.gui.Pipe;
 
 public class TimedToken {
-	private TimedPlace place;
+	private final TimedPlace place;
 	private BigDecimal age;
 
 	public TimedToken(TimedPlace place) {
@@ -31,8 +31,7 @@ public class TimedToken {
 	}
 	
 	public TimedToken clone() {
-		return new TimedToken(place, age); // age is immutable so ok to pass it
-											// to constructor
+		return new TimedToken(place, age); // age is immutable so ok to pass it to constructor
 	}
 
 	public TimedToken delay(BigDecimal delay) {
@@ -44,12 +43,7 @@ public class TimedToken {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-		StringBuilder buffer = new StringBuilder("(");
-		buffer.append(place.toString());
-		buffer.append(", ");
-		buffer.append(df.format(age));
-		buffer.append(')');
-		return buffer.toString();
+        return String.format("(%s, %s)", place.toString(), df.format(age));
 	}
 
 	@Override

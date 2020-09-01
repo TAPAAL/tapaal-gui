@@ -16,7 +16,7 @@ import dk.aau.cs.debug.Logger;
 import net.tapaal.resourcemanager.ResourceManager;
 
 public class VersionChecker {
-	private static final String versionURL = "http://versioncheck.tapaal.net/fileadmin/version.txt";
+	private static final String versionURL = "http://versioncheck.tapaal.net/version.txt";
 	private static final int timeoutMs = 2500;
 	private URL url;
 	private String newestVersion;

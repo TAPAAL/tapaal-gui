@@ -16,6 +16,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
@@ -33,29 +34,42 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 public class TimedTransitionComponent extends Transition {
 
 	private dk.aau.cs.model.tapn.TimedTransition transition;
-	private dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
+	private final dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
-	public TimedTransitionComponent(int positionXInput, int positionYInput,
-			dk.aau.cs.model.tapn.TimedTransition transition) {
+	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition, TabContent.TAPNLens lens) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 		attributesVisible = true;
+		this.lens = lens;
 
 	}
 
-	public TimedTransitionComponent(int positionXInput,
-			int positionYInput, String idInput,
-			int nameOffsetXInput, int nameOffsetYInput,
-			boolean timedTransition, boolean infServer, int angleInput,
-			int priority) {
-		super(positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput, infServer,
-				angleInput, priority);
+	public TimedTransitionComponent(
+	    int positionXInput,
+        int positionYInput,
+        String idInput,
+        int nameOffsetXInput,
+        int nameOffsetYInput,
+        boolean timedTransition,
+        boolean infServer,
+        int angleInput,
+        int priority,
+        TabContent.TAPNLens lens
+    ) {
+		super(
+		    positionXInput,
+            positionYInput,
+            idInput,
+            nameOffsetXInput,
+            nameOffsetYInput,
+            angleInput
+        );
 		listener = timedTransitionListener();
 		attributesVisible = true;
+        this.lens = lens;
 
 	}
 
@@ -80,8 +94,7 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Transition", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Transition", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -102,7 +115,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	@Override
-	public boolean isEnabled() {
+	public boolean isTransitionEnabled() {
 		return transition.isEnabled();
 	}
 
@@ -146,7 +159,15 @@ public class TimedTransitionComponent extends Transition {
 	public void setUrgent(boolean value){
 		transition.setUrgent(value);
 	}
-	
+
+    public boolean isUncontrollable() {
+        return transition.isUncontrollable();
+    }
+
+    public void setUncontrollable(boolean isUncontrollable) {
+        transition.setUncontrollable(isUncontrollable);
+    }
+
 	public boolean hasUntimedPreset(){
 		return transition.hasUntimedPreset();
 	}
@@ -179,8 +200,11 @@ public class TimedTransitionComponent extends Transition {
 
 			graphics.setStroke(oldStroke);
 		}
-		if(isUrgent()){
-			g.setColor(Color.WHITE);
+        if(!isUncontrollable()){
+            super.fillTransition(g);
+        }
+		if (isUrgent()) {
+		    g.setColor(isUncontrollable() ? Color.BLACK : Color.WHITE);
 			g.fillOval(11, 11, 8,8);
 		}
 	}
@@ -202,7 +226,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0, lens);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;
@@ -217,7 +241,7 @@ public class TimedTransitionComponent extends Transition {
 		}
 		
 		// Build interface
-		if (show && (transition.getdInterval() != null)) {
+		if (show && (transition.getdInterval() != null) && isTimed()) {
 			dIntervalWindow = new Window(new Frame());
 			dIntervalWindow.add(new JTextArea(transition.getdInterval().toString()));
 			

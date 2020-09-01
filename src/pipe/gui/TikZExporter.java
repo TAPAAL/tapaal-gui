@@ -24,10 +24,10 @@ public class TikZExporter {
 		FIGURE_ONLY, FULL_LATEX
 	}
 
-	private DataLayer net;
-	private String fullpath;
-	private TikZOutputOption option;
-	private double scale = 1.0 / 55.0;
+	private final DataLayer net;
+	private final String fullpath;
+	private final TikZOutputOption option;
+	private final double scale = 1.0 / 55.0;
         
         private double RoundCoordinate(double position) {
             return Math.round(position * scale * 10)/10.0d;
@@ -195,6 +195,13 @@ public class TikZExporter {
 				out.append(trans.getId());
 				out.append(".center) { };\n");
 			}
+            if (((TimedTransitionComponent)trans).underlyingTransition().isUncontrollable()) {
+                out.append("\\node[uncontrollabletransition");
+                out.append(angle);
+                out.append("] at (");
+                out.append(trans.getId());
+                out.append(".center) { };\n");
+            }
 			if (trans.getAttributesVisible()){
 				out.append("%% label for transition " + trans.getName() + "\n");
 				out.append("\\draw (");
@@ -312,7 +319,8 @@ public class TikZExporter {
 		out.append("\\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]\n");
 		out.append("\\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]\n");
 		out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]");
-		return out;
+        out.append("\\tikzstyle{uncontrollabletransition}=[transition,fill=white,draw=black,very thick]");
+        return out;
 	}
 
 	protected String replaceWithMathLatex(String text) {

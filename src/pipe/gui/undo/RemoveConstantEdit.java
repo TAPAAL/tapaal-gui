@@ -7,8 +7,8 @@ import dk.aau.cs.model.tapn.ConstantStore;
 
 public class RemoveConstantEdit extends Command {
 
-	private Constant constant;
-	private ConstantStore store;
+	private final Constant constant;
+	private final ConstantStore store;
 
 	public RemoveConstantEdit(Constant constant, ConstantStore store) {
 		this.constant = constant;

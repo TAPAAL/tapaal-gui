@@ -1,11 +1,7 @@
 package dk.aau.cs.gui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,20 +9,18 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
+import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
+import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
@@ -38,17 +32,14 @@ public class EnabledTransitionsList extends JPanel{
 		initPanel();
 	}
 
-	DefaultListModel<TransitionListItem> transitions;
-	JList<TransitionListItem> transitionsList;
-	JScrollPane scrollPane;
+	final DefaultListModel<TransitionListItem> transitions = new DefaultListModel<>();
+	final JList<TransitionListItem> transitionsList = new JList<>(transitions);
+	final JScrollPane scrollPane = new JScrollPane(transitionsList);
 	TransitionListItem lastSelected;
 
 	public void initPanel(){
-		transitions = new DefaultListModel<>();
-		transitionsList = new JList<>(transitions);
-		transitionsList.setCellRenderer(new EnabledTransitionListCellRenderer());
 
-		transitionsList.addMouseListener(new MouseAdapter() {
+        transitionsList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2){
@@ -64,9 +55,7 @@ public class EnabledTransitionsList extends JPanel{
 			}
 		});
 
-		scrollPane = new JScrollPane(transitionsList);
-
-		this.add(scrollPane, BorderLayout.CENTER);
+        this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	public void startReInit(){
@@ -75,7 +64,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void reInitDone(){
-		if(CreateGui.getCurrentTab().getDelayEnabledTransitionControl().isRandomTransitionMode()){
+		if(SimulationControl.getInstance().isRandomTransitionMode()){
 			selectRandom();
 			return;
 		}
@@ -110,18 +99,12 @@ public class EnabledTransitionsList extends JPanel{
 	public void addTransition(Template template, Transition transition){
 		TransitionListItem item = new TransitionListItem(transition, template);
 
-		transition.isDelayEnabled();
 		if(!transitions.contains(item)){
 			transitions.addElement(item);
 		}
 	}
 
-	public void removeTransition(Template template, Transition transition){
-		TransitionListItem item = new TransitionListItem(transition, template);
-		transitions.removeElement(item);
-	}
-
-	public void fireSelectedTransition(){
+    public void fireSelectedTransition(){
 		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
@@ -131,27 +114,10 @@ public class EnabledTransitionsList extends JPanel{
 
 	interface ListItem extends Comparable<ListItem>{}
 
-	class SplitterListItem implements ListItem{
-
-		@Override
-		public int compareTo(ListItem o) {
-			if(o instanceof TransitionListItem){
-				return o.compareTo(this);
-			} else {
-				return 0;
-			}
-		}
-
-		@Override
-		public String toString() {
-			return "_";
-		}
-
-	}
 
 	static class TransitionListItem implements ListItem{
-		private Transition transition;
-		private Template template;
+		private final Transition transition;
+		private final Template template;
 
 		public TransitionListItem(Transition transition, Template template){
 			this.transition = transition;
@@ -160,8 +126,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null || !showIntervals ? 
-					"" : transition.getDInterval().toString() + " ";
+			String interval = transition.getDInterval() == null || !showIntervals || !transition.isTimed() ? "" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 
 			if(isShared()){
@@ -202,7 +167,7 @@ public class EnabledTransitionsList extends JPanel{
 			return template.model().getTransitionByName(transition.getName()).isShared();
 		}
 
-		public int compareTo(ListItem o) {
+		public int compareTo(@NotNull ListItem o) {
 			if(o instanceof TransitionListItem){
 				return compareTo((TransitionListItem)o);
 			} else {
@@ -217,8 +182,8 @@ public class EnabledTransitionsList extends JPanel{
 			//Sort according to lower bound
 			int result = thisLower.compareTo(otherLower);
 			//According to strict non strict
-			if(result == 0 && this.transition.getDInterval().IsLowerBoundNonStrict() != o.transition.getDInterval().IsLowerBoundNonStrict()){
-				if(this.transition.getDInterval().IsLowerBoundNonStrict()){
+			if(result == 0 && this.transition.getDInterval().isLowerBoundNonStrict() != o.transition.getDInterval().isLowerBoundNonStrict()){
+				if(this.transition.getDInterval().isLowerBoundNonStrict()){
 					result = -1;
 				} else {
 					result = 1;
@@ -234,51 +199,6 @@ public class EnabledTransitionsList extends JPanel{
 			}
 			
 			return result;
-		}
-	}
-
-	//This class creates the stippled line shown between the enabled transitions and the delay-enabled transitions
-	class EnabledTransitionListCellRenderer extends DefaultListCellRenderer{
-
-		@Override
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			if(value instanceof SplitterListItem){
-				JLabel separator = new JLabel();
-				separator.setBorder(new DashBorder());
-				separator.setPreferredSize(new Dimension(1, 1));
-				return separator;
-			} else {
-				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			}
-		}
-
-		class DashBorder implements Border {
-			private final Insets	insets	= new Insets(1, 1, 1, 1);
-			private final int	 length	= 5;
-			private final int	 space	= 3;
-			public boolean isBorderOpaque() {
-				return false;
-			}
-			public void paintBorder(Component c, Graphics g, int x, int y,
-					int width, int height) {
-				g.setColor(Color.BLACK);
-				// --- draw horizontal ---
-				for (int i = 0; i < width; i += length) {
-					g.drawLine(i, y, i + length, y);
-					g.drawLine(i, height - 1, i + length, height - 1);
-					i += space;
-				}
-				// --- draw vertical ---
-				for (int i = 0; i < height; i += length) {
-					g.drawLine(0, i, 0, i + length);
-					g.drawLine(width - 1, i, width - 1, i + length);
-					i += space;
-				}
-			}
-			public Insets getBorderInsets(Component c) {
-				return insets;
-			}
 		}
 	}
 

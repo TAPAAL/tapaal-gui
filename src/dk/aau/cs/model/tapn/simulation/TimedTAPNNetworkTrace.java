@@ -5,11 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import org.jetbrains.annotations.NotNull;
 
 public class TimedTAPNNetworkTrace implements TAPNNetworkTrace {
-	private List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
+	private final List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
 	TraceType traceType;
-	private int loopToIndex;
+	private final int loopToIndex;
 	
 	public TimedTAPNNetworkTrace(int loopToIndex) {
 		this.loopToIndex = loopToIndex;
@@ -22,7 +23,7 @@ public class TimedTAPNNetworkTrace implements TAPNNetworkTrace {
 		steps.add(step);
 	}
 
-	public Iterator<TAPNNetworkTraceStep> iterator() {
+	public @NotNull Iterator<TAPNNetworkTraceStep> iterator() {
 		return steps.iterator();
 	}
 

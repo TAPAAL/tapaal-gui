@@ -4,24 +4,24 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
+import pipe.gui.Grid;
 import pipe.gui.GuiFrame;
 
 public class NewTAPNPanel extends JPanel {
 
-	private JRootPane rootPane;
-	private GuiFrame frame;
+	private final JRootPane rootPane;
+	private final GuiFrame frame;
 	private JTextField nameTextBox;
+	private JRadioButton timedNet;
+	private JRadioButton gameNet;
 
 	public NewTAPNPanel(JRootPane rootPane, GuiFrame frame) {
 		this.rootPane = rootPane;
@@ -34,6 +34,7 @@ public class NewTAPNPanel extends JPanel {
 		this.setLayout(new GridBagLayout());
 
 		initNamePanel();
+		initSelectionPanel();
 		initButtonPanel();
 	}
 
@@ -64,7 +65,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText()));
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected()));
 
 		rootPane.setDefaultButton(okButton);
 		
@@ -72,7 +73,7 @@ public class NewTAPNPanel extends JPanel {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		gbc.insets = new Insets(0, 8, 5, 8);
 		gbc.anchor = GridBagConstraints.EAST;
 		add(buttonPanel, gbc);
@@ -82,7 +83,7 @@ public class NewTAPNPanel extends JPanel {
 		rootPane.getParent().setVisible(false);
 	}
 
-	protected void createNewTAPNBasedOnSelection(String name) {
+	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame) {
 		if (!name.endsWith(".tapn")) {
 			name = name + ".tapn";
 		}
@@ -95,7 +96,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			TabContent tab = TabContent.createNewEmptyTab(name);
+			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame);
 			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
@@ -113,7 +114,7 @@ public class NewTAPNPanel extends JPanel {
 
 	private void initNamePanel() {
 		JPanel namePanel = new JPanel(new GridBagLayout());
-		
+
 		JLabel nameLabel = new JLabel("Name:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -145,4 +146,104 @@ public class NewTAPNPanel extends JPanel {
 		gbc.insets = new Insets(5, 5, 5, 5);
 		add(namePanel, gbc);
 	}
+
+	private void initSelectionPanel() {
+        JPanel selectionPanel = new JPanel(new GridBagLayout());
+
+        initTimeOptions(selectionPanel);
+        initGameOptions(selectionPanel);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        add(selectionPanel, gbc);
+    }
+
+    private void initTimeOptions(JPanel selectionPanel) {
+        JPanel isTimedPanel = new JPanel(new GridBagLayout());
+        ButtonGroup isTimedRadioButtonGroup = new ButtonGroup();
+
+        JLabel timedText = new JLabel("Use time semantics: ");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isTimedPanel.add(timedText, gbc);
+
+        JRadioButton untimedNet = new JRadioButton("No");
+        untimedNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isTimedPanel.add(untimedNet, gbc);
+        isTimedRadioButtonGroup.add(untimedNet);
+
+        timedNet = new JRadioButton("Yes");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isTimedPanel.add(timedNet, gbc);
+        isTimedRadioButtonGroup.add(timedNet);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        selectionPanel.add(isTimedPanel, gbc);
+    }
+
+    private void initGameOptions(JPanel selectionPanel) {
+        JPanel isGamePanel = new JPanel(new GridBagLayout());
+        ButtonGroup isGameRadioButtonGroup = new ButtonGroup();
+
+        JLabel gameText = new JLabel("Use game semantics:");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isGamePanel.add(gameText, gbc);
+
+        JRadioButton nonGameNet = new JRadioButton("No");
+        nonGameNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isGamePanel.add(nonGameNet, gbc);
+        isGameRadioButtonGroup.add(nonGameNet);
+
+        gameNet = new JRadioButton("Yes");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isGamePanel.add(gameNet, gbc);
+        isGameRadioButtonGroup.add(gameNet);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        selectionPanel.add(isGamePanel, gbc);
+    }
 }

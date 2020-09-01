@@ -30,7 +30,7 @@ public class Degree2Converter {
 	private TimedArcPetriNet degree2Model;
 	private TimedArcPetriNet conservativeModel;
 	
-	private List<TimedTransition> retainedDegree2Transitions = new ArrayList<TimedTransition>();
+	private final List<TimedTransition> retainedDegree2Transitions = new ArrayList<TimedTransition>();
 
 	public TimedArcPetriNet transformModel(TimedArcPetriNet model) throws Exception {
 		try{
@@ -80,11 +80,11 @@ public class Degree2Converter {
 
 
 	private boolean isTransitionDegree1(TimedTransition t) {
-		return t.presetSize() == 1 && t.postsetSize() == 1;
+		return t.presetSizeWithoutInhibitorArcs() == 1 && t.postsetSize() == 1;
 	}
 	
 	private boolean isTransitionDegree2(TimedTransition t) {
-		return t.presetSize() == 2 && t.postsetSize() == 2;
+		return t.presetSizeWithoutInhibitorArcs() == 2 && t.postsetSize() == 2;
 	}	
 
 	private void createCopyOfOriginalTransition(TimedTransition transition, Pairing pairing) {
@@ -111,7 +111,7 @@ public class Degree2Converter {
 
 	private void createRingStructure(TimedTransition transition, Pairing p) {
 		String transitionName = transition.name();
-		int transitionsToCreate = 2 * transition.presetSize() - 1;
+		int transitionsToCreate = 2 * transition.presetSizeWithoutInhibitorArcs() - 1;
 		TimedPlace previousPlace = null;
 		
 		// create t^i_in (with corresponding places)
@@ -173,7 +173,7 @@ public class Degree2Converter {
 		int numPresetArcs = 1;
 		String transitionName = transition.name();
 		for(TimedInputArc inputArc : transition.getInputArcs()) {
-			if (numPresetArcs == transition.presetSize()) {
+			if (numPresetArcs == transition.presetSizeWithoutInhibitorArcs()) {
 				TimedTransition tmax = degree2Model.getTransitionByName(String.format(T_MAX_FORMAT, transitionName, numPresetArcs));
 				degree2Model.add(new TimedInputArc(degree2Model.getPlaceByName(inputArc.source().name()), tmax, inputArc.interval().copy()));				
 				degree2Model.add(new TimedOutputArc(tmax, degree2Model.getPlaceByName(pairing.getOutputArcFor(inputArc).destination().name())));
@@ -196,7 +196,7 @@ public class Degree2Converter {
 		}
 		
 		for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
-			if (numPresetArcs == transition.presetSize()) {
+			if (numPresetArcs == transition.presetSizeWithoutInhibitorArcs()) {
 				degree2Model.add(new TransportArc(degree2Model.getPlaceByName(transArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_MAX_FORMAT, transitionName, numPresetArcs)), 
 						degree2Model.getPlaceByName(transArc.destination().name()), 
@@ -217,11 +217,11 @@ public class Degree2Converter {
 	}
 	
 	private void createInhibitorArcs(TimedTransition t) {
-		if(t.presetSize() == 0)
+		if(t.presetSizeWithoutInhibitorArcs() == 0)
 			return;
 		
 		for(TimedInhibitorArc inhibArc : t.getInhibitorArcs()) {
-			if(t.presetSize() == 1) {
+			if(t.presetSizeWithoutInhibitorArcs() == 1) {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_MAX_FORMAT, t.name(), 1)), 
 						inhibArc.interval().copy()));

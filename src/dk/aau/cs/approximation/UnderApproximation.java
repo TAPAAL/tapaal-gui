@@ -163,11 +163,11 @@ public class UnderApproximation implements ITAPNApproximation {
 					newUpperBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() / denominator));
 				}
 				
-				boolean isLowerBoundNonStrict = oldInterval.IsLowerBoundNonStrict();
-				boolean isUpperBoundNonStrict = oldInterval.IsUpperBoundNonStrict();
+				boolean isLowerBoundNonStrict = oldInterval.isLowerBoundNonStrict();
+				boolean isUpperBoundNonStrict = oldInterval.isUpperBoundNonStrict();
 				
 				// if the interval becomes too small we make it a bit bigger to secure, that we do not have to delete the arc
-				if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.IsLowerBoundNonStrict() && oldInterval.IsUpperBoundNonStrict()))
+				if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.isLowerBoundNonStrict() && oldInterval.isUpperBoundNonStrict()))
 				{
 					isUpperBoundNonStrict = true;
 					isLowerBoundNonStrict = true;

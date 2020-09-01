@@ -33,8 +33,8 @@ import java.util.List;
 
 public class GuiFrameController implements GuiFrameControllerActions{
 
-    GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
-    GuiFrameActions guiFrame;
+    final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
+    final GuiFrameActions guiFrame;
 
     final MutableReference<TabContentActions> currentTab = new MutableReference<>();
 
@@ -85,9 +85,10 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         DelayEnabledTransitionControl.setDefaultDelayMode(prefs.getDelayEnabledTransitionDelayMode());
         DelayEnabledTransitionControl.setDefaultGranularity(prefs.getDelayEnabledTransitionGranularity());
-        DelayEnabledTransitionControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
+        SimulationControl.setDefaultIsRandomTransition(prefs.getDelayEnabledTransitionIsRandomTransition());
 
         showToolTips = prefs.getShowToolTips();
+        setDisplayToolTips(showToolTips);
         guiFrame.setShowToolTipsSelected(showToolTips);
 
         showZeroToInfinityIntervals = prefs.getShowZeroInfIntervals();
@@ -106,9 +107,12 @@ public class GuiFrameController implements GuiFrameControllerActions{
     public void openTab(TabContent tab) {
         CreateGui.addTab(tab);
         tab.setSafeGuiFrameActions(guiFrameDirectAccess);
+        tab.setGuiFrameControllerActions(this);
 
         guiFrame.attachTabToGuiFrame(tab);
         guiFrame.changeToTab(tab);
+        //XXX fixes an issue where on first open of a net the time intervals are not shown
+        tab.drawingSurface().repaintAll();
 
     }
 
@@ -124,6 +128,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
             if (closeNet) {
                 tab.setSafeGuiFrameActions(null);
+                tab.setGuiFrameControllerActions(null);
                 //Close the gui part first, else we get an error bug #826578
                 guiFrame.detachTabFromGuiFrame(tab);
                 CreateGui.removeTab(tab);
@@ -147,6 +152,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         currentTab.ifPresent(t -> t.setApp(guiFrame));
         guiFrameDirectAccess.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
+
     }
 
     @Override
@@ -215,7 +221,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         prefs.setShowTokenAge(guiFrameDirectAccess.showTokenAge());
         prefs.setDelayEnabledTransitionDelayMode(DelayEnabledTransitionControl.getDefaultDelayMode());
         prefs.setDelayEnabledTransitionGranularity(DelayEnabledTransitionControl.getDefaultGranularity());
-        prefs.setDelayEnabledTransitionIsRandomTransition(DelayEnabledTransitionControl.isRandomTransition());
+        prefs.setDelayEnabledTransitionIsRandomTransition(SimulationControl.isRandomTransition());
 
         JOptionPane.showMessageDialog(guiFrameDirectAccess,
                 "The workspace has now been saved into your preferences.\n"
@@ -230,7 +236,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     }
 
     @Override
-    public void showAbout() {
+    public void     showAbout() {
         StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
         buffer.append("\n\n");
         buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
@@ -304,6 +310,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
                     return;
                 }finally {
                     CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -482,7 +489,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void showBatchProcessingDialog() {
         if (showSavePendingChangesDialogForAllTabs()) {
-            BatchProcessingDialog.showBatchProcessingDialog(new JList(new DefaultListModel()));
+            BatchProcessingDialog.showBatchProcessingDialog(new JList<>(new DefaultListModel<>()));
         }
     }
 
@@ -668,7 +675,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void toggleDisplayToolTips() {
-        setDisplayToolTips(!showToolTips);
+        showToolTips = !showToolTips;
+        setDisplayToolTips(showToolTips);
     }
 
     private void setDisplayToolTips(boolean b) {
@@ -718,7 +726,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //showDelayEnabledTransitions(advanced);
         DelayEnabledTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
         DelayEnabledTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
-        DelayEnabledTransitionControl.getInstance().setRandomTransitionMode(false);
+        SimulationControl.getInstance().setRandomTransitionMode(false);
     }
 
 }

@@ -15,16 +15,16 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedArcPetriNetNetwork {
-	private List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
-	private List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
-	private List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
+	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
+	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 	
-	private NetworkMarking currentMarking;
-	private ConstantStore constants;
+	private NetworkMarking currentMarking = new NetworkMarking();
+	private final ConstantStore constants;
 	
 	private int defaultBound = 3;
 	
-	private List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
+	private final List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
 	
 	private boolean paintNet = true;
 	
@@ -34,8 +34,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public TimedArcPetriNetNetwork(ConstantStore constants){
 		this.constants = constants;
-		currentMarking = new NetworkMarking();
-		buildConstraints();
+        buildConstraints();
 	}
 	
 	public void addConstantsListener(ConstantsListener listener){
@@ -467,6 +466,15 @@ public class TimedArcPetriNetNetwork {
 		}
 		return false;
 	}
+
+    public boolean hasUncontrollableTransitions() {
+        for(TimedArcPetriNet t : tapns){
+            if(t.isActive() && t.hasUncontrollableTransitions()){
+                return true;
+            }
+        }
+        return false;
+    }
 	
 	public boolean hasInvariants() {
 		for(TimedArcPetriNet t : tapns){
@@ -496,6 +504,13 @@ public class TimedArcPetriNetNetwork {
 
 		return composedModel.value1().isDegree2();
 	}
+
+    public int getHighestNetDegree(){
+        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
+
+        return composedModel.value1().getHighestNetDegree();
+    }
 
 	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
 		for(TimedArcPetriNet tapn : this.activeTemplates()){

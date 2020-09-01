@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 
 public class SortSharedPlacesCommand extends Command {
 
-	SharedPlacesListModel listModel;
+	final SharedPlacesListModel listModel;
 	SharedPlace[] oldOrder;
 	
 	public SortSharedPlacesCommand(SharedPlacesListModel listModel) {

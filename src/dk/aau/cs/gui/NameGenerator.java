@@ -14,14 +14,11 @@ public class NameGenerator {
 	private static final String PLACE_NAME_PREFIX = "P";
 	private static final String TRANSITION_NAME_PREFIX = "T";
 	private static final String TEMPLATE_NAME_PREFIX = "TAPN";
-	private Hashtable<TimedArcPetriNet, Integer> placeIDs;
-	private Hashtable<TimedArcPetriNet, Integer> transitionIDs;
+	private final Hashtable<TimedArcPetriNet, Integer> placeIDs = new Hashtable<TimedArcPetriNet, Integer>();
+	private final Hashtable<TimedArcPetriNet, Integer> transitionIDs = new Hashtable<TimedArcPetriNet, Integer>();
 	private int tapnId = 0;
 
-	public NameGenerator() {
-		placeIDs = new Hashtable<TimedArcPetriNet, Integer>();
-		transitionIDs = new Hashtable<TimedArcPetriNet, Integer>();
-	}
+	public NameGenerator() {}
 
 	public void add(TimedArcPetriNet net) {
 		if (!placeIDs.containsKey(net) && !transitionIDs.containsKey(net)) {

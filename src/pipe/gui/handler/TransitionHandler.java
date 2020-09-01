@@ -1,44 +1,20 @@
 package pipe.gui.handler;
 
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
-import pipe.gui.CreateGui;
-import pipe.gui.Zoomer;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.Transition;
 
 /**
  * Class used to implement methods corresponding to mouse events on transitions.
  */
-public class TransitionHandler extends PlaceTransitionObjectHandler implements
-		java.awt.event.MouseWheelListener {
+public class TransitionHandler extends PlaceTransitionObjectHandler implements java.awt.event.MouseWheelListener {
 
 	public TransitionHandler(Transition obj) {
 		super(obj);
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected())) {
-			return;
-		}
-
-		int rotation = 0;
-		if (e.getWheelRotation() < 0) {
-			rotation = -e.getWheelRotation() * 135;
-		} else {
-			rotation = e.getWheelRotation() * 45;
-		}
-
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) myObject).rotate(rotation));
-
 	}
 
 	/**
@@ -65,34 +41,4 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 
 		return popup;
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed()) {
-				if (e.getClickCount() == 2
-						&& (CreateGui.getApp().getMode() == ElementType.TIMEDTRANS
-								|| CreateGui.getApp().getMode() == ElementType.IMMTRANS || CreateGui
-								.getApp().getMode() == ElementType.SELECT)) {
-					((Transition) myObject).showEditor();
-				}
-			}
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup && CreateGui.getApp().getMode() == ElementType.SELECT) {
-				JPopupMenu m = getPopup(e);
-				if (m != null) {
-					int x = Zoomer.getZoomedValue(
-					    ((Transition) myObject).getNameOffsetX(),
-                        myObject.getZoom()
-                    );
-					int y = Zoomer.getZoomedValue(
-					    ((Transition) myObject).getNameOffsetY(),
-                        myObject.getZoom()
-                    );
-					m.show(myObject, x, y);
-				}
-			}
-		}
-	}
-
 }

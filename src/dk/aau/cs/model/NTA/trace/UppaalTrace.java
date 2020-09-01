@@ -1,12 +1,14 @@
 package dk.aau.cs.model.NTA.trace;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class UppaalTrace implements Iterable<TAFiringAction> {
-	private List<TAFiringAction> firingActions;
-	private List<SymbolicState> states;
+	private final List<TAFiringAction> firingActions;
+	private final List<SymbolicState> states;
 
 	public UppaalTrace() {
 		firingActions = new ArrayList<TAFiringAction>();
@@ -21,7 +23,7 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 		firingActions.add(action);
 	}
 
-	public Iterator<TAFiringAction> iterator() {
+	public @NotNull Iterator<TAFiringAction> iterator() {
 		return firingActions.iterator();
 	}
 

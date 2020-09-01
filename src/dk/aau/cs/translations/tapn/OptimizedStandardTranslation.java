@@ -53,12 +53,12 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 	
 	private int extraTokens;
-	private boolean useSymmetry;
+	private final boolean useSymmetry;
 	private int numberOfInitChannels;
 	
 	private List<TimedTransition> retainedTransitions;
 	
-	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	
 	public OptimizedStandardTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;
@@ -184,7 +184,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		}
 
 		for (TimedTransition t : degree2Model.transitions()) {
-			if(t.presetSize() == 0) {
+			if(t.presetSizeWithoutInhibitorArcs() == 0) {
 				continue;
 			}
 			else if (isTransitionDegree1(t)) {
@@ -299,7 +299,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			if(transition.hasInhibitorArcs())
 				throw new RuntimeException("Standard translation does not support inhibitor arcs!");
 			
-			if(transition.presetSize() == 0)
+			if(transition.presetSizeWithoutInhibitorArcs() == 0)
 				continue;
 			
 			Degree2Pairing pairing = new Degree2Pairing(transition);
@@ -351,7 +351,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	}
 
 	private boolean isTransitionDegree1(TimedTransition transition) {
-		return transition.presetSize() == 1 && transition.postsetSize() == 1;
+		return transition.presetSizeWithoutInhibitorArcs() == 1 && transition.postsetSize() == 1;
 	}
 
 	private String createTransitionGuardWithLock(TimeInterval interval) {
@@ -372,9 +372,9 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		
 		StringBuilder builder = new StringBuilder();
 		boolean lowerBoundAdded = false;
-		if(!(interval.lowerBound().value() == 0 && interval.IsLowerBoundNonStrict())) {
+		if(!(interval.lowerBound().value() == 0 && interval.isLowerBoundNonStrict())) {
 			builder.append(TOKEN_CLOCK_NAME);
-			if(interval.IsLowerBoundNonStrict())
+			if(interval.isLowerBoundNonStrict())
 				builder.append(" >= ");
 			else
 				builder.append(" > ");
@@ -387,7 +387,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			if(lowerBoundAdded) builder.append(" && ");
 			builder.append(TOKEN_CLOCK_NAME);
 			
-			if(interval.IsUpperBoundNonStrict())
+			if(interval.isUpperBoundNonStrict())
 				builder.append(" <= ");
 			else
 				builder.append(" < ");
@@ -435,8 +435,8 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	protected static class OptimizedStandardNamingScheme implements TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_(?:1_in|single|deg2)$";
-		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-		private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
+		private final Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");
 		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
 
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
@@ -504,7 +504,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			return false;
 		
 		for(TimedTransition t : model.transitions()) {
-			if(t.presetSize() > 2 || t.postsetSize() > 2)
+			if(t.presetSizeWithoutInhibitorArcs() > 2 || t.postsetSize() > 2)
 				return false;
 		}
 		

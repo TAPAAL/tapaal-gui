@@ -63,10 +63,10 @@ public class OverApproximation implements ITAPNApproximation {
 		IntBound newLowerBound = new IntBound((int) Math.floor(oldInterval.lowerBound().value() / denominator));
 
 		return new TimeInterval(
-			 oldInterval.IsLowerBoundNonStrict(),
+			 oldInterval.isLowerBoundNonStrict(),
 			 newLowerBound,
 			 newUpperBound,
-			 oldInterval.IsUpperBoundNonStrict()
+			 oldInterval.isUpperBoundNonStrict()
 			 );
 	}
 	

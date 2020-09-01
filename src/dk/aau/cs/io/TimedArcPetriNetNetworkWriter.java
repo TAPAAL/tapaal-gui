@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -51,21 +52,38 @@ import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
-	private Iterable<Template> templates;
-	private Iterable<TAPNQuery> queries;
-	private Iterable<Constant> constants;
+	private final Iterable<Template> templates;
+	private final Iterable<TAPNQuery> queries;
+	private final Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
+    private final TabContent.TAPNLens lens;
 
 	public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
 			Iterable<Template> templates,
 			Iterable<TAPNQuery> queries,
-			Iterable<Constant> constants) {
+			Iterable<Constant> constants
+    ) {
 		this.network = network;
 		this.templates = templates;
 		this.queries = queries;
 		this.constants = constants;
+		this.lens = TabContent.TAPNLens.Default;
 	}
+
+    public TimedArcPetriNetNetworkWriter(
+        TimedArcPetriNetNetwork network,
+        Iterable<Template> templates,
+        Iterable<TAPNQuery> queries,
+        Iterable<Constant> constants,
+        TabContent.TAPNLens lens
+    ) {
+        this.network = network;
+        this.templates = templates;
+        this.queries = queries;
+        this.constants = constants;
+        this.lens = lens;
+    }
 	
 	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
 		Document document = null;
@@ -89,6 +107,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 		appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
+		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
 		// Create Transformer with XSL Source File
@@ -139,6 +158,29 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		element.setAttribute("bound", network.getDefaultBound() + "");
 		root.appendChild(element);
 	}
+
+    private void appendFeature(Document document, Element root) {
+        String isTimed = "true";
+        String isGame = "true";
+        if (!lens.isTimed()) {
+            isTimed = "false";
+        }
+        if (!lens.isGame()) {
+            isGame = "false";
+        }
+
+        root.appendChild(createFeatureElement(isTimed, isGame, document));
+    }
+
+    private Element createFeatureElement(String isTimed, String isGame, Document document) {
+        Require.that(document != null, "Error: document was null");
+        Element feature = document.createElement("feature");
+
+        feature.setAttribute("isTimed", isTimed);
+        feature.setAttribute("isGame", isGame);
+
+        return feature;
+    }
 	
 	private void appendSharedPlaces(Document document, Element root) {
 		for(SharedPlace place : network.sharedPlaces()){
@@ -155,6 +197,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			Element element = document.createElement("shared-transition");
 			element.setAttribute("name", transition.name());
 			element.setAttribute("urgent", transition.isUrgent()?"true":"false");
+            element.setAttribute("player", transition.isUncontrollable() ? "1" : "0");
 			root.appendChild(element);
 		}
 	}
@@ -194,7 +237,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 			Attr netAttrType = document.createAttribute("type");
 			netAttrType.setValue("P/T net");
-
 			NET.setAttributeNode(netAttrType);
 
 			appendAnnotationNotes(document, guiModel, NET);
@@ -412,6 +454,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
+        transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
 
 		return transitionElement;
 	}

@@ -152,7 +152,7 @@ public class AnimationHistoryList extends JList<String> {
 		}
 		for (Template t : CreateGui.getCurrentTab().activeTemplates()){
 			for(Transition trans : t.guiModel().getTransitions()){
-				if(trans.isEnabled(true) || trans.isDelayEnabledTransition(true)){
+				if(trans.isTransitionEnabled() || trans.isDelayEnabled()){
 					return;
 				}
 			}

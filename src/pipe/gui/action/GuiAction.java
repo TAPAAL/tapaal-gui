@@ -10,7 +10,6 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.CreateGui;
 
 /**
  * GuiAction class
@@ -109,5 +108,13 @@ public abstract class GuiAction extends AbstractAction {
 		}
 
 	}
+
+	public void setName(String newName){
+	    putValue(NAME, newName);
+    }
+
+    public void setTooltip(String newTooltip){
+        putValue(SHORT_DESCRIPTION, newTooltip);
+    }
 
 }

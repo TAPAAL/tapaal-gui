@@ -14,7 +14,7 @@ import dk.aau.cs.util.Require;
 public class TransportArc extends TAPNElement {
 	private Weight weight;
 	private TimedPlace source;
-	private TimedTransition transition;
+	private final TimedTransition transition;
 	private TimedPlace destination;
 
 	private TimeInterval interval;
@@ -36,8 +36,12 @@ public class TransportArc extends TAPNElement {
 		setTimeInterval(interval);
 		this.weight = weight;
 	}
-	
-	public Weight getWeight(){
+
+    public TransportArc(TimedPlace source, TimedTransition transitions, TimedPlace destination) {
+        this(source, transitions, destination, TimeInterval.ZERO_INF);
+    }
+
+    public Weight getWeight(){
 		return weight;
 	}
         
@@ -149,15 +153,15 @@ public class TransportArc extends TAPNElement {
 						newUpper = BigDecimal.ZERO;
 					}
 					
-					if (newUpper.compareTo(newLower) == 0 && interval.IsLowerBoundNonStrict() && interval.IsUpperBoundNonStrict()){
+					if (newUpper.compareTo(newLower) == 0 && interval.isLowerBoundNonStrict() && interval.isUpperBoundNonStrict()){
 						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newLower.compareTo(newUpper) < 0){
-						temp = new  TimeInterval(interval.IsLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
+						temp = new  TimeInterval(interval.isLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.isUpperBoundNonStrict());
 					} else { //new bounds are empty
 						temp = null;
 					}
 				} else { //upper bound is inf
-					temp = new TimeInterval(interval.IsLowerBoundNonStrict(), new RatBound(newLower), interval.upperBound(), false);
+					temp = new TimeInterval(interval.isLowerBoundNonStrict(), new RatBound(newLower), interval.upperBound(), false);
 				}
 			}
 			

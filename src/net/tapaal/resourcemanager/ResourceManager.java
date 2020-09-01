@@ -8,17 +8,15 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import pipe.gui.CreateGui;
-
 public class ResourceManager {
     public static final String imgPath = "resources/Images/";
 
-	private static ImageIcon satisfiedIcon = loadIcon("satisfied.png");
-	private static ImageIcon notSatisfiedIcon = loadIcon("notsatisfied.png");
-	private static ImageIcon inconclusiveIcon = loadIcon("maybe1.png");
-	private static ImageIcon rerunIcon = loadIcon("maybe.png");
-	private static ImageIcon infoIcon = loadIcon("info.png");
-	private static ImageIcon appIcon = loadIcon("tapaal-icon.png");
+	private static final ImageIcon satisfiedIcon = loadIcon("satisfied.png");
+	private static final ImageIcon notSatisfiedIcon = loadIcon("notsatisfied.png");
+	private static final ImageIcon inconclusiveIcon = loadIcon("maybe1.png");
+	private static final ImageIcon rerunIcon = loadIcon("maybe.png");
+	private static final ImageIcon infoIcon = loadIcon("info.png");
+	private static final ImageIcon appIcon = loadIcon("tapaal-icon.png");
 	
 	private static ImageIcon loadIcon(String name) {
 		try {

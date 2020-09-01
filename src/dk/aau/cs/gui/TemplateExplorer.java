@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -81,12 +80,12 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private JButton renameButton;
 	private JButton copyButton;
 
-	private TabContent parent;
-	private UndoManager undoManager;
+	private final TabContent parent;
+	private final UndoManager undoManager;
 	private boolean isInAnimationMode;
 
-	public JButton moveUpButton;
-	public JButton moveDownButton;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 	private JButton sortButton;
 	
 	private static final String toolTipNewComponent ="Create a new component";
@@ -188,7 +187,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new GridBagLayout());
-		listModel = new DefaultListModel();
+		listModel = new DefaultListModel<>();
 		for (Template net : parent.allTemplates()) {
 			listModel.addElement(net);
 		}
@@ -214,7 +213,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			}
 		});
 
-		templateList = new NonsearchableJList(listModel);
+		templateList = new NonsearchableJList<>(listModel);
 
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
@@ -241,6 +240,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		templatePanel.add(scrollpane, gbc);
 		
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
+		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
@@ -264,6 +264,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		templatePanel.add(moveUpButton,gbc);
 		
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
+		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
@@ -288,6 +289,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		
 		//Sort button
 		sortButton = new JButton(ResourceManager.getIcon("Sort.png"));
+		sortButton.setMargin(new Insets(2,2,2,2));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(false);
 		sortButton.addActionListener(e -> {
@@ -476,7 +478,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private void onOKRenameTemplate() {		
 		Template template = selectedModel();			
 		String newName = nameTextField.getText().trim();
-		if (newName == null || template.model().name().equals(newName)) {
+		if (template.model().name().equals(newName)) {
 			exit();
 			return;
 		}
@@ -508,37 +510,34 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	private void onOK() {
-		Template template = null;		
-		String templateName = nameTextField.getText().trim();		
-		if (templateName != null) {
-			if(!isNameAllowed(templateName)) {
-				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-				exit();
-				ShowNewTemplateDialog(templateName);
-				return;
-			}
-			else if (parent.network().hasTAPNCalled(templateName)) {
-				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-				exit();
-				ShowNewTemplateDialog(templateName);
-				return;
-			}
-			else {
-				template = createNewTemplate(templateName);
+        String templateName = nameTextField.getText().trim();
+        if(!isNameAllowed(templateName)) {
+            JOptionPane.showMessageDialog(parent.drawingSurface(),
+                    "Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
+                    "Error Creating Component",
+                    JOptionPane.ERROR_MESSAGE);
+            exit();
+            ShowNewTemplateDialog(templateName);
+            return;
+        }
+        else if (parent.network().hasTAPNCalled(templateName)) {
+            JOptionPane.showMessageDialog(parent.drawingSurface(),
+                    "A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
+                    "Error Creating Component",
+                    JOptionPane.ERROR_MESSAGE);
+            exit();
+            ShowNewTemplateDialog(templateName);
+            return;
+        }
+        else {
+            Template template = createNewTemplate(templateName);
 
-				int index = listModel.size();
-				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
-				parent.addTemplate(template);
-			}
-		}
+            int index = listModel.size();
+            undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+            parent.addTemplate(template);
+        }
 
-		exit();
+        exit();
 	}
 	
 	private void exit() {
@@ -639,8 +638,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	private void ShowNewTemplateDialog(String nameToShow) {
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Enter Component Name", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Enter Component Name", true);
 		initComponentsOfNewTemplateDialog(nameToShow);
 		dialog.add(container);
 		dialog.setResizable(false);
@@ -742,8 +740,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	private void showRenameTemplateDialog(String nameToShow) {		
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Enter Component Name", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Enter Component Name", true);
 		Template template = selectedModel();
 		if (nameToShow.equals("")){
 			initComponentsOfRenameTemplateDialog(template.model().name());
@@ -777,7 +774,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	public void openSelectedTemplate() {
 		Template tapn = selectedModel();
-		if (tapn != null && parent.isTabInFocus()) {
+		if (tapn != null) {
 			parent.changeToTemplate(tapn);
 		}
 		//parent.drawingSurface().repaintAll();
@@ -789,7 +786,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	public void updateTemplateList() {
 		int selectedIndex = templateList.getSelectedIndex();
-		DefaultListModel newList = new DefaultListModel();
+		DefaultListModel<Template> newList = new DefaultListModel<>();
 		
 		if(isInAnimationMode) {
 			for (Template net : parent.activeTemplates()) {
@@ -852,7 +849,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
         listModel.setElementAt(o, index+1);
     }
     @Override
-    public JList getJList(){
+    public JList<Template> getJList(){
 	    return templateList;
     }
 
@@ -860,8 +857,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
 		private static final String CHECK_TO_ACTIVATE = "Check to active the component";
-		private JCheckBox activeCheckbox = new JCheckBox();
-		private ListCellRenderer cellRenderer;
+		private final JCheckBox activeCheckbox = new JCheckBox();
+		private final ListCellRenderer cellRenderer;
 		
 		
 		public TemplateListCellRenderer(ListCellRenderer renderer) {
@@ -891,9 +888,9 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	private class TemplateListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
-		private int checkBoxWidth = new JCheckBox().getPreferredSize().width;
-		private ListSelectionModel selectionModel;
-		private JList list;
+		private final int checkBoxWidth = new JCheckBox().getPreferredSize().width;
+		private final ListSelectionModel selectionModel;
+		private final JList list;
 		
 		public TemplateListManager(JList list) {
 			this.list = list;
@@ -995,21 +992,24 @@ public class TemplateExplorer extends JPanel implements SidePane {
 						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
-						if(templateList.getModel().getSize() >= 2)
-							sortButton.setEnabled(true);
-						else
-							sortButton.setEnabled(false);
-						
-						if(index > 0)
-							moveUpButton.setEnabled(true);
-						else
-							moveUpButton.setEnabled(false);
+						if(templateList.getModel().getSize() >= 2) {
+                            sortButton.setEnabled(true);
+                        } else {
+                            sortButton.setEnabled(false);
+                        }
+
+						if(index > 0) {
+                            moveUpButton.setEnabled(true);
+                        } else {
+                            moveUpButton.setEnabled(false);
+                        }
 								
 							
-						if(index < parent.network().allTemplates().size() - 1)
-							moveDownButton.setEnabled(true);
-						else
-							moveDownButton.setEnabled(false);
+						if(index < parent.network().allTemplates().size() - 1) {
+                            moveDownButton.setEnabled(true);
+                        } else {
+                            moveDownButton.setEnabled(false);
+                        }
 					}
 					templateList.ensureIndexIsVisible(index);
 					openSelectedTemplate();

@@ -15,7 +15,7 @@ public class TimedInputArc extends TAPNElement {
 	private Weight weight = new IntWeight(1);
 	private TimedPlace source;
 	private TimeInterval interval;
-	private TimedTransition destination;
+	private final TimedTransition destination;
 
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
 		this(source, destination, interval, new IntWeight(1));
@@ -127,15 +127,15 @@ public class TimedInputArc extends TAPNElement {
 						newUpper = BigDecimal.ZERO;
 					}
 					
-					if (newUpper.compareTo(newLower) == 0 && (interval.IsLowerBoundNonStrict() || overrideLowerInclusion) && interval.IsUpperBoundNonStrict()){
+					if (newUpper.compareTo(newLower) == 0 && (interval.isLowerBoundNonStrict() || overrideLowerInclusion) && interval.isUpperBoundNonStrict()){
 						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newLower.compareTo(newUpper) < 0){
-						temp = new  TimeInterval(interval.IsLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
+						temp = new  TimeInterval(interval.isLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.isUpperBoundNonStrict());
 					} else { //new bounds are empty
 						temp = null;
 					}
 				} else { //upper bound is inf
-					temp = new TimeInterval(interval.IsLowerBoundNonStrict(), new RatBound(newLower), interval.upperBound(), false);
+					temp = new TimeInterval(interval.isLowerBoundNonStrict(), new RatBound(newLower), interval.upperBound(), false);
 				}
 			}
 			

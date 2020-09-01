@@ -4,7 +4,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
 // TODO: Fix this to work on the model class instead of the GUI class
 public class TimedPlaceMarkingEdit extends Command {
-	private int numberOfTokens;
+	private final int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;
 
 	public TimedPlaceMarkingEdit(TimedPlaceComponent tpc, int numberOfTokens) {
@@ -15,9 +15,9 @@ public class TimedPlaceMarkingEdit extends Command {
 	@Override
 	public void redo() {
 		if (numberOfTokens > 0) {
-			timedPlaceComponent.addTokens(Math.abs(numberOfTokens));
+			timedPlaceComponent.underlyingPlace().addTokens(Math.abs(numberOfTokens));
 		} else {
-			timedPlaceComponent.removeTokens(Math.abs(numberOfTokens));
+			timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
 		}
 		timedPlaceComponent.repaint();
 	}
@@ -25,9 +25,9 @@ public class TimedPlaceMarkingEdit extends Command {
 	@Override
 	public void undo() {
 		if (numberOfTokens > 0) {
-			timedPlaceComponent.removeTokens(Math.abs(numberOfTokens));
+			timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
 		} else {
-			timedPlaceComponent.addTokens(Math.abs(numberOfTokens));
+			timedPlaceComponent.underlyingPlace().addTokens(Math.abs(numberOfTokens));
 		}
 		timedPlaceComponent.repaint();
 	}

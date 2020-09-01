@@ -21,6 +21,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import net.tapaal.swinghelpers.RequestFocusListener;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
+import pipe.gui.Grid;
 import pipe.gui.MessengerImpl;
 
 public class EngineDialogPanel {	
@@ -30,34 +31,36 @@ public class EngineDialogPanel {
 	private JPanel tapaalDiscretePanel;
 	private JPanel untimedPanel;
 	private JPanel uppaalPanel;
+	private JPanel javaPanel;
 
 	JButton closeButton;
 
-	JLabel tapaalLocationLabel = new JLabel("Located: ");
-	JLabel tapaalVersionLabel = new JLabel("Version: ");
-	JLabel dtapaalLocationLabel = new JLabel("Located: ");
-	JLabel dtapaalVersionLabel = new JLabel("Version: ");
-	JLabel untimedLocationLabel = new JLabel("Located: ");
-	JLabel untimedVersionLabel = new JLabel("Version: ");
-	JLabel uppaalLocationLabel = new JLabel("Located: ");
-	JLabel uppaalVersionLabel = new JLabel("Version: ");
+	final JLabel tapaalLocationLabel = new JLabel("Located: ");
+	final JLabel tapaalVersionLabel = new JLabel("Version: ");
+	final JLabel dtapaalLocationLabel = new JLabel("Located: ");
+	final JLabel dtapaalVersionLabel = new JLabel("Version: ");
+	final JLabel untimedLocationLabel = new JLabel("Located: ");
+	final JLabel untimedVersionLabel = new JLabel("Version: ");
+	final JLabel uppaalLocationLabel = new JLabel("Located: ");
+	final JLabel uppaalVersionLabel = new JLabel("Version: ");
+    final JLabel javaVersionLabel = new JLabel("Version: ");
 
-	JLabel tapaalLocationLabelVal = new JLabel("Not setup");
-	JLabel tapaalVersionLabelVal = new JLabel("N/A");
-	JLabel dtapaalLocationLabelVal = new JLabel("Not setup");
-	JLabel dtapaalVersionLabelVal = new JLabel("N/A");
-	JLabel untimedLocationLabelVal = new JLabel("Not setup");
-	JLabel untimedVersionLabelVal = new JLabel("N/A");
-	JLabel uppaalLocationLabelVal = new JLabel("Not setup");
-	JLabel uppaalVersionLabelVal = new JLabel("N/A");
+	final JLabel tapaalLocationLabelVal = new JLabel("Not setup");
+	final JLabel tapaalVersionLabelVal = new JLabel("N/A");
+	final JLabel dtapaalLocationLabelVal = new JLabel("Not setup");
+	final JLabel dtapaalVersionLabelVal = new JLabel("N/A");
+	final JLabel untimedLocationLabelVal = new JLabel("Not setup");
+	final JLabel untimedVersionLabelVal = new JLabel("N/A");
+	final JLabel uppaalLocationLabelVal = new JLabel("Not setup");
+	final JLabel uppaalVersionLabelVal = new JLabel("N/A");
 
-	private Dimension minimumSize = new Dimension(320,1);
-	private Insets panelInsets = new Insets(5, 5, 5, 5);
-	private Insets smallPanelInsets = new Insets(0, 5, 0, 5);
-	private Insets buttonInsets = new Insets(0, 5, 0, 0);
+	private final Dimension minimumSize = new Dimension(320,1);
+	private final Insets panelInsets = new Insets(5, 5, 5, 5);
+	private final Insets smallPanelInsets = new Insets(0, 5, 0, 5);
+	private final Insets buttonInsets = new Insets(0, 5, 0, 0);
 
-	private String toolTipSelect = "Select a path to the verification engine.";
-	private String toolTipReset = "Reset the path to the verification engine.";
+	private final String toolTipSelect = "Select a path to the verification engine.";
+	private final String toolTipReset = "Reset the path to the verification engine.";
 
 	public EngineDialogPanel() {
 		initComponents();		
@@ -68,6 +71,7 @@ public class EngineDialogPanel {
 		makeUppaalPanel();
 		makeDiscreteTapaalPanel();
 		makeUntimedPanel();
+		makeJavaPanel();
 		makeEnginePanel();
 		setPathsAndVersionNumbers();
 	}	
@@ -585,6 +589,40 @@ public class EngineDialogPanel {
 		uppaalPanel.add(uppaalButtonPanel,gbc);
 	}
 
+    private void makeJavaPanel() {
+        String version = System.getProperty("java.version");
+
+        //make java panel
+        javaPanel = new JPanel();
+        javaPanel.setBorder(BorderFactory.createTitledBorder("Java"));
+        javaPanel.setLayout(new GridBagLayout());
+
+        //add info panel to java panel
+        JPanel javaInfoPanel = new JPanel();
+        javaInfoPanel.setLayout(new GridBagLayout());
+
+        JPanel p = new JPanel(new FlowLayout());
+        p.add(javaVersionLabel);
+        p.add(new JLabel(version));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        javaInfoPanel.add(p, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = panelInsets;
+        javaPanel.add(javaInfoPanel,gbc);
+    }
+
 	private void makeEnginePanel() {
 		enginePanel = new JPanel();
 		enginePanel.setLayout(new GridBagLayout());		
@@ -626,6 +664,15 @@ public class EngineDialogPanel {
 		gbc.insets = panelInsets;
 		enginePanel.add(uppaalPanel,gbc);
 
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = panelInsets;
+        enginePanel.add(javaPanel,gbc);
+
 		JPanel closeButtonPanel = new JPanel();
 		closeButtonPanel.setLayout(new GridBagLayout());
 		closeButton = new JButton("Close");
@@ -639,7 +686,7 @@ public class EngineDialogPanel {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(0,5,2,5);
 		enginePanel.add(closeButtonPanel,gbc);	
@@ -656,6 +703,5 @@ public class EngineDialogPanel {
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
-
 	}
 }

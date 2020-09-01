@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,18 +52,20 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
-	
-	enum GraphicsType { Position, Offset }
 
-	private NameGenerator nameGenerator = new NameGenerator();
-	private IdResolver idResolver = new IdResolver();
-	private HashSet<String> arcs = new HashSet<String>();
-	private HashMap<String, TimedPlace> places = new HashMap<String, TimedPlace>();
-	private HashMap<String, TimedTransition> transitions = new HashMap<String, TimedTransition>();
+    private final TabContent.TAPNLens lens = new TabContent.TAPNLens(false, false);
+
+    enum GraphicsType { Position, Offset }
+
+	private final NameGenerator nameGenerator = new NameGenerator();
+	private final IdResolver idResolver = new IdResolver();
+	private final HashSet<String> arcs = new HashSet<String>();
+	private final HashMap<String, TimedPlace> places = new HashMap<String, TimedPlace>();
+	private final HashMap<String, TimedTransition> transitions = new HashMap<String, TimedTransition>();
 	
 	//If the net is too big, do not make the graphics
 	private int netSize = 0;
-	private int maxNetSize = 4000;
+	private final int maxNetSize = 4000;
 	private boolean hasPositionalInfo = false;
 	
 	public PNMLoader() {
@@ -192,7 +195,7 @@ public class PNMLoader {
 		
 		if(isNetDrawable()){
 			//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y);
+			TimedPlaceComponent placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
 			placeComponent.setUnderlyingPlace(place);
 			template.guiModel().addPetriNetObject(placeComponent);
 		}
@@ -236,8 +239,7 @@ public class PNMLoader {
 		if(isNetDrawable()){
 			TimedTransitionComponent transitionComponent = 
 				//We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique 
-				new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y,
-						true, false, 0, 0);
+				new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, true, false, 0, 0, lens);
 			transitionComponent.setUnderlyingTransition(transition);
 			template.guiModel().addPetriNetObject(transitionComponent);
 		}
@@ -275,10 +277,9 @@ public class PNMLoader {
 			Node text = getFirstDirectChild(inscription, "text");
 			if(text != null){
 				String weightString = text.getTextContent().trim();
-				try{
-					if(weightString != null)
-						weight = Integer.parseInt(weightString);
-					} catch(NumberFormatException e) {}
+                try {
+                    weight = Integer.parseInt(weightString);
+                } catch (NumberFormatException ignored) {} //Default values is 1
 			}
 		}
 		
@@ -321,8 +322,8 @@ public class PNMLoader {
 						String arcTempX = position.getAttribute("x");
 						String arcTempY = position.getAttribute("y");
 
-						double arcPointX = Double.valueOf(arcTempX);
-                        double arcPointY = Double.valueOf(arcTempY);
+						double arcPointX = Double.parseDouble(arcTempX);
+                        double arcPointY = Double.parseDouble(arcTempY);
 						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
 						
@@ -364,8 +365,8 @@ public class PNMLoader {
 		String x = offset.getAttribute("x");
 		String y = offset.getAttribute("y");
 		
-                int xd = Math.round(Float.valueOf(x));
-                int yd = Math.round(Float.valueOf(y));
+                int xd = Math.round(Float.parseFloat(x));
+                int yd = Math.round(Float.parseFloat(y));
                
 		return new Point(xd, yd);
 	}
@@ -424,7 +425,7 @@ public class PNMLoader {
 		TimedInputArcComponent arc = null;
 		
 		if(isNetDrawable()){
-			arc = new TimedInputArcComponent(new TimedOutputArcComponent(source, target, weight, arcId));
+			arc = new TimedInputArcComponent(new TimedOutputArcComponent(source, target, weight, arcId), lens);
 			arc.setUnderlyingArc(inputArc);
 
 			template.guiModel().addPetriNetObject(arc);

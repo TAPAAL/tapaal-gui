@@ -19,20 +19,20 @@ public abstract class Place extends PlaceTransitionObject {
 	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
-	protected static int tWidth = 5;
-	protected static int tHeight = 5;
+	protected static final int tWidth = 5;
+	protected static final int tHeight = 5;
 
 	// Token dot position offsets
-	protected static int tLeftX = 7;
-	protected static int tRightX = 19;
-	protected static int tTopY = 7;
-	protected static int tBotY = 19;
-	protected static int tMiddleX = 13;
-	protected static int tMiddleY = 13;
+	protected static final int tLeftX = 7;
+	protected static final int tRightX = 19;
+	protected static final int tTopY = 7;
+	protected static final int tBotY = 19;
+	protected static final int tMiddleX = 13;
+	protected static final int tMiddleY = 13;
 
 	// Ellipse2D.Double place
-	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
-	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
+	protected static final Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
+	protected static final Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
 
 	public Place(
@@ -42,9 +42,7 @@ public abstract class Place extends PlaceTransitionObject {
 			int nameOffsetXInput,
 			int nameOffsetYInput
 	){
-		super(positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
-		componentWidth = DIAMETER;
-		componentHeight = DIAMETER;
+		super(DIAMETER, DIAMETER, positionXInput, positionYInput, idInput,	nameOffsetXInput, nameOffsetYInput);
 	}
 
 	public Place(int positionXInput, int positionYInput) {
@@ -91,8 +89,7 @@ public abstract class Place extends PlaceTransitionObject {
 		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, getZoom());
 		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, getZoom());
 
-		Arc createArc = CreateGui.getDrawingSurface().createArc;
-		if (createArc != null) { // Must be drawing a new Arc if non-NULL.
+		if (CreateGui.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
 			return (proximityPlace.contains((int) unZoomedX, (int) unZoomedY) ||
 					placeEllipse.contains((int) unZoomedX, (int) unZoomedY));
 		} else {

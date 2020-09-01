@@ -12,8 +12,8 @@ import dk.aau.cs.gui.undo.Command;
  */
 public class TransitionRotationEdit extends Command {
 
-	Transition transition;
-	Integer angle;
+	final Transition transition;
+	final Integer angle;
 
 	/** Creates a new instance of placePriorityEdit */
 	public TransitionRotationEdit(Transition _transition, Integer _angle) {

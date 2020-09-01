@@ -1,10 +1,10 @@
 package dk.aau.cs.verification;
 
 public class BoundednessAnalysisResult {
-	private int maxUsedTokens;
-	private int totalTokens;
-	private int extraTokens;
-        private boolean isUPPAAL;
+	private final int maxUsedTokens;
+	private final int totalTokens;
+	private final int extraTokens;
+	private boolean isUPPAAL;
 	
 	public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens, int extraTokens){
 		this.maxUsedTokens = maxUsedTokens;

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.ExportBatchDialog;
 import pipe.gui.graphicElements.Arc;
@@ -37,7 +38,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
 public class TAPNComposer implements ITAPNComposer {
-	private Messenger messenger;
+	private final Messenger messenger;
 	private boolean hasShownMessage = false;
 	private boolean singleComponentNoPrefix = false; // if set to true then nets with only a single component have no prefix before places/transitions 
     private boolean inlineConstants = true;
@@ -45,8 +46,9 @@ public class TAPNComposer implements ITAPNComposer {
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
+    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
-	public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentNoPrefix, boolean inlineConstants){
+    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentNoPrefix, boolean inlineConstants){
 		this.messenger = messenger;
 		
 		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -185,8 +187,9 @@ public class TAPNComposer implements ITAPNComposer {
 						oldPlace.getPositionY(),
 						oldPlace.getId(),
 						oldPlace.getNameOffsetX(),
-						oldPlace.getNameOffsetY()
-						);
+						oldPlace.getNameOffsetY(),
+                        lens
+					);
 					newPlace.setUnderlyingPlace(constructedPlace);
 					newPlace.setName(uniquePlaceName);
 					guiModel.addPetriNetObject(newPlace);
@@ -227,13 +230,14 @@ public class TAPNComposer implements ITAPNComposer {
 					// Gui work
 					if (this.guiModels != null) {
 						Place oldPlace = currentGuiModel.getPlaceByName(timedPlace.name());
-						TimedPlaceComponent newPlace = new TimedPlaceComponent(
-								oldPlace.getPositionX() + offset.value1() * greatestWidth,
-								oldPlace.getPositionY() + offset.value2() * greatestHeight,
-								oldPlace.getId(),
-								oldPlace.getNameOffsetX(),
-								oldPlace.getNameOffsetY()
-						);
+                        TimedPlaceComponent newPlace = new TimedPlaceComponent(
+                            oldPlace.getPositionX() + offset.value1() * greatestWidth,
+                            oldPlace.getPositionY() + offset.value2() * greatestHeight,
+                            oldPlace.getId(),
+                            oldPlace.getNameOffsetX(),
+                            oldPlace.getNameOffsetY(),
+                            lens
+                        );
 						newPlace.setGuiModel(guiModel);
 
 						newPlace.setUnderlyingPlace(place);
@@ -275,21 +279,26 @@ public class TAPNComposer implements ITAPNComposer {
 						}
 						
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent());
+						if (timedTransition.isUncontrollable()) {
+						    transition.setUncontrollable(true);
+                        }
 						constructedModel.add(transition);
 						
 						// Gui work
 						if (this.guiModels != null) {
 							Transition oldTransition = currentGuiModel.getTransitionByName(timedTransition.name());
 							TimedTransitionComponent newTransition = new TimedTransitionComponent(
-									oldTransition.getPositionX() + offset.value1() * greatestWidth,
-									oldTransition.getPositionY() + offset.value2() * greatestHeight,
-									oldTransition.getId(),
-									oldTransition.getNameOffsetX(),
-									oldTransition.getNameOffsetY(),
-									true,
-									false,
-									oldTransition.getAngle(),
-									0);
+                                oldTransition.getPositionX() + offset.value1() * greatestWidth,
+                                oldTransition.getPositionY() + offset.value2() * greatestHeight,
+                                oldTransition.getId(),
+                                oldTransition.getNameOffsetX(),
+                                oldTransition.getNameOffsetY(),
+                                true,
+                                false,
+                                oldTransition.getAngle(),
+                                0,
+                                lens
+                            );
 							newTransition.setUnderlyingTransition(transition);
 							newTransition.setName(uniqueTransitionName);
 							guiModel.addPetriNetObject(newTransition);
@@ -377,12 +386,14 @@ public class TAPNComposer implements ITAPNComposer {
 					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 					
-					Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
-                        guiSource,
-							guiTarget,
-							arc.getWeight().value(),
-							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name())
-                    )
+					TimedInputArcComponent newArc = new TimedInputArcComponent(
+                        new TimedOutputArcComponent(
+                            guiSource,
+                            guiTarget,
+                            arc.getWeight().value(),
+                            mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name())
+                        ),
+                        lens
 					);
 					
 					// Build ArcPath
@@ -391,7 +402,7 @@ public class TAPNComposer implements ITAPNComposer {
 					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
 					
 					// Set arcPath, guiModel and connectors
-					((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);
@@ -597,7 +608,7 @@ public class TAPNComposer implements ITAPNComposer {
 				if (this.guiModels != null) {
 					Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 					Transition guiTarget = guiModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
-					Arc newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
+					TimedInhibitorArcComponent newArc = new TimedInhibitorArcComponent(new TimedOutputArcComponent(
                         guiSource,
 							guiTarget,
 							arc.getWeight().value(),
@@ -609,7 +620,7 @@ public class TAPNComposer implements ITAPNComposer {
 					Transition oldGuiTarget = currentGuiModel.getTransitionByName(arc.destination().name());
 					ArcPath newArcPath = createArcPath(currentGuiModel, oldGuiSource, oldGuiTarget, newArc, offset.value1() * greatestWidth, offset.value2() * greatestHeight);
 					
-					((TimedInhibitorArcComponent) newArc).setUnderlyingArc(addedArc);
+					newArc.setUnderlyingArc(addedArc);
 					newArc.setArcPath(newArcPath);
 					newArc.updateArcPosition();
 					guiModel.addPetriNetObject(newArc);

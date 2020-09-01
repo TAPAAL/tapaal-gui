@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.Template;
 import pipe.gui.AnimationSettingsDialog;
 import pipe.gui.DelayEnabledTransitionControl;
@@ -19,27 +20,32 @@ import pipe.gui.graphicElements.Transition;
 
 public class TransitionFireingComponent extends JPanel {
 
-	private EnabledTransitionsList enabledTransitionsList;
-	private JButton fireButton;
-	private JButton settingsButton;
+	private final EnabledTransitionsList enabledTransitionsList;
+	private final JButton fireButton;
+	private final JButton settingsButton;
+	private final TabContent.TAPNLens lens;
 
-	public TransitionFireingComponent(boolean showDelayEnabledTransitions) {
+	public TransitionFireingComponent(boolean showDelayEnabledTransitions, TabContent.TAPNLens lens) {
 		super(new GridBagLayout());
-
 		enabledTransitionsList = new EnabledTransitionsList();
-
-		this.setBorder(BorderFactory.createCompoundBorder(
+        this.lens = lens;
+		this.setBorder(
+		    BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Enabled Transitions"),
-				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		this
-		.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
-		enabledTransitionsList.setPreferredSize(new Dimension(
+				BorderFactory.createEmptyBorder(3, 3, 3, 3)
+            )
+        );
+		this.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
+		enabledTransitionsList.setPreferredSize(
+		    new Dimension(
 				enabledTransitionsList.getPreferredSize().width,
-				enabledTransitionsList.getMinimumSize().height));
+				enabledTransitionsList.getMinimumSize().height
+            )
+        );
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
-		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings());
+		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings(lens));
 
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
@@ -50,6 +56,7 @@ public class TransitionFireingComponent extends JPanel {
 				fireSelectedTransition();
 			}
 		});
+
 		fireButton.addKeyListener(new KeyAdapter() {			
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -119,7 +126,10 @@ public class TransitionFireingComponent extends JPanel {
 				fireButton.setToolTipText(SIMULATE_ACTIVATED_TOOL_TIP);
 			}
 		} else { //If random simulation is not enabled.
-			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions() ? "Delay & Fire" : "Fire");
+			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions()  ? "Delay & Fire" : "Fire");
+			if(!lens.isTimed()){
+			    fireButton.setText("Fire");
+            }
 
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){
 				fireButton.setEnabled(false);

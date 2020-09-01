@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
-import dk.aau.cs.model.tapn.TimedPlace.PlaceType;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 // This class must remain immutable wrt. delays and transition firings!
 public class LocalTimedMarking implements TimedMarking { // TODO: Consider removing the interface here?
-	private HashMap<TimedPlace, List<TimedToken>> placesToTokensMap;
+	private final HashMap<TimedPlace, List<TimedToken>> placesToTokensMap;
 	private NetworkMarking parent;
 
 	public LocalTimedMarking() {

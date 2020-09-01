@@ -7,18 +7,19 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class MovePlaceTransitionObject extends Command {
 	
-	private int newY;
-	private int newX;
-	private PlaceTransitionObject objectToBeMoved;
-	private int oldY;
-	private int oldX;
-	private boolean doUpdate = false;
+	private final int newY;
+	private final int newX;
+	private final PlaceTransitionObject objectToBeMoved;
+	private final int oldY;
+	private final int oldX;
 	
 	
 	public MovePlaceTransitionObject(PlaceTransitionObject object, Point point) {
 		objectToBeMoved = object;
 		this.newX = point.x;
 		this.newY = point.y;
+        this.oldY = objectToBeMoved.getOriginalY();
+        this.oldX = objectToBeMoved.getOriginalX();
 	}
 
 	@Override
@@ -34,19 +35,14 @@ public class MovePlaceTransitionObject extends Command {
 
 	@Override
 	public void redo() {
-		oldY = objectToBeMoved.getOriginalY();
-		oldX = objectToBeMoved.getOriginalX();
-		
 		objectToBeMoved.setOriginalX(newX);
 		objectToBeMoved.setOriginalY(newY);
 		
-		if(doUpdate) {
-			objectToBeMoved.updateOnMoveOrZoom();
-			objectToBeMoved.repaint();
-			CreateGui.getDrawingSurface().updatePreferredSize();
-		}
-		doUpdate = true;
-		
+
+		objectToBeMoved.updateOnMoveOrZoom();
+		objectToBeMoved.repaint();
+		CreateGui.getDrawingSurface().updatePreferredSize();
+
 	}
 
 }

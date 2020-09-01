@@ -1,11 +1,6 @@
 package dk.aau.cs.gui.components;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -34,6 +29,7 @@ public class StatisticsPanel extends JPanel{
 
 	private final int topBottomMargin = 3;
 	private final int rightMargin = 10;
+	private Point location;
 	
 	private JButton removeOrphanTransitions;
     private JButton removeOrphanPlaces;
@@ -66,7 +62,7 @@ public class StatisticsPanel extends JPanel{
 	}
 
 	private JPanel init() {
-		addRow(headLines, 0, true);
+        addRow(headLines, 0, true);
 		
 		//Add the content - make space for separators (except the orphan transitions)
 		for(int i = 0; i < contents.length - 2; i++){
@@ -203,6 +199,8 @@ public class StatisticsPanel extends JPanel{
                 }
                 tab.drawingSurface().repaint();
 
+                location = StatisticsPanel.dialog.getLocationOnScreen();
+
                 StatisticsPanel.this.removeAll();
                 StatisticsPanel.this.init();
 
@@ -210,6 +208,7 @@ public class StatisticsPanel extends JPanel{
 
                 dialog.dispose();
                 dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);
             }
@@ -242,6 +241,8 @@ public class StatisticsPanel extends JPanel{
                 }
                 tab.drawingSurface().repaint();
 
+                location = StatisticsPanel.dialog.getLocationOnScreen();
+
                 StatisticsPanel.this.removeAll();
                 StatisticsPanel.this.init();
 
@@ -249,6 +250,7 @@ public class StatisticsPanel extends JPanel{
 
                 dialog.dispose();
                 dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);
             }

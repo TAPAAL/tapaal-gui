@@ -1,37 +1,33 @@
 package dk.aau.cs.model.tapn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import java.util.HashSet;
 
 public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
-	private boolean isActive;
-	
+    private boolean isActive;
+
 	//Should the names be checked to see if the name is already used 
 	//This is used when loading big nets as the checking  of names is slow.
 	private boolean checkNames = true; 
 
-	private List<TimedPlace> places = new ArrayList<TimedPlace>();
-	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
-	private List<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
-	private List<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
-	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-	private List<TransportArc> transportArcs = new ArrayList<TransportArc>();
+	private final List<TimedPlace> places = new ArrayList<TimedPlace>();
+	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
+	private final List<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
+	private final List<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+	private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+	private final List<TransportArc> transportArcs = new ArrayList<TransportArc>();
 
-	private TimedMarking currentMarking;
+	private TimedMarking currentMarking = new LocalTimedMarking();
 
 	public TimedArcPetriNet(String name) {
-		setName(name);
-		setMarking(new LocalTimedMarking());
-		isActive = true;
-	}
+        setName(name);
+        isActive = true;
+    }
 
 	public TimedMarking marking(){
 		return currentMarking;
@@ -127,11 +123,7 @@ public class TimedArcPetriNet {
 		currentMarking.add(token);
 	}
 
-	public void removeToken(TimedToken token) {
-		currentMarking.remove(token);
-	}
-
-	public void remove(TimedPlace place) {
+    public void remove(TimedPlace place) {
 		boolean removed = places.remove(place);
 		if (removed && !place.isShared()){
 			currentMarking.removePlaceFromMarking(place);
@@ -371,11 +363,19 @@ public class TimedArcPetriNet {
 	
 	public boolean isDegree2(){
 		for(TimedTransition t : this.transitions()) {
-			if(t.presetSize() > 2 || t.postsetSize() > 2)
+			if(t.presetSizeWithoutInhibitorArcs() > 2 || t.postsetSize() > 2)
 				return false;
 		}
 		return true;
 	}
+
+    public int getHighestNetDegree(){
+	    int currentHighestNetDegree = 0;
+        for (TimedTransition t : this.transitions()) {
+            currentHighestNetDegree = Collections.max(Arrays.asList(currentHighestNetDegree, t.presetSize(), t.postsetSize()));
+        }
+        return currentHighestNetDegree;
+    }
 	
 	public boolean isActive() {
 		return isActive;
@@ -441,7 +441,7 @@ public class TimedArcPetriNet {
             numberOfOrphanPlaces += t.getOrphanPlaces().size();
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!(in.interval().lowerBound().value() == 0 && in.interval().isLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedInputArcs++;
@@ -452,7 +452,7 @@ public class TimedArcPetriNet {
 			}
 			//Test if all tansportarcs is untimed and get the number of untimed transport arcs
 			for(TransportArc in : t.transportArcs()){
-				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+				if(!(in.interval().lowerBound().value() == 0 && in.interval().isLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
 				} else {
 					numberOfUntimedTransportArcs++;
@@ -461,6 +461,18 @@ public class TimedArcPetriNet {
 					networkWeighted = true;
 				}
 			}
+
+			for (TimedPlace p : t.places) {
+			    if (!p.invariant().upperBound().equals(Bound.Infinity)) {
+			        networkUntimed = false;
+                }
+            }
+
+			for (TimedTransition transition : t.transitions) {
+			    if (transition.isUrgent()) {
+			        networkUntimed = false;
+                }
+            }
 			
 			// Test all output arcs for weights
 			if(!networkWeighted){
@@ -612,12 +624,19 @@ public class TimedArcPetriNet {
 				return false;
 			}
 		}
-		
-		for(TransportArc t : transportArcs){
-			if(!t.interval().equals(TimeInterval.ZERO_INF)){
-				return false;
-			}
-		}
+		if (transportArcs.size() > 0) {
+		    return false;
+        }
+
+		if (hasUrgentTransitions()) {
+		    return false;
+        }
+
+		for (TimedPlace p : places) {
+		    if (!p.invariant().upperBound().toString().equals("inf")) {
+		        return false;
+            }
+        }
 		
 		return true;
 	}
@@ -631,16 +650,26 @@ public class TimedArcPetriNet {
 		
 		return false;
 	}
+
+    public boolean hasUncontrollableTransitions() {
+        for(TimedTransition t : transitions){
+            if(t.isUncontrollable()){
+                return true;
+            }
+        }
+
+        return false;
+    }
 	
 	public boolean isNonStrict(){
 		for(TimedInputArc t : inputArcs){
-			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
+			if(!t.interval().isLowerBoundNonStrict() || (!t.interval().isUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
 				return false;
 			}
 		}
 		
 		for(TransportArc t : transportArcs){
-			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
+			if(!t.interval().isLowerBoundNonStrict() || (!t.interval().isUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
 				return false;
 			}
 		}

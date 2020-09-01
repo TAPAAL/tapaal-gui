@@ -16,10 +16,10 @@ import dk.aau.cs.gui.undo.Command;
  */
 public class AddArcPathPointEdit extends Command {
 
-	ArcPath arcPath;
-	ArcPathPoint point;
+	final ArcPath arcPath;
+	final ArcPathPoint point;
 	private final DataLayer guiModel;
-	Integer index;
+	final Integer index;
 
 	/** Creates a new instance of AddArcPathPointEdit */
 	public AddArcPathPointEdit(Arc _arc, ArcPathPoint _point, DataLayer guiModel) {
