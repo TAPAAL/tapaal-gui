@@ -19,10 +19,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private boolean useSiphontrap = false; 
 	private boolean useQueryReduction = true; 
 	private boolean useStubbornReduction = true;
+	private String pathToReducedNet;
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, 
 		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
+		boolean siphontrap, boolean queryReduction, boolean stubbornReduction, String pathToReducedNet) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
@@ -30,13 +31,14 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.useSiphontrap = siphontrap;
 		this.useQueryReduction = queryReduction;
 		this.useStubbornReduction = stubbornReduction;
+		this.pathToReducedNet = pathToReducedNet;
 	}
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, 
 		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
+		boolean siphontrap, boolean queryReduction, boolean stubbornReduction, String pathToReducedNet) {
 		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
-			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction);
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet);
 	}
 
 	@Override
@@ -50,7 +52,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
-            String writeReducedCMD = " --write-reduced reduced-" + CreateGui.getApp().getCurrentTabName();
+            String writeReducedCMD = " --write-reduced reduced-" + CreateGui.getApp().getCurrentTabName().replace(" ", "");
             writeReducedCMD = writeReducedCMD.replace(".tapn", ".pnml");
             result.append(writeReducedCMD);
 			break;

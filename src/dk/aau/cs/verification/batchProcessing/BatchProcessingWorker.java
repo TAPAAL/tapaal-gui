@@ -575,7 +575,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
 		queryToVerify.setCategory(query.getCategory());
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
-		
+
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens());
 		clonedQuery.setCategory(query.getCategory());
 		MapQueryToNewNames(clonedQuery, composedModel.value2());

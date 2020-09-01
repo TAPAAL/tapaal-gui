@@ -282,13 +282,13 @@ public class RunVerification extends RunVerificationBase {
 			}
 			
 			if(!result.getReductionResultAsString().isEmpty()){
-				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
+				JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
 				gbc.gridy = 5;
 				gbc.insets = new Insets(0,0,0,-90);
 				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(reductionStatsLabet, gbc);
+				panel.add(reductionStatsLabel, gbc);
 
                 JButton openReducedButton = new JButton("Open reduced net");
                 openReducedButton.addActionListener(new ActionListener() {
