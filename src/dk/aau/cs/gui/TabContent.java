@@ -13,7 +13,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -605,6 +605,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
+            checkQueries(tab);
+
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
@@ -617,6 +619,78 @@ public class TabContent extends JSplitPane implements TabContentActions{
             throw e;
 		}
 
+	}
+
+	private static void checkQueries(TabContent tab) {
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
+
+        EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
+        EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
+        EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+        EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
+        EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options(); //support nested quantification
+        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions(); //support nested quantification
+        EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
+
+        EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
+        TimedArcPetriNetNetwork net = tab.network();
+        for (TAPNQuery q : tab.queries()) {
+            boolean hasEngine = false;
+            boolean[] queryOptions = new boolean[]{
+                q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
+                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
+                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)),
+                (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()),
+                net.hasWeights(),
+                net.hasInhibitorArcs(),
+                net.hasUrgentTransitions(),
+                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode),
+                !net.isNonStrict(),
+                tab.lens.isTimed(),
+                (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
+                tab.lens.isGame(),
+                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
+                q.hasUntimedOnlyProperties()
+            };
+            for(EngineSupportOptions engine : engineSupportOptions){
+                if(engine.areOptionsSupported(queryOptions)){
+                    hasEngine = true;
+                    break;
+                }
+            }
+            if (!hasEngine) {
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            } else if (tab.lens.isGame()) {
+                if (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLEGNode) {
+                    queriesToRemove.add(q);
+                    tab.removeQuery(q);
+                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                }
+                q.setUseGCD(false);
+                q.setUseTimeDarts(false);
+                q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                q.setUseOverApproximationEnabled(false);
+                q.setUseUnderApproximationEnabled(false);
+            }
+        }
+        String message = "";
+        if (!queriesToRemove.isEmpty()) {
+            message = "The following queries will be removed in the conversion:";
+            for (TAPNQuery q : queriesToRemove) {
+                message += "\n" + q.getName();
+            }
+        }
+        if (tab.lens.isGame()) {
+            message += (message.length() == 0 ? "" : "\n\n");
+            message += "Some options may have been changed to make the query compatible with the net features.";
+        }
+        if(message.length() > 0){
+            JOptionPane.showMessageDialog(tab, message,"Information", JOptionPane.INFORMATION_MESSAGE);
+        }
 	}
 
     public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
@@ -1510,27 +1584,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame()), "-timed");
-                findAndRemoveAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
-        }
-    }
-
-    private void findAndRemoveAffectedQueries(TabContent tab){
-        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
-        for (TAPNQuery q : tab.queries()){
-            if(q.hasUntimedOnlyProperties()){
-                queriesToRemove.add(q);
-                tab.removeQuery(q);
-            }
-        }
-        String message = "The following queries will be removed in the conversion:";
-        for(TAPNQuery q : queriesToRemove){
-            message += "\n" + q.getName();
-        }
-        if(!queriesToRemove.isEmpty()){
-            JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1550,42 +1606,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
-                findAndRemoveGameAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
-        }
-    }
-
-    private void findAndRemoveGameAffectedQueries(TabContent tab){
-        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
-        for (TAPNQuery q : tab.queries()) {
-            if (q.hasUntimedOnlyProperties() || !(q.getProperty() instanceof TCTLAGNode) || !lens.isTimed()) {
-                queriesToRemove.add(q);
-                tab.removeQuery(q);
-            } else {
-                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
-                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
-                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
-                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
-                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
-                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
-                } if (q.useTimeDarts()) {
-                    q.setUseTimeDarts(false);
-                } if (q.useGCD()) {
-                    q.setUseGCD(false);
-                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
-                    q.setUseOverApproximationEnabled(false);
-                    q.setUseUnderApproximationEnabled(false);
-                }
-            }
-        }
-        String message = "The following queries will be removed in the conversion:";
-        for (TAPNQuery q : queriesToRemove) {
-            message += "\n" + q.getName();
-        }
-        if (!queriesToRemove.isEmpty()) {
-            JOptionPane.showMessageDialog(this, message, "Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
