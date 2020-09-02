@@ -113,6 +113,7 @@ public class ColorExpressionDialogPanel extends JPanel {
     }
 
     public void initPanels() {
+        setLayout(new BorderLayout());
         exprPanel = new JPanel(new GridBagLayout());
         exprPanel.setBorder(BorderFactory.createTitledBorder("Color Expression"));
 
@@ -122,14 +123,7 @@ public class ColorExpressionDialogPanel extends JPanel {
         initExprEditPanel();
         initExitButtons();
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.WEST;
-        add(exprPanel, gbc);
+        add(exprPanel, BorderLayout.CENTER);
     }
 
     public ColorExpression getColorExpression() {
@@ -504,9 +498,6 @@ public class ColorExpressionDialogPanel extends JPanel {
     public void initColorTypePanel() {
         colortypePanel = new JPanel(new GridBagLayout());
         colortypePanel.setBorder(BorderFactory.createTitledBorder("Variables and Colors"));
-        Dimension d = new Dimension(450, 158);
-        colortypePanel.setPreferredSize(d);
-        colortypePanel.setMinimumSize(d);
 
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
@@ -522,18 +513,10 @@ public class ColorExpressionDialogPanel extends JPanel {
             colorTypeLabel.setText("<html>Colortype is: " + arcColorType.toString());
         }
 
-        colorTypeCombobox.setPreferredSize(new Dimension(300, 27));
-        colorTypeCombobox.setMinimumSize(new Dimension(300, 27));
-        colorTypeCombobox.setMaximumSize(new Dimension(300, 27));
-
         variableLabel = new JLabel("Variable: ");
         variableCombobox = new JComboBox();
         addVariableButton = new JButton("Add Variable");
         Dimension addDim = new Dimension(120, 27);
-        Dimension comboboxDim = new Dimension(250, 27);
-        variableCombobox.setPreferredSize(comboboxDim);
-        variableCombobox.setMinimumSize(comboboxDim);
-        variableCombobox.setMaximumSize(comboboxDim);
 
         addVariableButton.setPreferredSize(addDim);
         addVariableButton.setMinimumSize(addDim);
@@ -542,10 +525,6 @@ public class ColorExpressionDialogPanel extends JPanel {
         colorLabel = new JLabel("Color: ");
         colorCombobox = new JComboBox();
         addColorButton = new JButton("Add Color");
-
-        colorCombobox.setPreferredSize(comboboxDim);
-        colorCombobox.setMinimumSize(comboboxDim);
-        colorCombobox.setMaximumSize(comboboxDim);
 
         addColorButton.setPreferredSize(addDim);
         addColorButton.setMinimumSize(addDim);
@@ -598,41 +577,50 @@ public class ColorExpressionDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3,3,3,3);
         if(!isArc){
+            gbc.weightx = 1.0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
             colortypePanel.add(colorTypeCombobox, gbc);
         } else{
             colortypePanel.add(colorTypeLabel, gbc);
         }
 
-        gbc.gridy  = 0;
-        gbc.gridx = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        //colortypePanel.add(colorTypeLabel, gbc);
-
-
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(3,3,3,3);
         colortypePanel.add(variableCombobox, gbc);
 
+        gbc = new GridBagConstraints();
         gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(3,3,3,3);
+        gbc.anchor = GridBagConstraints.WEST;
         colortypePanel.add(addVariableButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(3, 3,3 ,3);
-        //colortypePanel.add(colorLabel, gbc);
-
-        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(3,3,3,3);
         colortypePanel.add(colorCombobox, gbc);
 
+        gbc = new GridBagConstraints();
         gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3,3 ,3);
         colortypePanel.add(addColorButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         exprPanel.add(colortypePanel, gbc);
     }
 
