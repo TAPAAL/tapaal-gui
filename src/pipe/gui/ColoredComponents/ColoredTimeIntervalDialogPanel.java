@@ -216,6 +216,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(5, 10, 5, 10);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -292,6 +293,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
         guardEditPanel.add(leftConstantsComboBox, gridBagConstraints);
 
         rightUseConstant = new JCheckBox("Use Constant                    ");
@@ -305,6 +307,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+
         guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
         rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
@@ -323,6 +327,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+
         guardEditPanel.add(rightConstantsComboBox, gridBagConstraints);
     }
 

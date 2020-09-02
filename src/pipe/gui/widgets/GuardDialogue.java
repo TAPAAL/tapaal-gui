@@ -1,10 +1,6 @@
 package pipe.gui.widgets;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -14,17 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
 import dk.aau.cs.gui.Context;
@@ -72,6 +58,8 @@ public class GuardDialogue extends JPanel /*
 	private ColoredArcGuardPanel coloredArcGuardPanel;
     PetriNetObject objectToBeEdited;
     Context context;
+    JPanel mainPanel;
+    JScrollPane scrollPane;
 	
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
@@ -79,7 +67,13 @@ public class GuardDialogue extends JPanel /*
 		myRootPane = rootPane;
 		this.context = context;
 		this.objectToBeEdited = objectToBeEdited;
-		setLayout(new GridBagLayout());
+		setLayout(new BorderLayout());
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new GridBagLayout());
+		scrollPane = new JScrollPane();
+		scrollPane.setViewportView(mainPanel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 			initTimeGuardPanel();
@@ -104,6 +98,7 @@ public class GuardDialogue extends JPanel /*
 			
 			weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight().value());
 		}
+		add(scrollPane, BorderLayout.CENTER);
 		hideIrrelevantInformation();
 	}
 
@@ -127,10 +122,15 @@ public class GuardDialogue extends JPanel /*
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context);
-	    add(coloredArcGuardPanel, gridBagConstraints);
+        coloredArcGuardPanel.setBorder(BorderFactory.createTitledBorder("test border"));
+	    mainPanel.add(coloredArcGuardPanel, gridBagConstraints);
     }
 
 	private void initButtonPanel(final PetriNetObject objectToBeEdited) {
@@ -249,7 +249,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 4;
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-		add(buttonPanel, gridBagConstraints);
+		mainPanel.add(buttonPanel, gridBagConstraints);
 	}
 	
 	private void initWeightPanel() {
@@ -339,7 +339,8 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.insets = new Insets(5, 5, 0, 5);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		add(weightEditPanel, gridBagConstraints);
+		gridBagConstraints.weightx = 1.0;
+		mainPanel.add(weightEditPanel, gridBagConstraints);
 	}
 
 	private void initTimeGuardPanel() {
@@ -399,7 +400,8 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.insets = new Insets(5, 5, 0, 5);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		add(guardEditPanel, gridBagConstraints);
+		gridBagConstraints.weightx = 1.0;
+		mainPanel.add(guardEditPanel, gridBagConstraints);
 	}
 
 	private void initNonColoredTimeIntervalControls() {

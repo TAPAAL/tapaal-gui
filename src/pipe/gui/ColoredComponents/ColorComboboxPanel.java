@@ -31,7 +31,7 @@ public abstract class ColorComboboxPanel extends JPanel {
         this.colorType = colorType;
         this.panelName = panelName;
         this.showAllCheckBoxes = showAllCheckBoxes;
-        this.setLayout(new GridBagLayout());
+        this.setLayout(new BorderLayout());
         initPanel();
     }
 
@@ -61,16 +61,7 @@ public abstract class ColorComboboxPanel extends JPanel {
         colorTypesScrollPane.setBorder(BorderFactory.createTitledBorder("Color Type elements"));
         updateColorType(colorType);
 
-        Dimension scrollPaneSize = new Dimension(260, 150);
-        colorTypesScrollPane.setMaximumSize(scrollPaneSize);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        colorcomboBoxPanel.add(colorTypesScrollPane, gbc);
-        add(colorcomboBoxPanel, gbc);
+        add(colorTypesScrollPane, BorderLayout.CENTER);
     }
 
     public void removeScrollPaneBorder(){
@@ -94,7 +85,6 @@ public abstract class ColorComboboxPanel extends JPanel {
     public void updateColorType(ColorType ct){
         removeOldComboBoxes();
         colorType = ct;
-        Dimension comboSize = new Dimension(230, 30);
         if (colorType instanceof ProductType) {
             colorTypeComboBoxesArray = new JComboBox[((ProductType) colorType).getColorTypes().size()];
             allCheckBoxesArray = new JCheckBox[((ProductType) colorType).getColorTypes().size()];
@@ -106,21 +96,21 @@ public abstract class ColorComboboxPanel extends JPanel {
                     colorTypeComboBoxesArray[i].addItem(element);
                 }
 
-                colorTypeComboBoxesArray[i].setPreferredSize(comboSize);
-                colorTypeComboBoxesArray[i].setMinimumSize(comboSize);
-                colorTypeComboBoxesArray[i].setMaximumSize(comboSize);
                 colorTypeComboBoxesArray[i].addActionListener(actionEvent -> changedColor(colorTypeComboBoxesArray));
+                ((JLabel)colorTypeComboBoxesArray[i].getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.gridx = 0;
                 gbc.gridy = i;
-                gbc.anchor = GridBagConstraints.SOUTH;
+                gbc.anchor = GridBagConstraints.WEST;
+                gbc.weightx = 1.0;
                 gbc.insets = new Insets(5 , 0,0,0);
+                gbc.fill =GridBagConstraints.HORIZONTAL;
                 comboBoxPanel.add(colorTypeComboBoxesArray[i], gbc);
                 if(showAllCheckBoxes){
                     allCheckBoxesArray[i] = new JCheckBox("All");
                     gbc.gridx = 1;
                     gbc.gridy = i;
-                    gbc.anchor = GridBagConstraints.SOUTH;
+                    gbc.anchor = GridBagConstraints.WEST;
                     gbc.insets = new Insets(5 , 0,0,0);
                     comboBoxPanel.add(allCheckBoxesArray[i], gbc);
                 }
@@ -134,29 +124,28 @@ public abstract class ColorComboboxPanel extends JPanel {
                 Color element = iter.next();
                 colorTypeComboBoxesArray[0].addItem(element);
             }
-            colorTypeComboBoxesArray[0].setPreferredSize(comboSize);
-            colorTypeComboBoxesArray[0].setMinimumSize(comboSize);
-            colorTypeComboBoxesArray[0].setMaximumSize(comboSize);
+
             colorTypeComboBoxesArray[0].addActionListener(actionEvent -> changedColor(colorTypeComboBoxesArray));
+            ((JLabel)colorTypeComboBoxesArray[0].getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
-
-            gbc.anchor = GridBagConstraints.SOUTH;
+            gbc.fill =GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 1.0;
+            gbc.anchor = GridBagConstraints.WEST;
             gbc.insets = new Insets(5 , 0,0,0);
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
             if(showAllCheckBoxes){
                 allCheckBoxesArray[0] = new JCheckBox("All");
                 gbc.gridx = 1;
                 gbc.gridy = 0;
-                gbc.anchor = GridBagConstraints.SOUTH;
+                gbc.anchor = GridBagConstraints.WEST;
                 gbc.insets = new Insets(5 , 0,0,0);
                 comboBoxPanel.add(allCheckBoxesArray[0], gbc);
             }
         }
         addCheckBoxActionListeners();
-        colorTypesScrollPane.setPreferredSize(new Dimension(300,colorTypeComboBoxesArray.length*40));
-        colorTypesScrollPane.setMinimumSize(new Dimension(300, 60));
         revalidate();
     }
     private void removeOldComboBoxes(){

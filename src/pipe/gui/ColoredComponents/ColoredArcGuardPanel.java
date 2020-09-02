@@ -76,7 +76,7 @@ public class ColoredArcGuardPanel extends JPanel {
             nonDefaultArcColorIntervalPanel.setVisible(false);
         }
         if(isTransportArc){
-            regularArcExprPanel.setVisible(false);
+            expressionPanel.setVisible(false);
         } else{
             transportWeightPanel.setVisible(false);
         }
@@ -101,7 +101,7 @@ public class ColoredArcGuardPanel extends JPanel {
     private void initPanels() {
         initRegularArcExpressionPanel();
         if(isInputArc || isTransportArc){
-            initColoredTimedGuard();
+            initNonDefaultColorIntervalPanel();
         }
         initWeightPanel();
         if(isTransportArc){
@@ -131,23 +131,12 @@ public class ColoredArcGuardPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         add(transportWeightPanel, gbc);
     }
 
-    private void initColoredTimedGuard() {
-        ColorType ct;
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.WEST;
-        add(initNonDefaultColorIntervalPanel(), gbc);
-    }
-
-    private JPanel initNonDefaultColorIntervalPanel() {
+    private void initNonDefaultColorIntervalPanel() {
         nonDefaultArcColorIntervalPanel = new JPanel(new GridBagLayout());
         JPanel colorIntervalEditPanel = new JPanel(new GridBagLayout());
         nonDefaultArcColorIntervalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Color specific time intervals"));
@@ -260,6 +249,8 @@ public class ColoredArcGuardPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
         gbc.gridx = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         colorIntervalEditPanel.add(colorIntervalComboboxPanel, gbc);
 
@@ -291,30 +282,48 @@ public class ColoredArcGuardPanel extends JPanel {
                 cti = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals().get(0);
             }
         }
+        gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
         intervalEditorPanel = new ColoredTimeIntervalDialogPanel(getRootPane(),context, cti);
         colorIntervalEditPanel.add(intervalEditorPanel, gbc);
 
+        gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
         colorIntervalEditPanel.add(buttonPanel,gbc);
 
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.EAST;
         nonDefaultArcColorIntervalPanel.add(colorIntervalEditPanel, gbc);
 
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth =3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         nonDefaultArcColorIntervalPanel.add(timeConstraintScrollPane, gbc);
 
-        return nonDefaultArcColorIntervalPanel;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        add(nonDefaultArcColorIntervalPanel, gbc);
     }
 
     private void initTransportArcExpressionPanel(){
@@ -327,6 +336,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
         GridBagConstraints gbc = GridBagHelper.as(0, 4, GridBagHelper.Anchor.WEST, new Insets(5, 10, 5, 10));
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
         add(transportExprTabbedPane, gbc);
 
     }
@@ -339,18 +349,20 @@ public class ColoredArcGuardPanel extends JPanel {
         initEditPanel();
         initColorExpressionButtonsPanel();
 
-        expressionPanel = new JPanel(new GridBagLayout());
+        expressionPanel = new JPanel(new BorderLayout());
         expressionPanel.setBorder(BorderFactory.createTitledBorder("Arc Expression"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
-        expressionPanel.add(regularArcExprPanel, gbc);
+        expressionPanel.add(regularArcExprPanel, BorderLayout.CENTER);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
+        gbc.weightx = 1.0;
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
@@ -604,9 +616,11 @@ public class ColoredArcGuardPanel extends JPanel {
         numberExprPanel.add(numberExpressionJSpinner, gbc);
 
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
         numberExprPanel.add(colorExpressionComboBoxPanel, gbc);
         numberExprPanel.add(variableCombobox, gbc);
         variableCombobox.setVisible(false);
+        gbc.weightx = 0.0;
 
         gbc.gridx = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -615,6 +629,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.VERTICAL;
 
@@ -689,6 +704,7 @@ public class ColoredArcGuardPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 4;
         regularArcExprPanel.add(exprScrollPane, gbc);
@@ -1061,7 +1077,6 @@ public class ColoredArcGuardPanel extends JPanel {
     JList timeConstraintList;
     private ExprStringPosition currentSelection = null;
     JSpinner numberExpressionJSpinner;
-    JSpinner allExpressionJSpinner;
     private ArcExpression arcExpression;
     private JTextPane exprField;
     JButton allExpressionButton;

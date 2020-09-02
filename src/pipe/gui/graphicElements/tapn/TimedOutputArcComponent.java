@@ -119,7 +119,7 @@ public class TimedOutputArcComponent extends Arc {
 		// 2 Add Place editor
 		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
 
-		guiDialog.setResizable(false);
+		guiDialog.setResizable(true);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
