@@ -706,8 +706,9 @@ public class PlaceEditorPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.CENTER;
         tokenPanel.add(tokenColorComboboxPanel, gbc);
         //Logger.log(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(0).toString());
 
@@ -735,15 +736,16 @@ public class PlaceEditorPanel extends JPanel {
         JScrollPane tokenListScrollPane = new JScrollPane(tokenTable);
         tokenListScrollPane.setViewportView(tokenTable);
         tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension tokenScrollPaneDim = new Dimension(850, 200);
+        Dimension tokenScrollPaneDim = new Dimension(100, 150);
         tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens"));
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.gridwidth = 3;
         gbc.insets = new Insets(3, 3, 3,3);
         tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
@@ -758,7 +760,6 @@ public class PlaceEditorPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.SOUTHWEST;
         gbc.insets = new Insets(3, 3, 3,3);
         tokenButtonPanel.add(addColoredTokenButton, gbc);
@@ -770,9 +771,9 @@ public class PlaceEditorPanel extends JPanel {
         SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
         addTokenSpinner.setPreferredSize(buttonSize);
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3,3);
         tokenPanel.add(addTokenSpinner, gbc);
@@ -803,30 +804,31 @@ public class PlaceEditorPanel extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
-        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         tokenPanel.add(tokenButtonPanel, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(3, 3, 3, 3);
         mainPanel.add(tokenPanel, gbc);
     }
 
     public void initColorInvariantPanel(){
 	    timeInvariantColorPanel = new JPanel(new GridBagLayout());
+
+        timeInvariantColorPanel = initNonDefaultColorInvariantPanel();
         timeInvariantColorPanel.setBorder(BorderFactory.createTitledBorder("Time invariants for specific colors"));
 
-        GridBagConstraints gbc = GridBagHelper.as(0,0);
-        gbc.fill = GridBagConstraints.BOTH;
-        timeInvariantColorPanel.add(initNonDefaultColorInvariantPanel(), gbc);
-
-        gbc = GridBagHelper.as(0,3, WEST, HORIZONTAL, new Insets(3, 3, 3, 3));
+        GridBagConstraints gbc;
+        gbc = GridBagHelper.as(0,3, WEST, new Insets(3, 3, 3, 3));
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
 
         mainPanel.add(timeInvariantColorPanel, gbc);
 
@@ -837,7 +839,6 @@ public class PlaceEditorPanel extends JPanel {
         JPanel nonDefaultColorInvariantPanel = new JPanel(new GridBagLayout());
         //this panel holds the buttons, the invariant editor panel and the color combobox
         JPanel colorInvariantEditPanel = new JPanel(new GridBagLayout());
-        //colorInvariantEditPanel.setBorder(BorderFactory.createTitledBorder("Edit color specific invariant"));
 
         colorInvariantComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
             @Override
@@ -952,6 +953,7 @@ public class PlaceEditorPanel extends JPanel {
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = gbc.BOTH;
+        gbc.weightx = 1.0;
         colorInvariantEditPanel.add(colorInvariantComboboxPanel, gbc);
 
         JPanel buttonPanel = new JPanel(new GridBagLayout());
@@ -971,7 +973,7 @@ public class PlaceEditorPanel extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.CENTER;
         ColoredTimeInvariant cti;
         if(place.underlyingPlace().getCtiList().isEmpty()) {
             cti = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(place.underlyingPlace().getColorType().getFirstColor());
@@ -997,18 +999,15 @@ public class PlaceEditorPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         nonDefaultColorInvariantPanel.add(colorInvariantEditPanel,gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        //gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        timeConstraintScrollPane.setPreferredSize(new Dimension(700,200));
-        //timeConstraintScrollPane.setMinimumSize(new Dimension(500, 100));
+        gbc.fill = GridBagConstraints.BOTH;
         nonDefaultColorInvariantPanel.add(timeConstraintScrollPane, gbc);
 
         return nonDefaultColorInvariantPanel;
@@ -1057,12 +1056,13 @@ public class PlaceEditorPanel extends JPanel {
 
         Dimension colorTypeComboBoxSize = new Dimension(500, 30);
         colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);
-        colorTypeComboBox.setMinimumSize(colorTypeComboBoxSize);
-        colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);
+        /*colorTypeComboBox.setMinimumSize(colorTypeComboBoxSize);
+        colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);*/
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3,3 );
         colorTypePanel.add(colorTypeComboBox, gbc);

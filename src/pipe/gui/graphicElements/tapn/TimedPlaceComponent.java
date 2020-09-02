@@ -404,7 +404,6 @@ public class TimedPlaceComponent extends Place {
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
-        guiDialog.setMinimumSize(new Dimension(placeEditorPanel.getWidth(), 200));
 
         // Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
