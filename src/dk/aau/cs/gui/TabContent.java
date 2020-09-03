@@ -664,7 +664,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 queriesToRemove.add(q);
                 tab.removeQuery(q);
             } else if (tab.lens.isGame()) {
-                if (q.getProperty() instanceof TCTLAFNode || q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLEGNode) {
+                if (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLEGNode) {
                     queriesToRemove.add(q);
                     tab.removeQuery(q);
                 } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
