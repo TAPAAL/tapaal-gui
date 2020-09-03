@@ -624,13 +624,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
+        boolean gameChanged = false;
 
         EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
         EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
         EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
         EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
-        EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options(); //support nested quantification
-        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions(); //support nested quantification
+        EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
+        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
         EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
 
         EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
@@ -668,7 +669,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     tab.removeQuery(q);
                 } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
                     q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                    gameChanged = true;
                 }
+                if (q.useGCD() || q.useTimeDarts() || q.getTraceOption().equals(TAPNQuery.TraceOption.FASTEST) ||
+                    !q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification) ||
+                    q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) gameChanged = true;
                 q.setUseGCD(false);
                 q.setUseTimeDarts(false);
                 q.setTraceOption(TAPNQuery.TraceOption.NONE);
@@ -684,12 +689,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 message += "\n" + q.getName();
             }
         }
-        if (tab.lens.isGame()) {
+        if (gameChanged) {
             message += (message.length() == 0 ? "" : "\n\n");
             message += "Some options may have been changed to make the query compatible with the net features.";
         }
         if(message.length() > 0){
-            JOptionPane.showMessageDialog(tab, message,"Information", JOptionPane.INFORMATION_MESSAGE);
+            new MessengerImpl().displayInfoMessage(message, "Information");
         }
 	}
 
