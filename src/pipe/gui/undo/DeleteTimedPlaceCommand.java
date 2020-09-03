@@ -45,6 +45,7 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 
 	@Override
 	public void undo() {
+        timedPlaceComponent.deselect();
 		guiModel.addPetriNetObject(timedPlaceComponent);
 		tapn.add(timedPlace);
 		
@@ -57,8 +58,6 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		for(TAPNQuery q : queriesInclusion){
 			q.inclusionPlaces().inclusionPlaces().add(timedPlace);
 		}
-
 	}
-
 
 }
