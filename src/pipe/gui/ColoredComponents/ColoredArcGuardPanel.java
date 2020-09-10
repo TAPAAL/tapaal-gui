@@ -72,7 +72,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     public void hideIrrelevantInformation(){
-        if(!objectToBeEdited.isTimed()){
+        if(!objectToBeEdited.isTimed() && isInputArc){
             nonDefaultArcColorIntervalPanel.setVisible(false);
         }
         if(isTransportArc){
