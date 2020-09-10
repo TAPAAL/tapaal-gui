@@ -15,9 +15,7 @@ import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +69,7 @@ public class ColorTypeDialogPanel extends JPanel {
     private DefaultListModel cyclicModel;
     private JButton cyclicRemoveButton;
     private JButton okButton;
+    private JScrollPane scrollPane;
 
     public ColorTypeDialogPanel() throws IOException {
         initComponents();
@@ -101,12 +100,11 @@ public class ColorTypeDialogPanel extends JPanel {
     public void showDialog() {
         dialog = new EscapableDialog(CreateGui.getApp(),
                 "Edit color type", true);
-        dialog.add(container);
+        dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);
         dialog.pack();
-        dialog.setPreferredSize(dialog.getSize());
-        dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()));
+        dialog.setMinimumSize(new Dimension(447,231));
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -137,6 +135,7 @@ public class ColorTypeDialogPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 8, 0, 8);
@@ -145,8 +144,10 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicAndFiniteEnumerationPanel = createCyclicAndFiniteEnumerationPanel();
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 8, 0, 8);
         container.add(cyclicAndFiniteEnumerationPanel, gbc);
 
@@ -161,8 +162,10 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypePanel = createProductTypePanel();
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 8, 0, 8);
         container.add(productTypePanel, gbc);
 
@@ -173,6 +176,10 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         container.add(buttonPanel,gbc);
+        scrollPane = new JScrollPane();
+        scrollPane.setViewportView(container);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         rangeOfIntegersPanel.setVisible(false);
         productTypePanel.setVisible(false);
     }
@@ -199,15 +206,9 @@ public class ColorTypeDialogPanel extends JPanel {
             @Override
             public void ancestorAdded(AncestorEvent ancestorEvent) {
                 final AncestorListener al= this;
-                SwingUtilities.invokeLater(new Runnable(){
-
-
-                    public void run() {
-                        JComponent component = (JComponent)ancestorEvent.getComponent();
-                        component.requestFocusInWindow();
-                        component.removeAncestorListener( al );
-                    }
-                });
+                JComponent component = ancestorEvent.getComponent();
+                component.requestFocusInWindow();
+                component.removeAncestorListener( al );
             }
 
             @Override
@@ -220,16 +221,15 @@ public class ColorTypeDialogPanel extends JPanel {
 
             }
         });
-        nameTextField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                okButton.requestFocusInWindow();
-                okButton.doClick();
-            }
+        nameTextField.addActionListener(e -> {
+            okButton.requestFocusInWindow();
+            okButton.doClick();
         });
         GridBagConstraints gbcNTF = new GridBagConstraints();
         gbcNTF.gridx = 1;
         gbcNTF.gridy = 0;
         gbcNTF.gridwidth = 1;
+        gbcNTF.weightx = 1.0;
         gbcNTF.anchor = GridBagConstraints.WEST;
         gbcNTF.fill = GridBagConstraints.HORIZONTAL;
         gbcNTF.insets = new Insets(4, 4, 2, 4);
@@ -249,61 +249,43 @@ public class ColorTypeDialogPanel extends JPanel {
         colorTypeComboBox = new JXComboBox(new String[]{cyclicEnumeration, rangeOfIntegers, productColor});
         colorTypeComboBox.setToolTipText(toolTipColorComboBox);
 
-        colorTypeComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JComboBox source = (JXComboBox)e.getSource();
-                    final String selectedString = source.getSelectedItem().toString();
+        colorTypeComboBox.addActionListener(e -> {
+            JComboBox source = (JXComboBox)e.getSource();
+            final String selectedString = source.getSelectedItem().toString();
 
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                         if (selectedString.equals(finiteEnumeration)) {
-                            rangeOfIntegersPanel.setVisible(false);
-                            productTypePanel.setVisible(false);
-                            cyclicAndFiniteEnumerationPanel.setVisible(true);
-                            cyclicAndFiniteEnumerationPanelEnabled = true;
-                            rangeOfIntegersPanelEnabled = false;
-                            productTypePanelEnabled = false;
-                        }
-                        else if (selectedString.equals(cyclicEnumeration)) {
-                            rangeOfIntegersPanel.setVisible(false);
-                            productTypePanel.setVisible(false);
-                            cyclicAndFiniteEnumerationPanel.setVisible(true);
-                            cyclicAndFiniteEnumerationPanelEnabled = true;
-                            rangeOfIntegersPanelEnabled = false;
-                            productTypePanelEnabled = false;
-
-                        }
-                        else if (selectedString.equals(rangeOfIntegers)) {
-                            cyclicAndFiniteEnumerationPanel.setVisible(false);
-                            productTypePanel.setVisible(false);
-                            rangeOfIntegersPanel.setVisible(true);
-                            rangeOfIntegersPanelEnabled = true;
-                            cyclicAndFiniteEnumerationPanelEnabled = false;
-                            productTypePanelEnabled = false;
-
-                        }
-                        else if (selectedString.equals(productColor)) {
-                            cyclicAndFiniteEnumerationPanel.setVisible(false);
-                            productTypePanel.setVisible(true);
-                            rangeOfIntegersPanel.setVisible(false);
-                            productTypePanelEnabled = true;
-                            rangeOfIntegersPanelEnabled = false;
-                            cyclicAndFiniteEnumerationPanelEnabled = false;
-                        }
-                    }
-                });
+            if (selectedString.equals(finiteEnumeration) || selectedString.equals(cyclicEnumeration)) {
+                rangeOfIntegersPanel.setVisible(false);
+                productTypePanel.setVisible(false);
+                cyclicAndFiniteEnumerationPanel.setVisible(true);
+                cyclicAndFiniteEnumerationPanelEnabled = true;
+                rangeOfIntegersPanelEnabled = false;
+                productTypePanelEnabled = false;
             }
+            else if (selectedString.equals(rangeOfIntegers)) {
+                cyclicAndFiniteEnumerationPanel.setVisible(false);
+                productTypePanel.setVisible(false);
+                rangeOfIntegersPanel.setVisible(true);
+                rangeOfIntegersPanelEnabled = true;
+                cyclicAndFiniteEnumerationPanelEnabled = false;
+                productTypePanelEnabled = false;
+            }
+            else if (selectedString.equals(productColor)) {
+                cyclicAndFiniteEnumerationPanel.setVisible(false);
+                productTypePanel.setVisible(true);
+                rangeOfIntegersPanel.setVisible(false);
+                productTypePanelEnabled = true;
+                rangeOfIntegersPanelEnabled = false;
+                cyclicAndFiniteEnumerationPanelEnabled = false;
+            }
+            dialog.pack();
+            System.out.println(dialog.getSize());
         });
         GridBagConstraints gbcCTCB = new GridBagConstraints();
         gbcCTCB.insets = new Insets(2, 4, 2, 4);
-        Dimension conboBoxSize = new Dimension(350,30);
-        colorTypeComboBox.setPreferredSize(conboBoxSize);
-        colorTypeComboBox.setMaximumSize(conboBoxSize);
-        colorTypeComboBox.setMinimumSize(conboBoxSize);
-        colorTypeComboBox.setBackground(Color.white);
         gbcCTCB.gridx = 1;
         gbcCTCB.gridy = 1;
         gbcCTCB.gridwidth = 1;
+        gbcCTCB.weightx = 1.0;
         gbcCTCB.anchor = GridBagConstraints.EAST;
         gbcCTCB.fill = GridBagConstraints.HORIZONTAL;
         nameAndTypePanel.add(colorTypeComboBox, gbcCTCB);
@@ -437,6 +419,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbcNTF.gridx = 1;
         gbcNTF.gridy = 0;
         gbcNTF.gridwidth = 1;
+        gbcNTF.weightx = 1.0;
         gbcNTF.anchor = GridBagConstraints.WEST;
         gbcNTF.fill = GridBagConstraints.HORIZONTAL;
         gbcNTF.insets = new Insets(4, 4, 2, 4);
@@ -450,10 +433,11 @@ public class ColorTypeDialogPanel extends JPanel {
             }
         });
 
-
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         cyclicAndFiniteEnumeration.add(firstRow, gbc);
 
         JPanel secondRow = new JPanel();
@@ -525,14 +509,11 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicModel = new DefaultListModel();
         enumList = new JList();
 
-        enumList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    JList source = (JList) e.getSource();
-                    if (source.getSelectedIndex() == -1) {
-                        cyclicRemoveButton.setEnabled(false);
-                    }
+        enumList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                JList source = (JList) e.getSource();
+                if (source.getSelectedIndex() == -1) {
+                    cyclicRemoveButton.setEnabled(false);
                 }
             }
         });
@@ -544,6 +525,8 @@ public class ColorTypeDialogPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         Dimension listSize = new Dimension(450, 150);
         cyclicListScrollPane.setPreferredSize(listSize);
         cyclicListScrollPane.setMinimumSize(listSize);
@@ -551,12 +534,15 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicListScrollPane.setVisible(true);
         cyclicListScrollPane.setBorder(new LineBorder(Color.GRAY));
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         thirdRow.add(cyclicListScrollPane, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridy = 2;
         gbc.gridx = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         cyclicAndFiniteEnumeration.add(thirdRow, gbc);
 
         return cyclicAndFiniteEnumeration;
@@ -572,7 +558,6 @@ public class ColorTypeDialogPanel extends JPanel {
         productLabel = new JLabel("Color types: ");
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(3, 3, 3, 3);
         productTypePanel.add(productLabel, gbc);
@@ -593,17 +578,16 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        Dimension ComboBoxSize = new Dimension(350,30);
-        productTypeComboBox.setPreferredSize(ComboBoxSize);
+        gbc.weightx = 1.0;
         productTypeComboBox.setBackground(Color.white);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         productTypePanel.add(productTypeComboBox,gbc);
 
         JPanel productButtonPanel = createProductButtonsPanel();
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(3, 3, 3, 3);
         productTypePanel.add(productButtonPanel, gbc);
@@ -612,13 +596,12 @@ public class ColorTypeDialogPanel extends JPanel {
         JScrollPane productColorsListScrollPane = new JScrollPane(productColorTypeList);
         productColorsListScrollPane.setViewportView(productColorTypeList);
         productColorsListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension size = new Dimension(300,150);
-        productColorsListScrollPane.setPreferredSize(size);
-        productColorsListScrollPane.setMaximumSize(size);
-        productColorsListScrollPane.setMinimumSize(size);
-        productColorsListScrollPane.setBorder(new LineBorder(Color.GRAY));
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(3,3,3,3);
         productTypePanel.add(productColorsListScrollPane, gbc);
