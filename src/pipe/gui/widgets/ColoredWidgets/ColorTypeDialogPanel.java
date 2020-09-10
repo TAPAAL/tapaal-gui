@@ -12,10 +12,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,15 +27,12 @@ public class ColorTypeDialogPanel extends JPanel {
     private static final String cyclicEnumeration = "Cyclic Enumeration";
     private static final String rangeOfIntegers = "Range of Integers";
     private static final String productColor = "Product Color";
-    private boolean cyclicAndFiniteEnumerationPanelEnabled = false;
     private boolean rangeOfIntegersPanelEnabled = false;
-    private boolean productTypePanelEnabled = false;
-    private JRootPane rootPane;
     private TimedArcPetriNetNetwork network;
     private EscapableDialog dialog;
     private List<ColorType> colorTypes;
     private ColorType oldColorType;
-    private HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
+    private final HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
     private String oldName;
     private ConstantsPane.ColorTypesListModel colorTypesListModel;
 
@@ -71,13 +66,8 @@ public class ColorTypeDialogPanel extends JPanel {
     private JButton okButton;
     private JScrollPane scrollPane;
 
-    public ColorTypeDialogPanel() throws IOException {
-        initComponents();
-    }
-
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
-                                TimedArcPetriNetNetwork network) throws IOException {
-        rootPane = pane;
+                                TimedArcPetriNetNetwork network) {
         oldName = "";
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
@@ -87,8 +77,7 @@ public class ColorTypeDialogPanel extends JPanel {
     }
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
-                                TimedArcPetriNetNetwork network, ColorType colortype) throws IOException {
-        rootPane = pane;
+                                TimedArcPetriNetNetwork network, ColorType colortype) {
         this.oldColorType = colortype;
         oldName = colortype.getName();
         this.network = network;
@@ -104,6 +93,7 @@ public class ColorTypeDialogPanel extends JPanel {
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);
         dialog.pack();
+        //size of range of integers panel
         dialog.setMinimumSize(new Dimension(447,231));
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -257,25 +247,19 @@ public class ColorTypeDialogPanel extends JPanel {
                 rangeOfIntegersPanel.setVisible(false);
                 productTypePanel.setVisible(false);
                 cyclicAndFiniteEnumerationPanel.setVisible(true);
-                cyclicAndFiniteEnumerationPanelEnabled = true;
                 rangeOfIntegersPanelEnabled = false;
-                productTypePanelEnabled = false;
             }
             else if (selectedString.equals(rangeOfIntegers)) {
                 cyclicAndFiniteEnumerationPanel.setVisible(false);
                 productTypePanel.setVisible(false);
                 rangeOfIntegersPanel.setVisible(true);
                 rangeOfIntegersPanelEnabled = true;
-                cyclicAndFiniteEnumerationPanelEnabled = false;
-                productTypePanelEnabled = false;
             }
             else if (selectedString.equals(productColor)) {
                 cyclicAndFiniteEnumerationPanel.setVisible(false);
                 productTypePanel.setVisible(true);
                 rangeOfIntegersPanel.setVisible(false);
-                productTypePanelEnabled = true;
                 rangeOfIntegersPanelEnabled = false;
-                cyclicAndFiniteEnumerationPanelEnabled = false;
             }
             dialog.pack();
             System.out.println(dialog.getSize());
@@ -309,11 +293,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbcOk.anchor = GridBagConstraints.WEST;
         gbcOk.insets = new Insets(5, 5, 5, 5);
 
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                onOK();
-            }
-        });
+        okButton.addActionListener(actionEvent -> onOK());
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setMaximumSize(new Dimension(100, 25));
@@ -327,11 +307,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridwidth = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.EAST;
 
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                exit();
-            }
-        });
+        cancelButton.addActionListener(e -> exit());
 
         buttonPanel.add(cancelButton,gbc);
         buttonPanel.add(okButton,gbcOk);
@@ -426,12 +402,7 @@ public class ColorTypeDialogPanel extends JPanel {
         nameTextField.requestFocusInWindow();
         firstRow.add(enumTextField, gbcNTF);
 
-        enumTextField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                enumAddButton.doClick();
-            }
-        });
+        enumTextField.addActionListener(e -> enumAddButton.doClick());
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -444,26 +415,24 @@ public class ColorTypeDialogPanel extends JPanel {
         secondRow.setLayout(new GridBagLayout());
 
         enumAddButton = new JButton("Add");
-        enumAddButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String enumerationName = enumTextField.getText();
-                if(enumerationName == null || enumerationName.trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(
-                            CreateGui.getApp(), "You have to enter a name for the color",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
-                    JOptionPane.showMessageDialog(
-                        CreateGui.getApp(),
-                        "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+        enumAddButton.addActionListener(e -> {
+            String enumerationName = enumTextField.getText();
+            if(enumerationName == null || enumerationName.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        CreateGui.getApp(), "You have to enter a name for the color",
                         "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else {
-                    cyclicModel.addElement(enumTextField.getText());
-                    enumList.setModel(cyclicModel);
-                    enumTextField.setText("");
-                    cyclicRemoveButton.setEnabled(true);
-                }
+                return;
+            } else if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                cyclicModel.addElement(enumTextField.getText());
+                enumList.setModel(cyclicModel);
+                enumTextField.setText("");
+                cyclicRemoveButton.setEnabled(true);
             }
         });
 
@@ -480,12 +449,9 @@ public class ColorTypeDialogPanel extends JPanel {
 
         cyclicRemoveButton = new JButton("Remove");
         cyclicRemoveButton.setEnabled(false);
-        cyclicRemoveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                cyclicModel.removeElementAt(enumList.getSelectedIndex());
-                enumList.setModel(cyclicModel);
-            }
+        cyclicRemoveButton.addActionListener(actionEvent -> {
+            cyclicModel.removeElementAt(enumList.getSelectedIndex());
+            enumList.setModel(cyclicModel);
         });
         cyclicRemoveButton.setPreferredSize(buttonSize);
         cyclicRemoveButton.setMinimumSize(buttonSize);
@@ -550,7 +516,6 @@ public class ColorTypeDialogPanel extends JPanel {
 
     private JPanel createProductTypePanel() {
         JPanel productTypePanel = new JPanel();
-        productTypePanelEnabled = true;
         productTypePanel.setLayout(new GridBagLayout());
         productTypePanel.setBorder(BorderFactory.createTitledBorder("Product Type/ Domain"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -567,7 +532,7 @@ public class ColorTypeDialogPanel extends JPanel {
         allColorTypes = new JList();
 
 
-        colorTypes = new ArrayList<ColorType>();
+        colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
         productTypeComboBox = new JComboBox();
@@ -622,12 +587,10 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         productButtonPanel.add(productAddButton, gbc);
 
-        productAddButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                productModel.addElement(productTypeComboBox.getSelectedItem());
-                productColorTypeList.setModel(productModel);
-                productRemoveButton.setEnabled(true);
-            }
+        productAddButton.addActionListener(e -> {
+            productModel.addElement(productTypeComboBox.getSelectedItem());
+            productColorTypeList.setModel(productModel);
+            productRemoveButton.setEnabled(true);
         });
 
         productRemoveButton = new JButton("Remove");
@@ -639,13 +602,11 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         productButtonPanel.add(productRemoveButton, gbc);
 
-        productRemoveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        productRemoveButton.addActionListener(e -> {
 
-                productModel.removeElementAt(productColorTypeList.getSelectedIndex());
-                if(productModel.size() == 0) {
-                    productRemoveButton.setEnabled(false);
-                }
+            productModel.removeElementAt(productColorTypeList.getSelectedIndex());
+            if(productModel.size() == 0) {
+                productRemoveButton.setEnabled(false);
             }
         });
         return productButtonPanel;
@@ -739,8 +700,8 @@ public class ColorTypeDialogPanel extends JPanel {
 
                 }
                 else if(selectedColorType.equals(rangeOfIntegers)) {
-                    Integer lowerboundNumber = Integer.parseInt(lowerbound);
-                    Integer upperboundNumber = Integer.parseInt(upperbound);
+                    int lowerboundNumber = Integer.parseInt(lowerbound);
+                    int upperboundNumber = Integer.parseInt(upperbound);
                     for(int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
                         newColorType.addColor(String.valueOf(i));
                     }
