@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Set;
 
-public class PlaceHolderGuardExpression extends GuardExpression {
+public class PlaceHolderGuardExpression extends GuardExpression implements PlaceHolderExpression {
 
     public PlaceHolderGuardExpression() {
 

@@ -132,99 +132,90 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         add(logicPanel, gbc);
 
-        andButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                AndExpression andExpr = null;
-                if (currentSelection.getObject() instanceof AndExpression) {
-                    andExpr = new AndExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
-                    updateSelection(andExpr);
-                }
-                else if (currentSelection.getObject() instanceof OrExpression) {
-                    andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
-                    //andExpr = new AndExpression((OrExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
-                    updateSelection(andExpr);
-                }
-                else if (currentSelection.getObject() instanceof NotExpression) {
-                    andExpr = new AndExpression((NotExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
-                    updateSelection(andExpr);
-                }
-                else if (currentSelection.getObject() instanceof GuardExpression) {
-                    PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
-                    andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), ph);
+        andButton.addActionListener(actionEvent -> {
+            AndExpression andExpr = null;
+            if (currentSelection.getObject() instanceof AndExpression) {
+                andExpr = new AndExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
+                updateSelection(andExpr);
+            }
+            else if (currentSelection.getObject() instanceof OrExpression) {
+                andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
+                //andExpr = new AndExpression((OrExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
+                updateSelection(andExpr);
+            }
+            else if (currentSelection.getObject() instanceof NotExpression) {
+                andExpr = new AndExpression((NotExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
+                updateSelection(andExpr);
+            }
+            else if (currentSelection.getObject() instanceof GuardExpression) {
+                PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
+                andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), ph);
 
-                    newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
-                    updateSelection(andExpr);
-                }
+                newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
+                updateSelection(andExpr);
             }
         });
 
-        orButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                OrExpression orExpr = null;
-                if (currentSelection.getObject() instanceof AndExpression) {
-                    orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
-                    updateSelection(orExpr);
-                }
-                else if (currentSelection.getObject() instanceof OrExpression) {
-                    orExpr = new OrExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
-                    updateSelection(orExpr);
-                }
-                else if (currentSelection.getObject() instanceof NotExpression) {
-                    orExpr = new OrExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
-                    updateSelection(orExpr);
-                }
-                else if (currentSelection.getObject() instanceof GuardExpression) {
-                    PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
-                    orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), ph);
-                    newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
-                    updateSelection(orExpr);
-                }
+        orButton.addActionListener(actionEvent -> {
+            OrExpression orExpr = null;
+            if (currentSelection.getObject() instanceof AndExpression) {
+                orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
+                updateSelection(orExpr);
+            }
+            else if (currentSelection.getObject() instanceof OrExpression) {
+                orExpr = new OrExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
+                updateSelection(orExpr);
+            }
+            else if (currentSelection.getObject() instanceof NotExpression) {
+                orExpr = new OrExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
+                updateSelection(orExpr);
+            }
+            else if (currentSelection.getObject() instanceof GuardExpression) {
+                PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
+                orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), ph);
+                newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
+                updateSelection(orExpr);
             }
         });
 
-        notButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                NotExpression notExpr = null;
-                if (currentSelection.getObject() instanceof NotExpression) {
-                    notExpr = new NotExpression((NotExpression)currentSelection.getObject());
-                    newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-                    updateSelection(notExpr);
-                }
-                else if (currentSelection.getObject() instanceof AndExpression) {
-                    notExpr = new NotExpression((AndExpression)currentSelection.getObject());
-                    newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-                    updateSelection(notExpr);
-                }
-                else if (currentSelection.getObject() instanceof OrExpression) {
-                    notExpr = new NotExpression((OrExpression) currentSelection.getObject());
-                    newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-                    updateSelection(notExpr);
-                }
-                else if (currentSelection.getObject() instanceof EqualityExpression ||
-                    currentSelection.getObject() instanceof InequalityExpression ||
-                    currentSelection.getObject() instanceof GreaterThanExpression ||
-                    currentSelection.getObject() instanceof GreaterThanEqExpression ||
-                    currentSelection.getObject() instanceof LessThanExpression ||
-                    currentSelection.getObject() instanceof LessThanEqExpression) {
-                    notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
-                    newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-                    updateSelection(notExpr);
-                }
-                else if (currentSelection.getObject() instanceof GuardExpression) {
-                    PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
-                    notExpr = new NotExpression((GuardExpression)ph);
-                    newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-                    updateSelection(notExpr);
-                }
+        notButton.addActionListener(actionEvent -> {
+            NotExpression notExpr = null;
+            if (currentSelection.getObject() instanceof NotExpression) {
+                notExpr = new NotExpression((NotExpression)currentSelection.getObject());
+                newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
+                updateSelection(notExpr);
+            }
+            else if (currentSelection.getObject() instanceof AndExpression) {
+                notExpr = new NotExpression((AndExpression)currentSelection.getObject());
+                newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
+                updateSelection(notExpr);
+            }
+            else if (currentSelection.getObject() instanceof OrExpression) {
+                notExpr = new NotExpression((OrExpression) currentSelection.getObject());
+                newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
+                updateSelection(notExpr);
+            }
+            else if (currentSelection.getObject() instanceof EqualityExpression ||
+                currentSelection.getObject() instanceof InequalityExpression ||
+                currentSelection.getObject() instanceof GreaterThanExpression ||
+                currentSelection.getObject() instanceof GreaterThanEqExpression ||
+                currentSelection.getObject() instanceof LessThanExpression ||
+                currentSelection.getObject() instanceof LessThanEqExpression) {
+                notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
+                newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
+                updateSelection(notExpr);
+            }
+            else if (currentSelection.getObject() instanceof GuardExpression) {
+                PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
+                notExpr = new NotExpression((GuardExpression)ph);
+                newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
+                updateSelection(notExpr);
             }
         });
     }
@@ -836,7 +827,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(true);
             editColorExpressionButton.setEnabled(false);
         }
-        if(newProperty.containsPlaceHolder()){
+        if(newProperty.containsPlaceHolder() && !(newProperty instanceof PlaceHolderExpression)){
             parent.enableOKButton(false);
         } else{
             parent.enableOKButton(true);

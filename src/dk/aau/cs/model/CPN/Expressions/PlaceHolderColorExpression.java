@@ -3,7 +3,7 @@ package dk.aau.cs.model.CPN.Expressions;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 
-public class PlaceHolderColorExpression extends ColorExpression {
+public class PlaceHolderColorExpression extends ColorExpression implements PlaceHolderExpression {
 
     @Override
     public Color eval(ExpressionContext context) {
