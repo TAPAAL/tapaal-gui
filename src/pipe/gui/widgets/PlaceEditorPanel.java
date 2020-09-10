@@ -758,6 +758,7 @@ public class PlaceEditorPanel extends JPanel {
         addColoredTokenButton.setMinimumSize(buttonSize);
         addColoredTokenButton.setMaximumSize(buttonSize);
 
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.SOUTHWEST;
@@ -793,10 +794,9 @@ public class PlaceEditorPanel extends JPanel {
 
         });
         removeColoredTokenButton.setEnabled(false);
-
-        gbc.gridx = 2;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.SOUTHWEST;
         gbc.insets = new Insets(3, 3, 3, 3);
         tokenButtonPanel.add(removeColoredTokenButton, gbc);

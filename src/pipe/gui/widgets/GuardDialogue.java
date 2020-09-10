@@ -129,7 +129,6 @@ public class GuardDialogue extends JPanel /*
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context);
-        coloredArcGuardPanel.setBorder(BorderFactory.createTitledBorder("test border"));
 	    mainPanel.add(coloredArcGuardPanel, gridBagConstraints);
     }
 
