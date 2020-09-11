@@ -11,6 +11,11 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
+    public boolean hasColor(Color color) {
+        return false;
+    }
+
+    @Override
     public ColorExpression replace(Expression object1, Expression object2) {
         if (this == object1 && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression)object2;

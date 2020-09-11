@@ -21,6 +21,11 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     @Override
+    public boolean hasColor(Color color) {
+        return userOperator.equals(color);
+    }
+
+    @Override
     public String toString() {
         return userOperator.toString();
     }

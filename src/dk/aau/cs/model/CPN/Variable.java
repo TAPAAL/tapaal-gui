@@ -21,6 +21,10 @@ public class Variable {
 
     public ColorType getColorType() {return colorType;}
 
+    public void setColorType(ColorType newColorType){
+        colorType = newColorType;
+    }
+
     public String toString() {
         return "<html>" + name + "<b> in </b>" + colorType.getName() + "</html>";
     }

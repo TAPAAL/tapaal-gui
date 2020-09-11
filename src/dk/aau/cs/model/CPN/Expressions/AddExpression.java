@@ -1,10 +1,13 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -44,6 +47,26 @@ public class AddExpression extends ArcExpression {
             res += element.weight();
         }
         return res;
+    }
+
+    @Override
+    public ArcExpression removeColorFromExpression(Color color) {
+        List<ArcExpression> toRemove = new ArrayList<>();
+        for(ArcExpression expr : constituents){
+            if(expr.removeColorFromExpression(color) == null){
+                toRemove.add(expr);
+            }
+        }
+        for(ArcExpression expr : toRemove){
+            constituents.remove(expr);
+        }
+        if(constituents.size() < 1){
+            return null;
+        } else if(constituents.size() < 2){
+            return constituents.get(0);
+        } else{
+            return this;
+        }
     }
 
     @Override

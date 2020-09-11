@@ -24,6 +24,11 @@ public class SuccessorExpression extends ColorExpression {
     }
 
     @Override
+    public boolean hasColor(Color color) {
+        return this.color.hasColor(color);
+    }
+
+    @Override
     public ColorExpression replace(Expression object1, Expression object2) {
         if (object1 == this && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression)object2;

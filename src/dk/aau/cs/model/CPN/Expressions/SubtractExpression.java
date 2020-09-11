@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
@@ -34,6 +35,19 @@ public class SubtractExpression extends ArcExpression {
     //discuss implementation with group
     public Integer weight() {
         return null;
+    }
+
+    @Override
+    public ArcExpression removeColorFromExpression(Color color) {
+        ArcExpression rightRemoved = right.removeColorFromExpression(color);
+        ArcExpression leftRemoved = left.removeColorFromExpression(color);
+        if(rightRemoved == null && leftRemoved == null){
+            return null;
+        } else if(rightRemoved == null){
+            return leftRemoved;
+        } else{
+            return rightRemoved;
+        }
     }
 
     @Override

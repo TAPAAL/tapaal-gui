@@ -7,6 +7,8 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -70,6 +72,24 @@ public class NumberOfExpression extends ArcExpression {
     //TODO: is this correct with AllExpressions to?
     public Integer weight() {
         return number * color.size();
+    }
+
+    @Override
+    public ArcExpression removeColorFromExpression(Color color) {
+        List<ColorExpression> toRemove = new ArrayList<>();
+        for(ColorExpression color1 : this.color){
+            if(color1.hasColor(color)){
+                toRemove.add(color1);
+            }
+        }
+        for (ColorExpression expr : toRemove){
+            this.color.remove(expr);
+        }
+        if(this.color.isEmpty()){
+            return null;
+        } else{
+            return this;
+        }
     }
 
     @Override

@@ -266,7 +266,7 @@ public class TabTransformer {
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
                 arc.setExpression(numbExpr);
-                arc.setWeight(new IntWeight(0));
+                arc.setWeight(new IntWeight(1));
             }
 
             for(TimedOutputArc arc : template.model().outputArcs()){
@@ -276,7 +276,7 @@ public class TabTransformer {
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
                 arc.setExpression(numbExpr);
-                arc.setWeight(new IntWeight(0));
+                arc.setWeight(new IntWeight(1));
             }
 
             for(TransportArc arc : template.model().transportArcs()){
@@ -287,7 +287,7 @@ public class TabTransformer {
                 NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
                 arc.setInputExpression(numbExpr);
                 arc.setOutputExpression(numbExpr);
-                arc.setWeight(new IntWeight(0));
+                arc.setWeight(new IntWeight(1));
 
             }
         }

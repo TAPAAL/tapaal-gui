@@ -2,13 +2,8 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.ColoredTimeInvariant;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import dk.aau.cs.model.CPN.Expressions.Expression;
-import dk.aau.cs.model.CPN.Expressions.GuardExpression;
-import dk.aau.cs.model.CPN.Expressions.VariableExpression;
-import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.CPN.*;
+import dk.aau.cs.model.CPN.Expressions.*;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -624,8 +619,134 @@ public class TimedArcPetriNetNetwork {
 
     public void updateColorType(String oldName, ColorType colorType) {
         Integer index = getColorTypeIndex(oldName);
+        ColorType oldColorType = getColorTypeByIndex(index);
+        List<Color> removedColors = new ArrayList<>();
+        for(Color color : oldColorType.getColors()){
+            if(!colorType.getColors().contains(color)){
+                removedColors.add(color);
+            }
+        }
         if (index != null) {
             colorTypes.set(index, colorType);
+        }
+        updateColorTypeOnVariables(oldColorType, colorType);
+        for (TimedArcPetriNet tapn : tapns) {
+            updateColorTypeOnPlaces(oldColorType, colorType, tapn.places());
+            updateColorTypeOnArcs(oldColorType,colorType,tapn,removedColors);
+        }
+
+    }
+
+    private void updateColorTypeOnArcs(ColorType oldColorType, ColorType colorType, TimedArcPetriNet tapn, List<Color> removedColors){
+        ColorExpression oldColorExpr = new AllExpression(oldColorType);
+        ColorExpression newColorExpr = new AllExpression(colorType);
+        for(TimedInputArc arc : tapn.inputArcs()){
+            ArcExpression arcExpr = arc.getArcExpression();
+            arcExpr.replace(oldColorExpr, newColorExpr);
+            for(Color color : removedColors){
+                arcExpr = arcExpr.removeColorFromExpression(color);
+            }
+            if(arcExpr != null){
+                arc.setExpression(arcExpr);
+            } else{
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+            }
+            List<ColoredTimeInterval> intervalsToRemove = new ArrayList<>();
+            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
+                if(!colorType.getColors().contains(interval.getColor())){
+                    intervalsToRemove.add(interval);
+                }
+            }
+            arc.getColorTimeIntervals().removeAll(intervalsToRemove);
+        }
+        for(TimedOutputArc arc : tapn.outputArcs()){
+            ArcExpression arcExpr = arc.getExpression();
+            arcExpr.replace(oldColorExpr, newColorExpr);
+            for(Color color : removedColors){
+                arcExpr = arcExpr.removeColorFromExpression(color);
+            }
+            if(arcExpr != null){
+                arc.setExpression(arcExpr);
+            } else{
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+            }
+        }
+        for(TransportArc arc : tapn.transportArcs()){
+            ArcExpression arcExpr = arc.getInputExpression();
+            arcExpr.replace(oldColorExpr, newColorExpr);
+            for(Color color : removedColors){
+                arcExpr = arcExpr.removeColorFromExpression(color);
+            }
+            if(arcExpr != null){
+                arc.setInputExpression(arcExpr);
+            } else{
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setInputExpression(numbExpr);
+            }
+            arcExpr = arc.getOutputExpression();
+            arcExpr.replace(oldColorExpr, newColorExpr);
+            for(Color color : removedColors){
+                arcExpr = arcExpr.removeColorFromExpression(color);
+            }
+            if(arcExpr != null){
+                arc.setOutputExpression(arcExpr);
+            } else{
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setOutputExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+            }
+            List<ColoredTimeInterval> intervalsToRemove = new ArrayList<>();
+            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
+                if(!colorType.getColors().contains(interval.getColor())){
+                    intervalsToRemove.add(interval);
+                }
+            }
+            arc.getColorTimeIntervals().removeAll(intervalsToRemove);
+        }
+    }
+    public void updateColorTypeOnVariables(ColorType oldColorType, ColorType colorType){
+        for(Variable var : variables){
+            if(var.getColorType().equals(oldColorType)){
+                var.setColorType(colorType);
+            }
+        }
+    }
+
+    public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places){
+        for(TimedPlace place : places){
+            if(place.getColorType().equals(oldColorType)){
+                place.setColorType(colorType);
+                List<TimedToken> tokensToRemove = new ArrayList<>();
+                for(TimedToken token : place.tokens()){
+                    if(!colorType.getColors().contains(token.color())){
+                        tokensToRemove.add(token);
+                    }
+                }
+                place.removeTokens(tokensToRemove);
+                List<ColoredTimeInvariant> invariantsToRemove = new ArrayList<>();
+                for(ColoredTimeInvariant invariant : place.getCtiList()){
+                    if(!colorType.getColors().contains(invariant.getColor())){
+                        invariantsToRemove.add(invariant);
+                    }
+                }
+                place.getCtiList().removeAll(invariantsToRemove);
+            }
         }
     }
     public void updateVariable(String oldName, Variable variable) {

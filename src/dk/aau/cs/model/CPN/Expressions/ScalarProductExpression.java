@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
@@ -30,6 +31,15 @@ public class ScalarProductExpression extends ArcExpression {
 
     public Integer weight() {
         return scalar * expr.weight();
+    }
+
+    @Override
+    public ArcExpression removeColorFromExpression(Color color) {
+        if(expr.removeColorFromExpression(color) == null){
+            return null;
+        } else{
+            return this;
+        }
     }
 
     @Override

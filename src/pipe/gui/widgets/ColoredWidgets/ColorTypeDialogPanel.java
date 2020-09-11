@@ -261,8 +261,9 @@ public class ColorTypeDialogPanel extends JPanel {
                 rangeOfIntegersPanel.setVisible(false);
                 rangeOfIntegersPanelEnabled = false;
             }
-            dialog.pack();
-            System.out.println(dialog.getSize());
+            if(dialog != null){
+                dialog.pack();
+            }
         });
         GridBagConstraints gbcCTCB = new GridBagConstraints();
         gbcCTCB.insets = new Insets(2, 4, 2, 4);
@@ -480,6 +481,8 @@ public class ColorTypeDialogPanel extends JPanel {
                 JList source = (JList) e.getSource();
                 if (source.getSelectedIndex() == -1) {
                     cyclicRemoveButton.setEnabled(false);
+                } else{
+                    cyclicRemoveButton.setEnabled(true);
                 }
             }
         });

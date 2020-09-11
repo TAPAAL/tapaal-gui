@@ -1,6 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -97,8 +98,15 @@ public abstract class TimedPlace {
             fireMarkingChanged();
         }
     }
-	
-	public abstract Tuple<PlaceType, Integer> extrapolate();
+
+    public void removeTokens(Iterable<TimedToken> tokens){
+        for(TimedToken token : tokens){
+            currentMarking.remove(token);
+        }
+        fireMarkingChanged();
+    }
+
+    public abstract Tuple<PlaceType, Integer> extrapolate();
 	
 	public abstract TimedPlace copy();
 	

@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -22,6 +23,12 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     @Override
     public Integer weight() {
         return null;
+    }
+
+    @Override
+    public ArcExpression removeColorFromExpression(Color color) {
+        //We could also return null here
+        return this;
     }
 
     @Override

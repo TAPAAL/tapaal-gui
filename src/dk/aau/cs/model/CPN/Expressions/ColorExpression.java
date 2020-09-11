@@ -25,4 +25,6 @@ public abstract class ColorExpression extends Expression {
     }
     // This function might only be needed in the derived classes
     public abstract Color eval(ExpressionContext context);
+
+    public abstract boolean hasColor(Color color);
 }

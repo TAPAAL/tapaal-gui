@@ -7,6 +7,8 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -33,6 +35,24 @@ public class TupleExpression extends ColorExpression {
 
         ProductType pt = context.findProductColorType(colorTypes);
         return pt.getColor(colors);
+    }
+
+    @Override
+    public boolean hasColor(Color color) {
+        List<ColorExpression> toRemove = new ArrayList<>();
+        for (ColorExpression expr : colors){
+            if(expr.hasColor(color)){
+                toRemove.add(expr);
+            }
+        }
+        for(ColorExpression expr : toRemove){
+            colors.remove(expr);
+        }
+        if(colors.isEmpty()){
+            return true;
+        } else{
+            return false;
+        }
     }
 
     public void addColorExpression(ColorExpression expr) {

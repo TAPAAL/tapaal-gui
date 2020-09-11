@@ -25,6 +25,12 @@ public class AllExpression extends ColorExpression {
         return null;
     }
 
+    @Override
+    public boolean hasColor(Color color) {
+        //This should always be false because we replace all arc expressions
+        return false;
+    }
+
     public Integer size() {
         return sort.size();
     }

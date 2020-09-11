@@ -907,6 +907,9 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         public void updateName() {
             fireContentsChanged(this, 0, getSize());
+            for (Template activeTemplate : parent.activeTemplates()) {
+                activeTemplate.guiModel().repaintAll(true);
+            }
         }
 
         public void setNetwork(TimedArcPetriNetNetwork network) {

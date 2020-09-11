@@ -11,6 +11,11 @@ public class DotConstantExpression extends ColorExpression {
     }
 
     @Override
+    public boolean hasColor(Color color) {
+        return color.getColorName() == "dot";
+    }
+
+    @Override
     public ColorExpression replace(Expression object1, Expression object2) {
         if (this == object1 && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression) object2;
