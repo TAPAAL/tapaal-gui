@@ -699,18 +699,10 @@ public class ConstantsPane extends JPanel implements SidePane {
     private void showEditColorTypeDialog(ColorType colorType) {
         ColorTypeDialogPanel panel = null;
         if (colorType != null) {
-            try {
-                panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType);
         }
         else {
-            try {
-                panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network());
         }
         panel.showDialog();
     }
@@ -837,12 +829,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         public void updateName() {
             fireContentsChanged(this, 0, getSize());
             for (Template activeTemplate : parent.activeTemplates()) {
-                activeTemplate.guiModel().getPetriNetObjects();
-                for (PetriNetObject petriNetObject : activeTemplate.guiModel().getPetriNetObjects()) {
-                    if (petriNetObject instanceof TimedTransitionComponent) {
-                        ((TimedTransitionComponent) petriNetObject).update(true);
-                    }
-                }
+                activeTemplate.guiModel().repaintAll(true);
             }
         }
 

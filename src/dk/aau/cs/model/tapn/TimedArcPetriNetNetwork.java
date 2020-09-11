@@ -4,6 +4,7 @@ import java.util.*;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.CPN.Expressions.VariableExpression;
@@ -642,6 +643,24 @@ public class TimedArcPetriNetNetwork {
                     transition.setGuard((GuardExpression) expr);
                     tapn.replace(transition, i);
 
+                }
+                for(TimedInputArc arc : transition.getInputArcs()){
+                    Expression arcexpr = arc.getArcExpression();
+                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arc.setExpression((ArcExpression)arcexpr);
+                }
+                for(TimedOutputArc arc : transition.getOutputArcs()){
+                    Expression arcexpr = arc.getExpression();
+                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arc.setExpression((ArcExpression)arcexpr);
+                }
+                for(TransportArc arc : transition.getTransportArcsGoingThrough()){
+                    Expression arcexpr = arc.getInputExpression();
+                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arc.setInputExpression((ArcExpression)arcexpr);
+                    arcexpr = arc.getOutputExpression();
+                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arc.setOutputExpression((ArcExpression)arcexpr);
                 }
                 i++;
             }
