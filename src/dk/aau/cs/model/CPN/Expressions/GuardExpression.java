@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Set;
@@ -25,4 +26,5 @@ public abstract class GuardExpression extends Expression {
 
     public abstract void getVariables(Set<Variable> variables);
     public abstract Boolean eval(ExpressionContext context);
+    public abstract GuardExpression removeColorFromExpression(Color color);
 }

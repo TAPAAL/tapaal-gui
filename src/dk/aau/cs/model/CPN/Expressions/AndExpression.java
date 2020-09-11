@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -66,6 +67,19 @@ public class AndExpression extends GuardExpression {
     //Missing implementation for evaluation - might not be needed
     public Boolean eval(ExpressionContext context) {
         return null;
+    }
+
+    @Override
+    public GuardExpression removeColorFromExpression(Color color) {
+        GuardExpression leftExprRemoved = left.removeColorFromExpression(color);
+        GuardExpression rightExprRemoved = right.removeColorFromExpression(color);
+        if(leftExprRemoved == null && rightExprRemoved == null){
+            return null;
+        } else if(leftExprRemoved == null){
+            return rightExprRemoved;
+        }else{
+            return leftExprRemoved;
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -14,6 +15,19 @@ public class OrExpression extends GuardExpression {
     public OrExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
         this.right = right;
+    }
+
+    @Override
+    public GuardExpression removeColorFromExpression(Color color) {
+        GuardExpression leftExprRemoved = left.removeColorFromExpression(color);
+        GuardExpression rightExprRemoved = right.removeColorFromExpression(color);
+        if(leftExprRemoved == null && rightExprRemoved == null){
+            return null;
+        } else if(leftExprRemoved == null){
+            return rightExprRemoved;
+        }else{
+            return leftExprRemoved;
+        }
     }
 
     public GuardExpression getLeftExpression() {

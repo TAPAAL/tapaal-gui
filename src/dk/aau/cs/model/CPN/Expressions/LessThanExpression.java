@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -21,7 +22,14 @@ public class LessThanExpression extends GuardExpression {
     public ColorExpression getRightExpression() {
         return this.right;
     }
-
+    @Override
+    public GuardExpression removeColorFromExpression(Color color) {
+        if(left.hasColor(color) || right.hasColor(color)){
+            return null;
+        } else{
+            return this;
+        }
+    }
     @Override
     public GuardExpression replace(Expression object1, Expression object2) {
         if (this == object1 && object2 instanceof GuardExpression) {

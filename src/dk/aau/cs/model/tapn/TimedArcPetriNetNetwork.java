@@ -633,10 +633,19 @@ public class TimedArcPetriNetNetwork {
         for (TimedArcPetriNet tapn : tapns) {
             updateColorTypeOnPlaces(oldColorType, colorType, tapn.places());
             updateColorTypeOnArcs(oldColorType,colorType,tapn,removedColors);
+            updateColorTypeOnTransitions(tapn.transitions(), removedColors);
         }
 
     }
-
+    private void updateColorTypeOnTransitions(List<TimedTransition> transitions, List<Color> removedColors){
+	    for(TimedTransition transition : transitions){
+            GuardExpression expr = transition.getGuard();
+            for(Color color : removedColors){
+                expr = expr.removeColorFromExpression(color);
+            }
+            transition.setGuard(expr);
+        }
+    }
     private void updateColorTypeOnArcs(ColorType oldColorType, ColorType colorType, TimedArcPetriNet tapn, List<Color> removedColors){
         ColorExpression oldColorExpr = new AllExpression(oldColorType);
         ColorExpression newColorExpr = new AllExpression(colorType);

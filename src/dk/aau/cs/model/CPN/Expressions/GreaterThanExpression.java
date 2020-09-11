@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -24,6 +25,15 @@ public class GreaterThanExpression extends GuardExpression{
     //Missing implementation for evaluation - might not be needed
     public Boolean eval(ExpressionContext context) {
         return null;
+    }
+
+    @Override
+    public GuardExpression removeColorFromExpression(Color color) {
+        if(left.hasColor(color) || right.hasColor(color)){
+            return null;
+        } else{
+            return this;
+        }
     }
 
     @Override

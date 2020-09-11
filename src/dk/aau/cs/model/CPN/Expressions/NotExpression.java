@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -16,7 +17,10 @@ public class NotExpression extends GuardExpression {
     public GuardExpression getExpression() {
         return this.expr;
     }
-
+    @Override
+    public GuardExpression removeColorFromExpression(Color color) {
+        return expr.removeColorFromExpression(color);
+    }
     @Override
     public GuardExpression replace(Expression object1, Expression object2) {
         if (this == object1 && object2 instanceof GuardExpression) {

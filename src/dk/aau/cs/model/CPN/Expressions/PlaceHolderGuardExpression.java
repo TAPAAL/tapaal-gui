@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
@@ -53,6 +54,11 @@ public class PlaceHolderGuardExpression extends GuardExpression implements Place
     @Override
     public Boolean eval(ExpressionContext context) {
         return null;
+    }
+
+    @Override
+    public GuardExpression removeColorFromExpression(Color color) {
+        return this;
     }
 
     @Override
