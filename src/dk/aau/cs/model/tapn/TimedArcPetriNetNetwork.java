@@ -620,14 +620,18 @@ public class TimedArcPetriNetNetwork {
     public void updateColorType(String oldName, ColorType colorType) {
         Integer index = getColorTypeIndex(oldName);
         ColorType oldColorType = getColorTypeByIndex(index);
+
+        if (index != null) {
+            colorTypes.set(index, colorType);
+        }
+        updateColorType(colorType, oldColorType);
+    }
+    private void updateColorType(ColorType colorType, ColorType oldColorType){
         List<Color> removedColors = new ArrayList<>();
         for(Color color : oldColorType.getColors()){
             if(!colorType.getColors().contains(color)){
                 removedColors.add(color);
             }
-        }
-        if (index != null) {
-            colorTypes.set(index, colorType);
         }
         updateColorTypeOnVariables(oldColorType, colorType);
         for (TimedArcPetriNet tapn : tapns) {
@@ -635,13 +639,14 @@ public class TimedArcPetriNetNetwork {
             updateColorTypeOnArcs(oldColorType,colorType,tapn,removedColors);
             updateColorTypeOnTransitions(tapn.transitions(), removedColors);
         }
-
     }
     private void updateColorTypeOnTransitions(List<TimedTransition> transitions, List<Color> removedColors){
 	    for(TimedTransition transition : transitions){
             GuardExpression expr = transition.getGuard();
             for(Color color : removedColors){
-                expr = expr.removeColorFromExpression(color);
+                if(expr != null){
+                    expr = expr.removeColorFromExpression(color);
+                }
             }
             transition.setGuard(expr);
         }
@@ -654,6 +659,9 @@ public class TimedArcPetriNetNetwork {
             arcExpr.replace(oldColorExpr, newColorExpr);
             for(Color color : removedColors){
                 arcExpr = arcExpr.removeColorFromExpression(color);
+                if(arcExpr == null){
+                    break;
+                }
             }
             if(arcExpr != null){
                 arc.setExpression(arcExpr);
@@ -678,6 +686,9 @@ public class TimedArcPetriNetNetwork {
             arcExpr.replace(oldColorExpr, newColorExpr);
             for(Color color : removedColors){
                 arcExpr = arcExpr.removeColorFromExpression(color);
+                if(arcExpr == null){
+                    break;
+                }
             }
             if(arcExpr != null){
                 arc.setExpression(arcExpr);
@@ -698,6 +709,9 @@ public class TimedArcPetriNetNetwork {
             }
             if(arcExpr != null){
                 arc.setInputExpression(arcExpr);
+                if(arcExpr == null){
+                    break;
+                }
             } else{
                 UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
@@ -709,6 +723,9 @@ public class TimedArcPetriNetNetwork {
             arcExpr.replace(oldColorExpr, newColorExpr);
             for(Color color : removedColors){
                 arcExpr = arcExpr.removeColorFromExpression(color);
+                if(arcExpr == null){
+                    break;
+                }
             }
             if(arcExpr != null){
                 arc.setOutputExpression(arcExpr);
@@ -764,39 +781,43 @@ public class TimedArcPetriNetNetwork {
         Variable oldVar = getVariableByIndex(index);
         VariableExpression oldVarExpr = new VariableExpression(oldVar);
         VariableExpression newVarExpr = new VariableExpression(variable);
+        updateVariable(newVarExpr, oldVarExpr);
+        if (index != null) {
+            variables.set(index, variable);
+        }
+    }
+
+    private void updateVariable(ColorExpression newExpr, VariableExpression oldExpression){
         for (TimedArcPetriNet tapn : tapns) {
             int i = 0;
             for (TimedTransition transition : tapn.transitions()) {
                 Expression expr = transition.getGuard();
                 if (expr != null) {
-                    expr.replace(oldVarExpr, newVarExpr);
+                    expr.replace(oldExpression, newExpr);
                     transition.setGuard((GuardExpression) expr);
                     tapn.replace(transition, i);
 
                 }
                 for(TimedInputArc arc : transition.getInputArcs()){
                     Expression arcexpr = arc.getArcExpression();
-                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arcexpr.replace(oldExpression, newExpr);
                     arc.setExpression((ArcExpression)arcexpr);
                 }
                 for(TimedOutputArc arc : transition.getOutputArcs()){
                     Expression arcexpr = arc.getExpression();
-                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arcexpr.replace(oldExpression, newExpr);
                     arc.setExpression((ArcExpression)arcexpr);
                 }
                 for(TransportArc arc : transition.getTransportArcsGoingThrough()){
                     Expression arcexpr = arc.getInputExpression();
-                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arcexpr.replace(oldExpression, newExpr);
                     arc.setInputExpression((ArcExpression)arcexpr);
                     arcexpr = arc.getOutputExpression();
-                    arcexpr.replace(oldVarExpr, newVarExpr);
+                    arcexpr.replace(oldExpression, newExpr);
                     arc.setOutputExpression((ArcExpression)arcexpr);
                 }
                 i++;
             }
-        }
-        if (index != null) {
-            variables.set(index, variable);
         }
     }
     public Integer getColorTypeIndex(String name) {
@@ -872,13 +893,32 @@ public class TimedArcPetriNetNetwork {
     }
 
     public void remove(ColorType colorType) {
-        if (colorType != null) {
-            colorTypes.remove(colorType);
+        List<ColorType> toRemove = collectColorTypesToRemoveAndUpdateTodot(colorType);
+        for(ColorType ct : toRemove){
+            updateColorType(ColorType.COLORTYPE_DOT, ct);
+        }
+	    if (colorType != null) {
+            colorTypes.removeAll(toRemove);
         }
     }
 
+    private List<ColorType> collectColorTypesToRemoveAndUpdateTodot(ColorType colorType){
+        List<ColorType> toRemove = new ArrayList<>();
+        toRemove.add(colorType);
+        for(ColorType ct : colorTypes){
+            if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
+                toRemove.addAll(collectColorTypesToRemoveAndUpdateTodot(ct));
+            }
+        }
+        return toRemove;
+    }
+
     public void remove(Variable variable) {
-        if (variable != null) {
+        VariableExpression oldVarExpr = new VariableExpression(variable);
+        UserOperatorExpression newExpr = new UserOperatorExpression(variable.getColorType().getFirstColor());
+        updateVariable(newExpr,oldVarExpr);
+
+	    if (variable != null) {
             variables.remove(variable);
         }
     }

@@ -824,6 +824,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                 editBtn.setEnabled(false);
                 editBtn.setEnabled(false);
             }
+            updateName();
         }
 
         public void updateName() {
@@ -903,6 +904,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                 removeBtn.setEnabled(false);
                 editBtn.setEnabled(false);
             }
+            updateName();
         }
 
         public void updateName() {

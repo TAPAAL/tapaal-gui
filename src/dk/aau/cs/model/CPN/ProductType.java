@@ -20,7 +20,14 @@ public class ProductType extends ColorType {
         this.name = name;
         this.id = id;
     }
-
+    public boolean contains(ColorType colorType){
+        for (ColorType ct : constituents){
+            if(ct.equals(colorType)){
+                return true;
+            }
+        }
+        return false;
+    }
     public Vector<ColorType> getColorTypes() {return constituents; }
 
     public void addType(ColorType colortype) {
