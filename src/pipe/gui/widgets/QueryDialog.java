@@ -891,6 +891,9 @@ public class QueryDialog extends JPanel {
             }
         } else if (!lens.isGame()) {
             options.add(name_UNTIMED);
+            options.add(name_DISCRETE);
+        } else {
+            options.add(name_DISCRETE);
         }
 
 		reductionOption.removeAllItems();
