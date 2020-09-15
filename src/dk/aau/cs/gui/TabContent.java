@@ -1748,6 +1748,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
             app.ifPresent(o->o.setStatusBarText(textforDrawing));
+
+            if (restoreWorkflowDialog()) {
+                WorkflowDialog.showDialog();
+            }
 		}
 		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
