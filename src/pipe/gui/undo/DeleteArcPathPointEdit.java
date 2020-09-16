@@ -32,8 +32,8 @@ public class DeleteArcPathPointEdit extends Command {
 	/** */
 	@Override
 	public void undo() {
-
 		//guiModel.addPetriNetObject(point);
+	    point.deselect();
 		arcPath.insertPoint(index, point);
 		arcPath.updateArc();
 	}
@@ -41,7 +41,6 @@ public class DeleteArcPathPointEdit extends Command {
 	/** */
 	@Override
 	public void redo() {
-
 		guiModel.removePetriNetObject(point);
 		arcPath.deletePoint(point);
 		arcPath.updateArc();

@@ -21,6 +21,7 @@ public class DeleteAnnotationNoteCommand extends Command {
 
     @Override
     public void redo() {
+        note.deselect();
         model.removePetriNetObject(note);
     }
 }
