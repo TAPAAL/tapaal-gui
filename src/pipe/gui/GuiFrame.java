@@ -934,10 +934,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
 
-                if (getCurrentTab().restoreWorkflowDialog()) {
-                    WorkflowDialog.showDialog();
-                }
-
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
                 fixBug812694GrayMenuAfterSimulationOnMac();
