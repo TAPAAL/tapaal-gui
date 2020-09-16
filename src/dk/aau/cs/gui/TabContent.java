@@ -2692,32 +2692,40 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
             );
             registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel,
                 e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), ((MouseWheelEvent) e.e))
             );
             registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel,
                 e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
             );
 
         }
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
-            int rotation = 0;
-            if (e.getWheelRotation() < 0) {
-                rotation = -e.getWheelRotation() * 135;
-            } else {
-                rotation = e.getWheelRotation() * 45;
-            }
+            if (p.isSelected()) {
+                int rotation = 0;
+                if (e.getWheelRotation() < 0) {
+                    rotation = -e.getWheelRotation() * 135;
+                } else {
+                    rotation = e.getWheelRotation() * 45;
+                }
 
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+                CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+            } else {
+                p.getParent().dispatchEvent(e);
+            }
         }
 
         private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
-            if (e.getWheelRotation() < 0) {
-                guiModelManager.addToken(getModel(), p, 1);
+            if (p.isSelected()) {
+                if (e.getWheelRotation() < 0) {
+                    guiModelManager.addToken(getModel(), p, 1);
+                } else {
+                    guiModelManager.removeToken(getModel(), p, 1);
+                }
             } else {
-                guiModelManager.removeToken(getModel(), p, 1);
+                p.getParent().dispatchEvent(e);
             }
         }
 
