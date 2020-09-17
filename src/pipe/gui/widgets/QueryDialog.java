@@ -371,7 +371,7 @@ public class QueryDialog extends JPanel {
 		TAPNQuery.SearchOption searchOption = getSearchOption();
 		ReductionOption reductionOptionToSet = getReductionOption();
 
-        if (!lens.isGame()) {
+        if (!lens.isGame() && !lens.isTimed()) {
             return getUntimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
         } else {
             return getTimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
@@ -2047,7 +2047,7 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 						placeNames.add(place.name());
 					}
-                    if (lens.isTimed() | lens.isGame()) {
+                    if (lens.isTimed() || lens.isGame()) {
                         for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
                             placeNames.add(transition.name());
                         }
@@ -2803,7 +2803,7 @@ public class QueryDialog extends JPanel {
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }
-            } else if (lens.isTimed() || lens.isGame()) {
+            } else if (lens.isTimed()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     enableOnlyPathButtons();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
