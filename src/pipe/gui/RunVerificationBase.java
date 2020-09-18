@@ -1,5 +1,6 @@
 package pipe.gui;
 
+import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
@@ -40,15 +41,21 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected TimedArcPetriNetNetwork model;
 	protected TAPNQuery query;
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
+	protected String reducedNetFilePath;
 	
 	
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, String reducedNetFilePath) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
+		this.reducedNetFilePath = reducedNetFilePath;
 	}
+
+    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
+        this(modelChecker, messenger, null);
+    }
 
 	
 	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
@@ -112,7 +119,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 										dataLayerQuery.getAlgorithmOption(),
 										dataLayerQuery.isSiphontrapEnabled(),
 										dataLayerQuery.isQueryReductionEnabled(),
-										dataLayerQuery.isStubbornReductionEnabled()
+										dataLayerQuery.isStubbornReductionEnabled(),
+                                        reducedNetFilePath
 								),
 								transformedModel,
 								clonedQuery
@@ -132,7 +140,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 										pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
 										false,
 										true,
-										false
+										false,
+                                        reducedNetFilePath
 								),
 								transformedModel,
 								clonedQuery

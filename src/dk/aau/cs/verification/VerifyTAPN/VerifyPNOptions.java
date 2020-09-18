@@ -32,13 +32,14 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.useQueryReduction = queryReduction;
 		this.useStubbornReduction = stubbornReduction;
 		this.pathToReducedNet = pathToReducedNet;
+
 	}
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, 
 		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-		boolean siphontrap, boolean queryReduction, boolean stubbornReduction, String pathToReducedNet) {
+		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
 		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
-			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet);
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null);
 	}
 
 	@Override
@@ -52,8 +53,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
-            String writeReducedCMD = " --write-reduced reduced-" + CreateGui.getApp().getCurrentTabName().replace(" ", "");
-            writeReducedCMD = writeReducedCMD.replace(".tapn", ".pnml");
+            String writeReducedCMD = " --write-reduced " +pathToReducedNet;
             result.append(writeReducedCMD);
 			break;
 		case NO_REDUCTION:
@@ -61,7 +61,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
-            result.append(" --write-reduced testopt.tapn");
+            writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            result.append(writeReducedCMD);
 			break;
 		default:
 			break;			

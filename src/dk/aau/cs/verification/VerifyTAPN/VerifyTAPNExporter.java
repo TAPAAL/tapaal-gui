@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import dk.aau.cs.gui.TabContent;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -18,6 +19,9 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.Transition;
 
 public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens) {
@@ -63,14 +67,16 @@ public class VerifyTAPNExporter {
 	}
 	
 	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
+        DataLayer guiModel = CreateGui.getModel();
+
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
 		
 		for(TimedPlace p : model.places())
-			outputPlace(p, modelStream);
+			outputPlace(p, modelStream, guiModel);
 		
 		for(TimedTransition t : model.transitions())
-			outputTransition(t,modelStream);
+			outputTransition(t,modelStream, guiModel);
 		
 		for(TimedInputArc inputArc : model.inputArcs())
 			outputInputArc(inputArc, modelStream);
@@ -88,27 +94,51 @@ public class VerifyTAPNExporter {
 		modelStream.append("</pnml>");
 	}
 	
-	private void outputPlace(TimedPlace p, PrintStream modelStream) {
+	private void outputPlace(TimedPlace p, PrintStream modelStream, DataLayer guiModel) {
+
+        String placeName = p.name().split("_",2)[1];
+
+        //remove the net prefix from the place name
+	    Place guiPlace = guiModel.getPlaceById(placeName);
+
 		modelStream.append("<place ");
 		
 		modelStream.append("id=\"" + p.name() + "\" ");
 		modelStream.append("name=\"" + p.name() + "\" ");
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
-		
-		modelStream.append("/>\n");
+        modelStream.append(">\n");
+        outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+
+        modelStream.append("</place>\n");
 	}
 
-	private void outputTransition(TimedTransition t, PrintStream modelStream) {
+    private void outputTransition(TimedTransition t, PrintStream modelStream, DataLayer guiModel) {
+        String transitionName = t.name().split("_",2)[1];
+
+        //remove the net prefix from the transition name
+        Transition guiTransition = guiModel.getTransitionByName(transitionName);
+
 		modelStream.append("<transition ");
 
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
-		modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
-		
-		modelStream.append("/>\n");
+        modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
+        modelStream.append(">\n");
+        outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
+
+        modelStream.append("</transition>\n");
 	}
+
+    private void outputPosition(PrintStream modelStream, int positionX, int positionY) {
+        modelStream.append("<graphics>");
+        modelStream.append("<position ");
+        modelStream.append("x=\"" + positionX + "\" ");
+        modelStream.append("y=\"" + positionY + "\" ");
+        modelStream.append("/>");
+        modelStream.append("</graphics>");
+    }
 
 	protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
 		modelStream.append("<inputArc ");

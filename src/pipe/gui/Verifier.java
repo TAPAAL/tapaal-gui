@@ -15,6 +15,9 @@ import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Implementes af class for handling integrated Uppaal Verification
  * 
@@ -132,6 +135,7 @@ public class Verifier {
 			VerificationCallback callback
 	) {
 		ModelChecker verifytapn = getModelChecker(query);
+        File reducedNetTempFile = null;
 
 		if (!verifytapn.isCorrectVersion()) {
 			new MessengerImpl().displayErrorMessage(
@@ -165,7 +169,18 @@ public class Verifier {
 					query.isStubbornReductionEnabled()
 			);
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(
+
+
+            try {
+                reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(
+                    e.getMessage(),
+                    "Error");
+                return;
+            }
+
+            verifytapnOptions = new VerifyPNOptions(
 					bound,
 					query.getTraceOption(),
 					query.getSearchOption(),
@@ -178,7 +193,8 @@ public class Verifier {
 					query.getAlgorithmOption(),
 					query.isSiphontrapEnabled(),
 					query.isQueryReductionEnabled(),
-					query.isStubbornReductionEnabled()
+					query.isStubbornReductionEnabled(),
+                    reducedNetTempFile.getAbsolutePath()
 			);
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(
@@ -200,7 +216,13 @@ public class Verifier {
 		}
 		
 		if (tapnNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+            RunVerificationBase thread;
+		    if (reducedNetTempFile != null) {
+                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, reducedNetTempFile.getAbsolutePath() );
+            } else {
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+            }
+
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);

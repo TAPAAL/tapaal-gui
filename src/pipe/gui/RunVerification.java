@@ -39,14 +39,18 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-		super(modelChecker, messenger);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath) {
+		super(modelChecker, messenger, reducedNetFilePath);
 		iconSelector = selector;
 		this.callback = callback;
 	}
+
+    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
+        this(modelChecker, selector, messenger, callback, null);
+    }
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null);
+		this(modelChecker, selector, messenger, null, null);
 	}
 
 	@Override
@@ -293,13 +297,13 @@ public class RunVerification extends RunVerificationBase {
                 JButton openReducedButton = new JButton("Open reduced net");
                 openReducedButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        String reducedName = "reduced-" + CreateGui.getApp().getCurrentTabName();
-                        reducedName = reducedName.replace(".tapn", ".pnml");
-                        File reducedNetFile = new File(reducedName);
+                        openReducedButton.setEnabled(false);
+                        File reducedNetFile = new File(reducedNetFilePath);
 
                         if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
                             try {
                                 TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
                                 CreateGui.openNewTabFromStream(reducedNetTab);
                             } catch (Exception e1){
                                 JOptionPane.showMessageDialog(CreateGui.getApp(),
