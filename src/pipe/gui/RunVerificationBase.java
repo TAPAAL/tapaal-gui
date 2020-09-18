@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;

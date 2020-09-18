@@ -53,7 +53,8 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
 
-    private TabContent.TAPNLens lens;
+
+    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
     enum GraphicsType { Position, Offset }
 
@@ -124,7 +125,8 @@ public class PNMLoader {
 		
 		network.setPaintNet(isNetDrawable());
 		tapn.setCheckNames(true);
-		return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>(), null, lens);
+
+		return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>(), new ArrayList<>(), null);
 	}
 
 	private String getTAPNName(Node netNode) {

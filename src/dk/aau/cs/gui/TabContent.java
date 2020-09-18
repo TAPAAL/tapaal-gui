@@ -13,7 +13,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.StatisticsPanel;
@@ -635,6 +635,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
+            checkQueries(tab);
+
             tab.setInitialName(name);
 
 			tab.selectFirstElements();
@@ -643,7 +645,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             return tab;
 		} catch (Exception e) {
-			throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+			//throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+            throw e;
 		}
 
 	}
@@ -698,8 +701,85 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
+	private static void checkQueries(TabContent tab) {
+        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
+        boolean gameChanged = false;
+
+        EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
+        EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
+        EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+        EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
+        EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
+        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
+        EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
+
+        EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
+        TimedArcPetriNetNetwork net = tab.network();
+        for (TAPNQuery q : tab.queries()) {
+            boolean hasEngine = false;
+            boolean[] queryOptions = new boolean[]{
+                q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
+                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
+                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)),
+                (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()),
+                net.hasWeights(),
+                net.hasInhibitorArcs(),
+                net.hasUrgentTransitions(),
+                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode),
+                !net.isNonStrict(),
+                tab.lens.isTimed(),
+                (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
+                tab.lens.isGame(),
+                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
+                q.hasUntimedOnlyProperties()
+            };
+            for(EngineSupportOptions engine : engineSupportOptions){
+                if(engine.areOptionsSupported(queryOptions)){
+                    hasEngine = true;
+                    break;
+                }
+            }
+            if (!hasEngine) {
+                queriesToRemove.add(q);
+                tab.removeQuery(q);
+            } else if (tab.lens.isGame()) {
+                if (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLEGNode) {
+                    queriesToRemove.add(q);
+                    tab.removeQuery(q);
+                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
+                    gameChanged = true;
+                }
+                if (q.useGCD() || q.useTimeDarts() || q.getTraceOption().equals(TAPNQuery.TraceOption.FASTEST) ||
+                    !q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification) ||
+                    q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) gameChanged = true;
+                q.setUseGCD(false);
+                q.setUseTimeDarts(false);
+                q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                q.setUseOverApproximationEnabled(false);
+                q.setUseUnderApproximationEnabled(false);
+            }
+        }
+        String message = "";
+        if (!queriesToRemove.isEmpty()) {
+            message = "The following queries will be removed in the conversion:";
+            for (TAPNQuery q : queriesToRemove) {
+                message += "\n" + q.getName();
+            }
+        }
+        if (gameChanged) {
+            message += (message.length() == 0 ? "" : "\n\n");
+            message += "Some options may have been changed to make the query compatible with the net features.";
+        }
+        if(message.length() > 0){
+            new MessengerImpl().displayInfoMessage(message, "Information");
+        }
+	}
+
 	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
-		TabContent tab = new TabContent(isTimed, isGame, isColored);
+        TabContent tab = new TabContent(isTimed, isGame, isColored);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -848,14 +928,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         Require.that(network != null, "network cannot be null");
         Require.notNull(lens, "Lens can't be null");
-        this.lens = lens;
+
         tapnNetwork = network;
+        this.lens = lens;
 
         guiModels.clear();
         for (Template template : templates) {
             addGuiModel(template.model(), template.guiModel());
             zoomLevels.put(template.model(), template.zoomer());
             hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+
             for(PetriNetObject o : template.guiModel().getPetriNetObjects()){
                 o.setLens(this.lens);
             }
@@ -906,6 +988,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
         this(network, templates, tapnqueries,  new TAPNLens(true, false, false));
     }
+
 	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
@@ -1612,27 +1695,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored()), "-timed");
-                findAndRemoveAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
-        }
-    }
-
-    private void findAndRemoveAffectedQueries(TabContent tab){
-        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
-        for (TAPNQuery q : tab.queries()){
-            if(q.hasUntimedOnlyProperties()){
-                queriesToRemove.add(q);
-                tab.removeQuery(q);
-            }
-        }
-        String message = "The following queries will be removed in the conversion:";
-        for(TAPNQuery q : queriesToRemove){
-            message += "\n" + q.getName();
-        }
-        if(!queriesToRemove.isEmpty()){
-            JOptionPane.showMessageDialog(this,message,"Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1652,7 +1717,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
             } else {
                 TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored()), "-game");
-                findAndRemoveGameAffectedQueries(tab);
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1673,38 +1737,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 createNewAndConvertColor();
             }
             updateFeatureText();
-        }
-    }
-
-    private void findAndRemoveGameAffectedQueries(TabContent tab){
-        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
-        for (TAPNQuery q : tab.queries()) {
-            if (q.hasUntimedOnlyProperties() || !(q.getProperty() instanceof TCTLAGNode) || !lens.isTimed()) {
-                queriesToRemove.add(q);
-                tab.removeQuery(q);
-            } else {
-                if (!q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification)) {
-                    q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
-                } if (!q.getTraceOption().equals(TAPNQuery.TraceOption.NONE)) {
-                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
-                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
-                    q.setSearchOption(TAPNQuery.SearchOption.DFS);
-                } if (q.useTimeDarts()) {
-                    q.setUseTimeDarts(false);
-                } if (q.useGCD()) {
-                    q.setUseGCD(false);
-                } if (q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
-                    q.setUseOverApproximationEnabled(false);
-                    q.setUseUnderApproximationEnabled(false);
-                }
-            }
-        }
-        String message = "The following queries will be removed in the conversion:";
-        for (TAPNQuery q : queriesToRemove) {
-            message += "\n" + q.getName();
-        }
-        if (!queriesToRemove.isEmpty()) {
-            JOptionPane.showMessageDialog(this, message, "Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1839,6 +1871,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
             app.ifPresent(o->o.setStatusBarText(textforDrawing));
+
+            if (restoreWorkflowDialog()) {
+                WorkflowDialog.showDialog();
+            }
 		}
 		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 	}
@@ -2792,11 +2828,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
             );
             registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel,
                 e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), ((MouseWheelEvent) e.e))
             );
             registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel && e.e.isShiftDown(),
+                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel,
                 e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
             );
             registerEvent(
@@ -2822,23 +2858,33 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
-            int rotation = 0;
-            if (e.getWheelRotation() < 0) {
-                rotation = -e.getWheelRotation() * 135;
-            } else {
-                rotation = e.getWheelRotation() * 45;
-            }
+            if (p.isSelected()) {
+                int rotation = 0;
+                if (e.getWheelRotation() < 0) {
+                    rotation = -e.getWheelRotation() * 135;
+                } else {
+                    rotation = e.getWheelRotation() * 45;
+                }
 
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+                CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+            } else {
+                p.getParent().dispatchEvent(e);
+            }
         }
 
         private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
             //TODO: how to handle if lens is colored??
-            if(!lens.isColored()){
-                if (e.getWheelRotation() < 0) {
-                    guiModelManager.addToken(getModel(), p, 1);
+            if(!lens.isColored()) {
+                if (p.isSelected()) {
+                    if (e.getWheelRotation() < 0) {
+                        guiModelManager.addToken(getModel(), p, 1);
+                    } else {
+                        guiModelManager.removeToken(getModel(), p, 1);
+                    }
+
                 } else {
-                    guiModelManager.removeToken(getModel(), p, 1);
+                    p.getParent().dispatchEvent(e);
+
                 }
             }
         }
