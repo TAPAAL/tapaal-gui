@@ -41,6 +41,7 @@ public class VariablesDialogPanel extends JPanel {
     JPanel buttonContainer;
     JButton okButton;
     JButton cancelButton;
+    private JScrollPane scrollPane;
 
     public VariablesDialogPanel() throws IOException {
         initComponents();
@@ -71,7 +72,7 @@ public class VariablesDialogPanel extends JPanel {
     public void showDialog() {
         dialog = new EscapableDialog(CreateGui.getApp(),
                 "Edit Variable", true);
-        dialog.add(container);
+        dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);
         dialog.pack();
@@ -92,17 +93,9 @@ public class VariablesDialogPanel extends JPanel {
         createNameTextField();
         createOKButton();
 
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        okButton.addActionListener(e -> onOK());
 
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                exit();
-            }
-        });
+        cancelButton.addActionListener(e -> exit());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(0, 8, 5, 8);
@@ -111,6 +104,10 @@ public class VariablesDialogPanel extends JPanel {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         container.add(buttonContainer,gbc);
+        scrollPane = new JScrollPane();
+        scrollPane.setViewportView(container);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
     private void createNameTextField() {
@@ -120,14 +117,10 @@ public class VariablesDialogPanel extends JPanel {
             @Override
             public void ancestorAdded(AncestorEvent ancestorEvent) {
                 final AncestorListener al= this;
-                SwingUtilities.invokeLater(new Runnable(){
-
-
-                    public void run() {
-                        JComponent component = (JComponent)ancestorEvent.getComponent();
-                        component.requestFocusInWindow();
-                        component.removeAncestorListener( al );
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    JComponent component = ancestorEvent.getComponent();
+                    component.requestFocusInWindow();
+                    component.removeAncestorListener( al );
                 });
             }
 

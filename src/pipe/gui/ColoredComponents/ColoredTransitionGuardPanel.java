@@ -129,6 +129,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(logicPanel, gbc);
 
@@ -317,295 +318,275 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 1;
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(comparisonPanel, gbc);
 
 
-        editColorExpressionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Logger.log(currentSelection.getObject());
-                if (currentSelection.getObject() instanceof TupleExpression || currentSelection.getObject() instanceof ColorExpression) {
+        editColorExpressionButton.addActionListener(actionEvent -> {
+            Logger.log(currentSelection.getObject());
+            if (currentSelection.getObject() instanceof TupleExpression || currentSelection.getObject() instanceof ColorExpression) {
 
 
-                    EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
-                    Container contentPane = guiDialog.getContentPane();
+                EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Color Expression", true);
+                Container contentPane = guiDialog.getContentPane();
 
-                    ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
-                    contentPane.add(cep);
+                ColorExpressionDialogPanel cep = new ColorExpressionDialogPanel(guiDialog.getRootPane(), context, (ColorExpression) currentSelection.getObject(), false);
+                contentPane.add(cep);
 
-                    guiDialog.setResizable(true);
-                    guiDialog.pack();
-                    guiDialog.setLocationRelativeTo(null);
-                    guiDialog.setVisible(true);
+                guiDialog.setResizable(true);
+                guiDialog.pack();
+                guiDialog.setLocationRelativeTo(null);
+                guiDialog.setVisible(true);
 
-                    ColorExpression expr = cep.getColorExpression();
+                ColorExpression expr = cep.getColorExpression();
 
-                    if (cep.clickedOK) {
-                        if (currentSelection.getObject()instanceof EqualityExpression) {
-                            EqualityExpression eqExpr= new EqualityExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), expr);
-                            newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                            updateSelection(expr);
-                            return;
-                        }
-                        newProperty = newProperty.replace(currentSelection.getObject(), expr);
+                if (cep.clickedOK) {
+                    if (currentSelection.getObject()instanceof EqualityExpression) {
+                        EqualityExpression eqExpr= new EqualityExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), expr);
+                        newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
                         updateSelection(expr);
+                        return;
                     }
+                    newProperty = newProperty.replace(currentSelection.getObject(), expr);
+                    updateSelection(expr);
                 }
-                else {
-                    JOptionPane.showMessageDialog(CreateGui.getApp(), "You have to either select a color expression or a colored placeholder <+>.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                }
+            }
+            else {
+                JOptionPane.showMessageDialog(CreateGui.getApp(), "You have to either select a color expression or a colored placeholder <+>.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
 
 
 
+        });
+
+        equalityButton.addActionListener(actionEvent -> {
+            EqualityExpression eqExpr = null;
+            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
+                eqExpr = new EqualityExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
+                eqExpr = new EqualityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
+                eqExpr = new EqualityExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
+            }
+            else if (currentSelection.getObject() instanceof InequalityExpression) {
+                eqExpr = new EqualityExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
+                eqExpr = new EqualityExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanExpression) {
+                eqExpr = new EqualityExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
+                eqExpr = new EqualityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
+                updateSelection(eqExpr);
             }
         });
 
-        equalityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                EqualityExpression eqExpr = null;
-                if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                    eqExpr = new EqualityExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                    eqExpr = new EqualityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                    eqExpr = new EqualityExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
-                else if (currentSelection.getObject() instanceof InequalityExpression) {
-                    eqExpr = new EqualityExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                    eqExpr = new EqualityExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanExpression) {
-                    eqExpr = new EqualityExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                    eqExpr = new EqualityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-                    updateSelection(eqExpr);
-                }
+        greaterThanEqButton.addActionListener(actionEvent -> {
+            GreaterThanEqExpression greaterEqExpr = null;
+            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
+                greaterEqExpr = new GreaterThanEqExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
+                updateSelection(greaterEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
+                greaterEqExpr = new GreaterThanEqExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
+                updateSelection(greaterEqExpr);
+            }
+
+            else if (currentSelection.getObject() instanceof InequalityExpression) {
+                greaterEqExpr = new GreaterThanEqExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
+                updateSelection(greaterEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof EqualityExpression) {
+                greaterEqExpr = new GreaterThanEqExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
+                updateSelection(greaterEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanExpression) {
+                greaterEqExpr = new GreaterThanEqExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
+                updateSelection(greaterEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
+                greaterEqExpr = new GreaterThanEqExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
+                updateSelection(greaterEqExpr);
             }
         });
 
-        greaterThanEqButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                GreaterThanEqExpression greaterEqExpr = null;
-                if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                    greaterEqExpr = new GreaterThanEqExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-                    updateSelection(greaterEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                    greaterEqExpr = new GreaterThanEqExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-                    updateSelection(greaterEqExpr);
-                }
-
-                else if (currentSelection.getObject() instanceof InequalityExpression) {
-                    greaterEqExpr = new GreaterThanEqExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-                    updateSelection(greaterEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof EqualityExpression) {
-                    greaterEqExpr = new GreaterThanEqExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-                    updateSelection(greaterEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanExpression) {
-                    greaterEqExpr = new GreaterThanEqExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-                    updateSelection(greaterEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                    greaterEqExpr = new GreaterThanEqExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-                    updateSelection(greaterEqExpr);
-                }
+        greaterThanButton.addActionListener(actionEvent -> {
+            GreaterThanExpression greaterExpr = null;
+            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
+                greaterExpr = new GreaterThanExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
+                greaterExpr = new GreaterThanExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
+                greaterExpr = new GreaterThanExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
+            }
+            else if (currentSelection.getObject() instanceof EqualityExpression) {
+                greaterExpr = new GreaterThanExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
+            }
+            else if (currentSelection.getObject() instanceof InequalityExpression) {
+                greaterExpr = new GreaterThanExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
+                greaterExpr = new GreaterThanExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanExpression) {
+                greaterExpr = new GreaterThanExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
+                updateSelection(greaterExpr);
             }
         });
 
-        greaterThanButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                GreaterThanExpression greaterExpr = null;
-                if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                    greaterExpr = new GreaterThanExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                    greaterExpr = new GreaterThanExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                    greaterExpr = new GreaterThanExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
-                else if (currentSelection.getObject() instanceof EqualityExpression) {
-                    greaterExpr = new GreaterThanExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
-                else if (currentSelection.getObject() instanceof InequalityExpression) {
-                    greaterExpr = new GreaterThanExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                    greaterExpr = new GreaterThanExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanExpression) {
-                    greaterExpr = new GreaterThanExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-                    updateSelection(greaterExpr);
-                }
+        inequalityButton.addActionListener(actionEvent -> {
+            InequalityExpression iqExpr = null;
+            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
+                iqExpr = new InequalityExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
+                iqExpr = new InequalityExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
+                iqExpr = new InequalityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+            else if (currentSelection.getObject() instanceof EqualityExpression) {
+                iqExpr = new InequalityExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+            else if (currentSelection.getObject() instanceof InequalityExpression) {
+                iqExpr = new InequalityExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanExpression) {
+                iqExpr = new InequalityExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
+                iqExpr = new InequalityExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
+                updateSelection(iqExpr);
+            }
+        });
+        lessThanButton.addActionListener(actionEvent -> {
+            LessThanExpression lessThanExpr = null;
+            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
+                lessThanExpr = new LessThanExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
+                lessThanExpr = new LessThanExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
+            }
+            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
+                lessThanExpr = new LessThanExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
+            }
+            else if (currentSelection.getObject() instanceof EqualityExpression) {
+                lessThanExpr = new LessThanExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
+            }
+            else if (currentSelection.getObject() instanceof InequalityExpression) {
+                lessThanExpr = new LessThanExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanExpression) {
+                lessThanExpr = new LessThanExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
+                lessThanExpr = new LessThanExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
+                updateSelection(lessThanExpr);
             }
         });
 
-        inequalityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                InequalityExpression iqExpr = null;
-                if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                    iqExpr = new InequalityExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                    iqExpr = new InequalityExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                    iqExpr = new InequalityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
-                else if (currentSelection.getObject() instanceof EqualityExpression) {
-                    iqExpr = new InequalityExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
-                else if (currentSelection.getObject() instanceof InequalityExpression) {
-                    iqExpr = new InequalityExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanExpression) {
-                    iqExpr = new InequalityExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                    iqExpr = new InequalityExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-                    updateSelection(iqExpr);
-                }
+        lessThanEqButton.addActionListener(actionEvent -> {
+            LessThanEqExpression lessThanEqExpr = null;
+            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
+                lessThanEqExpr = new LessThanEqExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
             }
-        });
-        lessThanButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                LessThanExpression lessThanExpr = null;
-                if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                    lessThanExpr = new LessThanExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                    lessThanExpr = new LessThanExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                    lessThanExpr = new LessThanExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
-                else if (currentSelection.getObject() instanceof EqualityExpression) {
-                    lessThanExpr = new LessThanExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
-                else if (currentSelection.getObject() instanceof InequalityExpression) {
-                    lessThanExpr = new LessThanExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanExpression) {
-                    lessThanExpr = new LessThanExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                    lessThanExpr = new LessThanExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-                    updateSelection(lessThanExpr);
-                }
+            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
+                lessThanEqExpr = new LessThanEqExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
             }
-        });
-
-        lessThanEqButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                LessThanEqExpression lessThanEqExpr = null;
-                if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof InequalityExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof EqualityExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
-                else if (currentSelection.getObject() instanceof LessThanExpression) {
-                    lessThanEqExpr = new LessThanEqExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-                    newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-                    updateSelection(lessThanEqExpr);
-                }
+            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
+                lessThanEqExpr = new LessThanEqExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof InequalityExpression) {
+                lessThanEqExpr = new LessThanEqExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof EqualityExpression) {
+                lessThanEqExpr = new LessThanEqExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
+                lessThanEqExpr = new LessThanEqExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
+            }
+            else if (currentSelection.getObject() instanceof LessThanExpression) {
+                lessThanEqExpr = new LessThanEqExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
+                newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
+                updateSelection(lessThanEqExpr);
             }
         });
 
@@ -632,31 +613,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         editButtonsGroup.add(redoButton);
         editButtonsGroup.add(editExprButton);
 
-        deleteExprSelectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                deleteSelection();
+        deleteExprSelectionButton.addActionListener(actionEvent -> deleteSelection());
+
+        editExprButton.addActionListener(actionEvent -> {
+            if (exprField.isEditable()) {
+                returnFromManualEdit(null);
+            } else {
+                changeToEditMode();
             }
         });
 
-        editExprButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (exprField.isEditable()) {
-                    returnFromManualEdit(null);
-                } else {
-                    changeToEditMode();
-                }
-            }
-        });
-
-        resetExprButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                PlaceHolderGuardExpression phGuard = new PlaceHolderGuardExpression();
-                newProperty = newProperty.replace(newProperty, phGuard);
-                updateSelection(phGuard);
-            }
+        resetExprButton.addActionListener(actionEvent -> {
+            PlaceHolderGuardExpression phGuard = new PlaceHolderGuardExpression();
+            newProperty = newProperty.replace(newProperty, phGuard);
+            updateSelection(phGuard);
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -689,6 +659,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.gridx = 2;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(editPanel, gbc);
     }
@@ -765,6 +736,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 3;
         add(exprScrollPane, gbc);

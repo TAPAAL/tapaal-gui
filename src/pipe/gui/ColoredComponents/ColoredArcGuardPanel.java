@@ -360,7 +360,7 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 3;
         gbc.weightx = 1.0;
         //Comment in this if we want to resize the height as well
-        //gbc.weighty = 1.0;
+        gbc.weighty = 1.0;
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
@@ -705,13 +705,9 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        /*
-        Comment in this if we want to resize it in the height as well
-        gbc.weighty = 1.0;
-          gbc.fill = GridBagConstraints.BOTH;
 
-         */
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 4;
         regularArcExprPanel.add(exprScrollPane, gbc);
     }
