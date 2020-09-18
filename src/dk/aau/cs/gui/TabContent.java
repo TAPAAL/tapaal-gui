@@ -23,10 +23,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.Expression;
-import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
@@ -217,19 +214,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
-            TimedInputArc tia = new TimedInputArc(
-                p.underlyingPlace(),
-                t.underlyingTransition(),
-                TimeInterval.ZERO_INF
-            );
-
-            //Init color
-            ColorType ct = tia.source().getColorType();
+            ColorType ct = p.underlyingPlace().getColorType();
             UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
             Vector<ColorExpression> vecColorExpr = new Vector<>();
             vecColorExpr.add(userOperatorExpression);
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-            tia.setExpression(numbExpr);
+            TimedInputArc tia = new TimedInputArc(
+                p.underlyingPlace(),
+                t.underlyingTransition(),
+                TimeInterval.ZERO_INF,
+                numbExpr
+            );
 
             TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens);
 
@@ -314,6 +309,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 p.underlyingPlace(),
                 t.underlyingTransition()
             );
+
+            ColorType ct = tiha.source().getColorType();
+            AllExpression allExpression = new AllExpression(ct);
+            Vector<ColorExpression> vecColorExpr = new Vector<>();
+            vecColorExpr.add(allExpression);
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tiha.setExpression(numbExpr);
+
 
             TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
 

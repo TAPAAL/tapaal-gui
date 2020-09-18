@@ -604,7 +604,7 @@ public class TAPNComposer implements ITAPNComposer {
                         newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
                     }
                 }
-				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue());
+				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
 				constructedModel.add(addedArc);
 				
 				// Gui work

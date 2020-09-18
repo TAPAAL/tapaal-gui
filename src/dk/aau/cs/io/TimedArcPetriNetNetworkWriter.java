@@ -521,17 +521,18 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
-				//TODO: Same as with places and invariants, nasty to have two types of intervals
-				appendArcIntervals((TimedInputArcComponent)inputArc, document, arcElement);
+				if(!(inputArc instanceof TimedInhibitorArcComponent)){
+				    //TODO: Same as with places and invariants, nasty to have two types of intervals
+                    appendArcIntervals((TimedInputArcComponent)inputArc, document, arcElement);
+                }
 			} else {
 				arcElement.setAttribute("type", "normal");
 				arcElement.setAttribute("inscription", "1");
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 			}
 		}
-        if (!(inputArc instanceof  TimedInhibitorArcComponent)){
-            writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
-        }
+		writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
+
 		return arcElement;
 	}
 

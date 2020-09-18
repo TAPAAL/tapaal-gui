@@ -8,6 +8,7 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
@@ -36,6 +37,7 @@ public class ColoredArcGuardPanel extends JPanel {
     PetriNetObject objectToBeEdited;
     boolean isTransportArc = false;
     boolean isInputArc = false;
+    boolean isInhibitorArc = false;
     Context context;
     private Integer transportWeight;
     private ColorExpression transportInputExpr;
@@ -46,6 +48,9 @@ public class ColoredArcGuardPanel extends JPanel {
         if(objectToBeEdited instanceof TimedTransportArcComponent){
             isTransportArc = true;
             setTransportExpression();
+        }
+        else if(objectToBeEdited instanceof TimedInhibitorArcComponent){
+            isInhibitorArc = true;
         }
         if(((Arc)objectToBeEdited).getSource() instanceof Place){
             isInputArc = true;
@@ -72,7 +77,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     public void hideIrrelevantInformation(){
-        if(!objectToBeEdited.isTimed() && isInputArc){
+        if(!objectToBeEdited.isTimed() && isInputArc && nonDefaultArcColorIntervalPanel != null){
             nonDefaultArcColorIntervalPanel.setVisible(false);
         }
         if(isTransportArc){
@@ -100,7 +105,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initPanels() {
         initRegularArcExpressionPanel();
-        if(isInputArc || isTransportArc){
+        if((isInputArc || isTransportArc) && !isInhibitorArc){
             initNonDefaultColorIntervalPanel();
         }
         initWeightPanel();
@@ -269,7 +274,7 @@ public class ColoredArcGuardPanel extends JPanel {
         buttonPanel.add(removeTimeConstraintButton, gbc);
 
         ColoredTimeInterval cti = null;
-        if(isInputArc && !isTransportArc){
+        if(isInputArc && !isTransportArc && !isInhibitorArc){
             if(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().isEmpty()) {
                 cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().source().getColorType().getFirstColor());
             } else{
@@ -859,25 +864,22 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void initExpr() {
         if (!isTransportArc && isInputArc) {
-            TimedInputArc inputArc = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc();
-            if (inputArc.getArcExpression() != null) {
-                arcExpression = new PlaceHolderArcExpression();
+            ArcExpression expression;
+            if(isInputArc && !isInhibitorArc){
+                expression = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc().getArcExpression();
+            } else if(isInhibitorArc){
+                expression = ((TimedInhibitorArcComponent) objectToBeEdited).underlyingTimedInhibitorArc().getArcExpression();
+            } else{
+                expression = (((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression();
+            }
+            arcExpression = new PlaceHolderArcExpression();
+            if(expression != null){
                 updateSelection(arcExpression);
-                parseExpression(inputArc.getArcExpression());
+                parseExpression(expression);
             } else {
-                arcExpression = new PlaceHolderArcExpression();
                 exprField.setText(arcExpression.toString());
             }
-        } else if (!isTransportArc) {
-            if ((((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression() != null) {
-                arcExpression = new PlaceHolderArcExpression();
-                updateSelection(arcExpression);
-                parseExpression((((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression());
-            } else {
-                arcExpression = new PlaceHolderArcExpression();
-                exprField.setText(arcExpression.toString());
-            }
-        }else {
+        } else if(isTransportArc){
             TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
             if (isInputArc) {
                 if (transportArc.getInputExpression() != null) {
@@ -973,50 +975,33 @@ public class ColoredArcGuardPanel extends JPanel {
 
     }
     public void onOkColored() {
-        if (isInputArc) {
-            if (isTransportArc) {
-                int weight =  Integer.parseInt(colorExpressionWeightSpinner.getValue().toString());
-                TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
-                ArcExpression inputExpression = getTransportExpression(inputPanel.getColorExpression(), weight);
-                ArcExpression outputExpression = getTransportExpression(outputPanel.getColorExpression(), weight);
-                transportArc.setInputExpression(inputExpression);
-                transportArc.setOutputExpression(outputExpression);
-                /*objectToBeEditedTransport.setUnderlyingArc(transportArc);
-                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setInputExpression(inputExpression);
-                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setOutputExpression(outputExpression);
-                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setCtiList(getctiList());*/
-                transportArc.setColorTimeIntervals(getctiList());
-                ((TimedTransportArcComponent) objectToBeEdited).updateLabel(false);
-            } else {
-                TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
-                ArcExpression arcExpression = this.arcExpression;
-                inputArc.setExpression(arcExpression);
-                /*objectToBeEditedInput.setUnderlyingArc(inputArc);
-                ((ColoredInputArc)((ColoredInputArcComponent)petriNetObject).underlyingTimedInputArc()).setExpression(arcExpression);
-                ((ColoredInputArc)((ColoredInputArcComponent)petriNetObject).underlyingTimedInputArc()).setColorTimeIntervals(getctiList());*/
-                inputArc.setColorTimeIntervals(getctiList());
-                ((TimedInputArcComponent) objectToBeEdited).updateLabel(false);
-            }
+        if(isTransportArc){
+            int weight =  Integer.parseInt(colorExpressionWeightSpinner.getValue().toString());
+            TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
+            ArcExpression inputExpression = getTransportExpression(inputPanel.getColorExpression(), weight);
+            ArcExpression outputExpression = getTransportExpression(outputPanel.getColorExpression(), weight);
+            transportArc.setInputExpression(inputExpression);
+            transportArc.setOutputExpression(outputExpression);
+            transportArc.setColorTimeIntervals(getctiList());
+            ((TimedTransportArcComponent) objectToBeEdited).updateLabel(false);
+        }
+        if (!isInhibitorArc && isInputArc) {
+            TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
+            ArcExpression arcExpression = this.arcExpression;
+            inputArc.setExpression(arcExpression);
+            inputArc.setColorTimeIntervals(getctiList());
+            ((TimedInputArcComponent) objectToBeEdited).updateLabel(false);
+        } else if(isInhibitorArc){
+            TimedInhibitorArc inhibitorArc = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
+            ArcExpression arcExpression = this.arcExpression;
+            inhibitorArc.setExpression(arcExpression);
+            ((TimedInhibitorArcComponent)objectToBeEdited).updateLabel(false);
         } else {
-            if(isTransportArc){
-                int weight =  Integer.parseInt(colorExpressionWeightSpinner.getValue().toString());
-                TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
-                ArcExpression inputExpression = getTransportExpression(inputPanel.getColorExpression(), weight);
-                ArcExpression outputExpression = getTransportExpression(outputPanel.getColorExpression(), weight);
-                transportArc.setInputExpression(inputExpression);
-                transportArc.setOutputExpression(outputExpression);
-                /*objectToBeEditedTransport.setUnderlyingArc(transportArc);
-                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setInputExpression(inputExpression);
-                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setOutputExpression(outputExpression);
-                ((ColoredTransportArc)((ColoredTransportArcComponent)petriNetObject).underlyingTransportArc()).setCtiList(getctiList());*/
-                transportArc.setColorTimeIntervals(getctiList());
-                ((TimedTransportArcComponent) objectToBeEdited).updateLabel(false);
-            } else{
-                ArcExpression arcExpression = this.arcExpression;
-                TimedOutputArc outputArc = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc();
-                ((TimedOutputArcComponent) objectToBeEdited).setUnderlyingArc(outputArc);
-                outputArc.setExpression(arcExpression);
-            }
+            ArcExpression arcExpression = this.arcExpression;
+            TimedOutputArc outputArc = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc();
+            ((TimedOutputArcComponent) objectToBeEdited).setUnderlyingArc(outputArc);
+            outputArc.setExpression(arcExpression);
+            ((TimedOutputArcComponent) objectToBeEdited).updateLabel(false);
         }
     }
 
@@ -1039,7 +1024,7 @@ public class ColoredArcGuardPanel extends JPanel {
         if (isTransportArc){
             timeIntervals = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals();
         }
-        else if(isInputArc){
+        else if(isInputArc && !isInhibitorArc){
             timeIntervals = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals();
         } else{
             return;

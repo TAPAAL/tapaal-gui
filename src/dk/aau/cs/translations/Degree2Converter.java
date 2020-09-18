@@ -231,11 +231,11 @@ public class Degree2Converter {
 			if(t.presetSizeWithoutInhibitorArcs() == 1) {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_MAX_FORMAT, t.name(), 1)), 
-						inhibArc.interval().copy()));
+						inhibArc.interval().copy(), inhibArc.getArcExpression().copy()));
 			} else {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_I_IN_FORMAT, t.name(), 1)), 
-						inhibArc.interval().copy()));
+						inhibArc.interval().copy(), inhibArc.getArcExpression().copy()));
 			}
 		}
 	}

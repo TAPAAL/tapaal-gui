@@ -3,7 +3,9 @@ package pipe.gui.graphicElements.tapn;
 import java.awt.geom.Ellipse2D;
 import java.util.Hashtable;
 
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -64,23 +66,30 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		getNameLabel().setText("");
-		if(getWeight().value() > 1 || displayConstantNames){
-			getNameLabel().setText(getWeight().toString(displayConstantNames));
-		}
-		
-		boolean focusedConstant = false;
-		if(getWeight() instanceof ConstantWeight){
-			if(((ConstantWeight) getWeight()).constant().hasFocus()){
-				focusedConstant = true;
-			}
-			pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
-		}
-		if(focusedConstant){
-			getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-		}else{
-			getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
-		}
-		
+		if(!isColored()) {
+            if (getWeight().value() > 1 || displayConstantNames) {
+                getNameLabel().setText(getWeight().toString(displayConstantNames));
+            }
+
+            boolean focusedConstant = false;
+            if (getWeight() instanceof ConstantWeight) {
+                if (((ConstantWeight) getWeight()).constant().hasFocus()) {
+                    focusedConstant = true;
+                }
+                pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
+            }
+            if(focusedConstant){
+                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+            }else{
+                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+            }
+        }else{
+            ArcExpression expression = getExpression();
+		    if(expression != null){
+                getNameLabel().setText(expression.toString());
+            }
+        }
+
 		this.setLabelPosition();
 	}
 
@@ -113,7 +122,12 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		
 		return arc;
 	}
-	
+
+	public ArcExpression getExpression(){
+        if(inhibitorArc == null) return null;	// Hack to support inherited constructor (updateLabel called before inhibitorArc set when opening a saved file)
+        return inhibitorArc.getArcExpression();
+    }
+
 	@Override
 	public void setWeight(Weight weight){
 		inhibitorArc.setWeight(weight);

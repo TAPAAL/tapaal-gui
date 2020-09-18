@@ -1,5 +1,8 @@
 package dk.aau.cs.model.tapn;
 
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,16 +10,18 @@ import java.util.List;
 
 public class TimedInhibitorArc extends TimedInputArc {
 
-	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
-		this(source, destination, interval, new IntWeight(1));
+    private List<ColoredTimeInterval> colorTimeIntervals = new ArrayList<ColoredTimeInterval>();
+
+    public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, ArcExpression expression) {
+		this(source, destination, interval, new IntWeight(1), expression);
 	}
 	
-	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
-		super(source, destination, TimeInterval.ZERO_INF, weight, null);
+	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
+		super(source, destination, TimeInterval.ZERO_INF, weight, expression);
 	}
 
     public TimedInhibitorArc(TimedPlace source, TimedTransition destination) {
-        this(source, destination, TimeInterval.ZERO_INF, new IntWeight(1));
+        this(source, destination, TimeInterval.ZERO_INF, new IntWeight(1), null);
     }
 
     public List<TimeInterval> getDEnabledInterval(){
@@ -60,6 +65,6 @@ public class TimedInhibitorArc extends TimedInputArc {
 	}
 	
 	public TimedInhibitorArc copy(TimedArcPetriNet tapn) {
-		return new TimedInhibitorArc(tapn.getPlaceByName(source().name()), tapn.getTransitionByName(destination().name()), interval().copy(), getWeight());
+		return new TimedInhibitorArc(tapn.getPlaceByName(source().name()), tapn.getTransitionByName(destination().name()), interval().copy(), getWeight(), expression.copy());
 	}
 }

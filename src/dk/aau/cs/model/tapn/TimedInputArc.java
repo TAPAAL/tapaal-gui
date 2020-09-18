@@ -5,10 +5,15 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.util.IntervalOperations;
@@ -20,7 +25,7 @@ public class TimedInputArc extends TAPNElement {
 	private TimeInterval interval;
 	private final TimedTransition destination;
     private List<ColoredTimeInterval> colorTimeIntervals = new ArrayList<ColoredTimeInterval>();
-    private ArcExpression expression;
+    protected ArcExpression expression;
 
     public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
         this(source, destination, interval, new IntWeight(1), null);
@@ -162,7 +167,6 @@ public class TimedInputArc extends TAPNElement {
 	}
 
     public ArcExpression getArcExpression() {return this.expression;}
-
 
     public void setExpression(ArcExpression expression) {this.expression = expression;}
 

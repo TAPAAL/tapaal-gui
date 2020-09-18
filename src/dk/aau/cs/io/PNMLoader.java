@@ -757,7 +757,7 @@ public class PNMLoader {
 	private TimedInputArcComponent parseInputArc(String arcId, TimedPlace place, TimedTransition transition, PlaceTransitionObject source,
                                                  PlaceTransitionObject target, int weight, int _endx,
                                                  int _endy, Template template) throws FormatException {
-
+        //TODO: Add colors
 		TimedInputArc inputArc = new TimedInputArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
 		
 		Require.that(places.containsKey(inputArc.source().name()),	"The source place must be part of the petri net.");
@@ -785,7 +785,7 @@ public class PNMLoader {
 	private Arc parseOutputArc(String arcId, TimedTransition transition, TimedPlace place, PlaceTransitionObject source,
                                PlaceTransitionObject target, int weight, int _endx,
                                int _endy, Template template) throws FormatException {
-		
+		//TODO: Add colors
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place, new IntWeight(weight));
 		
 		Require.that(places.containsKey(outputArc.destination().name()), "The destination place must be part of the petri net.");
@@ -817,8 +817,8 @@ public class PNMLoader {
 						new TimedOutputArcComponent(source, target, weight, arcId)
 				),
 				(""));
-		
-		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight));
+		//TODO: Add colors
+		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight), null);
 
 		tempArc.setUnderlyingArc(inhibArc);
 		template.guiModel().addPetriNetObject(tempArc);

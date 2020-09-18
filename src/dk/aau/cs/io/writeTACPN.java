@@ -34,13 +34,14 @@ public class writeTACPN { // both export and save share some of the same syntax 
             if (arcExpr != null) {
                 arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
             }
-        } else if( arc instanceof TimedInputArcComponent) {
-            arcExpr = ((TimedInputArcComponent) arc).underlyingTimedInputArc().getArcExpression();
-            if (arcExpr != null) {
-                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
+        } else {
+            if(arc instanceof TimedInhibitorArcComponent){
+                arcExpr = ((TimedInhibitorArcComponent) arc).underlyingTimedInhibitorArc().getArcExpression();
+            } else if( arc instanceof TimedInputArcComponent) {
+                arcExpr = ((TimedInputArcComponent) arc).underlyingTimedInputArc().getArcExpression();
+            } else if (arc instanceof TimedOutputArcComponent) {
+                arcExpr = ((TimedOutputArcComponent) arc).underlyingArc().getExpression();
             }
-        } else if (arc instanceof TimedOutputArcComponent) {
-            arcExpr = ((TimedOutputArcComponent) arc).underlyingArc().getExpression();
             if (arcExpr != null) {
                 arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
             }

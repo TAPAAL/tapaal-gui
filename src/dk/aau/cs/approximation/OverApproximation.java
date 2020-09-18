@@ -174,7 +174,7 @@ public class OverApproximation implements ITAPNApproximation {
 				}
 				for (TimedInhibitorArc arc : originalInhibitor) {
 					if (arc.destination() == firedTransition) {
-						net.add(new TimedInhibitorArc(arc.source(), copyTransition, arc.interval(), arc.getWeight()));
+						net.add(new TimedInhibitorArc(arc.source(), copyTransition, arc.interval(), arc.getWeight(), arc.getArcExpression()));
 					}
 				}
 				for (TransportArc arc : originalTransport) {
