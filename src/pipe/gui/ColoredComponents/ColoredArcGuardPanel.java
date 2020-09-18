@@ -274,17 +274,17 @@ public class ColoredArcGuardPanel extends JPanel {
         buttonPanel.add(removeTimeConstraintButton, gbc);
 
         ColoredTimeInterval cti = null;
-        if(isInputArc && !isTransportArc && !isInhibitorArc){
-            if(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().isEmpty()) {
-                cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().source().getColorType().getFirstColor());
-            } else{
-                cti = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().get(0);
-            }
-        } else if(isInputArc && isTransportArc){
+        if(isTransportArc){
             if(((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals().isEmpty()) {
                 cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().source().getColorType().getFirstColor());
             } else{
                 cti = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals().get(0);
+            }
+        } else if(isInputArc && !isInhibitorArc){
+            if(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().isEmpty()) {
+                cti = ColoredTimeInterval.ZERO_INF_DYN_COLOR(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().source().getColorType().getFirstColor());
+            } else{
+                cti = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().getColorTimeIntervals().get(0);
             }
         }
         gbc = new GridBagConstraints();
@@ -859,7 +859,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void initExpr() {
-        if (!isTransportArc && isInputArc) {
+        if (!isTransportArc) {
             ArcExpression expression;
             if(isInputArc && !isInhibitorArc){
                 expression = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc().getArcExpression();
@@ -875,7 +875,7 @@ public class ColoredArcGuardPanel extends JPanel {
             } else {
                 exprField.setText(arcExpression.toString());
             }
-        } else if(isTransportArc){
+        } else {
             TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
             if (isInputArc) {
                 if (transportArc.getInputExpression() != null) {
