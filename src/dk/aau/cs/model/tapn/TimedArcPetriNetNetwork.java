@@ -443,8 +443,13 @@ public class TimedArcPetriNetNetwork {
 	public void undoSort(SharedTransition[] oldOrder) {
 		sharedTransitions.clear();
 		sharedTransitions.addAll(Arrays.asList(oldOrder));
-	}	
-	
+	}
+
+	//TODO: maybe should be more extensive than this
+    //E.g. check expressions, invariants, intervals and tokens
+	public boolean hasColors(){
+	    return colorTypes.size() > 1 || variables.size() > 0;
+    }
 	public boolean isUntimed(){
 		for(TimedArcPetriNet t : tapns){
 			if(!t.isUntimed()){
