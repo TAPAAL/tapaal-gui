@@ -24,6 +24,7 @@ import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
@@ -215,9 +216,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
             ColorType ct = p.underlyingPlace().getColorType();
-            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
             Vector<ColorExpression> vecColorExpr = new Vector<>();
-            vecColorExpr.add(userOperatorExpression);
+            if(ct instanceof ProductType){
+                Vector<ColorExpression> tempVec = new Vector();
+                for(ColorType colorType : ((ProductType)ct).getColorTypes()){
+                    tempVec.add(new UserOperatorExpression(colorType.getFirstColor()));
+                }
+                TupleExpression tupleExpr = new TupleExpression(tempVec);
+                vecColorExpr.add(tupleExpr);
+            } else{
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                vecColorExpr.add(userOperatorExpression);
+            }
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             TimedInputArc tia = new TimedInputArc(
                 p.underlyingPlace(),
