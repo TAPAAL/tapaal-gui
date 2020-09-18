@@ -14,7 +14,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +64,12 @@ public class ColorTypeDialogPanel extends JPanel {
     private JButton cyclicRemoveButton;
     private JButton okButton;
     private JScrollPane scrollPane;
+    private static final String removeColorInColorTypeMessage = "You have removed a color in this color type. " +
+        "\nAll tokens of this color will be removed and all usages of this color in Arc expressions and guards will also be removed,\n " +
+        "while maintaing as much of the expression as possible.\n" +
+        "If the arc expressions are empty they will be converted to 1'{topColor}.\n" +
+        "If the guards are empty they will be removed.\n\n" +
+        "Do you wish to continue?";
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
                                 TimedArcPetriNetNetwork network) {
@@ -695,8 +700,19 @@ public class ColorTypeDialogPanel extends JPanel {
                         return;
                     }
                     if (oldColorType != null) {
-                        network.updateColorType(oldColorType.getName(), newColorType);
-                        colorTypesListModel.updateName();
+                        boolean showDialog = false;
+                        for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
+                            if(!newColorType.getColors().contains(c)){
+                                showDialog = true;
+                            }
+                        }
+                        if(showDialog){
+                            int cont = JOptionPane.showConfirmDialog(this,  removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                            if(cont == JOptionPane.OK_OPTION){
+                                network.updateColorType(oldColorType.getName(), newColorType);
+                                colorTypesListModel.updateName();
+                            }
+                        }
                     } else {
                         colorTypesListModel.addElement(newColorType);
                     }
@@ -708,9 +724,21 @@ public class ColorTypeDialogPanel extends JPanel {
                     for(int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
                         newColorType.addColor(String.valueOf(i));
                     }
+
                     if (oldColorType != null) {
-                        network.updateColorType(oldColorType.getName(), newColorType);
-                        colorTypesListModel.updateName();
+                        boolean showDialog = false;
+                        for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
+                            if(!newColorType.getColors().contains(c)){
+                                showDialog = true;
+                            }
+                        }
+                        if(showDialog) {
+                            int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                            if (cont == JOptionPane.OK_OPTION) {
+                                network.updateColorType(oldColorType.getName(), newColorType);
+                                colorTypesListModel.updateName();
+                            }
+                        }
                     }
                     else
                         colorTypesListModel.addElement(newColorType);
@@ -728,8 +756,20 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                     }
                     if (oldColorType != null) {
-                        network.updateColorType(oldColorType.getName(), productType);
-                        colorTypesListModel.updateName();
+                        boolean showDialog = false;
+                        for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
+                            if(!newColorType.getColors().contains(c)){
+                                showDialog = true;
+                            }
+                        }
+                        if(showDialog) {
+                            int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                            if (cont == JOptionPane.OK_OPTION) {
+
+                                network.updateColorType(oldColorType.getName(), productType);
+                                colorTypesListModel.updateName();
+                            }
+                        }
                     } else {
                         colorTypesListModel.addElement(productType);
                     }

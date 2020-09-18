@@ -98,7 +98,15 @@ public class ConstantsPane extends JPanel implements SidePane {
     private static final String toolTipMoveUpColorType = "Move the selected color type up";
     private static final String toolTipMoveDownColorType = "Move down the selected color type";
     private static final String toolTipColorTypeList = "Shows all color types and product types. Product types are noted with DOMAIN. only usable in CPN";
-
+    private static final String removeColorTypeMessage = "Removing this color type will result the following:\n" +
+        "All places with this color type will be converted to dot types. Any arc from these places will have their expression reset to 1'dot.\n" +
+        "The colortype will be pruned from guard expressions, maintaining as much of the expression as possible.\n" +
+        "Variables of this color type will be removed." +
+        "All products using this colortype will be removed recursively.\n\n" +
+        "Do you wish to continue?";
+    private static final String removeVariableMessage = "Removing this variable will result in the following:\n" +
+        "Anywhere the variable is used will be replaced with the topmost color of the variables color type.\n\n" +
+        "Do you wish to continue?";
 	Timer timer;
 
 
@@ -813,18 +821,21 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(Variable variable) {
-            network.remove(variable);
-            fireContentsChanged(this, 0, getSize());
-            int numElements = list.getModel().getSize();
-            if(numElements <= 1) {
-                moveDownButton.setEnabled(false);
-                moveUpButton.setEnabled(false);
+            int cont = JOptionPane.showConfirmDialog(CreateGui.getApp(),  removeVariableMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if(cont == JOptionPane.OK_OPTION) {
+                network.remove(variable);
+                fireContentsChanged(this, 0, getSize());
+                int numElements = list.getModel().getSize();
+                if (numElements <= 1) {
+                    moveDownButton.setEnabled(false);
+                    moveUpButton.setEnabled(false);
+                }
+                if (numElements <= 0) {
+                    editBtn.setEnabled(false);
+                    editBtn.setEnabled(false);
+                }
+                updateName();
             }
-            if (numElements <= 0) {
-                editBtn.setEnabled(false);
-                editBtn.setEnabled(false);
-            }
-            updateName();
         }
 
         public void updateName() {
@@ -893,18 +904,21 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(ColorType colorType) {
-            network.remove(colorType);
-            fireContentsChanged(this, 0, getSize());
-            int numElements = list.getModel().getSize();
-            if (numElements <= 1) {
-                moveDownButton.setEnabled(false);
-                moveUpButton.setEnabled(false);
+            int cont = JOptionPane.showConfirmDialog(CreateGui.getApp(),  removeColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if(cont == JOptionPane.OK_OPTION) {
+                network.remove(colorType);
+                fireContentsChanged(this, 0, getSize());
+                int numElements = list.getModel().getSize();
+                if (numElements <= 1) {
+                    moveDownButton.setEnabled(false);
+                    moveUpButton.setEnabled(false);
+                }
+                if (numElements <= 0) {
+                    removeBtn.setEnabled(false);
+                    editBtn.setEnabled(false);
+                }
+                updateName();
             }
-            if (numElements <= 0) {
-                removeBtn.setEnabled(false);
-                editBtn.setEnabled(false);
-            }
-            updateName();
         }
 
         public void updateName() {
