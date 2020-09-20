@@ -945,7 +945,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.setText(newProperty.toString());
 
         ExprStringPosition position;
-        if (newProperty.containsPlaceHolder()) {
+        if (!(newSelection instanceof  ColorExpression) && newProperty.containsPlaceHolder()) {
             Expression ge = newProperty.findFirstPlaceHolder();
             position = newProperty.indexOf(ge);
         }
