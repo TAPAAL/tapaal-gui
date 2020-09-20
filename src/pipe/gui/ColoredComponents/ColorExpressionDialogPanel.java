@@ -389,7 +389,7 @@ public class ColorExpressionDialogPanel extends JPanel {
             }
         });
 
-        predButton.addActionListener((ActionListener) actionEvent -> {
+        predButton.addActionListener(actionEvent -> {
             PredecessorExpression predExpr;
             if (currentSelection.getObject() instanceof ColorExpression) {
                 predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
@@ -398,7 +398,7 @@ public class ColorExpressionDialogPanel extends JPanel {
             }
         });
 
-        succButton.addActionListener((ActionListener) actionEvent -> {
+        succButton.addActionListener(actionEvent -> {
             SuccessorExpression succExpr;
             if (currentSelection.getObject() instanceof  ColorExpression) {
                 succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
