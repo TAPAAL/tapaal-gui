@@ -929,7 +929,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 smartDrawAction.setEnabled(true);
                 mergeComponentsDialogAction.setEnabled(true);
-                workflowDialogAction.setEnabled(true);
+                if (gameFeatureOptions.getSelectedIndex() == 1) {
+                    workflowDialogAction.setEnabled(false);
+                } else {
+                    workflowDialogAction.setEnabled(true);
+                }
 
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
