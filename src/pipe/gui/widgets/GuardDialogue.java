@@ -75,10 +75,8 @@ public class GuardDialogue extends JPanel /*
 		setLayout(new GridBagLayout());
 
 		initTimeGuardPanel();
-
-        if(!objectToBeEdited.isTimed() ){
-            guardEditPanel.setVisible(false);
-        }
+        guardEditPanel.setVisible(objectToBeEdited.isTimed() && objectToBeEdited instanceof TimedInputArcComponent
+            && !(objectToBeEdited instanceof TimedInhibitorArcComponent));
 
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
