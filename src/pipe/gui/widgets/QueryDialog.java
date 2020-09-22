@@ -209,7 +209,7 @@ public class QueryDialog extends JPanel {
 
 	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
-	private final static EngineSupportOptions verifyTAPNOptions= new VerifyPNEngineOptions();
+	private final static EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
     private final static EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
     private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
     private final static EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
