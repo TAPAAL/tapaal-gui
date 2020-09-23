@@ -239,12 +239,12 @@ public class QueryDialog extends JPanel {
 
 	//Tool tip for query field
 	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on a part of the query you want to edit.<br />" +
-			"(Queries can be edited also manually by pressing the \"Edit Query\" button.)</html>";
+			"(Queries can also be edited manually by pressing the \"Edit Query\" button.)</html>";
 
 	//Tool tips for quantification panel
 	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
-	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Available only for some verification engines.)";
-	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maxiaml trace there is marking that satisfies the given property. (Available only for some verification engines.)";
+	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Only available for some verification engines.)";
+	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maximal trace there is a marking that satisfies the given property. (Only available for some verification engines.)";
 	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
 
     private static final String TOOL_TIP_EXISTS_UNTIL = "There is a computation where the first formula holds until the second one holds.";
@@ -279,7 +279,7 @@ public class QueryDialog extends JPanel {
 
 	//Tool tips for boundedness check panel
 	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "A number of extra tokens allowed in the net.";
-	private static final String TOOL_TIP_KBOUNDED = "Check wheather the net is bounded for the given number of extra tokens.";
+	private static final String TOOL_TIP_KBOUNDED = "Check whether the net is bounded for the given number of extra tokens.";
 
 	//Tool tips for reduction options panel
 	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose a verification engine.";
@@ -292,11 +292,11 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
     private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "Apply structural reductions to reduce the size of the net.";
-    private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freeness by using siphon-trap analysis via linear programming.";
+    private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freedom by using siphon-trap analysis via linear programming.";
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
 
 	//Tool tips for search options panel
-	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
+	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
 			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
