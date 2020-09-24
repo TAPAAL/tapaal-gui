@@ -32,9 +32,11 @@ import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 
@@ -77,6 +79,9 @@ public class GuardDialogue extends JPanel /*
 		initTimeGuardPanel();
         guardEditPanel.setVisible(objectToBeEdited.isTimed() && objectToBeEdited instanceof TimedInputArcComponent
             && !(objectToBeEdited instanceof TimedInhibitorArcComponent));
+        if(objectToBeEdited instanceof TimedTransportArcComponent && ((TimedTransportArcComponent) objectToBeEdited).getSource() instanceof Transition){
+            guardEditPanel.setVisible(false);
+        }
 
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
