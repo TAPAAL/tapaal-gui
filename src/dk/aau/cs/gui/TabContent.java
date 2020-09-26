@@ -217,17 +217,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
             ColorType ct = p.underlyingPlace().getColorType();
             Vector<ColorExpression> vecColorExpr = new Vector<>();
-            if(ct instanceof ProductType){
-                Vector<ColorExpression> tempVec = new Vector();
-                for(ColorType colorType : ((ProductType)ct).getColorTypes()){
-                    tempVec.add(new UserOperatorExpression(colorType.getFirstColor()));
-                }
-                TupleExpression tupleExpr = new TupleExpression(tempVec);
-                vecColorExpr.add(tupleExpr);
-            } else{
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
-                vecColorExpr.add(userOperatorExpression);
-            }
+            vecColorExpr.add(createColorExpression(ct));
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             TimedInputArc tia = new TimedInputArc(
                 p.underlyingPlace(),
@@ -252,6 +242,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
             undoManager.addNewEdit(edit);
 
             return new Result<>(tiac);
+        }
+
+        private ColorExpression createColorExpression(ColorType ct) {
+            if(ct instanceof ProductType){
+                Vector<ColorExpression> tempVec = new Vector();
+                for(ColorType colorType : ((ProductType)ct).getColorTypes()){
+                    tempVec.add(createColorExpression(colorType));
+                }
+                TupleExpression tupleExpr = new TupleExpression(tempVec);
+                return tupleExpr;
+            } else{
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                return userOperatorExpression;
+            }
         }
 
         public Result<TimedOutputArcComponent, ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {

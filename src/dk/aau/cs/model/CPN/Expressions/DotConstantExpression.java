@@ -1,8 +1,11 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+
+import java.util.List;
 
 public class DotConstantExpression extends ColorExpression {
 
@@ -13,6 +16,15 @@ public class DotConstantExpression extends ColorExpression {
     @Override
     public boolean hasColor(Color color) {
         return color.getColorName() == "dot";
+    }
+
+    @Override
+    public ColorType getColorType(List<ColorType> colorTypes) {
+        return getColorType();
+    }
+
+    public ColorType getColorType() {
+        return ColorType.COLORTYPE_DOT;
     }
 
     @Override

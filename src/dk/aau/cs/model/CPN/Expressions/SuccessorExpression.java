@@ -1,10 +1,12 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.List;
 import java.util.Set;
 
 public class SuccessorExpression extends ColorExpression {
@@ -26,6 +28,11 @@ public class SuccessorExpression extends ColorExpression {
     @Override
     public boolean hasColor(Color color) {
         return this.color.hasColor(color);
+    }
+
+    @Override
+    public ColorType getColorType(List<ColorType> colorTypes) {
+        return color.getColorType(colorTypes);
     }
 
     @Override

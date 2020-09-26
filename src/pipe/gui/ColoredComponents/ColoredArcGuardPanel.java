@@ -30,6 +30,7 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -61,6 +62,7 @@ public class ColoredArcGuardPanel extends JPanel {
             this.colorType = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc().destination().getColorType();
         }
         this.context = context;
+        selectedColorType = this.colorType;
         this.setLayout(new GridBagLayout());
         initPanels();
         initExpr();
@@ -716,7 +718,7 @@ public class ColoredArcGuardPanel extends JPanel {
         Vector<ColorExpression> exprVec = new Vector();
         if (!useVariableCheckBox.isSelected()){
             TupleExpression tupleExpression;
-            if (colorType instanceof ProductType) {
+            if (selectedColorType instanceof ProductType) {
                 Vector<ColorExpression> tempVec = new Vector();
                 for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
                     ColorExpression expr;
@@ -745,10 +747,19 @@ public class ColoredArcGuardPanel extends JPanel {
             VariableExpression varExpr = new VariableExpression(var);
             exprVec.add(varExpr);
         }
-        Integer value = (Integer) numberExpressionJSpinner.getValue();
-        NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
-        arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
-        updateSelection(numbExpr);
+
+        if (currentSelection.getObject() instanceof ArcExpression) {
+            Integer value = (Integer) numberExpressionJSpinner.getValue();
+            NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
+            arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
+            updateSelection(numbExpr);
+        } else {
+            //TODO: add implementation for when the vector has more than one element, if that can ever happen
+            ColorExpression colorExpr = exprVec.firstElement();
+            arcExpression = arcExpression.replace(currentSelection.getObject(), colorExpr);
+            updateSelection(colorExpr);
+        }
+
     }
 
     private void parseExpression(ArcExpression expressionToParse) {
@@ -906,6 +917,9 @@ public class ColoredArcGuardPanel extends JPanel {
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
+        updateSelectedColorType();
+        updateNumberExpressionsPanel();
+
         toggleEnabledButtons();
     }
 
@@ -924,9 +938,33 @@ public class ColoredArcGuardPanel extends JPanel {
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
+        updateSelectedColorType();
+        updateNumberExpressionsPanel();
+
+
         toggleEnabledButtons();
 
     }
+
+    private void updateSelectedColorType(){
+        ColorType newSelectedColorType = getCurrentSelectionColorType();
+        if (newSelectedColorType != null) {
+            selectedColorType = newSelectedColorType;
+        } else {
+            selectedColorType = colorType;
+        }
+    }
+
+    private void updateNumberExpressionsPanel() {
+        colorExpressionComboBoxPanel.updateColorType(selectedColorType);
+        getVariables();
+        if (currentSelection.getObject() instanceof ColorExpression) {
+            numberExpressionJSpinner.setVisible(false);
+        } else {
+            numberExpressionJSpinner.setVisible(true);
+        }
+    }
+
     private void toggleEnabledButtons() {
         if(currentSelection == null){
             allExpressionButton.setEnabled(false);
@@ -940,7 +978,7 @@ public class ColoredArcGuardPanel extends JPanel {
             addAdditionPlaceHolderButton.setEnabled(false);
         }
         if (currentSelection.getObject() instanceof ColorExpression) {
-            addExpressionButton.setEnabled(false);
+            addExpressionButton.setEnabled(true);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
@@ -1040,17 +1078,29 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void getVariables(){
+        variableCombobox.removeAllItems();
         for (Variable element : context.network().variables()) {
-            if (element.getColorType().getName().equals(colorType.getName())) {
+            if (element.getColorType().getName().equals(selectedColorType.getName())) {
                 variableCombobox.addItem(element);
             }
         }
         if(variableCombobox.getItemCount() < 1){
             useVariableCheckBox.setEnabled(false);
+        } else {
+            useVariableCheckBox.setEnabled(true);
         }
     }
 
+    private ColorType getCurrentSelectionColorType() {
+        if ( currentSelection.getObject() instanceof ColorExpression) {
+            return ((ColorExpression) currentSelection.getObject()).getColorType(context.network().colorTypes());
+        }
+
+        return null;
+    }
+
     private ColorType colorType;
+    private ColorType selectedColorType;
     private JPanel regularArcExprPanel;
     JPanel nonDefaultArcColorIntervalPanel;
     JPanel transportWeightPanel;

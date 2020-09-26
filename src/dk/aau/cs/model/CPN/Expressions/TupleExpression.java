@@ -55,6 +55,26 @@ public class TupleExpression extends ColorExpression {
         }
     }
 
+    @Override
+    public ColorType getColorType(List<ColorType> colorTypes) {
+        Vector<ColorType> expressionColorTypes = new Vector<ColorType>();
+
+        for (ColorExpression ce : this.colors) {
+            expressionColorTypes.add(ce.getColorType(colorTypes));
+        }
+
+        for (ColorType ct : colorTypes) {
+            if (ct instanceof ProductType) {
+                ProductType pt = (ProductType) ct;
+                if (pt.containsTypes(expressionColorTypes)) {
+                    return pt;
+                }
+            }
+        }
+
+        return  null;
+    }
+
     public void addColorExpression(ColorExpression expr) {
         colors.add(expr);
     }

@@ -1,8 +1,11 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+
+import java.util.List;
 
 public class UserOperatorExpression extends ColorExpression {
 
@@ -23,6 +26,11 @@ public class UserOperatorExpression extends ColorExpression {
     @Override
     public boolean hasColor(Color color) {
         return userOperator.equals(color);
+    }
+
+    @Override
+    public ColorType getColorType(List<ColorType> colorTypes) {
+        return userOperator.getColorType();
     }
 
     @Override

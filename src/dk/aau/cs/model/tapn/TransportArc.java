@@ -62,7 +62,7 @@ public class TransportArc extends TAPNElement {
 		return weight;
 	}
         
-        public Weight getWeightValue(){
+	public Weight getWeightValue(){
                 return new IntWeight(weight.value());
 	}
 	

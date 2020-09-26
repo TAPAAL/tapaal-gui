@@ -6,11 +6,16 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.List;
 import java.util.Set;
 
 public class AllExpression extends ColorExpression {
 
     private ColorType sort;
+
+    public ColorType getColorType(List<ColorType> colorTypes){
+        return getColorType();
+    }
 
     public ColorType getColorType(){
         return this.sort;
