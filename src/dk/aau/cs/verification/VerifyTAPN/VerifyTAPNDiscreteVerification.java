@@ -286,6 +286,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		return verify(options, model, exportedModel, query);
 	}
 
+	//An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
 	private void addGhostPlace(TimedArcPetriNet net) {
 	    net.add(new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0))));
     }
