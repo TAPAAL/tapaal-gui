@@ -54,6 +54,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     boolean showComponents = true;
     boolean showSharedPT = true;
     boolean showConstants = true;
+    boolean showColoredTokens = true;
     boolean showQueries = true;
     boolean showEnabledTransitions = true;
     boolean showDelayEnabledTransitions = true;
@@ -76,6 +77,9 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         showConstants = prefs.getShowConstants();
         guiFrame.setShowConstantsSelected(showConstants);
+
+        showColoredTokens = prefs.getShowColoredTokens();
+        guiFrame.setShowColoredTokensSelected(showColoredTokens);
 
         showEnabledTransitions = prefs.getShowEnabledTransitions();
         guiFrame.setShowEnabledTransitionsSelected(showEnabledTransitions);
@@ -215,6 +219,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         prefs.setShowComponents(showComponents);
         prefs.setShowQueries(showQueries);
         prefs.setShowConstants(showConstants);
+        prefs.setShowColoredTokens(showColoredTokens);
 
         prefs.setShowEnabledTrasitions(showEnabledTransitions);
         prefs.setShowDelayEnabledTransitions(showDelayEnabledTransitions);
@@ -612,6 +617,18 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowTokenAgeSelected(showTokenAge);
         currentTab.ifPresent(TabContentActions::repaintAll);
 
+    }
+
+    @Override
+    public void toggleColorTokens(){
+        setColorTokens(!showColoredTokens);
+    }
+    public void setColorTokens(boolean b){
+        showColoredTokens = b;
+
+        Preferences.getInstance().setShowColoredTokens(showColoredTokens);
+        guiFrame.setShowColoredTokensSelected(showColoredTokens);
+        currentTab.ifPresent(TabContentActions::repaintAll);
     }
 
     @Override

@@ -186,6 +186,14 @@ public class Preferences {
 		return pref.getBoolean("constantPanel", true);
 	}
 
+    public void setShowColoredTokens(boolean show){
+        pref.putBoolean("coloredTokens", show);
+    }
+
+    public boolean getShowColoredTokens(){
+        return pref.getBoolean("coloredTokens", true);
+    }
+
 	public void setEditorModelRoot(Split modelRoot){
 		try{
 			saveSerilizableObject("editorModelRoot", modelRoot);

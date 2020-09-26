@@ -2845,26 +2845,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel,
                 e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
             );
-            registerEvent(
-                e->e.a == MouseAction.entered && e.pno instanceof PlaceTransitionObject && lens.isColored(),
-                e->mouseEnterPTO((PlaceTransitionObject)e.pno)
-            );
-            registerEvent(
-                e->e.a == MouseAction.exited && e.pno instanceof PlaceTransitionObject && lens.isColored(),
-                e->mouseExitPTO((PlaceTransitionObject)e.pno)
-            );
 
-        }
-
-        void mouseEnterPTO(PlaceTransitionObject pto) {
-            if (pto instanceof TimedPlaceComponent) {
-                ((TimedPlaceComponent) pto).showAgeOfTokens(true);
-            }
-        }
-        void mouseExitPTO(PlaceTransitionObject pto) {
-            if (pto instanceof TimedPlaceComponent) {
-                ((TimedPlaceComponent) pto).showAgeOfTokens(false);
-            }
         }
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {

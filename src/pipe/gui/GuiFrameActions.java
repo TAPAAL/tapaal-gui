@@ -46,6 +46,7 @@ public interface GuiFrameActions {
     void setShowComponentsSelected(boolean b);
     void setShowSharedPTSelected(boolean b);
     void setShowConstantsSelected(boolean b);
+    void setShowColoredTokensSelected(boolean b);
     void setShowQueriesSelected(boolean b);
     void setShowEnabledTransitionsSelected(boolean b);
     void setShowDelayEnabledTransitionsSelected(boolean b);

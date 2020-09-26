@@ -287,7 +287,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private final GuiAction showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('9', shortcutkey), true) {
+    private final GuiAction showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('0', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleTokenAge);
         }
@@ -312,22 +312,27 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
         }
     };
-    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('7', shortcutkey), true) {
+    private final GuiAction showColoredTokensAction = new GuiAction("Display colored tokens", "Show/hide the colored tokens in each place.", KeyStroke.getKeyStroke('5', shortcutkey),  true) {
+        public void actionPerformed(ActionEvent e) {
+            guiFrameController.ifPresent(GuiFrameControllerActions::toggleColorTokens);
+        }
+    };
+    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('8', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
         }
     };
-    private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('5', shortcutkey), true) {
+    private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('6', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
         }
     };
-    private final GuiAction showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('6', shortcutkey), true) {
+    private final GuiAction showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('7', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDelayEnabledTransitions);
         }
     };
-    private final GuiAction showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('8', shortcutkey), true) {
+    private final GuiAction showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('9', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
@@ -441,6 +446,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
     private JCheckBoxMenuItem showTokenAgeCheckBox;
     private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
+    private JCheckBoxMenuItem showColoredTokensCheckbox;
 
     private JMenu zoomMenu;
 
@@ -668,6 +674,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         addCheckboxMenuItem(viewMenu, showQueriesAction);
 
         addCheckboxMenuItem(viewMenu, showConstantsAction);
+
+        showColoredTokensCheckbox = addCheckboxMenuItem(viewMenu, showColoredTokensAction);
 
         addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction);
 
@@ -963,6 +971,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 showSharedPTAction.setEnabled(false);
                 showConstantsAction.setEnabled(false);
+                showColoredTokensAction.setEnabled(false);
                 showQueriesAction.setEnabled(false);
 
                 stepbackwardAction.setEnabled(true);
@@ -1067,6 +1076,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showComponentsAction.setEnabled(enable);
         showSharedPTAction.setEnabled(enable);
         showConstantsAction.setEnabled(enable);
+        showColoredTokensAction.setEnabled(enable);
         showQueriesAction.setEnabled(enable);
         showZeroToInfinityIntervalsAction.setEnabled(enable);
         showEnabledTransitionsAction.setEnabled(enable);
@@ -1265,6 +1275,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             showTokenAgeCheckBox.setVisible(true);
             showDelayEnabledTransitionsCheckbox.setVisible(true);
         }
+
+        if(!getCurrentTab().getLens().isColored()) {
+            showColoredTokensCheckbox.setVisible(false);
+        } else {
+            showColoredTokensCheckbox.setVisible(true);
+        }
     }
 
     private void fixBug812694GrayMenuAfterSimulationOnMac() {
@@ -1316,6 +1332,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     public void setShowConstantsSelected(boolean b) {
         showConstantsAction.setSelected(b);
     }
+
+    @Override
+    public void setShowColoredTokensSelected(boolean b) { showColoredTokensAction.setSelected(b); }
 
     @Override
     public void setShowQueriesSelected(boolean b) {
@@ -1587,6 +1606,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     public boolean showTokenAge() {
         return Preferences.getInstance().getShowTokenAge();
+    }
+
+    public boolean showColoredTokens() {
+        return Preferences.getInstance().getShowColoredTokens();
     }
 
     public int getSelectedTabIndex() {
