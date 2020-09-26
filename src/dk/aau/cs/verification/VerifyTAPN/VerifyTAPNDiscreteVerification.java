@@ -6,10 +6,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.TAPNQuery;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
@@ -275,6 +272,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		//throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
+		if (CreateGui.getCurrentTab().getLens().isGame() && !CreateGui.getCurrentTab().getLens().isTimed()) {
+		    addGhostPlace(model.value1());
+        }
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens());
@@ -285,6 +285,10 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		return verify(options, model, exportedModel, query);
 	}
+
+	private void addGhostPlace(TimedArcPetriNet net) {
+	    net.add(new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0))));
+    }
 
 	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions) options;
