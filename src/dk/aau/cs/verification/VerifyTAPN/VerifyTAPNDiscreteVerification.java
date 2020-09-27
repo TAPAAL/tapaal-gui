@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -288,7 +289,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	//An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
 	private void addGhostPlace(TimedArcPetriNet net) {
-	    net.add(new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0))));
+	    TimedPlace place = new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0)));
+	    net.add(place);
+        place.addToken(new TimedToken(place, new BigDecimal(0)));
     }
 
 	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
