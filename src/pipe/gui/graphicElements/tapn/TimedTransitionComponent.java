@@ -215,7 +215,6 @@ public class TimedTransitionComponent extends Transition {
 		    g.setColor(isUncontrollable() ? Color.BLACK : Color.WHITE);
 			g.fillOval(11, 11, 8,8);
 		}
-
 	}
 
 	@Override
