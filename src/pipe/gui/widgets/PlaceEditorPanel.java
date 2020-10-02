@@ -11,6 +11,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 
+import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
@@ -25,14 +26,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.undo.ChangedInvariantCommand;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
-import dk.aau.cs.gui.undo.MakePlaceNewSharedCommand;
-import dk.aau.cs.gui.undo.MakePlaceNewSharedMultiCommand;
-import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
-import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.RequireException;
 
@@ -1125,16 +1118,15 @@ public class PlaceEditorPanel extends JPanel {
 
 
     public boolean doOKColored() {
+        ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
         ArrayList<TimedToken> tokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+        doNewEdit = false;
 
-        for (TimedToken token : tokenList) {
-            context.activeModel().marking().remove(token);
-        }
         for(int row = 0; row < tableModel.getRowCount(); row++){
             int numberToAdd = (int)tableModel.getValueAt(row,0);
             TimedToken tokenTypeToAdd = (TimedToken) tableModel.getValueAt(row,1);
             for (int i = 0; i < numberToAdd; i++) {
-                context.activeModel().marking().add(tokenTypeToAdd);
+                tokensToAdd.add(tokenTypeToAdd);
             }
         }
 
@@ -1143,8 +1135,9 @@ public class PlaceEditorPanel extends JPanel {
             ctiList.add((ColoredTimeInvariant) timeConstraintListModel.get(i));
         }
 
-        place.underlyingPlace().setCtiList(ctiList);
-        place.underlyingPlace().setColorType(colorType);
+        Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
+        command.redo();
+        context.undoManager().addNewEdit(command);
 
         return true;
     }
