@@ -645,7 +645,7 @@ public class PlaceEditorPanel extends JPanel {
 			}
 		}
 		//TODO: Look at this
-        if(place.isTimed() && !place.isColored()){
+        if(!place.isColored()){
             if(newMarking != place.underlyingPlace().numberOfTokens()){
                 Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
                 command.redo();
