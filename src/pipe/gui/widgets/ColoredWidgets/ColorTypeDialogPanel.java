@@ -70,6 +70,9 @@ public class ColorTypeDialogPanel extends JPanel {
         "If the arc expressions are empty they will be converted to 1'{topColor}.\n" +
         "If the guards are empty they will be removed.\n\n" +
         "Do you wish to continue?";
+    private static final String editProductTypeMessage = "Editing product types will result in removing all tokens in all places with this colortype\n" +
+        "All arc expressions from such a place will also be reset to 1'{topColor}" +
+        "Do you wish to continue?";
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
                                 TimedArcPetriNetNetwork network) {
@@ -546,7 +549,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypeComboBox = new JComboBox();
 
         for (ColorType element : colorTypes) {
-            productTypeComboBox.addItem(element.getName());
+            productTypeComboBox.addItem(element);
         }
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridx = 1;
@@ -566,6 +569,16 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypePanel.add(productButtonPanel, gbc);
 
         productColorTypeList = new JList();
+        productColorTypeList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                JList source = (JList) e.getSource();
+                if (source.getSelectedIndex() == -1) {
+                    productRemoveButton.setEnabled(false);
+                } else{
+                    productRemoveButton.setEnabled(true);
+                }
+            }
+        });
         JScrollPane productColorsListScrollPane = new JScrollPane(productColorTypeList);
         productColorsListScrollPane.setViewportView(productColorTypeList);
         productColorsListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -613,6 +626,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productRemoveButton.addActionListener(e -> {
 
             productModel.removeElementAt(productColorTypeList.getSelectedIndex());
+            productColorTypeList.setModel(productModel);
             if(productModel.size() == 0) {
                 productRemoveButton.setEnabled(false);
             }
@@ -712,6 +726,9 @@ public class ColorTypeDialogPanel extends JPanel {
                                 network.updateColorType(oldColorType.getName(), newColorType);
                                 colorTypesListModel.updateName();
                             }
+                        } else{
+                            network.updateColorType(oldColorType.getName(), newColorType);
+                            colorTypesListModel.updateName();
                         }
                     } else {
                         colorTypesListModel.addElement(newColorType);
@@ -738,10 +755,14 @@ public class ColorTypeDialogPanel extends JPanel {
                                 network.updateColorType(oldColorType.getName(), newColorType);
                                 colorTypesListModel.updateName();
                             }
+                        } else{
+                            network.updateColorType(oldColorType.getName(), newColorType);
+                            colorTypesListModel.updateName();
                         }
                     }
-                    else
+                    else {
                         colorTypesListModel.addElement(newColorType);
+                    }
                 }
                 else if(selectedColorType.equals(productColor)) {
                     ProductType productType = new ProductType(name);
@@ -757,18 +778,24 @@ public class ColorTypeDialogPanel extends JPanel {
                     }
                     if (oldColorType != null) {
                         boolean showDialog = false;
-                        for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                            if(!newColorType.getColors().contains(c)){
+                        for(ColorType ct : ((ProductType)oldColorType).getColorTypes()){
+                            if(!productType.getColorTypes().contains(ct)){
                                 showDialog = true;
                             }
                         }
+                        if(!showDialog && ((ProductType)oldColorType).getColorTypes().size() != productType.getColorTypes().size()){
+                            showDialog = true;
+                        }
                         if(showDialog) {
-                            int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                            int cont = JOptionPane.showConfirmDialog(this, "<html>" + editProductTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
 
                                 network.updateColorType(oldColorType.getName(), productType);
                                 colorTypesListModel.updateName();
                             }
+                        } else{
+                            network.updateColorType(oldColorType.getName(), productType);
+                            colorTypesListModel.updateName();
                         }
                     } else {
                         colorTypesListModel.addElement(productType);

@@ -53,12 +53,12 @@ public class ProductType extends ColorType {
     public boolean contains(Color color){
         for(ColorType ct : constituents){
             for(Color c : color.getTuple()){
-                if(ct.contains(c)){
-                    return true;
+                if(!ct.contains(c)){
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
 

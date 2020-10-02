@@ -15,6 +15,10 @@ import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
@@ -1135,11 +1139,81 @@ public class PlaceEditorPanel extends JPanel {
             ctiList.add((ColoredTimeInvariant) timeConstraintListModel.get(i));
         }
 
+        place.underlyingPlace().setCtiList(ctiList);
+        if(!place.underlyingPlace().getColorType().equals(colorType)){
+            place.underlyingPlace().setColorType(colorType);
+            updateArcsAccordingToColorType();
+        }
+        /*
         Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
         command.redo();
         context.undoManager().addNewEdit(command);
+         */
 
         return true;
+    }
+
+    private void updateArcsAccordingToColorType() {
+        for (var template : context.tabContent().allTemplates()) {
+            TimedArcPetriNet net = template.model();
+            for (TimedInputArc arc : net.inputArcs()) {
+                if (!arc.source().equals(place.underlyingPlace())) {
+                    continue;
+                } else {
+                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                    vecColorExpr.add(userOperatorExpression);
+                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                    arc.setExpression(numbExpr);
+                    arc.setWeight(new IntWeight(1));
+                    arc.getColorTimeIntervals().clear();
+                }
+            }
+            for(TimedOutputArc arc : net.outputArcs()){
+                if (!arc.destination().equals(place.underlyingPlace())) {
+                    continue;
+                } else {
+                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                    vecColorExpr.add(userOperatorExpression);
+                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                    arc.setExpression(numbExpr);
+                    arc.setWeight(new IntWeight(1));
+                }
+            }
+            for(TransportArc arc : net.transportArcs()){
+                if(arc.source().equals(place.underlyingPlace())) {
+                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                    vecColorExpr.add(userOperatorExpression);
+                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                    arc.setInputExpression(numbExpr);
+                    arc.getColorTimeIntervals().clear();
+                }
+                if(arc.destination().equals(place.underlyingPlace())) {
+                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                    vecColorExpr.add(userOperatorExpression);
+                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                    arc.setOutputExpression(numbExpr);
+                    arc.setWeight(new IntWeight(1));
+                }
+            }
+            for(TimedInhibitorArc arc : net.inhibitorArcs()){
+                if (!arc.source().equals(place.underlyingPlace())) {
+                    continue;
+                } else {
+                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                    vecColorExpr.add(userOperatorExpression);
+                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                    arc.setExpression(numbExpr);
+                    arc.setWeight(new IntWeight(1));
+                    arc.getColorTimeIntervals().clear();
+                }
+            }
+            template.guiModel().repaintAll(true);
+        }
     }
 
     private void writeTokensToList() {

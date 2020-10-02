@@ -634,7 +634,7 @@ public class TimedArcPetriNetNetwork {
     private void updateColorType(ColorType colorType, ColorType oldColorType){
         List<Color> removedColors = new ArrayList<>();
         for(Color color : oldColorType.getColors()){
-            if(!colorType.getColors().contains(color)){
+            if(!colorType.contains(color)){
                 removedColors.add(color);
             }
         }
@@ -669,6 +669,15 @@ public class TimedArcPetriNetNetwork {
         ColorExpression oldColorExpr = new AllExpression(oldColorType);
         ColorExpression newColorExpr = new AllExpression(colorType);
         for(TimedInputArc arc : tapn.inputArcs()){
+            if(colorType instanceof ProductType){
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.source().getColorType().getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+                continue;
+            }
             ArcExpression arcExpr = arc.getArcExpression();
             arcExpr.replace(oldColorExpr, newColorExpr);
             for(Color color : removedColors){
@@ -696,6 +705,15 @@ public class TimedArcPetriNetNetwork {
             arc.getColorTimeIntervals().removeAll(intervalsToRemove);
         }
         for(TimedOutputArc arc : tapn.outputArcs()){
+            if(colorType instanceof ProductType){
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.destination().getColorType().getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+                continue;
+            }
             ArcExpression arcExpr = arc.getExpression();
             arcExpr.replace(oldColorExpr, newColorExpr);
             for(Color color : removedColors){
@@ -716,6 +734,22 @@ public class TimedArcPetriNetNetwork {
             }
         }
         for(TransportArc arc : tapn.transportArcs()){
+            if(colorType instanceof ProductType){
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.source().getColorType().getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setInputExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+
+                userOperatorExpression = new UserOperatorExpression(arc.destination().getColorType().getFirstColor());
+                vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setOutputExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+                continue;
+            }
             ArcExpression arcExpr = arc.getInputExpression();
             arcExpr.replace(oldColorExpr, newColorExpr);
             for(Color color : removedColors){
@@ -770,6 +804,14 @@ public class TimedArcPetriNetNetwork {
 
     public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places){
         for(TimedPlace place : places){
+            if(colorType instanceof ProductType){
+                if(place.getColorType().equals(oldColorType)) {
+                    place.setColorType(colorType);
+                }
+                place.tokens().clear();
+                place.getCtiList().clear();
+                continue;
+            }
             if(place.getColorType().equals(oldColorType)) {
                 place.setColorType(colorType);
             }
