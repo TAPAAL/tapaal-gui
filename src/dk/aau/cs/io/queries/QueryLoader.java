@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.io.LoadedQueries;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -25,7 +26,8 @@ public abstract class QueryLoader {
 	boolean queryUsingNonexistentPlaceFound = false;
 	boolean queryUsingNonexistentTransitionFound = false;
 
-        protected boolean showErrorMessage = true;
+    protected boolean showErrorMessage = true;
+    protected final Collection<String> messages = new ArrayList<>(10);
 	
 	protected TimedArcPetriNetNetwork network;
 	
@@ -33,7 +35,7 @@ public abstract class QueryLoader {
 		this.network = network;
 	}
 	
-	public Collection<TAPNQuery> parseQueries() {
+	public LoadedQueries parseQueries() {
 		ArrayList<TAPNQuery> queries = getQueries();
 		
 		ArrayList<Tuple<String, String>> templatePlaceNames = getPlaceNames(network);
@@ -57,14 +59,16 @@ public abstract class QueryLoader {
 		}
 		
 		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning && showErrorMessage) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+		    messages.add(ERROR_PARSING_QUERY_MESSAGE);
+			//JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		} else if(queryUsingNonexistentTransitionFound && firstQueryParsingWarning && showErrorMessage){
-			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+            messages.add(ERROR_PARSING_QUERY_MESSAGE);
+            //JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		}
 		
-		return queries;
+		return new LoadedQueries(queries,messages);
 	}
 	
 	private ArrayList<Tuple<String, String>> getPlaceNames(TimedArcPetriNetNetwork network) {

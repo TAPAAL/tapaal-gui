@@ -126,17 +126,20 @@ public class TapnXmlLoader {
 		parseSharedTransitions(doc, network);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
-		Collection<TAPNQuery> queries = new TAPNQueryLoader(doc, network).parseQueries();
+		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
 
+		for(String message : loadedQueries.getMessages()){
+		    messages.add(message);
+        }
 		network.buildConstraints();
 		
 		parseBound(doc, network);
 
 
         if (hasFeatureTag) {
-            return new LoadedModel(network, templates, queries, messages, lens);
+            return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, lens);
         } else {
-            return new LoadedModel(network, templates, queries, messages, null);
+            return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, null);
         }
 	}
 
