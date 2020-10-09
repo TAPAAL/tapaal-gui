@@ -12,6 +12,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 
 import dk.aau.cs.gui.undo.*;
+import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
@@ -610,7 +611,7 @@ public class PlaceEditorPanel extends JPanel {
 			context.undoManager().addEdit(renameCommand);
 			try{ // set name
 				renameCommand.redo();
-			}catch(RequireException e){
+            }catch(RequireException e){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
@@ -649,6 +650,33 @@ public class PlaceEditorPanel extends JPanel {
                 context.undoManager().addEdit(command);
             }
         }
+
+        ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
+        ArrayList<TimedToken> tokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+        List<ColoredTimeInvariant> ctiList = new ArrayList<>();
+
+        for(int row = 0; row < tableModel.getRowCount(); row++){
+            int numberToAdd = (int)tableModel.getValueAt(row,0);
+            TimedToken tokenTypeToAdd = (TimedToken) tableModel.getValueAt(row,1);
+            for (int i = 0; i < numberToAdd; i++) {
+                tokensToAdd.add(tokenTypeToAdd);
+            }
+        }
+        if(!place.isColored()){
+            tokensToAdd.clear();
+            for (int i = 0; i < newMarking; i++) {
+                TimedToken token = new TimedToken(place.underlyingPlace(), ColorType.COLORTYPE_DOT.getFirstColor());
+                tokensToAdd.add(token);
+            }
+        }
+
+        for (int i = 0; i < timeConstraintListModel.size(); i++) {
+            ctiList.add(timeConstraintListModel.get(i));
+        }
+
+        Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
+        command.redo();
+        context.undoManager().addEdit(command);
 
 		TimeInvariant newInvariant = constructInvariant();
 		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
@@ -1122,33 +1150,7 @@ public class PlaceEditorPanel extends JPanel {
 
 
     public boolean doOKColored() {
-        ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
-        ArrayList<TimedToken> tokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
-        doNewEdit = false;
 
-        for(int row = 0; row < tableModel.getRowCount(); row++){
-            int numberToAdd = (int)tableModel.getValueAt(row,0);
-            TimedToken tokenTypeToAdd = (TimedToken) tableModel.getValueAt(row,1);
-            for (int i = 0; i < numberToAdd; i++) {
-                tokensToAdd.add(tokenTypeToAdd);
-            }
-        }
-
-        place.underlyingPlace().tokens().clear();
-        for (var token : tokensToAdd){
-            place.underlyingPlace().addToken(token);
-        }
-
-        List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
-        for (int i = 0; i < timeConstraintListModel.size(); i++) {
-            ctiList.add(timeConstraintListModel.get(i));
-        }
-
-        place.underlyingPlace().setCtiList(ctiList);
-        if(!place.underlyingPlace().getColorType().equals(colorType)){
-            place.underlyingPlace().setColorType(colorType);
-            updateArcsAccordingToColorType();
-        }
         /*
         Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
         command.redo();
