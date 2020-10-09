@@ -41,9 +41,9 @@ public class AllExpression extends ColorExpression {
     }
 
     @Override
-    public AllExpression replace(Expression object1, Expression object2) {
-        if (this == object1 && object2 instanceof AllExpression) {
-            AllExpression obj2 = (AllExpression) object2;
+    public ColorExpression replace(Expression object1, Expression object2) {
+        if (this == object1 && object2 instanceof ColorExpression) {
+            ColorExpression obj2 = (ColorExpression) object2;
             obj2.setParent(parent);
             return obj2;
         } else {

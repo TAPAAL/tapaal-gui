@@ -19,14 +19,12 @@ import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.*;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import javax.swing.event.*;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -43,6 +41,8 @@ public class ColoredArcGuardPanel extends JPanel {
     private Integer transportWeight;
     private ColorExpression transportInputExpr;
     private ColorExpression transportOutputExpr;
+    ColoredArcGuardPanel.ExpressionConstructionUndoManager undoManager;
+    UndoableEditSupport undoSupport;
 
     public ColoredArcGuardPanel(PetriNetObject objectToBeEdited, Context context){
         this.objectToBeEdited = objectToBeEdited;
@@ -75,6 +75,10 @@ public class ColoredArcGuardPanel extends JPanel {
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         editExprButton.setEnabled(false);
+        undoManager = new ColoredArcGuardPanel.ExpressionConstructionUndoManager();
+        undoSupport = new UndoableEditSupport();
+        undoSupport.addUndoableEditListener(new ColoredArcGuardPanel.UndoAdapter());
+        refreshUndoRedo();
 
     }
 
@@ -394,8 +398,32 @@ public class ColoredArcGuardPanel extends JPanel {
 
         resetExprButton.addActionListener(actionEvent -> {
             PlaceHolderArcExpression pHExpr = new PlaceHolderArcExpression();
+            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), pHExpr);
             arcExpression = arcExpression.replace(arcExpression, pHExpr);
             updateSelection(pHExpr);
+            undoSupport.postEdit(edit);
+        });
+        undoButton.addActionListener(e -> {
+            UndoableEdit edit = undoManager.GetNextEditToUndo();
+
+            if (edit instanceof ColoredArcGuardPanel.ExpressionConstructionEdit) {
+                Expression original = ((ColoredArcGuardPanel.ExpressionConstructionEdit) edit)
+                    .getOriginal();
+                undoManager.undo();
+                refreshUndoRedo();
+                updateSelection(original);
+            }
+        });
+
+        redoButton.addActionListener(e -> {
+            UndoableEdit edit = undoManager.GetNextEditToRedo();
+            if (edit instanceof ColoredArcGuardPanel.ExpressionConstructionEdit) {
+                Expression replacement = ((ColoredArcGuardPanel.ExpressionConstructionEdit) edit)
+                    .getReplacement();
+                undoManager.redo();
+                refreshUndoRedo();
+                updateSelection(replacement);
+            }
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -474,8 +502,10 @@ public class ColoredArcGuardPanel extends JPanel {
                 vExpr.add((ArcExpression) currentSelection.getObject());
                 vExpr.add(new PlaceHolderArcExpression());
                 addExpr = new AddExpression(vExpr);
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
                 updateSelection(addExpr);
+                undoSupport.postEdit(edit);
             }
         });
 
@@ -483,23 +513,20 @@ public class ColoredArcGuardPanel extends JPanel {
             SubtractExpression subExpr = null;
             if (currentSelection.getObject() instanceof PlaceHolderArcExpression) {
                 subExpr = new SubtractExpression((PlaceHolderArcExpression)currentSelection.getObject(), new PlaceHolderArcExpression());
-                arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
-                updateSelection(subExpr);
             }
             else if (currentSelection.getObject() instanceof SubtractExpression) {
                 subExpr = new SubtractExpression((SubtractExpression)currentSelection.getObject(), new PlaceHolderArcExpression());
-                arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
-                updateSelection(subExpr);
             }
             else if (currentSelection.getObject() instanceof ScalarProductExpression) {
                 subExpr = new SubtractExpression((ScalarProductExpression)currentSelection.getObject(), new PlaceHolderArcExpression());
-                arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
-                updateSelection(subExpr);
             } else if (currentSelection.getObject() instanceof NumberOfExpression || currentSelection.getObject() instanceof AddExpression) {
                 subExpr = new SubtractExpression((ArcExpression) currentSelection.getObject(), new PlaceHolderArcExpression());
-                arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
-                updateSelection(subExpr);
             }
+            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), subExpr);
+            arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
+            updateSelection(subExpr);
+            undoSupport.postEdit(edit);
+
         });
 
         scalarButton.addActionListener(actionEvent -> {
@@ -507,8 +534,10 @@ public class ColoredArcGuardPanel extends JPanel {
             Integer value = (Integer)scalarJSpinner.getValue();
             if (currentSelection.getObject() instanceof ArcExpression) {
                 scalarExpr = new ScalarProductExpression(value, (ArcExpression) currentSelection.getObject());
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), scalarExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), scalarExpr);
                 updateSelection(scalarExpr);
+                undoSupport.postEdit(edit);
             }
         });
 
@@ -518,8 +547,10 @@ public class ColoredArcGuardPanel extends JPanel {
                 Vector<ArcExpression> vecExpr =  addExpr.getAddExpression();
                 vecExpr.add(new PlaceHolderArcExpression());
                 addExpr = new AddExpression(vecExpr);
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
                 updateSelection(addExpr);
+                undoSupport.postEdit(edit);
             }
         });
 
@@ -751,13 +782,17 @@ public class ColoredArcGuardPanel extends JPanel {
         if (currentSelection.getObject() instanceof ArcExpression) {
             Integer value = (Integer) numberExpressionJSpinner.getValue();
             NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
+            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), numbExpr);
             arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
             updateSelection(numbExpr);
+            undoSupport.postEdit(edit);
         } else {
             //TODO: add implementation for when the vector has more than one element, if that can ever happen
             ColorExpression colorExpr = exprVec.firstElement();
+            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), colorExpr);
             arcExpression = arcExpression.replace(currentSelection.getObject(), colorExpr);
             updateSelection(colorExpr);
+            undoSupport.postEdit(edit);
         }
 
     }
@@ -791,8 +826,10 @@ public class ColoredArcGuardPanel extends JPanel {
                 replacement = new PlaceHolderColorExpression();
             }
             if (replacement != null) {
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), replacement);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), replacement);
                 updateSelection(replacement);
+                undoSupport.postEdit(edit);
             }
         }
     }
@@ -837,8 +874,10 @@ public class ColoredArcGuardPanel extends JPanel {
             PredecessorExpression predExpr;
             if (currentSelection.getObject() instanceof ColorExpression) {
                 predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), predExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), predExpr);
                 updateSelection(predExpr);
+                undoSupport.postEdit(edit);
             }
         });
 
@@ -846,8 +885,10 @@ public class ColoredArcGuardPanel extends JPanel {
             SuccessorExpression succExpr;
             if (currentSelection.getObject() instanceof  ColorExpression) {
                 succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), succExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), succExpr);
                 updateSelection(succExpr);
+                undoSupport.postEdit(edit);
             }
         });
 
@@ -1141,5 +1182,66 @@ public class ColoredArcGuardPanel extends JPanel {
 
     JCheckBox useVariableCheckBox;
     JComboBox<Variable> variableCombobox;
+    private void refreshUndoRedo() {
+        undoButton.setEnabled(undoManager.canUndo());
+        redoButton.setEnabled(undoManager.canRedo());
+    }
+
+    private class UndoAdapter implements UndoableEditListener {
+        public void undoableEditHappened(UndoableEditEvent arg0) {
+            UndoableEdit edit = arg0.getEdit();
+            undoManager.addEdit(edit);
+            refreshUndoRedo();
+        }
+    }
+
+    private static class ExpressionConstructionUndoManager extends UndoManager {
+        public UndoableEdit GetNextEditToUndo() {
+            return editToBeUndone();
+        }
+
+        public UndoableEdit GetNextEditToRedo() {
+            return editToBeRedone();
+        }
+    }
+
+    public class ExpressionConstructionEdit extends AbstractUndoableEdit {
+        private Expression original;
+        private Expression replacement;
+
+        public Expression getOriginal() {
+            return original;
+        }
+
+        public Expression getReplacement() {
+            return replacement;
+        }
+
+        public ExpressionConstructionEdit(Expression original,
+                                          Expression replacement) {
+            this.original = original;
+            this.replacement = replacement;
+        }
+
+        @Override
+        public void undo() throws CannotUndoException {
+            arcExpression = arcExpression.replace(replacement, original);
+        }
+
+        @Override
+        public void redo() throws CannotRedoException {
+            arcExpression = arcExpression.replace(original, replacement);
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public boolean canRedo() {
+            return true;
+        }
+    }
 
 }
