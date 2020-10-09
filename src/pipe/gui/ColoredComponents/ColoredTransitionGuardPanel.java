@@ -2,6 +2,7 @@ package pipe.gui.ColoredComponents;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
@@ -1160,41 +1161,4 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 }
 
-class ColorComboBoxRenderer extends JLabel
-    implements ListCellRenderer {
-    JComboBox comboBox;
-    public ColorComboBoxRenderer(JComboBox comboBox) {
-        this.comboBox = comboBox;
-    }
 
-    public Component getListCellRendererComponent(
-        JList list,
-        Object value,
-        int index,
-        boolean isSelected,
-        boolean cellHasFocus) {
-        if(value != null) {
-            setText(ellipsis(value.toString(), comboBox.getWidth() / 7));
-
-            setFont(list.getFont());
-        }
-
-        return this;
-    }
-    //From here https://stackoverflow.com/questions/3597550/ideal-method-to-truncate-a-string-with-ellipsis
-
-
-    public static String ellipsis(final String text, int length)
-    {
-        if(length > 3) {
-            // The letters [iIl1] are slim enough to only count as half a character.
-            length += Math.ceil(text.replaceAll("[^iIl]", "").length() / 2.0d);
-
-            if (text.length() > length) {
-                return text.substring(0, length - 3) + "...";
-            }
-        }
-
-        return text;
-    }
-}

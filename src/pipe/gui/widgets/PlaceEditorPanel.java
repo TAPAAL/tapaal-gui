@@ -11,6 +11,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 
+import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.model.CPN.*;
@@ -1052,6 +1053,7 @@ public class PlaceEditorPanel extends JPanel {
         for (ColorType element : colorTypes) {
             colorTypeComboBox.addItem(element);
         }
+        colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
 
         colorTypeComboBox.addActionListener(actionEvent -> {
             if (!(tokenTable.getRowCount() < 1) || !timeConstraintListModel.isEmpty()) {
