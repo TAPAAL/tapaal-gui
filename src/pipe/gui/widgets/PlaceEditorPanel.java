@@ -143,7 +143,7 @@ public class PlaceEditorPanel extends JPanel {
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 
 		okButton.addActionListener(evt -> {
-			if(doOKColored() && doOK()){
+			if(doOK()){
 				exit();
 			}
 		});
@@ -1146,18 +1146,6 @@ public class PlaceEditorPanel extends JPanel {
         }else{
             tableModel.addRow(new Object[]{1, tokenToAdd});
         }
-    }
-
-
-    public boolean doOKColored() {
-
-        /*
-        Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
-        command.redo();
-        context.undoManager().addNewEdit(command);
-         */
-
-        return true;
     }
 
     private void updateArcsAccordingToColorType() {
