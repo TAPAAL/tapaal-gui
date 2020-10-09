@@ -148,16 +148,23 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
+        colorTypeCombobox.setPreferredSize(new Dimension(200,25));
+        colorTypeCombobox.setRenderer(new ColorComboBoxRenderer(colorTypeCombobox));
+
 
         for (ColorType element : context.network().colorTypes()) {
             colorTypeCombobox.addItem(element);
         }
+
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
         }
 
         variableLabel = new JLabel("Variable: ");
         variableCombobox = new JComboBox();
+        variableCombobox.setPreferredSize(new Dimension(200,25));
+        variableCombobox.setRenderer(new ColorComboBoxRenderer(variableCombobox));
+
         addVariableButton = new JButton("Add Variable");
         Dimension addDim = new Dimension(120, 27);
 
@@ -167,6 +174,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         colorLabel = new JLabel("Color: ");
         colorCombobox = new JComboBox();
+        colorCombobox.setPreferredSize(new Dimension(200,25));
+        colorCombobox.setRenderer(new ColorComboBoxRenderer(colorCombobox));
+
         addColorButton = new JButton("Add Color");
 
         addColorButton.setPreferredSize(addDim);
@@ -1147,5 +1157,44 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
         variableCombobox.setEnabled(variableCombobox.getItemCount() > 0);
         addVariableButton.setEnabled(variableCombobox.getItemCount() > 0);
+    }
+}
+
+class ColorComboBoxRenderer extends JLabel
+    implements ListCellRenderer {
+    JComboBox comboBox;
+    public ColorComboBoxRenderer(JComboBox comboBox) {
+        this.comboBox = comboBox;
+    }
+
+    public Component getListCellRendererComponent(
+        JList list,
+        Object value,
+        int index,
+        boolean isSelected,
+        boolean cellHasFocus) {
+        if(value != null) {
+            setText(ellipsis(value.toString(), comboBox.getWidth() / 7));
+
+            setFont(list.getFont());
+        }
+
+        return this;
+    }
+    //From here https://stackoverflow.com/questions/3597550/ideal-method-to-truncate-a-string-with-ellipsis
+
+
+    public static String ellipsis(final String text, int length)
+    {
+        if(length > 3) {
+            // The letters [iIl1] are slim enough to only count as half a character.
+            length += Math.ceil(text.replaceAll("[^iIl]", "").length() / 2.0d);
+
+            if (text.length() > length) {
+                return text.substring(0, length - 3) + "...";
+            }
+        }
+
+        return text;
     }
 }
