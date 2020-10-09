@@ -1134,9 +1134,14 @@ public class PlaceEditorPanel extends JPanel {
             }
         }
 
+        place.underlyingPlace().tokens().clear();
+        for (var token : tokensToAdd){
+            place.underlyingPlace().addToken(token);
+        }
+
         List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
         for (int i = 0; i < timeConstraintListModel.size(); i++) {
-            ctiList.add((ColoredTimeInvariant) timeConstraintListModel.get(i));
+            ctiList.add(timeConstraintListModel.get(i));
         }
 
         place.underlyingPlace().setCtiList(ctiList);
