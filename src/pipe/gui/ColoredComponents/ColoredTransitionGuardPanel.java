@@ -397,12 +397,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         comparisonPanel.setBorder(BorderFactory.createTitledBorder("Comparison"));
 
         ButtonGroup comparisonButtons = new ButtonGroup();
-        equalityButton = new JButton("EQ");
-        greaterThanEqButton = new JButton("GEQ");
-        greaterThanButton = new JButton("G");
-        inequalityButton = new JButton("IQ");
-        lessThanEqButton = new JButton("LEQ");
-        lessThanButton = new JButton("L");
+        equalityButton = new JButton("=");
+        greaterThanEqButton = new JButton(">=");
+        greaterThanButton = new JButton(">");
+        inequalityButton = new JButton("!=");
+        lessThanEqButton = new JButton("<=");
+        lessThanButton = new JButton("<");
 
         comparisonButtons.add(equalityButton);
         comparisonButtons.add(greaterThanEqButton);
