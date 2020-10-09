@@ -73,6 +73,11 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
     }
 
     @Override
+    public void mouseEntered(MouseEvent e) {
+        ((ArcPathPoint) myObject).getArcPath().showPoints();
+    }
+
+    @Override
 	public void mouseReleased(MouseEvent e) {
 		((ArcPathPoint) e.getComponent()).setVisibilityLock(false);
 		super.mouseReleased(e);
