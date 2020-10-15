@@ -39,18 +39,18 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath) {
-		super(modelChecker, messenger, reducedNetFilePath);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath, boolean reduceNetOnly) {
+		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly);
 		iconSelector = selector;
 		this.callback = callback;
 	}
 
     public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-        this(modelChecker, selector, messenger, callback, null);
+        this(modelChecker, selector, messenger, callback, null, false);
     }
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null, null);
+		this(modelChecker, selector, messenger, null, null, false);
 	}
 
 	@Override
@@ -72,7 +72,9 @@ public class RunVerification extends RunVerificationBase {
 				}
 			}
 
-		}else{
+		} else if(reduceNetOnly) {
+            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
+        }else{
 			
 			//Check if the is something like 
 			//verifyta: relocation_error:

@@ -27,6 +27,8 @@ import java.io.IOException;
  */
 
 public class Verifier {
+    private static File reducedNetTempFile = null;
+
 	private static Verifyta getVerifyta() {
 		Verifyta verifyta = new Verifyta(new FileFinder(), new MessengerImpl());
 		verifyta.setup();
@@ -63,6 +65,10 @@ public class Verifier {
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
 		}
 	}
+
+	public static String getReducedNetFilePath() {
+	    return reducedNetTempFile.getAbsolutePath();
+    }
 
 	public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
 		ModelChecker modelChecker;
@@ -132,10 +138,11 @@ public class Verifier {
 	public static void runVerifyTAPNVerification(
 			TimedArcPetriNetNetwork tapnNetwork,
 			TAPNQuery query,
+            boolean onlyCreateReducedNet,
 			VerificationCallback callback
 	) {
 		ModelChecker verifytapn = getModelChecker(query);
-        File reducedNetTempFile = null;
+
 
 		if (!verifytapn.isCorrectVersion()) {
 			new MessengerImpl().displayErrorMessage(
@@ -170,7 +177,6 @@ public class Verifier {
 			);
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
 
-
             try {
                 reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
             } catch (IOException e) {
@@ -180,22 +186,43 @@ public class Verifier {
                 return;
             }
 
-            verifytapnOptions = new VerifyPNOptions(
-					bound,
-					query.getTraceOption(),
-					query.getSearchOption(),
-					query.useOverApproximation(),
-					query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
-					query.isOverApproximationEnabled(),
-					query.isUnderApproximationEnabled(),
-					query.approximationDenominator(),
-					query.getCategory(),
-					query.getAlgorithmOption(),
-					query.isSiphontrapEnabled(),
-					query.isQueryReductionEnabled(),
-					query.isStubbornReductionEnabled(),
+            if (onlyCreateReducedNet) {
+                //These options should disable the verification and only produce the net after applying reduction rules
+                verifytapnOptions = new VerifyPNOptions(
+                    bound,
+                    query.getTraceOption(),
+                    TAPNQuery.SearchOption.OVERAPPROXIMATE,
+                    query.useOverApproximation(),
+                    query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+                    query.isOverApproximationEnabled(),
+                    query.isUnderApproximationEnabled(),
+                    query.approximationDenominator(),
+                    query.getCategory(),
+                    query.getAlgorithmOption(),
+                    query.isSiphontrapEnabled(),
+                    TAPNQuery.QueryReductionTime.ShortestTime,
+                    query.isStubbornReductionEnabled(),
                     reducedNetTempFile.getAbsolutePath()
-			);
+                );
+            } else {
+                verifytapnOptions = new VerifyPNOptions(
+                    bound,
+                    query.getTraceOption(),
+                    query.getSearchOption(),
+                    query.useOverApproximation(),
+                    query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+                    query.isOverApproximationEnabled(),
+                    query.isUnderApproximationEnabled(),
+                    query.approximationDenominator(),
+                    query.getCategory(),
+                    query.getAlgorithmOption(),
+                    query.isSiphontrapEnabled(),
+                    query.isQueryReductionEnabled()? TAPNQuery.QueryReductionTime.UnlimitedTime: TAPNQuery.QueryReductionTime.NoTime,
+                    query.isStubbornReductionEnabled(),
+                    reducedNetTempFile.getAbsolutePath()
+                );
+            }
+
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(
 					bound,
@@ -218,7 +245,7 @@ public class Verifier {
 		if (tapnNetwork != null) {
             RunVerificationBase thread;
 		    if (reducedNetTempFile != null) {
-                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, reducedNetTempFile.getAbsolutePath() );
+                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet );
             } else {
                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
             }

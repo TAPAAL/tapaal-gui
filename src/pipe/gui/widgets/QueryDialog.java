@@ -72,6 +72,7 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Merge net components";
+    private static final String OPEN_REDUCED_BTN_TEXT = "Open reduced net";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SOME_TRACE_STRING = "Some trace       ";
@@ -185,6 +186,7 @@ public class QueryDialog extends JPanel {
 	private JButton saveAndVerifyButton;
 	private JButton saveUppaalXMLButton;
 	private JButton mergeNetComponentsButton;
+	private JButton openReducedNetButton;
 
 	// Private Members
 	private StringPosition currentSelection = null;
@@ -418,6 +420,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
 	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
+	private final static String TOOL_TIP_OPEN_REDUCED_BUTTON = "Open the net produced after applying structural reduction rules";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 
@@ -916,11 +919,13 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton.setEnabled(isQueryOk);
 			saveUppaalXMLButton.setEnabled(isQueryOk);
 			mergeNetComponentsButton.setEnabled(isQueryOk);
+            openReducedNetButton.setEnabled(isQueryOk);
 		} else {
 			saveButton.setEnabled(false);
 			saveAndVerifyButton.setEnabled(false);
 			saveUppaalXMLButton.setEnabled(false);
 			mergeNetComponentsButton.setEnabled(false);
+            openReducedNetButton.setEnabled(false);
 		}
 	}
 
@@ -1558,6 +1563,7 @@ public class QueryDialog extends JPanel {
 		    overApproximationOptionsPanel.setVisible(advancedView);
         }
 		mergeNetComponentsButton.setVisible(advancedView);
+        openReducedNetButton.setVisible(advancedView);
 
 		if(advancedView){
 			advancedButton.setText("Simple view");
@@ -3059,6 +3065,10 @@ public class QueryDialog extends JPanel {
 			mergeNetComponentsButton = new JButton(EXPORT_COMPOSED_BTN_TEXT);
 			mergeNetComponentsButton.setVisible(false);
 
+			openReducedNetButton = new JButton(OPEN_REDUCED_BTN_TEXT);
+            openReducedNetButton.setVisible(false);
+
+
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 			//Only show in advanced mode
 			saveUppaalXMLButton.setVisible(false);
@@ -3069,6 +3079,7 @@ public class QueryDialog extends JPanel {
 			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
 			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			mergeNetComponentsButton.setToolTipText(TOOL_TIP_SAVE_COMPOSED_BUTTON);
+            openReducedNetButton.setToolTipText(TOOL_TIP_OPEN_REDUCED_BUTTON);
 
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -3092,7 +3103,7 @@ public class QueryDialog extends JPanel {
 						TAPNQuery query = getQuery();
 
 						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null);
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query, false, null);
 						else
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
@@ -3214,6 +3225,45 @@ public class QueryDialog extends JPanel {
 				}
 			});
 
+            openReducedNetButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+                    if (checkIfSomeReductionOption()) {
+                        querySaved = true;
+                        // Now if a query is saved and verified, the net is marked as modified
+                        CreateGui.getCurrentTab().setNetChanged(true);
+
+                        TAPNQuery query = getQuery();
+
+                        if(query.getReductionOption() != ReductionOption.VerifyPN) {
+                            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                "The selected verification engine does not support application of reduction rules",
+                                "Reduction rules unsupported", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        exit();
+
+                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,true, null);
+                    }
+
+                    File reducedNetFile = new File(Verifier.getReducedNetFilePath());
+
+                    if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                        try {
+                            TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                            reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                            CreateGui.openNewTabFromStream(reducedNetTab);
+                        } catch (Exception e1){
+                            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                e1.getMessage(),
+                                "Error loading reduced net file",
+                                JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            });
+
 
 		} else if (option == QueryDialogueOption.Export) {
 			saveButton = new JButton("export");
@@ -3230,6 +3280,7 @@ public class QueryDialog extends JPanel {
 			JPanel leftButtomPanel = new JPanel(new FlowLayout());
 			JPanel rightButtomPanel = new JPanel(new FlowLayout());
 			leftButtomPanel.add(mergeNetComponentsButton, FlowLayout.LEFT);
+			leftButtomPanel.add(openReducedNetButton, FlowLayout.LEFT);
 			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
 
 
