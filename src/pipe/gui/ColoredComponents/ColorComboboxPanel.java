@@ -1,5 +1,6 @@
 package pipe.gui.ColoredComponents;
 
+import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
 import net.tapaal.swinghelpers.GridBagHelper;
@@ -92,6 +93,7 @@ public abstract class ColorComboboxPanel extends JPanel {
 
             for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
                 colorTypeComboBoxesArray[i] = new JComboBox();
+                colorTypeComboBoxesArray[i].setRenderer(new ColorComboBoxRenderer(colorTypeComboBoxesArray[i]));
                 for (Color element : ((ProductType) colorType).getColorTypes().get(i)) {
                     colorTypeComboBoxesArray[i].addItem(element);
                 }
@@ -120,6 +122,8 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray = new JComboBox[1];
             allCheckBoxesArray = new JCheckBox[1];
             colorTypeComboBoxesArray[0] = new JComboBox();
+            colorTypeComboBoxesArray[0].setRenderer(new ColorComboBoxRenderer(colorTypeComboBoxesArray[0]));
+
             for (Iterator<Color> iter = colorType.iterator(); iter.hasNext();) {
                 Color element = iter.next();
                 colorTypeComboBoxesArray[0].addItem(element);

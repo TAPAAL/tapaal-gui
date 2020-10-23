@@ -29,6 +29,7 @@ import javax.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
+import java.util.Vector;
 
 public class ColoredTransitionGuardPanel  extends JPanel {
     JPanel coloredTransitionPanel;
@@ -69,7 +70,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     JLabel colorTypeLabel;
     JComboBox<Variable> variableCombobox;
     JButton addVariableButton;
-    JComboBox<dk.aau.cs.model.CPN.Color> colorCombobox;
+    ColorComboboxPanel colorCombobox;
     JLabel colorLabel;
     JButton addColorButton;
 
@@ -189,10 +190,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         addVariableButton.setMaximumSize(addDim);
 
         colorLabel = new JLabel("Color: ");
-        colorCombobox = new JComboBox();
-        colorCombobox.setPreferredSize(new Dimension(200,25));
-        colorCombobox.setRenderer(new ColorComboBoxRenderer(colorCombobox));
+        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(), "") {
+            @Override
+            public void changedColor(JComboBox[] comboBoxes) {
 
+            }
+        };
+        colorCombobox.removeScrollPaneBorder();
         addColorButton = new JButton("Add Color");
 
         addColorButton.setPreferredSize(addDim);
@@ -218,11 +222,15 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         });
 
         addColorButton.addActionListener(actionEvent -> {
-            dk.aau.cs.model.CPN.Color color = colorCombobox.getItemAt(colorCombobox.getSelectedIndex());
+            Vector<dk.aau.cs.model.CPN.Color> colorVector = new Vector();
+            for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length ; i++) {
+                colorVector.add((dk.aau.cs.model.CPN.Color)colorCombobox.getColorTypeComboBoxesArray()[i].getItemAt(colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
+            }
+            dk.aau.cs.model.CPN.Color tempColor = new dk.aau.cs.model.CPN.Color((ColorType)colorTypeCombobox.getSelectedItem(), 0, colorVector);
             UserOperatorExpression colorExpr;
 
             if (currentSelection.getObject() instanceof ColorExpression) {
-                colorExpr = new UserOperatorExpression(color);
+                colorExpr = new UserOperatorExpression(tempColor);
                 UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), colorExpr);
                 newProperty = newProperty.replace(currentSelection.getObject(), colorExpr);
                 updateSelection(colorExpr);
@@ -1101,7 +1109,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         else if (expression instanceof LessThanEqExpression) {
             LessThanEqExpression lesseQExpr = new LessThanEqExpression(((LessThanEqExpression) expression).getLeftExpression(), ((LessThanEqExpression) expression).getRightExpression());
             newProperty = newProperty.replace(currentSelection.getObject(), lesseQExpr);
-            updateSelection(lesseQExpr);;
+            updateSelection(lesseQExpr);
         }
         else if (expression instanceof LessThanExpression) {
             LessThanExpression lessExpr = new LessThanExpression(((LessThanExpression) expression).getLeftExpression(), ((LessThanExpression) expression).getRightExpression());
@@ -1111,7 +1119,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     }
     private void updateColorType() {
-        colorCombobox.removeAllItems();
         variableCombobox.removeAllItems();
         ColorType ct;
         ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
@@ -1121,18 +1128,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     variableCombobox.addItem(element);
                 }
             }
-            if (ct instanceof ProductType) {
-                for (ColorType element: ((ProductType) ct).getColorTypes()) {
-                    for (dk.aau.cs.model.CPN.Color color : element) {
-                        colorCombobox.addItem(color);
-                    }
-                }
-            }
-            else {
-                for (dk.aau.cs.model.CPN.Color element : ct) {
-                    colorCombobox.addItem(element);
-                }
-            }
+            colorCombobox.updateColorType(ct);
         }
         variableCombobox.setEnabled(variableCombobox.getItemCount() > 0);
         addVariableButton.setEnabled(variableCombobox.getItemCount() > 0);
