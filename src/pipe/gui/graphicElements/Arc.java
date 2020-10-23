@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.*;
 
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -81,6 +82,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	abstract public void setWeight(Weight weight);
 	abstract public Weight getWeight();
+	abstract public void setExpression(ArcExpression expr);
+	abstract public ArcExpression getExpression();
 
 	/**
 	 * Set source

@@ -15,6 +15,8 @@ import javax.swing.table.DefaultTableModel;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
+import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
+import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
@@ -30,6 +32,8 @@ import pipe.gui.ColoredComponents.ColorComboboxPanel;
 import pipe.gui.ColoredComponents.ColoredTimeInvariantDialogPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -678,6 +682,7 @@ public class PlaceEditorPanel extends JPanel {
         Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
         command.redo();
         context.undoManager().addEdit(command);
+        updateArcsAccordingToColorType();
 
 		TimeInvariant newInvariant = constructInvariant();
 		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
@@ -1151,65 +1156,26 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private void updateArcsAccordingToColorType() {
-        for (var template : context.tabContent().allTemplates()) {
-            TimedArcPetriNet net = template.model();
-            for (TimedInputArc arc : net.inputArcs()) {
-                if (!arc.source().equals(place.underlyingPlace())) {
-                    continue;
-                } else {
-                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
-                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                    vecColorExpr.add(userOperatorExpression);
-                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                    arc.setExpression(numbExpr);
-                    arc.setWeight(new IntWeight(1));
-                    arc.getColorTimeIntervals().clear();
-                }
-            }
-            for(TimedOutputArc arc : net.outputArcs()){
-                if (!arc.destination().equals(place.underlyingPlace())) {
-                    continue;
-                } else {
-                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
-                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                    vecColorExpr.add(userOperatorExpression);
-                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                    arc.setExpression(numbExpr);
-                    arc.setWeight(new IntWeight(1));
-                }
-            }
-            for(TransportArc arc : net.transportArcs()){
-                if(arc.source().equals(place.underlyingPlace())) {
-                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
-                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                    vecColorExpr.add(userOperatorExpression);
-                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                    arc.setInputExpression(numbExpr);
-                    arc.getColorTimeIntervals().clear();
-                }
-                if(arc.destination().equals(place.underlyingPlace())) {
-                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
-                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                    vecColorExpr.add(userOperatorExpression);
-                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                    arc.setOutputExpression(numbExpr);
-                    arc.setWeight(new IntWeight(1));
-                }
-            }
-            for(TimedInhibitorArc arc : net.inhibitorArcs()){
-                if (!arc.source().equals(place.underlyingPlace())) {
-                    continue;
-                } else {
-                    UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
-                    Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                    vecColorExpr.add(userOperatorExpression);
-                    NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                    arc.setExpression(numbExpr);
-                    arc.setWeight(new IntWeight(1));
-                    arc.getColorTimeIntervals().clear();
-                }
-            }
-            template.guiModel().repaintAll(true);
+        for(Arc arc : place.getPostset()){
+            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(userOperatorExpression);
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
+            arcExpressionCommand.redo();
+            context.undoManager().addEdit(arcExpressionCommand);
+            Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<ColoredTimeInterval>());
+            arcIntervalCommand.redo();
+            context.undoManager().addEdit(arcIntervalCommand);
+        }
+        for(Arc arc : place.getPreset()) {
+            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(userOperatorExpression);
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
+            arcExpressionCommand.redo();
+            context.undoManager().addEdit(arcExpressionCommand);
         }
     }
 

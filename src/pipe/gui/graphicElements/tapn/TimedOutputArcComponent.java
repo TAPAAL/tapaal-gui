@@ -7,6 +7,7 @@ import javax.swing.BoxLayout;
 
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.CreateGui;
 
@@ -156,5 +157,13 @@ public class TimedOutputArcComponent extends Arc {
 	public Weight getWeight() {
 		return outputArc.getWeight();
 	}
+    @Override
+    public void setExpression(ArcExpression expr){
+        outputArc.setExpression(expr);
+    }
+    @Override
+    public ArcExpression getExpression(){
+	    return outputArc.getExpression();
+    }
 
 }

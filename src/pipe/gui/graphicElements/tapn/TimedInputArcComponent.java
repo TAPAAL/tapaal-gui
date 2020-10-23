@@ -5,6 +5,7 @@ import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -189,4 +190,22 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	public Weight getWeight(){
 		return inputArc.getWeight();
 	}
+
+	@Override
+    public void setExpression(ArcExpression expr){
+	    inputArc.setExpression(expr);
+    }
+
+    @Override
+    public ArcExpression getExpression(){
+        return inputArc.getArcExpression();
+    }
+
+    public void setCtiList(List<ColoredTimeInterval> ctiList){
+	    inputArc.setColorTimeIntervals(ctiList);
+    }
+
+    public List<ColoredTimeInterval> getCtiList(){
+	    return inputArc.getColorTimeIntervals();
+    }
 }
