@@ -18,6 +18,12 @@ public class SubtractExpression extends ArcExpression {
         this.right = right;
     }
 
+    public SubtractExpression(SubtractExpression otherExpr) {
+        super(otherExpr);
+        this.left = otherExpr.left.copy();
+        this.right = otherExpr.right.copy();
+    }
+
 
     public ArcExpression getLeftExpression() {return this.left;}
 
@@ -66,6 +72,11 @@ public class SubtractExpression extends ArcExpression {
     @Override
     public ArcExpression copy() {
         return new SubtractExpression(left, right);
+    }
+
+    @Override
+    public ArcExpression deepCopy() {
+        return new SubtractExpression(left.deepCopy(), right.deepCopy());
     }
 
     @Override

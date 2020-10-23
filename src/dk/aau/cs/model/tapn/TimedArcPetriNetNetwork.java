@@ -2,8 +2,10 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
+import dk.aau.cs.gui.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -15,6 +17,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import pipe.gui.undo.UndoManager;
 
 public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -622,214 +625,76 @@ public class TimedArcPetriNetNetwork {
     public void setVariables(List<Variable> newVariables) { variables = newVariables;}
 
 
-    public void updateColorType(String oldName, ColorType colorType) {
+    public void updateColorType(String oldName, ColorType colorType, UndoManager undoManager) {
         Integer index = getColorTypeIndex(oldName);
         ColorType oldColorType = getColorTypeByIndex(index);
 
-        if (index != null) {
-            colorTypes.set(index, colorType);
-        }
-        updateColorType(colorType, oldColorType);
+        Command command = new UpdateColorTypeCommand(this, oldColorType, colorType, index);
+        command.redo();
+        undoManager.addEdit(command);
+        updateColorType(colorType, oldColorType, undoManager);
     }
-    private void updateColorType(ColorType colorType, ColorType oldColorType){
-        List<Color> removedColors = new ArrayList<>();
-        for(Color color : oldColorType.getColors()){
-            if(!colorType.contains(color)){
-                removedColors.add(color);
-            }
-        }
-        updateColorTypeOnVariables(oldColorType, colorType);
+
+    private void updateColorType(ColorType colorType, ColorType oldColorType, UndoManager undoManager){
+
+        updateColorTypeOnVariables(oldColorType, colorType, undoManager);
+        //updateProductTypes(oldColorType, colorType, undoManager);
         for (TimedArcPetriNet tapn : tapns) {
-            updateProductTypes(oldColorType, colorType);
-            updateColorTypeOnPlaces(oldColorType, colorType, tapn.places());
-            updateColorTypeOnArcs(oldColorType,colorType,tapn,removedColors);
-            updateColorTypeOnTransitions(tapn.transitions(), removedColors);
+            updateColorTypeOnPlaces(oldColorType, colorType, tapn.places(), undoManager);
+            updateColorTypeOnArcs(oldColorType,colorType,tapn,undoManager);
+            updateColorTypeOnTransitions(tapn.transitions(), colorType, oldColorType, undoManager);
         }
     }
 
-    private void updateProductTypes(ColorType oldColorType, ColorType colorType){
+    private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
         for(ColorType ct : colorTypes){
             if(ct instanceof ProductType){
-                ((ProductType)ct).replaceColorType(colorType,oldColorType);
+                Command command = new UpdatePTColorTypeCommand(oldColorType, colorType, (ProductType)ct);
+                command.redo();
+                undoManager.addEdit(command);
             }
         }
     }
-    private void updateColorTypeOnTransitions(List<TimedTransition> transitions, List<Color> removedColors){
+    private void updateColorTypeOnTransitions(List<TimedTransition> transitions, ColorType colorType, ColorType oldColorType, UndoManager undoManager){
 	    for(TimedTransition transition : transitions){
-            GuardExpression expr = transition.getGuard();
-            for(Color color : removedColors){
-                if(expr != null){
-                    expr = expr.removeColorFromExpression(color);
-                }
-            }
-            transition.setGuard(expr);
+            Command command = new UpdateTransitionColorsCommand(transition, oldColorType, colorType);
+            command.redo();
+            undoManager.addEdit(command);
         }
     }
-    private void updateColorTypeOnArcs(ColorType oldColorType, ColorType colorType, TimedArcPetriNet tapn, List<Color> removedColors){
-        ColorExpression oldColorExpr = new AllExpression(oldColorType);
-        ColorExpression newColorExpr = new AllExpression(colorType);
-        for(TimedInputArc arc : tapn.inputArcs()){
-            if(colorType instanceof ProductType){
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.source().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-                continue;
-            }
-            ArcExpression arcExpr = arc.getArcExpression();
-            arcExpr.replace(oldColorExpr, newColorExpr);
-            for(Color color : removedColors){
-                arcExpr = arcExpr.removeColorFromExpression(color);
-                if(arcExpr == null){
-                    break;
-                }
-            }
-            if(arcExpr != null){
-                arc.setExpression(arcExpr);
-            } else{
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.source().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-            }
-            List<ColoredTimeInterval> intervalsToRemove = new ArrayList<>();
-            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
-                if(!colorType.getColors().contains(interval.getColor())){
-                    intervalsToRemove.add(interval);
-                }
-            }
-            arc.getColorTimeIntervals().removeAll(intervalsToRemove);
+
+    private void updateColorTypeOnArcs(ColorType oldColorType, ColorType colorType, TimedArcPetriNet tapn, UndoManager undoManager){
+        for(TimedInputArc arc : tapn.inputArcs()) {
+            Command command = new UpdateInputArcColorTypeCommand(oldColorType, colorType, arc);
+            command.redo();
+            undoManager.addEdit(command);
         }
         for(TimedOutputArc arc : tapn.outputArcs()){
-            if(colorType instanceof ProductType){
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.destination().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-                continue;
-            }
-            ArcExpression arcExpr = arc.getExpression();
-            arcExpr.replace(oldColorExpr, newColorExpr);
-            for(Color color : removedColors){
-                arcExpr = arcExpr.removeColorFromExpression(color);
-                if(arcExpr == null){
-                    break;
-                }
-            }
-            if(arcExpr != null){
-                arc.setExpression(arcExpr);
-            } else{
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.destination().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-            }
+            Command command = new UpdateOutputArcColorTypeCommand(oldColorType, colorType, arc);
+            command.redo();
+            undoManager.addEdit(command);
         }
         for(TransportArc arc : tapn.transportArcs()){
-            if(colorType instanceof ProductType){
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.source().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setInputExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-
-                userOperatorExpression = new UserOperatorExpression(arc.destination().getColorType().getFirstColor());
-                vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setOutputExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-                continue;
-            }
-            ArcExpression arcExpr = arc.getInputExpression();
-            arcExpr.replace(oldColorExpr, newColorExpr);
-            for(Color color : removedColors){
-                arcExpr = arcExpr.removeColorFromExpression(color);
-            }
-            if(arcExpr != null){
-                arc.setInputExpression(arcExpr);
-                if(arcExpr == null){
-                    break;
-                }
-            } else{
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.source().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setInputExpression(numbExpr);
-            }
-            arcExpr = arc.getOutputExpression();
-            arcExpr.replace(oldColorExpr, newColorExpr);
-            for(Color color : removedColors){
-                arcExpr = arcExpr.removeColorFromExpression(color);
-                if(arcExpr == null){
-                    break;
-                }
-            }
-            if(arcExpr != null){
-                arc.setOutputExpression(arcExpr);
-            } else{
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(arc.destination().getColorType().getFirstColor());
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-                vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
-                arc.setOutputExpression(numbExpr);
-                arc.setWeight(new IntWeight(1));
-            }
-            List<ColoredTimeInterval> intervalsToRemove = new ArrayList<>();
-            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
-                if(!colorType.getColors().contains(interval.getColor())){
-                    intervalsToRemove.add(interval);
-                }
-            }
-            arc.getColorTimeIntervals().removeAll(intervalsToRemove);
+            Command command = new UpdateTransportArcColorTypeCommand(oldColorType, colorType, arc);
+            command.redo();
+            undoManager.addEdit(command);
         }
     }
-    public void updateColorTypeOnVariables(ColorType oldColorType, ColorType colorType){
+    public void updateColorTypeOnVariables(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
         for(Variable var : variables){
             if(var.getColorType().equals(oldColorType)){
-                var.setColorType(colorType);
+                Command command = new UpdateColorTypeOnVariableCommand(colorType, oldColorType, var);
+                command.redo();
+                undoManager.addEdit(command);
             }
         }
     }
 
-    public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places){
+    public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places, UndoManager undoManager){
         for(TimedPlace place : places){
-            if(colorType instanceof ProductType){
-                if(place.getColorType().equals(oldColorType)) {
-                    place.setColorType(colorType);
-                }
-                place.tokens().clear();
-                place.getCtiList().clear();
-                continue;
-            }
-            if(place.getColorType().equals(oldColorType)) {
-                place.setColorType(colorType);
-            }
-            List<TimedToken> tokensToRemove = new ArrayList<>();
-            for(TimedToken token : place.tokens()) {
-                if (!place.getColorType().contains(token.color())) {
-                    tokensToRemove.add(token);
-                }
-            }
-            place.removeTokens(tokensToRemove);
-            List<ColoredTimeInvariant> invariantsToRemove = new ArrayList<>();
-            for(ColoredTimeInvariant invariant : place.getCtiList()){
-                if(!place.getColorType().contains(invariant.getColor())){
-                    invariantsToRemove.add(invariant);
-                }
-            }
-            place.getCtiList().removeAll(invariantsToRemove);
-
+            Command command = new UpdateColorTypeForPlaceCommand(place, oldColorType, colorType);
+            command.redo();
+            undoManager.addEdit(command);
         }
     }
     public void updateVariable(String oldName, Variable variable) {
@@ -949,14 +814,19 @@ public class TimedArcPetriNetNetwork {
         variables.add(variable);
     }
 
-    public void remove(ColorType colorType) {
+    public void remove(ColorType colorType, UndoManager undoManager) {
         List<ColorType> toRemove = collectColorTypesToRemoveAndUpdateTodot(colorType);
         for(ColorType ct : toRemove){
-            updateColorType(ColorType.COLORTYPE_DOT, ct);
+            Command command = new RemoveColorTypeFromNetworkCommand(ct, this);
+            command.redo();
+            undoManager.addEdit(command);
+            updateColorType(ColorType.COLORTYPE_DOT, ct, undoManager);
         }
+        /*
 	    if (colorType != null) {
             colorTypes.removeAll(toRemove);
         }
+         */
     }
 
     private List<ColorType> collectColorTypesToRemoveAndUpdateTodot(ColorType colorType){

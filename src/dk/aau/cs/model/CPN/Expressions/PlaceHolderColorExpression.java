@@ -36,7 +36,12 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
-    public Expression copy() {
+    public ColorExpression copy() {
+        return new PlaceHolderColorExpression();
+    }
+
+    @Override
+    public ColorExpression deepCopy() {
         return new PlaceHolderColorExpression();
     }
 

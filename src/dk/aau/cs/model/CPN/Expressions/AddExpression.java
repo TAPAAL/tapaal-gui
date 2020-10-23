@@ -19,6 +19,11 @@ public class AddExpression extends ArcExpression {
         this.constituents = constituents;
     }
 
+    public AddExpression(AddExpression otherExpr)  {
+        super(otherExpr);
+        this.constituents = new Vector<>(otherExpr.constituents);
+    }
+
 
     public Vector<ArcExpression> getAddExpression (){return constituents;}
 
@@ -86,6 +91,15 @@ public class AddExpression extends ArcExpression {
     @Override
     public ArcExpression copy() {
         return new AddExpression(constituents);
+    }
+
+    @Override
+    public ArcExpression deepCopy() {
+        Vector<ArcExpression> constituentsCopy = new Vector<>();
+        for (ArcExpression expr : constituents) {
+            constituentsCopy.add(expr.deepCopy());
+        }
+        return new AddExpression(constituentsCopy);
     }
 
     @Override

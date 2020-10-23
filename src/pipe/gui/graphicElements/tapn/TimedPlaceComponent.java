@@ -177,6 +177,7 @@ public class TimedPlaceComponent extends Place {
 
         List<TimedToken> timedTokens = place.tokens();
 
+        //TODO: this causes null pointer exceptions when importing some pnml nets
         Map<String, Long> tokenMap = timedTokens.stream().map(
             timedToken -> timedToken.color().getColorName() == ""?
                 timedToken.color().toString() :

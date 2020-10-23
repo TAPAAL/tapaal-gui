@@ -11,13 +11,13 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 
+//import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;

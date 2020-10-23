@@ -49,6 +49,11 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     }
 
     @Override
+    public ArcExpression deepCopy() {
+        return new PlaceHolderArcExpression();
+    }
+
+    @Override
     public boolean containsPlaceHolder() {
         return true;
     }

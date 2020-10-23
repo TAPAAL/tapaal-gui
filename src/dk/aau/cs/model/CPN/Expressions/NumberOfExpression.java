@@ -25,6 +25,12 @@ public class NumberOfExpression extends ArcExpression {
         this.color = color;
     }
 
+    public NumberOfExpression(NumberOfExpression otherExpr){
+        super(otherExpr);
+        this.number = otherExpr.number;
+        this.color = new Vector<>(otherExpr.color);
+    }
+
     public Integer getNumber() {return number;}
     public Vector<ColorExpression> getColor() {return color;}
 
@@ -76,25 +82,35 @@ public class NumberOfExpression extends ArcExpression {
 
     @Override
     public ArcExpression removeColorFromExpression(Color color) {
-        List<ColorExpression> toRemove = new ArrayList<>();
+        List<ColorExpression> toKeep = new ArrayList<>();
+        Vector<ColorExpression> newColors = new Vector<>();
         for(ColorExpression color1 : this.color){
-            if(color1.hasColor(color)){
-                toRemove.add(color1);
+            if(!color1.hasColor(color)){
+                toKeep.add(color1);
             }
         }
-        for (ColorExpression expr : toRemove){
-            this.color.remove(expr);
+        for (ColorExpression expr : toKeep){
+            newColors.add((ColorExpression)expr.copy());
         }
-        if(this.color.isEmpty()){
+        if(newColors.isEmpty()){
             return null;
         } else{
-            return this;
+            return new NumberOfExpression(number, newColors);
         }
     }
 
     @Override
     public ArcExpression copy() {
-        return new NumberOfExpression(number, color);
+        return new NumberOfExpression(number, new Vector<ColorExpression>((Vector<ColorExpression>) color.clone()));
+    }
+
+    @Override
+    public ArcExpression deepCopy() {
+        Vector<ColorExpression> colorsCopy = new Vector<>();
+        for (ColorExpression colorExpr : color) {
+            colorsCopy.add(colorExpr.copy());
+        }
+        return new NumberOfExpression(number, colorsCopy);
     }
 
     @Override

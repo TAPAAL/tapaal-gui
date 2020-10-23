@@ -189,6 +189,24 @@ public class TransportArc extends TAPNElement {
 
 		return result;
 	}
+
+    public void createNewInputArcExpression() {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(source().getColorType().getFirstColor());
+        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        vecColorExpr.add(userOperatorExpression);
+        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        setInputExpression(numbExpr);
+        setWeight(new IntWeight(1));
+    }
+
+    public void createNewOutputArcExpression() {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(destination().getColorType().getFirstColor());
+        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        vecColorExpr.add(userOperatorExpression);
+        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        setOutputExpression(numbExpr);
+        setWeight(new IntWeight(1));
+    }
 	
 	@Override
 	public String toString() {

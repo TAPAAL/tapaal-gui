@@ -52,6 +52,11 @@ public class SuccessorExpression extends ColorExpression {
     }
 
     @Override
+    public ColorExpression deepCopy() {
+        return new SuccessorExpression(color.deepCopy());
+    }
+
+    @Override
     public boolean containsPlaceHolder() {
         return color.containsPlaceHolder();
     }

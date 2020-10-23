@@ -1,7 +1,12 @@
 package dk.aau.cs.model.tapn;
 
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.util.Require;
+
+import java.util.Vector;
 
 public class TimedOutputArc extends TAPNElement {
 	private Weight weight;
@@ -46,6 +51,15 @@ public class TimedOutputArc extends TAPNElement {
 	public TimedPlace destination() {
 		return destination;
 	}
+
+    public void createNewArcExpression() {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(destination().getColorType().getFirstColor());
+        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        vecColorExpr.add(userOperatorExpression);
+        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        setExpression(numbExpr);
+        setWeight(new IntWeight(1));
+    }
 
 	@Override
 	public void delete() {

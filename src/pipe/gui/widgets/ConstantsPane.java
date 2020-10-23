@@ -20,15 +20,11 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import dk.aau.cs.gui.undo.MoveElementDownCommand;
-import dk.aau.cs.gui.undo.MoveElementUpCommand;
+import dk.aau.cs.gui.undo.Colored.UpdateColorTypePanelCommand;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
-import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.GridBagHelper;
 import org.jdesktop.swingx.JXComboBox;
 import pipe.dataLayer.Template;
@@ -40,8 +36,7 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.components.NonsearchableJList;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ColoredWidgets.ColorTypeDialogPanel;
 import pipe.gui.widgets.ColoredWidgets.VariablesDialogPanel;
 
@@ -706,11 +701,12 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
     private void showEditColorTypeDialog(ColorType colorType) {
         ColorTypeDialogPanel panel = null;
+        UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
         if (colorType != null) {
-            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType);
+            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType, undoManager);
         }
         else {
-            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network());
+            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), undoManager);
         }
         panel.showDialog();
     }
@@ -903,21 +899,21 @@ public class ConstantsPane extends JPanel implements SidePane {
             fireIntervalAdded(this, network.numberOfColorTypes()-1, network.numberOfColorTypes());
         }
 
+        @Override
+        public void fireContentsChanged(Object source, int index0, int index1) {
+            super.fireContentsChanged(source, index0, index1);
+        }
+
         public void removeElement(ColorType colorType) {
             int cont = JOptionPane.showConfirmDialog(CreateGui.getApp(),  removeColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if(cont == JOptionPane.OK_OPTION) {
-                network.remove(colorType);
-                fireContentsChanged(this, 0, getSize());
-                int numElements = list.getModel().getSize();
-                if (numElements <= 1) {
-                    moveDownButton.setEnabled(false);
-                    moveUpButton.setEnabled(false);
-                }
-                if (numElements <= 0) {
-                    removeBtn.setEnabled(false);
-                    editBtn.setEnabled(false);
-                }
-                updateName();
+                UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+                undoManager.newEdit();
+                network.remove(colorType, undoManager);
+
+                Command command = new UpdateColorTypePanelCommand(colorTypesListModel, list, moveUpButton, moveDownButton, editBtn, removeBtn);
+                command.redo();
+                undoManager.addEdit(command);
             }
         }
 

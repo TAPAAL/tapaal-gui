@@ -18,6 +18,12 @@ public class ScalarProductExpression extends ArcExpression {
         this.expr = expr;
     }
 
+    public ScalarProductExpression(ScalarProductExpression otherExpr) {
+        super(otherExpr);
+        this.scalar = otherExpr.scalar;
+        this.expr = otherExpr.expr.copy();
+    }
+
     //Missing implementation for evaluation - might not be needed
     public ColorMultiset eval(ExpressionContext context) {
         ColorMultiset result = expr.eval(context);
@@ -57,6 +63,11 @@ public class ScalarProductExpression extends ArcExpression {
     @Override
     public ArcExpression copy() {
         return new ScalarProductExpression(scalar, expr);
+    }
+
+    @Override
+    public ArcExpression deepCopy() {
+        return new ScalarProductExpression(scalar, expr.deepCopy());
     }
 
     @Override

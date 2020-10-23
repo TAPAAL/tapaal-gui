@@ -49,6 +49,14 @@ public class ProductType extends ColorType {
         return out;
     }
 
+    private int getConstituentCombinationSize(){
+        int result = 1;
+        for (ColorType ct : constituents) {
+            result *= ct.size();
+        }
+        return result;
+    }
+
     @Override
     public boolean contains(Color color){
         for(ColorType ct : constituents){
@@ -61,6 +69,46 @@ public class ProductType extends ColorType {
         return true;
     }
 
+
+    @Override
+    public Vector<Color> getColors(){
+        Vector<Color> colors = new Vector<>();
+
+        if (getConstituentCombinationSize() != colorCache.size()) {
+
+            Vector<Vector<Color>> tupleColors = new Vector<>();
+            for (ColorType ct : constituents) {
+                if (tupleColors.isEmpty()) {
+                    for (Color color : ct.getColors()) {
+                        Vector<Color> tupleColor = new Vector<>();
+                        tupleColor.add(color);
+                        tupleColors.add(tupleColor);
+                    }
+                } else {
+                    Vector<Vector<Color>> newTupleColors = new Vector<>();
+                    for (Color color : ct.getColors()) {
+                        Vector<Vector<Color>> tupleColorsClone = (Vector<Vector<Color>>) tupleColors.clone();
+                        for (Vector<Color> tupleColor : tupleColorsClone) {
+                            tupleColor.add(color);
+                        }
+                        newTupleColors.addAll(tupleColorsClone);
+                    }
+                    tupleColors = newTupleColors;
+                }
+
+            }
+
+            for (Vector<Color> tupleColor : tupleColors) {
+                colorCache.putIfAbsent(tupleColor, new Color(this, 0, tupleColor));
+            }
+        }
+
+        for (Color cachedColor : colorCache.values()){
+            colors.add(cachedColor);
+        }
+
+        return colors;
+    }
 
     public boolean containsTypes(Vector<ColorType> colorTypes) {
         return constituents.equals(colorTypes);
@@ -83,6 +131,13 @@ public class ProductType extends ColorType {
             colors.add(ct.getFirstColor());
         }
         return getColor(colors);
+    }
+
+    public Vector<ColorType> getConstituents(){
+        return constituents;
+    }
+    public void setConstituents(Vector<ColorType> constituents) {
+        this.constituents = constituents;
     }
 
     public void replaceColorType(ColorType newColorType, ColorType oldColorType){

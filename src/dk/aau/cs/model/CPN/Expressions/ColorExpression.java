@@ -15,6 +15,11 @@ public abstract class ColorExpression extends Expression {
 
     }
 
+    @Override
+    public abstract ColorExpression copy();
+
+    public abstract ColorExpression deepCopy();
+
     public abstract ColorExpression findFirstPlaceHolder();
 
     public abstract boolean containsPlaceHolder();

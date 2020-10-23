@@ -66,7 +66,7 @@ public class TimedToken {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-        return String.format("(%s, %s)", place.toString(), df.format(age));
+        return String.format("(%s, %s, %s)", place.toString(), df.format(age), color.toString());
 	}
     //This is for colors
     public String toStringForPNML() {

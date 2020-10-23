@@ -3,12 +3,18 @@ package dk.aau.cs.model.CPN.Expressions;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 
+import java.lang.reflect.InvocationTargetException;
+
 public abstract class ArcExpression extends Expression {
 
     protected ArcExpression parent;
 
     public ArcExpression() {
 
+    }
+
+    public ArcExpression(ArcExpression otherExpr) {
+        this.parent = otherExpr.parent;
     }
 
     public abstract ArcExpression replace(Expression object1, Expression object2);
@@ -19,6 +25,8 @@ public abstract class ArcExpression extends Expression {
 
     @Override
     public abstract ArcExpression copy();
+
+    public abstract ArcExpression deepCopy();
 
     @Override
     public abstract ArcExpression findFirstPlaceHolder();

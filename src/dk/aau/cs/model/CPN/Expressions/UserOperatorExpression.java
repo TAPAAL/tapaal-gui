@@ -56,6 +56,11 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     @Override
+    public ColorExpression deepCopy() {
+        return new UserOperatorExpression(userOperator.deepCopy());
+    }
+
+    @Override
     public boolean containsPlaceHolder() {
         return false;
     }

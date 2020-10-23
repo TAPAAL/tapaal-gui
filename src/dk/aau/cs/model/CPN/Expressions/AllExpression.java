@@ -59,6 +59,11 @@ public class AllExpression extends ColorExpression {
     }
 
     @Override
+    public AllExpression deepCopy() {
+        return new AllExpression(sort.copy());
+    }
+
+    @Override
     public boolean containsPlaceHolder() {
         return false;
     }

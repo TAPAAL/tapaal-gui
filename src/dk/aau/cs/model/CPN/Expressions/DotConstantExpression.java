@@ -40,8 +40,13 @@ public class DotConstantExpression extends ColorExpression {
     }
 
     @Override
-    public Expression copy() {
+    public ColorExpression copy() {
         return null;
+    }
+
+    @Override
+    public DotConstantExpression deepCopy() {
+        return new DotConstantExpression();
     }
 
     @Override

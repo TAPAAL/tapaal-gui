@@ -99,8 +99,19 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
-    public Expression copy() {
-        return new TupleExpression(colors);
+    public ColorExpression copy() {
+        return new TupleExpression(new Vector<>(colors));
+    }
+
+    @Override
+    public TupleExpression deepCopy() {
+        Vector<ColorExpression> colorsCopy = new Vector<>();
+
+        for (ColorExpression expr: colors) {
+            colorsCopy.add(expr.deepCopy());
+        }
+
+        return new TupleExpression(colorsCopy);
     }
 
     @Override

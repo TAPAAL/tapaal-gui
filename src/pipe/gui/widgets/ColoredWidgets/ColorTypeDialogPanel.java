@@ -5,6 +5,7 @@ import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import org.jdesktop.swingx.JXComboBox;
 import pipe.gui.CreateGui;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
 
@@ -34,6 +35,7 @@ public class ColorTypeDialogPanel extends JPanel {
     private final HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
     private String oldName;
     private ConstantsPane.ColorTypesListModel colorTypesListModel;
+    private UndoManager undoManager;
 
     private JLabel nameLabel;
     private JTextField nameTextField;
@@ -75,19 +77,21 @@ public class ColorTypeDialogPanel extends JPanel {
         "Do you wish to continue?";
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
-                                TimedArcPetriNetNetwork network) {
+                                TimedArcPetriNetNetwork network, UndoManager undoManager) {
         oldName = "";
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
+        this.undoManager = undoManager;
         initComponents();
         nameTextField.setText(oldName);
 
     }
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
-                                TimedArcPetriNetNetwork network, ColorType colortype) {
+                                TimedArcPetriNetNetwork network, ColorType colortype, UndoManager undoManager) {
         this.oldColorType = colortype;
         oldName = colortype.getName();
+        this.undoManager = undoManager;
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
         initComponents();
@@ -723,11 +727,12 @@ public class ColorTypeDialogPanel extends JPanel {
                         if(showDialog){
                             int cont = JOptionPane.showConfirmDialog(this,  removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if(cont == JOptionPane.OK_OPTION){
-                                network.updateColorType(oldColorType.getName(), newColorType);
-                                colorTypesListModel.updateName();
+                                undoManager.newEdit();
+                                network.updateColorType(oldColorType.getName(), newColorType, undoManager);
+
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), newColorType);
+                            network.updateColorType(oldColorType.getName(), newColorType, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {
@@ -752,11 +757,11 @@ public class ColorTypeDialogPanel extends JPanel {
                         if(showDialog) {
                             int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
-                                network.updateColorType(oldColorType.getName(), newColorType);
-                                colorTypesListModel.updateName();
+                                undoManager.newEdit();
+                                network.updateColorType(oldColorType.getName(), newColorType, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), newColorType);
+                            network.updateColorType(oldColorType.getName(), newColorType, undoManager);
                             colorTypesListModel.updateName();
                         }
                     }
@@ -790,11 +795,11 @@ public class ColorTypeDialogPanel extends JPanel {
                             int cont = JOptionPane.showConfirmDialog(this, "<html>" + editProductTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
 
-                                network.updateColorType(oldColorType.getName(), productType);
-                                colorTypesListModel.updateName();
+                                undoManager.newEdit();
+                                network.updateColorType(oldColorType.getName(), newColorType, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), productType);
+                            network.updateColorType(oldColorType.getName(), productType, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {

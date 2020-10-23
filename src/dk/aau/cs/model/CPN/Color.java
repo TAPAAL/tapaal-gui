@@ -94,9 +94,26 @@ public class Color {
     @Override
     public String toString() {
         if (tuple != null) {
-            return tuple.toString();
+            String out = "(";
+            for (Color color : tuple) {
+                out += color.toString() + ", ";
+            }
+            out = out.substring(0, out.length() -2);
+            out += ")";
+            return out;
         }
         else
             return colorName;
+    }
+
+    public Color deepCopy() {
+        if (tuple.isEmpty()) {
+            return  new Color(colorType.copy(), id, colorName);
+        }
+        Vector<Color> colors = new Vector<>();
+        for(Color color : tuple) {
+            colors.add(color.deepCopy());
+        }
+        return new Color(colorType.copy(), id, colors);
     }
 }
