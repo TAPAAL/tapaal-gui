@@ -288,7 +288,7 @@ public class PNMLoader {
         String id = getAttribute(node, "id").getNodeValue();
         String name = getAttribute(node, "name").getNodeValue();
         if (typetag.equals("productsort")) {
-            ProductType pt = new ProductType(name, id);
+            ProductType pt = new ProductType(id, name);
             Node typechild = skipWS(type.getFirstChild());
             while (typechild != null) {
                 if (typechild.getNodeName().equals("usersort")) {

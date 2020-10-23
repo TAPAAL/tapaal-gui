@@ -444,7 +444,6 @@ public class TapnXmlLoader {
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
-		
 
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;

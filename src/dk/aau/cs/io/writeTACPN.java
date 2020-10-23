@@ -362,7 +362,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
         Element typeStructure = document.createElement("structure");
         type.appendChild(typeStructure);
         Element typeUsersort = document.createElement("usersort");
-        typeUsersort.setAttribute("declaration", colorType.getId());
+        typeUsersort.setAttribute("declaration", colorType.getName());
 
         typeStructure.appendChild(typeUsersort);
         placeElement.appendChild(type);

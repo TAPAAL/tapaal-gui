@@ -52,7 +52,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
     @SuppressWarnings("Duplicates")
     public void parseDeclarations(Node node, TimedArcPetriNetNetwork network) throws FormatException {
-        if(node == null || !(node instanceof Element)){
+        if(!(node instanceof Element)){
             return;
         }
         Node child = skipWS(node.getFirstChild());
@@ -78,10 +78,9 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     private void parseNamedSort(Node node, TimedArcPetriNetNetwork network) throws FormatException {
         Node type = skipWS(node.getFirstChild());
         String typetag = type.getNodeName();
-        String id = getAttribute(node, "id").getNodeValue();
         String name = getAttribute(node, "name").getNodeValue();
         if (typetag.equals("productsort")) {
-            ProductType pt = new ProductType(name, id);
+            ProductType pt = new ProductType(name, name);
             Node typechild = skipWS(type.getFirstChild());
             while (typechild != null) {
                 if (typechild.getNodeName().equals("usersort")) {
@@ -90,10 +89,10 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 }
                 typechild = skipWS(typechild.getNextSibling());
             }
-            Require.that(colortypes.put(id, pt) == null, "the name " + name + ", was already used");
+            Require.that(colortypes.put(name, pt) == null, "the name " + name + ", was already used");
             network.add(pt);
         } else {
-            ColorType ct = new ColorType(id, name);
+            ColorType ct = new ColorType(name, name);
             if (typetag.equals("dot")) {
                 ct.addColor("dot");
             } else {
@@ -108,7 +107,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                     }
                 }
             }
-            Require.that(colortypes.put(id, ct) == null, "the name " + name + ", was already used");
+            Require.that(colortypes.put(name, ct) == null, "the name " + name + ", was already used");
             network.add(ct);
         }
     }
