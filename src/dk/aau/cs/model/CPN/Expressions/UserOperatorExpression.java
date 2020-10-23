@@ -40,7 +40,7 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     @Override
-    public ColorExpression replace(Expression object1, Expression object2) {
+    public ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof  ColorExpression) {
             ColorExpression obj2 = (ColorExpression)object2;
             obj2.setParent(parent);
@@ -50,7 +50,10 @@ public class UserOperatorExpression extends ColorExpression {
             return this;
         }
     }
-
+    @Override
+    public ColorExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
+    }
     @Override
     public ColorExpression copy() {
         return new UserOperatorExpression(userOperator);

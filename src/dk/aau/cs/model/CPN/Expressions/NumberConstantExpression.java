@@ -18,6 +18,11 @@ public class NumberConstantExpression extends Expression {
     }
 
     @Override
+    public Expression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
+        return null;
+    }
+
+    @Override
     public Expression replace(Expression object1, Expression object2) {
         return null;
     }

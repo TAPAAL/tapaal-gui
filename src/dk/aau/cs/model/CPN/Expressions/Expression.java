@@ -44,6 +44,7 @@ public abstract class Expression {
         }
     }
 
+    public abstract Expression replace(Expression object1, Expression object2,boolean replaceAllInstances);
     public abstract Expression replace(Expression object1, Expression object2);
 
     public abstract Expression copy();

@@ -35,7 +35,7 @@ public class NumberOfExpression extends ArcExpression {
     public Vector<ColorExpression> getColor() {return color;}
 
     @Override
-    public ArcExpression replace(Expression object1, Expression object2) {
+    public ArcExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
             ArcExpression obj2 = (ArcExpression) object2;
             obj2.setParent(parent);
@@ -43,10 +43,14 @@ public class NumberOfExpression extends ArcExpression {
         }
         else {
             for (int i = 0; i < color.size(); i++) {
-                color.set(i, color.get(i).replace(object1, object2));
+                color.set(i, color.get(i).replace(object1, object2, replaceAllInstances));
             }
             return this;
         }
+    }
+    @Override
+    public ArcExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     public ColorMultiset eval(ExpressionContext context) {

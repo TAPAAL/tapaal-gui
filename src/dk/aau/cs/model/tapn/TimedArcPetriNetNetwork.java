@@ -715,27 +715,27 @@ public class TimedArcPetriNetNetwork {
             for (TimedTransition transition : tapn.transitions()) {
                 Expression expr = transition.getGuard();
                 if (expr != null) {
-                    expr.replace(oldExpression, newExpr);
+                    expr.replace(oldExpression, newExpr, true);
                     transition.setGuard((GuardExpression) expr);
                     tapn.replace(transition, i);
 
                 }
                 for(TimedInputArc arc : transition.getInputArcs()){
                     Expression arcexpr = arc.getArcExpression();
-                    arcexpr.replace(oldExpression, newExpr);
+                    arcexpr.replace(oldExpression, newExpr, true);
                     arc.setExpression((ArcExpression)arcexpr);
                 }
                 for(TimedOutputArc arc : transition.getOutputArcs()){
                     Expression arcexpr = arc.getExpression();
-                    arcexpr.replace(oldExpression, newExpr);
+                    arcexpr.replace(oldExpression, newExpr, true);
                     arc.setExpression((ArcExpression)arcexpr);
                 }
                 for(TransportArc arc : transition.getTransportArcsGoingThrough()){
                     Expression arcexpr = arc.getInputExpression();
-                    arcexpr.replace(oldExpression, newExpr);
+                    arcexpr.replace(oldExpression, newExpr, true);
                     arc.setInputExpression((ArcExpression)arcexpr);
                     arcexpr = arc.getOutputExpression();
-                    arcexpr.replace(oldExpression, newExpr);
+                    arcexpr.replace(oldExpression, newExpr, true);
                     arc.setOutputExpression((ArcExpression)arcexpr);
                 }
                 i++;

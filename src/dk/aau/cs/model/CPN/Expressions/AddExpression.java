@@ -73,16 +73,19 @@ public class AddExpression extends ArcExpression {
             return this;
         }
     }
-
     @Override
-    public ArcExpression replace(Expression object1, Expression object2) {
+    public ArcExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
+    }
+    @Override
+    public ArcExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
             ArcExpression obj2 = (ArcExpression) object2;
             obj2.setParent(parent);
             return obj2;
         } else {
             for (int i = 0; i < constituents.size(); i++) {
-                constituents.set(i, constituents.get(i).replace(object1, object2));
+                constituents.set(i, constituents.get(i).replace(object1, object2, replaceAllInstances));
             }
             return this;
         }

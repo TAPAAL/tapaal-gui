@@ -78,17 +78,21 @@ public class OrExpression extends GuardExpression {
     }
 
     @Override
-    public GuardExpression replace(Expression object1, Expression object2) {
+    public GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof GuardExpression) {
             GuardExpression ge = (GuardExpression)object2;
             ge.setParent(parent);
             return ge;
         }
         else  {
-            left = left.replace(object1, object2);
-            right = right.replace(object1, object2);
+            left = left.replace(object1, object2,replaceAllInstances);
+            right = right.replace(object1, object2,replaceAllInstances);
             return this;
         }
+    }
+    @Override
+    public GuardExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     @Override

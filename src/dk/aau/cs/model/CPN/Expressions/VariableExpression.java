@@ -38,15 +38,30 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
-    public ColorExpression replace(Expression object1, Expression object2) {
-        if (this.equals(object1) && object2 instanceof ColorExpression) {
-            ColorExpression obj2 = (ColorExpression)object2;
-            obj2.setParent(parent);
-            return obj2;
+    public ColorExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
+        if(replaceAllInstances) {
+            if (this.equals(object1) && object2 instanceof ColorExpression) {
+                ColorExpression obj2 = (ColorExpression) object2;
+                obj2.setParent(parent);
+                return obj2;
+            } else {
+                return this;
+            }
+        } else{
+            //This is needed so that we can replace the exact object and not every instance
+            if (this.strictEquals(object1) && object2 instanceof ColorExpression) {
+                ColorExpression obj2 = (ColorExpression)object2;
+                obj2.setParent(parent);
+                return obj2;
+            }
+            else {
+                return this;
+            }
         }
-        else {
-            return this;
-        }
+    }
+    @Override
+    public ColorExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     @Override
@@ -89,6 +104,15 @@ public class VariableExpression extends ColorExpression {
         if (o instanceof VariableExpression) {
             VariableExpression expr = (VariableExpression) o;
             return variable.getName().equals(expr.variable.getName());
+        }
+
+        return false;
+    }
+    //this should only be used in replace function
+    public boolean strictEquals(Object o) {
+        if (o instanceof VariableExpression) {
+            VariableExpression expr = (VariableExpression) o;
+            return variable.getName().equals(expr.variable.getName()) && this == expr;
         }
 
         return false;

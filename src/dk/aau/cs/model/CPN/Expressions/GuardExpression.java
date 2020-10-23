@@ -15,6 +15,8 @@ public abstract class GuardExpression extends Expression {
     public void setParent(GuardExpression parent) {this.parent = parent; }
 
     @Override
+    public abstract GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances);
+    @Override
     public abstract GuardExpression replace(Expression object1, Expression object2);
 
     @Override

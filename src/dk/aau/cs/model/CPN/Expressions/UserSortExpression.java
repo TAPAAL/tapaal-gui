@@ -20,7 +20,7 @@ public class UserSortExpression extends Expression {
     }
 
     @Override
-    public Expression replace(Expression object1, Expression object2) {
+    public Expression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof Expression) {
             Expression obj2 = (Expression)object2;
             obj2.setParent(parent);
@@ -29,6 +29,10 @@ public class UserSortExpression extends Expression {
         else {
             return this;
         }
+    }
+    @Override
+    public Expression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     @Override

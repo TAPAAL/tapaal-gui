@@ -25,7 +25,7 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
-    public ColorExpression replace(Expression object1, Expression object2) {
+    public ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression)object2;
             obj2.setParent(parent);
@@ -34,6 +34,10 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
         else {
             return this;
         }
+    }
+    @Override
+    public ColorExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     @Override

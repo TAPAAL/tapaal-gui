@@ -24,6 +24,7 @@ public abstract class ColorExpression extends Expression {
 
     public abstract boolean containsPlaceHolder();
 
+    public abstract ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances);
     public abstract ColorExpression replace(Expression object1, Expression object2);
 
     public void setParent(ColorExpression parent) {this.parent = parent;}

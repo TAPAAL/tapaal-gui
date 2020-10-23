@@ -17,7 +17,9 @@ public abstract class ArcExpression extends Expression {
         this.parent = otherExpr.parent;
     }
 
+    public abstract ArcExpression replace(Expression object1, Expression object2,boolean replaceAllInstances);
     public abstract ArcExpression replace(Expression object1, Expression object2);
+
 
     public ArcExpression getParent() {return parent;}
 

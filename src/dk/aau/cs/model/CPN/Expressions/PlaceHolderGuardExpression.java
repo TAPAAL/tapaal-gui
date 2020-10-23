@@ -15,7 +15,7 @@ public class PlaceHolderGuardExpression extends GuardExpression implements Place
     public boolean isSimple() {return true;}
 
     @Override
-    public GuardExpression replace(Expression object1, Expression object2) {
+    public GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof GuardExpression) {
             GuardExpression obj2 = (GuardExpression)object2;
             obj2.setParent(parent);
@@ -25,7 +25,10 @@ public class PlaceHolderGuardExpression extends GuardExpression implements Place
             return this;
         }
     }
-
+    @Override
+    public GuardExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
+    }
     @Override
     public GuardExpression copy() {
         return new PlaceHolderGuardExpression();

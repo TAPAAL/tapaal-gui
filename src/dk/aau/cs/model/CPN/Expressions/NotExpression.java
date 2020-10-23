@@ -22,16 +22,20 @@ public class NotExpression extends GuardExpression {
         return expr.removeColorFromExpression(color);
     }
     @Override
-    public GuardExpression replace(Expression object1, Expression object2) {
+    public GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof GuardExpression) {
             GuardExpression obj2 = (GuardExpression) object2;
             obj2.setParent(parent);
             return obj2;
         }
         else {
-            expr = expr.replace(object1, object2);
+            expr = expr.replace(object1, object2,replaceAllInstances);
             return this;
         }
+    }
+    @Override
+    public GuardExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     @Override

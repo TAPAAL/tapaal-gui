@@ -27,9 +27,12 @@ public class DotConstantExpression extends ColorExpression {
     public ColorType getColorType() {
         return ColorType.COLORTYPE_DOT;
     }
-
     @Override
-    public ColorExpression replace(Expression object1, Expression object2) {
+    public ColorExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
+    }
+    @Override
+    public ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression) object2;
             obj2.setParent(parent);

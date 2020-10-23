@@ -81,7 +81,7 @@ public class TupleExpression extends ColorExpression {
 
 
     @Override
-    public ColorExpression replace(Expression object1, Expression object2) {
+    public ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression) object2;
             obj2.setParent(parent);
@@ -89,10 +89,14 @@ public class TupleExpression extends ColorExpression {
         }
         else  {
             for (int i = 0; i < colors.size(); i++) {
-                colors.set(i, colors.get(i).replace(object1, object2));
+                colors.set(i, colors.get(i).replace(object1, object2, replaceAllInstances));
             }
             return this;
         }
+    }
+    @Override
+    public ColorExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
     }
 
     @Override
