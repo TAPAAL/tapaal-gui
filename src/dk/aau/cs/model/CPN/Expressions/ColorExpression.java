@@ -31,7 +31,7 @@ public abstract class ColorExpression extends Expression {
     public void getVariables(Set<Variable> variables) {
     }
     // This function might only be needed in the derived classes
-    public abstract Color eval(ExpressionContext context);
+    public abstract List<Color> eval(ExpressionContext context);
 
     public abstract boolean hasColor(Color color);
 

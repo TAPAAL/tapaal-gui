@@ -5,6 +5,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class UserOperatorExpression extends ColorExpression {
@@ -19,8 +20,8 @@ public class UserOperatorExpression extends ColorExpression {
         this.userOperator = userOperator;
     }
 
-    public Color eval(ExpressionContext context) {
-        return userOperator;
+    public List<Color> eval(ExpressionContext context) {
+        return Arrays.asList(userOperator);
     }
 
     @Override

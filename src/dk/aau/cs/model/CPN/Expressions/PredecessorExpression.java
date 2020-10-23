@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +22,8 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     //Missing implementation for evaluation - might not be needed
-    public Color eval(ExpressionContext context) {
-        return color.eval(context).predecessor();
+    public List<Color> eval(ExpressionContext context) {
+        return Arrays.asList(color.eval(context).get(0).predecessor());
     }
 
     @Override

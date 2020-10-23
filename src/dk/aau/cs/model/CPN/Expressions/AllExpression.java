@@ -26,8 +26,8 @@ public class AllExpression extends ColorExpression {
     }
 
     //TODO unsure about this
-    public Color eval(ExpressionContext context) {
-        return null;
+    public List<Color> eval(ExpressionContext context) {
+        return sort.getColors();
     }
 
     @Override

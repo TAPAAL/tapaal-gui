@@ -509,7 +509,6 @@ public class TapnXmlLoader {
                 ColorMultiset cm = colorMarking.eval(context);
 
 
-                //TODO: nasty with two types of tokens/markings
                 for (TimedToken ctElement : cm.getTokens(p)) {
                     network.marking().add(ctElement);
                     //p.addToken(ctElement);

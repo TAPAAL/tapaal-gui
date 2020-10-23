@@ -3,14 +3,15 @@ package dk.aau.cs.model.CPN.Expressions;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.*;
 
 public class PlaceHolderColorExpression extends ColorExpression implements PlaceHolderExpression {
 
     @Override
-    public Color eval(ExpressionContext context) {
-        return null;
+    public List<Color> eval(ExpressionContext context) {
+        return Arrays.asList();
     }
 
     @Override

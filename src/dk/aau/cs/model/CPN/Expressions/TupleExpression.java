@@ -7,10 +7,7 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class TupleExpression extends ColorExpression {
     private Vector<ColorExpression> colors;
@@ -23,18 +20,18 @@ public class TupleExpression extends ColorExpression {
         this.colors = colors;
     }
 
-    public Color eval(ExpressionContext context) {
+    public List<Color> eval(ExpressionContext context) {
         Vector<Color> colors = new Vector<Color>();
         Vector<ColorType> colorTypes = new Vector<ColorType>();
 
         for (ColorExpression ce : this.colors) {
-            Color color = ce.eval(context);
-            colors.add(color);
-            colorTypes.add(color.getColorType());
+            List<Color> color = ce.eval(context);
+            colors.addAll(color);
+            colorTypes.add(color.get(0).getColorType());
         }
 
         ProductType pt = context.findProductColorType(colorTypes);
-        return pt.getColor(colors);
+        return Arrays.asList(pt.getColor(colors));
     }
 
     @Override

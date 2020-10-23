@@ -61,13 +61,13 @@ public class NumberOfExpression extends ArcExpression {
                     assert(ct == ((AllExpression) ce).getSort());
                 }
             }
-            Color c = ce.eval(context);
+            List<Color> c = ce.eval(context);
             if (ct == null) {
-                ct = c.getColorType();
+                ct = c.get(0).getColorType();
             } else {
-                assert(ct == c.getColorType());
+                assert(ct == c.get(0).getColorType());
             }
-            colors.add(c);
+            colors.addAll(c);
         }
         return new ColorMultiset(ct, number, colors);
     }

@@ -5,12 +5,13 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class DotConstantExpression extends ColorExpression {
 
-    public Color eval(ExpressionContext context) {
-        return DotConstant.getInstance();
+    public List<Color> eval(ExpressionContext context) {
+        return Arrays.asList(DotConstant.getInstance());
     }
 
     @Override

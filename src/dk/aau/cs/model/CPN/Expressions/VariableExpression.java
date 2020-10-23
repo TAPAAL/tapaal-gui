@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +22,8 @@ public class VariableExpression extends ColorExpression {
         this.variable = variable;
     }
 
-    public Color eval(ExpressionContext context) {
-        return context.binding.get(variable.getName());
+    public List<Color> eval(ExpressionContext context) {
+        return Arrays.asList(context.binding.get(variable.getName()));
     }
 
     @Override
