@@ -96,6 +96,8 @@ public class ColorTypeDialogPanel extends JPanel {
         this.colorTypesListModel = colorTypesListModel;
         initComponents();
         initValues();
+        colorTypeComboBox.setVisible(false);
+        colorTypeLabel.setVisible(false);
     }
 
     public void showDialog() {
@@ -277,6 +279,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 dialog.pack();
             }
         });
+
         GridBagConstraints gbcCTCB = new GridBagConstraints();
         gbcCTCB.insets = new Insets(2, 4, 2, 4);
         gbcCTCB.gridx = 1;
@@ -554,6 +557,9 @@ public class ColorTypeDialogPanel extends JPanel {
 
         for (ColorType element : colorTypes) {
             productTypeComboBox.addItem(element);
+        }
+        if(oldColorType != null && oldColorType instanceof ProductType){
+            productTypeComboBox.removeItem(oldColorType);
         }
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridx = 1;
