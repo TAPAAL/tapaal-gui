@@ -17,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
@@ -147,6 +148,14 @@ public class TimedTransitionComponent extends Transition {
 		transition.setName(nameInput);
 		super.setName(nameInput);
 	}
+
+	public GuardExpression getGuardExpression() {
+	    return transition.getGuard();
+    }
+
+    public void setGuardExpression(GuardExpression expression) {
+	    transition.setGuard(expression);
+    }
 
 	public String getName() {
 		return transition != null ? transition.name() : "";

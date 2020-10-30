@@ -4,6 +4,8 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
+import dk.aau.cs.gui.undo.Colored.SetTransitionExpressionCommand;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
@@ -1031,11 +1033,15 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.requestFocus(true);
     }
 
-    public void onOK() {
+    public void onOK(pipe.gui.undo.UndoManager undoManager) {
         if (newProperty instanceof PlaceHolderGuardExpression) {
-            transition.underlyingTransition().setGuard(null);
+            Command cmd = new SetTransitionExpressionCommand(transition, transition.getGuardExpression(), null);
+            cmd.redo();
+            undoManager.addEdit(cmd);
         } else {
-            transition.underlyingTransition().setGuard(newProperty);
+            Command cmd = new SetTransitionExpressionCommand(transition, transition.getGuardExpression(), newProperty);
+            cmd.redo();
+            undoManager.addEdit(cmd);
         }
         /*if (urgentCheckBox.isSelected()) {
             List<TimedInputArc> oldInputArcs = transition.underlyingTransition().getInputArcs();

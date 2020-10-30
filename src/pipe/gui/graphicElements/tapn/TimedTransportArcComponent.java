@@ -6,6 +6,7 @@ import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -98,6 +99,14 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		repaint();
 
 	}
+
+	public void setInputExpression(ArcExpression expression) {
+	    underlyingTransportArc().setInputExpression(expression);
+    }
+
+    public void setOutputExpression(ArcExpression expression) {
+	    underlyingTransportArc().setOutputExpression(expression);
+    }
 
 	public int getGroupNr() {
 		return getGroup();

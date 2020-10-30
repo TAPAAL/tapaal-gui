@@ -171,7 +171,7 @@ public class GuardDialogue extends JPanel /*
 					}
 				}
 				//Update colors
-				coloredArcGuardPanel.onOkColored();
+				coloredArcGuardPanel.onOkColored(undoManager);
 				Weight weight = composeWeight();
 				undoManager.addEdit(arc.setGuardAndWeight(guard, weight));
 				CreateGui.getCurrentTab().network().buildConstraints();

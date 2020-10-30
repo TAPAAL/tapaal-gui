@@ -2,6 +2,10 @@ package pipe.gui.ColoredComponents;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
+import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
+import dk.aau.cs.gui.undo.Colored.SetTransportArcExpressionsCommand;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
@@ -1049,34 +1053,37 @@ public class ColoredArcGuardPanel extends JPanel {
         }
 
     }
-    public void onOkColored() {
+    public void onOkColored(pipe.gui.undo.UndoManager undoManager) {
         if(isTransportArc){
             int weight =  Integer.parseInt(colorExpressionWeightSpinner.getValue().toString());
             TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
             ArcExpression inputExpression = getTransportExpression(inputPanel.getColorExpression(), weight);
             ArcExpression outputExpression = getTransportExpression(outputPanel.getColorExpression(), weight);
-            transportArc.setInputExpression(inputExpression);
-            transportArc.setOutputExpression(outputExpression);
-            transportArc.setColorTimeIntervals(getctiList());
-            ((TimedTransportArcComponent) objectToBeEdited).updateLabel(false);
+            Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(), inputExpression, transportArc.getOutputExpression(), outputExpression);
+            expressionsCommand.redo();
+            undoManager.addEdit(expressionsCommand);
+            Command cmd = new SetColoredArcIntervalsCommand((TimedTransportArcComponent) objectToBeEdited, ((TimedTransportArcComponent) objectToBeEdited).getCtiList(), getctiList());
+            cmd.redo();
+            undoManager.addEdit(cmd);
         }
         if (!isInhibitorArc && isInputArc) {
             TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
-            ArcExpression arcExpression = this.arcExpression;
-            inputArc.setExpression(arcExpression);
-            inputArc.setColorTimeIntervals(getctiList());
-            ((TimedInputArcComponent) objectToBeEdited).updateLabel(false);
+            Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getArcExpression(), arcExpression);
+            cmd.redo();
+            undoManager.addEdit(cmd);
+            cmd = new SetColoredArcIntervalsCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getColorTimeIntervals(), getctiList());
+            cmd.redo();
+            undoManager.addEdit(cmd);
         } else if(isInhibitorArc){
             TimedInhibitorArc inhibitorArc = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
-            ArcExpression arcExpression = this.arcExpression;
-            inhibitorArc.setExpression(arcExpression);
-            ((TimedInhibitorArcComponent)objectToBeEdited).updateLabel(false);
+            Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)objectToBeEdited, inhibitorArc.getArcExpression(), arcExpression);
+            cmd.redo();
+            undoManager.addEdit(cmd);
         } else {
-            ArcExpression arcExpression = this.arcExpression;
             TimedOutputArc outputArc = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc();
-            ((TimedOutputArcComponent) objectToBeEdited).setUnderlyingArc(outputArc);
-            outputArc.setExpression(arcExpression);
-            ((TimedOutputArcComponent) objectToBeEdited).updateLabel(false);
+            Command cmd = new SetArcExpressionCommand((TimedOutputArcComponent)objectToBeEdited, outputArc.getExpression(), arcExpression);
+            cmd.redo();
+            undoManager.addEdit(cmd);
         }
     }
 

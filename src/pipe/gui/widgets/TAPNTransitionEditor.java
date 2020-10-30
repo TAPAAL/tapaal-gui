@@ -473,8 +473,7 @@ public class TAPNTransitionEditor extends JPanel {
 		}
 		
 
-		coloredTransitionGuardPanel.onOK();
-        transition.update(true);
+		coloredTransitionGuardPanel.onOK(context.undoManager());
 		
 		return true;
 	}
