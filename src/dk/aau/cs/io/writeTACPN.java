@@ -32,7 +32,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 arcExpr = ((TimedTransportArcComponent) arc).underlyingTransportArc().getInputExpression();
             }
             if (arcExpr != null) {
-                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
+                arcElement.appendChild(createArcExpressionElement(document, arcExpr));
             }
         } else {
             if(arc instanceof TimedInhibitorArcComponent){
@@ -43,12 +43,12 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 arcExpr = ((TimedOutputArcComponent) arc).underlyingArc().getExpression();
             }
             if (arcExpr != null) {
-                arcElement.appendChild(createArcExpressionElement(arc, guiModel, document, arcExpr));
+                arcElement.appendChild(createArcExpressionElement(document, arcExpr));
             }
         }
     }
 
-    private Element createArcExpressionElement(Arc arc, DataLayer guiModel, Document document, ArcExpression arcExpr) {
+    public Element createArcExpressionElement(Document document, ArcExpression arcExpr) {
 
         Element hlinscriptionElement = document.createElement("hlinscription");
         Element textElement = document.createElement("text");
@@ -206,19 +206,17 @@ public class writeTACPN { // both export and save share some of the same syntax 
         return structureElement;
     }
 
-    public void appendColoredTransitionDependencies(TimedTransitionComponent inputTransition, Document document, Element transitionElement) {
-        if(inputTransition.underlyingTransition() instanceof TimedTransition) {
-            Expression expr = inputTransition.underlyingTransition().getGuard();
-            if(expr != null) {
-                Element conditionElement = document.createElement("condition");
-                transitionElement.appendChild(conditionElement);
-                Element textElement = document.createElement("text");
-                String expressionName = ReplaceExpressionWithNames(expr.toString());
-                textElement.setTextContent(expressionName);
-                conditionElement.appendChild(textElement);
-                Element structureElement = document.createElement("structure");
-                conditionElement.appendChild(parseGuardExpression(expr, document, structureElement));
-            }
+    public void appendColoredTransitionDependencies(TimedTransition inputTransition, Document document, Element transitionElement) {
+        Expression expr = inputTransition.getGuard();
+        if(expr != null) {
+            Element conditionElement = document.createElement("condition");
+            transitionElement.appendChild(conditionElement);
+            Element textElement = document.createElement("text");
+            String expressionName = ReplaceExpressionWithNames(expr.toString());
+            textElement.setTextContent(expressionName);
+            conditionElement.appendChild(textElement);
+            Element structureElement = document.createElement("structure");
+            conditionElement.appendChild(parseGuardExpression(expr, document, structureElement));
         }
     }
 
@@ -349,10 +347,8 @@ public class writeTACPN { // both export and save share some of the same syntax 
 
     }
 
-
     public void appendColoredPlaceDependencies(TimedPlace inputPlace, Document document, Element placeElement) {
         ColorType colorType = inputPlace.getColorType();
-
         Element type = document.createElement("type");
         Element typeText = document.createElement("text");
         if (colorType != null) {
@@ -431,7 +427,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
                     if (colorType instanceof ProductType) {
                         Element rangeTuble = document.createElement("tuple");
                         rangeSubTerm3.appendChild(rangeTuble);
-                        for (Color element :  token.getColor().getTuple()) {
+                        for (Color element : token.getColor().getTuple()) {
                             Element rangeSubTerm4 = document.createElement("subterm");
                             rangeTuble.appendChild(rangeSubTerm4);
                             Element rangeUseroperator = document.createElement("useroperator");

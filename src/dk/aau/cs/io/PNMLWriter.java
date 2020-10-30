@@ -303,7 +303,7 @@ public class PNMLWriter implements NetWriter {
         offset.setAttribute("x", String.valueOf(Math.round(inputTransition.getPositionX())));
         offset.setAttribute("y", String.valueOf(Math.round(inputTransition.getPositionY())));
 
-        writeTACPN.appendColoredTransitionDependencies(inputTransition, document, transitionElement);
+        writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
         return transitionElement;
     }
 

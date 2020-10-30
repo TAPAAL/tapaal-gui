@@ -498,7 +498,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
-        writeTACPN.appendColoredTransitionDependencies(inputTransition, document, transitionElement);
+        writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
 
         return transitionElement;
 	}

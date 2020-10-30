@@ -20,6 +20,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 
 public class VerifyTAPNExporter {
+    protected TimedArcPetriNet model;
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
@@ -28,6 +29,7 @@ public class VerifyTAPNExporter {
 		} else {
 			queryFile = createTempFile(".q");
 		}
+		this.model = model;
 		
 
 		return export(model, query, modelFile, queryFile, null, lens);
@@ -65,7 +67,6 @@ public class VerifyTAPNExporter {
 	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
-		
 		for(TimedPlace p : model.places())
 			outputPlace(p, modelStream);
 		
@@ -83,12 +84,18 @@ public class VerifyTAPNExporter {
 		
 		for(TimedInhibitorArc inhibArc : model.inhibitorArcs())
 			outputInhibitorArc(inhibArc, modelStream);
-		
-		modelStream.append("</net>\n");
+
+		outputDeclarations(modelStream);
+
+        modelStream.append("</net>\n");
 		modelStream.append("</pnml>");
 	}
+
+	protected void outputDeclarations(PrintStream modelStream){
+	    return;
+    }
 	
-	private void outputPlace(TimedPlace p, PrintStream modelStream) {
+	protected void outputPlace(TimedPlace p, PrintStream modelStream) {
 		modelStream.append("<place ");
 		
 		modelStream.append("id=\"" + p.name() + "\" ");
@@ -99,7 +106,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("/>\n");
 	}
 
-	private void outputTransition(TimedTransition t, PrintStream modelStream) {
+	protected void outputTransition(TimedTransition t, PrintStream modelStream) {
 		modelStream.append("<transition ");
 
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");

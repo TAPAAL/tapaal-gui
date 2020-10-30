@@ -56,6 +56,7 @@ public class VerifyPN implements ModelChecker{
 
 		private ProcessRunner runner;
 		private boolean ctlOutput = false;
+		private boolean supportsStats = true;
 		
 		public VerifyPN(FileFinder fileFinder, Messenger messenger) {
 			this.fileFinder = fileFinder;
@@ -63,7 +64,7 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		public boolean supportsStats(){
-			return true;
+			return supportsStats;
 		}
 
         public String[] getStatsExplanations(){
@@ -282,8 +283,13 @@ public class VerifyPN implements ModelChecker{
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 			
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-			
-			VerifyPNExporter exporter = new VerifyPNExporter();
+			VerifyTAPNExporter exporter;
+			if(model.value1().parentNetwork().hasColors()){
+			    exporter = new VerifyCPNExporter();
+			    supportsStats = false;
+            } else {
+                exporter = new VerifyPNExporter();
+            }
 			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null);
 
 			if (exportedModel == null) {

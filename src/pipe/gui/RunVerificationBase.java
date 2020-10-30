@@ -62,7 +62,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		ITAPNComposer composer = new TAPNComposer(messenger, false);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-		
+
+		//this is needed to get the declarations for colored nets
+        transformedModel.value1().setParentNetwork(model);
+
 		if (options.enabledOverApproximation())
 		{
 			OverApproximation overaprx = new OverApproximation();
