@@ -556,6 +556,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
         //This makes it look slightly better in ubuntu dark mode
+        //By removing a white bar around the whole drawing surface
+        //https://bugs.launchpad.net/tapaal/+bug/1902226
         SwingUtilities.updateComponentTreeUI(this);
         this.pack();
     }
