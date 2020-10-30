@@ -60,11 +60,9 @@ public abstract class QueryLoader {
 		
 		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning && showErrorMessage) {
 		    messages.add(ERROR_PARSING_QUERY_MESSAGE);
-			//JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		} else if(queryUsingNonexistentTransitionFound && firstQueryParsingWarning && showErrorMessage){
             messages.add(ERROR_PARSING_QUERY_MESSAGE);
-            //JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			firstQueryParsingWarning = false;
 		}
 		

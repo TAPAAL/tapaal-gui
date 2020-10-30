@@ -79,16 +79,14 @@ public class SUMOQueryLoader extends QueryLoader{
 		SUMOQueryLoader loader = new SUMOQueryLoader(file, network);
 		LoadedQueries loadedQueries = loader.parseQueries();
         if (loadedQueries.getMessages().size() != 0) {
-            new Thread(() -> {
-                CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                String message = "While loading the net we found one or more warnings: \n\n";
-                for (String s : loadedQueries.getMessages()) {
-                    message += s + "\n\n";
-                }
+            String message = "While loading the net we found one or more warnings: \n\n";
+            for (String s : loadedQueries.getMessages()) {
+                message += s + "\n\n";
+            }
 
-                new MessengerImpl().displayInfoMessage(message, "Warning");
-            }).start();
+            new MessengerImpl().displayInfoMessage(message, "Warning");
         }
+
 		for(TAPNQuery query : loadedQueries.getQueries()){
 			CreateGui.getCurrentTab().addQuery(query);
 		}

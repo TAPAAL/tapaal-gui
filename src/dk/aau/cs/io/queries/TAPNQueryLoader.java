@@ -272,12 +272,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		try {
 			query = XMLCTLQueryParser.parse(queryElement);
 		} catch (XMLQueryParseException e) {
-		    //We thread this to avoid freezing the GUI
             messages.add(ERROR_PARSING_QUERY_MESSAGE);
-            /*new Thread(() -> {
-                CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-            }).start();*/
 		}
 		
 		return query;
@@ -289,12 +284,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			if(firstQueryParsingWarning) {
-                //We thread this to avoid freezing the GUI
                 messages.add(ERROR_PARSING_QUERY_MESSAGE);
-                /*new Thread(() -> {
-                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-                }).start();*/
                 firstQueryParsingWarning = false;
 			}
 			System.err.println("No query was specified: ");
