@@ -724,6 +724,10 @@ public class ColorTypeDialogPanel extends JPanel {
                         return;
                     }
                     if (oldColorType != null) {
+                        if(oldColorType.equals(newColorType)){
+                            exit();
+                            return;
+                        }
                         boolean showDialog = false;
                         for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
                             if(!newColorType.getColors().contains(c)){
@@ -753,6 +757,10 @@ public class ColorTypeDialogPanel extends JPanel {
                     }
 
                     if (oldColorType != null) {
+                        if(oldColorType.equals(newColorType)){
+                            exit();
+                            return;
+                        }
                         boolean showDialog = false;
                         for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
                             if(!newColorType.getColors().contains(c)){
@@ -787,6 +795,10 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                     }
                     if (oldColorType != null) {
+                        if(oldColorType.equals(productType)){
+                            exit();
+                            return;
+                        }
                         boolean showDialog = false;
                         for(ColorType ct : ((ProductType)oldColorType).getColorTypes()){
                             if(!productType.getColorTypes().contains(ct)){

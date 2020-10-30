@@ -777,7 +777,7 @@ public class TimedArcPetriNetNetwork {
     }
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {
-            if (element.getName().equalsIgnoreCase(name)) {
+            if (element.getName().equals(name)) {
                 return true;
             }
         }
