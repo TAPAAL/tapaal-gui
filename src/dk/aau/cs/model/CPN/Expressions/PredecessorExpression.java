@@ -32,6 +32,21 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        ColorExpression expr = this.color.updateColor(color, newColorType);
+        if (expr != null) {
+            return new SuccessorExpression(expr);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
+        return this.color.hasVariable(variables);
+    }
+
+    @Override
     public ColorType getColorType(List<ColorType> colorTypes) {
         return color.getColorType(colorTypes);
     }

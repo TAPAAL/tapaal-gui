@@ -4,6 +4,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,22 @@ public class UserOperatorExpression extends ColorExpression {
     @Override
     public boolean hasColor(Color color) {
         return userOperator.equals(color);
+    }
+
+    @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        if (userOperator.equals(color)) {
+            if(!userOperator.getColorType().getId().equals(newColorType.getId())) {
+                return null;
+            }
+            userOperator = newColorType.getFirstColor();
+        }
+        return this;
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
+        return false;
     }
 
     @Override

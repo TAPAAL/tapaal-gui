@@ -33,6 +33,21 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        return this;
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
+        for(Variable var : variables) {
+            if (variable.getName().equals(var.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public ColorType getColorType(List<ColorType> colorTypes) {
         return variable.getColorType();
     }

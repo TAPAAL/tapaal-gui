@@ -35,6 +35,9 @@ public abstract class ColorExpression extends Expression {
     public abstract List<Color> eval(ExpressionContext context);
 
     public abstract boolean hasColor(Color color);
+    public abstract ColorExpression updateColor(Color color, ColorType newColorType);
+
+    public abstract boolean hasVariable(List<Variable> variables);
 
     public abstract ColorType getColorType(List<ColorType> colortypes);
 }

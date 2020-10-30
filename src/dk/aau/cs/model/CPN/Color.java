@@ -38,6 +38,19 @@ public class Color {
         return colorType;
     }
 
+    public boolean contains(Color color) {
+        if(tuple != null) {
+            for (Color c : tuple) {
+                if (c.contains(color)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return equals(color);
+        }
+    }
+
     public Color successor() {
         return colorType.successorTo(this, 1);
     }
@@ -107,7 +120,7 @@ public class Color {
     }
 
     public Color deepCopy() {
-        if (tuple.isEmpty()) {
+        if (tuple == null) {
             return  new Color(colorType.copy(), id, colorName);
         }
         Vector<Color> colors = new Vector<>();

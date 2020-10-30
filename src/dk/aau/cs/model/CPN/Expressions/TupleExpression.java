@@ -53,6 +53,32 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        Vector<ColorExpression> newColors = new Vector<>();
+        for (ColorExpression expr : colors){
+            ColorExpression newExpr = expr.updateColor(color, newColorType);
+            if (newExpr != null) {
+                newColors.add(newExpr);
+            } else {
+                return null;
+            }
+        }
+
+        colors = newColors;
+        return this;
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
+        for(ColorExpression expr : colors) {
+            if(expr.hasVariable(variables)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public ColorType getColorType(List<ColorType> colorTypes) {
         Vector<ColorType> expressionColorTypes = new Vector<ColorType>();
 

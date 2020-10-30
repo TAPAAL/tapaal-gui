@@ -59,14 +59,26 @@ public class ProductType extends ColorType {
 
     @Override
     public boolean contains(Color color){
-        for(ColorType ct : constituents){
-            for(Color c : color.getTuple()){
-                if(!ct.contains(c)){
-                    return false;
+        Vector<Color> tupleColors = color.getTuple();
+        if(tupleColors != null) {
+            if(constituents.size() == tupleColors.size()) {
+                //Are the colors in a tuple color ordered correctly?
+                //maybe do more coarse check
+                for(int i = 0; i < constituents.size(); i++) {
+                    if(!constituents.elementAt(i).contains(tupleColors.elementAt(i))){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        } else {
+            for(ColorType ct : constituents) {
+                if (ct.contains(color)) {
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
 
@@ -147,10 +159,10 @@ public class ProductType extends ColorType {
                 constituents.set(index, newColorType);
             }
         }
-        for(ColorType ct : constituents){
+/*        for(ColorType ct : constituents){
             if(ct instanceof ProductType){
                 ((ProductType)ct).replaceColorType(newColorType,oldColorType);
             }
-        }
+        }*/
     }
 }

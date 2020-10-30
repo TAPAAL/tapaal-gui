@@ -44,37 +44,36 @@ public class UpdateColorTypeForPlaceCommand extends Command {
 
 
         if(oldPlaceColorType.equals(oldColorType)) {
-
             place.setColorType(newColorType);
-
-            if(newColorType instanceof ProductType){
-                place.tokens().clear();
-                place.getCtiList().clear();
-                CreateGui.getModel().repaintPlaces();
-                return;
-            }
-
-            if (tokensToRemove.isEmpty()) {
-                for (TimedToken token : place.tokens()) {
-                    if (!place.getColorType().contains(token.color())) {
-                        tokensToRemove.add(token);
-                    }
-                }
-            }
-
-            place.removeTokens(tokensToRemove);
-
-            if (invariantsToRemove.isEmpty()) {
-                for (ColoredTimeInvariant invariant : place.getCtiList()) {
-                    if (!place.getColorType().contains(invariant.getColor())) {
-                        invariantsToRemove.add(invariant);
-                    }
-                }
-            }
-
-            place.getCtiList().removeAll(invariantsToRemove);
-
-            CreateGui.getModel().repaintPlaces(true);
         }
+
+        if(newColorType instanceof ProductType){
+            place.tokens().clear();
+            place.getCtiList().clear();
+            CreateGui.getModel().repaintPlaces();
+            return;
+        }
+
+        if (tokensToRemove.isEmpty()) {
+            for (TimedToken token : place.tokens()) {
+                if (!place.getColorType().contains(token.color())) {
+                    tokensToRemove.add(token);
+                }
+            }
+        }
+
+        place.removeTokens(tokensToRemove);
+
+        if (invariantsToRemove.isEmpty()) {
+            for (ColoredTimeInvariant invariant : place.getCtiList()) {
+                if (!place.getColorType().contains(invariant.getColor())) {
+                    invariantsToRemove.add(invariant);
+                }
+            }
+        }
+
+        place.getCtiList().removeAll(invariantsToRemove);
+
+        CreateGui.getModel().repaintPlaces(true);
     }
 }

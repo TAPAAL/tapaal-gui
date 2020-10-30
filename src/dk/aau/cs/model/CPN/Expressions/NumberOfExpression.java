@@ -85,21 +85,40 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression removeColorFromExpression(Color color) {
-        List<ColorExpression> toKeep = new ArrayList<>();
-        Vector<ColorExpression> newColors = new Vector<>();
+    public ArcExpression removeColorFromExpression(Color color, ColorType newColorType) {
+        Vector<ColorExpression> newExpressions = new Vector<>();
         for(ColorExpression color1 : this.color){
-            if(!color1.hasColor(color)){
-                toKeep.add(color1);
+            ColorExpression updatedExpr = color1.updateColor(color, newColorType);
+            if(updatedExpr != null) {
+                newExpressions.add(updatedExpr);
             }
         }
-        for (ColorExpression expr : toKeep){
-            newColors.add((ColorExpression)expr.copy());
+
+        this.color = newExpressions;
+
+        if(this.color.isEmpty()) {
+            return null;
+        } else {
+            return this;
         }
-        if(newColors.isEmpty()){
+    }
+
+
+    @Override
+    public ArcExpression removeExpressionVariables(List<Variable> variables) {
+        List<ColorExpression> toRemove = new ArrayList<>();
+        for (ColorExpression expr : this.color) {
+            if(expr.hasVariable(variables)) {
+                toRemove.add(expr);
+            }
+        }
+        for (ColorExpression expr : toRemove){
+            this.color.remove(expr);
+        }
+        if(this.color.isEmpty()){
             return null;
         } else{
-            return new NumberOfExpression(number, newColors);
+            return this;
         }
     }
 
@@ -112,7 +131,7 @@ public class NumberOfExpression extends ArcExpression {
     public ArcExpression deepCopy() {
         Vector<ColorExpression> colorsCopy = new Vector<>();
         for (ColorExpression colorExpr : color) {
-            colorsCopy.add(colorExpr.copy());
+            colorsCopy.add(colorExpr.deepCopy());
         }
         return new NumberOfExpression(number, colorsCopy);
     }

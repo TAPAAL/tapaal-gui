@@ -3,7 +3,7 @@ package dk.aau.cs.model.CPN.Expressions;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
-import org.jetbrains.annotations.NotNull;
+import dk.aau.cs.model.CPN.Variable;
 
 import java.util.*;
 
@@ -16,6 +16,16 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
 
     @Override
     public boolean hasColor(Color color) {
+        return false;
+    }
+
+    @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        return this;
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
         return false;
     }
 

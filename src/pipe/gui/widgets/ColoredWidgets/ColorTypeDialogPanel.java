@@ -728,11 +728,10 @@ public class ColorTypeDialogPanel extends JPanel {
                             int cont = JOptionPane.showConfirmDialog(this,  removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if(cont == JOptionPane.OK_OPTION){
                                 undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), newColorType, undoManager);
-
+                                network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), newColorType, undoManager);
+                            network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {
@@ -758,10 +757,10 @@ public class ColorTypeDialogPanel extends JPanel {
                             int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
                                 undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), newColorType, undoManager);
+                                network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), newColorType, undoManager);
+                            network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     }
@@ -796,10 +795,10 @@ public class ColorTypeDialogPanel extends JPanel {
                             if (cont == JOptionPane.OK_OPTION) {
 
                                 undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), newColorType, undoManager);
+                                network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), productType, undoManager);
+                            network.updateColorType(oldColorType.getName(), productType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {

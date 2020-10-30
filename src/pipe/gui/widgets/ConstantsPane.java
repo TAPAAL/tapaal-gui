@@ -909,7 +909,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             if(cont == JOptionPane.OK_OPTION) {
                 UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
                 undoManager.newEdit();
-                network.remove(colorType, undoManager);
+                network.remove(colorType,colorTypesListModel , undoManager);
 
                 Command command = new UpdateColorTypePanelCommand(colorTypesListModel, list, moveUpButton, moveDownButton, editBtn, removeBtn);
                 command.redo();

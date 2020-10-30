@@ -2,10 +2,12 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.List;
 import java.util.Set;
 
 public class SubtractExpression extends ArcExpression {
@@ -44,15 +46,28 @@ public class SubtractExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression removeColorFromExpression(Color color) {
-        ArcExpression rightRemoved = right.removeColorFromExpression(color);
-        ArcExpression leftRemoved = left.removeColorFromExpression(color);
-        if(rightRemoved == null && leftRemoved == null){
+    public ArcExpression removeColorFromExpression(Color color, ColorType newColorType) {
+        ArcExpression rightRemoved = right.removeColorFromExpression(color, newColorType);
+        ArcExpression leftRemoved = left.removeColorFromExpression(color, newColorType);
+        if(leftRemoved == null){
             return null;
         } else if(rightRemoved == null){
             return leftRemoved;
         } else{
-            return rightRemoved;
+            return new SubtractExpression(leftRemoved, rightRemoved);
+        }
+    }
+
+    @Override
+    public ArcExpression removeExpressionVariables(List<Variable> variables) {
+        ArcExpression rightChecked = right.removeExpressionVariables(variables);
+        ArcExpression leftChecked = left.removeExpressionVariables(variables);
+        if(leftChecked == null){
+            return null;
+        } else if(rightChecked == null){
+            return leftChecked;
+        } else{
+            return new SubtractExpression(leftChecked, rightChecked);
         }
     }
 

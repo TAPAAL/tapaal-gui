@@ -4,6 +4,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,17 @@ public class DotConstantExpression extends ColorExpression {
     @Override
     public boolean hasColor(Color color) {
         return color.getColorName() == "dot";
+    }
+
+    @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        //It should not be possible to remove the dot color
+        return this;
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
+        return false;
     }
 
     @Override

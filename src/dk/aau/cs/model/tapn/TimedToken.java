@@ -105,6 +105,13 @@ public class TimedToken {
 		} else if (age.compareTo(other.age) != 0){
 			return false;
 		}
+		if(color == null) {
+		    if (other.color != null) {
+		        return false;
+            }
+        } else if(!color.equals(other.color)){
+		    return false;
+        }
 		if (place == null) {
 			if (other.place != null)
 				return false;

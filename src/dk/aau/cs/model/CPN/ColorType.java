@@ -85,6 +85,11 @@ public class ColorType implements Iterable<Color> {
     }
 
     public boolean contains(Color color){
-        return colors.contains(color);
+        for (Color c : colors) {
+            if(c.contains(color)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

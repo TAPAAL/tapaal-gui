@@ -36,6 +36,16 @@ public class AllExpression extends ColorExpression {
         return false;
     }
 
+    @Override
+    public ColorExpression updateColor(Color color, ColorType newColorType) {
+        return this;
+    }
+
+    @Override
+    public boolean hasVariable(List<Variable> variables) {
+        return false;
+    }
+
     public Integer size() {
         return sort.size();
     }
