@@ -73,7 +73,7 @@ public class ColorTypeDialogPanel extends JPanel {
         "If the guards are empty they will be removed.\n\n" +
         "Do you wish to continue?";
     private static final String editProductTypeMessage = "Editing product types will result in removing all tokens in all places with this colortype\n" +
-        "All arc expressions from such a place will also be reset to 1'{topColor}" +
+        "All arc expressions from such a place will also be reset to 1'{topColor}.\n" +
         "Do you wish to continue?";
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
@@ -795,7 +795,7 @@ public class ColorTypeDialogPanel extends JPanel {
                             if (cont == JOptionPane.OK_OPTION) {
 
                                 undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
+                                network.updateColorType(oldColorType.getName(), productType, colorTypesListModel, undoManager);
                             }
                         } else{
                             network.updateColorType(oldColorType.getName(), productType, colorTypesListModel, undoManager);
