@@ -1561,9 +1561,11 @@ public class QueryDialog extends JPanel {
 		if (lens.isTimed()) {
 		    saveUppaalXMLButton.setVisible(advancedView);
 		    overApproximationOptionsPanel.setVisible(advancedView);
+        } else if (!lens.isGame()){
+            openReducedNetButton.setVisible(advancedView);
         }
 		mergeNetComponentsButton.setVisible(advancedView);
-        openReducedNetButton.setVisible(advancedView);
+
 
 		if(advancedView){
 			advancedButton.setText("Simple view");
