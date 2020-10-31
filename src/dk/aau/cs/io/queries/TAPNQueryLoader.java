@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.debug.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -287,8 +288,6 @@ public class TAPNQueryLoader extends QueryLoader{
                 messages.add(ERROR_PARSING_QUERY_MESSAGE);
                 firstQueryParsingWarning = false;
 			}
-			System.err.println("No query was specified: ");
-			e.printStackTrace();
 		}
 		return query;
 	}
