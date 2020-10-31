@@ -306,6 +306,7 @@ public class RunVerification extends RunVerificationBase {
                             try {
                                 TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
                                 reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                reducedNetTab.addQuery(dataLayerQuery);
                                 CreateGui.openNewTabFromStream(reducedNetTab);
                             } catch (Exception e1){
                                 JOptionPane.showMessageDialog(CreateGui.getApp(),

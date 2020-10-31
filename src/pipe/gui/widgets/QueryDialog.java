@@ -3230,13 +3230,13 @@ public class QueryDialog extends JPanel {
             openReducedNetButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
 
+
                     if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved and verified, the net is marked as modified
                         CreateGui.getCurrentTab().setNetChanged(true);
 
                         TAPNQuery query = getQuery();
-
                         if(query.getReductionOption() != ReductionOption.VerifyPN) {
                             JOptionPane.showMessageDialog(CreateGui.getApp(),
                                 "The selected verification engine does not support application of reduction rules",
@@ -3247,20 +3247,21 @@ public class QueryDialog extends JPanel {
                         exit();
 
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query,true, null);
-                    }
 
-                    File reducedNetFile = new File(Verifier.getReducedNetFilePath());
+                        File reducedNetFile = new File(Verifier.getReducedNetFilePath());
 
-                    if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
-                        try {
-                            TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
-                            reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                            CreateGui.openNewTabFromStream(reducedNetTab);
-                        } catch (Exception e1){
-                            JOptionPane.showMessageDialog(CreateGui.getApp(),
-                                e1.getMessage(),
-                                "Error loading reduced net file",
-                                JOptionPane.ERROR_MESSAGE);
+                        if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                            try {
+                                TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                reducedNetTab.addQuery(query);
+                                CreateGui.openNewTabFromStream(reducedNetTab);
+                            } catch (Exception e1){
+                                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                    e1.getMessage(),
+                                    "Error loading reduced net file",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
                         }
                     }
                 }
