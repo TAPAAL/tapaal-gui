@@ -1,10 +1,12 @@
 package dk.aau.cs.io.queries;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.debug.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,6 +20,7 @@ import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.StringPosition;
@@ -267,11 +270,10 @@ public class TAPNQueryLoader extends QueryLoader{
 	
 	private TCTLAbstractProperty parseCTLQueryProperty(Node queryElement){
 		TCTLAbstractProperty query = null;
-		
 		try {
 			query = XMLCTLQueryParser.parse(queryElement);
 		} catch (XMLQueryParseException e) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+            messages.add(ERROR_PARSING_QUERY_MESSAGE);
 		}
 		
 		return query;
@@ -279,16 +281,13 @@ public class TAPNQueryLoader extends QueryLoader{
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
 		TCTLAbstractProperty query = null;
-
 		try {
 			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			if(firstQueryParsingWarning) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-				firstQueryParsingWarning = false;
+                messages.add(ERROR_PARSING_QUERY_MESSAGE);
+                firstQueryParsingWarning = false;
 			}
-			System.err.println("No query was specified: ");
-			e.printStackTrace();
 		}
 		return query;
 	}

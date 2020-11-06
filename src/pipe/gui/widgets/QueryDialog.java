@@ -12,13 +12,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -130,7 +128,7 @@ public class QueryDialog extends JPanel {
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
 	private JComboBox templateBox;
-	private JComboBox<String> placesBox;
+	private JComboBox<String> placeTransitionBox;
 	private JComboBox<String> relationalOperatorBox;
     private JLabel transitionIsEnabledLabel;
     private CustomJSpinner placeMarking;
@@ -210,122 +208,19 @@ public class QueryDialog extends JPanel {
 	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
+
 	//In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
-	private final static EngineSupportOptions verifyTAPNOptions= new EngineSupportOptions(
-	    name_verifyTAPN, //name of engine
-        false, //  support fastest trace
-        false, // support deadlock with net degree 2 and (EF or AG)
-        false, //  support deadlock with EG or AF
-        false, // support deadlock with inhibitor arcs
-        false,  //support weights
-        true,  //support inhibitor arcs
-        false, // support urgent transitions
-        false, // support EG or AF
-        true, // support strict nets
-        true, //  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        false);//support EG or AF with net degree > 2
+	private final static EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
+    private final static EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
+    private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
+    private final static EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+    private final static EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
+    private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
+    private final static EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
+    private final static EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
 
-    private final static EngineSupportOptions UPPAALCombiOptions= new EngineSupportOptions(
-        name_COMBI,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        true, //support weights
-        true, //support inhibitor arcs
-        true,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        true);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new EngineSupportOptions(
-        name_OPTIMIZEDSTANDARD,//name of engine
-        false,//  support fastest trace
-        false,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        false, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        false);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAAALStandardOptions = new EngineSupportOptions(
-        name_STANDARD,//name of engine
-        false,//  support fastest trace
-        false,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        false, //support inhibitor arcs
-        false,// support urgent transitions
-        false,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        false);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAALBroadcastOptions = new EngineSupportOptions(
-        name_BROADCAST,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        true, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        true);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new EngineSupportOptions(
-        name_BROADCASTDEG2,//name of engine
-        false,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        false,//  support deadlock with EG or AF
-        false,// support deadlock with inhibitor arcs
-        false, //support weights
-        true, //support inhibitor arcs
-        false,// support urgent transitions
-        true,// support EG or AF
-        true,// support strict nets
-        true,//  support timed nets/time intervals
-        false,// support deadlock with net degree > 2
-        false, //support games
-        true);//support EG or AF with net degree > 2);
-
-    private final static EngineSupportOptions verifyDTAPNOptions= new EngineSupportOptions(
-        name_DISCRETE,//name of engine
-        true,//  support fastest trace
-        true,// support deadlock with net degree 2 and (EF or AG)
-        true,//  support deadlock with EG or AF
-        true,// support deadlock with inhibitor arcs
-        true, //support weights
-        true, //support inhibitor arcs
-        true,// support urgent transitions
-        true,// support EG or AF
-        false,// support strict nets
-        true,//  support timed nets/time intervals
-        true,// support deadlock with net degree > 2
-        true, //support games
-        true);//support EG or AF with net degree > 2);
-
-    //private final static EngineSupportOptions verifyPNOptions= new EngineSupportOptions(name_UNTIMED,false, true, true,true,true,true,false,true,false, false, false);
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
@@ -346,12 +241,12 @@ public class QueryDialog extends JPanel {
 
 	//Tool tip for query field
 	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on a part of the query you want to edit.<br />" +
-			"(Queries can be edited also manually by pressing the \"Edit Query\" button.)</html>";
+			"(Queries can also be edited manually by pressing the \"Edit Query\" button.)</html>";
 
 	//Tool tips for quantification panel
 	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
-	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Available only for some verification engines.)";
-	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maxiaml trace there is marking that satisfies the given property. (Available only for some verification engines.)";
+	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Only available for some verification engines.)";
+	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maximal trace there is a marking that satisfies the given property. (Only available for some verification engines.)";
 	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
 
     private static final String TOOL_TIP_EXISTS_UNTIL = "There is a computation where the first formula holds until the second one holds.";
@@ -386,7 +281,7 @@ public class QueryDialog extends JPanel {
 
 	//Tool tips for boundedness check panel
 	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "A number of extra tokens allowed in the net.";
-	private static final String TOOL_TIP_KBOUNDED = "Check wheather the net is bounded for the given number of extra tokens.";
+	private static final String TOOL_TIP_KBOUNDED = "Check whether the net is bounded for the given number of extra tokens.";
 
 	//Tool tips for reduction options panel
 	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose a verification engine.";
@@ -399,11 +294,11 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
     private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "Apply structural reductions to reduce the size of the net.";
-    private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freeness by using siphon-trap analysis via linear programming.";
+    private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freedom by using siphon-trap analysis via linear programming.";
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
 
 	//Tool tips for search options panel
-	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
+	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
 			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
@@ -479,10 +374,10 @@ public class QueryDialog extends JPanel {
 		TAPNQuery.SearchOption searchOption = getSearchOption();
 		ReductionOption reductionOptionToSet = getReductionOption();
 
-        if (lens.isTimed()) {
-            return getTimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
-        } else {
+        if (!lens.isGame() && !lens.isTimed()) {
             return getUntimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
+        } else {
+            return getTimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
         }
     }
 
@@ -670,7 +565,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                              HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
+                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs",
@@ -687,7 +582,7 @@ public class QueryDialog extends JPanel {
 
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
-		contentPane.add(queryDialogue);
+        contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
 
@@ -798,10 +693,10 @@ public class QueryDialog extends JPanel {
                     templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
                 }
             }
-            if (lens.isTimed()) {
-                updateTimedQueryButtons(node);
-            } else {
+            if (!lens.isGame() && !lens.isTimed()) {
                 updateUntimedQueryButtons(node);
+            } else {
+                updateTimedQueryButtons(node);
             }
         } else if (current instanceof TCTLTransitionNode) {
             TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
@@ -811,10 +706,10 @@ public class QueryDialog extends JPanel {
             } else {
                 templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
             }
-            placesBox.setSelectedItem(transitionNode.getTransition());
+            placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             userChangedAtomicPropSelection = true;
         }
-        if (!lens.isTimed()) {
+        if (!lens.isTimed() && !lens.isGame()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
 	}
@@ -826,7 +721,7 @@ public class QueryDialog extends JPanel {
         TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
         TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
 
-        placesBox.setSelectedItem(placeNode.getPlace());
+        placeTransitionBox.setSelectedItem(placeNode.getPlace());
         relationalOperatorBox.setSelectedItem(node.getOp());
         placeMarking.setValue(placeMarkingNode.getConstant());
         userChangedAtomicPropSelection = true;
@@ -836,10 +731,10 @@ public class QueryDialog extends JPanel {
         userChangedAtomicPropSelection = false;
         if (node.getLeft() instanceof TCTLPlaceNode) {
             TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
-            placesBox.setSelectedItem(placeNode.getPlace());
+            placeTransitionBox.setSelectedItem(placeNode.getPlace());
         } else {
-            if (placesBox.getItemCount() > 0) {
-                placesBox.setSelectedIndex(0);
+            if (placeTransitionBox.getItemCount() > 0) {
+                placeTransitionBox.setSelectedIndex(0);
             }
         }
         relationalOperatorBox.setSelectedItem(node.getOp());
@@ -864,7 +759,7 @@ public class QueryDialog extends JPanel {
     }
 
     private boolean transitionIsSelected() {
-        String itemName = (String) placesBox.getSelectedItem();
+        String itemName = (String) placeTransitionBox.getSelectedItem();
         if (itemName == null) return false;
         boolean transitionSelected = false;
         boolean sharedTransitionSelected = false;
@@ -951,7 +846,8 @@ public class QueryDialog extends JPanel {
             lens.isTimed(),
             (queryHasDeadlock() && highestNetDegree > 2),
             lens.isGame(),
-            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2
+            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2,
+            newProperty.hasNestedPathQuantifiers()
         };
 
 
@@ -1000,6 +896,8 @@ public class QueryDialog extends JPanel {
             }
         } else if (!lens.isGame()) {
             options.add(name_UNTIMED);
+        } else {
+            options.add(name_DISCRETE);
         }
 
 		reductionOption.removeAllItems();
@@ -1087,7 +985,7 @@ public class QueryDialog extends JPanel {
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
-		placesBox.setEnabled(false);
+		placeTransitionBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
@@ -1112,7 +1010,7 @@ public class QueryDialog extends JPanel {
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
-		placesBox.setEnabled(false);
+		placeTransitionBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
@@ -1135,7 +1033,7 @@ public class QueryDialog extends JPanel {
 		disjunctionButton.setEnabled(true);
 		negationButton.setEnabled(true);
 		templateBox.setEnabled(true);
-		placesBox.setEnabled(true);
+		placeTransitionBox.setEnabled(true);
 		relationalOperatorBox.setEnabled(true);
 		placeMarking.setEnabled(true);
 		truePredicateButton.setEnabled(true);
@@ -1158,7 +1056,7 @@ public class QueryDialog extends JPanel {
         disjunctionButton.setEnabled(true);
         negationButton.setEnabled(true);
         templateBox.setEnabled(true);
-        placesBox.setEnabled(true);
+        placeTransitionBox.setEnabled(true);
         relationalOperatorBox.setEnabled(true);
         placeMarking.setEnabled(true);
         truePredicateButton.setEnabled(true);
@@ -1167,11 +1065,11 @@ public class QueryDialog extends JPanel {
         setEnablednessOfAddPredicateButton();
     }
 
-    private void enableOnlyForAllBox() {
+    private void enableOnlyForAll() {
         existsBox.setEnabled(false);
         existsDiamond.setEnabled(false);
         forAllBox.setEnabled(true);
-        forAllDiamond.setEnabled(false);
+        forAllDiamond.setEnabled(true);
         if (!lens.isTimed()) {
             existsUntil.setEnabled(false);
             existsNext.setEnabled(false);
@@ -1183,7 +1081,7 @@ public class QueryDialog extends JPanel {
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
         templateBox.setEnabled(false);
-        placesBox.setEnabled(false);
+        placeTransitionBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
         placeMarking.setEnabled(false);
         addPredicateButton.setEnabled(false);
@@ -1193,7 +1091,7 @@ public class QueryDialog extends JPanel {
     }
 
 	private void setEnablednessOfAddPredicateButton() {
-		if (placesBox.getSelectedItem() == null)
+		if (placeTransitionBox.getSelectedItem() == null)
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
@@ -1252,10 +1150,10 @@ public class QueryDialog extends JPanel {
 			TCTLAbstractStateProperty property;
 
             if (!lens.isTimed() && transitionIsSelected()) {
-                property = new TCTLTransitionNode(template, (String) placesBox.getSelectedItem());
+                property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
             } else {
                 property = new TCTLAtomicPropositionNode(
-                    new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()),
+                    new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
                     (String) relationalOperatorBox.getSelectedItem(),
                     new TCTLConstNode((Integer) placeMarking.getValue()));
             }
@@ -1308,7 +1206,7 @@ public class QueryDialog extends JPanel {
 		queryName.setText(queryToCreateFrom.getName());
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 
-        if (lens.isTimed()) {
+        if (lens.isTimed() || lens.isGame()) {
             setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
         }
@@ -1361,7 +1259,7 @@ public class QueryDialog extends JPanel {
         reductionOption.addItem(reduction);
         reductionOption.setSelectedItem(reduction);
 
-        if (lens.isTimed()) {
+        if (lens.isTimed() || lens.isGame()) {
             setupTimedReductionOptions(queryToCreateFrom);
         } else {
             setupUntimedReductionOptions(queryToCreateFrom);
@@ -1558,7 +1456,7 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
-		if (lens.isTimed()) {
+		if (lens.isTimed() || lens.isGame()) {
 		    saveUppaalXMLButton.setVisible(advancedView);
 		    overApproximationOptionsPanel.setVisible(advancedView);
         } else if (!lens.isGame()){
@@ -1794,7 +1692,7 @@ public class QueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(quantificationPanel, gbc);
 
-		if (lens.isTimed()) {
+		if (lens.isTimed()|| lens.isGame()) {
             addTimedQuantificationListeners();
         } else {
             addUntimedQuantificationListeners();
@@ -2036,7 +1934,7 @@ public class QueryDialog extends JPanel {
 		});
 
 		negationButton.addActionListener(e -> {
-            if (lens.isTimed()) {
+            if (lens.isTimed() || lens.isGame()) {
                 TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
                 addPropertyToQuery(property);
             } else {
@@ -2112,10 +2010,10 @@ public class QueryDialog extends JPanel {
 		predicatePanel = new JPanel(new GridBagLayout());
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
-		placesBox = new JComboBox();
+		placeTransitionBox = new JComboBox();
 		Dimension d = new Dimension(125, 27);
-		placesBox.setMaximumSize(d);
-		placesBox.setPreferredSize(d);
+		placeTransitionBox.setMaximumSize(d);
+		placeTransitionBox.setPreferredSize(d);
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
@@ -2135,7 +2033,7 @@ public class QueryDialog extends JPanel {
 								placeNames.add(place.name());
 							}
 						}
-                        if (!lens.isTimed()) {
+                        if (!lens.isTimed() && !lens.isGame()) {
                             for (TimedTransition transition : tapn.transitions()) {
                                 if (!transition.isShared()) {
                                     placeNames.add(transition.name());
@@ -2144,7 +2042,7 @@ public class QueryDialog extends JPanel {
                         }
 
 						placeNames.sort(String::compareToIgnoreCase);
-						placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
+						placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
 						currentlySelected = tapn;
 						setEnablednessOfAddPredicateButton();
@@ -2157,13 +2055,13 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 						placeNames.add(place.name());
 					}
-                    if (lens.isTimed()) {
+                    if (lens.isTimed() || lens.isGame()) {
                         for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
                             placeNames.add(transition.name());
                         }
                     }
 					placeNames.sort(String::compareToIgnoreCase);
-					placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
+					placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
 					currentlySelected = SHARED;
 					setEnablednessOfAddPredicateButton();
@@ -2171,7 +2069,7 @@ public class QueryDialog extends JPanel {
                         updateQueryOnAtomicPropositionChange();
                     }
 				}
-                if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
+                if (!lens.isTimed() && !lens.isGame()) setEnablednessOfOperatorAndMarkingBoxes();
 
 			}
 		});
@@ -2195,7 +2093,7 @@ public class QueryDialog extends JPanel {
         JPanel placeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         gbc.gridy = 1;
         predicatePanel.add(placeRow, gbc);
-        placeRow.add(placesBox);
+        placeRow.add(placeTransitionBox);
 
         String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
         relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
@@ -2208,7 +2106,7 @@ public class QueryDialog extends JPanel {
 
         transitionIsEnabledLabel = new JLabel(" is enabled");
         transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
-        if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
+        if (!lens.isTimed() && !lens.isGame()) placeRow.add(transitionIsEnabledLabel);
 
         JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         gbc.gridy = 2;
@@ -2254,7 +2152,7 @@ public class QueryDialog extends JPanel {
 		queryPanel.add(predicatePanel, gbc);
 
 		//Add tool tips for predicate panel
-		placesBox.setToolTipText(TOOL_TIP_PLACESBOX);
+		placeTransitionBox.setToolTipText(TOOL_TIP_PLACESBOX);
 		templateBox.setToolTipText(TOOL_TIP_TEMPLATEBOX);
 		relationalOperatorBox.setToolTipText(TOOL_TIP_RELATIONALOPERATORBOX);
 		placeMarking.setToolTipText(TOOL_TIP_PLACEMARKING);
@@ -2270,11 +2168,11 @@ public class QueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 
-                if (lens.isTimed() && transitionIsSelected()) {
-                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placesBox.getSelectedItem()));
+                if ((!lens.isTimed() && !lens.isGame()) && transitionIsSelected()) {
+                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
                 } else {
                     TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-                        new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()),
+                        new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
                         (String) relationalOperatorBox.getSelectedItem(),
                         new TCTLConstNode((Integer) placeMarking.getValue()));
                     addPropertyToQuery(property);
@@ -2303,10 +2201,13 @@ public class QueryDialog extends JPanel {
             }
 		});
 
-		placesBox.addActionListener(e -> {
+		placeTransitionBox.addActionListener(e -> {
 			if (userChangedAtomicPropSelection) {
 				updateQueryOnAtomicPropositionChange();
 			}
+			if (!lens.isTimed() && !lens.isGame()) {
+                setEnablednessOfOperatorAndMarkingBoxes();
+            }
 		});
 
 		relationalOperatorBox.addActionListener(e -> {
@@ -2405,7 +2306,7 @@ public class QueryDialog extends JPanel {
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
 						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
 							for(TimedPlace p : tapn.places()) {
-                                if (lens.isTimed() || !p.isShared()) {
+                                if (lens.isTimed() || !p.isShared() || lens.isGame()) {
                                     templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
                                 }
 							}
@@ -2421,7 +2322,7 @@ public class QueryDialog extends JPanel {
 
                         boolean isResultFalse;
 
-                        if (lens.isTimed()) {
+                        if (lens.isTimed() || lens.isGame()) {
                             isResultFalse = !c.getResult();
                         } else {
                             isResultFalse = checkUntimedResult(newQuery) && !c.getResult();
@@ -2647,7 +2548,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
 
-		if (lens.isTimed()) {
+		if (lens.isTimed() || lens.isGame()) {
             gridBagConstraints.gridy = 2;
             gridBagConstraints.weightx = 1;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -2783,7 +2684,7 @@ public class QueryDialog extends JPanel {
         usePTrie.setToolTipText(TOOL_TIP_PTRIE);
         useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
 
-        if (lens.isTimed()) {
+        if (lens.isTimed() || lens.isGame()) {
             initTimedReductionOptions();
         } else {
             initUntimedReductionOptions();
@@ -2865,7 +2766,7 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
-        if (lens.isTimed()) {
+        if (lens.isTimed() || lens.isGame()) {
             refreshSymmetryReduction();
             refreshStubbornReduction();
             refreshDiscreteOptions();
@@ -2894,7 +2795,9 @@ public class QueryDialog extends JPanel {
 
 	private void refreshExportButtonText() {
 		ReductionOption reduction = getReductionOption();
-		if (reduction == null) {saveUppaalXMLButton.setEnabled(false);}
+		if (reduction == null) {
+		    saveUppaalXMLButton.setEnabled(false);
+		}
 		else {
 			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
 			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
@@ -2907,7 +2810,7 @@ public class QueryDialog extends JPanel {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     forAllBox.setSelected(false);
-                    enableOnlyForAllBox();
+                    enableOnlyForAll();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.io.LoadedQueries;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
@@ -122,9 +123,9 @@ public class XMLQueryLoader extends QueryLoader{
 
         // Suppress default error message
         loader.showErrorMessage = false;
-        Collection<TAPNQuery> queries = loader.parseQueries();
+        LoadedQueries loadedQueries = loader.parseQueries();
 	
-        for(TAPNQuery query : queries){
+        for(TAPNQuery query : loadedQueries.getQueries()){
             CreateGui.getCurrentTab().addQuery(query);
 
             // Remove successfully parsed queries from list

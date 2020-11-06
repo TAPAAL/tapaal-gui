@@ -30,7 +30,9 @@ public class DeleteTransportArcCommand extends TAPNElementCommand {
 	public void undo() {
 		TimedTransportArcComponent partner = transportArcComponent.getConnectedTo();
 
-		guiModel.addPetriNetObject(transportArcComponent);
+        transportArcComponent.deselect();
+
+        guiModel.addPetriNetObject(transportArcComponent);
 		guiModel.addPetriNetObject(partner);
 
 		tapn.add(transportArc);

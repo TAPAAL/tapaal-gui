@@ -146,7 +146,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 					focusedConstant = true;
 				}
 				if(!((ConstantWeight) getWeight()).constant().hasFocus()){
-					isvisible = false;
+					focusedConstant = false;
 				}
 			}
 			if(focusedConstant){

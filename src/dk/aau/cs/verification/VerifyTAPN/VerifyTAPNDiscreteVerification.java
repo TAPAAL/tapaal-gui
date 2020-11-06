@@ -5,10 +5,8 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.TAPNQuery;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
@@ -27,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -274,6 +273,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		//throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
+		if (CreateGui.getCurrentTab().getLens().isGame() && !CreateGui.getCurrentTab().getLens().isTimed()) {
+		    addGhostPlace(model.value1());
+        }
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens());
@@ -284,6 +286,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		return verify(options, model, exportedModel, query);
 	}
+
+	//An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
+	private void addGhostPlace(TimedArcPetriNet net) {
+	    TimedPlace place = new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0)));
+	    net.add(place);
+        place.addToken(new TimedToken(place, new BigDecimal(0)));
+    }
 
 	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions) options;
@@ -308,7 +317,8 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 		((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
-		runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+
+        runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 
 		if (runner.error()) {

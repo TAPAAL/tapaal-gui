@@ -540,7 +540,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Logger.log("Error loading L&F: " + exc);
         }
 
-
         if (Platform.isMac()) {
 
             //Set specific settings
@@ -556,6 +555,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
+        //This makes it look slightly better in ubuntu dark mode
+        //By removing a white bar around the whole drawing surface
+        //https://bugs.launchpad.net/tapaal/+bug/1902226
+        SwingUtilities.updateComponentTreeUI(this);
+        this.pack();
     }
 
 
@@ -929,14 +933,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 smartDrawAction.setEnabled(true);
                 mergeComponentsDialogAction.setEnabled(true);
-                workflowDialogAction.setEnabled(true);
+                if (gameFeatureOptions.getSelectedIndex() == 1) {
+                    workflowDialogAction.setEnabled(false);
+                } else {
+                    workflowDialogAction.setEnabled(true);
+                }
 
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
-
-                if (getCurrentTab().restoreWorkflowDialog()) {
-                    WorkflowDialog.showDialog();
-                }
 
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());

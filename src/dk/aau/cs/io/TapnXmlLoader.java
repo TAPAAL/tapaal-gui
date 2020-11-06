@@ -71,7 +71,8 @@ public class TapnXmlLoader {
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
 
-    private TabContent.TAPNLens lens;
+    boolean hasFeatureTag = false;
+    private TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
 	public TapnXmlLoader() {
 
@@ -125,15 +126,21 @@ public class TapnXmlLoader {
 		parseSharedTransitions(doc, network);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
-		Collection<TAPNQuery> queries = new TAPNQueryLoader(doc, network).parseQueries();
+		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
 
+		for(String message : loadedQueries.getMessages()){
+		    messages.add(message);
+        }
 		network.buildConstraints();
 		
 		parseBound(doc, network);
 
 
-
-		return new LoadedModel(network, templates, queries,messages, lens);
+        if (hasFeatureTag) {
+            return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, lens);
+        } else {
+            return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, null);
+        }
 	}
 
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
@@ -147,12 +154,12 @@ public class TapnXmlLoader {
         if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");
 
+	        hasFeatureTag = true;
+
             var isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
 
             lens = new TabContent.TAPNLens(isTimed, isGame);
-        } else {
-            lens = new TabContent.TAPNLens(true, false);
         }
     }
 

@@ -17,13 +17,6 @@ public class LoadedModel implements LoadedBatchProcessingModel {
     private final Collection<String> messages;
     private final TabContent.TAPNLens lens;
 
-    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages){
-        this(network, templates, queries, messages, TabContent.TAPNLens.Default);
-    }
-	public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
-		this(network, templates, queries, List.of(), TabContent.TAPNLens.Default);
-	}
-
     public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, TabContent.TAPNLens lens){
         this.templates = templates;
         this.network = network;
@@ -38,14 +31,14 @@ public class LoadedModel implements LoadedBatchProcessingModel {
     public Collection<String> getMessages() { return messages; }
 
     public TabContent.TAPNLens getLens(){
-        return lens;
-    }
+        if (lens != null) {
+            return lens;
+        } else {
+            boolean isNetTimed = !network().isUntimed();
+            boolean isNetGame = network().hasUncontrollableTransitions();
 
-	public boolean isTimed() {
-	    return lens.isTimed();
-    }
-    public boolean isGame() {
-	    return lens.isGame();
+            return new TabContent.TAPNLens(isNetTimed, isNetGame);
+        }
     }
 
 }
