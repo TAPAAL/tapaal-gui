@@ -706,7 +706,7 @@ public class QueryDialog extends JPanel {
             placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             userChangedAtomicPropSelection = true;
         }
-        if (!lens.isTimed()) {
+        if (!lens.isTimed() && !lens.isGame()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
 	}
@@ -2025,7 +2025,7 @@ public class QueryDialog extends JPanel {
 								placeNames.add(place.name());
 							}
 						}
-                        if (!lens.isTimed()) {
+                        if (!lens.isTimed() && !lens.isGame()) {
                             for (TimedTransition transition : tapn.transitions()) {
                                 if (!transition.isShared()) {
                                     placeNames.add(transition.name());
@@ -2061,7 +2061,7 @@ public class QueryDialog extends JPanel {
                         updateQueryOnAtomicPropositionChange();
                     }
 				}
-                if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
+                if (!lens.isTimed() && !lens.isGame()) setEnablednessOfOperatorAndMarkingBoxes();
 
 			}
 		});
@@ -2160,7 +2160,7 @@ public class QueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 
-                if ((!lens.isTimed() || lens.isGame()) && transitionIsSelected()) {
+                if ((!lens.isTimed() && !lens.isGame()) && transitionIsSelected()) {
                     addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
                 } else {
                     TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
@@ -2197,7 +2197,7 @@ public class QueryDialog extends JPanel {
 			if (userChangedAtomicPropSelection) {
 				updateQueryOnAtomicPropositionChange();
 			}
-			if (!lens.isTimed()) {
+			if (!lens.isTimed() && !lens.isGame()) {
                 setEnablednessOfOperatorAndMarkingBoxes();
             }
 		});
