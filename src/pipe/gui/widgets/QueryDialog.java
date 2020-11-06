@@ -744,7 +744,6 @@ public class QueryDialog extends JPanel {
     }
 
     private void setEnablednessOfOperatorAndMarkingBoxes() {
-	    var item = placeTransitionBox.getSelectedItem();
         if (transitionIsSelected()) {
             placeMarking.setVisible(false);
             relationalOperatorBox.setVisible(false);
