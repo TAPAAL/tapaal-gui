@@ -744,6 +744,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void setEnablednessOfOperatorAndMarkingBoxes() {
+	    var item = placesBox.getSelectedItem();
         if (transitionIsSelected()) {
             placeMarking.setVisible(false);
             relationalOperatorBox.setVisible(false);
@@ -2197,6 +2198,9 @@ public class QueryDialog extends JPanel {
 			if (userChangedAtomicPropSelection) {
 				updateQueryOnAtomicPropositionChange();
 			}
+			if (!lens.isTimed()) {
+                setEnablednessOfOperatorAndMarkingBoxes();
+            }
 		});
 
 		relationalOperatorBox.addActionListener(e -> {
