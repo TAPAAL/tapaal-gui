@@ -2098,7 +2098,7 @@ public class QueryDialog extends JPanel {
 
         transitionIsEnabledLabel = new JLabel(" is enabled");
         transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
-        if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
+        if (!lens.isTimed() && !lens.isGame()) placeRow.add(transitionIsEnabledLabel);
 
         JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         gbc.gridy = 2;
