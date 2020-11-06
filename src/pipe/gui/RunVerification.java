@@ -34,6 +34,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class RunVerification extends RunVerificationBase {	
@@ -306,7 +307,9 @@ public class RunVerification extends RunVerificationBase {
                             try {
                                 TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
                                 reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                                reducedNetTab.addQuery(dataLayerQuery);
+                                TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                System.out.println(convertedQuery.toString());
+                                reducedNetTab.addQuery(convertedQuery);
                                 CreateGui.openNewTabFromStream(reducedNetTab);
                             } catch (Exception e1){
                                 JOptionPane.showMessageDialog(CreateGui.getApp(),

@@ -26,7 +26,12 @@ public class TCTLConstNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+
+    }
+
+    @Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLConstNode(constant);
 	}

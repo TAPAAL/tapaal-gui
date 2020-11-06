@@ -29,7 +29,13 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        transition = template + "_" + transition;
+        template = templateName;
+    }
+
+    @Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLTransitionNode(template, transition);
 	}

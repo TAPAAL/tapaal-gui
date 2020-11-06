@@ -434,4 +434,10 @@ public class TAPNQuery {
         }
         return false;
     }
+
+    public TAPNQuery convertPropertyForReducedNet(String templateName){
+	    TAPNQuery convertedQuery = copy();
+	    convertedQuery.property.convertForReducedNet(templateName);
+        return  convertedQuery;
+    }
 }

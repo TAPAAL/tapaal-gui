@@ -51,7 +51,11 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+    }
+
+    @Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
 

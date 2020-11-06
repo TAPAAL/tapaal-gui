@@ -784,7 +784,7 @@ public class QueryDialog extends JPanel {
             current = ((TCTLStateToPathConverter) current).getProperty();
         }
         if (current instanceof TCTLAtomicPropositionNode) {
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
+			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
 
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
@@ -3254,7 +3254,8 @@ public class QueryDialog extends JPanel {
                             try {
                                 TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
                                 reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                                reducedNetTab.addQuery(query);
+                                TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                reducedNetTab.addQuery(convertedQuery);
                                 CreateGui.openNewTabFromStream(reducedNetTab);
                             } catch (Exception e1){
                                 JOptionPane.showMessageDialog(CreateGui.getApp(),

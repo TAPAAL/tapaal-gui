@@ -29,7 +29,13 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        place = template + "_" + place;
+        template = templateName;
+    }
+
+    @Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLPlaceNode(template, place);
 	}
