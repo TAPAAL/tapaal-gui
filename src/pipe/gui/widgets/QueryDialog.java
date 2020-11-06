@@ -2160,7 +2160,7 @@ public class QueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 
-                if ((lens.isTimed() || lens.isGame()) && transitionIsSelected()) {
+                if ((!lens.isTimed() || lens.isGame()) && transitionIsSelected()) {
                     addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
                 } else {
                     TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
