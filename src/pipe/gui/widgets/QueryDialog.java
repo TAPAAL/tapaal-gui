@@ -3156,10 +3156,14 @@ public class QueryDialog extends JPanel {
                         if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
                             try {
                                 TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
-                                reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                                TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                reducedNetTab.addQuery(convertedQuery);
-                                CreateGui.openNewTabFromStream(reducedNetTab);
+                                //Ensure that a net was created by the query reduction
+                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                    || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
+                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                    TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                    reducedNetTab.addQuery(convertedQuery);
+                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                }
                             } catch (Exception e1){
                                 JOptionPane.showMessageDialog(CreateGui.getApp(),
                                     e1.getMessage(),
