@@ -127,7 +127,7 @@ public class QueryDialog extends JPanel {
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
 	private JComboBox templateBox;
-	private JComboBox<String> placesBox;
+	private JComboBox<String> placeTransitionBox;
 	private JComboBox<String> relationalOperatorBox;
     private JLabel transitionIsEnabledLabel;
     private CustomJSpinner placeMarking;
@@ -703,7 +703,7 @@ public class QueryDialog extends JPanel {
             } else {
                 templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
             }
-            placesBox.setSelectedItem(transitionNode.getTransition());
+            placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             userChangedAtomicPropSelection = true;
         }
         if (!lens.isTimed()) {
@@ -718,7 +718,7 @@ public class QueryDialog extends JPanel {
         TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
         TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
 
-        placesBox.setSelectedItem(placeNode.getPlace());
+        placeTransitionBox.setSelectedItem(placeNode.getPlace());
         relationalOperatorBox.setSelectedItem(node.getOp());
         placeMarking.setValue(placeMarkingNode.getConstant());
         userChangedAtomicPropSelection = true;
@@ -728,10 +728,10 @@ public class QueryDialog extends JPanel {
         userChangedAtomicPropSelection = false;
         if (node.getLeft() instanceof TCTLPlaceNode) {
             TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
-            placesBox.setSelectedItem(placeNode.getPlace());
+            placeTransitionBox.setSelectedItem(placeNode.getPlace());
         } else {
-            if (placesBox.getItemCount() > 0) {
-                placesBox.setSelectedIndex(0);
+            if (placeTransitionBox.getItemCount() > 0) {
+                placeTransitionBox.setSelectedIndex(0);
             }
         }
         relationalOperatorBox.setSelectedItem(node.getOp());
@@ -744,7 +744,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void setEnablednessOfOperatorAndMarkingBoxes() {
-	    var item = placesBox.getSelectedItem();
+	    var item = placeTransitionBox.getSelectedItem();
         if (transitionIsSelected()) {
             placeMarking.setVisible(false);
             relationalOperatorBox.setVisible(false);
@@ -757,7 +757,7 @@ public class QueryDialog extends JPanel {
     }
 
     private boolean transitionIsSelected() {
-        String itemName = (String) placesBox.getSelectedItem();
+        String itemName = (String) placeTransitionBox.getSelectedItem();
         if (itemName == null) return false;
         boolean transitionSelected = false;
         boolean sharedTransitionSelected = false;
@@ -981,7 +981,7 @@ public class QueryDialog extends JPanel {
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
-		placesBox.setEnabled(false);
+		placeTransitionBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
@@ -1006,7 +1006,7 @@ public class QueryDialog extends JPanel {
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
 		templateBox.setEnabled(false);
-		placesBox.setEnabled(false);
+		placeTransitionBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
@@ -1029,7 +1029,7 @@ public class QueryDialog extends JPanel {
 		disjunctionButton.setEnabled(true);
 		negationButton.setEnabled(true);
 		templateBox.setEnabled(true);
-		placesBox.setEnabled(true);
+		placeTransitionBox.setEnabled(true);
 		relationalOperatorBox.setEnabled(true);
 		placeMarking.setEnabled(true);
 		truePredicateButton.setEnabled(true);
@@ -1052,7 +1052,7 @@ public class QueryDialog extends JPanel {
         disjunctionButton.setEnabled(true);
         negationButton.setEnabled(true);
         templateBox.setEnabled(true);
-        placesBox.setEnabled(true);
+        placeTransitionBox.setEnabled(true);
         relationalOperatorBox.setEnabled(true);
         placeMarking.setEnabled(true);
         truePredicateButton.setEnabled(true);
@@ -1077,7 +1077,7 @@ public class QueryDialog extends JPanel {
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
         templateBox.setEnabled(false);
-        placesBox.setEnabled(false);
+        placeTransitionBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
         placeMarking.setEnabled(false);
         addPredicateButton.setEnabled(false);
@@ -1087,7 +1087,7 @@ public class QueryDialog extends JPanel {
     }
 
 	private void setEnablednessOfAddPredicateButton() {
-		if (placesBox.getSelectedItem() == null)
+		if (placeTransitionBox.getSelectedItem() == null)
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
@@ -1146,10 +1146,10 @@ public class QueryDialog extends JPanel {
 			TCTLAbstractStateProperty property;
 
             if (!lens.isTimed() && transitionIsSelected()) {
-                property = new TCTLTransitionNode(template, (String) placesBox.getSelectedItem());
+                property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
             } else {
                 property = new TCTLAtomicPropositionNode(
-                    new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()),
+                    new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
                     (String) relationalOperatorBox.getSelectedItem(),
                     new TCTLConstNode((Integer) placeMarking.getValue()));
             }
@@ -2003,10 +2003,10 @@ public class QueryDialog extends JPanel {
 		predicatePanel = new JPanel(new GridBagLayout());
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
-		placesBox = new JComboBox();
+		placeTransitionBox = new JComboBox();
 		Dimension d = new Dimension(125, 27);
-		placesBox.setMaximumSize(d);
-		placesBox.setPreferredSize(d);
+		placeTransitionBox.setMaximumSize(d);
+		placeTransitionBox.setPreferredSize(d);
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
@@ -2035,7 +2035,7 @@ public class QueryDialog extends JPanel {
                         }
 
 						placeNames.sort(String::compareToIgnoreCase);
-						placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
+						placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
 						currentlySelected = tapn;
 						setEnablednessOfAddPredicateButton();
@@ -2054,7 +2054,7 @@ public class QueryDialog extends JPanel {
                         }
                     }
 					placeNames.sort(String::compareToIgnoreCase);
-					placesBox.setModel(new DefaultComboBoxModel<>(placeNames));
+					placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
 
 					currentlySelected = SHARED;
 					setEnablednessOfAddPredicateButton();
@@ -2086,7 +2086,7 @@ public class QueryDialog extends JPanel {
         JPanel placeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         gbc.gridy = 1;
         predicatePanel.add(placeRow, gbc);
-        placeRow.add(placesBox);
+        placeRow.add(placeTransitionBox);
 
         String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
         relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
@@ -2145,7 +2145,7 @@ public class QueryDialog extends JPanel {
 		queryPanel.add(predicatePanel, gbc);
 
 		//Add tool tips for predicate panel
-		placesBox.setToolTipText(TOOL_TIP_PLACESBOX);
+		placeTransitionBox.setToolTipText(TOOL_TIP_PLACESBOX);
 		templateBox.setToolTipText(TOOL_TIP_TEMPLATEBOX);
 		relationalOperatorBox.setToolTipText(TOOL_TIP_RELATIONALOPERATORBOX);
 		placeMarking.setToolTipText(TOOL_TIP_PLACEMARKING);
@@ -2162,10 +2162,10 @@ public class QueryDialog extends JPanel {
 				if(template.equals(SHARED)) template = "";
 
                 if ((lens.isTimed() || lens.isGame()) && transitionIsSelected()) {
-                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placesBox.getSelectedItem()));
+                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
                 } else {
                     TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-                        new TCTLPlaceNode(template, (String) placesBox.getSelectedItem()),
+                        new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
                         (String) relationalOperatorBox.getSelectedItem(),
                         new TCTLConstNode((Integer) placeMarking.getValue()));
                     addPropertyToQuery(property);
@@ -2194,7 +2194,7 @@ public class QueryDialog extends JPanel {
             }
 		});
 
-		placesBox.addActionListener(e -> {
+		placeTransitionBox.addActionListener(e -> {
 			if (userChangedAtomicPropSelection) {
 				updateQueryOnAtomicPropositionChange();
 			}
