@@ -10,10 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,7 +32,6 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
@@ -297,35 +293,37 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabel, gbc);
 
-                JButton openReducedButton = new JButton("Open reduced net");
-                openReducedButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        openReducedButton.setEnabled(false);
-                        reducedNetOpened = true;
-                        File reducedNetFile = new File(reducedNetFilePath);
+				if(result.reductionRulesApplied()){
+                    JButton openReducedButton = new JButton("Open reduced net");
+                    openReducedButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            openReducedButton.setEnabled(false);
+                            reducedNetOpened = true;
+                            File reducedNetFile = new File(reducedNetFilePath);
 
-                        if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
-                            try {
-                                TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
-                                reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                                TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                reducedNetTab.addQuery(convertedQuery);
-                                CreateGui.openNewTabFromStream(reducedNetTab);
-                            } catch (Exception e1){
-                                JOptionPane.showMessageDialog(CreateGui.getApp(),
-                                    e1.getMessage(),
-                                    "Error loading reduced net file",
-                                    JOptionPane.ERROR_MESSAGE);
+                            if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                                try {
+                                    TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                    TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                    reducedNetTab.addQuery(convertedQuery);
+                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                } catch (Exception e1){
+                                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                        e1.getMessage(),
+                                        "Error loading reduced net file",
+                                        JOptionPane.ERROR_MESSAGE);
+                                }
                             }
                         }
-                    }
-                });
-                gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = 6;
-                gbc.insets = new Insets(0,0,20,0);
-                gbc.anchor = GridBagConstraints.WEST;
-                panel.add(openReducedButton, gbc);
+                    });
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 6;
+                    gbc.insets = new Insets(0,0,20,0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(openReducedButton, gbc);
+                }
             }
 
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
