@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
@@ -23,8 +26,10 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
 
+import javax.xml.crypto.Data;
+
 public class VerifyTAPNExporter {
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL){
@@ -34,17 +39,17 @@ public class VerifyTAPNExporter {
 		}
 		
 
-		return export(model, query, modelFile, queryFile, null, lens);
+		return export(model, query, modelFile, queryFile, null, lens, mapping);
 	}
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
 		try{
 			PrintStream modelStream = new PrintStream(modelFile);
 
-			outputModel(model, modelStream);
+			outputModel(model, modelStream, mapping);
 			modelStream.close();
 
 			PrintStream queryStream = new PrintStream(queryFile);
@@ -66,17 +71,17 @@ public class VerifyTAPNExporter {
 		return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 	}
 	
-	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
-        DataLayer guiModel = CreateGui.getModel();
+	private void outputModel(TimedArcPetriNet model, PrintStream modelStream, NameMapping mapping) {
+        Collection<DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels().values();
 
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
 		
 		for(TimedPlace p : model.places())
-			outputPlace(p, modelStream, guiModel);
+			outputPlace(p, modelStream, guiModels, mapping);
 		
 		for(TimedTransition t : model.transitions())
-			outputTransition(t,modelStream, guiModel);
+			outputTransition(t,modelStream, guiModels, mapping);
 		
 		for(TimedInputArc inputArc : model.inputArcs())
 			outputInputArc(inputArc, modelStream);
@@ -94,12 +99,17 @@ public class VerifyTAPNExporter {
 		modelStream.append("</pnml>");
 	}
 	
-	private void outputPlace(TimedPlace p, PrintStream modelStream, DataLayer guiModel) {
-
-        String placeName = p.name().split("_",2)[1];
-
+	private void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the place name
-	    Place guiPlace = guiModel.getPlaceById(placeName);
+        String placeName = mapping.map(p.name()).value2();
+        Place guiPlace = null;
+
+        for(DataLayer guiModel : guiModels ){
+            guiPlace = guiModel.getPlaceById(placeName);
+            if(guiPlace != null){
+                break;
+            }
+        }
 
 		modelStream.append("<place ");
 		
@@ -113,11 +123,17 @@ public class VerifyTAPNExporter {
         modelStream.append("</place>\n");
 	}
 
-    private void outputTransition(TimedTransition t, PrintStream modelStream, DataLayer guiModel) {
-        String transitionName = t.name().split("_",2)[1];
-
+    private void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the transition name
-        Transition guiTransition = guiModel.getTransitionByName(transitionName);
+	    String transitionName = mapping.map(t.name()).value2();
+        Transition guiTransition = null;
+
+        for(DataLayer guiModel : guiModels){
+	        guiTransition = guiModel.getTransitionById(transitionName);
+	        if(guiTransition != null){
+	            break;
+            }
+        }
 
 		modelStream.append("<transition ");
 

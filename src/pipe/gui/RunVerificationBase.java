@@ -42,6 +42,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
 	protected String reducedNetFilePath;
 	protected boolean reduceNetOnly;
+	protected boolean reducedNetOpened = false;
 	
 	
 	protected Messenger messenger;

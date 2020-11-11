@@ -31,7 +31,11 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 
     @Override
     public void convertForReducedNet(String templateName) {
-        place = template + "_" + place;
+	    if(template.isEmpty()){
+            place = "Shared_" + place;
+        } else {
+            place = template + "_" + place;
+        }
         template = templateName;
     }
 

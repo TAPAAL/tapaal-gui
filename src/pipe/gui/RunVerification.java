@@ -68,7 +68,7 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 	
-				if (result.getTrace() != null) {
+				if (!reducedNetOpened && result.getTrace() != null) {
 					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}
@@ -301,6 +301,7 @@ public class RunVerification extends RunVerificationBase {
                 openReducedButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         openReducedButton.setEnabled(false);
+                        reducedNetOpened = true;
                         File reducedNetFile = new File(reducedNetFilePath);
 
                         if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
@@ -308,7 +309,6 @@ public class RunVerification extends RunVerificationBase {
                                 TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
                                 reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
                                 TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                System.out.println(convertedQuery.toString());
                                 reducedNetTab.addQuery(convertedQuery);
                                 CreateGui.openNewTabFromStream(reducedNetTab);
                             } catch (Exception e1){
