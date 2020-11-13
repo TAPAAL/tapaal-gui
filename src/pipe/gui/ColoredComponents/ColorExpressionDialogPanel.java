@@ -115,7 +115,6 @@ public class ColorExpressionDialogPanel extends JPanel {
     public void initPanels() {
         setLayout(new BorderLayout());
         exprPanel = new JPanel(new GridBagLayout());
-        exprPanel.setBorder(BorderFactory.createTitledBorder("Color Expression"));
 
         initExprField();
         initColorTypePanel();
@@ -204,32 +203,21 @@ public class ColorExpressionDialogPanel extends JPanel {
 
     private void toggleEnabledButtons() {
         if (currentSelection == null){
-            toggleaddPlaceholderButton(false);
             toggleColorExprButtons(false);
             deleteExprSelectionButton.setEnabled(false);
             resetExprButton.setEnabled(false);
         }
         else if (currentSelection.getObject() instanceof TupleExpression) {
-            toggleaddPlaceholderButton(true);
             toggleColorExprButtons(false);
             deleteExprSelectionButton.setEnabled(true);
             resetExprButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof PlaceHolderColorExpression) {
-            if (expr instanceof PlaceHolderColorExpression) {
-                toggleaddPlaceholderButton(true);
-                toggleColorExprButtons(true);
-                deleteExprSelectionButton.setEnabled(true);
-                resetExprButton.setEnabled(true);
-            } else {
-                toggleaddPlaceholderButton(false);
-                toggleColorExprButtons(true);
-                deleteExprSelectionButton.setEnabled(true);
-                resetExprButton.setEnabled(true);
-            }
+            toggleColorExprButtons(true);
+            deleteExprSelectionButton.setEnabled(true);
+            resetExprButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof ColorExpression) {
-            toggleaddPlaceholderButton(false);
             toggleColorExprButtons(true);
             deleteExprSelectionButton.setEnabled(true);
             resetExprButton.setEnabled(true);
@@ -238,10 +226,6 @@ public class ColorExpressionDialogPanel extends JPanel {
             variableCombobox.setEnabled(false);
             addVariableButton.setEnabled(false);
         }
-    }
-
-    private void toggleaddPlaceholderButton(boolean enable) {
-        addPlaceHolderButton.setEnabled(enable);
     }
 
     private void toggleColorExprButtons(boolean enable) {
@@ -349,13 +333,10 @@ public class ColorExpressionDialogPanel extends JPanel {
 
     public void initButtonsPanel() {
         colorExpressionButtons = new JPanel(new GridBagLayout());
-        colorExpressionButtons.setBorder(BorderFactory.createTitledBorder("Misc"));
-        colorExpressionButtons.setPreferredSize(new Dimension(300 ,158 ));
 
         ButtonGroup expressionButtonsGroup = new ButtonGroup();
         predButton = new JButton("Add Pred");
         succButton = new JButton("Add Succ");
-        addPlaceHolderButton = new JButton("Add placeholder");
 
         predButton.setPreferredSize(new Dimension(130 , 27));
         predButton.setMinimumSize(new Dimension(130 , 27));
@@ -363,31 +344,9 @@ public class ColorExpressionDialogPanel extends JPanel {
         succButton.setPreferredSize(new Dimension(130 , 27));
         succButton.setMinimumSize(new Dimension(130 , 27));
         succButton.setMaximumSize(new Dimension(130 , 27));
-        addPlaceHolderButton.setPreferredSize(new Dimension(260 , 27));
-        addPlaceHolderButton.setMinimumSize(new Dimension(260 , 27));
-        addPlaceHolderButton.setMaximumSize(new Dimension(260 , 27));
-
 
         expressionButtonsGroup.add(predButton);
         expressionButtonsGroup.add(succButton);
-        expressionButtonsGroup.add(addPlaceHolderButton);
-
-        addPlaceHolderButton.addActionListener(actionEvent -> {
-            if (!(currentSelection.getObject() instanceof TupleExpression) || !(expr instanceof TupleExpression)) {
-                ColorExpression currentObject = (ColorExpression) currentSelection.getObject();
-                Vector<ColorExpression> colorExprVec = new Vector();
-                colorExprVec.add(currentObject);
-                TupleExpression tupleExpr = new TupleExpression(colorExprVec);
-                tupleExpr.addColorExpression(new PlaceHolderColorExpression());
-                expr = expr.replace(expr, tupleExpr);
-                updateSelection(tupleExpr);
-            } else {
-                TupleExpression tupleExpr = (TupleExpression) expr;
-                tupleExpr.addColorExpression(new PlaceHolderColorExpression());
-                expr = expr.replace(expr, tupleExpr);
-                updateSelection(tupleExpr);
-            }
-        });
 
         predButton.addActionListener(actionEvent -> {
             PredecessorExpression predExpr;
@@ -418,18 +377,12 @@ public class ColorExpressionDialogPanel extends JPanel {
         gbc.insets = new Insets(0, 10, 0 , 0);
         colorExpressionButtons.add(succButton, gbc);
 
-        gbc.insets = new Insets(0, 0, 5 , 0);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        colorExpressionButtons.add(addPlaceHolderButton, gbc);
-
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         gbc.fill = GridBagConstraints.VERTICAL;
-        exprPanel.add(colorExpressionButtons, gbc);
+        gbc.gridwidth = 2;
+        colortypePanel.add(colorExpressionButtons, gbc);
     }
 
     private void initExprEditPanel() {

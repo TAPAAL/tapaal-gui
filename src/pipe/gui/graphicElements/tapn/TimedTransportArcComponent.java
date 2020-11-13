@@ -271,5 +271,14 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public Weight getWeight(){
 		return underlyingTransportArc.getWeight();
 	}
+    @Override
+    public List<ColoredTimeInterval> getCtiList(){
+        return underlyingTransportArc.getColorTimeIntervals();
+    }
+    @Override
+    public void setCtiList(List<ColoredTimeInterval> ctiList){
+        underlyingTransportArc.setColorTimeIntervals(ctiList);
+    }
+
 
 }

@@ -20,6 +20,7 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.*;
 
 import javax.swing.*;
@@ -347,6 +348,9 @@ public class ColoredArcGuardPanel extends JPanel {
 
         transportExprTabbedPane.add(inputPanel, "input");
         transportExprTabbedPane.add(outputPanel, "output");
+        if(((TimedTransportArcComponent)objectToBeEdited).getTarget() instanceof Place){
+            transportExprTabbedPane.setSelectedIndex(1);
+        }
 
         GridBagConstraints gbc = GridBagHelper.as(0, 4, GridBagHelper.Anchor.WEST, new Insets(5, 10, 5, 10));
         gbc.fill = GridBagConstraints.BOTH;
@@ -599,7 +603,7 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void initNumberExpressionsPanel() {
-        JPanel numberExprPanel = new JPanel(new GridBagLayout());
+        numberExprPanel = new JPanel(new GridBagLayout());
         numberExprPanel.setBorder(BorderFactory.createTitledBorder("Numerical Expressions"));
         colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, "colors", true) {
             @Override
@@ -856,8 +860,6 @@ public class ColoredArcGuardPanel extends JPanel {
 
     public void initColorExpressionButtonsPanel() {
         colorExpressionButtons = new JPanel(new GridBagLayout());
-        colorExpressionButtons.setBorder(BorderFactory.createTitledBorder("Misc"));
-        colorExpressionButtons.setPreferredSize(new Dimension(140 ,158 ));
 
         ButtonGroup expressionButtonsGroup = new ButtonGroup();
         predButton = new JButton("Add Pred");
@@ -903,15 +905,21 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         colorExpressionButtons.add(predButton, gbc);
 
-        gbc.gridy = 1;
-        gbc.insets = new Insets(0, 5, 0 , 0);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         colorExpressionButtons.add(succButton, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        regularArcExprPanel.add(colorExpressionButtons, gbc);
+        gbc.gridwidth = 3;
+        numberExprPanel.add(colorExpressionButtons, gbc);
+
     }
 
     private void initExpr() {
@@ -1066,7 +1074,7 @@ public class ColoredArcGuardPanel extends JPanel {
             cmd.redo();
             undoManager.addEdit(cmd);
         }
-        if (!isInhibitorArc && isInputArc) {
+        else if (!isInhibitorArc && isInputArc) {
             TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
             Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getArcExpression(), arcExpression);
             cmd.redo();
@@ -1189,6 +1197,7 @@ public class ColoredArcGuardPanel extends JPanel {
 
     JCheckBox useVariableCheckBox;
     JComboBox<Variable> variableCombobox;
+    JPanel numberExprPanel;
     private void refreshUndoRedo() {
         undoButton.setEnabled(undoManager.canUndo());
         redoButton.setEnabled(undoManager.canRedo());
