@@ -556,11 +556,13 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypeComboBox = new JComboBox();
 
         for (ColorType element : colorTypes) {
-            productTypeComboBox.addItem(element);
+            if(!(element instanceof ProductType)){
+                productTypeComboBox.addItem(element);
+            }
         }
-        if(oldColorType != null && oldColorType instanceof ProductType){
+/*        if(oldColorType != null && oldColorType instanceof ProductType){
             productTypeComboBox.removeItem(oldColorType);
-        }
+        }*/
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridx = 1;
         gbc.gridy = 0;
