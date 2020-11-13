@@ -506,7 +506,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void addConstantsComponents() {
-        constantsColorTypesVariablesComboBox = new JXComboBox(new String[]{CONSTANTS, COLORTYPES, VARIABLES });
+        constantsColorTypesVariablesComboBox = new JXComboBox(new String[]{COLORTYPES, VARIABLES, CONSTANTS });
         constantsColorTypesVariablesComboBox.setToolTipText(toolTipComboBox);
         constantsColorTypesVariablesComboBox.addActionListener(new ActionListener() {
             @Override
