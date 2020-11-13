@@ -200,7 +200,7 @@ public class Verifier {
                     query.getCategory(),
                     query.getAlgorithmOption(),
                     query.isSiphontrapEnabled(),
-                    TAPNQuery.QueryReductionTime.ShortestTime,
+                    TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
                     reducedNetTempFile.getAbsolutePath()
                 );
