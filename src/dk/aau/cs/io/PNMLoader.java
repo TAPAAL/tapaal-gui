@@ -71,8 +71,10 @@ public class PNMLoader {
     private int netSize = 0;
     private final int maxNetSize = 4000;
     private boolean hasPositionalInfo = false;
+    private LoadTACPN loadTACPN;
 
     public PNMLoader() {
+        loadTACPN = new LoadTACPN();
     }
 
     public LoadedModel load(File file) throws FormatException{
@@ -121,7 +123,7 @@ public class PNMLoader {
         //We assume there is only one page pr. file (this is what we call a net)
         Template template = new Template(tapn, new DataLayer(), new Zoomer());
 
-        parseTimedArcPetriNet(netNode, tapn, template);
+        parseTimedArcPetriNet(netNode, tapn, template, network);
         template.setHasPositionalInfo(hasPositionalInfo);
 
         network.setPaintNet(isNetDrawable());
@@ -148,10 +150,10 @@ public class PNMLoader {
         return NamePurifier.purify(result);
     }
 
-    private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template) throws FormatException {
+    private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template, TimedArcPetriNetNetwork network) throws FormatException {
         if (lens.isColored()) {
             Node declarations = getFirstDirectChild(netNode, "declaration");
-            parseDeclarations(declarations, tapn, template);
+            loadTACPN.parseDeclarations(declarations, network);
         }
 
         //We assume there is only one page pr. file (this is what we call a net)
@@ -208,7 +210,7 @@ public class PNMLoader {
             Node typeNode = getFirstDirectChild(node, "type");
             ColorType colorType = null;
             if(typeNode != null) {
-                colorType = parseUserSort(typeNode);
+                colorType = loadTACPN.parseUserSort(typeNode);
             }
 
             Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
@@ -218,7 +220,7 @@ public class PNMLoader {
             } else {
                 markingOffset = parseGraphics(getFirstDirectChild(markingNode, "graphics"), GraphicsType.Offset);
                 Node markingExpression = getFirstDirectChild(markingNode, "structure");
-                colorMarking = parseArcExpression(markingExpression);
+                colorMarking = loadTACPN.parseArcExpression(markingExpression);
             }
             place = new LocalTimedPlace(id, colorType);
 
@@ -256,88 +258,6 @@ public class PNMLoader {
         }
     }
 
-    private void parseDeclarations(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
-        if(node == null || !(node instanceof Element)){
-            return;
-        }
-
-        Node child = skipWS(node.getFirstChild());
-        while(child != null){
-            String childName = child.getNodeName();
-            if (childName.equals("namedsort")){
-                parseNamedSort(child, tapn, template);
-            } else if (childName.equals("variabledecl")){
-                String id = getAttribute(child, "id").getNodeValue();
-                String name = getAttribute(child, "name").getNodeValue();
-                ColorType ct = parseUserSort(child);
-                Variable var = new Variable(name, id, ct);
-                Require.that(variables.put(id, var) == null, "the id " + id + ", was already used");
-                tapn.parentNetwork().add(var);
-            } else {
-                parseDeclarations(child, tapn, template);
-            }
-
-            child = skipWS(child.getNextSibling());
-        }
-    }
-
-    private void parseNamedSort(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
-        Node type = skipWS(node.getFirstChild());
-        String typetag = type.getNodeName();
-
-        String id = getAttribute(node, "id").getNodeValue();
-        String name = getAttribute(node, "name").getNodeValue();
-        if (typetag.equals("productsort")) {
-            ProductType pt = new ProductType(id, name);
-            Node typechild = skipWS(type.getFirstChild());
-            while (typechild != null) {
-                if (typechild.getNodeName().equals("usersort")) {
-                    String constituent = getAttribute(typechild, "declaration").getNodeValue();
-                    pt.addType(colortypes.get(constituent));
-                }
-                typechild = skipWS(typechild.getNextSibling());
-            }
-            Require.that(colortypes.put(id, pt) == null, "the name " + name + ", was already used");
-            tapn.parentNetwork().add(pt);
-
-        } else {
-            ColorType ct = new ColorType(id, name);
-            if (typetag.equals("dot")) {
-                ct.addColor("dot");
-            } else {
-                Node typechild = skipWS(type.getFirstChild());
-                while (typechild != null) {
-                    Node dotId = getAttribute(typechild, "id");
-                    if (dotId != null) {
-                        ct.addColor(dotId.getNodeValue());
-                        typechild = skipWS(typechild.getNextSibling());
-                    } else {
-                        throw new FormatException(String.format("No id found on %s\n", typechild.getNodeName()));
-                    }
-                }
-            }
-            Require.that(colortypes.put(id, ct) == null, "the name " + name + ", was already used");
-            tapn.parentNetwork().add(ct);
-        }
-    }
-
-    private ColorType parseUserSort(Node node) throws FormatException {
-        if (node instanceof Element) {
-            Node child = skipWS(node.getFirstChild());
-            while (child != null) {
-                String name = child.getNodeName();
-                if (name.equals("usersort")) {
-                    Node decl = getAttribute(child, "declaration");
-                    return colortypes.get(decl.getNodeValue());
-                } else if (name.matches("structure|type|subterm")) {
-                    return parseUserSort(child);
-                }
-                child = skipWS(child.getNextSibling());
-            }
-        }
-        throw new FormatException(String.format("Could not parse %s as an usersort\n", node.getNodeName()));
-    }
-
     private static Node skipWS(Node node) {
         if (node != null && !(node instanceof Element)) {
             return skipWS(node.getNextSibling());
@@ -348,107 +268,6 @@ public class PNMLoader {
 
     private static Node getAttribute(Node node, String attribute) {
         return node.getAttributes().getNamedItem(attribute);
-    }
-
-    private ArcExpression parseArcExpression(Node node) throws FormatException {
-        String name = node.getNodeName();
-        if (name.equals("numberof")) {
-            return parseNumberOfExpression(node);
-        } else if (name.equals("add")) {
-            Vector<ArcExpression> constituents = new Vector<ArcExpression>();
-
-            Node child = skipWS(node.getFirstChild());
-            while (child != null) {
-                ArcExpression subterm = parseArcExpression(child);
-                constituents.add(subterm);
-                child = skipWS(child.getNextSibling());
-            }
-            return new AddExpression(constituents);
-        } else if (name.equals("subtract")) {
-            Node headchild = skipWS(node.getFirstChild());
-            ArcExpression headexp = parseArcExpression(headchild);
-
-            Node nextchild = skipWS(headchild.getNextSibling());
-            while (nextchild != null) {
-                ArcExpression nextexp = parseArcExpression(nextchild);
-                headexp = new SubtractExpression(headexp, nextexp);
-                nextchild = skipWS(nextchild.getNextSibling());
-            }
-            return headexp;
-        } else if (name.equals("scalarproduct")) {
-            Node scalar = skipWS(node.getFirstChild());
-            Integer scalarval = parseNumberConstantExpression(scalar);
-
-            Node child = skipWS(scalar.getNextSibling());
-            ArcExpression childexp = parseArcExpression(child);
-
-            return new ScalarProductExpression(scalarval, childexp);
-
-        } else if (name.equals("all")) {
-            Node parent = node.getParentNode();
-            return parseNumberOfExpression(parent);
-        } else if (name.matches("subterm|structure")) {
-            Node child = skipWS(node.getFirstChild());
-            return parseArcExpression(child);
-        } else {
-            throw new FormatException(String.format("Could not parse %s as an arc expression\n", name));
-        }
-    }
-
-    private NumberOfExpression parseNumberOfExpression(Node node) throws FormatException {
-        Node number = skipWS(node.getFirstChild());
-        //The number constant may be omitted.
-        //In that case, this parsing returns null.
-        Integer numberval = parseNumberConstantExpression(number);
-        Node subnode;
-        if (numberval != null) {
-            //The subexpression comes after the number constant.
-            subnode = skipWS(number.getNextSibling());
-        } else {
-            //The number we read was actually the subexpression.
-            subnode = number;
-            numberval = 1;
-        }
-        //Try to parse subexpression as all expression
-        AllExpression subexp = parseAllExpression(subnode);
-
-        if (subexp != null) {
-            return new NumberOfExpression(numberval, new Vector<>(Arrays.asList(subexp)));
-        } else {
-            Vector<ColorExpression> colorexps = new Vector<>();
-            while (subnode != null) {
-                ColorExpression colorexp = parseColorExpression(subnode);
-                colorexps.add(colorexp);
-                subnode = skipWS(subnode.getNextSibling());
-            }
-            return new NumberOfExpression(numberval, colorexps);
-        }
-    }
-
-    private Integer parseNumberConstantExpression(Node node) {
-        String name = node.getNodeName();
-        if (name.equals("numberconstant")) {
-            String value = getAttribute(node, "value").getNodeValue();
-            return Integer.valueOf(value);
-        } else if (name.equals("subterm")) {
-            Node child = skipWS(node.getFirstChild());
-            return parseNumberConstantExpression(child);
-        } else {
-            return null;
-        }
-    }
-
-    private AllExpression parseAllExpression(Node node) throws FormatException {
-        String name = node.getNodeName();
-        if (name.equals("all")) {
-            ColorType ct = parseUserSort(node);
-            return new AllExpression(ct);
-        } else if (name.equals("subterm")) {
-            Node child = skipWS(node.getFirstChild());
-            return parseAllExpression(child);
-        } else {
-            return null;
-        }
     }
 
     private ColorExpression parseColorExpression(Node node) throws FormatException {
@@ -500,60 +319,6 @@ public class PNMLoader {
         throw new FormatException(String.format("The color \"%s\" was not declared\n", colorname));
     }
 
-    private GuardExpression parseGuardExpression(Node node) throws FormatException {
-        String name = node.getNodeName();
-        if (name.matches("lt|lessthan")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
-            return new LessThanExpression(subexps.value1(), subexps.value2());
-        } else if (name.matches("gt|greaterthan")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
-            return new GreaterThanExpression(subexps.value1(), subexps.value2());
-        } else if (name.matches("leq|lessthanorequal")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
-            return new LessThanEqExpression(subexps.value1(), subexps.value2());
-        } else if (name.matches("geq|greaterthanorequal")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
-            return new GreaterThanEqExpression(subexps.value1(), subexps.value2());
-        } else if (name.matches("eq|equality")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
-            return new EqualityExpression(subexps.value1(), subexps.value2());
-        } else if (name.matches("neq|inequality")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
-            return new InequalityExpression(subexps.value1(), subexps.value2());
-        } else if (name.equals("not")) {
-            Node child = skipWS(node.getFirstChild());
-            GuardExpression childexp = parseGuardExpression(child);
-            return new NotExpression(childexp);
-        } else if (name.equals("and")) {
-            Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
-            return new AndExpression(subexps.value1(), subexps.value2());
-        } else if (name.equals("or")) {
-            Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
-            return new OrExpression(subexps.value1(), subexps.value2());
-        } else if (name.matches("subterm|structure")) {
-            Node child = skipWS(node.getFirstChild());
-            return parseGuardExpression(child);
-        } else {
-            throw new FormatException(String.format("Could not parse %s as a guard expression\n", name));
-        }
-    }
-
-    private Tuple<ColorExpression,ColorExpression> parseLRColorExpressions(Node node) throws FormatException {
-        Node left = skipWS(node.getFirstChild());
-        ColorExpression leftexp = parseColorExpression(left);
-        Node right = skipWS(left.getNextSibling());
-        ColorExpression rightexp = parseColorExpression(right);
-        return new Tuple<ColorExpression, ColorExpression>(leftexp, rightexp);
-    }
-
-    private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressions(Node node) throws FormatException {
-        Node left = skipWS(node.getFirstChild());
-        GuardExpression leftexp = parseGuardExpression(left);
-        Node right = skipWS(left.getNextSibling());
-        GuardExpression rightexp = parseGuardExpression(right);
-        return new Tuple<GuardExpression, GuardExpression>(leftexp, rightexp);
-    }
-
     private InitialMarking parseMarking(Node node) {
         if(!(node instanceof Element)){
             return new InitialMarking();
@@ -581,7 +346,7 @@ public class PNMLoader {
         GuardExpression guardExpression = null;
         Node conditionNode = getFirstDirectChild(node, "condition");
         if (conditionNode != null) {
-            guardExpression = parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
+            guardExpression = loadTACPN.parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
         }
 
         TimedTransition transition = new TimedTransition(id, guardExpression);
@@ -651,7 +416,7 @@ public class PNMLoader {
         ArcExpression arcExpression = null;
         Node hlInscriptionNode = getFirstDirectChild(node, "hlinscription");
         if (hlInscriptionNode != null) {
-            arcExpression = parseArcExpression(getFirstDirectChild(hlInscriptionNode, "structure"));
+            arcExpression = loadTACPN.parseArcExpression(getFirstDirectChild(hlInscriptionNode, "structure"));
         }
 
         if(type != null && type.equals("inhibitor")) {

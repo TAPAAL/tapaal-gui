@@ -184,11 +184,13 @@ public class writeTACPN { // both export and save share some of the same syntax 
         }
         else if (expression instanceof SubtractExpression) {
             Element subtractElement = document.createElement("subtract");
-            Element subtermElement = document.createElement("subterm");
-            subtractElement.appendChild(subtermElement);
+            Element subtermLeftElement = document.createElement("subterm");
+            Element subtermRightElement = document.createElement("subterm");
+            subtractElement.appendChild(subtermLeftElement);
+            subtractElement.appendChild(subtermRightElement);
             SubtractExpression expr = (SubtractExpression) expression;
-            subtractElement.appendChild(parseArcExpression(expr.getRightExpression(), document, subtermElement));
-            subtractElement.appendChild(parseArcExpression(expr.getLeftExpression(), document, subtermElement));
+            subtractElement.appendChild(parseArcExpression(expr.getLeftExpression(), document, subtermLeftElement));
+            subtractElement.appendChild(parseArcExpression(expr.getRightExpression(), document, subtermRightElement));
             structureElement.appendChild(subtractElement);
         }
         else if (expression instanceof TupleExpression) {
