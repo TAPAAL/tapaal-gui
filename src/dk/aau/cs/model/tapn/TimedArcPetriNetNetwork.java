@@ -894,5 +894,13 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
+    public ExpressionContext getContext(){
+	    HashMap<String, ColorType> hashMap = new HashMap<>();
+	    for(ColorType colorType : colorTypes){
+	        hashMap.put(colorType.getName(), colorType);
+        }
+	    return new ExpressionContext(new HashMap<String, Color>(), hashMap);
+    }
+
 
 }

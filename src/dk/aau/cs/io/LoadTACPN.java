@@ -345,6 +345,33 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return new Tuple<GuardExpression, GuardExpression>(leftexp, rightexp);
     }
 
+    public AddExpression parseTokenExpression(Node node) throws FormatException{
+        return normalizeTokenExpression(parseArcExpression(node));
+    }
+
+    private AddExpression normalizeTokenExpression(ArcExpression colorMarking){
+        Vector<ArcExpression> coloredTokenList = new Vector<>();
+        if(colorMarking != null){
+            for(ArcExpression expr : ((AddExpression)colorMarking).getAddExpression()){
+                NumberOfExpression numberOfExpression = (NumberOfExpression) expr;
+                boolean exists = false;
+                for(int i = 0; i < coloredTokenList.size();i++){
+                    NumberOfExpression otherExpr = (NumberOfExpression)coloredTokenList.get(i);
+                    if(numberOfExpression.equalsColor(otherExpr)){
+                        System.out.println(numberOfExpression + " is equal to " + otherExpr);
+                        exists = true;
+                        otherExpr.setNumber(otherExpr.getNumber() + numberOfExpression.getNumber());
+                        break;
+                    }
+                }
+                if(!exists){
+                    coloredTokenList.add(numberOfExpression);
+                }
+            }
+        }
+        return new AddExpression(coloredTokenList);
+    }
+
 
 
 }

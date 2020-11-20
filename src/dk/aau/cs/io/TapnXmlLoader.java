@@ -3,6 +3,7 @@ package dk.aau.cs.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -10,9 +11,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
-import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import dk.aau.cs.model.CPN.Expressions.*;
 import kotlin.Pair;
 import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.*;
@@ -487,7 +487,7 @@ public class TapnXmlLoader {
         }
         if (hlInitialMarkingNode != null && hlInitialMarkingNode instanceof Element) {
             try {
-                colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
+                colorMarking = loadTACPN.parseTokenExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
             } catch (FormatException e) {
                 e.printStackTrace();
             }
@@ -507,15 +507,25 @@ public class TapnXmlLoader {
 		    if(colorMarking!= null){
                 ColorMultiset cm = colorMarking.eval(context);
 
+                p.setTokenExpression(colorMarking);
+
 
                 for (TimedToken ctElement : cm.getTokens(p)) {
                     network.marking().add(ctElement);
                     //p.addToken(ctElement);
                 }
+
             } else {
                 for (int i = 0; i < initialMarkingInput; i++) {
                     //Regular tokens will just be dotconstant
                     network.marking().add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
+                }
+                if(initialMarkingInput > 1) {
+                    Vector<ColorExpression> v = new Vector<>();
+                    v.add(new DotConstantExpression());
+                    Vector<ArcExpression> numbOfExpression = new Vector<>();
+                    numbOfExpression.add(new NumberOfExpression(initialMarkingInput, v));
+                    p.setTokenExpression(new AddExpression(numbOfExpression));
                 }
             }
 

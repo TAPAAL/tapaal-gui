@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
@@ -22,6 +24,7 @@ public abstract class TimedPlace {
     protected String name;
     protected TimeInvariant invariant;
     protected TimedMarking currentMarking;
+    protected ArcExpression tokensAsExpression;
 
     private final List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
     private final List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
@@ -35,7 +38,6 @@ public abstract class TimedPlace {
     public abstract List<ColoredTimeInvariant> getCtiList();
     public abstract void setCtiList(List<ColoredTimeInvariant> list);
     public abstract void setColorType(ColorType ct);
-
     public abstract boolean isShared();
 
     public String name() {
@@ -222,4 +224,13 @@ public abstract class TimedPlace {
     public int postsetSize() {
         return postset.size() + transportArcs.size() + inhibitorArcs.size();
     }
+
+    public void setTokenExpression(ArcExpression newExpression){
+        tokensAsExpression = newExpression;
+    }
+
+    public ArcExpression getTokensAsExpression(){
+        return tokensAsExpression;
+    }
+
 }

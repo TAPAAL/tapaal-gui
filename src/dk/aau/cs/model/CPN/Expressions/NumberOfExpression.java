@@ -34,6 +34,16 @@ public class NumberOfExpression extends ArcExpression {
     public Integer getNumber() {return number;}
     public Vector<ColorExpression> getColor() {return color;}
 
+    public boolean equalsColor(NumberOfExpression otherExpr){
+        Vector<ColorExpression> otherColors = otherExpr.color;
+        for(int i = 0; i < color.size(); i++){
+            if(!(color.get(i).equals(otherColors.get(i)))){
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public ArcExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
@@ -206,5 +216,9 @@ public class NumberOfExpression extends ArcExpression {
         }
 
         return children;
+    }
+
+    public void setNumber(int newNumber){
+        number = newNumber;
     }
 }

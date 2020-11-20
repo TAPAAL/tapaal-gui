@@ -365,89 +365,18 @@ public class writeTACPN { // both export and save share some of the same syntax 
         typeStructure.appendChild(typeUsersort);
         placeElement.appendChild(type);
 
-        if(!inputPlace.tokens().isEmpty()) {
+        if(inputPlace.getTokensAsExpression() != null) {
             Element hlInitialMarking = document.createElement("hlinitialMarking");
-            /*Element hlInitialMarkingGraphics = document.createElement("graphics");
-            hlInitialMarking.appendChild(hlInitialMarkingGraphics);
-            Element hlInitialMarkingOffSet = document.createElement("offset");
-            hlInitialMarkingGraphics.appendChild(hlInitialMarkingOffSet);
-            hlInitialMarkingOffSet.setAttribute("x", (inputPlace.getMarkingOffsetXObject() != null ?
-                    String.valueOf(Math.round(inputPlace.getMarkingOffsetXObject())) : ""));
-            hlInitialMarkingOffSet.setAttribute("y", (inputPlace.getMarkingOffsetYObject() != null ?
-                    String.valueOf(Math.round(inputPlace.getMarkingOffsetYObject())) : ""));*/
             Element hlInitialMarkingText = document.createElement("text");
             hlInitialMarking.appendChild(hlInitialMarkingText);
             String tokenNames = "";
-            for (TimedToken token : inputPlace.tokens()) {
-                if (token.getColor() instanceof DotConstant) {
-                    tokenNames += 1 + "'" + "(dot)";
-                } else {
-                    String tokenName = token.toStringForPNML();
-                    tokenNames += 1 + "'" + tokenName + " + ";
-                }
-            }
-
+            tokenNames = inputPlace.getTokensAsExpression().toString();
             hlInitialMarkingText.setTextContent(tokenNames);
             placeElement.appendChild(hlInitialMarking);
             Element hlStructure = document.createElement("structure");
             hlInitialMarking.appendChild(hlStructure);
-
-            if (colorType.getName().equals("dot")) {
-                int tokens = inputPlace.tokens().size();
-                Element dotNumberOf = document.createElement("numberof");
-                hlStructure.appendChild(dotNumberOf);
-                Element dotSubterm = document.createElement("subterm");
-                dotNumberOf.appendChild(dotSubterm);
-                Element dotNumbersConstsat = document.createElement("numberconstant");
-                dotNumbersConstsat.setAttribute("value", String.valueOf(tokens));
-                dotSubterm.appendChild(dotNumbersConstsat);
-                Element dotPositive = document.createElement("positive");
-                dotNumbersConstsat.appendChild(dotPositive);
-                Element dotSubterm2 = document.createElement("subterm");
-                dotNumberOf.appendChild(dotSubterm2);
-                Element dotconstant = document.createElement("dotconstant");
-                dotSubterm2.appendChild(dotconstant);
-            }
-            else {
-                Element rangeAdd = document.createElement("add");
-                hlStructure.appendChild(rangeAdd);
-                for (TimedToken token : inputPlace.tokens()) {
-                    Element rangeSubTerm = document.createElement("subterm");
-                    rangeAdd.appendChild(rangeSubTerm);
-                    Element rangeNumberOf = document.createElement("numberof");
-                    rangeSubTerm.appendChild(rangeNumberOf);
-                    Element rangeSubTerm2 = document.createElement("subterm");
-                    rangeNumberOf.appendChild(rangeSubTerm2);
-                    Element rangeNumberConstant = document.createElement("numberconstant");
-                    rangeNumberConstant.setAttribute("value", "1");
-                    rangeSubTerm2.appendChild(rangeNumberConstant);
-                    Element rangePositive = document.createElement("positive");
-                    rangeNumberConstant.appendChild(rangePositive);
-                    Element rangeSubTerm3 = document.createElement("subterm");
-                    rangeNumberOf.appendChild(rangeSubTerm3);
-
-                    if (colorType instanceof ProductType) {
-                        Element rangeTuble = document.createElement("tuple");
-                        rangeSubTerm3.appendChild(rangeTuble);
-                        for (Color element : token.getColor().getTuple()) {
-                            Element rangeSubTerm4 = document.createElement("subterm");
-                            rangeTuble.appendChild(rangeSubTerm4);
-                            Element rangeUseroperator = document.createElement("useroperator");
-                            rangeUseroperator.setAttribute("declaration", element.getColorName());
-                            rangeSubTerm4.appendChild(rangeUseroperator);
-                        }
-                    } else {
-                        Element useroperatorElement = document.createElement("useroperator");
-                        useroperatorElement.setAttribute("declaration", token.color().getName());
-                        rangeSubTerm3.appendChild(useroperatorElement);
-                    }
-
-                }
-                return;
-            }
-            return;
+            parseArcExpression(inputPlace.getTokensAsExpression(), document, hlStructure);
         }
-
     }
 
     public void appendDeclarations (Document document, Element NET) {

@@ -8,7 +8,7 @@ import pipe.gui.Pipe;
 
 public class TimedToken {
 	private final TimedPlace place;
-	private BigDecimal age;
+	protected BigDecimal age;
     private Color color;
 
 
@@ -79,6 +79,10 @@ public class TimedToken {
         } else {
             return token += "(" + color.getColorName() + ")";
         }
+    }
+
+    public String getFormattedTokenString(){
+        return color.getColorName();
     }
 
 	@Override

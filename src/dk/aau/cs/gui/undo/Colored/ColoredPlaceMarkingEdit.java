@@ -4,6 +4,7 @@ import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.TimedToken;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
@@ -20,15 +21,19 @@ public class ColoredPlaceMarkingEdit extends Command {
     private final ColorType colorType;
     private ColorType oldColorType;
     List<ColoredTimeInvariant> oldCtiList;
+    private ArcExpression oldExpression;
+    private ArcExpression newExpression;
 
-    public ColoredPlaceMarkingEdit(ArrayList<TimedToken> tokenList, ArrayList<TimedToken> newTokenList, Context context,
-                                   TimedPlaceComponent place, List<ColoredTimeInvariant> ctiList, ColorType colorType1){
+    public ColoredPlaceMarkingEdit(ArrayList<TimedToken> tokenList, ArrayList<TimedToken> newTokenList, ArcExpression oldExpression, ArcExpression newExpression,
+                                   Context context, TimedPlaceComponent place, List<ColoredTimeInvariant> ctiList, ColorType colorType1){
         this.tokenList = tokenList;
         this.newTokenList = newTokenList;
         this.context = context;
         this.place = place;
         this.ctiList = ctiList;
         this.colorType = colorType1;
+        this.oldExpression = oldExpression;
+        this.newExpression = newExpression;
     }
 
     @Override
@@ -44,6 +49,7 @@ public class ColoredPlaceMarkingEdit extends Command {
 
         place.underlyingPlace().setColorType(oldColorType);
         place.underlyingPlace().setCtiList(oldCtiList);
+        place.underlyingPlace().setTokenExpression(oldExpression);
 
         place.update(true);
         place.repaint();
@@ -64,6 +70,8 @@ public class ColoredPlaceMarkingEdit extends Command {
 
         place.underlyingPlace().setCtiList(ctiList);
         place.underlyingPlace().setColorType(colorType);
+        place.underlyingPlace().setTokenExpression(newExpression);
+
 
         place.update(true);
         place.repaint();

@@ -9,7 +9,8 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 //import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
@@ -20,9 +21,7 @@ import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
@@ -657,32 +656,40 @@ public class PlaceEditorPanel extends JPanel {
         }
 
         ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
-        ArrayList<TimedToken> tokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+        ArrayList<TimedToken> oldTokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
         List<ColoredTimeInvariant> ctiList = new ArrayList<>();
+        ArcExpression oldExpression = place.underlyingPlace().getTokensAsExpression();
+        Vector<ArcExpression> v = new Vector<>();
 
-        for(int row = 0; row < tableModel.getRowCount(); row++){
-            int numberToAdd = (int)tableModel.getValueAt(row,0);
-            TimedToken tokenTypeToAdd = (TimedToken) tableModel.getValueAt(row,1);
-            for (int i = 0; i < numberToAdd; i++) {
-                tokensToAdd.add(tokenTypeToAdd);
-            }
+        for(int i = 0; i < coloredTokenListModel.getSize();i++){
+            v.add(coloredTokenListModel.getElementAt(i));
         }
+
         if(!place.isColored()){
-            tokensToAdd.clear();
-            for (int i = 0; i < newMarking; i++) {
-                TimedToken token = new TimedToken(place.underlyingPlace(), ColorType.COLORTYPE_DOT.getFirstColor());
-                tokensToAdd.add(token);
-            }
+            //we turn the dots into a numberofexpression to maintain the expression on the place
+            Vector<ColorExpression> cv = new Vector<>();
+            cv.add(new DotConstantExpression());
+            v.clear();
+            v.add(new NumberOfExpression(newMarking, cv));
         }
 
+        AddExpression newExpression = new AddExpression(v);
+        ColorMultiset cm = newExpression.eval(context.network().getContext());
+
+        for (TimedToken ctElement : cm.getTokens(place.underlyingPlace())) {
+            tokensToAdd.add(ctElement);
+        }
         for (int i = 0; i < timeConstraintListModel.size(); i++) {
             ctiList.add(timeConstraintListModel.get(i));
         }
 
-        Command command = new ColoredPlaceMarkingEdit(tokenList, tokensToAdd, context, place, ctiList, colorType);
+        Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, oldExpression, newExpression, context, place, ctiList, colorType);
         command.redo();
         context.undoManager().addEdit(command);
-        updateArcsAccordingToColorType();
+        if(colorType.equals( place.underlyingPlace().getColorType())){
+            //TODO: this needs undo functionality
+            updateArcsAccordingToColorType();
+        }
 
 		TimeInvariant newInvariant = constructInvariant();
 		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
@@ -727,10 +734,10 @@ public class PlaceEditorPanel extends JPanel {
         tokenPanel.setLayout(new GridBagLayout());
         tokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Tokens"));
 
-        tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
+        tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors",true) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-                updateSpinnerValue(comboBoxes);
+                updateSpinnerValue();
             }
         };
         tokenColorComboboxPanel.removeScrollPaneBorder();
@@ -746,26 +753,23 @@ public class PlaceEditorPanel extends JPanel {
 
         coloredTokenListModel = new DefaultListModel();
         tokenList = new JList(coloredTokenListModel);
-        tableModel = new DefaultTableModel(0, new String[]{"Number of Token", "Token type"}.length);
-        tableModel.setColumnIdentifiers(new String[]{"Number of Token", "Token type"});
-        tokenTable = new JTable(tableModel);
-        tokenTable.setCellSelectionEnabled(false);
-        tokenTable.setRowSelectionAllowed(true);
-        tokenTable.setColumnSelectionAllowed(false);
-        tokenTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tokenTable.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
-            if(tokenTable.getSelectedRow() < 0){
-                removeColoredTokenButton.setEnabled(false);
-            } else{
+        tokenList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        tokenList.addListSelectionListener(listSelectionEvent -> {
+            if(!listSelectionEvent.getValueIsAdjusting() && !tokenList.isSelectionEmpty()) {
+                tokenColorComboboxPanel.updateSelection(((NumberOfExpression)tokenList.getSelectedValue()).getColor().get(0));
                 updateSpinnerValue();
-                tokenColorComboboxPanel.updateSelection(((TimedToken)tokenTable.getValueAt(tokenTable.getSelectedRow(), 1)).color());
+                addColoredTokenButton.setText("Modify");
                 removeColoredTokenButton.setEnabled(true);
+
+            } else if(tokenList.isSelectionEmpty()){
+                addColoredTokenButton.setText("Add");
+                removeColoredTokenButton.setEnabled(false);
+
             }
         });
-        tokenTable.setDefaultRenderer(Object.class, new TokenTableCellRenderer());
 
-        JScrollPane tokenListScrollPane = new JScrollPane(tokenTable);
-        tokenListScrollPane.setViewportView(tokenTable);
+        JScrollPane tokenListScrollPane = new JScrollPane(tokenList);
+        tokenListScrollPane.setViewportView(tokenList);
         tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         Dimension tokenScrollPaneDim = new Dimension(100, 150);
         tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens"));
@@ -797,8 +801,12 @@ public class PlaceEditorPanel extends JPanel {
         tokenButtonPanel.add(addColoredTokenButton, gbc);
 
         addColoredTokenButton.addActionListener(actionEvent -> {
-            addColoredTokens((int) addTokenSpinner.getValue());
+            NumberOfExpression exprToAdd = buildTokenExpression((int) addTokenSpinner.getValue());
+            addTokenExpression(exprToAdd);
             addColoredTokenButton.setText("Modify");
+            if(tokenList.isSelectionEmpty()){
+                tokenList.setSelectedIndex(coloredTokenListModel.size()-1);
+            }
         });
         SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
@@ -818,9 +826,10 @@ public class PlaceEditorPanel extends JPanel {
         removeColoredTokenButton.setMaximumSize(buttonSize);
 
         removeColoredTokenButton.addActionListener(actionEvent -> {
-            if(tokenTable.getSelectedRow() > -1){
-                tableModel.removeRow(tokenTable.getSelectedRow());
+            if(tokenList.getSelectedIndex() > -1){
+                coloredTokenListModel.remove(tokenList.getSelectedIndex());
                 addColoredTokenButton.setText("Add");
+                removeColoredTokenButton.setEnabled(false);
             }
 
         });
@@ -1061,7 +1070,7 @@ public class PlaceEditorPanel extends JPanel {
         colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
 
         colorTypeComboBox.addActionListener(actionEvent -> {
-            if (!(tokenTable.getRowCount() < 1) || !timeConstraintListModel.isEmpty()) {
+            if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()) {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the color type for this place?\n" +
                     "All tokens and time invariants for colors will be deleted.","alert", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
@@ -1108,53 +1117,6 @@ public class PlaceEditorPanel extends JPanel {
         mainPanel.add(colorTypePanel, gbc);
     }
 
-    private void addColoredTokens(int numberOfTokens) {
-        TimedToken ct;
-        if (colorType instanceof ProductType) {
-            Vector<Color> colorVector = new Vector();
-            for (int i = 0; i < tokenColorComboboxPanel.getColorTypeComboBoxesArray().length ; i++) {
-                colorVector.add((Color)tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
-            }
-            Color tempColor = new Color(colorType, 0, colorVector);
-            ct = new TimedToken(place.underlyingPlace(), tempColor);
-        }
-        else {
-            ct = new TimedToken(place.underlyingPlace(), (dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
-        }
-        boolean existsAlready = false;
-        if(tableModel.getRowCount() > 0){
-            int currSize = tableModel.getRowCount();
-            for(int i = 0; i < currSize; i++){
-                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(ct.color().toString())){
-                    tableModel.setValueAt(numberOfTokens,i,0);
-                    existsAlready = true;
-                }
-            }
-            if(!existsAlready){
-                tableModel.addRow(new Object[]{numberOfTokens, ct});
-            }
-        }else{
-            tableModel.addRow(new Object[]{numberOfTokens, ct});
-        }
-	}
-    private void addColoredToken(TimedToken tokenToAdd) {
-        boolean existsAlready = false;
-        if(tableModel.getRowCount() > 0){
-            int currSize = tableModel.getRowCount();
-            for(int i = 0; i < currSize; i++){
-                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(tokenToAdd.color().toString())){
-                    tableModel.setValueAt((int)tokenTable.getValueAt(i,0) +1,i,0);
-                    existsAlready = true;
-                }
-            }
-            if(!existsAlready){
-                tableModel.addRow(new Object[]{1, tokenToAdd});
-            }
-        }else{
-            tableModel.addRow(new Object[]{1, tokenToAdd});
-        }
-    }
-
     private void updateArcsAccordingToColorType() {
         for(Arc arc : place.getPostset()){
             UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
@@ -1181,35 +1143,30 @@ public class PlaceEditorPanel extends JPanel {
 
     private void writeTokensToList() {
         coloredTokenListModel.clear();
-        for (TimedToken element : context.network().marking().getTokensFor(place.underlyingPlace())) {
-            addColoredToken(element);
+        AddExpression tokenExpression = (AddExpression)place.underlyingPlace().getTokensAsExpression();
+        if(tokenExpression != null){
+            for(ArcExpression expr : tokenExpression.getAddExpression()){
+                addTokenExpression((NumberOfExpression)expr);
+            }
         }
         updateSpinnerValue();
     }
 
     private void updateSpinnerValue(){
-	    updateSpinnerValue(tokenColorComboboxPanel.getColorTypeComboBoxesArray());
-    }
-
-    private void updateSpinnerValue(JComboBox[] comboBoxes){
-        boolean existsAlready = false;
-        if(tableModel.getRowCount() > 0){
-            int currSize = tableModel.getRowCount();
-            for(int i = 0; i < currSize; i++){
-                if(((TimedToken) tokenTable.getValueAt(i,1)).color().toString().equals(comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()).toString())){
-                    addTokenSpinner.setValue(tokenTable.getValueAt(i,0));
-                    existsAlready = true;
-                    addColoredTokenButton.setText("Modify");
+        NumberOfExpression expr = buildTokenExpression(1);
+        if(coloredTokenListModel.getSize() > 0){
+            for(int i = 0; i < coloredTokenListModel.getSize();i++){
+                NumberOfExpression otherExpr = coloredTokenListModel.getElementAt(i);
+                if(expr.equalsColor(otherExpr)){
+                    addTokenSpinner.setValue(otherExpr.getNumber());
+                    tokenList.setSelectedIndex(i);
+                    return;
                 }
             }
-            if(!existsAlready){
-                addTokenSpinner.setValue(1);
-                addColoredTokenButton.setText("Add");
-            }
-        }else{
-            addTokenSpinner.setValue(1);
-            addColoredTokenButton.setText("Add");
         }
+        addTokenSpinner.setValue(1);
+        tokenList.clearSelection();
+        addColoredTokenButton.setText("Add");
     }
 
     private void setInitialComboBoxValue() {
@@ -1224,7 +1181,7 @@ public class PlaceEditorPanel extends JPanel {
 
     private void setNewColorType(ColorType colorType) {
         this.colorType = colorType;
-        tableModel.setRowCount(0);
+        coloredTokenListModel.clear();
         timeConstraintListModel.clear();
         tokenColorComboboxPanel.updateColorType(colorType);
         colorInvariantComboboxPanel.updateColorType(colorType);
@@ -1239,6 +1196,58 @@ public class PlaceEditorPanel extends JPanel {
         }
         timeConstraintList.setSelectedIndex(0);
     }
+
+    private void addTokenExpression(NumberOfExpression expr){
+	    boolean exists = false;
+        for(int i = 0; i < coloredTokenListModel.getSize();i++){
+            NumberOfExpression otherExpr = coloredTokenListModel.getElementAt(i);
+            if(expr.equalsColor(otherExpr)){
+                exists = true;
+
+                otherExpr.setNumber(expr.getNumber());
+
+                break;
+            }
+        }
+        if(!exists){
+            coloredTokenListModel.addElement(expr);
+        }
+        tokenList.updateUI();
+    }
+
+    private NumberOfExpression buildTokenExpression(int number){
+        Vector<ColorExpression> exprVec = new Vector();
+        TupleExpression tupleExpression;
+        if (colorType instanceof ProductType) {
+            Vector<ColorExpression> tempVec = new Vector();
+            for (int i = 0; i < tokenColorComboboxPanel.getColorTypeComboBoxesArray().length; i++) {
+                ColorExpression expr;
+                if (tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()) instanceof String) {
+                    //We hack this
+                    //"all" is always last, so we get the colortype by taking the colortype of the first element
+                    expr = new AllExpression(((dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i]
+                        .getItemAt(0)).getColorType());
+                } else {
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i]
+                        .getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
+                }
+                tempVec.add(expr);
+            }
+            tupleExpression = new TupleExpression(tempVec);
+            exprVec.add(tupleExpression);
+        } else {
+            ColorExpression expr;
+            if (tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()) instanceof String) {
+                expr = new AllExpression(colorType);
+            } else {
+                expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0]
+                    .getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
+            }
+            exprVec.add(expr);
+        }
+        return new NumberOfExpression(number, exprVec);
+    }
+
 
 
     private javax.swing.JCheckBox attributesCheckBox;
@@ -1261,7 +1270,7 @@ public class PlaceEditorPanel extends JPanel {
 	private JRadioButton normalInvRadioButton;
 	private JRadioButton constantInvRadioButton;
     private JPanel tokenPanel;
-    private DefaultListModel<TimedToken> coloredTokenListModel;
+    private DefaultListModel<NumberOfExpression> coloredTokenListModel;
     private JList tokenList;
     private JPanel tokenButtonPanel;
     private JButton addColoredTokenButton;
@@ -1274,8 +1283,6 @@ public class PlaceEditorPanel extends JPanel {
     JComboBox<ColorType>  colorTypeComboBox;
     JPanel colorTypePanel;
     JSpinner addTokenSpinner;
-    DefaultTableModel tableModel;
-    JTable tokenTable;
     ColoredTimeInvariantDialogPanel invariantEditorPanel;
     JButton addTimeConstraintButton;
     JButton removeTimeConstraintButton;

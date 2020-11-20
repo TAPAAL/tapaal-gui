@@ -220,7 +220,7 @@ public class PNMLoader {
             } else {
                 markingOffset = parseGraphics(getFirstDirectChild(markingNode, "graphics"), GraphicsType.Offset);
                 Node markingExpression = getFirstDirectChild(markingNode, "structure");
-                colorMarking = loadTACPN.parseArcExpression(markingExpression);
+                colorMarking = loadTACPN.parseTokenExpression(markingExpression);
             }
             place = new LocalTimedPlace(id, colorType);
 

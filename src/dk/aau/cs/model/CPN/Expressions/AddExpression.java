@@ -33,6 +33,7 @@ public class AddExpression extends ArcExpression {
         //Start with null, to use colortype of first constituent
         for (ArcExpression constituent : constituents) {
             if (result == null) {
+                System.out.println(constituent);
                 result = constituent.eval(context);
             } else {
                 ColorMultiset cm = constituent.eval(context);
@@ -209,5 +210,13 @@ public class AddExpression extends ArcExpression {
             res += " + " + constituents.get(i).toString();
         }
         return res + ")";
+    }
+
+    public String toTokenString() {
+        String res = "";
+        for (int i = 0; i < constituents.size(); ++i) {
+            res +=  constituents.get(i).toString() + "\n";
+        }
+        return res;
     }
 }

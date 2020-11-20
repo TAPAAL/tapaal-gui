@@ -15,6 +15,8 @@ import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -179,10 +181,7 @@ public class TimedPlaceComponent extends Place {
 
         //TODO: this causes null pointer exceptions when importing some pnml nets
         Map<String, Long> tokenMap = timedTokens.stream().map(
-            timedToken -> timedToken.color().getColorName() == ""?
-                timedToken.color().toString() :
-                timedToken.color().getColorName())
-            .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+            timedToken -> timedToken.getFormattedTokenString()).collect(Collectors.groupingBy(e -> e, Collectors.counting()));
 
         boolean first = true;
 
@@ -471,7 +470,9 @@ public class TimedPlaceComponent extends Place {
                 }
 
                 if (CreateGui.getApp().showColoredTokens()) {
-                    buffer.append("\n" + getColoredTokensLabel());
+                    if(underlyingPlace().getTokensAsExpression() != null){
+                        buffer.append("\n" + ((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
+                    }
                 }
 
                 getNameLabel().setText(buffer.toString());

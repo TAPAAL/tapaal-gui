@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN;
 
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 
