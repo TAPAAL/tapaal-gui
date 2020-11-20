@@ -761,8 +761,8 @@ public class ColoredArcGuardPanel extends JPanel {
                 Vector<ColorExpression> tempVec = new Vector();
                 for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
                     ColorExpression expr;
-                    if (colorExpressionComboBoxPanel.getAllCheckBoxesArray()[i].isSelected()) {
-                        expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem()).getColorType());
+                    if ( colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem() instanceof String) {
+                        expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getItemAt(0)).getColorType());
                     } else {
                         expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i]
                             .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
@@ -773,8 +773,8 @@ public class ColoredArcGuardPanel extends JPanel {
                 exprVec.add(tupleExpression);
             } else {
                 ColorExpression expr;
-                if (colorExpressionComboBoxPanel.getAllCheckBoxesArray()[0].isSelected()) {
-                    expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem()).getColorType());
+                if (colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem() instanceof String) {
+                    expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getItemAt(0)).getColorType());
                 } else {
                     expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0]
                         .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));

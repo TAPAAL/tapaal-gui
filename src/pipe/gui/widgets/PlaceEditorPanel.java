@@ -675,10 +675,12 @@ public class PlaceEditorPanel extends JPanel {
 
         AddExpression newExpression = new AddExpression(v);
         ColorMultiset cm = newExpression.eval(context.network().getContext());
-
-        for (TimedToken ctElement : cm.getTokens(place.underlyingPlace())) {
-            tokensToAdd.add(ctElement);
+        if(cm != null){
+            for (TimedToken ctElement : cm.getTokens(place.underlyingPlace())) {
+                tokensToAdd.add(ctElement);
+            }
         }
+
         for (int i = 0; i < timeConstraintListModel.size(); i++) {
             ctiList.add(timeConstraintListModel.get(i));
         }
