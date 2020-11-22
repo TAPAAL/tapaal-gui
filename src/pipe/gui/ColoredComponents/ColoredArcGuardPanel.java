@@ -72,7 +72,6 @@ public class ColoredArcGuardPanel extends JPanel {
         initPanels();
         initExpr();
         setTimeConstraints();
-        getVariables();
         updateSelection();
         hideIrrelevantInformation();
 
@@ -605,7 +604,7 @@ public class ColoredArcGuardPanel extends JPanel {
     private void initNumberExpressionsPanel() {
         numberExprPanel = new JPanel(new GridBagLayout());
         numberExprPanel.setBorder(BorderFactory.createTitledBorder("Numerical Expressions"));
-        colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, "colors", true) {
+        colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, "colors", true, context) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
 
@@ -617,17 +616,7 @@ public class ColoredArcGuardPanel extends JPanel {
         Integer max = 999;
         Integer step = 1;
         SpinnerNumberModel numberModelNumber = new SpinnerNumberModel(current, min, max, step);
-        variableCombobox = new JComboBox();
-        useVariableCheckBox = new JCheckBox("Use variable");
-        useVariableCheckBox.addItemListener(e -> {
-            if(e.getStateChange() == ItemEvent.SELECTED){
-                colorExpressionComboBoxPanel.setVisible(false);
-                variableCombobox.setVisible(true);
-            } else{
-                colorExpressionComboBoxPanel.setVisible(true);
-                variableCombobox.setVisible(false);
-            }
-        });
+
         numberExpressionJSpinner = new JSpinner(numberModelNumber);
         addExpressionButton = new JButton("Add Expression");
 
@@ -635,18 +624,13 @@ public class ColoredArcGuardPanel extends JPanel {
         numberExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMaximumSize(new Dimension(50, 27));
 
-        addExpressionButton.setPreferredSize(new Dimension(125, 27));
-        addExpressionButton.setMinimumSize(new Dimension(125, 27));
-        addExpressionButton.setMaximumSize(new Dimension(125, 27));
+        addExpressionButton.setPreferredSize(new Dimension(125, 30));
+        addExpressionButton.setMinimumSize(new Dimension(125, 30));
+        addExpressionButton.setMaximumSize(new Dimension(125, 30));
 
         addExpressionButton.addActionListener(actionEvent -> addNumberExpression());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0,5 ,5 );
-        numberExprPanel.add(useVariableCheckBox, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -658,8 +642,6 @@ public class ColoredArcGuardPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         numberExprPanel.add(colorExpressionComboBoxPanel, gbc);
-        numberExprPanel.add(variableCombobox, gbc);
-        variableCombobox.setVisible(false);
 
         gbc = new GridBagConstraints();
         gbc.gridy = 1;
@@ -755,37 +737,37 @@ public class ColoredArcGuardPanel extends JPanel {
 
     private void addNumberExpression() {
         Vector<ColorExpression> exprVec = new Vector();
-        if (!useVariableCheckBox.isSelected()){
-            TupleExpression tupleExpression;
-            if (selectedColorType instanceof ProductType) {
-                Vector<ColorExpression> tempVec = new Vector();
-                for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
-                    ColorExpression expr;
-                    if ( colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem() instanceof String) {
-                        expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getItemAt(0)).getColorType());
-                    } else {
-                        expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i]
-                            .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
-                    }
-                    tempVec.add(expr);
-                }
-                tupleExpression = new TupleExpression(tempVec);
-                exprVec.add(tupleExpression);
-            } else {
+        TupleExpression tupleExpression;
+        if (selectedColorType instanceof ProductType) {
+            Vector<ColorExpression> tempVec = new Vector();
+            for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
                 ColorExpression expr;
-                if (colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem() instanceof String) {
-                    expr = new AllExpression(((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getItemAt(0)).getColorType());
+                Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem();
+                if ( selectedElement instanceof String) {
+                    expr = new AllExpression(((ProductType)colorExpressionComboBoxPanel.getColorType()).getColorTypes().get(i));
+                }else if(selectedElement instanceof Variable){
+                    expr = new VariableExpression((Variable)selectedElement);
                 } else {
-                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0]
-                        .getItemAt(colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedIndex()));
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
                 }
-                exprVec.add(expr);
+                tempVec.add(expr);
             }
-        } else{
-            Variable var = variableCombobox.getItemAt(variableCombobox.getSelectedIndex());
-            VariableExpression varExpr = new VariableExpression(var);
-            exprVec.add(varExpr);
+            tupleExpression = new TupleExpression(tempVec);
+            exprVec.add(tupleExpression);
+        } else {
+            ColorExpression expr;
+            Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem();
+            if (selectedElement instanceof String) {
+                expr = new AllExpression(colorExpressionComboBoxPanel.getColorType());
+            } else if(selectedElement instanceof Variable){
+                expr = new VariableExpression((Variable)selectedElement);
+            }
+            else {
+                expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+            }
+            exprVec.add(expr);
         }
+
 
         if (currentSelection.getObject() instanceof ArcExpression) {
             Integer value = (Integer) numberExpressionJSpinner.getValue();
@@ -1009,13 +991,8 @@ public class ColoredArcGuardPanel extends JPanel {
     }
 
     private void updateNumberExpressionsPanel() {
-        colorExpressionComboBoxPanel.updateColorType(selectedColorType);
-        getVariables();
-        if (currentSelection.getObject() instanceof ColorExpression) {
-            numberExpressionJSpinner.setVisible(false);
-        } else {
-            numberExpressionJSpinner.setVisible(true);
-        }
+        colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
+        numberExpressionJSpinner.setVisible(!(currentSelection.getObject() instanceof ColorExpression));
     }
 
     private void toggleEnabledButtons() {
@@ -1133,20 +1110,6 @@ public class ColoredArcGuardPanel extends JPanel {
         return ctiList;
     }
 
-    private void getVariables(){
-        variableCombobox.removeAllItems();
-        for (Variable element : context.network().variables()) {
-            if (element.getColorType().getName().equals(selectedColorType.getName())) {
-                variableCombobox.addItem(element);
-            }
-        }
-        if(variableCombobox.getItemCount() < 1){
-            useVariableCheckBox.setEnabled(false);
-        } else {
-            useVariableCheckBox.setEnabled(true);
-        }
-    }
-
     private ColorType getCurrentSelectionColorType() {
         if ( currentSelection.getObject() instanceof ColorExpression) {
             return ((ColorExpression) currentSelection.getObject()).getColorType(context.network().colorTypes());
@@ -1194,9 +1157,6 @@ public class ColoredArcGuardPanel extends JPanel {
     JButton predButton;
     JButton succButton;
     ColorComboboxPanel colorExpressionComboBoxPanel;
-
-    JCheckBox useVariableCheckBox;
-    JComboBox<Variable> variableCombobox;
     JPanel numberExprPanel;
     private void refreshUndoRedo() {
         undoButton.setEnabled(undoManager.canUndo());

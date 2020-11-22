@@ -1,5 +1,6 @@
 package pipe.gui.ColoredComponents;
 
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
@@ -27,19 +28,21 @@ public abstract class ColorComboboxPanel extends JPanel {
     private JComboBox[] colorTypeComboBoxesArray;
     JScrollPane colorTypesScrollPane;
     JPanel comboBoxPanel;
-    private JCheckBox[] allCheckBoxesArray;
     boolean showAllElement;
+    Context context;
 
     public ColorComboboxPanel(ColorType colorType, String panelName) {
-        this(colorType,panelName,false);
+        this(colorType,panelName,false, null);
     }
-    public ColorComboboxPanel(ColorType colorType, String panelName, boolean showAllElement){
+    public ColorComboboxPanel(ColorType colorType, String panelName, boolean showAllElement, Context context){
         this.colorType = colorType;
         this.panelName = panelName;
         this.showAllElement = showAllElement;
         this.setLayout(new BorderLayout());
+        this.context = context;
         initPanel();
     }
+
 
     public ColorType getColorType() {
         return colorType;
@@ -47,10 +50,6 @@ public abstract class ColorComboboxPanel extends JPanel {
 
     public JComboBox[] getColorTypeComboBoxesArray() {
         return colorTypeComboBoxesArray;
-    }
-
-    public JCheckBox[] getAllCheckBoxesArray(){
-        return allCheckBoxesArray;
     }
 
     private void initPanel() {
@@ -87,7 +86,7 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[0].setSelectedItem(color);
         }
     }
-
+    //This assumes no nested producttypes
     public void updateSelection(ColorExpression expr){
         if(expr instanceof TupleExpression){
             int i = 0;
@@ -106,18 +105,31 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
         }
     }
-
     public void updateColorType(ColorType ct){
+        updateColorType(ct, null);
+    }
+    public void updateColorType(ColorType ct, Context context){
         removeOldComboBoxes();
         colorType = ct;
         if (colorType instanceof ProductType) {
             colorTypeComboBoxesArray = new JComboBox[((ProductType) colorType).getColorTypes().size()];
-            allCheckBoxesArray = new JCheckBox[((ProductType) colorType).getColorTypes().size()];
-
 
             for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
                 colorTypeComboBoxesArray[i] = new JComboBox();
                 colorTypeComboBoxesArray[i].setRenderer(new ColorComboBoxRenderer(colorTypeComboBoxesArray[i]));
+                colorTypeComboBoxesArray[i].setPreferredSize(new Dimension(200,25));
+                if (context != null) {
+                    boolean variableFound = false;
+                    for (Variable variable : context.network().variables()) {
+                        if (variable.getColorType().getName().equals(((ProductType) colorType).getColorTypes().get(i).getName())) {
+                            variableFound = true;
+                            colorTypeComboBoxesArray[i].addItem(variable);
+                        }
+                    }
+                    if(variableFound){
+                        colorTypeComboBoxesArray[i].addItem(new JSeparator());
+                    }
+                }
                 for (Color element : ((ProductType) colorType).getColorTypes().get(i)) {
                     colorTypeComboBoxesArray[i].addItem(element);
                 }
@@ -129,7 +141,7 @@ public abstract class ColorComboboxPanel extends JPanel {
                 gbc.gridy = i;
                 gbc.anchor = GridBagConstraints.WEST;
                 gbc.weightx = 1.0;
-                gbc.insets = new Insets(5 , 0,0,0);
+                gbc.insets = new Insets(0 , 0,5,0);
                 gbc.fill =GridBagConstraints.HORIZONTAL;
                 comboBoxPanel.add(colorTypeComboBoxesArray[i], gbc);
                 if(showAllElement){
@@ -140,12 +152,22 @@ public abstract class ColorComboboxPanel extends JPanel {
         }
         else if (colorType != null){
             colorTypeComboBoxesArray = new JComboBox[1];
-            allCheckBoxesArray = new JCheckBox[1];
             colorTypeComboBoxesArray[0] = new JComboBox();
             colorTypeComboBoxesArray[0].setRenderer(new ColorComboBoxRenderer(colorTypeComboBoxesArray[0]));
-
-            for (Iterator<Color> iter = colorType.iterator(); iter.hasNext();) {
-                Color element = iter.next();
+            colorTypeComboBoxesArray[0].setPreferredSize(new Dimension(200,25));
+            if(context != null){
+                boolean variableFound = false;
+                for (Variable element : context.network().variables()) {
+                    if (element.getColorType().getName().equals(ct.getName())) {
+                        colorTypeComboBoxesArray[0].addItem(element);
+                        variableFound = true;
+                    }
+                }
+                if(variableFound){
+                    colorTypeComboBoxesArray[0].addItem(new JSeparator());
+                }
+            }
+            for (Color element : colorType) {
                 colorTypeComboBoxesArray[0].addItem(element);
             }
 
@@ -158,37 +180,16 @@ public abstract class ColorComboboxPanel extends JPanel {
             gbc.fill =GridBagConstraints.HORIZONTAL;
             gbc.weightx = 1.0;
             gbc.anchor = GridBagConstraints.WEST;
-            gbc.insets = new Insets(5 , 0,0,0);
+            gbc.insets = new Insets(0 , 0,5,0);
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
             if(showAllElement){
                 colorTypeComboBoxesArray[0].addItem(new JSeparator());
                 colorTypeComboBoxesArray[0].addItem("<html><b>.all</b>");
             }
         }
-        addCheckBoxActionListeners();
         revalidate();
     }
     private void removeOldComboBoxes(){
         comboBoxPanel.removeAll();
-    }
-
-    private void addCheckBoxActionListeners(){
-        for(JCheckBox checkBox : allCheckBoxesArray){
-            if(checkBox != null){
-                checkBox.addItemListener(e -> {
-                    int index = 0;
-                    for(JCheckBox item : allCheckBoxesArray){
-                        if(item.equals(e.getItem())){
-                            if(e.getStateChange() == ItemEvent.SELECTED) {
-                                colorTypeComboBoxesArray[index].setEnabled(false);
-                            } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                                colorTypeComboBoxesArray[index].setEnabled(true);
-                            }
-                        }
-                        index++;
-                    }
-                });
-            }
-        }
     }
 }

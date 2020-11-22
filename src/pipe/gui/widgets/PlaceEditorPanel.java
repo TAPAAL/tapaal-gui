@@ -735,7 +735,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenPanel.setLayout(new GridBagLayout());
         tokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Tokens"));
 
-        tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors",true) {
+        tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors",true, null) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
                 updateSpinnerValue();

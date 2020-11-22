@@ -70,8 +70,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     JButton succButton;
     JComboBox<ColorType> colorTypeCombobox;
     JLabel colorTypeLabel;
-    JComboBox<Variable> variableCombobox;
-    JButton addVariableButton;
     ColorComboboxPanel colorCombobox;
     JLabel colorLabel;
     JButton addColorButton;
@@ -179,20 +177,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorTypeCombobox.setSelectedIndex(0);
         }
 
-        variableLabel = new JLabel("Variable: ");
-        variableCombobox = new JComboBox();
-        variableCombobox.setPreferredSize(new Dimension(200,25));
-        variableCombobox.setRenderer(new ColorComboBoxRenderer(variableCombobox));
-
-        addVariableButton = new JButton("Add Variable");
-        Dimension addDim = new Dimension(120, 27);
-
-        addVariableButton.setPreferredSize(addDim);
-        addVariableButton.setMinimumSize(addDim);
-        addVariableButton.setMaximumSize(addDim);
-
         colorLabel = new JLabel("Color: ");
-        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(), "") {
+        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(), "",false,context) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
 
@@ -200,42 +186,45 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         };
         colorCombobox.removeScrollPaneBorder();
         addColorButton = new JButton("Add Color");
-
+        Dimension addDim = new Dimension(120, 30);
         addColorButton.setPreferredSize(addDim);
         addColorButton.setMinimumSize(addDim);
         addColorButton.setMaximumSize(addDim);
 
-        addVariableButton.addActionListener(actionEvent -> {
-            VariableExpression varExpr;
-            Variable var = variableCombobox.getItemAt(variableCombobox.getSelectedIndex());
-            if (currentSelection.getObject() instanceof TupleExpression) {
-                TupleExpression expr = (TupleExpression)currentSelection.getObject();
-                if (expr.containsPlaceHolder()) {
-                    //expr.findFirstPlaceHolder().
-                }
-            }
-            else if (currentSelection.getObject() instanceof ColorExpression) {
-                varExpr = new VariableExpression(var);
-                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), varExpr);
-                newProperty = newProperty.replace(currentSelection.getObject(), varExpr);
-                updateSelection(varExpr);
-                undoSupport.postEdit(edit);
-            }
-        });
-
         addColorButton.addActionListener(actionEvent -> {
-            Vector<dk.aau.cs.model.CPN.Color> colorVector = new Vector();
-            for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length ; i++) {
-                colorVector.add((dk.aau.cs.model.CPN.Color)colorCombobox.getColorTypeComboBoxesArray()[i].getItemAt(colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedIndex()));
+            Expression newExpression;
+            if (colorCombobox.getColorTypeComboBoxesArray().length > 1) {
+                Vector<ColorExpression> tempVec = new Vector();
+                for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length; i++) {
+                    ColorExpression expr;
+                    Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedItem();
+                    if ( selectedElement instanceof String) {
+                        expr = new AllExpression(((ProductType)colorCombobox.getColorType()).getColorTypes().get(i));
+                    }else if(selectedElement instanceof Variable){
+                        expr = new VariableExpression((Variable)selectedElement);
+                    } else {
+                        expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                    }
+                    tempVec.add(expr);
+                }
+                newExpression = new TupleExpression(tempVec);
+            } else {
+                ColorExpression expr;
+                Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[0].getSelectedItem();
+                if (selectedElement instanceof String) {
+                    expr = new AllExpression(colorCombobox.getColorType());
+                } else if(selectedElement instanceof Variable){
+                    expr = new VariableExpression((Variable)selectedElement);
+                }
+                else {
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                }
+                newExpression = expr;
             }
-            dk.aau.cs.model.CPN.Color tempColor = new dk.aau.cs.model.CPN.Color((ColorType)colorTypeCombobox.getSelectedItem(), 0, colorVector);
-            UserOperatorExpression colorExpr;
-
             if (currentSelection.getObject() instanceof ColorExpression) {
-                colorExpr = new UserOperatorExpression(tempColor);
-                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), colorExpr);
-                newProperty = newProperty.replace(currentSelection.getObject(), colorExpr);
-                updateSelection(colorExpr);
+                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), newExpression);
+                newProperty = newProperty.replace(currentSelection.getObject(), newExpression);
+                updateSelection(newExpression);
                 undoSupport.postEdit(edit);
 
             }
@@ -252,26 +241,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         colorExpressionPanel.add(colorTypeCombobox, gbc);
 
-
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(3,3,3,3);
-        colorExpressionPanel.add(variableCombobox, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.insets = new Insets(3,3,3,3);
-        gbc.anchor = GridBagConstraints.WEST;
-        colorExpressionPanel.add(addVariableButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -280,9 +252,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(3, 3,3 ,3);
+        gbc.insets = new Insets(0, 3,0 ,0);
         colorExpressionPanel.add(addColorButton, gbc);
 
         gbc = new GridBagConstraints();
@@ -888,9 +860,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             predButton.setEnabled(false);
             colorCombobox.setEnabled(false);
             colorTypeCombobox.setEnabled(false);
-            variableCombobox.setEnabled(false);
             addColorButton.setEnabled(false);
-            addVariableButton.setEnabled(false);
         }
         else if (currentSelection.getObject() instanceof ColorExpression) {
             andButton.setEnabled(false);
@@ -908,9 +878,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             }
             colorCombobox.setEnabled(true);
             colorTypeCombobox.setEnabled(true);
-            addColorButton.setEnabled(true);
-            variableCombobox.setEnabled(variableCombobox.getItemCount() > 0);
-            addVariableButton.setEnabled(variableCombobox.getItemCount() > 0);
+            addColorButton.setEnabled(true);;
         }
         else if (currentSelection.getObject() instanceof GuardExpression) {
             andButton.setEnabled(true);
@@ -926,9 +894,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             predButton.setEnabled(false);
             colorCombobox.setEnabled(false);
             colorTypeCombobox.setEnabled(false);
-            variableCombobox.setEnabled(false);
             addColorButton.setEnabled(false);
-            addVariableButton.setEnabled(false);
 
         }
         if(newProperty.containsPlaceHolder() && !(newProperty instanceof PlaceHolderExpression)){
@@ -1125,19 +1091,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     }
     private void updateColorType() {
-        variableCombobox.removeAllItems();
         ColorType ct;
         ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
         if (ct != null) {
-            for (Variable element : context.network().variables()) {
-                if (element.getColorType().getName().equals(ct.getName())) {
-                    variableCombobox.addItem(element);
-                }
-            }
-            colorCombobox.updateColorType(ct);
+            colorCombobox.updateColorType(ct, context);
         }
-        variableCombobox.setEnabled(variableCombobox.getItemCount() > 0);
-        addVariableButton.setEnabled(variableCombobox.getItemCount() > 0);
     }
 
     // /////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 package dk.aau.cs.gui.components;
 
+import dk.aau.cs.model.CPN.Variable;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -18,6 +20,11 @@ public class ColorComboBoxRenderer extends JLabel
         boolean cellHasFocus) {
         if(value instanceof JSeparator){
             return  new JSeparator(JSeparator.HORIZONTAL);
+        }
+        else if(value instanceof Variable){
+            setText(ellipsis(((Variable)value).getName(), comboBox.getWidth() / 7));
+
+            setFont(list.getFont());
         }
         else if(value != null) {
             setText(ellipsis(value.toString(), comboBox.getWidth() / 7));
