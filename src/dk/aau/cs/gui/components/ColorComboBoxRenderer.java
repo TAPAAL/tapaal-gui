@@ -16,7 +16,10 @@ public class ColorComboBoxRenderer extends JLabel
         int index,
         boolean isSelected,
         boolean cellHasFocus) {
-        if(value != null) {
+        if(value instanceof JSeparator){
+            return  new JSeparator(JSeparator.HORIZONTAL);
+        }
+        else if(value != null) {
             setText(ellipsis(value.toString(), comboBox.getWidth() / 7));
 
             setFont(list.getFont());

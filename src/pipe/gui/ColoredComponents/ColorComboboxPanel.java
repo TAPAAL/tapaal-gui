@@ -101,7 +101,7 @@ public abstract class ColorComboboxPanel extends JPanel {
 
     private void setIndex(ColorExpression expr, int index){
         if(expr instanceof AllExpression){
-            colorTypeComboBoxesArray[index].setSelectedItem("all");
+            colorTypeComboBoxesArray[index].setSelectedItem(".all");
         } else{
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
         }
@@ -133,7 +133,8 @@ public abstract class ColorComboboxPanel extends JPanel {
                 gbc.fill =GridBagConstraints.HORIZONTAL;
                 comboBoxPanel.add(colorTypeComboBoxesArray[i], gbc);
                 if(showAllElement){
-                    colorTypeComboBoxesArray[i].addItem("all");
+                    colorTypeComboBoxesArray[i].addItem(new JSeparator());
+                    colorTypeComboBoxesArray[i].addItem("<html><b>.all</b>");
                 }
             }
         }
@@ -160,7 +161,8 @@ public abstract class ColorComboboxPanel extends JPanel {
             gbc.insets = new Insets(5 , 0,0,0);
             comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
             if(showAllElement){
-                colorTypeComboBoxesArray[0].addItem("all");
+                colorTypeComboBoxesArray[0].addItem(new JSeparator());
+                colorTypeComboBoxesArray[0].addItem("<html><b>.all</b>");
             }
         }
         addCheckBoxActionListeners();

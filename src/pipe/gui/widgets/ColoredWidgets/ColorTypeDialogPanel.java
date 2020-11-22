@@ -444,7 +444,7 @@ public class ColorTypeDialogPanel extends JPanel {
                     "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
-            } else if(enumerationName.equals("all") || enumerationName.equals("All") || enumerationName.equals("dot")){
+            } else if(enumerationName.equals("all") || enumerationName.equals("All") || enumerationName.equals("dot") || enumerationName.equals(".all") || enumerationName.equals(".All")){
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
