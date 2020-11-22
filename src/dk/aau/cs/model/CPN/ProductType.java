@@ -10,6 +10,30 @@ public class ProductType extends ColorType {
     private String id;
     private HashMap<Vector<Color>, Color> colorCache = new HashMap<Vector<Color>, Color>();
 
+    @Override
+    public Integer size() {
+        return constituents.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ProductType))
+            return false;
+        ProductType object = (ProductType) o;
+
+        if (!object.name.equals(this.name))
+            return false;
+
+        if(!object.size().equals(size())){
+            return false;
+        }
+        for(int i = 0; i < constituents.size(); i++){
+            if(!constituents.get(i).equals(object.constituents.get(i))){
+                return false;
+            }
+        }
+        return true;
+    }
 
     public ProductType(String name) {
         super(name);

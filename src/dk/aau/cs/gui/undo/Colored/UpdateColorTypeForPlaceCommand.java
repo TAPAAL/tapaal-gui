@@ -1,8 +1,10 @@
 package dk.aau.cs.gui.undo.Colored;
 
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -10,6 +12,7 @@ import pipe.gui.CreateGui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class UpdateColorTypeForPlaceCommand extends Command {
     private TimedPlace place;
@@ -18,6 +21,10 @@ public class UpdateColorTypeForPlaceCommand extends Command {
     private  ColorType oldPlaceColorType;
     private List<TimedToken> tokensToRemove;
     private List<ColoredTimeInvariant> invariantsToRemove;
+    private ArcExpression newTokenExpression;
+    private ArcExpression oldTokenExpression;
+    private final ArrayList<Color> removedColors = new ArrayList<>();
+
 
     public UpdateColorTypeForPlaceCommand(TimedPlace place, ColorType oldColorType, ColorType newColorType) {
         this.place = place;
@@ -26,6 +33,38 @@ public class UpdateColorTypeForPlaceCommand extends Command {
         tokensToRemove = new ArrayList<>();
         invariantsToRemove = new ArrayList<>();
         oldPlaceColorType = place.getColorType();
+        oldTokenExpression = place.getTokensAsExpression();
+
+        for (TimedToken token : place.tokens()) {
+            if (!place.getColorType().contains(token.color())) {
+                tokensToRemove.add(token);
+            }
+        }
+
+        for (ColoredTimeInvariant invariant : place.getCtiList()) {
+            if (!place.getColorType().contains(invariant.getColor())) {
+                invariantsToRemove.add(invariant);
+            }
+        }
+
+        for(Color color : oldColorType.getColors()) {
+            if (!newColorType.getColors().contains(color)) {
+                removedColors.add(color);
+            }
+        }
+
+        AllExpression oldColorExpr = new AllExpression(oldColorType);
+        AllExpression newColorExpr = new AllExpression(newColorType);
+        if(place.getTokensAsExpression() != null){
+            newTokenExpression = place.getTokensAsExpression().deepCopy();
+            newTokenExpression.replace(oldColorExpr, newColorExpr);
+            for(Color color : removedColors){
+                newTokenExpression = newTokenExpression.removeColorFromExpression(color, newColorType);
+                if(newTokenExpression == null){
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -35,6 +74,7 @@ public class UpdateColorTypeForPlaceCommand extends Command {
         place.setColorType(oldPlaceColorType);
         place.addTokens(tokensToRemove);
         place.getCtiList().addAll(invariantsToRemove);
+        place.setTokenExpression(oldTokenExpression);
 
         CreateGui.getModel().repaintPlaces(true);
     }
@@ -50,30 +90,26 @@ public class UpdateColorTypeForPlaceCommand extends Command {
         if(newColorType instanceof ProductType){
             place.tokens().clear();
             place.getCtiList().clear();
+            newTokenExpression = buildSingleDotExpression();
+            place.setTokenExpression(newTokenExpression);
             CreateGui.getModel().repaintPlaces();
             return;
         }
 
-        if (tokensToRemove.isEmpty()) {
-            for (TimedToken token : place.tokens()) {
-                if (!place.getColorType().contains(token.color())) {
-                    tokensToRemove.add(token);
-                }
-            }
-        }
+        place.setTokenExpression(newTokenExpression);
 
         place.removeTokens(tokensToRemove);
-
-        if (invariantsToRemove.isEmpty()) {
-            for (ColoredTimeInvariant invariant : place.getCtiList()) {
-                if (!place.getColorType().contains(invariant.getColor())) {
-                    invariantsToRemove.add(invariant);
-                }
-            }
-        }
 
         place.getCtiList().removeAll(invariantsToRemove);
 
         CreateGui.getModel().repaintPlaces(true);
+    }
+
+    private AddExpression buildSingleDotExpression(){
+        Vector<ColorExpression> numberOfVector = new Vector<>();
+        numberOfVector.add(new DotConstantExpression());
+        Vector<ArcExpression> addVector = new Vector<>();
+        addVector.add(new NumberOfExpression(1, numberOfVector));
+        return new AddExpression(addVector);
     }
 }

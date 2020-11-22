@@ -39,15 +39,21 @@ public class ColorType implements Iterable<Color> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ColorType))
+        if (!(o instanceof ColorType) || o instanceof ProductType)
             return false;
         ColorType object = (ColorType)o;
 
         if (!object.name.equals(this.name))
             return false;
 
-        if (!object.colors.equals(this.colors))
+        if(!object.size().equals(size())){
             return false;
+        }
+        for(int i = 0; i < colors.size(); i++){
+            if(!colors.get(i).equals(object.colors.get(i))){
+                return false;
+            }
+        }
 
         return true;
     }

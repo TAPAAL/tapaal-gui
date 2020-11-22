@@ -700,14 +700,15 @@ public class TimedArcPetriNetNetwork {
 
     public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places, UndoManager undoManager){
         for(TimedPlace place : places){
-            Command command = new UpdateColorTypeForPlaceCommand(place, oldColorType, colorType);
-            command.redo();
-            undoManager.addEdit(command);
+            if(place.getColorType().equals(oldColorType)){
+                Command command = new UpdateColorTypeForPlaceCommand(place, oldColorType, colorType);
+                command.redo();
+                undoManager.addEdit(command);
+            }
         }
     }
     public void updateVariable(String oldName, Variable variable) {
         Integer index = getVariableIndex(oldName);
-        //TODO: We update our variable in any expressions it is used - does not work with the current equals method in expressions, will have to override with new equal and hash functions
         Variable oldVar = getVariableByIndex(index);
         VariableExpression oldVarExpr = new VariableExpression(oldVar);
         VariableExpression newVarExpr = new VariableExpression(variable);

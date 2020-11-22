@@ -358,7 +358,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 for(int i = 0; i < coloredTokenList.size();i++){
                     NumberOfExpression otherExpr = (NumberOfExpression)coloredTokenList.get(i);
                     if(numberOfExpression.equalsColor(otherExpr)){
-                        System.out.println(numberOfExpression + " is equal to " + otherExpr);
                         exists = true;
                         otherExpr.setNumber(otherExpr.getNumber() + numberOfExpression.getNumber());
                         break;

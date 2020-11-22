@@ -807,7 +807,7 @@ public class ColorTypeDialogPanel extends JPanel {
                                 productType.addType(colorTypes.get(j));
                             }
                         }
-                    }
+                    };
                     if (oldColorType != null) {
                         if(oldColorType.equals(productType)){
                             exit();
