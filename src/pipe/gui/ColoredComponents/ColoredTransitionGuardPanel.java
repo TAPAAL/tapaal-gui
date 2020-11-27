@@ -165,7 +165,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
-        colorTypeCombobox.setPreferredSize(new Dimension(200,25));
+        //colorTypeCombobox.setPreferredSize(new Dimension(200,25));
         colorTypeCombobox.setRenderer(new ColorComboBoxRenderer(colorTypeCombobox));
 
 
@@ -428,8 +428,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         comparisonPanel.add(equalityButton, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(0, 0, 5, 0);
         comparisonPanel.add(inequalityButton, gbc);
@@ -438,14 +438,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(0, 0, 5, 0);
         comparisonPanel.add(greaterThanEqButton, gbc);
 
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(0, 0, 5, 0);
@@ -453,16 +453,16 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(0, 0, 5, 0);
         comparisonPanel.add(lessThanEqButton, gbc);
 
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(0, 0, 5, 0);
         comparisonPanel.add(lessThanButton, gbc);
@@ -659,7 +659,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void initExprEditPanel() {
         editPanel = new JPanel(new GridBagLayout());
         editPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
-        editPanel.setPreferredSize(new Dimension(260, 190));
+        //editPanel.setPreferredSize(new Dimension(260, 190));
 
         editButtonsGroup = new ButtonGroup();
         deleteExprSelectionButton = new JButton("Delete Selection");
@@ -721,7 +721,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5,0,5,5);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -776,9 +776,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         exprScrollPane = new JScrollPane(exprField);
         exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension d = new Dimension(880, 80);
+        Dimension d = new Dimension(100, 80);
         exprScrollPane.setPreferredSize(d);
-        exprScrollPane.setMinimumSize(d);
+        //exprScrollPane.setMinimumSize(d);
 
         exprField.addMouseListener(new MouseAdapter() {
             @Override
