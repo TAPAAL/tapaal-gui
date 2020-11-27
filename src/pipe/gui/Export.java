@@ -19,7 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Iterator;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -33,6 +34,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.VerifyTAPN.ExportedVerifyTAPNModel;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.DOMException;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
@@ -49,6 +57,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**
@@ -63,9 +72,12 @@ public class Export {
 	public static final int PRINTER = 3;
 	public static final int TIKZ = 5;
 	public static final int PNML = 6;
-	public static final int QUERY = 7;	
+	public static final int QUERY = 7;
+    public static final int VERIFYTAPN = 8;
+    public static final int VERIFYDTAPN = 9;
+    public static final int VERIFYPN = 10;
 
-	private static void toPnml(DrawingSurfaceImpl g, String filename)
+    private static void toPnml(DrawingSurfaceImpl g, String filename)
 			throws NullPointerException, DOMException, TransformerConfigurationException, 
 			IOException, ParserConfigurationException, TransformerException {
 		TabContent currentTab = CreateGui.getCurrentTab();
@@ -121,6 +133,48 @@ public class Export {
 			System.err.append("An error occurred while exporting the queries to XML.");
 		}
 	}
+
+	public static void toVerifyTAPN(String modelFile, String queryFile, boolean isDTAPN) {
+        VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+        TabContent currentTab = CreateGui.getCurrentTab();
+
+        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(currentTab.network());
+        TimedArcPetriNet model = transformedModel.value1();
+
+        TabContent.TAPNLens lens = currentTab.getLens();
+
+        Iterable<TAPNQuery> queries = currentTab.queries();
+        dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
+        int i = 0;
+        for (TAPNQuery query : queries) {
+            queriesArray[i] = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0);
+            i++;
+        }
+
+        if (lens.isGame() && isDTAPN) {
+            exporter.export(model, queriesArray, new File(modelFile), new File(queryFile), lens);
+        } else {
+            exporter.export(model, queriesArray, new File(modelFile), new File(queryFile), new TabContent.TAPNLens(true, false));
+        }
+    }
+
+    public static void toVerifyPN(String modelFile, String queryFile, TabContent.TAPNLens lens) {
+        VerifyPNExporter exporter = new VerifyPNExporter();
+        TabContent currentTab = CreateGui.getCurrentTab();
+        TimedArcPetriNet model = currentTab.currentTemplate().model();
+
+        Iterable<TAPNQuery> queries = currentTab.queries();
+        dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
+        int i = 0;
+
+        for (TAPNQuery query : queries) {
+            queriesArray[i] = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0);
+            i++;
+        }
+
+        exporter.export(model, queriesArray, new File(modelFile), new File(queryFile), lens);
+    }
 
 	public static void toPostScript(Object g, String filename)
 			throws PrintException, IOException {
@@ -187,24 +241,28 @@ public class Export {
 				// dot is for extension
 				filename = filename.substring(0, dotpos + 1);
 				switch (format) {
-				case PNG:
-					filename += "png";
-					break;
-				case POSTSCRIPT:
-					filename += "ps";
-					break;
-				case TIKZ:
-					filename += "tex";
-					break;
-				case PNML:
-					filename += "pnml";
-					break;
-				case QUERY:
-					filename = filename.substring(0, dotpos);
-					filename += "-queries.xml";
-					break;
-				}
-				
+                    case PNG:
+                        filename += "png";
+                        break;
+                    case POSTSCRIPT:
+                        filename += "ps";
+                        break;
+                    case TIKZ:
+                        filename += "tex";
+                        break;
+                    case PNML:
+                        filename += "pnml";
+                        break;
+                    case QUERY:
+                        filename = filename.substring(0, dotpos);
+                        filename += "-queries.xml";
+                        break;
+                    case VERIFYTAPN:
+                    case VERIFYDTAPN:
+                    case VERIFYPN:
+                        filename += "xml";
+                        break;
+                }
 			}
 		}
 
@@ -265,8 +323,29 @@ public class Export {
 					toQueryXML(filename);
 				}
 				break;
+            case VERIFYTAPN:
+                filename = FileBrowser.constructor("verifyTAPN XML file", "xml", filename + "xml").saveFile();
+
+                if (filename != null) {
+                    toVerifyTAPN(filename, filename.replace(".xml", ".q"), false);
+                }
+                break;
+            case VERIFYDTAPN:
+                filename = FileBrowser.constructor("verifyTAPN XML file", "xml", filename + "xml").saveFile();
+
+                if (filename != null) {
+                    toVerifyTAPN(filename, filename.replace(".xml", ".q"), true);
+                }
+                break;
+            case VERIFYPN:
+                filename = FileBrowser.constructor("verifyTAPN XML file", "xml", filename + "xml").saveFile();
+
+                if (filename != null) {
+                    toVerifyPN(filename, filename.replace(".xml", ".q"), new TabContent.TAPNLens(false, false));
+                }
+                break;
 			}
-		} catch (Exception e) {
+        } catch (Exception e) {
 			// There was some problem with the action
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"There were errors performing the requested action:\n" + e,

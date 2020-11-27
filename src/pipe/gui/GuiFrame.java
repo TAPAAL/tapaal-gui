@@ -18,8 +18,10 @@ import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
@@ -27,6 +29,7 @@ import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.WorkflowDialog;
@@ -154,6 +157,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 }
                 Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PNML, null);
             }
+        }
+    };
+    private final GuiAction exportToVerifyPNAction = new GuiAction("Export to verifyPN", "Export the net to verifyPN") {
+        public void actionPerformed(ActionEvent arg0) {
+            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYPN, null);
+        }
+    };
+    private final GuiAction exportToVerifyTAPNAction = new GuiAction("Export to verifyTAPN", "Export the net to verifyTAPN") {
+        public void actionPerformed(ActionEvent arg0) {
+            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYTAPN, null);
+        }
+    };
+    private final GuiAction exportToVerifyDTAPNAction = new GuiAction("Export to verifyDTAPN", "Export the net to verifyDTAPN") {
+        public void actionPerformed(ActionEvent arg0) {
+            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYDTAPN, null);
         }
     };
     private final GuiAction exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
@@ -1037,6 +1055,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         exportToTikZAction.setEnabled(enable);
         exportToPNMLAction.setEnabled(enable);
         exportToXMLAction.setEnabled(enable);
+        exportToVerifyPNAction.setEnabled(enable);
+        exportToVerifyTAPNAction.setEnabled(enable);
+        exportToVerifyDTAPNAction.setEnabled(enable);
 
         exportTraceAction.setEnabled(enable);
         importTraceAction.setEnabled(enable);
@@ -1380,14 +1401,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         exportMenu.add(exportPSAction);
 
-
         exportMenu.add(exportToTikZAction);
-
 
         exportMenu.add(exportToPNMLAction);
 
-
         exportMenu.add(exportToXMLAction);
+
+        exportMenu.add(exportToVerifyPNAction);
+
+        exportMenu.add(exportToVerifyTAPNAction);
+
+        exportMenu.add(exportToVerifyDTAPNAction);
 
         exportMenu.add(exportBatchAction);
 
