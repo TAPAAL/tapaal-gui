@@ -793,6 +793,22 @@ public class TimedArcPetriNetNetwork {
         }
         return false;
     }
+    public Variable getVariableByName(String name){
+        for (int i = 0; i < variables.size(); i++) {
+            if (variables.get(i).getName().equalsIgnoreCase(name)) {
+                return variables.get(i);
+            }
+        }
+        return null;
+    }
+    public Color getColorByName(String name){
+        for (ColorType element : colorTypes) {
+            if(element.getColorByName(name) != null){
+                return element.getColorByName(name);
+            }
+        }
+        return null;
+    }
     public Variable getVariableByIndex(int index) {
         return variables.get(index);
     }

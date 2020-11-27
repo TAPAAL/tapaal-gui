@@ -1,0 +1,163 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_TOKEN_MANAGER = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+}
+PARSER_BEGIN(GuardExpressionParser)
+package dk.aau.cs.model.CPN.GuardExpressionParser;
+
+import java.io.StringReader;
+import java.util.ArrayList;import java.util.Vector;
+import dk.aau.cs.TCTL.Parsing.ParseException;import dk.aau.cs.model.CPN.ColorType;import dk.aau.cs.model.CPN.Expressions.*;import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+
+public class GuardExpressionParser {
+
+	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the expression";
+    private TimedArcPetriNetNetwork network;
+	public static GuardExpression parse(String expression, TimedArcPetriNetNetwork network) throws ParseException {
+	    this.network = network;
+		GuardExpressionParser parser = new GuardExpressionParser(new StringReader(expression));
+		return parser.guardExpression();
+	}
+}
+
+
+PARSER_END(GuardExpressionParser)
+TOKEN :
+{
+	<OR: "or" | "||">
+	|
+	<AND: "and" | "&&">
+	|
+	<NOT: "not" | "!">
+}
+
+TOKEN : {
+<LOGOP : <OR> | <AND> | <NOT> >
+}
+
+TOKEN :
+{
+	<PLUS: "+">
+	|
+	<SUB: "-">
+	|
+	<MULT: "*">
+}
+
+TOKEN :
+{
+	< NUM: ( ["1"-"9"] )+ >
+	|
+	<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
+}
+
+TOKEN :
+{
+	<OP: "<" | "<=" | ">" | "=" | "==" | ">=" | ">" >
+}
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN : {
+<PRODUCTCOLOR : "(" <IDENT> "," (<IDENT>",")* <IDENT> ")">
+}
+
+TOKEN : {
+<COLOR : <PRODUCTCOLOR> | <IDENT> >
+}
+
+GuardExpression Expression() : {
+    GuardExpression expression;
+    GuardExpression left;
+    GuardExpression right;
+}{
+    left = term() <OR> right = term() {return new AndExpression(left, right);}
+    | left = term() <AND> right = term() {return new OrExpression(left, right);}
+    | <NOT> "("left = term()")" {return new NotExpression(left);}
+    | left = term() {return left;}
+}
+GuardExpression term() : {
+    GuardExpression childExpression;
+}{
+    childExpression = parseOperatorExpression() {return childExpression;}
+    | "(" childExpression = Expression() ")" {return childExpression;}
+}
+
+GuardExpression parseOperatorExpression() :
+{
+	ColorExpression left;
+	ColorExpression right;
+	Token op;
+}
+{
+    left = SuccPredExpression() op = <OP> right = SuccPredExpression()
+	{
+       if(op.image.equals("<")) return new LessThanExpression(left,right);
+       else if(op.image.equals("<=")) return new LessThanEqExpression(left,right);
+       else if(op.image.equals(">")) return new GreaterThanExpression(left,right);
+       else if(op.image.equals(">=")) return new GreaterThanEqExpression(left,right);
+       else if(op.image.equals("=")) return new EqualityExpression(left,right);
+       else if(op.image.equals("!=")) return new InequalityExpression(left,right);
+       else return null;
+	}
+}
+
+ColorExpression ColorExpression() : {
+    String name;
+    ArrayList<String> names = new ArrayList<>();
+}
+{
+
+    "(" name = <IDENT> {names.add(name);} "," (name = <IDENT> {names.add(name);}",")* name = <IDENT> {names.add(name);} ")"
+    | name = <IDENT>{names.add(name);}
+    {
+        Vector<ColorExpression> v = new Vector<>();
+        for(String n : names){
+            Color c = network.getColorByName(name);
+            if(c != null){
+                v.add(new UserOperatorExpression(c));
+            } else if(network.getVariableByName(name) != null){
+                v.add(VariableExpression(network.getVariableByName(name)));
+            } else{
+                throw new ParseException("Could not parse " + names.toString() + " as the names could not be found");
+            }
+        }
+        if(v.size() == 1){
+            return v[0];
+        } else{
+            return new TupleExpression(v);
+        }
+    }
+}
+
+ColorExpression SuccPredExpression() : {
+    ColorExpression colorExpression;
+}
+{
+    colorExpression = ColorExpression()  "++" {return new SuccessorExpression(colorExpression);}
+    | colorExpression =  ColorExpression() "--" {return new PredecessorExpression(colorExpression);}
+    | colorExpression = SuccPredExpression() "++" {return new SuccessorExpression(colorExpression);}
+    | colorExpression = SuccPredExpression() "--" {return new PredecessorExpression(colorExpression);}
+}
+
+

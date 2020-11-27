@@ -106,7 +106,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
-        editExprButton.setEnabled(false);
         undoManager = new ColoredTransitionGuardPanel.ExpressionConstructionUndoManager();
         undoSupport = new UndoableEditSupport();
         undoSupport.addUndoableEditListener(new ColoredTransitionGuardPanel.UndoAdapter());
