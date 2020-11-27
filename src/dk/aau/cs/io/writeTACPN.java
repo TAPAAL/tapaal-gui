@@ -375,7 +375,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             placeElement.appendChild(hlInitialMarking);
             Element hlStructure = document.createElement("structure");
             hlInitialMarking.appendChild(hlStructure);
-            parseArcExpression(inputPlace.getTokensAsExpression(), document, hlStructure);
+            hlInitialMarking.appendChild(parseArcExpression(inputPlace.getTokensAsExpression(), document, hlStructure));
         }
     }
 

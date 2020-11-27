@@ -227,6 +227,7 @@ public class TAPNComposer implements ITAPNComposer {
 					for (TimedToken token : timedPlace.tokens()) {
 						place.addToken(new TimedToken(place, token.age(), token.color()));
 					}
+					place.setTokenExpression(timedPlace.getTokensAsExpression());
 					
 					// Gui work
 					if (this.guiModels != null) {

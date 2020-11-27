@@ -247,6 +247,7 @@ public class PNMLoader {
             if (colorMarking != null) {
                 ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), colortypes);
                 ColorMultiset cm = colorMarking.eval(context);
+                place.setTokenExpression(colorMarking);
                 for (TimedToken ct : cm.getTokens(place)) {
                     tapn.parentNetwork().marking().add(ct);
                 }
@@ -254,6 +255,13 @@ public class PNMLoader {
         } else {
             for (int i = 0; i < marking.marking; i++) {
                 tapn.parentNetwork().marking().add(new TimedToken(place, ColorType.COLORTYPE_DOT.getFirstColor()));
+            }
+            if(marking.marking > 1) {
+                Vector<ColorExpression> v = new Vector<>();
+                v.add(new DotConstantExpression());
+                Vector<ArcExpression> numbOfExpression = new Vector<>();
+                numbOfExpression.add(new NumberOfExpression(marking.marking, v));
+                place.setTokenExpression(new AddExpression(numbOfExpression));
             }
         }
     }
