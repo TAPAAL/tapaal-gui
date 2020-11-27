@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-public class ColoredArcGuardPanel extends JPanel {
+public abstract class ColoredArcGuardPanel extends JPanel {
     PetriNetObject objectToBeEdited;
     boolean isTransportArc = false;
     boolean isInputArc = false;
@@ -1036,6 +1036,11 @@ public class ColoredArcGuardPanel extends JPanel {
             predButton.setEnabled(false);
             addAdditionPlaceHolderButton.setEnabled(false);
         }
+        if(arcExpression.containsPlaceHolder()){
+            disableOkButton();
+        } else{
+            enableOkButton();
+        }
 
     }
     public void onOkColored(pipe.gui.undo.UndoManager undoManager) {
@@ -1117,6 +1122,9 @@ public class ColoredArcGuardPanel extends JPanel {
 
         return null;
     }
+
+    public abstract void disableOkButton();
+    public abstract void enableOkButton();
 
     private ColorType colorType;
     private ColorType selectedColorType;

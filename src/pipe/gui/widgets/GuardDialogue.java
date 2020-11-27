@@ -134,7 +134,17 @@ public class GuardDialogue extends JPanel /*
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context);
+        coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context) {
+            @Override
+            public void disableOkButton() {
+                okButton.setEnabled(false);
+            }
+
+            @Override
+            public void enableOkButton() {
+                okButton.setEnabled(true);
+            }
+        };
 	    mainPanel.add(coloredArcGuardPanel, gridBagConstraints);
     }
 
