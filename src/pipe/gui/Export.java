@@ -146,9 +146,11 @@ public class Export {
 
         Iterable<TAPNQuery> queries = currentTab.queries();
         dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
+        RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
         for (TAPNQuery query : queries) {
             queriesArray[i] = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0);
+            queriesArray[i].getProperty().accept(visitor, null);
             i++;
         }
 
@@ -159,17 +161,23 @@ public class Export {
         }
     }
 
-    public static void toVerifyPN(String modelFile, String queryFile, TabContent.TAPNLens lens) {
+    public static void toVerifyPN(String modelFile, String queryFile) {
         VerifyPNExporter exporter = new VerifyPNExporter();
         TabContent currentTab = CreateGui.getCurrentTab();
-        TimedArcPetriNet model = currentTab.currentTemplate().model();
+
+        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(currentTab.network());
+        TimedArcPetriNet model = transformedModel.value1();
+
+        TabContent.TAPNLens lens = currentTab.getLens();
 
         Iterable<TAPNQuery> queries = currentTab.queries();
         dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
+        RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
-
         for (TAPNQuery query : queries) {
             queriesArray[i] = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0);
+            queriesArray[i].getProperty().accept(visitor, null);
             i++;
         }
 
@@ -341,7 +349,7 @@ public class Export {
                 filename = FileBrowser.constructor("verifyTAPN XML file", "xml", filename + "xml").saveFile();
 
                 if (filename != null) {
-                    toVerifyPN(filename, filename.replace(".xml", ".q"), new TabContent.TAPNLens(false, false));
+                    toVerifyPN(filename, filename.replace(".xml", ".q"));
                 }
                 break;
 			}
