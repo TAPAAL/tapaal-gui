@@ -73,9 +73,6 @@ public class Export {
     public static final int TIKZ = 5;
     public static final int PNML = 6;
     public static final int QUERY = 7;
-    public static final int VERIFYTAPN = 8;
-    public static final int VERIFYDTAPN = 9;
-    public static final int VERIFYPN = 10;
 
     private static void toPnml(DrawingSurfaceImpl g, String filename)
         throws NullPointerException, DOMException, TransformerConfigurationException,
