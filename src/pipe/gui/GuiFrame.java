@@ -161,17 +161,27 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction exportToVerifyPNAction = new GuiAction("Export to verifyPN", "Export the net to verifyPN") {
         public void actionPerformed(ActionEvent arg0) {
-            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYPN, null);
+            if (canNetBeSavedAndShowMessage()) {
+                currentTab.ifPresent(o -> o.changeTimeFeature(false));
+                if (!getCurrentTab().isNetTimed()) {
+                    Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYPN, null);
+                    detachTabFromGuiFrame(getCurrentTab());
+                }
+            }
         }
     };
     private final GuiAction exportToVerifyTAPNAction = new GuiAction("Export to verifyTAPN", "Export the net to verifyTAPN") {
         public void actionPerformed(ActionEvent arg0) {
-            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYTAPN, null);
+            if (canNetBeSavedAndShowMessage()) {
+                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYTAPN, null);
+            }
         }
     };
     private final GuiAction exportToVerifyDTAPNAction = new GuiAction("Export to verifyDTAPN", "Export the net to verifyDTAPN") {
         public void actionPerformed(ActionEvent arg0) {
-            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYDTAPN, null);
+            if (canNetBeSavedAndShowMessage()) {
+                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYDTAPN, null);
+            }
         }
     };
     private final GuiAction exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
