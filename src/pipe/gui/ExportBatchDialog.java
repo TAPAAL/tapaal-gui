@@ -524,10 +524,10 @@ public class ExportBatchDialog extends JDialog {
                 Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", queries);
                 break;
             case 1:
-                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + ".xml", path.toString() + ".q", false);
+                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query.q", false);
                 break;
             case 2:
-                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + ".xml", path.toString() + ".q", true);
+                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query.q", true);
                 break;
         }
 	}

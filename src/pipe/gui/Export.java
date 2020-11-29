@@ -136,13 +136,12 @@ public class Export {
 
 	public static void toVerifyTAPN(TimedArcPetriNetNetwork network, Iterable<TAPNQuery> queries, String modelFile, String queryFile, boolean isDTAPN) {
         VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-        TabContent currentTab = CreateGui.getCurrentTab();
 
         ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 
-        TabContent.TAPNLens lens = currentTab.getLens();
+        TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions());
 
         dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
