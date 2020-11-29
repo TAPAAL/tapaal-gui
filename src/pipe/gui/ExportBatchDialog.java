@@ -24,19 +24,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -46,6 +34,7 @@ import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.w3c.dom.DOMException;
 import dk.aau.cs.gui.FileNameCellRenderer;
 import dk.aau.cs.gui.components.ExportBatchResultTableModel;
@@ -55,6 +44,7 @@ import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
@@ -62,8 +52,9 @@ public class ExportBatchDialog extends JDialog {
 	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch export";
 	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently selected nets";
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
-	private final static String TOOL_TIP_ExportFilesButton = "Press to export all nets in PNML and XML format";
-	private final static String TOOL_TIP_UniqueQueryNamesCheckbox = "Give queries unique names when exporting";
+	private final static String TOOL_TIP_ExportFilesButton = "Press to export all nets in the selected format";
+    private final static String TOOL_TIP_SelectedEngineComboBox = "Select the engine in which the format of the net should be compatible with";
+    private final static String TOOL_TIP_UniqueQueryNamesCheckbox = "Give queries unique names when exporting";
 	private final static String NAME_SuccesString = "Succeeded";
 	private final static String NAME_SuccesStringOrphanTransitionsRemoved = "Succeeded, orphan transitions removed";
 	private final static String NAME_FailStringFolderExists = "Failed as the subfolder already exists";
@@ -83,7 +74,8 @@ public class ExportBatchDialog extends JDialog {
 	private final List<File> files = new ArrayList<File>();
 	private String lastExportPath;
 	private String lastSelectPath;
-	private JCheckBox uniqueQueryNames;
+    private JCheckBox uniqueQueryNames;
+    private JComboBox selectedEngine;
 	private File destinationFile;
 	private ExportBatchResultTableModel tableModel;
 	
@@ -243,14 +235,28 @@ public class ExportBatchDialog extends JDialog {
 			enableButtons();
 		});
 		chooserPanel.add(destinationPathSelector, gbc);
-		
+
+        String[] options = new String[] {
+            "PNML and XML queries (verifypn)",
+            "Continuous Engine (verifytapn)",
+            "Discrete Engine (verifydtapn)"
+        };
+		selectedEngine = new JComboBox(options);
+		selectedEngine.setToolTipText(TOOL_TIP_SelectedEngineComboBox);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(10, 0, 0, 0);
+        chooserPanel.add(selectedEngine, gbc);
 
 		uniqueQueryNames = new JCheckBox("Use unique query names", true);
 		uniqueQueryNames.setToolTipText(TOOL_TIP_UniqueQueryNamesCheckbox);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(10, 0, 0, 0);
 		chooserPanel.add(uniqueQueryNames, gbc);
@@ -459,7 +465,7 @@ public class ExportBatchDialog extends JDialog {
 		}
 		else return;
 	}
-	
+
 	private void exportFiles() {
 		//loading bar
 		initProgressBar();
@@ -509,13 +515,21 @@ public class ExportBatchDialog extends JDialog {
 	}
 	
 	private void exportModel(File file, Path path) throws Exception {
-			LoadedModel loadedModel = loader.load(file);
-			exportPNML(path, loadedModel);
-			if(!uniqueQueryNames.isSelected())
-				Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", loadedModel.queries());
-			else {
-				Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", renameQueries(file.getName(), loadedModel.queries()));
-			}
+        LoadedModel loadedModel = loader.load(file);
+        Collection<TAPNQuery> queries = (uniqueQueryNames.isSelected() ? renameQueries(file.getName(), loadedModel.queries()) : loadedModel.queries());
+
+        switch (selectedEngine.getSelectedIndex()) {
+            case 0:
+                exportPNML(path, loadedModel);
+                Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", queries);
+                break;
+            case 1:
+                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + ".xml", path.toString() + ".q", false);
+                break;
+            case 2:
+                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + ".xml", path.toString() + ".q", true);
+                break;
+        }
 	}
 	
 	private void exportPNML(Path path, LoadedModel loadedModel) throws DOMException, TransformerConfigurationException, IOException, ParserConfigurationException, TransformerException {

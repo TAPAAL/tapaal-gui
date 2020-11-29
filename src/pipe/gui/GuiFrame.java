@@ -159,31 +159,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             }
         }
     };
-    private final GuiAction exportToVerifyPNAction = new GuiAction("Export to verifyPN", "Export the net to verifyPN") {
-        public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                currentTab.ifPresent(o -> o.changeTimeFeature(false));
-                if (!getCurrentTab().isNetTimed()) {
-                    Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYPN, null);
-                    detachTabFromGuiFrame(getCurrentTab());
-                }
-            }
-        }
-    };
-    private final GuiAction exportToVerifyTAPNAction = new GuiAction("Export to verifyTAPN", "Export the net to verifyTAPN") {
-        public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYTAPN, null);
-            }
-        }
-    };
-    private final GuiAction exportToVerifyDTAPNAction = new GuiAction("Export to verifyDTAPN", "Export the net to verifyDTAPN") {
-        public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.VERIFYDTAPN, null);
-            }
-        }
-    };
     private final GuiAction exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             if (canNetBeSavedAndShowMessage()) {
@@ -1065,9 +1040,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         exportToTikZAction.setEnabled(enable);
         exportToPNMLAction.setEnabled(enable);
         exportToXMLAction.setEnabled(enable);
-        exportToVerifyPNAction.setEnabled(enable);
-        exportToVerifyTAPNAction.setEnabled(enable);
-        exportToVerifyDTAPNAction.setEnabled(enable);
 
         exportTraceAction.setEnabled(enable);
         importTraceAction.setEnabled(enable);
@@ -1416,12 +1388,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         exportMenu.add(exportToPNMLAction);
 
         exportMenu.add(exportToXMLAction);
-
-        exportMenu.add(exportToVerifyPNAction);
-
-        exportMenu.add(exportToVerifyTAPNAction);
-
-        exportMenu.add(exportToVerifyDTAPNAction);
 
         exportMenu.add(exportBatchAction);
 
