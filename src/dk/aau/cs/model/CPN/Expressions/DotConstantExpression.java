@@ -76,8 +76,8 @@ public class DotConstantExpression extends ColorExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
+
     }
 
     @Override

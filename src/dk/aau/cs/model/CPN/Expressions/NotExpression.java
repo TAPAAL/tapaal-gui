@@ -54,9 +54,8 @@ public class NotExpression extends GuardExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        exprValues = expr.getValues(exprValues);
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
+        expr.getValues(exprValues);
     }
 
     public void getVariables(Set<Variable> variables) {

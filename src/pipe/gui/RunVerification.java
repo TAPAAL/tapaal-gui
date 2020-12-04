@@ -9,6 +9,7 @@ import java.awt.Window;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -23,6 +24,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
@@ -32,18 +34,19 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
+import pipe.dataLayer.DataLayer;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-		super(modelChecker, messenger);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+		super(modelChecker, messenger, guiModels);
 		iconSelector = selector;
 		this.callback = callback;
 	}
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null);
+		this(modelChecker, selector, messenger, null, null);
 	}
 
 	@Override

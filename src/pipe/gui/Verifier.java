@@ -3,7 +3,9 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -14,6 +16,8 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+
+import java.util.HashMap;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -126,10 +130,15 @@ public class Verifier {
 
 	}
 
+    public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
+        runVerifyTAPNVerification(tapnNetwork, query, callback, null);
+    }
+
 	public static void runVerifyTAPNVerification(
 			TimedArcPetriNetNetwork tapnNetwork,
 			TAPNQuery query,
-			VerificationCallback callback
+			VerificationCallback callback,
+            HashMap<TimedArcPetriNet, DataLayer> guiModels
 	) {
 		ModelChecker verifytapn = getModelChecker(query);
 
@@ -200,7 +209,7 @@ public class Verifier {
 		}
 		
 		if (tapnNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);

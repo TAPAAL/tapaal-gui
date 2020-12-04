@@ -285,6 +285,36 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		return verify(options, model, exportedModel, query);
 	}
 
+    @SuppressWarnings("Duplicates")
+    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception {
+        ((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
+        VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+        ExportedVerifyTAPNModel exportedModel = null;
+        runner = new ProcessRunner(verifydtapnpath, createArgumentString(modelOut, queryOut, options));
+        runner.run();
+        if (runner.error()) {
+            return null;
+        } else {
+            String errorOutput = readOutput(runner.errorOutput());
+            String standardOutput = readOutput(runner.standardOutput());
+
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
+
+            if (queryResult == null || queryResult.value1() == null) {
+                return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+            } else {
+                // Parse covered trace
+                TimedArcPetriNetTrace secondaryTrace = null;
+                if(queryResult.value2().getCoveredMarking() != null){
+                    secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
+                }
+
+                TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:")?errorOutput:(errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
+                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false);
+            }
+        }
+    }
+
 	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions) options;
 

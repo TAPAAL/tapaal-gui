@@ -43,8 +43,7 @@ public class NumberConstantExpression extends Expression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
     }
 
     public void getVariables(Set<Variable> variables) {

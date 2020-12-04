@@ -51,9 +51,8 @@ public class UserSortExpression extends Expression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) { // UserSort, which contains ColorTypes is not currently used, if it is in the future Exprvalues will have to be expanded
+    public void getValues(ExprValues exprValues) { // UserSort, which contains ColorTypes is not currently used, if it is in the future Exprvalues will have to be expanded
         exprValues.addColorType(userSort);
-        return exprValues;
     }
 
     public void getVariables(Set<Variable> variables) {

@@ -2,9 +2,12 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
+import pipe.gui.graphicElements.Transition;
 
 public class TimedArcPetriNet {
 	private String name;
@@ -52,6 +55,39 @@ public class TimedArcPetriNet {
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
 	}
+
+	public boolean isColored(){
+        ExprValues values = new ExprValues();
+	    for(TimedTransition transition : transitions){
+	        if(transition.getGuard() != null){
+                transition.getGuard().getValues(values);
+            }
+        }
+	    for(TimedInputArc arc : inputArcs){
+	        arc.expression.getValues(values);
+	        if(!arc.getColorTimeIntervals().isEmpty()){
+	            return true;
+            }
+        }
+        for(TimedOutputArc arc : outputArcs){
+            arc.getExpression().getValues(values);
+        }
+        for(TimedInhibitorArc arc : inhibitorArcs){
+            arc.expression.getValues(values);
+        }
+        for(TransportArc arc : transportArcs){
+            if(!arc.getColorTimeIntervals().isEmpty()){
+                return true;
+            }
+            arc.getInputExpression().getValues(values);
+            arc.getOutputExpression().getValues(values);
+        }
+        if(!values.getColors().isEmpty() || !values.getColorTypes().isEmpty() || !values.getVariables().isEmpty()){
+            return true;
+        }
+
+	    return false;
+    }
 
 	public void add(TimedTransition transition) {
 		Require.that(transition != null, "Argument must be a non-null transition");

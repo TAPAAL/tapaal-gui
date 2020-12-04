@@ -95,9 +95,8 @@ public class ScalarProductExpression extends ArcExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        exprValues = expr.getValues(exprValues);
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
+        expr.getValues(exprValues);
     }
 
     @Override

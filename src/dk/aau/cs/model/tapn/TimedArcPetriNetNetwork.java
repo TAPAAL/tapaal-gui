@@ -450,7 +450,12 @@ public class TimedArcPetriNetNetwork {
 
 	//TODO: maybe should be more extensive than this
     //E.g. check expressions, invariants, intervals and tokens
-	public boolean hasColors(){
+	public boolean isColored(){
+	    for (TimedArcPetriNet tapn : tapns){
+	        if(tapn.isColored()){
+	            return true;
+            }
+        }
 	    return colorTypes.size() > 1 || variables.size() > 0;
     }
 	public boolean isUntimed(){

@@ -87,9 +87,8 @@ public class AllExpression extends ColorExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
+    public void getValues(ExprValues exprValues) {
         exprValues.addColorType(sort);
-        return exprValues;
     }
 
     @Override

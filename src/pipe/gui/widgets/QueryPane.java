@@ -440,7 +440,7 @@ public class QueryPane extends JPanel implements SidePane {
 		
 		if(NumberOfSelectedElements == 1) {
 			if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null);
+				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels());
 			else
 				Verifier.runUppaalVerification(tabContent.network(), query);
 		}

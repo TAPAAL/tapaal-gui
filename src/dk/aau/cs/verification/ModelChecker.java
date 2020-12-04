@@ -19,6 +19,8 @@ public interface ModelChecker {
 
 	VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception;
 
+    VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception;
+
 	void kill();
 
 	boolean supportsStats();

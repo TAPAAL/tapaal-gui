@@ -58,7 +58,7 @@ public abstract class Expression {
 
     public abstract Expression findFirstPlaceHolder();
 
-    public abstract ExprValues getValues(ExprValues exprValues);
+    public abstract void getValues(ExprValues exprValues);
 
     public abstract void getVariables(Set<Variable> variables);
 }

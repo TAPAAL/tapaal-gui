@@ -53,7 +53,7 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
 
     @Override
     public String toString() {
-        String options =  "-q-out " + queryOut + " -m-out " + modelOut;
+        String options =  "--write-simplified " + queryOut + " --write-reduced " + modelOut;
 
         if (verifydtapnOptions.equals("tt"))
         options += " -verifydtapn " + verifydtapnOptions;

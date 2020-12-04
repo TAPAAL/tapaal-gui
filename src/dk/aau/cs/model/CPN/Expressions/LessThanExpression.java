@@ -70,10 +70,9 @@ public class LessThanExpression extends GuardExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        exprValues = left.getValues(exprValues);
-        exprValues = right.getValues(exprValues);
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
+        left.getValues(exprValues);
+        right.getValues(exprValues);
     }
 
     @Override
