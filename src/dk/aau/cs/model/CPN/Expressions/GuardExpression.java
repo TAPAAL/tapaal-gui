@@ -1,8 +1,10 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.List;
 import java.util.Set;
 
 public abstract class GuardExpression extends Expression {

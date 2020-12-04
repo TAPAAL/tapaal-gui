@@ -9,6 +9,7 @@ import dk.aau.cs.model.CPN.Variable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 public class SuccessorExpression extends ColorExpression {
     private ColorExpression color;
@@ -110,5 +111,20 @@ public class SuccessorExpression extends ColorExpression {
     @Override
     public boolean isSimpleProperty() {
         return false;
+    }
+
+    @Override
+    public boolean isComparable(ColorExpression otherExpr){
+        return color.isComparable(otherExpr);
+    }
+
+    @Override
+    public ColorExpression getButtomColorExpression(){
+        return color.getButtomColorExpression();
+    }
+
+    @Override
+    public Vector<ColorType> getColorTypes(){
+        return color.getColorTypes();
     }
 }

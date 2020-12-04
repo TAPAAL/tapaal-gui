@@ -20,17 +20,22 @@ PARSER_BEGIN(GuardExpressionParser)
 package dk.aau.cs.model.CPN.GuardExpressionParser;
 
 import java.io.StringReader;
-import java.util.ArrayList;import java.util.Vector;
-import dk.aau.cs.TCTL.Parsing.ParseException;import dk.aau.cs.model.CPN.ColorType;import dk.aau.cs.model.CPN.Expressions.*;import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import java.util.ArrayList;
+import java.util.Vector;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ProductType;import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.CPN.Color;
+
 
 public class GuardExpressionParser {
 
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the expression";
-    private TimedArcPetriNetNetwork network;
-	public static GuardExpression parse(String expression, TimedArcPetriNetNetwork network) throws ParseException {
-	    this.network = network;
+    private static TimedArcPetriNetNetwork network;
+	public static GuardExpression parse(String expression, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
+	    network = inputNetwork;
 		GuardExpressionParser parser = new GuardExpressionParser(new StringReader(expression));
-		return parser.guardExpression();
+		return parser.OrExpr();
 	}
 }
 
@@ -77,30 +82,44 @@ SKIP :
 | "\n"
 | "\r"
 }
-
-TOKEN : {
-<PRODUCTCOLOR : "(" <IDENT> "," (<IDENT>",")* <IDENT> ")">
+GuardExpression OrExpr() :
+{
+	GuardExpression left = null;
+	GuardExpression right = null;
 }
-
-TOKEN : {
-<COLOR : <PRODUCTCOLOR> | <IDENT> >
+{
+	left = AndExpr()
+	(
+		<OR> right = AndExpr()
+	)?
+	{ return right == null ? left : new OrExpression(left,right); }
 }
-
-GuardExpression Expression() : {
-    GuardExpression expression;
-    GuardExpression left;
-    GuardExpression right;
-}{
-    left = term() <OR> right = term() {return new AndExpression(left, right);}
-    | left = term() <AND> right = term() {return new OrExpression(left, right);}
-    | <NOT> "("left = term()")" {return new NotExpression(left);}
-    | left = term() {return left;}
+GuardExpression AndExpr() :
+{
+	GuardExpression left = null;
+	GuardExpression right = null;
+}
+{
+	left = NotExpr()
+	(
+		<AND> right = NotExpr()
+	)?
+	{ return right == null ? left : new AndExpression(left,right); }
+}
+GuardExpression NotExpr() :
+{
+	GuardExpression currentChild;
+}
+{
+	<NOT> "(" currentChild = OrExpr() ")" { return new NotExpression(currentChild); }
+    	| currentChild = term() { return currentChild; }
 }
 GuardExpression term() : {
     GuardExpression childExpression;
 }{
-    childExpression = parseOperatorExpression() {return childExpression;}
-    | "(" childExpression = Expression() ")" {return childExpression;}
+    LOOKAHEAD(parseOperatorExpression())
+        childExpression = parseOperatorExpression() {return childExpression;}
+    | "(" childExpression = OrExpr() ")" {return childExpression;}
 }
 
 GuardExpression parseOperatorExpression() :
@@ -110,8 +129,11 @@ GuardExpression parseOperatorExpression() :
 	Token op;
 }
 {
-    left = SuccPredExpression() op = <OP> right = SuccPredExpression()
+    left = ColorExpression() op = <OP> right = ColorExpression()
 	{
+       if(!left.isComparable(right)){
+           throw new ParseException(left.toString() + " is not comparable to " + right.toString());
+       }
        if(op.image.equals("<")) return new LessThanExpression(left,right);
        else if(op.image.equals("<=")) return new LessThanEqExpression(left,right);
        else if(op.image.equals(">")) return new GreaterThanExpression(left,right);
@@ -123,41 +145,69 @@ GuardExpression parseOperatorExpression() :
 }
 
 ColorExpression ColorExpression() : {
-    String name;
-    ArrayList<String> names = new ArrayList<>();
+    ColorExpression subexpression;
+
+    Vector<ColorExpression> expressions = new Vector<ColorExpression>();
+    ArrayList<String> succPreds= new ArrayList<String>();
+
 }
 {
 
-    "(" name = <IDENT> {names.add(name);} "," (name = <IDENT> {names.add(name);}",")* name = <IDENT> {names.add(name);} ")"
-    | name = <IDENT>{names.add(name);}
+    "(" subexpression = Element() {expressions.add(subexpression);} ("," subexpression = Element() {expressions.add(subexpression);})+ ")" ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
     {
-        Vector<ColorExpression> v = new Vector<>();
-        for(String n : names){
-            Color c = network.getColorByName(name);
-            if(c != null){
-                v.add(new UserOperatorExpression(c));
-            } else if(network.getVariableByName(name) != null){
-                v.add(VariableExpression(network.getVariableByName(name)));
+      ColorExpression cexpr = new TupleExpression(expressions);
+      //assumes single level producttypes
+      boolean colorTypeExists = false;
+      for(ColorType ct: network.colorTypes()){
+          if(ct instanceof ProductType){
+              if(((ProductType)ct).containsTypes(cexpr.getColorTypes())){
+                colorTypeExists = true;
+                break;
+              }
+          }
+      }
+      if(!colorTypeExists){
+          throw new ParseException("We could not find an existing colortype for the color " + cexpr.toString());
+      }
+      for(String s : succPreds){
+           if(s.equals("++")){
+               cexpr = new SuccessorExpression(cexpr);
+           } else{
+               cexpr = new PredecessorExpression(cexpr);
+           }
+      }
+
+      return cexpr;
+    }
+    | subexpression = Element(){return subexpression;}
+}
+
+ColorExpression Element() : {
+    Token name;
+    Vector<String> succPreds= new Vector<String>();
+}{
+    name = <IDENT> ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
+    {
+        ColorExpression cexpr;
+
+        Color c = network.getColorByName(name.toString());
+        if(c != null){
+            cexpr = new UserOperatorExpression(c);
+        } else if(network.getVariableByName(name.toString()) != null){
+            cexpr = new VariableExpression(network.getVariableByName(name.toString()));
+        } else{
+            throw new ParseException("Could not parse " + name + " as the name could not be found");
+        }
+        for(String s : succPreds){
+            if(s.equals("++")){
+                cexpr = new SuccessorExpression(cexpr);
             } else{
-                throw new ParseException("Could not parse " + names.toString() + " as the names could not be found");
+                cexpr = new PredecessorExpression(cexpr);
             }
         }
-        if(v.size() == 1){
-            return v[0];
-        } else{
-            return new TupleExpression(v);
-        }
-    }
-}
 
-ColorExpression SuccPredExpression() : {
-    ColorExpression colorExpression;
-}
-{
-    colorExpression = ColorExpression()  "++" {return new SuccessorExpression(colorExpression);}
-    | colorExpression =  ColorExpression() "--" {return new PredecessorExpression(colorExpression);}
-    | colorExpression = SuccPredExpression() "++" {return new SuccessorExpression(colorExpression);}
-    | colorExpression = SuccPredExpression() "--" {return new PredecessorExpression(colorExpression);}
+        return cexpr;
+    }
 }
 
 

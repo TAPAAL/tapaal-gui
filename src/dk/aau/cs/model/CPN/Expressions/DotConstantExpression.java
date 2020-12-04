@@ -8,6 +8,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 public class DotConstantExpression extends ColorExpression {
 
@@ -83,5 +84,21 @@ public class DotConstantExpression extends ColorExpression {
     @Override
     public String toString(){
         return "dot";
+    }
+
+    @Override
+    public boolean isComparable(ColorExpression otherExpr){
+        otherExpr = otherExpr.getButtomColorExpression();
+        return otherExpr instanceof DotConstantExpression;
+    }
+
+    @Override
+    public ColorExpression getButtomColorExpression() {
+        return this;
+    }
+
+    @Override
+    public Vector<ColorType> getColorTypes() {
+        return new Vector<>(Arrays.asList(ColorType.COLORTYPE_DOT));
     }
 }

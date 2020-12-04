@@ -8,6 +8,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 public class UserOperatorExpression extends ColorExpression {
 
@@ -113,6 +114,38 @@ public class UserOperatorExpression extends ColorExpression {
             return userOperator.equals(expr.userOperator);
         }
         return false;
+    }
+    @Override
+    public boolean isComparable(ColorExpression otherExpr){
+        otherExpr = otherExpr.getButtomColorExpression();
+        if(otherExpr instanceof TupleExpression){
+            return false;
+        }
+        if(otherExpr instanceof VariableExpression) {
+            VariableExpression otherUserOpExpression = (VariableExpression) otherExpr;
+            if (!userOperator.getColorType().equals(otherUserOpExpression.getVariable().getColorType())) {
+                return false;
+            }else {
+                return true;
+            }
+        }
+        if(!(otherExpr instanceof UserOperatorExpression)){
+            return false;
+        }
+        UserOperatorExpression otherUserOpExpression = (UserOperatorExpression) otherExpr;
+        if(!userOperator.getColorType().equals(otherUserOpExpression.userOperator.getColorType())){
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public ColorExpression getButtomColorExpression(){
+        return this;
+    }
+
+    @Override
+    public Vector<ColorType> getColorTypes(){
+        return new Vector<>(Arrays.asList(userOperator.getColorType()));
     }
 
 }

@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 public abstract class ColorExpression extends Expression {
 
@@ -40,4 +41,10 @@ public abstract class ColorExpression extends Expression {
     public abstract boolean hasVariable(List<Variable> variables);
 
     public abstract ColorType getColorType(List<ColorType> colortypes);
+
+    public abstract boolean isComparable(ColorExpression otherExpr);
+
+    public abstract ColorExpression getButtomColorExpression();
+
+    public abstract Vector<ColorType> getColorTypes();
 }
