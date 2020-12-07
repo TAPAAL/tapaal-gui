@@ -381,6 +381,7 @@ public class TAPNComposer implements ITAPNComposer {
                 }
 
 				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
+				addedArc.setColorTimeIntervals(arc.getColorTimeIntervals());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -499,6 +500,7 @@ public class TAPNComposer implements ITAPNComposer {
 				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
 				addedArc.setOutputExpression(arc.getOutputExpression());
 				addedArc.setInputExpression(arc.getInputExpression());
+				addedArc.setColorTimeIntervals(arc.getColorTimeIntervals());
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
