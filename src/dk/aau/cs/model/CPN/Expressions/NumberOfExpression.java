@@ -182,7 +182,7 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     public String toString() {
-        String res = number.toString() + "'(" + color.get(0).toString() + ")";
+        String res = number.toString() + "'" + color.get(0).toString();
         for (int i = 1; i < color.size(); ++i) {
             res += " + ";
             res += number.toString() + "'(" + color.get(i).toString() + ")";

@@ -692,8 +692,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         CreateGui.getApp(),
-                        "TAPAAL encountered an error trying to parse the specified query with the following error: \n\n" + ex.getMessage()+ ".\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
-                        "Error Parsing Query",
+                        "TAPAAL encountered an error trying to parse the specified Expression with the following error: \n\n" + ex.getMessage()+ ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
+                        "Error Parsing Expression",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE);
                     System.out.println(ex.getMessage());
@@ -727,7 +727,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 undoManager.undo();
                 refreshUndoRedo();
                 updateSelection(original);
-                //queryChanged();
             }
         });
 
@@ -739,7 +738,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 undoManager.redo();
                 refreshUndoRedo();
                 updateSelection(replacement);
-                //queryChanged();
             }
         });
 
@@ -1002,8 +1000,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             newProperty = newExpr;
 
         updateSelection(newProperty);
-        resetExprButton.setText("Reset Query");
-        editExprButton.setText("Edit Query");
+        resetExprButton.setText("Reset Expression");
+        editExprButton.setText("Edit Expression");
 
         /*resetExprButton.setToolTipText(TOOL_TIP_RESETBUTTON);
         editExprButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);*/
@@ -1029,7 +1027,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         colorCombobox.setEnabled(false);
         colorTypeCombobox.setEnabled(false);
         addColorButton.setEnabled(false);
-        resetExprButton.setText("Parse Query");
+        resetExprButton.setText("Parse Expression");
         editExprButton.setText("Cancel");
         clearSelection();
         exprField.setCaretPosition(exprField.getText().length());
