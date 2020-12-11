@@ -116,26 +116,32 @@ public abstract class ColorComboboxPanel extends JPanel {
 
             for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
                 colorTypeComboBoxesArray[i] = new JComboBox();
-                colorTypeComboBoxesArray[i].setRenderer(new ColorComboBoxRenderer(colorTypeComboBoxesArray[i]));
-                colorTypeComboBoxesArray[i].setPreferredSize(new Dimension(200,25));
+                var currentComboBox = colorTypeComboBoxesArray[i];
+                currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
+                currentComboBox.setPreferredSize(new Dimension(200,25));
                 if (context != null) {
                     boolean variableFound = false;
                     for (Variable variable : context.network().variables()) {
                         if (variable.getColorType().getName().equals(((ProductType) colorType).getColorTypes().get(i).getName())) {
                             variableFound = true;
-                            colorTypeComboBoxesArray[i].addItem(variable);
+                            currentComboBox.addItem(variable);
                         }
                     }
                     if(variableFound){
-                        colorTypeComboBoxesArray[i].addItem(new JSeparator());
+                        currentComboBox.addItem(new JSeparator());
                     }
                 }
                 for (Color element : ((ProductType) colorType).getColorTypes().get(i)) {
-                    colorTypeComboBoxesArray[i].addItem(element);
+                    currentComboBox.addItem(element);
                 }
 
-                colorTypeComboBoxesArray[i].addActionListener(actionEvent -> changedColor(colorTypeComboBoxesArray));
-                ((JLabel)colorTypeComboBoxesArray[i].getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+                currentComboBox.addActionListener(e -> {
+                    if(currentComboBox.getSelectedItem() instanceof JSeparator){
+                        currentComboBox.setSelectedIndex(currentComboBox.getSelectedIndex() +1);
+                    }
+                    changedColor(colorTypeComboBoxesArray);
+                });
+                ((JLabel)currentComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.gridx = 0;
                 gbc.gridy = i;
@@ -143,36 +149,45 @@ public abstract class ColorComboboxPanel extends JPanel {
                 gbc.weightx = 1.0;
                 gbc.insets = new Insets(0 , 0,5,0);
                 gbc.fill =GridBagConstraints.HORIZONTAL;
-                comboBoxPanel.add(colorTypeComboBoxesArray[i], gbc);
+                comboBoxPanel.add(currentComboBox, gbc);
                 if(showAllElement){
-                    colorTypeComboBoxesArray[i].addItem(new JSeparator());
-                    colorTypeComboBoxesArray[i].addItem("<html><b>.all</b>");
+                    currentComboBox.addItem(new JSeparator());
+                    currentComboBox.addItem("<html><b>.all</b>");
                 }
             }
         }
         else if (colorType != null){
             colorTypeComboBoxesArray = new JComboBox[1];
-            colorTypeComboBoxesArray[0] = new JComboBox();
-            colorTypeComboBoxesArray[0].setRenderer(new ColorComboBoxRenderer(colorTypeComboBoxesArray[0]));
-            colorTypeComboBoxesArray[0].setPreferredSize(new Dimension(200,25));
+            var currentComboBox = new JComboBox();
+            colorTypeComboBoxesArray[0] = currentComboBox;
+            currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
+            currentComboBox.setPreferredSize(new Dimension(200,25));
             if(context != null){
                 boolean variableFound = false;
                 for (Variable element : context.network().variables()) {
                     if (element.getColorType().getName().equals(ct.getName())) {
-                        colorTypeComboBoxesArray[0].addItem(element);
+                        currentComboBox.addItem(element);
                         variableFound = true;
                     }
                 }
                 if(variableFound){
-                    colorTypeComboBoxesArray[0].addItem(new JSeparator());
+                    currentComboBox.addItem(new JSeparator());
                 }
             }
             for (Color element : colorType) {
-                colorTypeComboBoxesArray[0].addItem(element);
+                if(currentComboBox.getSelectedItem() instanceof JSeparator){
+                    currentComboBox.setSelectedIndex(currentComboBox.getSelectedIndex() +1);
+                }
+                currentComboBox.addItem(element);
             }
 
-            colorTypeComboBoxesArray[0].addActionListener(actionEvent -> changedColor(colorTypeComboBoxesArray));
-            ((JLabel)colorTypeComboBoxesArray[0].getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+            currentComboBox.addActionListener(e -> {
+                if(currentComboBox.getSelectedItem() instanceof JSeparator){
+                    currentComboBox.setSelectedIndex(currentComboBox.getSelectedIndex() +1);
+                }
+                changedColor(colorTypeComboBoxesArray);
+            });
+            ((JLabel)currentComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -181,10 +196,10 @@ public abstract class ColorComboboxPanel extends JPanel {
             gbc.weightx = 1.0;
             gbc.anchor = GridBagConstraints.WEST;
             gbc.insets = new Insets(0 , 0,5,0);
-            comboBoxPanel.add(colorTypeComboBoxesArray[0], gbc);
+            comboBoxPanel.add(currentComboBox, gbc);
             if(showAllElement){
-                colorTypeComboBoxesArray[0].addItem(new JSeparator());
-                colorTypeComboBoxesArray[0].addItem("<html><b>.all</b>");
+                currentComboBox.addItem(new JSeparator());
+                currentComboBox.addItem("<html><b>.all</b>");
             }
         }
         revalidate();
