@@ -183,25 +183,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void showNewPNDialog() {
 
-        // Build interface
-        EscapableDialog guiDialog = new EscapableDialog(guiFrameDirectAccess, "Create a New Petri Net", true);
-
-        Container contentPane = guiDialog.getContentPane();
-
-        // 1 Set layout
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-        // 2 Add Place editor
-        contentPane.add(new NewTAPNPanel(guiDialog.getRootPane(), guiFrameDirectAccess));
-
-        guiDialog.setResizable(false);
-
-        // Make window fit contents' preferred size
-        guiDialog.pack();
-
-        // Move window to the middle of the screen
-        guiDialog.setLocationRelativeTo(null);
-        guiDialog.setVisible(true);
+        NewTAPNPanel.showNewTapnPanel(guiFrameDirectAccess);
 
 
     }

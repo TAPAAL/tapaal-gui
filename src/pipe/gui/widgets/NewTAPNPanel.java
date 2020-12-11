@@ -1,21 +1,18 @@
 package pipe.gui.widgets;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
 
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.GuiFrame;
 
-public class NewTAPNPanel extends JPanel {
+public class NewTAPNPanel extends JDialog {
 
 	private final JRootPane rootPane;
 	private final GuiFrame frame;
@@ -23,13 +20,31 @@ public class NewTAPNPanel extends JPanel {
 	private JRadioButton timedNet;
 	private JRadioButton gameNet;
 	private JRadioButton coloredNet;
+    static NewTAPNPanel newTAPNPanel;
 
-	public NewTAPNPanel(JRootPane rootPane, GuiFrame frame) {
-		this.rootPane = rootPane;
-		this.frame = frame;
+    /* ListOfQueries is used throughout the class to check if
+    BatchProcessing was called from QueryPane
+    (should maybe be boolean)
+    */
+    public static void showNewTapnPanel(GuiFrame frame){
+        if(newTAPNPanel == null){
+            newTAPNPanel = new NewTAPNPanel(frame, "New Net", true);
+            newTAPNPanel.pack();
+            newTAPNPanel.setPreferredSize(newTAPNPanel.getSize());
+            //Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
+            newTAPNPanel.setMinimumSize(new Dimension(newTAPNPanel.getWidth(), newTAPNPanel.getHeight()-150));
+            newTAPNPanel.setLocationRelativeTo(null);
+            newTAPNPanel.setResizable(true);
+        }
+        newTAPNPanel.setVisible(true);
+    }
 
-		initComponents();
-	}
+    private NewTAPNPanel(GuiFrame frame, String title, boolean modal) {
+        super(frame, title, modal);
+        this.frame = frame;
+        this.rootPane = this.getRootPane();
+        initComponents();
+    }
 
 	private void initComponents() {
 		this.setLayout(new GridBagLayout());
@@ -125,7 +140,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.insets = new Insets(3, 3, 3, 3);
 		namePanel.add(nameLabel, gbc);
 
-		String defaultName = String.format("New Petri net %1$d", frame
+		String defaultName = String.format("New Petri net %1$d", this.frame
 				.getNameCounter());
 		nameTextBox = new JTextField(defaultName);
 		Dimension size = new Dimension(330, 25);			
