@@ -388,7 +388,7 @@ public class TabTransformer {
     private static pipe.dataLayer.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
         List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
-        queries.addAll(queryLoader.parseQueries());
+        queries.addAll(queryLoader.parseQueries().getQueries());
         return queries.get(0);
     }
 
