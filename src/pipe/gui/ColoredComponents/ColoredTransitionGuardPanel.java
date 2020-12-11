@@ -810,28 +810,27 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             }
         });
 
-        exprField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-        });
-
         exprField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!exprField.isEditable()) {
-                    //TODO: see line 1232 in CTLQueryDialog for impl example.
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE
+                        || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                        deleteSelection();
+                    }else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
+                        e.consume();
+                        int position = exprField.getSelectionEnd();
+                        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                            position = exprField.getSelectionStart();
+                        }
+                        changeToEditMode();
+                        exprField.setCaretPosition(position);
+                    }
+                } else {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                        resetExprButton.doClick(); // we are in manual edit mode, so the reset button is now the Parse Expr button
+                        e.consume();
+                    }
                 }
             }
         });

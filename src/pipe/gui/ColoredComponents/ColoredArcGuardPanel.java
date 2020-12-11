@@ -506,7 +506,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         arithmeticPanel.setBorder(BorderFactory.createTitledBorder("Arithmetic Operators"));
 
         additionButton = new JButton("Addition");
-        addAdditionPlaceHolderButton = new JButton("Add Placeholder");
         subtractionButton = new JButton("Subtraction");
         scalarButton = new JButton("Scalar");
 
@@ -534,7 +533,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         scalarButton.setMinimumSize(new Dimension(110, 30));
         scalarButton.setMaximumSize(new Dimension(110, 30));
 
-        addAdditionPlaceHolderButton.setPreferredSize(new Dimension(150, 30));
 
         additionButton.addActionListener(actionEvent -> {
             AddExpression addExpr;
@@ -582,28 +580,12 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             }
         });
 
-        addAdditionPlaceHolderButton.addActionListener(actionEvent -> {
-            if (currentSelection.getObject() instanceof AddExpression) {
-                AddExpression addExpr = (AddExpression) currentSelection.getObject();
-                Vector<ArcExpression> vecExpr =  addExpr.getAddExpression();
-                vecExpr.add(new PlaceHolderArcExpression());
-                addExpr = new AddExpression(vecExpr);
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
-                updateSelection(addExpr);
-                undoSupport.postEdit(edit);
-            }
-        });
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 0,0, 0);
         gbc.anchor = GridBagConstraints.WEST;
         arithmeticPanel.add(additionButton, gbc);
-
-        gbc.gridy = 1;
-        arithmeticPanel.add(addAdditionPlaceHolderButton, gbc);
 
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setEnabled(true);
@@ -711,9 +693,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
         JScrollPane exprScrollPane = new JScrollPane(exprField);
         exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension d = new Dimension(880, 80);
+        Dimension d = new Dimension(100, 80);
         exprScrollPane.setPreferredSize(d);
-        exprScrollPane.setMinimumSize(d);
 
         exprField.addMouseListener(new MouseAdapter() {
             @Override
@@ -724,28 +705,27 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             }
         });
 
-        exprField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-        });
-
         exprField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!exprField.isEditable()) {
-                    //TODO: see line 1232 in CTLQueryDialog for impl example.
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE
+                        || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                        deleteSelection();
+                    }else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
+                        e.consume();
+                        int position = exprField.getSelectionEnd();
+                        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                            position = exprField.getSelectionStart();
+                        }
+                        changeToEditMode();
+                        exprField.setCaretPosition(position);
+                    }
+                } else {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                        resetExprButton.doClick(); // we are in manual edit mode, so the reset button is now the Parse Expr button
+                        e.consume();
+                    }
                 }
             }
         });
@@ -1027,19 +1007,15 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
         }
         if (currentSelection.getObject() instanceof ColorExpression) {
             addExpressionButton.setEnabled(true);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             succButton.setEnabled(true);
             predButton.setEnabled(true);
         }
@@ -1047,11 +1023,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof ArcExpression) {
             addExpressionButton.setEnabled(true);
@@ -1060,7 +1034,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             scalarButton.setEnabled(true);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
         }
         if(arcExpression.containsPlaceHolder()){
             disableOkButton();
@@ -1173,11 +1146,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         addExpressionButton.setEnabled(false);
         additionButton.setEnabled(false);
         subtractionButton.setEnabled(false);
-        addAdditionPlaceHolderButton.setEnabled(false);
         scalarButton.setEnabled(false);
         succButton.setEnabled(false);
         predButton.setEnabled(false);
-        addAdditionPlaceHolderButton.setEnabled(false);
         succButton.setEnabled(false);
         predButton.setEnabled(false);;
         resetExprButton.setText("Parse Expression");
@@ -1223,7 +1194,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     JButton redoButton;
     JButton editExprButton;
     JButton additionButton;
-    JButton addAdditionPlaceHolderButton;
     JButton subtractionButton;
     JButton scalarButton;
     JButton addExpressionButton;
