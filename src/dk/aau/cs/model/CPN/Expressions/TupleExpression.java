@@ -18,6 +18,12 @@ public class TupleExpression extends ColorExpression {
 
     public TupleExpression(Vector<ColorExpression> colors) {
         this.colors = colors;
+        int i = 0;
+        for(ColorExpression color : colors){
+            color.setParent(this);
+            color.setIndex(i);
+            i++;
+        }
     }
 
     public List<Color> eval(ExpressionContext context) {

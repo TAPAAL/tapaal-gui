@@ -147,4 +147,5 @@ public class UserOperatorExpression extends ColorExpression {
         return new Vector<>(Arrays.asList(userOperator.getColorType()));
     }
 
+
 }

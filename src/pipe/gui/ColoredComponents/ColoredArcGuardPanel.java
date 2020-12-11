@@ -78,7 +78,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         updateSelection();
         hideIrrelevantInformation();
 
-        //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         undoManager = new ColoredArcGuardPanel.ExpressionConstructionUndoManager();

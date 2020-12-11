@@ -11,6 +11,7 @@ import java.util.Vector;
 public abstract class ColorExpression extends Expression {
 
     protected ColorExpression parent;
+    protected int index = -1;
 
     public ColorExpression() {
 
@@ -47,4 +48,15 @@ public abstract class ColorExpression extends Expression {
     public abstract ColorExpression getButtomColorExpression();
 
     public abstract Vector<ColorType> getColorTypes();
+
+    public ColorExpression getParent(){
+        return this.parent;
+    }
+
+    public void setIndex(int index){
+        this.index = index;
+    }
+    public int getIndex(){
+        return index;
+    }
 }

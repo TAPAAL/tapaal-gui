@@ -940,6 +940,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         currentSelection = position;
 
         updateEnabledButtons();
+        updateColorOptions();
     }
 
     private void updateSelection() {
@@ -954,9 +955,25 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         currentSelection = position;
         Logger.log(currentSelection.getObject());
         updateEnabledButtons();
-
+        updateColorOptions();
         //TODO: updateexprButtonsAccordingToSelection; line 573
     }
+    public void updateColorOptions(){
+        if(currentSelection.getObject() instanceof ColorExpression) {
+            ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getButtomColorExpression();
+            if (exprToCheck instanceof UserOperatorExpression || exprToCheck instanceof VariableExpression) {
+                if (exprToCheck.getParent() instanceof TupleExpression) {
+                    TupleExpression tupleExpression = (TupleExpression) exprToCheck.getParent();
+                    colorTypeCombobox.setSelectedItem(tupleExpression.getColorTypes().get(exprToCheck.getIndex()));
+                    updateColorType();
+                    colorTypeCombobox.setEnabled(false);
+                }
+            }
+        }else{
+            colorTypeCombobox.setEnabled(true);
+        }
+    }
+
 
     private void deleteSelection() {
         if (currentSelection != null) {
