@@ -207,7 +207,43 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                     }
                 }
 			}
-		}
+		} else if(model.isColored()){
+            TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+            ArrayList<Template> templates = new ArrayList<Template>(1);
+            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+
+            network.add(transformedModel.value1());
+            for (ColorType ct :model.colorTypes()) {
+                if (!network.isNameUsedForColorType(ct.getName()))
+                    network.add(ct);
+            }
+            for (Variable variable: model.variables()) {
+                if (!network.isNameUsedForVariable(variable.getName()))
+                    network.add(variable);
+            }
+            templates.add(new Template(transformedModel.value1(), ((TAPNComposer)composer).getGuiModel(), new Zoomer()));
+
+            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+
+            File modelFile = File.createTempFile("modelIn", ".tapn");
+            File queryFile = File.createTempFile("queryIn", ".q");
+            writerTACPN.savePNML(modelFile);
+            OutputStream os;
+            try {
+                os = new FileOutputStream(queryFile);
+                os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt");
+            ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+            runner.run();
+            String errorOutput = readOutput(runner.errorOutput());
+            String standardOutput = readOutput(runner.standardOutput());
+            Logger.log(errorOutput);
+        }
 		
 		ApproximationWorker worker = new ApproximationWorker();
 
