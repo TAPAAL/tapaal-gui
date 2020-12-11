@@ -686,13 +686,13 @@ public class PlaceEditorPanel extends JPanel {
         for (int i = 0; i < timeConstraintListModel.size(); i++) {
             ctiList.add(timeConstraintListModel.get(i));
         }
-
-        Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, oldExpression, newExpression, context, place, ctiList, colorType);
-        command.redo();
-        context.undoManager().addEdit(command);
         if(!colorType.equals(place.underlyingPlace().getColorType())){
             updateArcsAccordingToColorType();
         }
+        Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, oldExpression, newExpression, context, place, ctiList, colorType);
+        command.redo();
+        context.undoManager().addEdit(command);
+
 
 		TimeInvariant newInvariant = constructInvariant();
 		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
