@@ -11,6 +11,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.GuiFrame;
+import pipe.gui.MessengerImpl;
 
 public class NewTAPNPanel extends JDialog {
 
@@ -20,7 +21,9 @@ public class NewTAPNPanel extends JDialog {
 	private JRadioButton timedNet;
 	private JRadioButton gameNet;
 	private JRadioButton coloredNet;
+	private static int newNameCounter = 1;
     static NewTAPNPanel newTAPNPanel;
+    private final static String COLORED_GAMES_NOT_SUPPORTED = "There exists no verification engine for colored games, we only allow modeling.\n\n Do you wish to continue?";
 
     /* ListOfQueries is used throughout the class to check if
     BatchProcessing was called from QueryPane
@@ -36,6 +39,8 @@ public class NewTAPNPanel extends JDialog {
             newTAPNPanel.setLocationRelativeTo(null);
             newTAPNPanel.setResizable(true);
         }
+        String defaultName = String.format("New Petri net %1$d", newNameCounter);
+        newTAPNPanel.setName(defaultName);
         newTAPNPanel.setVisible(true);
     }
 
@@ -81,7 +86,16 @@ public class NewTAPNPanel extends JDialog {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected()));
+		okButton.addActionListener(e -> {
+		    if(gameNet.isSelected() && coloredNet.isSelected()){
+                int cont = JOptionPane.showConfirmDialog(this, COLORED_GAMES_NOT_SUPPORTED, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(cont == JOptionPane.OK_OPTION){
+                    createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected());
+                }
+            }else{
+                createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected());
+            }
+        });
 
 		rootPane.setDefaultButton(okButton);
 		
@@ -123,9 +137,8 @@ public class NewTAPNPanel extends JDialog {
 			e.printStackTrace();
 			return;
 		}
-
-		frame.incrementNameCounter();
-		exit();
+		newNameCounter++;
+        exit();
 	}
 
 	private void initNamePanel() {
@@ -140,8 +153,7 @@ public class NewTAPNPanel extends JDialog {
 		gbc.insets = new Insets(3, 3, 3, 3);
 		namePanel.add(nameLabel, gbc);
 
-		String defaultName = String.format("New Petri net %1$d", this.frame
-				.getNameCounter());
+		String defaultName = String.format("New Petri net %1$d", newNameCounter);
 		nameTextBox = new JTextField(defaultName);
 		Dimension size = new Dimension(330, 25);			
 		nameTextBox.setPreferredSize(size);
@@ -303,5 +315,9 @@ public class NewTAPNPanel extends JDialog {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isColorPanel, gbc);
+    }
+
+    public void setName(String name){
+        nameTextBox.setText(name);
     }
 }
