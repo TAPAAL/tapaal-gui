@@ -135,7 +135,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                         e.printStackTrace();
                     }
 
-                    VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true);
+                    VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true, true);
                     ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
                     runner.run();
                     String errorOutput = readOutput(runner.errorOutput());
@@ -237,7 +237,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 e.printStackTrace();
             }
 
-            VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true);
+            VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true, true);
             ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
             runner.run();
             String errorOutput = readOutput(runner.errorOutput());

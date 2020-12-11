@@ -9,11 +9,13 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     private String queryOut;
     private String verifydtapnOptions;
     private boolean reduceQuery;
-    public VerifyPNUnfoldOptions(String modelOut, String queryOut, String verifydtapnOptions, boolean reduceQuery) {
+    private boolean enableStructuralReductions;
+    public VerifyPNUnfoldOptions(String modelOut, String queryOut, String verifydtapnOptions, boolean reduceQuery, boolean enableStructuralReductions) {
         this.modelOut = modelOut;
         this.queryOut = queryOut;
         this.verifydtapnOptions = verifydtapnOptions;
         this.reduceQuery = reduceQuery;
+        this.enableStructuralReductions = enableStructuralReductions;
     }
 
 
@@ -59,6 +61,9 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
 
         if(!reduceQuery){
             options += " -q 0 ";
+        }
+        if(!enableStructuralReductions){
+            options += " -r 0 ";
         }
 
         if (verifydtapnOptions.equals("tt"))
