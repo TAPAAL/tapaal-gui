@@ -76,8 +76,7 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
     }
 
     @Override

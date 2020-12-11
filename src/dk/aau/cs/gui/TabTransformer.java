@@ -6,7 +6,6 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
@@ -363,7 +362,7 @@ public class TabTransformer {
             e.printStackTrace();
         }
 
-        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff");
+        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", false);
         runner = new ProcessRunner(getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 

@@ -181,11 +181,10 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
+    public void getValues(ExprValues exprValues) {
         for (ColorExpression color : colors) {
-            exprValues = color.getValues(exprValues);
+            color.getValues(exprValues);
         }
-        return exprValues;
     }
 
     public void getVariables(Set<Variable> variables) {

@@ -146,11 +146,10 @@ public class AddExpression extends ArcExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
+    public void getValues(ExprValues exprValues) {
         for (ArcExpression constituent : constituents) {
-            exprValues = constituent.getValues(exprValues);
+            constituent.getValues(exprValues);
         }
-        return  exprValues;
     }
 
     @Override

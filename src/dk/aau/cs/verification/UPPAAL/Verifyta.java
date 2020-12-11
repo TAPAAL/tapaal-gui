@@ -324,7 +324,12 @@ public class Verifyta implements ModelChecker {
 		return verify(options, model.value1(), exportedModel, query);
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query) {
+    @Override
+    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception {
+        return null;
+    }
+
+    private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 

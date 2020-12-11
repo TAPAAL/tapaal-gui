@@ -153,7 +153,7 @@ public class VerifyTAPNExporter {
 		if(transArc.getWeight().value() > 1){
 			modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
 		}
-		
+
 		modelStream.append("/>\n");
 	}
 

@@ -1,10 +1,21 @@
 package pipe.gui;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.TabTransformer;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -19,17 +30,10 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.TAPNTraceDecomposer;
-import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
+import pipe.dataLayer.Template;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
@@ -39,14 +43,16 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected TimedArcPetriNetNetwork model;
 	protected TAPNQuery query;
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
+    protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	
 	
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
+		this.guiModels = guiModels;
 	}
 
 	
@@ -60,8 +66,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-		ITAPNComposer composer = new TAPNComposer(messenger, false);
+		ITAPNComposer composer = new TAPNComposer(messenger, guiModels, false, true);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
+        File modelOut = null;
+        File queryOut = null;
+        modelOut = File.createTempFile("modelOut", ".xml");
+        queryOut = File.createTempFile("queryOut", ".q");
 
 		//this is needed to get the declarations for colored nets
         transformedModel.value1().setParentNetwork(model);
@@ -95,75 +105,149 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				}
 
 
-				if (!verifypn.setup()) {
-					messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
-				} else {
-					VerificationResult<TimedArcPetriNetTrace> overapprox_result = null;
-					if (dataLayerQuery != null) {
-						overapprox_result = verifypn.verify(
-								new VerifyPNOptions(
-										options.extraTokens(),
-										options.traceOption(),
-										SearchOption.OVERAPPROXIMATE,
-										true,
-										ModelReduction.AGGRESSIVE,
-										options.enabledOverApproximation(),
-										options.enabledUnderApproximation(),
-										options.approximationDenominator(),
-										dataLayerQuery.getCategory(),
-										dataLayerQuery.getAlgorithmOption(),
-										dataLayerQuery.isSiphontrapEnabled(),
-										dataLayerQuery.isQueryReductionEnabled(),
-										dataLayerQuery.isStubbornReductionEnabled()
-								),
-								transformedModel,
-								clonedQuery
-						);
-					} else {
-						overapprox_result = verifypn.verify(
-								new VerifyPNOptions(
-										options.extraTokens(),
-										options.traceOption(),
-										SearchOption.OVERAPPROXIMATE,
-										true,
-										ModelReduction.AGGRESSIVE,
-										options.enabledOverApproximation(),
-										options.enabledUnderApproximation(),
-										options.approximationDenominator(),
-										pipe.dataLayer.TAPNQuery.QueryCategory.Default,
-										pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
-										false,
-										true,
-										false
-								),
-								transformedModel,
-								clonedQuery
-						);
-					}
+				if(model.isColored()){
+                    TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+                    ArrayList<Template> templates = new ArrayList<Template>(1);
+                    ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
 
-					if (overapprox_result.getQueryResult() != null) {
-						if (!overapprox_result.error() && model.isUntimed() || (
-								(query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
-										(query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
-						) {
-							VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
-									overapprox_result.getQueryResult(),
-									decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()),
-									overapprox_result.verificationTime(),
-									overapprox_result.stats(),
-									true
-							);
-							value.setNameMapping(transformedModel.value2());
-							return value;
-						}
-					}
-				}
+                    network.add(transformedModel.value1());
+                    for (ColorType ct :model.colorTypes()) {
+                        if (!network.isNameUsedForColorType(ct.getName()))
+                            network.add(ct);
+                    }
+                    for (Variable variable: model.variables()) {
+                        if (!network.isNameUsedForVariable(variable.getName()))
+                            network.add(variable);
+                    }
+                    templates.add(new Template(transformedModel.value1(), ((TAPNComposer)composer).getGuiModel(), new Zoomer()));
+
+                    TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+
+                    File modelFile = File.createTempFile("modelIn", ".tapn");
+                    File queryFile = File.createTempFile("queryIn", ".q");
+                    writerTACPN.savePNML(modelFile);
+                    OutputStream os;
+                    try {
+                        os = new FileOutputStream(queryFile);
+                        os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
+                        os.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true);
+                    ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+                    runner.run();
+                    String errorOutput = readOutput(runner.errorOutput());
+                    String standardOutput = readOutput(runner.standardOutput());
+                    Logger.log(errorOutput);
+                }else {
+                    if (!verifypn.setup()) {
+                        messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
+                    } else {
+                        VerificationResult<TimedArcPetriNetTrace> overapprox_result = null;
+                        if (dataLayerQuery != null) {
+                            overapprox_result = verifypn.verify(
+                                new VerifyPNOptions(
+                                    options.extraTokens(),
+                                    options.traceOption(),
+                                    SearchOption.OVERAPPROXIMATE,
+                                    true,
+                                    ModelReduction.AGGRESSIVE,
+                                    options.enabledOverApproximation(),
+                                    options.enabledUnderApproximation(),
+                                    options.approximationDenominator(),
+                                    dataLayerQuery.getCategory(),
+                                    dataLayerQuery.getAlgorithmOption(),
+                                    dataLayerQuery.isSiphontrapEnabled(),
+                                    dataLayerQuery.isQueryReductionEnabled(),
+                                    dataLayerQuery.isStubbornReductionEnabled()
+                                ),
+                                transformedModel,
+                                clonedQuery
+                            );
+                        } else {
+                            overapprox_result = verifypn.verify(
+                                new VerifyPNOptions(
+                                    options.extraTokens(),
+                                    options.traceOption(),
+                                    SearchOption.OVERAPPROXIMATE,
+                                    true,
+                                    ModelReduction.AGGRESSIVE,
+                                    options.enabledOverApproximation(),
+                                    options.enabledUnderApproximation(),
+                                    options.approximationDenominator(),
+                                    pipe.dataLayer.TAPNQuery.QueryCategory.Default,
+                                    pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
+                                    false,
+                                    true,
+                                    false
+                                ),
+                                transformedModel,
+                                clonedQuery
+                            );
+                        }
+
+                        if (overapprox_result.getQueryResult() != null) {
+                            if (!overapprox_result.error() && model.isUntimed() || (
+                                (query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
+                                    (query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
+                            ) {
+                                VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
+                                    overapprox_result.getQueryResult(),
+                                    decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()),
+                                    overapprox_result.verificationTime(),
+                                    overapprox_result.stats(),
+                                    true
+                                );
+                                value.setNameMapping(transformedModel.value2());
+                                return value;
+                            }
+                        }
+                    }
+                }
 			}
-		}
+		} else if(model.isColored()){
+            TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+            ArrayList<Template> templates = new ArrayList<Template>(1);
+            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+
+            network.add(transformedModel.value1());
+            for (ColorType ct :model.colorTypes()) {
+                if (!network.isNameUsedForColorType(ct.getName()))
+                    network.add(ct);
+            }
+            for (Variable variable: model.variables()) {
+                if (!network.isNameUsedForVariable(variable.getName()))
+                    network.add(variable);
+            }
+            templates.add(new Template(transformedModel.value1(), ((TAPNComposer)composer).getGuiModel(), new Zoomer()));
+
+            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+
+            File modelFile = File.createTempFile("modelIn", ".tapn");
+            File queryFile = File.createTempFile("queryIn", ".q");
+            writerTACPN.savePNML(modelFile);
+            OutputStream os;
+            try {
+                os = new FileOutputStream(queryFile);
+                os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true);
+            ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+            runner.run();
+            String errorOutput = readOutput(runner.errorOutput());
+            String standardOutput = readOutput(runner.standardOutput());
+            Logger.log(errorOutput);
+        }
 		
 		ApproximationWorker worker = new ApproximationWorker();
-		
-		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model);
+
+		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, modelOut.getAbsolutePath(), queryOut.getAbsolutePath());
 	}
 
 	private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
@@ -209,6 +293,35 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		}
 	}
+    private String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(modelFile);
+        buffer.append(" ");
+        buffer.append(queryFile);
+        buffer.append(" ");
+        buffer.append(options.toString());
+        return buffer.toString();
+    }
+    @SuppressWarnings("Duplicates")
+    private String readOutput(BufferedReader reader) {
+        try {
+            if (!reader.ready())
+                return "";
+        } catch (IOException e1) {
+            return "";
+        }
+        StringBuffer buffer = new StringBuffer();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+                buffer.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+        }
+
+        return buffer.toString();
+    }
 
 	private String error;
 	private void showErrorMessage(String errorMessage) {

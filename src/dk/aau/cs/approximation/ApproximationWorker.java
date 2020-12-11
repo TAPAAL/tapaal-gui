@@ -38,7 +38,9 @@ public class ApproximationWorker {
 			ITAPNComposer composer,
 			TAPNQuery clonedQuery,
 			RunVerificationBase verificationBase,
-			TimedArcPetriNetNetwork model
+			TimedArcPetriNetNetwork model,
+            String modelOut,
+            String queryOut
 	) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
@@ -53,7 +55,12 @@ public class ApproximationWorker {
 		}
 		
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
-		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
+		VerificationResult<TimedArcPetriNetTrace> result;
+        if(model.isColored()) {
+            result = modelChecker.verify(options, transformedModel, clonedQuery, modelOut, queryOut);
+        }else {
+            result = modelChecker.verify(options, transformedModel, clonedQuery);
+        }
 
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);

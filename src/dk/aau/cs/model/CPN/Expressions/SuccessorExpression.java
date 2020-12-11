@@ -87,9 +87,8 @@ public class SuccessorExpression extends ColorExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        exprValues = color.getValues(exprValues);
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
+        color.getValues(exprValues);
     }
 
     public void getVariables(Set<Variable> variables) {

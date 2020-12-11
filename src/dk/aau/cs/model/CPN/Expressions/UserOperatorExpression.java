@@ -93,9 +93,8 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
+    public void getValues(ExprValues exprValues) {
         exprValues.addColor(userOperator);
-        return exprValues;
     }
 
     @Override

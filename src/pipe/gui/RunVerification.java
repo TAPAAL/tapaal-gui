@@ -9,6 +9,7 @@ import java.awt.Window;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -23,6 +24,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
@@ -32,18 +34,19 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
+import pipe.dataLayer.DataLayer;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-		super(modelChecker, messenger);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+		super(modelChecker, messenger, guiModels);
 		iconSelector = selector;
 		this.callback = callback;
 	}
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null);
+		this(modelChecker, selector, messenger, null, null);
 	}
 
 	@Override
@@ -257,37 +260,40 @@ public class RunVerification extends RunVerificationBase {
 		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
 
             displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations());
-			
-			if(!result.getTransitionStatistics().isEmpty()){
-				JButton transitionStatsButton = new JButton("Transition Statistics");
-				transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
-				gbc = new GridBagConstraints();
-				gbc.gridx = 0;
-				gbc.gridy = 4;
-				gbc.insets = new Insets(10,0,10,0);
-				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(transitionStatsButton, gbc);
-			}
-			if(!result.getPlaceBoundStatistics().isEmpty()){
-				JButton placeStatsButton = new JButton("Place-Bound Statistics");
-				placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
-				gbc = new GridBagConstraints();
-				gbc.gridx = 1;
-				gbc.gridy = 4;
-				gbc.insets = new Insets(10,0,10,0);
-				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(placeStatsButton, gbc);
-			}
-			
-			if(!result.getReductionResultAsString().isEmpty()){
-				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
-				gbc = new GridBagConstraints();
-				gbc.gridx = 0;
-				gbc.gridy = 5;
-				gbc.insets = new Insets(0,0,20,-90);
-				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(reductionStatsLabet, gbc);
-			}
+
+            if(!model.isColored()) {
+                if (!result.getTransitionStatistics().isEmpty()) {
+                    JButton transitionStatsButton = new JButton("Transition Statistics");
+                    transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 4;
+                    gbc.insets = new Insets(10, 0, 10, 0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(transitionStatsButton, gbc);
+                }
+                if (!result.getPlaceBoundStatistics().isEmpty()) {
+                    JButton placeStatsButton = new JButton("Place-Bound Statistics");
+                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 1;
+                    gbc.gridy = 4;
+                    gbc.insets = new Insets(10, 0, 10, 0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(placeStatsButton, gbc);
+                }
+            }
+
+            if(!result.getReductionResultAsString().isEmpty()){
+                JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
+                gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 5;
+                gbc.insets = new Insets(0,0,20,-90);
+                gbc.anchor = GridBagConstraints.WEST;
+                panel.add(reductionStatsLabet, gbc);
+            }
+
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
             displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
 

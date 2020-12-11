@@ -1,7 +1,6 @@
 package dk.aau.cs.io;
 
 import java.util.Collection;
-import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
@@ -36,7 +35,7 @@ public class LoadedModel implements LoadedBatchProcessingModel {
         } else {
             boolean isNetTimed = !network().isUntimed();
             boolean isNetGame = network().hasUncontrollableTransitions();
-            boolean isNetColored = network.hasColors();
+            boolean isNetColored = network.isColored();
 
             return new TabContent.TAPNLens(isNetTimed, isNetGame, isNetColored);
         }

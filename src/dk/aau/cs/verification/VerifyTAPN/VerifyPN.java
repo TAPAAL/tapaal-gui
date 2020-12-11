@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.gui.TabContent;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
@@ -284,7 +282,7 @@ public class VerifyPN implements ModelChecker{
 			
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 			VerifyTAPNExporter exporter;
-			if(model.value1().parentNetwork().hasColors()){
+			if(model.value1().parentNetwork().isColored()){
 			    exporter = new VerifyCPNExporter();
 			    supportsStats = false;
             } else {
@@ -299,7 +297,12 @@ public class VerifyPN implements ModelChecker{
 			return verify(options, model, exportedModel, query);
 		}
 
-		private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+    @Override
+    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception {
+        return null;
+    }
+
+    private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 			VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
 			
 			if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 

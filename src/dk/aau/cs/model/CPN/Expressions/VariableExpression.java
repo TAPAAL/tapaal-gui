@@ -101,9 +101,8 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
+    public void getValues(ExprValues exprValues) {
         exprValues.addVariable(variable);
-        return exprValues;
     }
 
     public void getVariables(Set<Variable> variables) {

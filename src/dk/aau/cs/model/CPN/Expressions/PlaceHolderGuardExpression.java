@@ -45,8 +45,8 @@ public class PlaceHolderGuardExpression extends GuardExpression implements Place
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
-        return exprValues;
+    public void getValues(ExprValues exprValues) {
+
     }
 
     @Override

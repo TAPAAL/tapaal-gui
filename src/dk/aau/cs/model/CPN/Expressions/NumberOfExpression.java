@@ -168,11 +168,10 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     @Override
-    public ExprValues getValues(ExprValues exprValues) {
+    public void getValues(ExprValues exprValues) {
         for (ColorExpression colorExpression : color) {
-            exprValues = colorExpression.getValues(exprValues);
+            colorExpression.getValues(exprValues);
         }
-        return exprValues;
     }
 
     public void getVariables(Set<Variable> variables) {

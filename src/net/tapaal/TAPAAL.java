@@ -160,7 +160,7 @@ public class TAPAAL {
 								));
 							}
 
-						});
+						}, tab.getGuiModels());
 					} else {
 						System.out.println("    | Skipped");
 						//Verifier.runUppaalVerification(network, query);

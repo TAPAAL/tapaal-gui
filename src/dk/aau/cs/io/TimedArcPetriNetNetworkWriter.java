@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -57,6 +58,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private final Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
     private writeTACPN writeTACPN;
+    private boolean secondTransport = false;
+    private int transporCountID = 0;
     private final TabContent.TAPNLens lens;
 
     public TimedArcPetriNetNetworkWriter(
@@ -518,6 +521,16 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		
 		if (inputArc instanceof TimedOutputArcComponent) {
 			if (inputArc instanceof TimedInputArcComponent) {
+                if (getInputArcTypeAsString((TimedInputArcComponent) inputArc).equals("transport")) {
+                    if (secondTransport) {
+                        arcElement.setAttribute("transportID", String.valueOf(transporCountID));
+                        secondTransport = false;
+                    } else {
+                        transporCountID++;
+                        arcElement.setAttribute("transportID", String.valueOf(transporCountID));
+                        secondTransport = true;
+                    }
+                }
 				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");

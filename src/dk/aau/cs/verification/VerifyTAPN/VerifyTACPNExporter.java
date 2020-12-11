@@ -81,12 +81,10 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         if(transArc.getWeight().value() > 1){
             modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
         }
-        modelStream.append("/>\n");
-        //TODO: engine cannot handle time yet
-		/*modelStream.append(">\n");
+		modelStream.append(">\n");
 		modelStream.append(colorInformationToXMLString(transArc.getInputExpression()));
 		modelStream.append(colorInformationToXMLString(transArc.getOutputExpression()));
-        modelStream.append("</transportarc>\n");*/
+        modelStream.append("</transportarc>\n");
     }
 
     protected void outputInhibitorArc(TimedInhibitorArc inhibArc,	PrintStream modelStream) {
