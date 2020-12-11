@@ -1,5 +1,6 @@
 package dk.aau.cs.io.queries;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,12 +9,14 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.io.LoadedQueries;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.SUMOParsing.TokenMgrError;
@@ -74,9 +77,17 @@ public class SUMOQueryLoader extends QueryLoader{
 
 	public static void importQueries(File file, TimedArcPetriNetNetwork network){
 		SUMOQueryLoader loader = new SUMOQueryLoader(file, network);
-		Collection<TAPNQuery> queries = loader.parseQueries();
+		LoadedQueries loadedQueries = loader.parseQueries();
+        if (loadedQueries.getMessages().size() != 0) {
+            String message = "While loading the net we found one or more warnings: \n\n";
+            for (String s : loadedQueries.getMessages()) {
+                message += s + "\n\n";
+            }
 
-		for(TAPNQuery query : queries){
+            new MessengerImpl().displayInfoMessage(message, "Warning");
+        }
+
+		for(TAPNQuery query : loadedQueries.getQueries()){
 			CreateGui.getCurrentTab().addQuery(query);
 		}
 	}

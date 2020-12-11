@@ -774,6 +774,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
+            } else if (!tab.lens.isTimed()) {
+                q.setReductionOption(ReductionOption.VerifyPN);
+                q.setUseOverApproximationEnabled(false);
+                q.setUseUnderApproximationEnabled(false);
             }
         }
         String message = "";
