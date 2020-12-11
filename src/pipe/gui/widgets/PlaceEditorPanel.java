@@ -672,12 +672,14 @@ public class PlaceEditorPanel extends JPanel {
             v.clear();
             v.add(new NumberOfExpression(newMarking, cv));
         }
-
-        AddExpression newExpression = new AddExpression(v);
-        ColorMultiset cm = newExpression.eval(context.network().getContext());
-        if(cm != null){
-            for (TimedToken ctElement : cm.getTokens(place.underlyingPlace())) {
-                tokensToAdd.add(ctElement);
+        AddExpression newExpression = null;
+        if(!v.isEmpty()){
+            newExpression = new AddExpression(v);
+            ColorMultiset cm = newExpression.eval(context.network().getContext());
+            if(cm != null){
+                for (TimedToken ctElement : cm.getTokens(place.underlyingPlace())) {
+                    tokensToAdd.add(ctElement);
+                }
             }
         }
 
