@@ -6,8 +6,10 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Variable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 public class AllExpression extends ColorExpression {
 
@@ -116,5 +118,20 @@ public class AllExpression extends ColorExpression {
             return expr.sort.equals(this.sort);
         }
         return false;
+    }
+
+    @Override
+    public boolean isComparable(ColorExpression otherExpr){
+        return false;
+    }
+
+    @Override
+    public ColorExpression getButtomColorExpression(){
+        return this;
+    }
+
+    @Override
+    public Vector<ColorType> getColorTypes(){
+        return new Vector<>(Arrays.asList(sort));
     }
 }

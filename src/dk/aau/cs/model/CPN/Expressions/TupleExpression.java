@@ -97,6 +97,25 @@ public class TupleExpression extends ColorExpression {
 
         return  null;
     }
+    @Override
+    public boolean isComparable(ColorExpression otherExpr){
+        otherExpr = otherExpr.getButtomColorExpression();
+        if(!(otherExpr instanceof TupleExpression)){
+            return false;
+        }
+        TupleExpression otherTupleExpression = (TupleExpression) otherExpr;
+
+        if(otherTupleExpression.getColors().size() != getColors().size()){
+            return false;
+        }
+
+        for(int i = 0; i < getColors().size(); i++){
+            if(!getColors().get(i).isComparable(otherTupleExpression.getColors().get(i))){
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void addColorExpression(ColorExpression expr) {
         colors.add(expr);
@@ -221,5 +240,20 @@ public class TupleExpression extends ColorExpression {
         }
 
         return children;
+    }
+
+    @Override
+    public ColorExpression getButtomColorExpression(){
+        return this;
+    }
+
+    @Override
+    public Vector<ColorType> getColorTypes(){
+        Vector<ColorType> constituentColorTypes = new Vector<ColorType>();
+        //assumes single level producttypes
+        for(ColorExpression uexpr : getColors()){
+            constituentColorTypes.addAll(uexpr.getColorTypes());
+        }
+        return constituentColorTypes;
     }
 }

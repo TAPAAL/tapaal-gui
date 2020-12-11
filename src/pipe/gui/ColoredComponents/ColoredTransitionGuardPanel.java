@@ -1,6 +1,5 @@
 package pipe.gui.ColoredComponents;
 
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
@@ -9,13 +8,12 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedTransition;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 
 import javax.swing.*;
@@ -106,7 +104,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
-        editExprButton.setEnabled(false);
         undoManager = new ColoredTransitionGuardPanel.ExpressionConstructionUndoManager();
         undoSupport = new UndoableEditSupport();
         undoSupport.addUndoableEditListener(new ColoredTransitionGuardPanel.UndoAdapter());
@@ -688,11 +685,37 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         });
 
         resetExprButton.addActionListener(actionEvent -> {
-            PlaceHolderGuardExpression phGuard = new PlaceHolderGuardExpression();
-            UndoableEdit edit = new ExpressionConstructionEdit(newProperty, phGuard);
-            newProperty = newProperty.replace(newProperty, phGuard);
-            updateSelection(phGuard);
-            undoSupport.postEdit(edit);
+            if (exprField.isEditable()) {
+                GuardExpression newExpression = null;
+                try {
+                    newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
+                } catch (Throwable ex) {
+                    int choice = JOptionPane.showConfirmDialog(
+                        CreateGui.getApp(),
+                        "TAPAAL encountered an error trying to parse the specified Expression with the following error: \n\n" + ex.getMessage()+ ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
+                        "Error Parsing Expression",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE);
+                    System.out.println(ex.getMessage());
+                    if (choice == JOptionPane.NO_OPTION)
+                        returnFromManualEdit(null);
+                    else
+                        return;
+                }
+                if(newExpression != null){
+                    UndoableEdit edit = new ExpressionConstructionEdit(newProperty, newExpression);
+                    returnFromManualEdit(newExpression);
+                    undoSupport.postEdit(edit);
+                }else{
+                    returnFromManualEdit(null);
+                }
+            } else {
+                PlaceHolderGuardExpression phGuard = new PlaceHolderGuardExpression();
+                UndoableEdit edit = new ExpressionConstructionEdit(newProperty, phGuard);
+                newProperty = newProperty.replace(newProperty, phGuard);
+                updateSelection(phGuard);
+                undoSupport.postEdit(edit);
+            }
         });
 
         undoButton.addActionListener(e -> {
@@ -704,7 +727,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 undoManager.undo();
                 refreshUndoRedo();
                 updateSelection(original);
-                //queryChanged();
             }
         });
 
@@ -716,7 +738,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 undoManager.redo();
                 refreshUndoRedo();
                 updateSelection(replacement);
-                //queryChanged();
             }
         });
 
@@ -789,28 +810,27 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             }
         });
 
-        exprField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-        });
-
         exprField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!exprField.isEditable()) {
-                    //TODO: see line 1232 in CTLQueryDialog for impl example.
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE
+                        || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                        deleteSelection();
+                    }else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
+                        e.consume();
+                        int position = exprField.getSelectionEnd();
+                        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                            position = exprField.getSelectionStart();
+                        }
+                        changeToEditMode();
+                        exprField.setCaretPosition(position);
+                    }
+                } else {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                        resetExprButton.doClick(); // we are in manual edit mode, so the reset button is now the Parse Expr button
+                        e.consume();
+                    }
                 }
             }
         });
@@ -971,18 +991,44 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         return new PlaceHolderGuardExpression();
     }
-    //TODO: implement properly
+
     private void returnFromManualEdit(GuardExpression newExpr) {
         setExprFieldEditable(false);
-        //  if (newExpr)
+        deleteExprSelectionButton.setEnabled(true);
+        if (newExpr != null)
+            newProperty = newExpr;
+
+        updateSelection(newProperty);
+        resetExprButton.setText("Reset Expression");
+        editExprButton.setText("Edit Expression");
+
+        /*resetExprButton.setToolTipText(TOOL_TIP_RESETBUTTON);
+        editExprButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);*/
+        updateEnabledButtons();
     }
 
     private void changeToEditMode() {
         setExprFieldEditable(true);
-        resetExprButton.setText("Parse Query");
+        deleteExprSelectionButton.setEnabled(false);
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        andButton.setEnabled(false);
+        orButton.setEnabled(false);
+        notButton.setEnabled(false);
+        equalityButton.setEnabled(false);
+        inequalityButton.setEnabled(false);
+        greaterThanButton.setEnabled(false);
+        greaterThanEqButton.setEnabled(false);
+        lessThanEqButton.setEnabled(false);
+        lessThanButton.setEnabled(false);
+        succButton.setEnabled(false);
+        predButton.setEnabled(false);
+        colorCombobox.setEnabled(false);
+        colorTypeCombobox.setEnabled(false);
+        addColorButton.setEnabled(false);
+        resetExprButton.setText("Parse Expression");
         editExprButton.setText("Cancel");
         clearSelection();
-        //TODO:disable buttons not needed in edit mode
         exprField.setCaretPosition(exprField.getText().length());
     }
 
@@ -1009,36 +1055,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             cmd.redo();
             undoManager.addEdit(cmd);
         }
-        /*if (urgentCheckBox.isSelected()) {
-            List<TimedInputArc> oldInputArcs = transition.underlyingTransition().getInputArcs();
-            List<TimedInputArc> newInputArcs = new ArrayList<TimedInputArc>();
-            List<TransportArc> oldTransportArcs = transition.underlyingTransition().getTransportArcsGoingThrough();
-            List<TransportArc> newTransportArcs = new ArrayList<TransportArc>();
-
-            for (TransportArc transportArc : oldTransportArcs) {
-                ColoredTransportArc coloredTransportArc = (ColoredTransportArc) transportArc;
-                coloredTransportArc.setCtiList(new ArrayList<ColoredTimeInterval>(){{add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));}});
-                newTransportArcs.add(coloredTransportArc);
-            }
-
-            for (TimedInputArc oldInputArc : oldInputArcs) {
-                ColoredInputArc coloredInputArc = (ColoredInputArc) oldInputArc;
-                List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>() {{add(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR));}};
-                coloredInputArc.setColorTimeIntervals(ctiList);
-                newInputArcs.add(coloredInputArc);
-            }
-
-            for (int i = 0; i < newTransportArcs.size(); i++) {
-                transition.underlyingTransition().removeTransportArcGoingThrough(oldTransportArcs.get(i));
-                transition.underlyingTransition().addTransportArcGoingThrough(newTransportArcs.get(i));
-            }
-
-            for (int i = 0; i <  newInputArcs.size(); i++) {
-                transition.underlyingTransition().removeFromPreset(oldInputArcs.get(i));
-                transition.underlyingTransition().addToPreset(newInputArcs.get(i));
-            }
-        }*/
-        //context.tabContent().network().paintNet();
     }
 
     private void parseExpression(GuardExpression expression) {

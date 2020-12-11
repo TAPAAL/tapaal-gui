@@ -6,10 +6,12 @@ import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
 import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
 import dk.aau.cs.gui.undo.Colored.SetTransportArcExpressionsCommand;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.CPN.ArcExpressionParser.ArcExpressionParser;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -17,6 +19,7 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
 import net.tapaal.swinghelpers.GridBagHelper;
+import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
@@ -78,7 +81,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
-        editExprButton.setEnabled(false);
         undoManager = new ColoredArcGuardPanel.ExpressionConstructionUndoManager();
         undoSupport = new UndoableEditSupport();
         undoSupport.addUndoableEditListener(new ColoredArcGuardPanel.UndoAdapter());
@@ -400,15 +402,47 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         editButtonsGroup.add(undoButton);
         editButtonsGroup.add(redoButton);
         editButtonsGroup.add(editExprButton);
-
+        editExprButton.addActionListener(actionEvent -> {
+            if (exprField.isEditable()) {
+                returnFromManualEdit(null);
+            } else {
+                changeToEditMode();
+            }
+        });
         deleteExprSelectionButton.addActionListener(actionEvent -> deleteSelection());
 
         resetExprButton.addActionListener(actionEvent -> {
-            PlaceHolderArcExpression pHExpr = new PlaceHolderArcExpression();
-            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), pHExpr);
-            arcExpression = arcExpression.replace(arcExpression, pHExpr);
-            updateSelection(pHExpr);
-            undoSupport.postEdit(edit);
+            if (exprField.isEditable()) {
+                ArcExpression newExpression = null;
+                try {
+                    newExpression = ArcExpressionParser.parse(exprField.getText(), colorType,context.network());
+                } catch (Throwable ex) {
+                    int choice = JOptionPane.showConfirmDialog(
+                        CreateGui.getApp(),
+                        "TAPAAL encountered an error trying to parse the specified expression with the following error: \n\n" + ex.getMessage() + ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
+                        "Error Parsing Expression",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE);
+                    System.out.println(ex.getMessage());
+                    if (choice == JOptionPane.NO_OPTION)
+                        returnFromManualEdit(null);
+                    else
+                        return;
+                }
+                if (newExpression != null) {
+                    UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(arcExpression, newExpression);
+                    returnFromManualEdit(newExpression);
+                    undoSupport.postEdit(edit);
+                } else {
+                    returnFromManualEdit(null);
+                }
+            }else{
+                PlaceHolderArcExpression pHExpr = new PlaceHolderArcExpression();
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), pHExpr);
+                arcExpression = arcExpression.replace(arcExpression, pHExpr);
+                updateSelection(pHExpr);
+                undoSupport.postEdit(edit);
+            }
         });
         undoButton.addActionListener(e -> {
             UndoableEdit edit = undoManager.GetNextEditToUndo();
@@ -472,7 +506,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         arithmeticPanel.setBorder(BorderFactory.createTitledBorder("Arithmetic Operators"));
 
         additionButton = new JButton("Addition");
-        addAdditionPlaceHolderButton = new JButton("Add Placeholder");
         subtractionButton = new JButton("Subtraction");
         scalarButton = new JButton("Scalar");
 
@@ -500,7 +533,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         scalarButton.setMinimumSize(new Dimension(110, 30));
         scalarButton.setMaximumSize(new Dimension(110, 30));
 
-        addAdditionPlaceHolderButton.setPreferredSize(new Dimension(150, 30));
 
         additionButton.addActionListener(actionEvent -> {
             AddExpression addExpr;
@@ -548,28 +580,12 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             }
         });
 
-        addAdditionPlaceHolderButton.addActionListener(actionEvent -> {
-            if (currentSelection.getObject() instanceof AddExpression) {
-                AddExpression addExpr = (AddExpression) currentSelection.getObject();
-                Vector<ArcExpression> vecExpr =  addExpr.getAddExpression();
-                vecExpr.add(new PlaceHolderArcExpression());
-                addExpr = new AddExpression(vecExpr);
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
-                updateSelection(addExpr);
-                undoSupport.postEdit(edit);
-            }
-        });
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 0,0, 0);
         gbc.anchor = GridBagConstraints.WEST;
         arithmeticPanel.add(additionButton, gbc);
-
-        gbc.gridy = 1;
-        arithmeticPanel.add(addAdditionPlaceHolderButton, gbc);
 
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setEnabled(true);
@@ -677,9 +693,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
         JScrollPane exprScrollPane = new JScrollPane(exprField);
         exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        Dimension d = new Dimension(880, 80);
+        Dimension d = new Dimension(100, 80);
         exprScrollPane.setPreferredSize(d);
-        exprScrollPane.setMinimumSize(d);
 
         exprField.addMouseListener(new MouseAdapter() {
             @Override
@@ -688,38 +703,29 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                     updateSelection();
                 }
             }
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
-                    if(currentSelection.getObject() instanceof ColorExpression){
-                        editColorExpressionButton.doClick();
-                    }
-                }
-            }
-        });
-
-        exprField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                //TODO: setSaveButtonsEnabled()
-            }
         });
 
         exprField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!exprField.isEditable()) {
-                    //TODO: see line 1232 in CTLQueryDialog for impl example.
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE
+                        || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                        deleteSelection();
+                    }else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
+                        e.consume();
+                        int position = exprField.getSelectionEnd();
+                        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                            position = exprField.getSelectionStart();
+                        }
+                        changeToEditMode();
+                        exprField.setCaretPosition(position);
+                    }
+                } else {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                        resetExprButton.doClick(); // we are in manual edit mode, so the reset button is now the Parse Expr button
+                        e.consume();
+                    }
                 }
             }
         });
@@ -1001,19 +1007,15 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
         }
         if (currentSelection.getObject() instanceof ColorExpression) {
             addExpressionButton.setEnabled(true);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             succButton.setEnabled(true);
             predButton.setEnabled(true);
         }
@@ -1021,11 +1023,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             addExpressionButton.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
             scalarButton.setEnabled(false);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof ArcExpression) {
             addExpressionButton.setEnabled(true);
@@ -1034,7 +1034,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             scalarButton.setEnabled(true);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addAdditionPlaceHolderButton.setEnabled(false);
         }
         if(arcExpression.containsPlaceHolder()){
             disableOkButton();
@@ -1123,6 +1122,52 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         return null;
     }
 
+    private void returnFromManualEdit(ArcExpression newExpr) {
+        setExprFieldEditable(false);
+        deleteExprSelectionButton.setEnabled(true);
+        if (newExpr != null)
+            arcExpression = newExpr;
+
+        updateSelection(arcExpression);
+        resetExprButton.setText("Reset Expression");
+        editExprButton.setText("Edit Expression");
+
+        /*resetExprButton.setToolTipText(TOOL_TIP_RESETBUTTON);
+        editExprButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);*/
+        toggleEnabledButtons();
+    }
+
+    private void changeToEditMode() {
+        setExprFieldEditable(true);
+        deleteExprSelectionButton.setEnabled(false);
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        //allExpressionButton.setEnabled(false);
+        addExpressionButton.setEnabled(false);
+        additionButton.setEnabled(false);
+        subtractionButton.setEnabled(false);
+        scalarButton.setEnabled(false);
+        succButton.setEnabled(false);
+        predButton.setEnabled(false);
+        succButton.setEnabled(false);
+        predButton.setEnabled(false);;
+        resetExprButton.setText("Parse Expression");
+        editExprButton.setText("Cancel");
+        clearSelection();
+        exprField.setCaretPosition(exprField.getText().length());
+    }
+    private void setExprFieldEditable(boolean isEditable) {
+        exprField.setEditable(isEditable);
+        exprField.setFocusable(false);
+        exprField.setFocusable(true);
+        exprField.requestFocus(true);
+    }
+    private void clearSelection() {
+        exprField.select(0, 0);
+        currentSelection = null;
+
+    }
+
     public abstract void disableOkButton();
     public abstract void enableOkButton();
 
@@ -1149,7 +1194,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     JButton redoButton;
     JButton editExprButton;
     JButton additionButton;
-    JButton addAdditionPlaceHolderButton;
     JButton subtractionButton;
     JButton scalarButton;
     JButton addExpressionButton;

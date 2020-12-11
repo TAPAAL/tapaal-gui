@@ -89,4 +89,18 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
             return false;
         }
     }
+
+    @Override
+    public boolean isComparable(ColorExpression otherExpr){
+        return false;
+    }
+
+    @Override
+    public ColorExpression getButtomColorExpression(){
+        return this;
+    }
+    @Override
+    public Vector<ColorType> getColorTypes(){
+        return new Vector<>();
+    }
 }
