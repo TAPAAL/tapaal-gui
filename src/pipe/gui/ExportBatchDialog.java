@@ -236,10 +236,10 @@ public class ExportBatchDialog extends JDialog {
 		});
 		chooserPanel.add(destinationPathSelector, gbc);
 
-        String[] options = new String[] {
+        final String[] options = new String[] {
             "PNML and XML queries (verifypn)",
-            "Continuous Engine (verifytapn)",
-            "Discrete Engine (verifydtapn)"
+            "Continuous Engine model and queries (verifytapn)",
+            "Discrete Engine model and queries (verifydtapn)"
         };
 		selectedEngine = new JComboBox(options);
 		selectedEngine.setToolTipText(TOOL_TIP_SelectedEngineComboBox);
@@ -516,7 +516,13 @@ public class ExportBatchDialog extends JDialog {
 	
 	private void exportModel(File file, Path path) throws Exception {
         LoadedModel loadedModel = loader.load(file);
-        Collection<TAPNQuery> queries = (uniqueQueryNames.isSelected() ? renameQueries(file.getName(), loadedModel.queries()) : loadedModel.queries());
+        Collection<TAPNQuery> queries;
+
+        if (uniqueQueryNames.isSelected()) {
+            queries =  renameQueries(file.getName(), loadedModel.queries());
+        } else {
+            queries = loadedModel.queries();
+        }
 
         switch (selectedEngine.getSelectedIndex()) {
             case 0:
@@ -524,10 +530,10 @@ public class ExportBatchDialog extends JDialog {
                 Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", queries);
                 break;
             case 1:
-                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query.q", false);
+                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query", false);
                 break;
             case 2:
-                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query.q", true);
+                Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query", true);
                 break;
         }
 	}

@@ -140,43 +140,18 @@ public class Export {
 
         TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions());
 
-        dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
         for (TAPNQuery query : queries) {
-            queriesArray[i] = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0);
-            queriesArray[i].getProperty().accept(visitor, null);
+            query.getProperty().accept(visitor, null);
             i++;
+
+            if (lens.isGame() && isDTAPN) {
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), lens);
+            } else {
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), new TabContent.TAPNLens(true, false));
+            }
         }
-
-        if (lens.isGame() && isDTAPN) {
-            exporter.export(model, queriesArray, new File(modelFile), new File(queryFile), lens);
-        } else {
-            exporter.export(model, queriesArray, new File(modelFile), new File(queryFile), new TabContent.TAPNLens(true, false));
-        }
-    }
-
-    public static void toVerifyPN(String modelFile, String queryFile) {
-        VerifyPNExporter exporter = new VerifyPNExporter();
-        TabContent currentTab = CreateGui.getCurrentTab();
-
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(currentTab.network());
-        TimedArcPetriNet model = transformedModel.value1();
-
-        TabContent.TAPNLens lens = currentTab.getLens();
-
-        Iterable<TAPNQuery> queries = currentTab.queries();
-        dk.aau.cs.model.tapn.TAPNQuery[] queriesArray = new dk.aau.cs.model.tapn.TAPNQuery[100];
-        RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
-        int i = 0;
-        for (TAPNQuery query : queries) {
-            queriesArray[i] = new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0);
-            queriesArray[i].getProperty().accept(visitor, null);
-            i++;
-        }
-
-        exporter.export(model, queriesArray, new File(modelFile), new File(queryFile), lens);
     }
 
 	public static void toPostScript(Object g, String filename)

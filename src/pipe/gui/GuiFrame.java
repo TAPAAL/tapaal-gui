@@ -176,7 +176,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::importTrace);
         }
     };
-    private final GuiAction exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
+    private final GuiAction exportBatchAction = new GuiAction("Batch Export of model and queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
         public void actionPerformed(ActionEvent e) {
             ExportBatchDialog.ShowExportBatchDialog();
         }
