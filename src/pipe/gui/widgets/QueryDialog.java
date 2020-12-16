@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
+import javax.swing.event.*;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -814,7 +811,7 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton.setEnabled(isQueryOk);
 			saveUppaalXMLButton.setEnabled(isQueryOk);
 			mergeNetComponentsButton.setEnabled(isQueryOk);
-            openReducedNetButton.setEnabled(isQueryOk);
+            openReducedNetButton.setEnabled(isQueryOk && useReduction.isSelected());
 		} else {
 			saveButton.setEnabled(false);
 			saveAndVerifyButton.setEnabled(false);
@@ -2687,6 +2684,13 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed() || lens.isGame()) {
             initTimedReductionOptions();
         } else {
+            useReduction.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                        openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0
+                            && !newProperty.containsPlaceHolder());
+                }
+            });
             initUntimedReductionOptions();
         }
 
