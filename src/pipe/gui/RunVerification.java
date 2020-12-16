@@ -11,13 +11,7 @@ import java.awt.event.HierarchyListener;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -220,6 +214,43 @@ public class RunVerification extends RunVerificationBase {
 		return fullPanel;
 	}
 
+    private JPanel createRawQueryPanel(final String rawOutput) {
+        final JPanel fullPanel = new JPanel(new GridBagLayout());
+
+        JTextArea rawQueryLabel = new JTextArea(rawOutput);
+        rawQueryLabel.setEditable(false); // set textArea non-editable
+        JScrollPane scroll = new JScrollPane(rawQueryLabel);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setPreferredSize(new Dimension(640,400));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        fullPanel.add(scroll, gbc);
+
+        // Make window resizeable
+        fullPanel.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                //when the hierarchy changes get the ancestor for the message
+                Window window = SwingUtilities.getWindowAncestor(fullPanel);
+                //check to see if the ancestor is an instance of Dialog and isn't resizable
+                if (window instanceof Dialog) {
+                    Dialog dialog = (Dialog) window;
+                    if (!dialog.isResizable()) {
+                        //set resizable to true
+                        dialog.setResizable(true);
+                    }
+                }
+            }
+        });
+
+        return fullPanel;
+    }
+
 	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
 		List<Tuple<String, Integer>> transistionStats = result.getTransitionStatistics();
 		Object[][] out = new Object[transistionStats.size()][2];
@@ -283,11 +314,23 @@ public class RunVerification extends RunVerificationBase {
 				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 5;
+				gbc.gridy = 6;
 				gbc.insets = new Insets(0,0,20,-90);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(reductionStatsLabet, gbc);
 			}
+            if (result.getRawOutput() != null) {
+                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton.addActionListener(arg0 -> {
+                        JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE);
+                });
+                gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 5;
+                gbc.insets = new Insets(10,0,10,0);
+                gbc.anchor = GridBagConstraints.WEST;
+                panel.add(showRawQueryButton, gbc);
+            }
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
             displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
 
@@ -296,7 +339,7 @@ public class RunVerification extends RunVerificationBase {
 		if(result.isSolvedUsingStateEquation()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 5;
+			gbc.gridy = 6;
 			gbc.insets = new Insets(0,0,15,0);
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
@@ -304,14 +347,14 @@ public class RunVerification extends RunVerificationBase {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 7;
+		gbc.gridy = 8;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
