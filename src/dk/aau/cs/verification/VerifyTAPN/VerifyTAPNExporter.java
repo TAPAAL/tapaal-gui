@@ -30,10 +30,10 @@ public class VerifyTAPNExporter {
 		}
 		
 
-		return export(model, query, modelFile, queryFile, null, lens);
+		return export(model, query, modelFile, queryFile, lens);
 	}
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, TabContent.TAPNLens lens) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
@@ -44,16 +44,16 @@ public class VerifyTAPNExporter {
 			modelStream.close();
 
 			PrintStream queryStream = new PrintStream(queryFile);
-			if (query.getCategory() == QueryCategory.CTL){
-			    CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-			    queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-			} else if (lens != null && lens.isGame()) {
-			    queryStream.append("control: " + query.getProperty().toString());
+            if (query == null) {
+                throw new FileNotFoundException(null);
+            } else if (query.getCategory() == QueryCategory.CTL) {
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            } else if (lens != null && lens.isGame()) {
+                queryStream.append("control: " + query.getProperty().toString());
             } else {
                 queryStream.append(query.getProperty().toString());
             }
-
-			
 			queryStream.close();
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");

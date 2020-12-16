@@ -3049,10 +3049,10 @@ public class QueryDialog extends JPanel {
                         }
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens);
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), lens);
 						} else if(reduction == ReductionOption.VerifyPN){
 							VerifyPNExporter exporter = new VerifyPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens);
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), lens);
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
