@@ -18,8 +18,10 @@ import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
@@ -27,6 +29,7 @@ import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.WorkflowDialog;
@@ -173,7 +176,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::importTrace);
         }
     };
-    private final GuiAction exportBatchAction = new GuiAction("Batch Export to PNML and XML Queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
+    private final GuiAction exportBatchAction = new GuiAction("Batch Export of model and queries", "Export multiple nets into PNML together with the XML queries, while removing the timing information", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
         public void actionPerformed(ActionEvent e) {
             ExportBatchDialog.ShowExportBatchDialog();
         }
@@ -1380,12 +1383,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         exportMenu.add(exportPSAction);
 
-
         exportMenu.add(exportToTikZAction);
 
-
         exportMenu.add(exportToPNMLAction);
-
 
         exportMenu.add(exportToXMLAction);
 
