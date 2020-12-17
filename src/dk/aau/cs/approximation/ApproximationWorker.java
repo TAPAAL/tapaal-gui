@@ -308,7 +308,8 @@ public class ApproximationWorker {
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
 					result.verificationTime(),
 					result.stats(),
-					result.isSolvedUsingStateEquation());
+					result.isSolvedUsingStateEquation(),
+                    result.getRawOutput());
 			toReturn.setNameMapping(transformedModel.value2());
 		}
 		
@@ -468,7 +469,6 @@ public class ApproximationWorker {
 						verificationResult.stats(),
 						verificationResult.isSolvedUsingStateEquation());
 				    value.setNameMapping(composedModel.value2());
-					
 				}
 	        }
 	    } 

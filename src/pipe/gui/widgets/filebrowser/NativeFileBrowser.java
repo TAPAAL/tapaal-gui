@@ -29,7 +29,7 @@ class NativeFileBrowser extends FileBrowser {
 		//if(path == null) path = lastPath;
 
 		this.ext = ext;
-                this.optionalExt = optionalExt;
+        this.optionalExt = optionalExt;
 		//fc.setDirectory(path);
 
 		// Setup filter if extension specified

@@ -19,7 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Iterator;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -33,6 +34,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.VerifyTAPN.ExportedVerifyTAPNModel;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.DOMException;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
@@ -49,6 +57,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**
@@ -58,69 +67,92 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
  */
 public class Export {
 
-	public static final int PNG = 1;
-	public static final int POSTSCRIPT = 2;
-	public static final int PRINTER = 3;
-	public static final int TIKZ = 5;
-	public static final int PNML = 6;
-	public static final int QUERY = 7;	
+    public static final int PNG = 1;
+    public static final int POSTSCRIPT = 2;
+    public static final int PRINTER = 3;
+    public static final int TIKZ = 5;
+    public static final int PNML = 6;
+    public static final int QUERY = 7;
 
-	private static void toPnml(DrawingSurfaceImpl g, String filename)
-			throws NullPointerException, DOMException, TransformerConfigurationException, 
-			IOException, ParserConfigurationException, TransformerException {
-		TabContent currentTab = CreateGui.getCurrentTab();
-		NetworkMarking currentMarking = null;
-		if(CreateGui.getCurrentTab().isInAnimationMode()){
-			currentMarking = currentTab.network().marking();
-			currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
-		}
+    private static void toPnml(DrawingSurfaceImpl g, String filename)
+        throws NullPointerException, DOMException, TransformerConfigurationException,
+        IOException, ParserConfigurationException, TransformerException {
+        TabContent currentTab = CreateGui.getCurrentTab();
+        NetworkMarking currentMarking = null;
+        if (CreateGui.getCurrentTab().isInAnimationMode()) {
+            currentMarking = currentTab.network().marking();
+            currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
+        }
 
-		NetWriter tapnWriter = new PNMLWriter(
-				currentTab.network(),
-				currentTab.getGuiModels()
-				);
+        NetWriter tapnWriter = new PNMLWriter(
+            currentTab.network(),
+            currentTab.getGuiModels()
+        );
 
-		tapnWriter.savePNML(new File(filename));
+        tapnWriter.savePNML(new File(filename));
 
-		if(CreateGui.getCurrentTab().isInAnimationMode()){
-			currentTab.network().setMarking(currentMarking);
-		}
-	}
-	
-	private static void toQueryXML(String filename){
-		toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries());
-		
-	}
-	
-	public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries){
-		try{
-	            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
-	            NameMapping mapping = composer.transformModel(network).value2();
-	            Iterator<TAPNQuery> queryIterator = queries.iterator();
-	            PrintStream queryStream = new PrintStream(filename);
-	            CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-	            
-	            while(queryIterator.hasNext()){
-	                TAPNQuery clonedQuery = queryIterator.next().copy();
+        if (CreateGui.getCurrentTab().isInAnimationMode()) {
+            currentTab.network().setMarking(currentMarking);
+        }
+    }
 
-                            // Attempt to parse and possibly transform the string query using the manual edit parser
-                            TCTLAbstractProperty newProperty;
-                            try {
-                                newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
-                            } catch (Throwable ex) {
-                                newProperty = clonedQuery == null ? new TCTLPathPlaceHolder() : clonedQuery.getProperty();
-                            }
-                            newProperty.accept(new RenameAllPlacesVisitor(mapping), null);
-                            newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
-                            XMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
-	            }
-	            queryStream.print(XMLVisitor.getFormatted());
-				
-				queryStream.close();
-		} catch(FileNotFoundException e) {
-			System.err.append("An error occurred while exporting the queries to XML.");
-		}
-	}
+    private static void toQueryXML(String filename) {
+        toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries());
+
+    }
+
+    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries) {
+        try {
+            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
+            NameMapping mapping = composer.transformModel(network).value2();
+            Iterator<TAPNQuery> queryIterator = queries.iterator();
+            PrintStream queryStream = new PrintStream(filename);
+            CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+
+            while (queryIterator.hasNext()) {
+                TAPNQuery clonedQuery = queryIterator.next().copy();
+
+                // Attempt to parse and possibly transform the string query using the manual edit parser
+                TCTLAbstractProperty newProperty;
+                try {
+                    newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
+                } catch (Throwable ex) {
+                    newProperty = clonedQuery == null ? new TCTLPathPlaceHolder() : clonedQuery.getProperty();
+                }
+                newProperty.accept(new RenameAllPlacesVisitor(mapping), null);
+                newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
+                XMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+            }
+            queryStream.print(XMLVisitor.getFormatted());
+
+            queryStream.close();
+        } catch (FileNotFoundException e) {
+            System.err.append("An error occurred while exporting the queries to XML.");
+        }
+    }
+
+	public static void toVerifyTAPN(TimedArcPetriNetNetwork network, Iterable<TAPNQuery> queries, String modelFile, String queryFile, boolean isDTAPN) {
+        VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+
+        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
+        TimedArcPetriNet model = transformedModel.value1();
+
+        TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions());
+
+        RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
+        int i = 0;
+        for (TAPNQuery query : queries) {
+            query.getProperty().accept(visitor, null);
+            i++;
+
+            if (lens.isGame() && isDTAPN) {
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2());
+            } else {
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TabContent.TAPNLens(true, false), transformedModel.value2());
+            }
+        }
+    }
 
 	public static void toPostScript(Object g, String filename)
 			throws PrintException, IOException {
@@ -187,24 +219,23 @@ public class Export {
 				// dot is for extension
 				filename = filename.substring(0, dotpos + 1);
 				switch (format) {
-				case PNG:
-					filename += "png";
-					break;
-				case POSTSCRIPT:
-					filename += "ps";
-					break;
-				case TIKZ:
-					filename += "tex";
-					break;
-				case PNML:
-					filename += "pnml";
-					break;
-				case QUERY:
-					filename = filename.substring(0, dotpos);
-					filename += "-queries.xml";
-					break;
-				}
-				
+                    case PNG:
+                        filename += "png";
+                        break;
+                    case POSTSCRIPT:
+                        filename += "ps";
+                        break;
+                    case TIKZ:
+                        filename += "tex";
+                        break;
+                    case PNML:
+                        filename += "pnml";
+                        break;
+                    case QUERY:
+                        filename = filename.substring(0, dotpos);
+                        filename += "-queries.xml";
+                        break;
+                }
 			}
 		}
 
@@ -266,7 +297,7 @@ public class Export {
 				}
 				break;
 			}
-		} catch (Exception e) {
+        } catch (Exception e) {
 			// There was some problem with the action
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"There were errors performing the requested action:\n" + e,
