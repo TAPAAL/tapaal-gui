@@ -64,23 +64,33 @@ public class TimedArcPetriNet {
             }
         }
 	    for(TimedInputArc arc : inputArcs){
-	        arc.expression.getValues(values);
+	        if(arc.getArcExpression() != null){
+                arc.getArcExpression().getValues(values);
+            }
 	        if(!arc.getColorTimeIntervals().isEmpty()){
 	            return true;
             }
         }
         for(TimedOutputArc arc : outputArcs){
-            arc.getExpression().getValues(values);
+            if(arc.getExpression() != null){
+                arc.getExpression().getValues(values);
+            }
         }
         for(TimedInhibitorArc arc : inhibitorArcs){
-            arc.expression.getValues(values);
+            if(arc.getArcExpression() != null){
+                arc.getArcExpression().getValues(values);
+            }
         }
         for(TransportArc arc : transportArcs){
             if(!arc.getColorTimeIntervals().isEmpty()){
                 return true;
             }
-            arc.getInputExpression().getValues(values);
-            arc.getOutputExpression().getValues(values);
+            if(arc.getInputExpression() != null){
+                arc.getInputExpression().getValues(values);
+            }
+            if(arc.getOutputExpression() != null){
+                arc.getOutputExpression().getValues(values);
+            }
         }
         if(!values.getColors().isEmpty() || !values.getColorTypes().isEmpty() || !values.getVariables().isEmpty()){
             return true;

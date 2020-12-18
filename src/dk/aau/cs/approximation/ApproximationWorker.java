@@ -32,16 +32,14 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 
 public class ApproximationWorker {
 	public VerificationResult<TAPNNetworkTrace> normalWorker(
-			VerificationOptions options,
-			ModelChecker modelChecker,
-			Tuple<TimedArcPetriNet, NameMapping> transformedModel,
-			ITAPNComposer composer,
-			TAPNQuery clonedQuery,
-			RunVerificationBase verificationBase,
-			TimedArcPetriNetNetwork model,
-            String modelOut,
-            String queryOut
-	) throws Exception {
+        VerificationOptions options,
+        ModelChecker modelChecker,
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel,
+        ITAPNComposer composer,
+        TAPNQuery clonedQuery,
+        RunVerificationBase verificationBase,
+        TimedArcPetriNetNetwork model,
+        String queryPath) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;
@@ -56,11 +54,9 @@ public class ApproximationWorker {
 		
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
 		VerificationResult<TimedArcPetriNetTrace> result;
-        if(model.isColored()) {
-            result = modelChecker.verify(options, transformedModel, clonedQuery, modelOut, queryOut);
-        }else {
-            result = modelChecker.verify(options, transformedModel, clonedQuery);
-        }
+
+		result = modelChecker.verify(options, transformedModel, clonedQuery, queryPath);
+
 
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);
@@ -110,7 +106,7 @@ public class ApproximationWorker {
 			
 						// run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, null);
 
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
@@ -254,7 +250,7 @@ public class ApproximationWorker {
 			
 						//run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, null);
 
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
@@ -360,7 +356,7 @@ public class ApproximationWorker {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, null);
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
@@ -412,7 +408,7 @@ public class ApproximationWorker {
 
 	                //run model checker again for trace TAPN
 	                MemoryMonitor.cumulateMemory();
-	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, null);
 
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
@@ -541,7 +537,7 @@ public class ApproximationWorker {
 	        
 	                    //run model checker again for trace TAPN
 	                    MemoryMonitor.cumulateMemory();
-	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, null);
 
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);

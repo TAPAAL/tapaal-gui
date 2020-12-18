@@ -17,11 +17,10 @@ public interface ModelChecker {
 
 	String getPath(); // TODO: MJ -- Delete me when refactoring is done
 
-	VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception;
+	VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String queryPath) throws Exception;
 
-    VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception;
 
-	void kill();
+    void kill();
 
 	boolean supportsStats();
 	boolean supportsModel(TimedArcPetriNet model, VerificationOptions options);

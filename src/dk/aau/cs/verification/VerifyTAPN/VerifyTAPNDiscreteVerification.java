@@ -5,22 +5,12 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.ExecutabilityChecker;
-import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.UnsupportedModelException;
-import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.ProcessRunner;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.Stats;
-import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.util.*;
+import dk.aau.cs.verification.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -260,7 +250,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String queryPath) throws Exception {
 		if (!supportsModel(model.value1(), options)) {
 			throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 		}
@@ -280,7 +270,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
         }
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens());
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(), queryPath);
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
@@ -289,37 +279,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		return verify(options, model, exportedModel, query);
 	}
 
-    @SuppressWarnings("Duplicates")
-    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception {
-        ((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
-        VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-        ExportedVerifyTAPNModel exportedModel = null;
-        runner = new ProcessRunner(verifydtapnpath, createArgumentString(modelOut, queryOut, options));
-        runner.run();
-        if (runner.error()) {
-            return null;
-        } else {
-            String errorOutput = readOutput(runner.errorOutput());
-            String standardOutput = readOutput(runner.standardOutput());
-
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
-
-            if (queryResult == null || queryResult.value1() == null) {
-                return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
-            } else {
-                // Parse covered trace
-                TimedArcPetriNetTrace secondaryTrace = null;
-                if (queryResult.value2().getCoveredMarking() != null) {
-                    secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
-                }
-
-                TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
-                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false);
-            }
-        }
-    }
-
-	//An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
+    //An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
 	private void addGhostPlace(TimedArcPetriNet net) {
 	    TimedPlace place = new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
 	    net.add(place);

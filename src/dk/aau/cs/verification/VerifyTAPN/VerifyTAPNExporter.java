@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
@@ -35,16 +36,21 @@ public class VerifyTAPNExporter {
 		return export(model, query, modelFile, queryFile, null, lens);
 	}
 
+    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, String queryPath) {
+        if(queryPath == null || queryPath.isEmpty()){
+            return export(model, query, lens);
+        } else {
+            File modelFile = createTempFile(".xml");
+            this.model = model;
+            return export(model, query, modelFile, queryPath, null, lens);
+        }
+    }
+
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
-		if (modelFile == null || queryFile == null)
+		if (queryFile == null)
 			return null;
 
 		try{
-			PrintStream modelStream = new PrintStream(modelFile);
-
-			outputModel(model, modelStream);
-			modelStream.close();
-
 			PrintStream queryStream = new PrintStream(queryFile);
 			if (query.getCategory() == QueryCategory.CTL){
 			    CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
@@ -61,8 +67,24 @@ public class VerifyTAPNExporter {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
 		}
-		return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
+		return export(model, query, modelFile, queryFile.getAbsolutePath(), dataLayerQuery, lens);
 	}
+
+    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, String queryPath, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
+        if (modelFile == null)
+            return null;
+
+        try{
+            PrintStream modelStream = new PrintStream(modelFile);
+
+            outputModel(model, modelStream);
+            modelStream.close();
+        } catch(FileNotFoundException e) {
+            System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
+            return null;
+        }
+        return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryPath);
+    }
 	
 	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
 		modelStream.append("<pnml>\n");

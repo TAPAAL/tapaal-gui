@@ -3,16 +3,24 @@ package pipe.gui;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabTransformer;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
@@ -44,6 +52,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected TAPNQuery query;
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
     protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
+    protected String queryPath = null;
 	
 	
 	protected Messenger messenger;
@@ -68,10 +77,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		ITAPNComposer composer = new TAPNComposer(messenger, guiModels, false, true);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-        File modelOut = null;
-        File queryOut = null;
-        modelOut = File.createTempFile("modelOut", ".xml");
-        queryOut = File.createTempFile("queryOut", ".q");
+
 
 		//this is needed to get the declarations for colored nets
         transformedModel.value1().setParentNetwork(model);
@@ -106,41 +112,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 
 				if(model.isColored()){
-                    TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
-                    ArrayList<Template> templates = new ArrayList<Template>(1);
-                    ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
-
-                    network.add(transformedModel.value1());
-                    for (ColorType ct :model.colorTypes()) {
-                        if (!network.isNameUsedForColorType(ct.getName()))
-                            network.add(ct);
-                    }
-                    for (Variable variable: model.variables()) {
-                        if (!network.isNameUsedForVariable(variable.getName()))
-                            network.add(variable);
-                    }
-                    templates.add(new Template(transformedModel.value1(), ((TAPNComposer)composer).getGuiModel(), new Zoomer()));
-
-                    TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
-
-                    File modelFile = File.createTempFile("modelIn", ".tapn");
-                    File queryFile = File.createTempFile("queryIn", ".q");
-                    writerTACPN.savePNML(modelFile);
-                    OutputStream os;
-                    try {
-                        os = new FileOutputStream(queryFile);
-                        os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
-                        os.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true, true);
-                    ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
-                    runner.run();
-                    String errorOutput = readOutput(runner.errorOutput());
-                    String standardOutput = readOutput(runner.standardOutput());
-                    Logger.log(errorOutput);
+                    transformedModel = unfoldColoredNet((TAPNComposer) composer, transformedModel, clonedQuery);
                 }else {
                     if (!verifypn.setup()) {
                         messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
@@ -164,8 +136,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     dataLayerQuery.isStubbornReductionEnabled()
                                 ),
                                 transformedModel,
-                                clonedQuery
-                            );
+                                clonedQuery,
+                                null);
                         } else {
                             overapprox_result = verifypn.verify(
                                 new VerifyPNOptions(
@@ -184,8 +156,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     false
                                 ),
                                 transformedModel,
-                                clonedQuery
-                            );
+                                clonedQuery,
+                                null);
                         }
 
                         if (overapprox_result.getQueryResult() != null) {
@@ -208,49 +180,70 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 }
 			}
 		} else if(model.isColored()){
-            TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
-            ArrayList<Template> templates = new ArrayList<Template>(1);
-            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
-
-            network.add(transformedModel.value1());
-            for (ColorType ct :model.colorTypes()) {
-                if (!network.isNameUsedForColorType(ct.getName()))
-                    network.add(ct);
-            }
-            for (Variable variable: model.variables()) {
-                if (!network.isNameUsedForVariable(variable.getName()))
-                    network.add(variable);
-            }
-            templates.add(new Template(transformedModel.value1(), ((TAPNComposer)composer).getGuiModel(), new Zoomer()));
-
-            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
-
-            File modelFile = File.createTempFile("modelIn", ".tapn");
-            File queryFile = File.createTempFile("queryIn", ".q");
-            writerTACPN.savePNML(modelFile);
-            OutputStream os;
-            try {
-                os = new FileOutputStream(queryFile);
-                os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
-                os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", true, true);
-            ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
-            runner.run();
-            String errorOutput = readOutput(runner.errorOutput());
-            String standardOutput = readOutput(runner.standardOutput());
-            Logger.log(errorOutput);
+            transformedModel = unfoldColoredNet((TAPNComposer) composer, transformedModel, clonedQuery);
         }
 		
 		ApproximationWorker worker = new ApproximationWorker();
 
-		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, modelOut.getAbsolutePath(), queryOut.getAbsolutePath());
+		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, queryPath);
 	}
 
-	private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
+    private Tuple<TimedArcPetriNet, NameMapping> unfoldColoredNet(TAPNComposer composer, Tuple<TimedArcPetriNet, NameMapping> transformedModel, TAPNQuery clonedQuery) {
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+        ArrayList<Template> templates = new ArrayList<Template>(1);
+        ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+
+        network.add(transformedModel.value1());
+        for (ColorType ct :model.colorTypes()) {
+            if (!network.isNameUsedForColorType(ct.getName()))
+                network.add(ct);
+        }
+        for (Variable variable: model.variables()) {
+            if (!network.isNameUsedForVariable(variable.getName()))
+                network.add(variable);
+        }
+        templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
+
+        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+        File modelOut = null;
+        File queryOut = null;
+        File modelFile = null;
+        File queryFile = null;
+        try{
+            modelOut = File.createTempFile("modelOut", ".xml");
+            queryOut = File.createTempFile("queryOut", ".q");
+            modelFile = File.createTempFile("modelIn", ".tapn");
+            queryFile = File.createTempFile("queryIn", ".q");
+            writerTACPN.savePNML(modelFile);
+        } catch (IOException e){
+            e.printStackTrace();
+        } catch (ParserConfigurationException e){
+            e.printStackTrace();
+        } catch (TransformerException e){
+            e.printStackTrace();
+        }
+        queryPath = queryOut.getAbsolutePath();
+
+        OutputStream os;
+        try {
+            os = new FileOutputStream(queryFile);
+            os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        transformedModel = getUnfoldedModel(modelFile, queryFile);
+
+        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", false, false);
+        ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+        runner.run();
+        String errorOutput = readOutput(runner.errorOutput());
+        String standardOutput = readOutput(runner.standardOutput());
+        Logger.log(errorOutput);
+        return transformedModel;
+    }
+
+    private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
 		if (trace == null) {
 			return null;
 		}
@@ -258,6 +251,49 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model, mapping);
 		return decomposer.decompose();
 	}
+
+	private Tuple<TimedArcPetriNet, NameMapping> getUnfoldedModel(File modelFile, File queryFile){
+        File unfoldModelFile = null;
+        File unfoldQueryFile = null;
+	    try{
+            unfoldModelFile = File.createTempFile("modelOutUnfold", ".tapn");
+            unfoldQueryFile = File.createTempFile("queryOutUnfold", ".xml");
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(unfoldModelFile.getAbsolutePath(), unfoldQueryFile.getAbsolutePath(), "ff", false, false);
+        ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+        runner.run();
+
+        TapnXmlLoader tapnLoader = new TapnXmlLoader();
+        File fileOut = new File(unfoldModelFile.getAbsolutePath());
+        LoadedModel loadedModel = null;
+        TabContent oldTab = CreateGui.getCurrentTab();
+
+        try {
+            loadedModel = tapnLoader.load(fileOut);
+            TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
+            newTab.addQuery(getQuery(unfoldQueryFile, loadedModel.network()));
+            CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab));
+            model = loadedModel.network();
+        } catch (FormatException e) {
+            e.printStackTrace();
+        }
+
+
+
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
+        return composer.transformModel(loadedModel.network());
+    }
+    private static pipe.dataLayer.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
+        XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
+        List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
+        queries.addAll(queryLoader.parseQueries().getQueries());
+        return queries.get(0);
+    }
+
 
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);

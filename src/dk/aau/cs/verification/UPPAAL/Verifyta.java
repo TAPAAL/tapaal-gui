@@ -303,7 +303,7 @@ public class Verifyta implements ModelChecker {
 		return true;
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String queryPath) throws Exception {
 		
 		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
 			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");
@@ -323,11 +323,6 @@ public class Verifyta implements ModelChecker {
 
 		return verify(options, model.value1(), exportedModel, query);
 	}
-
-    @Override
-    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String modelOut, String queryOut) throws Exception {
-        return null;
-    }
 
     private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));

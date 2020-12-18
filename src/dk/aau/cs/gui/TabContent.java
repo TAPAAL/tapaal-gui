@@ -1691,7 +1691,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
-    private void createNewAndUnfoldColor(){
+    public void createNewAndUnfoldColor(){
 	    TabContent tab = TabTransformer.unfoldTab(this);
 	    guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
 
