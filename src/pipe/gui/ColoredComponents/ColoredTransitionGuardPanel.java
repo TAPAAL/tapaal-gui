@@ -162,7 +162,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
-        //colorTypeCombobox.setPreferredSize(new Dimension(200,25));
+        colorTypeCombobox.setPreferredSize(new Dimension(200,25));
         colorTypeCombobox.setRenderer(new ColorComboBoxRenderer(colorTypeCombobox));
 
 
