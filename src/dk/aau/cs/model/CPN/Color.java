@@ -1,5 +1,7 @@
 package dk.aau.cs.model.CPN;
 
+import dk.aau.cs.util.Require;
+
 import java.util.Vector;
 
 public class Color {
@@ -36,6 +38,11 @@ public class Color {
 
     public ColorType getColorType() {
         return colorType;
+    }
+
+    public void setColorType(ColorType newColorType){
+        Require.that(newColorType.contains(this), "The new colortype must contain the color");
+        colorType = newColorType;
     }
 
     public boolean contains(Color color) {

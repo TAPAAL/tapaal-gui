@@ -8,6 +8,7 @@ import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.util.RequireException;
 import pipe.gui.CreateGui;
 
 import java.util.ArrayList;
@@ -65,6 +66,9 @@ public class UpdateColorTypeForPlaceCommand extends Command {
                 }
             }
         }
+        if(newTokenExpression != null){
+            updateColorTypesOnColorsInExpression();
+        }
     }
 
 
@@ -111,5 +115,27 @@ public class UpdateColorTypeForPlaceCommand extends Command {
         Vector<ArcExpression> addVector = new Vector<>();
         addVector.add(new NumberOfExpression(1, numberOfVector));
         return new AddExpression(addVector);
+    }
+
+    //This function only works on non-tuples
+    private void updateColorTypesOnColorsInExpression(){
+        for(ArcExpression expr : ((AddExpression)newTokenExpression).getAddExpression()){
+            for(ColorExpression cexpr : ((NumberOfExpression)expr).getColor()){
+                cexpr = cexpr.getButtomColorExpression();
+                if(cexpr instanceof UserOperatorExpression){
+                    try {
+                        ((UserOperatorExpression)cexpr).getUserOperator().setColorType(newColorType);
+                    } catch (RequireException e){
+                        System.out.println(e.getMessage());
+                    }
+                }else if(cexpr instanceof VariableExpression){
+                    try {
+                        ((VariableExpression)cexpr).getVariable().setColorType(newColorType);
+                    } catch (RequireException e){
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        }
     }
 }
