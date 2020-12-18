@@ -147,9 +147,9 @@ public class Export {
             i++;
 
             if (lens.isGame() && isDTAPN) {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), lens);
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), new TabContent.TAPNLens(true, false));
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TabContent.TAPNLens(true, false), transformedModel.value2());
             }
         }
     }

@@ -6,8 +6,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
@@ -15,29 +18,30 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.verification.*;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.IconSelector;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.VerificationResult;
+import pipe.dataLayer.TAPNQuery;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-		super(modelChecker, messenger);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath, boolean reduceNetOnly) {
+		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly);
 		iconSelector = selector;
 		this.callback = callback;
 	}
+
+    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
+        this(modelChecker, selector, messenger, callback, null, false);
+    }
 	
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null);
+		this(modelChecker, selector, messenger, null, null, false);
 	}
 
 	@Override
@@ -54,12 +58,14 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 	
-				if (result.getTrace() != null) {
+				if (!reducedNetOpened && result.getTrace() != null) {
 					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}
 
-		}else{
+		} else if(reduceNetOnly) {
+            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
+        }else{
 			
 			//Check if the is something like 
 			//verifyta: relocation_error:
@@ -115,7 +121,6 @@ public class RunVerification extends RunVerificationBase {
         }
 
     }
-
 
 	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
@@ -311,13 +316,46 @@ public class RunVerification extends RunVerificationBase {
 			}
 			
 			if(!result.getReductionResultAsString().isEmpty()){
-				JLabel reductionStatsLabet = new JLabel(toHTML(result.getReductionResultAsString()));
+				JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
 				gbc.gridy = 6;
 				gbc.insets = new Insets(0,0,20,-90);
 				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(reductionStatsLabet, gbc);
+
+				panel.add(reductionStatsLabel, gbc);
+
+				if(result.reductionRulesApplied()){
+                    JButton openReducedButton = new JButton("Open reduced net");
+                    openReducedButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            openReducedButton.setEnabled(false);
+                            reducedNetOpened = true;
+                            File reducedNetFile = new File(reducedNetFilePath);
+
+                            if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                                try {
+                                    TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                    TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                    reducedNetTab.addQuery(convertedQuery);
+                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                } catch (Exception e1){
+                                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                        e1.getMessage(),
+                                        "Error loading reduced net file",
+                                        JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                    });
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 5;
+                    gbc.insets = new Insets(0,0,10,0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(openReducedButton, gbc);
+                }
 			}
             if (result.getRawOutput() != null) {
                 JButton showRawQueryButton = new JButton("Show raw query results");
@@ -325,9 +363,9 @@ public class RunVerification extends RunVerificationBase {
                         JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE);
                 });
                 gbc = new GridBagConstraints();
-                gbc.gridx = 0;
+                gbc.gridx = 1;
                 gbc.gridy = 5;
-                gbc.insets = new Insets(10,0,10,0);
+                gbc.insets = new Insets(0,0,10,0);
                 gbc.anchor = GridBagConstraints.WEST;
                 panel.add(showRawQueryButton, gbc);
             }

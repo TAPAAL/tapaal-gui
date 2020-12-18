@@ -1010,7 +1010,7 @@ public class WorkflowDialog extends JDialog {
 						WorkflowMode.WORKFLOW_STRONG_SOUNDNESS,
 						c
 				);
-				Verifier.runVerifyTAPNVerification(model, q, result -> {
+				Verifier.runVerifyTAPNVerification(model, q, false, result -> {
 					if(result.isQuerySatisfied()){
 
 						switch(((TimedTAPNNetworkTrace) result.getTrace()).getTraceType()){
@@ -1115,7 +1115,7 @@ public class WorkflowDialog extends JDialog {
                     ExtrapolationOption.AUTOMATIC,
                     WorkflowMode.WORKFLOW_SOUNDNESS
             );
-            Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+            Verifier.runVerifyTAPNVerification(model, q, false, new VerificationCallback() {
 
                 @Override
                 public void run(VerificationResult<TAPNNetworkTrace> result) {
@@ -1225,7 +1225,7 @@ public class WorkflowDialog extends JDialog {
                             null,
                             ExtrapolationOption.AUTOMATIC
                     );
-                    Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+                    Verifier.runVerifyTAPNVerification(model, q, false, new VerificationCallback() {
 
                         @Override
                         public void run(VerificationResult<TAPNNetworkTrace> result) {

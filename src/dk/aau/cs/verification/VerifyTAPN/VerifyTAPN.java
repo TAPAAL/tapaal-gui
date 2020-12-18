@@ -272,7 +272,7 @@ public class VerifyTAPN implements ModelChecker {
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null);
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

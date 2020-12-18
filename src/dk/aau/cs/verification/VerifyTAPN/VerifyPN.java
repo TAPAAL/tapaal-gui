@@ -284,7 +284,7 @@ public class VerifyPN implements ModelChecker{
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 			
 			VerifyPNExporter exporter = new VerifyPNExporter();
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null);
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");
@@ -314,8 +314,9 @@ public class VerifyPN implements ModelChecker{
 			((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 		}
 
-		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) throws IOException {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
+
 			runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
 

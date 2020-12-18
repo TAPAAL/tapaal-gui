@@ -15,6 +15,9 @@ import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Implementes af class for handling integrated Uppaal Verification
  * 
@@ -24,6 +27,8 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
  */
 
 public class Verifier {
+    private static File reducedNetTempFile = null;
+
 	private static Verifyta getVerifyta() {
 		Verifyta verifyta = new Verifyta(new FileFinder(), new MessengerImpl());
 		verifyta.setup();
@@ -60,6 +65,10 @@ public class Verifier {
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
 		}
 	}
+
+	public static String getReducedNetFilePath() {
+	    return reducedNetTempFile.getAbsolutePath();
+    }
 
 	public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
 		ModelChecker modelChecker;
@@ -129,9 +138,11 @@ public class Verifier {
 	public static void runVerifyTAPNVerification(
 			TimedArcPetriNetNetwork tapnNetwork,
 			TAPNQuery query,
+            boolean onlyCreateReducedNet,
 			VerificationCallback callback
 	) {
 		ModelChecker verifytapn = getModelChecker(query);
+
 
 		if (!verifytapn.isCorrectVersion()) {
 			new MessengerImpl().displayErrorMessage(
@@ -165,21 +176,53 @@ public class Verifier {
 					query.isStubbornReductionEnabled()
 			);
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(
-					bound,
-					query.getTraceOption(),
-					query.getSearchOption(),
-					query.useOverApproximation(),
-					query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
-					query.isOverApproximationEnabled(),
-					query.isUnderApproximationEnabled(),
-					query.approximationDenominator(),
-					query.getCategory(),
-					query.getAlgorithmOption(),
-					query.isSiphontrapEnabled(),
-					query.isQueryReductionEnabled(),
-					query.isStubbornReductionEnabled()
-			);
+
+            try {
+                reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(
+                    e.getMessage(),
+                    "Error");
+                return;
+            }
+
+            if (onlyCreateReducedNet) {
+                //These options should disable the verification and only produce the net after applying reduction rules
+                verifytapnOptions = new VerifyPNOptions(
+                    bound,
+                    query.getTraceOption(),
+                    TAPNQuery.SearchOption.OVERAPPROXIMATE,
+                    query.useOverApproximation(),
+                    query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+                    query.isOverApproximationEnabled(),
+                    query.isUnderApproximationEnabled(),
+                    query.approximationDenominator(),
+                    query.getCategory(),
+                    query.getAlgorithmOption(),
+                    query.isSiphontrapEnabled(),
+                    TAPNQuery.QueryReductionTime.NoTime,
+                    query.isStubbornReductionEnabled(),
+                    reducedNetTempFile.getAbsolutePath()
+                );
+            } else {
+                verifytapnOptions = new VerifyPNOptions(
+                    bound,
+                    query.getTraceOption(),
+                    query.getSearchOption(),
+                    query.useOverApproximation(),
+                    query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+                    query.isOverApproximationEnabled(),
+                    query.isUnderApproximationEnabled(),
+                    query.approximationDenominator(),
+                    query.getCategory(),
+                    query.getAlgorithmOption(),
+                    query.isSiphontrapEnabled(),
+                    query.isQueryReductionEnabled()? TAPNQuery.QueryReductionTime.UnlimitedTime: TAPNQuery.QueryReductionTime.NoTime,
+                    query.isStubbornReductionEnabled(),
+                    reducedNetTempFile.getAbsolutePath()
+                );
+            }
+
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(
 					bound,
@@ -200,7 +243,13 @@ public class Verifier {
 		}
 		
 		if (tapnNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+            RunVerificationBase thread;
+		    if (reducedNetTempFile != null) {
+                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet );
+            } else {
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback);
+            }
+
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);

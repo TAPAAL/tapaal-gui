@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
+import javax.swing.event.*;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -70,6 +67,7 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Merge net components";
+    private static final String OPEN_REDUCED_BTN_TEXT = "Open reduced net";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SOME_TRACE_STRING = "Some trace       ";
@@ -183,6 +181,7 @@ public class QueryDialog extends JPanel {
 	private JButton saveAndVerifyButton;
 	private JButton saveUppaalXMLButton;
 	private JButton mergeNetComponentsButton;
+	private JButton openReducedNetButton;
 
 	// Private Members
 	private StringPosition currentSelection = null;
@@ -313,6 +312,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
 	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
+	private final static String TOOL_TIP_OPEN_REDUCED_BUTTON = "Open the net produced after applying structural reduction rules";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 
@@ -676,7 +676,7 @@ public class QueryDialog extends JPanel {
             current = ((TCTLStateToPathConverter) current).getProperty();
         }
         if (current instanceof TCTLAtomicPropositionNode) {
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
+			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
 
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
@@ -811,11 +811,13 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton.setEnabled(isQueryOk);
 			saveUppaalXMLButton.setEnabled(isQueryOk);
 			mergeNetComponentsButton.setEnabled(isQueryOk);
+            openReducedNetButton.setEnabled(isQueryOk && useReduction.isSelected());
 		} else {
 			saveButton.setEnabled(false);
 			saveAndVerifyButton.setEnabled(false);
 			saveUppaalXMLButton.setEnabled(false);
 			mergeNetComponentsButton.setEnabled(false);
+            openReducedNetButton.setEnabled(false);
 		}
 	}
 
@@ -1454,8 +1456,11 @@ public class QueryDialog extends JPanel {
 		if (lens.isTimed() || lens.isGame()) {
 		    saveUppaalXMLButton.setVisible(advancedView);
 		    overApproximationOptionsPanel.setVisible(advancedView);
+        } else if (!lens.isGame()){
+            openReducedNetButton.setVisible(advancedView);
         }
 		mergeNetComponentsButton.setVisible(advancedView);
+
 
 		if(advancedView){
 			advancedButton.setText("Simple view");
@@ -2679,6 +2684,13 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed() || lens.isGame()) {
             initTimedReductionOptions();
         } else {
+            useReduction.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                        openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0
+                            && !newProperty.containsPlaceHolder());
+                }
+            });
             initUntimedReductionOptions();
         }
 
@@ -2962,6 +2974,10 @@ public class QueryDialog extends JPanel {
 			mergeNetComponentsButton = new JButton(EXPORT_COMPOSED_BTN_TEXT);
 			mergeNetComponentsButton.setVisible(false);
 
+			openReducedNetButton = new JButton(OPEN_REDUCED_BTN_TEXT);
+            openReducedNetButton.setVisible(false);
+
+
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 			//Only show in advanced mode
 			saveUppaalXMLButton.setVisible(false);
@@ -2972,6 +2988,7 @@ public class QueryDialog extends JPanel {
 			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
 			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			mergeNetComponentsButton.setToolTipText(TOOL_TIP_SAVE_COMPOSED_BUTTON);
+            openReducedNetButton.setToolTipText(TOOL_TIP_OPEN_REDUCED_BUTTON);
 
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -2995,7 +3012,7 @@ public class QueryDialog extends JPanel {
 						TAPNQuery query = getQuery();
 
 						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null);
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query, false, null);
 						else
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
@@ -3049,10 +3066,12 @@ public class QueryDialog extends JPanel {
                         }
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), lens);
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2());
+
 						} else if(reduction == ReductionOption.VerifyPN){
 							VerifyPNExporter exporter = new VerifyPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), lens);
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2());
+
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
@@ -3117,6 +3136,51 @@ public class QueryDialog extends JPanel {
 				}
 			});
 
+            openReducedNetButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+
+                    if (checkIfSomeReductionOption()) {
+                        querySaved = true;
+                        // Now if a query is saved and verified, the net is marked as modified
+                        CreateGui.getCurrentTab().setNetChanged(true);
+
+                        TAPNQuery query = getQuery();
+                        if(query.getReductionOption() != ReductionOption.VerifyPN) {
+                            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                "The selected verification engine does not support application of reduction rules",
+                                "Reduction rules unsupported", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        exit();
+
+                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,true, null);
+
+                        File reducedNetFile = new File(Verifier.getReducedNetFilePath());
+
+                        if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                            try {
+                                TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                //Ensure that a net was created by the query reduction
+                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                    || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
+                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                    TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                    reducedNetTab.addQuery(convertedQuery);
+                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                }
+                            } catch (Exception e1){
+                                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                    e1.getMessage(),
+                                    "Error loading reduced net file",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+                }
+            });
+
 
 		} else if (option == QueryDialogueOption.Export) {
 			saveButton = new JButton("export");
@@ -3133,6 +3197,7 @@ public class QueryDialog extends JPanel {
 			JPanel leftButtomPanel = new JPanel(new FlowLayout());
 			JPanel rightButtomPanel = new JPanel(new FlowLayout());
 			leftButtomPanel.add(mergeNetComponentsButton, FlowLayout.LEFT);
+			leftButtomPanel.add(openReducedNetButton, FlowLayout.LEFT);
 			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
 
 
