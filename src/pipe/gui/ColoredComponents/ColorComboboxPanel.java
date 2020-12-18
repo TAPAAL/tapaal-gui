@@ -92,6 +92,7 @@ public abstract class ColorComboboxPanel extends JPanel {
             int i = 0;
             for(ColorExpression c : ((TupleExpression)expr).getColors()){
                 setIndex(c, i);
+                i++;
             }
         } else{
             setIndex(expr, 0);

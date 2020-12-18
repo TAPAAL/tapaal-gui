@@ -37,7 +37,7 @@ public class NumberOfExpression extends ArcExpression {
     public boolean equalsColor(NumberOfExpression otherExpr){
         Vector<ColorExpression> otherColors = otherExpr.color;
         for(int i = 0; i < color.size(); i++){
-            if(!(color.get(i).equals(otherColors.get(i)))){
+            if(!(color.get(i).toString().equals(otherColors.get(i).toString()))){
                 return false;
             }
         }

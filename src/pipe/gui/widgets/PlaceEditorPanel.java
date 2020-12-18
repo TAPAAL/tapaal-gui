@@ -740,7 +740,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors",true, null) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-                updateSpinnerValue();
+                updateSpinnerValue(true);
             }
         };
         tokenColorComboboxPanel.removeScrollPaneBorder();
@@ -756,11 +756,11 @@ public class PlaceEditorPanel extends JPanel {
 
         coloredTokenListModel = new DefaultListModel();
         tokenList = new JList(coloredTokenListModel);
-        tokenList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        tokenList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tokenList.addListSelectionListener(listSelectionEvent -> {
             if(!listSelectionEvent.getValueIsAdjusting() && !tokenList.isSelectionEmpty()) {
                 tokenColorComboboxPanel.updateSelection(((NumberOfExpression)tokenList.getSelectedValue()).getColor().get(0));
-                updateSpinnerValue();
+                updateSpinnerValue(false);
                 addColoredTokenButton.setText("Modify");
                 removeColoredTokenButton.setEnabled(true);
 
@@ -1152,17 +1152,19 @@ public class PlaceEditorPanel extends JPanel {
                 addTokenExpression((NumberOfExpression)expr);
             }
         }
-        updateSpinnerValue();
+        updateSpinnerValue(true);
     }
 
-    private void updateSpinnerValue(){
+    private void updateSpinnerValue(boolean updateSelection){
         NumberOfExpression expr = buildTokenExpression(1);
         if(coloredTokenListModel.getSize() > 0){
             for(int i = 0; i < coloredTokenListModel.getSize();i++){
                 NumberOfExpression otherExpr = coloredTokenListModel.getElementAt(i);
                 if(expr.equalsColor(otherExpr)){
                     addTokenSpinner.setValue(otherExpr.getNumber());
-                    tokenList.setSelectedIndex(i);
+                    if(updateSelection){
+                        tokenList.setSelectedIndex(i);
+                    }
                     return;
                 }
             }
