@@ -744,18 +744,17 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                         boolean showDialog = false;
                         for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                            if(!newColorType.getColors().contains(c)){
+                            if(!newColorType.contains(c)){
                                 showDialog = true;
                             }
                         }
                         if(showDialog){
                             int cont = JOptionPane.showConfirmDialog(this,  removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if(cont == JOptionPane.OK_OPTION){
-                                undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
+                                network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
+                            network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {
@@ -785,10 +784,10 @@ public class ColorTypeDialogPanel extends JPanel {
                             int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
                                 undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
+                                network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), newColorType, colorTypesListModel, undoManager);
+                            network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     }
@@ -827,10 +826,10 @@ public class ColorTypeDialogPanel extends JPanel {
                             if (cont == JOptionPane.OK_OPTION) {
 
                                 undoManager.newEdit();
-                                network.updateColorType(oldColorType.getName(), productType, colorTypesListModel, undoManager);
+                                network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
                             }
                         } else{
-                            network.updateColorType(oldColorType.getName(), productType, colorTypesListModel, undoManager);
+                            network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {

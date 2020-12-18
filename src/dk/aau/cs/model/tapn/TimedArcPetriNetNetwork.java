@@ -629,25 +629,33 @@ public class TimedArcPetriNetNetwork {
     public List<Variable> variables() {return variables;}
     public void setVariables(List<Variable> newVariables) { variables = newVariables;}
 
-
-    public void updateColorType(String oldName, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
-        Integer index = getColorTypeIndex(oldName);
-        ColorType oldColorType = getColorTypeByIndex(index);
+    public void renameColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager){
+        Integer index = getColorTypeIndex(oldColorType.getName());
 
         Command command = new UpdateColorTypeCommand(this, oldColorType, colorType, index, colorTypesListModel);
         command.redo();
-        undoManager.addEdit(command);
+        undoManager.addNewEdit(command);
+        updateProductTypes(oldColorType, colorType, undoManager);
+
+        for (TimedArcPetriNet tapn : tapns) {
+            updateColorTypeOnPlaces(oldColorType, colorType, tapn.places(), undoManager);
+        }
+    }
+
+    public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
         updateColorType(colorType, oldColorType, undoManager);
+
+        renameColorType(oldColorType,colorType,colorTypesListModel, undoManager);
     }
 
     private void updateColorType(ColorType colorType, ColorType oldColorType, UndoManager undoManager){
-        updateProductTypes(oldColorType, colorType, undoManager);
+
         for (TimedArcPetriNet tapn : tapns) {
-            updateColorTypeOnPlaces(oldColorType, colorType, tapn.places(), undoManager);
             updateColorTypeOnArcs(oldColorType,colorType,tapn,undoManager);
             updateColorTypeOnTransitions(tapn.transitions(), colorType, oldColorType, undoManager);
         }
         updateColorTypeOnVariables(oldColorType, colorType, undoManager);
+
     }
 
     private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
@@ -677,19 +685,25 @@ public class TimedArcPetriNetNetwork {
             }
         }
 	    for(TimedInputArc arc : tapn.inputArcs()) {
-            Command command = new UpdateInputArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
-            command.redo();
-            undoManager.addEdit(command);
+	        if(arc.source().getColorType().equals(oldColorType)){
+                Command command = new UpdateInputArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
+                command.redo();
+                undoManager.addEdit(command);
+            }
         }
         for(TimedOutputArc arc : tapn.outputArcs()){
-            Command command = new UpdateOutputArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
-            command.redo();
-            undoManager.addEdit(command);
+            if(arc.destination().getColorType().equals(oldColorType)){
+                Command command = new UpdateOutputArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
+                command.redo();
+                undoManager.addEdit(command);
+            }
         }
         for(TransportArc arc : tapn.transportArcs()){
-            Command command = new UpdateTransportArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
-            command.redo();
-            undoManager.addEdit(command);
+            if(arc.source().getColorType().equals(oldColorType) || arc.destination().getColorType().equals(oldColorType)){
+                Command command = new UpdateTransportArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
+                command.redo();
+                undoManager.addEdit(command);
+            }
         }
     }
     public void updateColorTypeOnVariables(ColorType oldColorType, ColorType colorType, UndoManager undoManager){

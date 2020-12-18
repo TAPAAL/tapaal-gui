@@ -92,7 +92,7 @@ public class ColorType implements Iterable<Color> {
 
     public boolean contains(Color color){
         for (Color c : colors) {
-            if(c.contains(color)) {
+            if(c.getColorName().equals(color.getColorName())) {
                 return true;
             }
         }
