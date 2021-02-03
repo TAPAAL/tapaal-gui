@@ -194,7 +194,7 @@ public class NumberOfExpression extends ArcExpression {
 
         int i = 0;
         int endPrev = 0;
-        int start = 3;
+        int start = 2;
         int end = 0;
         boolean wasPrevSimple = false;
         for (ColorExpression p : color) {
