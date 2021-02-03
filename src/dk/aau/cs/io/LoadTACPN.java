@@ -132,17 +132,18 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         Node type = skipWS(node.getFirstChild());
         String typetag = type.getNodeName();
         String name = getAttribute(node, "name").getNodeValue();
+        String id = getAttribute(node, "id").getNodeValue();
         if (typetag.equals("productsort")) {
             ProductType pt = new ProductType(name, name);
             Node typechild = skipWS(type.getFirstChild());
             while (typechild != null) {
                 if (typechild.getNodeName().equals("usersort")) {
                     String constituent = getAttribute(typechild, "declaration").getNodeValue();
-                    pt.addType(colortypes.get(constituent.toLowerCase(Locale.ROOT)));
+                    pt.addType(colortypes.get(constituent));
                 }
                 typechild = skipWS(typechild.getNextSibling());
             }
-            Require.that(colortypes.put(name.toLowerCase(Locale.ROOT), pt) == null, "the name " + name + ", was already used");
+            Require.that(colortypes.put(id, pt) == null, "the name " + id + ", was already used");
             network.add(pt);
         } else {
             ColorType ct = new ColorType(name, name);
@@ -160,7 +161,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                     }
                 }
             }
-            Require.that(colortypes.put(name.toLowerCase(Locale.ROOT), ct) == null, "the name " + name + ", was already used");
+            Require.that(colortypes.put(id, ct) == null, "the name " + id + ", was already used");
             network.add(ct);
         }
     }
@@ -173,7 +174,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 String name = child.getNodeName();
                 if (name.equals("usersort")) {
                     Node decl = getAttribute(child, "declaration");
-                    return colortypes.get(decl.getNodeValue().toLowerCase(Locale.ROOT));
+                    return colortypes.get(decl.getNodeValue());
                 } else if (name.matches("structure|type|subterm")) {
                     return parseUserSort(child);
                 }
@@ -245,6 +246,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             ArcExpression childexp = parseArcExpression(child);
 
             return new ScalarProductExpression(scalarval, childexp);
+        }else if (name.equals("all")){
+            ColorType ct = parseUserSort(node);
+            Vector<ColorExpression> ceVector = new Vector<>();
+            ceVector.add(new AllExpression(ct));
+            return new NumberOfExpression(1,ceVector);
 
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());

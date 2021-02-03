@@ -198,6 +198,7 @@ public class PNMLoader {
         if(name == null){
             name = new Name(nameGenerator.getNewPlaceName(template.model()));
         }
+        System.out.println(name);
         Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
         String id = NamePurifier.purify(((Element) node).getAttribute("id"));
         System.out.println(id);
@@ -245,7 +246,7 @@ public class PNMLoader {
 
         if (lens.isColored()) {
             if (colorMarking != null) {
-                ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), colortypes);
+                ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
                 ColorMultiset cm = colorMarking.eval(context);
                 place.setTokenExpression(colorMarking);
                 for (TimedToken ct : cm.getTokens(place)) {
