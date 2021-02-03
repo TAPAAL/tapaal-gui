@@ -86,6 +86,19 @@ public class ColorType implements Iterable<Color> {
         return colors.firstElement();
     }
 
+    public boolean isProductColorType(){
+        return getFirstColor().getTuple() != null && !getFirstColor().getTuple().isEmpty();
+    }
+
+    public Vector<ColorType> getProductColorTypes(){
+        Vector<ColorType> colorTypes = new Vector<>();
+        for(Color color : getFirstColor().getTuple()){
+            colorTypes.addElement(color.getColorType());
+        }
+
+        return colorTypes;
+    }
+
     public ColorType copy(){
         ColorType ct = new ColorType(this.name);
         for(Color color : this.colors){

@@ -14,9 +14,13 @@ import dk.aau.cs.util.Tuple;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 
+import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Array;
+import java.util.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -26,6 +30,8 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
     private HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
     private HashMap<String, Variable> variables = new HashMap<String, Variable>();
+    private HashMap<String, ColorExpression> tupleVarExpressions = new HashMap<>();
+    private final Collection<String> messages = new ArrayList<>(10);
 
     public HashMap<String, ColorType> getColortypes() {
         return colortypes;
@@ -35,6 +41,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return variables;
     }
 
+    public Collection<String> getMessages() {return  messages;}
     //skipWS
     //  Takes a given node and returns it if it is an element,
     //  otherwise returns its first element sibling.
@@ -73,6 +80,51 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             }
 
             child = skipWS(child.getNextSibling());
+        }
+        Vector<String> variablesForRemoval = new Vector<>();
+        HashMap<String, Variable> newVars = new HashMap<>();
+        StringBuilder renameWarnings = new StringBuilder();
+        // Convert product variables into variables for the constituent of the product
+        for(String varName : variables.keySet()){
+            Variable var = variables.get(varName);
+            if(var.getColorType().isProductColorType()){
+                int constituentCounter = 1;
+
+                Vector<ColorExpression> constituentVarExpressions = new Vector<>();
+                renameWarnings.append("The product variable " + var.getName() + ", was unfolded to (");
+
+                for(ColorType colorType : var.getColorType().getProductColorTypes()){
+                    String elementSubstring = "_" + constituentCounter;
+                    while (variables.containsKey(varName + elementSubstring) || newVars.containsKey(varName + elementSubstring)){
+                        elementSubstring += "_1";
+                    }
+
+                    renameWarnings.append(varName + elementSubstring + ",");
+
+                    Variable newVar = new Variable(var.getName() + elementSubstring, varName + elementSubstring, colorType);
+                    Require.that(newVars.put(varName + elementSubstring, newVar) == null, "the id " + varName + elementSubstring + ", was already used");
+                    network.add(newVar);
+                    constituentVarExpressions.addElement(new VariableExpression(newVar));
+                    constituentCounter++;
+                }
+                renameWarnings.deleteCharAt(renameWarnings.length()-1);
+                renameWarnings.append(")\n");
+
+                tupleVarExpressions.put(varName, new TupleExpression(constituentVarExpressions));
+                network.remove(var);
+                variablesForRemoval.addElement(varName);
+            }
+        }
+        for(String varName : variablesForRemoval){
+            variables.remove(varName);
+        }
+        for(String varName : newVars.keySet()){
+            variables.put(varName, newVars.get(varName));
+        }
+
+        if(renameWarnings.length() > 0){
+            messages.add(renameWarnings.toString());
+            //JOptionPane.showConfirmDialog(CreateGui.getApp(), renameWarnings.toString(), "Product Variables unfolded", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
         }
     }
     @SuppressWarnings("Duplicates")
@@ -246,7 +298,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if (name.equals("variable")) {
             String varname = getAttribute(node, "refvariable").getNodeValue();
             Variable var = variables.get(varname);
-            return new VariableExpression(var);
+            if(var != null){
+                return new VariableExpression(var);
+            } else {
+                return tupleVarExpressions.get(varname);
+            }
         } else if (name.equals("useroperator")) {
             String colorname = getAttribute(node, "declaration").getNodeValue();
             Color color = getColor(colorname);

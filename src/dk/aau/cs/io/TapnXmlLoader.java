@@ -131,6 +131,9 @@ public class TapnXmlLoader {
                     loadTACPN.parseDeclarations(node, network);
                 }
             }
+            for(String message : loadTACPN.getMessages()){
+                messages.add(message);
+            }
         }
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);

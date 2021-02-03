@@ -70,8 +70,10 @@ public class VariablesDialogPanel extends JPanel {
     }
 
     public void showDialog() {
+        String panelHeader = variable != null? "Edit Variable" : "Create Variable";
+
         dialog = new EscapableDialog(CreateGui.getApp(),
-                "Edit Variable", true);
+                panelHeader, true);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);
@@ -178,13 +180,14 @@ public class VariablesDialogPanel extends JPanel {
 
         int variableIndex = 0;
         for (ColorType element : colorTypes) {
-            colorTypeComboBox.addItem(element.getName());
-            if (variable != null) {
-                if (element.getName().equals(variable.getColorType().getName())) {
-                    variableIndex = colorTypeComboBox.getItemCount() - 1;
+            if(!element.isProductColorType()){
+                colorTypeComboBox.addItem(element.getName());
+                if (variable != null) {
+                    if (element.getName().equals(variable.getColorType().getName())) {
+                        variableIndex = colorTypeComboBox.getItemCount() - 1;
+                    }
                 }
             }
-
         }
         colorTypeComboBox.setSelectedIndex(variableIndex);
 
