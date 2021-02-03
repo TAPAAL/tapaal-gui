@@ -1,5 +1,9 @@
 package dk.aau.cs.model.CPN;
 
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -188,5 +192,14 @@ public class ProductType extends ColorType {
                 ((ProductType)ct).replaceColorType(newColorType,oldColorType);
             }
         }*/
+    }
+    @Override
+    public ColorExpression createColorExpressionForFirstColor() {
+        Vector<ColorExpression> tempVec = new Vector();
+        for(ColorType colorType : getColorTypes()){
+            tempVec.add(colorType.createColorExpressionForFirstColor());
+        }
+        TupleExpression tupleExpr = new TupleExpression(tempVec);
+        return tupleExpr;
     }
 }

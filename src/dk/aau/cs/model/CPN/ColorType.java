@@ -1,5 +1,9 @@
 package dk.aau.cs.model.CPN;
 
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -106,5 +110,10 @@ public class ColorType implements Iterable<Color> {
             }
         }
         return null;
+    }
+
+    public ColorExpression createColorExpressionForFirstColor() {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(getFirstColor());
+        return userOperatorExpression;
     }
 }

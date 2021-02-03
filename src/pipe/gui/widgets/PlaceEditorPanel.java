@@ -1122,9 +1122,8 @@ public class PlaceEditorPanel extends JPanel {
 
     private void updateArcsAccordingToColorType() {
         for(Arc arc : place.getPostset()){
-            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
             Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-            vecColorExpr.add(userOperatorExpression);
+            vecColorExpr.add(colorType.createColorExpressionForFirstColor());
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
             arcExpressionCommand.redo();
@@ -1134,9 +1133,8 @@ public class PlaceEditorPanel extends JPanel {
             context.undoManager().addEdit(arcIntervalCommand);
         }
         for(Arc arc : place.getPreset()) {
-            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(colorType.getFirstColor());
             Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-            vecColorExpr.add(userOperatorExpression);
+            vecColorExpr.add(colorType.createColorExpressionForFirstColor());
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
             arcExpressionCommand.redo();

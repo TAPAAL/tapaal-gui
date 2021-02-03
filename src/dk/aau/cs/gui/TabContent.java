@@ -217,7 +217,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
             ColorType ct = p.underlyingPlace().getColorType();
             Vector<ColorExpression> vecColorExpr = new Vector<>();
-            vecColorExpr.add(createColorExpression(ct));
+            vecColorExpr.add(ct.createColorExpressionForFirstColor());
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             TimedInputArc tia = new TimedInputArc(
                 p.underlyingPlace(),
@@ -244,7 +244,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return new Result<>(tiac);
         }
 
-        private ColorExpression createColorExpression(ColorType ct) {
+        /*private ColorExpression createColorExpression(ColorType ct) {
             if(ct instanceof ProductType){
                 Vector<ColorExpression> tempVec = new Vector();
                 for(ColorType colorType : ((ProductType)ct).getColorTypes()){
@@ -256,7 +256,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
                 return userOperatorExpression;
             }
-        }
+        }*/
 
         public Result<TimedOutputArcComponent, ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
             Require.notNull(c, "DataLayer can't be null");
@@ -281,7 +281,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             //Init color
             ColorType ct = p.underlyingPlace().getColorType();
             Vector<ColorExpression> vecColorExpr = new Vector<>();
-            vecColorExpr.add(createColorExpression(ct));
+            vecColorExpr.add(ct.createColorExpressionForFirstColor());
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
 
             toa.setExpression(numbExpr);
