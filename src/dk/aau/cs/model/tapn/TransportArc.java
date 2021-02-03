@@ -47,15 +47,6 @@ public class TransportArc extends TAPNElement {
 
     public TransportArc(TimedPlace source, TimedTransition transitions, TimedPlace destination) {
         this(source, transitions, destination, TimeInterval.ZERO_INF);
-
-        //TODO: check if all this is correct. What should the default be?
-        ColorType ct = destination.getColorType();
-        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
-        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-        vecColorExpr.add(userOperatorExpression);
-        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-        this.setInputExpression(numbExpr);
-        this.setOutputExpression(numbExpr);
     }
 
     public Weight getWeight(){

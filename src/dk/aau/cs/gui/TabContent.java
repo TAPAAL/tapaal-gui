@@ -371,6 +371,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
             int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
 
             TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
+            //TODO: check if all this is correct. What should the default be?
+            ColorType ct = p2.underlyingPlace().getColorType();
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(ct.createColorExpressionForFirstColor());
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tta.setInputExpression(numbExpr);
+            tta.setOutputExpression(numbExpr);
 
             TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr, lens);
             TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr, lens);

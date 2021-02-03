@@ -18,6 +18,7 @@ import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
 import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
+import dk.aau.cs.gui.undo.Colored.SetTransportArcExpressionsCommand;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
@@ -37,6 +38,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.RequireException;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
@@ -1122,23 +1124,46 @@ public class PlaceEditorPanel extends JPanel {
 
     private void updateArcsAccordingToColorType() {
         for(Arc arc : place.getPostset()){
-            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-            vecColorExpr.add(colorType.createColorExpressionForFirstColor());
-            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-            Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
-            arcExpressionCommand.redo();
-            context.undoManager().addEdit(arcExpressionCommand);
+            if(arc instanceof TimedTransportArcComponent){
+                TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(colorType.createColorExpressionForFirstColor());
+                NumberOfExpression numbExpr = new NumberOfExpression(transportArc.getOutputExpression().weight(), vecColorExpr);
+                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
+                    numbExpr, transportArc.getOutputExpression(), transportArc.getOutputExpression());
+                expressionsCommand.redo();
+                context.undoManager().addEdit(expressionsCommand);
+            }else{
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(colorType.createColorExpressionForFirstColor());
+                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
+                arcExpressionCommand.redo();
+                context.undoManager().addEdit(arcExpressionCommand);
+            }
             Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<ColoredTimeInterval>());
             arcIntervalCommand.redo();
             context.undoManager().addEdit(arcIntervalCommand);
+
         }
         for(Arc arc : place.getPreset()) {
-            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-            vecColorExpr.add(colorType.createColorExpressionForFirstColor());
-            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-            Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
-            arcExpressionCommand.redo();
-            context.undoManager().addEdit(arcExpressionCommand);
+            if(arc instanceof TimedTransportArcComponent){
+                TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(colorType.createColorExpressionForFirstColor());
+                NumberOfExpression numbExpr = new NumberOfExpression(transportArc.getInputExpression().weight(), vecColorExpr);
+                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
+                    transportArc.getInputExpression(), transportArc.getOutputExpression(), numbExpr);
+                expressionsCommand.redo();
+                context.undoManager().addEdit(expressionsCommand);
+            }else{
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(colorType.createColorExpressionForFirstColor());
+                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
+                arcExpressionCommand.redo();
+                context.undoManager().addEdit(arcExpressionCommand);
+            }
         }
     }
 

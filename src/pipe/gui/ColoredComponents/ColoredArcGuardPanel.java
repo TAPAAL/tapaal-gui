@@ -43,6 +43,7 @@ import java.util.Vector;
 public abstract class ColoredArcGuardPanel extends JPanel {
     PetriNetObject objectToBeEdited;
     boolean isTransportArc = false;
+    boolean isInputTransportArc = false;
     boolean isInputArc = false;
     boolean isInhibitorArc = false;
     Context context;
@@ -56,7 +57,10 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         this.objectToBeEdited = objectToBeEdited;
         if(objectToBeEdited instanceof TimedTransportArcComponent){
             isTransportArc = true;
-            setTransportExpression();
+            if(((TimedTransportArcComponent)objectToBeEdited).getSource() instanceof Place){
+                isInputTransportArc = true;
+            }
+            //setTransportExpression();
         }
         else if(objectToBeEdited instanceof TimedInhibitorArcComponent){
             isInhibitorArc = true;
@@ -65,7 +69,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             isInputArc = true;
             this.colorType = ((TimedPlaceComponent) ((Arc)objectToBeEdited).getSource()).underlyingPlace().getColorType();
         } else if(isTransportArc){
-            this.colorType = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().source().getColorType();
+            //it is the outgoing arc so we take the output places type
+            this.colorType = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().destination().getColorType();
         } else{
             this.colorType = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc().destination().getColorType();
         }
@@ -92,9 +97,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             nonDefaultArcColorIntervalPanel.setVisible(false);
         }
         if(isTransportArc){
-            regularArcExprPanel.setVisible(false);
-        } else{
-            transportWeightPanel.setVisible(false);
+            additionButton.setEnabled(false);
+            subtractionButton.setEnabled(false);
         }
     }
 
@@ -116,17 +120,17 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
     private void initPanels() {
         initRegularArcExpressionPanel();
-        if((isInputArc || isTransportArc) && !isInhibitorArc){
+        if(isInputArc && !isInhibitorArc){
             initNonDefaultColorIntervalPanel();
         }
-        initWeightPanel();
-        if(isTransportArc){
+        //initWeightPanel();
+        /*if(isTransportArc){
             initTransportArcExpressionPanel();
-        }
+        }*/
 
     }
 
-    private void initWeightPanel(){
+    /*private void initWeightPanel(){
         transportWeightPanel = new JPanel(new GridBagLayout());
         //int current = transportWeight;
         int min = 1;
@@ -150,7 +154,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         add(transportWeightPanel, gbc);
-    }
+    }*/
 
     private void initNonDefaultColorIntervalPanel() {
         nonDefaultArcColorIntervalPanel = new JPanel(new GridBagLayout());
@@ -414,7 +418,11 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             if (exprField.isEditable()) {
                 ArcExpression newExpression = null;
                 try {
-                    newExpression = ArcExpressionParser.parse(exprField.getText(), colorType,context.network());
+                    if(!isTransportArc){
+                        newExpression = ArcExpressionParser.parse(exprField.getText(), colorType,context.network());
+                    } else{
+                        newExpression = ArcExpressionParser.parseNumberOfExpression(exprField.getText(), colorType,context.network());
+                    }
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         CreateGui.getApp(),
@@ -586,16 +594,12 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         arithmeticPanel.add(additionButton, gbc);
 
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setEnabled(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.gridwidth = 3;
         gbc.insets = new Insets(2, 0, 2, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        arithmeticPanel.add(separator,gbc);
-
 
         gbc.gridy = 3;
         arithmeticPanel.add(subtractionButton, gbc);
@@ -610,7 +614,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
 
         regularArcExprPanel.add(arithmeticPanel,gbc);
 
@@ -1028,9 +1032,11 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
         else if (currentSelection.getObject() instanceof ArcExpression) {
             addExpressionButton.setEnabled(true);
-            additionButton.setEnabled(true);
-            subtractionButton.setEnabled(true);
-            scalarButton.setEnabled(true);
+            if(!isTransportArc){
+                additionButton.setEnabled(true);
+                subtractionButton.setEnabled(true);
+                scalarButton.setEnabled(true);
+            }
             succButton.setEnabled(false);
             predButton.setEnabled(false);
         }
@@ -1043,16 +1049,31 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     }
     public void onOkColored(pipe.gui.undo.UndoManager undoManager) {
         if(isTransportArc){
-            int weight =  Integer.parseInt(colorExpressionWeightSpinner.getValue().toString());
             TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
-            ArcExpression inputExpression = getTransportExpression(inputPanel.getColorExpression(), weight);
-            ArcExpression outputExpression = getTransportExpression(outputPanel.getColorExpression(), weight);
-            Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(), inputExpression, transportArc.getOutputExpression(), outputExpression);
-            expressionsCommand.redo();
-            undoManager.addEdit(expressionsCommand);
-            Command cmd = new SetColoredArcIntervalsCommand((TimedTransportArcComponent) objectToBeEdited, ((TimedTransportArcComponent) objectToBeEdited).getCtiList(), getctiList());
-            cmd.redo();
-            undoManager.addEdit(cmd);
+            if(isInputArc){
+                ArcExpression inputExpression = arcExpression;
+                //Output and input should have same value
+                ArcExpression outputExpression = transportArc.getOutputExpression().deepCopy();
+                ((NumberOfExpression)outputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
+
+                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(),
+                    inputExpression, transportArc.getOutputExpression(), outputExpression);
+                expressionsCommand.redo();
+                undoManager.addEdit(expressionsCommand);
+                Command cmd = new SetColoredArcIntervalsCommand((TimedTransportArcComponent) objectToBeEdited, ((TimedTransportArcComponent) objectToBeEdited).getCtiList(), getctiList());
+                cmd.redo();
+                undoManager.addEdit(cmd);
+            } else{
+                ArcExpression outputExpression = arcExpression;
+                //Output and input should have same value
+                ArcExpression inputExpression = transportArc.getInputExpression().deepCopy();
+                ((NumberOfExpression)inputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
+
+                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(),
+                    inputExpression, transportArc.getOutputExpression(), outputExpression);
+                expressionsCommand.redo();
+                undoManager.addEdit(expressionsCommand);
+            }
         }
         else if (!isInhibitorArc && isInputArc) {
             TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();

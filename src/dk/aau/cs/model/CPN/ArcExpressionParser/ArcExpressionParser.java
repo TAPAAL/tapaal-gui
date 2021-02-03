@@ -22,6 +22,12 @@ public class ArcExpressionParser implements ArcExpressionParserConstants {
                 ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
                 return parser.AddExpression();
         }
+    public static ArcExpression parseNumberOfExpression(String expression, ColorType inputPlaceColorType, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
+        colorType = inputPlaceColorType;
+        network = inputNetwork;
+        ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
+        return parser.NumberOfExpression();
+    }
 
   final public ArcExpression AddExpression() throws ParseException {ArcExpression currentChild;
         Vector<ArcExpression> constituents = new Vector<ArcExpression>();
