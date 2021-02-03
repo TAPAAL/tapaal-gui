@@ -200,7 +200,7 @@ public class PNMLoader {
         }
         Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
         String id = NamePurifier.purify(((Element) node).getAttribute("id"));
-
+        System.out.println(id);
         InitialMarking marking = null;
         ArcExpression colorMarking = null;
         Point markingOffset = null;

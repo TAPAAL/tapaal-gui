@@ -19,6 +19,7 @@ import java.awt.*;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Vector;
 
 public class LoadTACPN { //the import feature for CPN and load for TACPN share similarities. These similarities are shared here. Feel free to find a better name for this class
@@ -85,11 +86,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             while (typechild != null) {
                 if (typechild.getNodeName().equals("usersort")) {
                     String constituent = getAttribute(typechild, "declaration").getNodeValue();
-                    pt.addType(colortypes.get(constituent));
+                    pt.addType(colortypes.get(constituent.toLowerCase(Locale.ROOT)));
                 }
                 typechild = skipWS(typechild.getNextSibling());
             }
-            Require.that(colortypes.put(name, pt) == null, "the name " + name + ", was already used");
+            Require.that(colortypes.put(name.toLowerCase(Locale.ROOT), pt) == null, "the name " + name + ", was already used");
             network.add(pt);
         } else {
             ColorType ct = new ColorType(name, name);
@@ -107,7 +108,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                     }
                 }
             }
-            Require.that(colortypes.put(name, ct) == null, "the name " + name + ", was already used");
+            Require.that(colortypes.put(name.toLowerCase(Locale.ROOT), ct) == null, "the name " + name + ", was already used");
             network.add(ct);
         }
     }
@@ -120,7 +121,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 String name = child.getNodeName();
                 if (name.equals("usersort")) {
                     Node decl = getAttribute(child, "declaration");
-                    return colortypes.get(decl.getNodeValue());
+                    return colortypes.get(decl.getNodeValue().toLowerCase(Locale.ROOT));
                 } else if (name.matches("structure|type|subterm")) {
                     return parseUserSort(child);
                 }
@@ -346,7 +347,16 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     }
 
     public AddExpression parseTokenExpression(Node node) throws FormatException{
-        return normalizeTokenExpression(parseArcExpression(node));
+        ArcExpression tokenExpr = parseArcExpression(node);
+        //This is a small hack since sometimes the token expression is a number of expression
+        //and sometimes it is a add expression
+        if(tokenExpr instanceof NumberOfExpression){
+            Vector<ArcExpression> coloredTokenList = new Vector<>();
+            coloredTokenList.add(tokenExpr);
+            return new AddExpression(coloredTokenList);
+        }
+
+        return normalizeTokenExpression(tokenExpr);
     }
 
     private AddExpression normalizeTokenExpression(ArcExpression colorMarking){
