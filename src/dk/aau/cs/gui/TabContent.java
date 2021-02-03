@@ -279,11 +279,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
 
             //Init color
-            ColorType ct = toa.destination().getColorType();
-            UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+            ColorType ct = p.underlyingPlace().getColorType();
             Vector<ColorExpression> vecColorExpr = new Vector<>();
-            vecColorExpr.add(userOperatorExpression);
+            vecColorExpr.add(createColorExpression(ct));
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+
             toa.setExpression(numbExpr);
 
 
