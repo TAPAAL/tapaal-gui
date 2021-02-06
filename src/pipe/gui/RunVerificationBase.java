@@ -111,7 +111,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 										dataLayerQuery.getAlgorithmOption(),
 										dataLayerQuery.isSiphontrapEnabled(),
 										dataLayerQuery.isQueryReductionEnabled(),
-										dataLayerQuery.isStubbornReductionEnabled()
+										dataLayerQuery.isStubbornReductionEnabled(),
+                                        dataLayerQuery.isTarOptionEnabled()
 								),
 								transformedModel,
 								clonedQuery

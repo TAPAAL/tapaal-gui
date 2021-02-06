@@ -295,7 +295,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "Apply structural reductions to reduce the size of the net.";
     private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freedom by using siphon-trap analysis via linear programming.";
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
-    private final static String TOOL_TIP_USE_TRACE_REFINEMENT = ""; // TODO: write tooltip
+    private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
@@ -324,8 +324,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
-	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
-                       TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
+	public QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		this.lens = lens;
@@ -444,6 +443,7 @@ public class QueryDialog extends JPanel {
         query.setUseSiphontrap(useSiphonTrap.isSelected());
         query.setUseQueryReduction(useQueryReduction.isSelected());
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
+        query.setUseTarOption(useTraceRefinement.isSelected());
         return query;
     }
 
@@ -1210,7 +1210,14 @@ public class QueryDialog extends JPanel {
 		setupSearchOptionsFromQuery(queryToCreateFrom);
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
+		setupTarOptionsFromQuery(queryToCreateFrom);
 	}
+
+	private void setupTarOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+	    if (queryToCreateFrom.isTarOptionEnabled()) {
+	        useTraceRefinement.setSelected(true);
+        }
+    }
 
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.isOverApproximationEnabled())

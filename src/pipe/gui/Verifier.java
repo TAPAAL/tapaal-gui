@@ -178,7 +178,8 @@ public class Verifier {
 					query.getAlgorithmOption(),
 					query.isSiphontrapEnabled(),
 					query.isQueryReductionEnabled(),
-					query.isStubbornReductionEnabled()
+					query.isStubbornReductionEnabled(),
+                    query.isTarOptionEnabled()
 			);
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(
