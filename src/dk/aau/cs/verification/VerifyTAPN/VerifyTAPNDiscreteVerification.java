@@ -278,7 +278,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
         }
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens());
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(), model.value2());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
@@ -340,7 +340,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				}
 
 				TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false);
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput);
 			}
 		}
 	}

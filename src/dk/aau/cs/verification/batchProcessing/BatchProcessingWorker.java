@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.dataLayer.TAPNQuery.QueryReductionTime;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -307,7 +308,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					}
 					long c  = m*B+1;
 					queryToVerify.setStrongSoundnessBound(c);
-					Verifier.runVerifyTAPNVerification(model.network(), queryToVerify, new VerificationCallback() {
+					Verifier.runVerifyTAPNVerification(model.network(), queryToVerify, false, new VerificationCallback() {
 						
 						@Override
 						public void run(VerificationResult<TAPNNetworkTrace> result) {
@@ -575,7 +576,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
 		queryToVerify.setCategory(query.getCategory());
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
-		
+
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens());
 		clonedQuery.setCategory(query.getCategory());
 		MapQueryToNewNames(clonedQuery, composedModel.value2());
@@ -622,9 +623,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
 			if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace){
-			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), false, false, false, false, query.approximationDenominator(), QueryCategory.Default, query.getAlgorithmOption(), false, false, false);
+			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), false, false, false, false, query.approximationDenominator(), QueryCategory.Default, query.getAlgorithmOption(), false, QueryReductionTime.UnlimitedTime, false);
 			} else {
-			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled(), query.isStubbornReductionEnabled());
+			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled()? QueryReductionTime.UnlimitedTime: QueryReductionTime.NoTime, query.isStubbornReductionEnabled());
 			}
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());

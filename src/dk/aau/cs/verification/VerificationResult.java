@@ -15,6 +15,7 @@ public class VerificationResult<TTrace> {
 	private QueryResult queryResult;
 	private TTrace trace;
 	private String errorMessage = null;
+	private String rawOutput = null;
 	private long verificationTime = 0;
 	private Stats stats;
 	private NameMapping nameMapping;
@@ -25,20 +26,26 @@ public class VerificationResult<TTrace> {
 		return queryResult.isQuerySatisfied();
 	}
 
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats){
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, String rawOutput){
 		this.queryResult = queryResult;
 		this.trace = trace;
 		this.verificationTime = verificationTime;
 		this.stats = stats;
+		this.rawOutput = rawOutput;
 	}
+
+    public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation){
+        this(queryResult, trace, verificationTime, stats, null);
+        this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
+    }
 	
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation){
-		this(queryResult, trace, verificationTime, stats);
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput){
+		this(queryResult, trace, verificationTime, stats, rawOutput);
 		this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
 	}
 
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime) {
-		this(queryResult, trace, verificationTime, new NullStats());
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, String rawOutput) {
+		this(queryResult, trace, verificationTime, new NullStats(), rawOutput);
 	}
 
 	public VerificationResult(String outputMessage, long verificationTime) {
@@ -51,9 +58,18 @@ public class VerificationResult<TTrace> {
 			TTrace secondaryTrace2, long runningTime,
 			Stats value2,
 			boolean isSolvedUsingStateEquation) {
-		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation);
+		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, null);
 		this.secondaryTrace = secondaryTrace2;
 	}
+
+    public VerificationResult(QueryResult value1,
+                              TTrace tapnTrace,
+                              TTrace secondaryTrace2, long runningTime,
+                              Stats value2,
+                              boolean isSolvedUsingStateEquation, String rawOutput) {
+        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput);
+        this.secondaryTrace = secondaryTrace2;
+    }
 
 	public NameMapping getNameMapping() {
 		return nameMapping;
@@ -164,6 +180,11 @@ public class VerificationResult<TTrace> {
 		}
 		return reductionStats.toString();
 	}
+
+	public boolean reductionRulesApplied(){
+        ReductionStats reductionStats = stats.getReductionStats();
+        return (reductionStats.getRemovedPlaces() + reductionStats.getRemovedTrantitions()) > 0;
+    }
 	
 	public NetworkMarking getCoveredMarking(TimedArcPetriNetNetwork model){
 		
@@ -206,4 +227,8 @@ public class VerificationResult<TTrace> {
 		buffer.append(stats.getEdges());
 		return buffer.toString();
 	}
+
+	public String getRawOutput() {
+	    return rawOutput;
+    }
 }

@@ -148,7 +148,7 @@ public class TAPAAL {
 					System.out.println("    | Running query: " + query.getName());
 
 					if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN) {
-						Verifier.runVerifyTAPNVerification(network, query, new VerificationCallback() {
+						Verifier.runVerifyTAPNVerification(network, query, false, new VerificationCallback() {
 							@Override
 							public void run(VerificationResult<TAPNNetworkTrace> result) {
 

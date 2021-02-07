@@ -58,7 +58,13 @@ public class TCTLEUNode extends TCTLAbstractPathProperty {
 		return children;
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        left.convertForReducedNet(templateName);
+        right.convertForReducedNet(templateName);
+    }
+
+    @Override
 	public boolean equals(Object o) {	
 		if (o instanceof TCTLEUNode) {
 			TCTLEUNode node = (TCTLEUNode) o;

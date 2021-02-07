@@ -16,6 +16,10 @@ public class TAPNQuery {
 		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT
 	}
 
+	public enum QueryReductionTime {
+	    NoTime, ShortestTime, UnlimitedTime
+    }
+
 	public enum HashTableSize {
 		MB_4, MB_16, MB_64, MB_256, MB_512
 	}
@@ -439,5 +443,11 @@ public class TAPNQuery {
             return true;
         }
         return false;
+    }
+
+    public TAPNQuery convertPropertyForReducedNet(String templateName){
+	    TAPNQuery convertedQuery = copy();
+	    convertedQuery.property.convertForReducedNet(templateName);
+        return  convertedQuery;
     }
 }

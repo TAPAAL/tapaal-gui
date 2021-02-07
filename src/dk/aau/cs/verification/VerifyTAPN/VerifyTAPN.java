@@ -272,7 +272,7 @@ public class VerifyTAPN implements ModelChecker {
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null);
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
@@ -318,7 +318,7 @@ public class VerifyTAPN implements ModelChecker {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
 				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2()); 
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
 			}
 		}
 	}
