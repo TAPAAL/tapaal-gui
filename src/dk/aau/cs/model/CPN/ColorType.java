@@ -129,4 +129,12 @@ public class ColorType implements Iterable<Color> {
         UserOperatorExpression userOperatorExpression = new UserOperatorExpression(getFirstColor());
         return userOperatorExpression;
     }
+
+    public boolean isIntegerRange(){
+        for(Color c : colors){
+            if(!c.getColorName().matches("-?(0|[1-9]\\d*)"))
+                return false;
+        }
+        return true;
+    }
 }

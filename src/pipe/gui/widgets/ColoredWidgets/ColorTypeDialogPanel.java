@@ -116,11 +116,22 @@ public class ColorTypeDialogPanel extends JPanel {
     private void initValues() {
         nameTextField.setText(oldName);
         if (!(oldColorType instanceof ProductType)) { // colortype is always either ProductType or Cyclic
-            colorTypeComboBox.setSelectedIndex(0);
-            for (dk.aau.cs.model.CPN.Color element : oldColorType) {
-                cyclicModel.addElement(element);
+            if(oldColorType.isIntegerRange()){
+                colorTypeComboBox.setSelectedIndex(1);
+                for (dk.aau.cs.model.CPN.Color element : oldColorType) {
+                    cyclicModel.addElement(element);
+                }
+                lowerBoundTextField.setText(cyclicModel.get(0).toString());
+
+                upperBoundTextField.setText(cyclicModel.get(cyclicModel.getSize()-1).toString());
+            } else{
+                colorTypeComboBox.setSelectedIndex(0);
+                for (dk.aau.cs.model.CPN.Color element : oldColorType) {
+                    cyclicModel.addElement(element);
+                }
             }
             enumList.setModel(cyclicModel);
+
         }
         else {
             colorTypeComboBox.setSelectedIndex(2);
