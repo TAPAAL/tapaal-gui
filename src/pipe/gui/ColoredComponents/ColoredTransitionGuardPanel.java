@@ -17,8 +17,6 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.TAPNTransitionEditor;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.MutableAttributeSet;

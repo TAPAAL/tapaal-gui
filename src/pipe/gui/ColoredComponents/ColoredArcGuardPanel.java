@@ -11,7 +11,6 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -23,7 +22,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.*;
 
 import javax.swing.*;
@@ -36,7 +34,6 @@ import javax.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 

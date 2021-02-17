@@ -39,6 +39,12 @@ public class ArcExpressionParser {
 		ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
 		return parser.AddExpression();
 	}
+	public static ArcExpression parseNumberOfExpression(String expression, ColorType inputPlaceColorType, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
+        colorType = inputPlaceColorType;
+        network = inputNetwork;
+        ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
+        return parser.NumberOfExpression();
+    }
 }
 
 
@@ -54,7 +60,7 @@ TOKEN :
 
 TOKEN :
 {
-	< NUM: ( ["1"-"9"] )+ >
+	< NUM: ["1"-"9"] (["0"-"9"])* >
 	|
 	<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
 }
@@ -192,7 +198,7 @@ ColorExpression Element() : {
                   return new AllExpression(constituentColorType);
 
               }
-    | name = <IDENT> ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
+    | (name = <IDENT> | name = <NUM> ) ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
     {
         ColorExpression cexpr = null;
 

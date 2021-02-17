@@ -34,7 +34,7 @@ public class VariablesDialogPanel extends JPanel {
     Dimension size;
     JLabel nameLabel;
 
-    JComboBox colorTypeComboBox;
+    JComboBox<ColorType> colorTypeComboBox;
     JLabel colorTypeLabel;
 
     JPanel container;
@@ -181,7 +181,7 @@ public class VariablesDialogPanel extends JPanel {
         int variableIndex = 0;
         for (ColorType element : colorTypes) {
             if(!element.isProductColorType()){
-                colorTypeComboBox.addItem(element.getName());
+                colorTypeComboBox.addItem(element);
                 if (variable != null) {
                     if (element.getName().equals(variable.getColorType().getName())) {
                         variableIndex = colorTypeComboBox.getItemCount() - 1;
@@ -289,7 +289,7 @@ public class VariablesDialogPanel extends JPanel {
         }
         else {
             //TODO SAME AS THE ONE OVER
-            listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex())));
+            listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
         }
         exit();
 
