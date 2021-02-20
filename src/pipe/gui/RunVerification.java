@@ -248,6 +248,7 @@ public class RunVerification extends RunVerificationBase {
                     if (!dialog.isResizable()) {
                         //set resizable to true
                         dialog.setResizable(true);
+                        dialog.setMinimumSize(dialog.getPreferredSize());
                     }
                 }
             }
