@@ -2803,10 +2803,8 @@ public class QueryDialog extends JPanel {
 	    useTraceRefinement.setEnabled(false);
 
 	    if (reduction != null && reduction.equals(ReductionOption.VerifyPN) && !hasInhibitorArcs &&
-            (newProperty.toString().contains("AG") && !(newProperty.toString().contains("EF") ||
-             newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))) ||
-            (newProperty.toString().contains("EF") && !(newProperty.toString().contains("AG") ||
-             newProperty.toString().contains("EG") || newProperty.toString().contains("AF")))) {
+            (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
+            !newProperty.hasNestedPathQuantifiers()) {
 	        useTraceRefinement.setEnabled(true);
         }
     }
