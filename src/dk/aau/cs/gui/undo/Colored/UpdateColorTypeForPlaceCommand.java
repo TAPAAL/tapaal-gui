@@ -37,13 +37,13 @@ public class UpdateColorTypeForPlaceCommand extends Command {
         oldTokenExpression = place.getTokensAsExpression();
 
         for (TimedToken token : place.tokens()) {
-            if (!place.getColorType().contains(token.color())) {
+            if (!newColorType.contains(token.color())) {
                 tokensToRemove.add(token);
             }
         }
 
         for (ColoredTimeInvariant invariant : place.getCtiList()) {
-            if (!place.getColorType().contains(invariant.getColor())) {
+            if (!newColorType.contains(invariant.getColor())) {
                 invariantsToRemove.add(invariant);
             }
         }
