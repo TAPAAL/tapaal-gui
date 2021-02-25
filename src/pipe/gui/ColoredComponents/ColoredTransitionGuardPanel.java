@@ -200,11 +200,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     } else {
                         expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
                     }
+                    expr.setIndex(i);
                     tempVec.add(expr);
                 }
                 newExpression = new TupleExpression(tempVec);
             } else {
                 ColorExpression expr;
+                ColorExpression oldExpression = ((ColorExpression)currentSelection.getObject());
                 Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[0].getSelectedItem();
                 if (selectedElement instanceof String) {
                     expr = new AllExpression(colorCombobox.getColorType());
@@ -213,6 +215,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 }
                 else {
                     expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                }
+                if(oldExpression.getParent() instanceof TupleExpression){
+                    expr.setParent(oldExpression.getParent());
+                    expr.setIndex(oldExpression.getIndex());
                 }
                 newExpression = expr;
             }
@@ -845,15 +851,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private void initExpr() {
         TimedTransition t = transition.underlyingTransition();
+        newProperty = new PlaceHolderGuardExpression();
         if (t.getGuard() != null) {
-            newProperty = new PlaceHolderGuardExpression();
-            updateSelection(newProperty);
-            parseExpression(t.getGuard());
+            newProperty = t.getGuard().copy();
         }
-        else {
-            newProperty = new PlaceHolderGuardExpression();
-            exprField.setText(newProperty.toString());
-        }
+        updateSelection(newProperty);
     }
 
     private void addPropertyToExpr(Expression property) {
@@ -951,7 +953,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
-        Logger.log(currentSelection.getObject());
+
         updateEnabledButtons();
         updateColorOptions();
         //TODO: updateexprButtonsAccordingToSelection; line 573
@@ -1072,7 +1074,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
     }
 
-    private void parseExpression(GuardExpression expression) {
+    /*private void parseExpression(GuardExpression expression) {
         if (expression instanceof AndExpression) {
             AndExpression andExpr = new AndExpression(((AndExpression) expression).getLeftExpression(), ((AndExpression) expression).getRightExpression());
             newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
@@ -1120,7 +1122,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             updateSelection(lessExpr);
         }
 
-    }
+    }*/
     private void updateColorType() {
         ColorType ct;
         ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
