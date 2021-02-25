@@ -72,6 +72,7 @@ public class TAPNComposer implements ITAPNComposer {
 		DataLayer guiModel = new DataLayer();
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
+        tapn.setParentNetwork(model);
 		
 		int greatestWidth = 0, greatestHeight = 0;
 		if (this.guiModels != null) {

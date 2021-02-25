@@ -2,6 +2,8 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -92,7 +94,13 @@ public class TimedArcPetriNet {
                 arc.getOutputExpression().getValues(values);
             }
         }
-        if(!values.getColors().isEmpty() || !values.getColorTypes().isEmpty() || !values.getVariables().isEmpty()){
+        boolean hasColors = false;
+        for(Color color : values.getColors()){
+            if(color.getColorType() != ColorType.COLORTYPE_DOT){
+                hasColors = true;
+            }
+        }
+        if(hasColors || !values.getColorTypes().isEmpty() || !values.getVariables().isEmpty()){
             return true;
         }
 

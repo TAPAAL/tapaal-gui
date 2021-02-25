@@ -18,10 +18,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private boolean useSiphontrap = false; 
 	private boolean useQueryReduction = true; 
 	private boolean useStubbornReduction = true;
+	private boolean coloredNet = false;
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, 
 		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
+		boolean siphontrap, boolean queryReduction, boolean stubbornReduction, boolean coloredNet) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
@@ -29,13 +30,14 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.useSiphontrap = siphontrap;
 		this.useQueryReduction = queryReduction;
 		this.useStubbornReduction = stubbornReduction;
+		this.coloredNet = coloredNet;
 	}
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, 
 		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
 		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
 		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
-			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction);
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, false);
 	}
 
 	@Override
@@ -61,7 +63,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		}
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			result.append(" -x 1");
+			if(!coloredNet){
+                result.append(" -x 1");
+            }
 		}
 		
 		if (this.useSiphontrap) {

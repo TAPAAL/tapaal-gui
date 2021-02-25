@@ -39,14 +39,14 @@ import pipe.dataLayer.DataLayer;
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-		super(modelChecker, messenger, guiModels);
+	public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+		super(modelChecker, unfoldingEngine, messenger, guiModels);
 		iconSelector = selector;
 		this.callback = callback;
 	}
 	
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null, null);
+	public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger) {
+		this(modelChecker, unfoldingEngine, selector, messenger, null, null);
 	}
 
 	@Override

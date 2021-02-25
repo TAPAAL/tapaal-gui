@@ -11,6 +11,7 @@ import javax.swing.SwingWorker;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabTransformer;
@@ -46,10 +47,12 @@ import pipe.dataLayer.Template;
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
 	protected ModelChecker modelChecker;
+    protected ModelChecker unfoldingEngine;
 
 	protected VerificationOptions options;
 	protected TimedArcPetriNetNetwork model;
 	protected TAPNQuery query;
+	protected TAPNQuery clonedQuery;
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
     protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
     protected String queryPath = null;
@@ -57,9 +60,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+	public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		super();
 		this.modelChecker = modelChecker;
+		this.unfoldingEngine = unfoldingEngine;
 		this.messenger = messenger;
 		this.guiModels = guiModels;
 	}
@@ -78,10 +82,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		ITAPNComposer composer = new TAPNComposer(messenger, guiModels, false, true);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 
-
-		//this is needed to get the declarations for colored nets
-        transformedModel.value1().setParentNetwork(model);
-
 		if (options.enabledOverApproximation())
 		{
 			OverApproximation overaprx = new OverApproximation();
@@ -93,7 +93,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			underaprx.modifyTAPN(transformedModel.value1(), options.approximationDenominator());
 		}
 
-		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
+		clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 		
 		if (dataLayerQuery != null){
@@ -109,7 +109,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					// Skip over-approximation if model is not supported.
 					// Prevents verification from displaying error.
 				}
-
 
 				if(model.isColored()){
                     transformedModel = unfoldColoredNet((TAPNComposer) composer, transformedModel, clonedQuery);
@@ -133,7 +132,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     dataLayerQuery.getAlgorithmOption(),
                                     dataLayerQuery.isSiphontrapEnabled(),
                                     dataLayerQuery.isQueryReductionEnabled(),
-                                    dataLayerQuery.isStubbornReductionEnabled()
+                                    dataLayerQuery.isStubbornReductionEnabled(),
+                                    model.isColored()
                                 ),
                                 transformedModel,
                                 clonedQuery,
@@ -153,7 +153,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
                                     false,
                                     true,
-                                    false
+                                    false,
+                                    model.isColored()
                                 ),
                                 transformedModel,
                                 clonedQuery,
@@ -182,7 +183,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		} else if(model.isColored()){
             transformedModel = unfoldColoredNet((TAPNComposer) composer, transformedModel, clonedQuery);
         }
-		
 		ApproximationWorker worker = new ApproximationWorker();
 
 		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, queryPath);
@@ -213,7 +213,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             modelOut = File.createTempFile("modelOut", ".xml");
             queryOut = File.createTempFile("queryOut", ".q");
             modelFile = File.createTempFile("modelIn", ".tapn");
-            queryFile = File.createTempFile("queryIn", ".q");
+            queryFile = File.createTempFile("queryIn", ".xml");
             writerTACPN.savePNML(modelFile);
         } catch (IOException e){
             e.printStackTrace();
@@ -224,18 +224,20 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
         queryPath = queryOut.getAbsolutePath();
 
-        OutputStream os;
-        try {
-            os = new FileOutputStream(queryFile);
-            os.write(clonedQuery.toString().getBytes(), 0, clonedQuery.toString().length());
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        try{
+            PrintStream queryStream = new PrintStream(queryFile);
+            CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+            queryStream.append(XMLVisitor.getXMLQueryFor(clonedQuery.getProperty(), null));
+            queryStream.close();
+        } catch(FileNotFoundException e) {
+            System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
+            return null;
         }
+
         transformedModel = getUnfoldedModel(modelFile, queryFile);
 
         VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "tt", false, false);
-        ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+        ProcessRunner runner = new ProcessRunner(unfoldingEngine.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
         String errorOutput = readOutput(runner.errorOutput());
         String standardOutput = readOutput(runner.standardOutput());
@@ -263,7 +265,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
 
         VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(unfoldModelFile.getAbsolutePath(), unfoldQueryFile.getAbsolutePath(), "ff", false, false);
-        ProcessRunner runner = new ProcessRunner(TabTransformer.getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+
+	    ProcessRunner runner = new ProcessRunner(unfoldingEngine.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
         TapnXmlLoader tapnLoader = new TapnXmlLoader();
@@ -275,7 +278,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             loadedModel = tapnLoader.load(fileOut);
             TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
-            newTab.addQuery(getQuery(unfoldQueryFile, loadedModel.network()));
+            pipe.dataLayer.TAPNQuery unfoldedQuery = getQuery(unfoldQueryFile, loadedModel.network());
+            clonedQuery = new TAPNQuery(unfoldedQuery.getProperty().copy(), clonedQuery.getExtraTokens());
+            newTab.addQuery(unfoldedQuery);
             CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab));
             model = loadedModel.network();
         } catch (FormatException e) {
@@ -324,6 +329,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			showResult(result);
 
 		} else {
+		    unfoldingEngine.kill();
 			modelChecker.kill();
 			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");
 

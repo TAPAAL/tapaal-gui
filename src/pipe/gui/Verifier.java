@@ -113,7 +113,7 @@ public class Verifier {
 		}
 
 		if (timedArcPetriNetNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
+			RunVerificationBase thread = new RunVerification(verifyta, verifyta, new UppaalIconSelector(), new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(
 					verifytaOptions,
@@ -154,7 +154,7 @@ public class Verifier {
 		int bound = query.getCapacity();
 		
 		VerifyTAPNOptions verifytapnOptions;
-		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
+		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())){
 			verifytapnOptions = new VerifyDTAPNOptions(
 					bound,
 					query.getTraceOption(),
@@ -187,8 +187,10 @@ public class Verifier {
 					query.getAlgorithmOption(),
 					query.isSiphontrapEnabled(),
 					query.isQueryReductionEnabled(),
-					query.isStubbornReductionEnabled()
+					query.isStubbornReductionEnabled(),
+                    tapnNetwork.isColored()
 			);
+
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(
 					bound,
@@ -209,7 +211,19 @@ public class Verifier {
 		}
 		
 		if (tapnNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+            RunVerificationBase thread;
+		    if(tapnNetwork.isColored() && !tapnNetwork.isUntimed()){
+                ModelChecker unfoldingEngine = getVerifyPN();
+                if (!unfoldingEngine.isCorrectVersion()) {
+                    new MessengerImpl().displayErrorMessage(
+                        "No "+unfoldingEngine+" specified: The verification is cancelled",
+                        "Verification Error");
+                    return;
+                }
+                thread = new RunVerification(verifytapn, unfoldingEngine, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+            } else {
+                thread = new RunVerification(verifytapn, verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+            }
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
 			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
 			dialog.setVisible(true);

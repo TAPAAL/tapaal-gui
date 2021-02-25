@@ -57,7 +57,7 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
 
     @Override
     public String toString() {
-        String options =  "--write-simplified " + queryOut + " --write-reduced " + modelOut;
+        String options =  "--write-simplified " + queryOut + " --write-reduced " + modelOut + " -x 1";
 
         if(!reduceQuery){
             options += " -q 0 ";

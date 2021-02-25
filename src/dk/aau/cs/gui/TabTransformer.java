@@ -443,7 +443,7 @@ public class TabTransformer {
                 return unfoldpath;
             }
             else {
-                FileDialog dialog = new FileDialog((Frame)null, "Select File to Open");
+                FileDialog dialog = new FileDialog((Frame)null, "Select Unfolding Engine");
                 dialog.setMode(FileDialog.LOAD);
                 dialog.setVisible(true);
                 unfoldpath = dialog.getDirectory() + dialog.getFile();

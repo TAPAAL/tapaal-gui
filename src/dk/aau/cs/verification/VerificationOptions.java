@@ -16,7 +16,6 @@ public abstract class VerificationOptions {
 	protected boolean useStateequationCheck;
 	protected int extraTokens;
 
-
 	public abstract String toString();
 
 	public boolean enabledStateequationsCheck() {
