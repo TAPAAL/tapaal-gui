@@ -1109,7 +1109,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void setTimeConstraints() {
         List<ColoredTimeInterval> timeIntervals;
 
-        if (isTransportArc){
+        if (isInputTransportArc){
             timeIntervals = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getColorTimeIntervals();
         }
         else if(isInputArc && !isInhibitorArc){
