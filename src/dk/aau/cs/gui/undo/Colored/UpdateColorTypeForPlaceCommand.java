@@ -59,12 +59,20 @@ public class UpdateColorTypeForPlaceCommand extends Command {
         if(place.getTokensAsExpression() != null){
             newTokenExpression = place.getTokensAsExpression().deepCopy();
             newTokenExpression.replace(oldColorExpr, newColorExpr);
+
             for(Color color : removedColors){
                 newTokenExpression = newTokenExpression.removeColorFromExpression(color, newColorType);
                 if(newTokenExpression == null){
                     break;
                 }
             }
+        }
+        //For arcs we want the numberofexpressions unwrapped if there is only one
+        //but for places we want it to be addexpressions
+        if(newTokenExpression instanceof NumberOfExpression){
+            Vector<ArcExpression> numberOfExpressionVector = new Vector<>();
+            numberOfExpressionVector.add(newTokenExpression);
+            newTokenExpression = new AddExpression(numberOfExpressionVector);
         }
         if(newTokenExpression != null){
             updateColorTypesOnColorsInExpression();
@@ -134,6 +142,8 @@ public class UpdateColorTypeForPlaceCommand extends Command {
                     } catch (RequireException e){
                         System.out.println(e.getMessage());
                     }
+                } else if(cexpr instanceof AllExpression){
+                    ((AllExpression)cexpr).setColorType(newColorType);
                 }
             }
         }

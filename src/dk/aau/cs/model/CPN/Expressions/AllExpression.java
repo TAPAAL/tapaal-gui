@@ -23,6 +23,10 @@ public class AllExpression extends ColorExpression {
         return this.sort;
     }
 
+    public ColorType setColorType(ColorType newType){
+        return this.sort = newType;
+    }
+
     public AllExpression(ColorType sort) {
         this.sort = sort;
     }
