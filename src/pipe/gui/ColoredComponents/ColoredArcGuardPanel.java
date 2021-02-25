@@ -930,7 +930,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
 
         if(expression != null){
-            arcExpression = expression;
+            arcExpression = expression.deepCopy();
         }
         exprField.setText(arcExpression.toString());
         updateSelection(arcExpression);
