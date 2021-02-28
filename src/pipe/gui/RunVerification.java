@@ -229,9 +229,9 @@ public class RunVerification extends RunVerificationBase {
         scroll.setPreferredSize(new Dimension(640,400));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -245,6 +245,7 @@ public class RunVerification extends RunVerificationBase {
                 //check to see if the ancestor is an instance of Dialog and isn't resizable
                 if (window instanceof Dialog) {
                     Dialog dialog = (Dialog) window;
+                    dialog.setMinimumSize(dialog.getPreferredSize());
                     if (!dialog.isResizable()) {
                         //set resizable to true
                         dialog.setResizable(true);
