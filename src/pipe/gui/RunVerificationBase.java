@@ -122,7 +122,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 										dataLayerQuery.isSiphontrapEnabled(),
 										dataLayerQuery.isQueryReductionEnabled()? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime: pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
 										dataLayerQuery.isStubbornReductionEnabled(),
-                                        reducedNetFilePath
+                                        reducedNetFilePath,
+                                        dataLayerQuery.isTarOptionEnabled()
 								),
 								transformedModel,
 								clonedQuery
@@ -143,7 +144,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 										false,
                                         pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,
 										false,
-                                        reducedNetFilePath
+                                        reducedNetFilePath,
+                                        false
 								),
 								transformedModel,
 								clonedQuery

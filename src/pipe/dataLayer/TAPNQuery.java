@@ -72,6 +72,7 @@ public class TAPNQuery {
 	private boolean useSiphontrap = false; 
 	private boolean useQueryReduction = true; 
 	private boolean useStubbornReduction = true;
+	private boolean useTarOption = false;
 
 	/**
 	 * @param name
@@ -107,6 +108,14 @@ public class TAPNQuery {
 	public boolean isStubbornReductionEnabled() {
 		return this.useStubbornReduction;
 	}
+
+	public boolean isTarOptionEnabled() {
+	    return this.useTarOption;
+    }
+
+    public void setUseTarOption(boolean useTarOption) {
+	    this.useTarOption = useTarOption;
+    }
 
 	public int approximationDenominator() {
 		return this.denominator;
@@ -361,6 +370,7 @@ public class TAPNQuery {
 		useSiphontrap = newQuery.isSiphontrapEnabled();
 		useQueryReduction = newQuery.isQueryReductionEnabled();
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
+		useTarOption = newQuery.isTarOptionEnabled();
 	}
 
 	public InclusionPlaces inclusionPlaces() {

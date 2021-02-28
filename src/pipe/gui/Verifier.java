@@ -176,7 +176,6 @@ public class Verifier {
 					query.isStubbornReductionEnabled()
 			);
 		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-
             try {
                 reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
             } catch (IOException e) {
@@ -202,7 +201,8 @@ public class Verifier {
                     query.isSiphontrapEnabled(),
                     TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
-                    reducedNetTempFile.getAbsolutePath()
+                    reducedNetTempFile.getAbsolutePath(),
+                    query.isTarOptionEnabled()
                 );
             } else {
                 verifytapnOptions = new VerifyPNOptions(
@@ -219,10 +219,10 @@ public class Verifier {
                     query.isSiphontrapEnabled(),
                     query.isQueryReductionEnabled()? TAPNQuery.QueryReductionTime.UnlimitedTime: TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
-                    reducedNetTempFile.getAbsolutePath()
+                    reducedNetTempFile.getAbsolutePath(),
+                    query.isTarOptionEnabled()
                 );
             }
-
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(
 					bound,

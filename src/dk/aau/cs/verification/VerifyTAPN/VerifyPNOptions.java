@@ -19,26 +19,28 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private boolean useSiphontrap = false; 
 	private QueryReductionTime queryReductionTime;
 	private boolean useStubbornReduction = true;
+	private boolean useTarOption;
 	private String pathToReducedNet;
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, String pathToReducedNet) {
-		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, String pathToReducedNet, boolean useTarOption) {
+		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
 		this.algorithmOption = algorithmOption;
 		this.useSiphontrap = siphontrap;
 		this.queryReductionTime = queryReduction;
 		this.useStubbornReduction = stubbornReduction;
+		this.useTarOption = useTarOption;
 		this.pathToReducedNet = pathToReducedNet;
 	}
-	
+
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
                            boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction) {
 		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
-			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null);
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, false);
 	}
 
 	@Override
@@ -83,6 +85,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (!this.useStubbornReduction) {
 			result.append(" -p ");
 		}
+		if (this.useTarOption) {
+		    result.append(" -tar ");
+        }
 		return result.toString();
 	}
 
