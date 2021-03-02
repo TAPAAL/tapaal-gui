@@ -1292,6 +1292,7 @@ public class QueryDialog extends JPanel {
         useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
         useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
         useReduction.setSelected(queryToCreateFrom.useReduction());
+        useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
     }
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
