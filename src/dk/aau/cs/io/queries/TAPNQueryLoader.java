@@ -91,7 +91,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
 		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
 		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
-		boolean useTar = getTarOption(queryElement, "useTar", false);
+		boolean useTar = getTarOption(queryElement, "useTarOption", false);
 
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
