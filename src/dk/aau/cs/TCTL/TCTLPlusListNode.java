@@ -36,7 +36,14 @@ public class TCTLPlusListNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        for(TCTLAbstractProperty property : terms) {
+            property.convertForReducedNet(templateName);
+        }
+    }
+
+    @Override
 	public TCTLAbstractStateProperty copy() {
 		ArrayList<TCTLAbstractStateProperty> copy = new ArrayList<TCTLAbstractStateProperty>();
 		

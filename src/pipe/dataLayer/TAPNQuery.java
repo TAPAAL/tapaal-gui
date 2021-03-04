@@ -16,6 +16,10 @@ public class TAPNQuery {
 		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT
 	}
 
+	public enum QueryReductionTime {
+	    NoTime, ShortestTime, UnlimitedTime
+    }
+
 	public enum HashTableSize {
 		MB_4, MB_16, MB_64, MB_256, MB_512
 	}
@@ -68,6 +72,7 @@ public class TAPNQuery {
 	private boolean useSiphontrap = false; 
 	private boolean useQueryReduction = true; 
 	private boolean useStubbornReduction = true;
+	private boolean useTarOption = false;
 
 	/**
 	 * @param name
@@ -103,6 +108,14 @@ public class TAPNQuery {
 	public boolean isStubbornReductionEnabled() {
 		return this.useStubbornReduction;
 	}
+
+	public boolean isTarOptionEnabled() {
+	    return this.useTarOption;
+    }
+
+    public void setUseTarOption(boolean useTarOption) {
+	    this.useTarOption = useTarOption;
+    }
 
 	public int approximationDenominator() {
 		return this.denominator;
@@ -357,6 +370,7 @@ public class TAPNQuery {
 		useSiphontrap = newQuery.isSiphontrapEnabled();
 		useQueryReduction = newQuery.isQueryReductionEnabled();
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
+		useTarOption = newQuery.isTarOptionEnabled();
 	}
 
 	public InclusionPlaces inclusionPlaces() {
@@ -429,5 +443,11 @@ public class TAPNQuery {
             return true;
         }
         return false;
+    }
+
+    public TAPNQuery convertPropertyForReducedNet(String templateName){
+	    TAPNQuery convertedQuery = copy();
+	    convertedQuery.property.convertForReducedNet(templateName);
+        return  convertedQuery;
     }
 }

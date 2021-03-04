@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
@@ -14,7 +15,6 @@ import javax.xml.transform.TransformerException;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
@@ -56,17 +56,25 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
     protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
     protected String queryPath = null;
-	
+	protected String reducedNetFilePath;
+	protected boolean reduceNetOnly;
+	protected boolean reducedNetOpened = false;
 	
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+	public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
 		super();
 		this.modelChecker = modelChecker;
 		this.unfoldingEngine = unfoldingEngine;
 		this.messenger = messenger;
 		this.guiModels = guiModels;
+		this.reducedNetFilePath = reducedNetFilePath;
+		this.reduceNetOnly = reduceNetOnly;
 	}
+
+    public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+        this(modelChecker, unfoldingEngine, messenger, guiModels, "",false);
+    }
 
 	
 	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
@@ -131,9 +139,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     dataLayerQuery.getCategory(),
                                     dataLayerQuery.getAlgorithmOption(),
                                     dataLayerQuery.isSiphontrapEnabled(),
-                                    dataLayerQuery.isQueryReductionEnabled(),
+                                    dataLayerQuery.isQueryReductionEnabled()? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime: pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
                                     dataLayerQuery.isStubbornReductionEnabled(),
-                                    model.isColored()
+                                    model.isColored(),
+                                    reducedNetFilePath,
+                                    dataLayerQuery.isTarOptionEnabled()
                                 ),
                                 transformedModel,
                                 clonedQuery,
@@ -152,9 +162,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     pipe.dataLayer.TAPNQuery.QueryCategory.Default,
                                     pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
                                     false,
-                                    true,
+                                    dataLayerQuery.isQueryReductionEnabled()? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime: pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
                                     false,
-                                    model.isColored()
+                                    model.isColored(),
+                                    reducedNetFilePath,
+                                    dataLayerQuery.isTarOptionEnabled()
                                 ),
                                 transformedModel,
                                 clonedQuery,

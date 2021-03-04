@@ -281,6 +281,7 @@ public class VerifyPN implements ModelChecker{
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 			
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
+
 			VerifyTAPNExporter exporter;
 			if(model.value1().parentNetwork().isColored()){
 			    exporter = new VerifyCPNExporter();
@@ -288,7 +289,7 @@ public class VerifyPN implements ModelChecker{
             } else {
                 exporter = new VerifyPNExporter();
             }
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, queryPath);
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, queryPath, model.value2());
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");
@@ -318,8 +319,9 @@ public class VerifyPN implements ModelChecker{
 			((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 		}
 
-		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) throws IOException {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
+
             runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
 
@@ -337,7 +339,7 @@ public class VerifyPN implements ModelChecker{
 					ctlOutput = queryResult.value1().isCTL;
 					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult);
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput);
 				}
 			}
 		}

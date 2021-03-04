@@ -16,8 +16,9 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
-
 import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -28,221 +29,269 @@ import java.util.HashMap;
  */
 
 public class Verifier {
-	private static Verifyta getVerifyta() {
-		Verifyta verifyta = new Verifyta(new FileFinder(), new MessengerImpl());
-		verifyta.setup();
-		return verifyta;
-	}
+    private static File reducedNetTempFile = null;
 
-	private static VerifyTAPN getVerifyTAPN() {
-		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinder(), new MessengerImpl());
-		verifytapn.setup();
-		return verifytapn;
-	}
+    private static Verifyta getVerifyta() {
+        Verifyta verifyta = new Verifyta(new FileFinder(), new MessengerImpl());
+        verifyta.setup();
+        return verifyta;
+    }
 
-	private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
-		VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
-		verifydtapn.setup();
-		return verifydtapn;
-	}
+    private static VerifyTAPN getVerifyTAPN() {
+        VerifyTAPN verifytapn = new VerifyTAPN(new FileFinder(), new MessengerImpl());
+        verifytapn.setup();
+        return verifytapn;
+    }
 
-	private static VerifyPN getVerifyPN() {
-		VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
-		verifypn.setup();
-		return verifypn;
-	}
+    private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
+        VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+        verifydtapn.setup();
+        return verifydtapn;
+    }
 
-	public static ModelChecker getModelChecker(TAPNQuery query) {
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
-			return getVerifyTAPN();
-		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			return getVerifydTAPN();
-		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			return getVerifyPN();
-		}
-		else{
-			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
-		}
-	}
+    private static VerifyPN getVerifyPN() {
+        VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
+        verifypn.setup();
+        return verifypn;
+    }
 
-	public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
-		ModelChecker modelChecker;
-		
-		if(tapnNetwork.isUntimed()){
-			modelChecker = getVerifyPN();
-		} else if(tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()){
-			modelChecker = getVerifydTAPN();
-		} else {
-			modelChecker = getVerifyTAPN();
-		}
+    public static ModelChecker getModelChecker(TAPNQuery query) {
+        if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
+            return getVerifyTAPN();
+        } else if (query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
+            return getVerifydTAPN();
+        } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+            return getVerifyPN();
+        } else {
+            throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
+        }
+    }
 
-		ModelChecker unfoldingEngine = getVerifyPN();
+    public static String getReducedNetFilePath() {
+        return reducedNetTempFile.getAbsolutePath();
+    }
 
-		if (!modelChecker.isCorrectVersion() ) {
+    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
+        ModelChecker modelChecker;
+
+        if (tapnNetwork.isUntimed()) {
+            modelChecker = getVerifyPN();
+        } else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
+            modelChecker = getVerifydTAPN();
+        } else {
+            modelChecker = getVerifyTAPN();
+        }
+
+        ModelChecker unfoldingEngine = getVerifyPN();
+
+        if (!modelChecker.isCorrectVersion()) {
             new MessengerImpl().displayErrorMessage(
-                "No "+modelChecker+" specified or you are running an old version of it:\nThe verification is cancelled",
-                "Verification Error");
-            return;
-		}
-        if (!unfoldingEngine.isCorrectVersion() ) {
-            new MessengerImpl().displayErrorMessage(
-                "No "+unfoldingEngine+" specified or you are running an old version of it:\nThe verification is cancelled",
+                "No " + modelChecker + " specified or you are running an old version of it:\nThe verification is cancelled",
                 "Verification Error");
             return;
         }
-		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, unfoldingEngine, new MessengerImpl(), tokensControl);
-		optimizer.analyze();
-	}
-
-
-	public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
-		Verifyta verifyta = getVerifyta();
-		if (!verifyta.isCorrectVersion()) {
-			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
-							+ "Update to the latest development version.");
-			return;
-		}
-
-		TCTLAbstractProperty inputQuery = input.getProperty();
-
-		VerifytaOptions verifytaOptions = new VerifytaOptions(
-				input.getTraceOption(),
-				input.getSearchOption(),
-				false,
-				input.getReductionOption(),
-				input.useSymmetry(),
-				input.useOverApproximation(),
-				input.isOverApproximationEnabled(),
-				input.isUnderApproximationEnabled(),
-				input.approximationDenominator()
-		);
-
-		if (inputQuery == null) {
-			return;
-		}
-
-		if (timedArcPetriNetNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifyta, verifyta, new UppaalIconSelector(), new MessengerImpl());
-			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
-			thread.execute(
-					verifytaOptions,
-					timedArcPetriNetNetwork,
-					new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()),
-					null
-			);
-			dialog.setVisible(true);
-		} else {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"There was an error converting the model.",
-					"Conversion error", JOptionPane.ERROR_MESSAGE);
-		}
-
-	}
-
-    public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
-        runVerifyTAPNVerification(tapnNetwork, query, callback, null);
+        if (!unfoldingEngine.isCorrectVersion()) {
+            new MessengerImpl().displayErrorMessage(
+                "No " + unfoldingEngine + " specified or you are running an old version of it:\nThe verification is cancelled",
+                "Verification Error");
+            return;
+        }
+        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, unfoldingEngine, new MessengerImpl(), tokensControl);
+        optimizer.analyze();
     }
 
-	public static void runVerifyTAPNVerification(
-			TimedArcPetriNetNetwork tapnNetwork,
-			TAPNQuery query,
-			VerificationCallback callback,
-            HashMap<TimedArcPetriNet, DataLayer> guiModels
-	) {
-		ModelChecker verifytapn = getModelChecker(query);
 
-		if (!verifytapn.isCorrectVersion()) {
-			new MessengerImpl().displayErrorMessage(
-					"No "+verifytapn+" specified: The verification is cancelled",
-					"Verification Error");
-			return;
-		}
-		
-		TCTLAbstractProperty inputQuery = query.getProperty();
+    public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
+        Verifyta verifyta = getVerifyta();
+        if (!verifyta.isCorrectVersion()) {
+            System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
+                + "Update to the latest development version.");
+            return;
+        }
 
-		int bound = query.getCapacity();
-		
-		VerifyTAPNOptions verifytapnOptions;
-		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())){
-			verifytapnOptions = new VerifyDTAPNOptions(
-					bound,
-					query.getTraceOption(),
-					query.getSearchOption(),
-					query.useSymmetry(),
-					query.useGCD(),
-					query.useTimeDarts(),
-					query.usePTrie(),
-					query.useOverApproximation(),
-					query.discreteInclusion(),
-					query.inclusionPlaces(),
-					query.getWorkflowMode(),
-					query.getStrongSoundnessBound(),
-					query.isOverApproximationEnabled(),
-					query.isUnderApproximationEnabled(),
-					query.approximationDenominator(),
-					query.isStubbornReductionEnabled()
-			);
-		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
-			verifytapnOptions = new VerifyPNOptions(
-					bound,
-					query.getTraceOption(),
-					query.getSearchOption(),
-					query.useOverApproximation(),
-					query.useReduction()? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
-					query.isOverApproximationEnabled(),
-					query.isUnderApproximationEnabled(),
-					query.approximationDenominator(),
-					query.getCategory(),
-					query.getAlgorithmOption(),
-					query.isSiphontrapEnabled(),
-					query.isQueryReductionEnabled(),
-					query.isStubbornReductionEnabled(),
-                    tapnNetwork.isColored()
-			);
+        TCTLAbstractProperty inputQuery = input.getProperty();
 
-		} else {
-			verifytapnOptions = new VerifyTAPNOptions(
-					bound,
-					query.getTraceOption(),
-					query.getSearchOption(),
-					query.useSymmetry(),
-					query.useOverApproximation(),
-					query.discreteInclusion(),
-					query.inclusionPlaces(),
-					query.isOverApproximationEnabled(),
-					query.isUnderApproximationEnabled(),
-					query.approximationDenominator()
-			);
-		}
-		
-		if (inputQuery == null) {
-			return;
-		}
-		
-		if (tapnNetwork != null) {
+        VerifytaOptions verifytaOptions = new VerifytaOptions(
+            input.getTraceOption(),
+            input.getSearchOption(),
+            false,
+            input.getReductionOption(),
+            input.useSymmetry(),
+            input.useOverApproximation(),
+            input.isOverApproximationEnabled(),
+            input.isUnderApproximationEnabled(),
+            input.approximationDenominator()
+        );
+
+        if (inputQuery == null) {
+            return;
+        }
+
+        if (timedArcPetriNetNetwork != null) {
+            RunVerificationBase thread = new RunVerification(verifyta, verifyta, new UppaalIconSelector(), new MessengerImpl());
+            RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+            thread.execute(
+                verifytaOptions,
+                timedArcPetriNetNetwork,
+                new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()),
+                null
+            );
+            dialog.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                "There was an error converting the model.",
+                "Conversion error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+    public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
+        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false);
+    }
+
+    public static void runVerifyTAPNVerification(
+        TimedArcPetriNetNetwork tapnNetwork,
+        TAPNQuery query,
+        VerificationCallback callback,
+        HashMap<TimedArcPetriNet, DataLayer> guiModels,
+        boolean onlyCreateReducedNet
+    ) {
+        ModelChecker verifytapn = getModelChecker(query);
+
+
+        if (!verifytapn.isCorrectVersion()) {
+            new MessengerImpl().displayErrorMessage(
+                "No " + verifytapn + " specified: The verification is cancelled",
+                "Verification Error");
+            return;
+        }
+
+        TCTLAbstractProperty inputQuery = query.getProperty();
+
+        int bound = query.getCapacity();
+
+        VerifyTAPNOptions verifytapnOptions;
+        if (query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())) {
+            verifytapnOptions = new VerifyDTAPNOptions(
+                bound,
+                query.getTraceOption(),
+                query.getSearchOption(),
+                query.useSymmetry(),
+                query.useGCD(),
+                query.useTimeDarts(),
+                query.usePTrie(),
+                query.useOverApproximation(),
+                query.discreteInclusion(),
+                query.inclusionPlaces(),
+                query.getWorkflowMode(),
+                query.getStrongSoundnessBound(),
+                query.isOverApproximationEnabled(),
+                query.isUnderApproximationEnabled(),
+                query.approximationDenominator(),
+                query.isStubbornReductionEnabled()
+            );
+        } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+            try {
+                reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(
+                    e.getMessage(),
+                    "Error");
+                return;
+            }
+
+            if (onlyCreateReducedNet) {
+                //These options should disable the verification and only produce the net after applying reduction rules
+                verifytapnOptions = new VerifyPNOptions(
+                    bound,
+                    query.getTraceOption(),
+                    TAPNQuery.SearchOption.OVERAPPROXIMATE,
+                    query.useOverApproximation(),
+                    query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
+                    query.isOverApproximationEnabled(),
+                    query.isUnderApproximationEnabled(),
+                    query.approximationDenominator(),
+                    query.getCategory(),
+                    query.getAlgorithmOption(),
+                    query.isSiphontrapEnabled(),
+                    TAPNQuery.QueryReductionTime.NoTime,
+                    query.isStubbornReductionEnabled(),
+                    tapnNetwork.isColored(),
+                    reducedNetTempFile.getAbsolutePath(),
+                    query.isTarOptionEnabled()
+                );
+            } else {
+                verifytapnOptions = new VerifyPNOptions(
+                    bound,
+                    query.getTraceOption(),
+                    query.getSearchOption(),
+                    query.useOverApproximation(),
+                    query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
+                    query.isOverApproximationEnabled(),
+                    query.isUnderApproximationEnabled(),
+                    query.approximationDenominator(),
+                    query.getCategory(),
+                    query.getAlgorithmOption(),
+                    query.isSiphontrapEnabled(),
+                    query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
+                    query.isStubbornReductionEnabled(),
+                    tapnNetwork.isColored(),
+                    reducedNetTempFile.getAbsolutePath(),
+                    query.isTarOptionEnabled()
+                );
+            }
+        } else {
+            verifytapnOptions = new VerifyTAPNOptions(
+                bound,
+                query.getTraceOption(),
+                query.getSearchOption(),
+                query.useSymmetry(),
+                query.useOverApproximation(),
+                query.discreteInclusion(),
+                query.inclusionPlaces(),
+                query.isOverApproximationEnabled(),
+                query.isUnderApproximationEnabled(),
+                query.approximationDenominator()
+            );
+        }
+
+        if (inputQuery == null) {
+            return;
+        }
+
+        if (tapnNetwork != null) {
             RunVerificationBase thread;
-		    if(tapnNetwork.isColored() && !tapnNetwork.isUntimed()){
+            if (tapnNetwork.isColored() && !tapnNetwork.isUntimed()) {
                 ModelChecker unfoldingEngine = getVerifyPN();
                 if (!unfoldingEngine.isCorrectVersion()) {
                     new MessengerImpl().displayErrorMessage(
-                        "No "+unfoldingEngine+" specified: The verification is cancelled",
+                        "No " + unfoldingEngine + " specified: The verification is cancelled",
                         "Verification Error");
                     return;
                 }
-                thread = new RunVerification(verifytapn, unfoldingEngine, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
-            } else {
-                thread = new RunVerification(verifytapn, verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
-            }
-			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
-			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
-			dialog.setVisible(true);
-		} else {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"There was an error converting the model.",
-					"Conversion error", JOptionPane.ERROR_MESSAGE);
-		}
 
-		return;
-		
-	}
+                if (reducedNetTempFile != null) {
+                    thread = new RunVerification(verifytapn, unfoldingEngine, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
+                } else {
+                    thread = new RunVerification(verifytapn, unfoldingEngine, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+                }
+            } else {
+                if (reducedNetTempFile != null) {
+                    thread = new RunVerification(verifytapn, verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
+                } else {
+                    thread = new RunVerification(verifytapn, verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+                }
+            }
+
+            RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
+            dialog.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                "There was an error converting the model.",
+                "Conversion error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return;
+    }
 }
