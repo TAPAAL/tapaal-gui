@@ -393,6 +393,7 @@ public class TAPNQuery {
 		copy.setUseSiphontrap(this.isQueryReductionEnabled());
 		copy.setUseQueryReduction(this.isQueryReductionEnabled());
 		copy.setUseStubbornReduction(this.isStubbornReductionEnabled());
+		copy.setUseTarOption(this.isTarOptionEnabled());
 		
 		return copy;
 	}
