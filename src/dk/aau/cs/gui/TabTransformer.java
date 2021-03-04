@@ -4,6 +4,7 @@ import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.io.LoadedModel;
@@ -21,9 +22,11 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.*;
@@ -302,7 +305,7 @@ public class TabTransformer {
         File queryOut = null;
         try {
             modelFile = File.createTempFile("modelInUnfold", ".tapn");
-            queryFile = File.createTempFile("queryInUnfold", ".q");
+            queryFile = File.createTempFile("queryInUnfold", ".xml");
             modelOut = File.createTempFile("modelOut", ".tapn");
             queryOut = File.createTempFile("queryOut", ".xml");
         } catch (IOException e) {
@@ -353,22 +356,27 @@ public class TabTransformer {
 
         ProcessRunner runner;
         //TODO::  implement possibility of there not being any queries, and make it possible to send all queries to the engine (requires the engine to be modified)
-        OutputStream os;
-        try {
-            os = new FileOutputStream(queryFile);
-            os.write(clonedQueries.get(0).toString().getBytes(), 0, clonedQueries.get(0).toString().length());
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        try{
+            PrintStream queryStream = new PrintStream(queryFile);
+            CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+            queryStream.append(XMLVisitor.getXMLQueryFor(clonedQueries.get(0).getProperty(), null));
+            queryStream.close();
+        } catch(FileNotFoundException e) {
+            System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
+            return null;
         }
 
         VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", false, false);
-        runner = new ProcessRunner(getunfoldPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+        String unfoldingEnginePath = getunfoldPath();
+        if (unfoldingEnginePath == null){
+            return null;
+        }
+        runner = new ProcessRunner(unfoldingEnginePath, createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
         //String errorOutput = readOutput(runner.errorOutput());
         //String standardOutput = readOutput(runner.standardOutput());
-       // Logger.log(errorOutput);
+        //Logger.log(errorOutput);
 
         TapnXmlLoader tapnLoader = new TapnXmlLoader();
         File fileOut = new File(modelOut.getAbsolutePath());
@@ -432,23 +440,16 @@ public class TabTransformer {
 
     public static String getunfoldPath() {
         if (unfoldpath.isEmpty()) {
-            File f = new File(new File(System.getProperty("user.dir")).getParent() + File.separator + "bin" + File.separator + "UnfoldTACPN");
-            File f2 = new File(System.getProperty("user.dir") + File.separator + "bin"+ File.separator + "UnfoldTACPN");
-            if (f.exists()) {
-                unfoldpath = f.getAbsolutePath();
-                return unfoldpath;
+            VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
+            verifypn.setup();
+            if (!verifypn.isCorrectVersion()) {
+                new MessengerImpl().displayErrorMessage(
+                    "No "+verifypn+" specified: The unfolding is cancelled",
+                    "Unfolding Error");
+                return null;
             }
-            else if (f2.exists()) {
-                unfoldpath = f2.getAbsolutePath();
-                return unfoldpath;
-            }
-            else {
-                FileDialog dialog = new FileDialog((Frame)null, "Select Unfolding Engine");
-                dialog.setMode(FileDialog.LOAD);
-                dialog.setVisible(true);
-                unfoldpath = dialog.getDirectory() + dialog.getFile();
-                return unfoldpath;
-            }
+            unfoldpath = verifypn.getPath();
+            return unfoldpath;
         } else {
             return unfoldpath;
         }

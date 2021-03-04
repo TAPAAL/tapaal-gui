@@ -76,12 +76,21 @@ public class Verifier {
 			modelChecker = getVerifyTAPN();
 		}
 
-		if (!modelChecker.isCorrectVersion()) {
-			System.err.println("The model checker not found, or you are running an old version of it.\n"
-							+ "Update to the latest development version.");
-			return;
+		ModelChecker unfoldingEngine = getVerifyPN();
+
+		if (!modelChecker.isCorrectVersion() ) {
+            new MessengerImpl().displayErrorMessage(
+                "No "+modelChecker+" specified or you are running an old version of it:\nThe verification is cancelled",
+                "Verification Error");
+            return;
 		}
-		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, new MessengerImpl(), tokensControl);
+        if (!unfoldingEngine.isCorrectVersion() ) {
+            new MessengerImpl().displayErrorMessage(
+                "No "+unfoldingEngine+" specified or you are running an old version of it:\nThe verification is cancelled",
+                "Verification Error");
+            return;
+        }
+		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, unfoldingEngine, new MessengerImpl(), tokensControl);
 		optimizer.analyze();
 	}
 

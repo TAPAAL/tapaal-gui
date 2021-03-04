@@ -287,8 +287,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             e.printStackTrace();
         }
 
-
-
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
         return composer.transformModel(loadedModel.network());
     }

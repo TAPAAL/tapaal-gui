@@ -27,15 +27,17 @@ public class KBoundAnalyzer {
 	protected int k;
 
 	private final ModelChecker modelChecker;
+	private final ModelChecker unfoldingEngine;
 	private final Messenger messenger;
 	private final JSpinner spinner;
 
 	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k,
-			ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl) {
+                          ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, JSpinner tokensControl) {
 		this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
-		this.messenger = messenger;
+        this.unfoldingEngine = unfoldingEngine;
+        this.messenger = messenger;
 		spinner = tokensControl;
 	}
 
@@ -43,7 +45,7 @@ public class KBoundAnalyzer {
 		TAPNQuery query = getBoundednessQuery();
 		VerifyTAPNOptions options = verificationOptions();
 
-		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
+		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, unfoldingEngine, messenger, spinner);
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
 		analyzer.execute(options, tapnNetwork, query, null);
