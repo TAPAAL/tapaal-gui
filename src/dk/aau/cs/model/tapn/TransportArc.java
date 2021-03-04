@@ -31,7 +31,20 @@ public class TransportArc extends TAPNElement {
 		this(source, transition, destination, interval, new IntWeight(1));
 	}
 
-	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight) {
+    public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight) {
+        Require.that(source != null, "The source place cannot be null");
+        Require.that(transition != null, "The associated transition cannot be null");
+        Require.that(destination != null, "The destination place cannot be null");
+        Require.that(!source.isShared() || !transition.isShared(), "You cannot draw an arc between a shared transition and shared place.");
+        Require.that(!transition.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
+
+        this.source = source;
+        this.transition = transition;
+        this.destination = destination;
+        setTimeInterval(interval);
+        this.weight = weight;
+    }
+	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight,ArcExpression inputExpression, ArcExpression outputExpression) {
 		Require.that(source != null, "The source place cannot be null");
 		Require.that(transition != null, "The associated transition cannot be null");
 		Require.that(destination != null, "The destination place cannot be null");
@@ -111,10 +124,14 @@ public class TransportArc extends TAPNElement {
 	}
 
 	public TransportArc copy(TimedArcPetriNet tapn) {
-		return new TransportArc(tapn.getPlaceByName(source.name()), 
-								tapn.getTransitionByName(transition.name()), 
-								tapn.getPlaceByName(destination.name()), 
-								interval.copy(), weight);
+	    TransportArc ta = new TransportArc(tapn.getPlaceByName(source.name()),
+            tapn.getTransitionByName(transition.name()),
+            tapn.getPlaceByName(destination.name()),
+            interval.copy(), weight);
+	    ta.setOutputExpression(outputExpression.deepCopy());
+	    ta.setInputExpression(inputExpression.deepCopy());
+	    ta.setColorTimeIntervals(ctiList);
+		return ta;
 	}
 
 	// Should ONLY be called in relation to sharing/unsharing places

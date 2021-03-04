@@ -40,7 +40,11 @@ public class SharedPlace extends TimedPlace{
 
     //TODO: check that colored time invariant is copied correctly
 	public TimedPlace copy() {
-		return new SharedPlace(this.name(), this.invariant().copy());
+        SharedPlace p = new SharedPlace(this.name(), this.invariant().copy());
+        p.setColorType(colorType);
+        p.setTokenExpression(tokensAsExpression.deepCopy());
+        p.setCtiList(ctiList);
+        return p;
 	}
 
 	public boolean isShared() {
