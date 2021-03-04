@@ -28,7 +28,6 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 			this.place = place;
 			this.context = context;
 			this.newSharedName = newSharedName;
-            System.out.println("what is up");
 		}
 		
 		@Override

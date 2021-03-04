@@ -56,7 +56,6 @@ public class MakePlaceNewSharedCommand extends Command {
 		this.colorType = place.getColorType();
 		this.tokenExpression = place.getTokensAsExpression();
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
-        System.out.println("hejhej");
 	}
 	
 	@Override
