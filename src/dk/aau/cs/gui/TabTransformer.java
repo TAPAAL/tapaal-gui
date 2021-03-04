@@ -211,8 +211,12 @@ public class TabTransformer {
                 int numberOfTokens = place.tokens().size();
 
                 //kind of hack to convert from coloredTokens to uncolored
-                for(TimedToken token : place.tokens()){
-                    token.setColor(place.getColorType().getFirstColor());
+                if(numberOfTokens > 0){
+                    Vector<ColorExpression> v = new Vector<>();
+                    v.add(new DotConstantExpression());
+                    Vector<ArcExpression> numbOfExpression = new Vector<>();
+                    numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
+                    place.setTokenExpression(new AddExpression(numbOfExpression));
                 }
             }
 
@@ -224,8 +228,8 @@ public class TabTransformer {
             for(TimedInputArc arc : template.model().inputArcs()){
                 arc.setColorTimeIntervals(new ArrayList<>());
                 int expressionWeight = arc.getArcExpression().weight();
-                ColorType ct = arc.source().getColorType();
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                ColorType ct = ColorType.COLORTYPE_DOT;
+                UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
@@ -234,9 +238,8 @@ public class TabTransformer {
             }
 
             for(TimedOutputArc arc : template.model().outputArcs()){
-                ColorType ct = arc.destination().getColorType();
                 int expressionWeight = arc.getExpression().weight();
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
@@ -245,9 +248,8 @@ public class TabTransformer {
             }
 
             for(TransportArc arc : template.model().transportArcs()){
-                ColorType ct = arc.source().getColorType();
                 ArcExpression oldInputExpr = arc.getInputExpression();
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
