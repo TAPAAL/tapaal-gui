@@ -124,7 +124,7 @@ public class PlaceEditorPanel extends JPanel {
         setInitialComboBoxValue();
         writeTokensToList();
 		setColoredTimeInvariants();
-		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN) {
+		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN || currentTab.getEditorMode() == Pipe.ElementType.DELTOKEN) {
             basicPropertiesPanel.setVisible(false);
             timeInvariantPanel.setVisible(false);
             colorTypePanel.setVisible(false);
