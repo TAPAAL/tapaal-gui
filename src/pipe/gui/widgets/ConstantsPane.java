@@ -245,7 +245,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		
 			public void keyPressed(KeyEvent arg0) {				
 				ListModel model = list.getModel();
-				if (model.getSize()>0) {
+				if (model.getSize()>0 && isDisplayingGlobalConstants()) {
 					Constant c = (Constant) model.getElementAt(list.getSelectedIndex());
 					if (c != null) {
 						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {										
