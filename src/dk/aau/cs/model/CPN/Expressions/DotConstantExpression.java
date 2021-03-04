@@ -10,7 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-public class DotConstantExpression extends ColorExpression {
+public class DotConstantExpression extends UserOperatorExpression {
+
+    public DotConstantExpression() {
+        super(DotConstant.getInstance());
+    }
 
     public List<Color> eval(ExpressionContext context) {
         return Arrays.asList(DotConstant.getInstance());
