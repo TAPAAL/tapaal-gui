@@ -531,7 +531,7 @@ public class QueryDialog extends JPanel {
                 !(newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode));
             someTraceRadioButton.setEnabled(true);
             noTraceRadioButton.setEnabled(true);
-        } else if (queryIsReachability()) {
+        } else if (queryIsReachability() || queryType.getSelectedIndex() == 1) {
             fastestTraceRadioButton.setEnabled(false);
             someTraceRadioButton.setEnabled(true);
             noTraceRadioButton.setEnabled(true);
@@ -944,13 +944,18 @@ public class QueryDialog extends JPanel {
 			currentselected = randomSearch;
 		}
 
-		if(fastestTraceRadioButton.isSelected()){
+		if (fastestTraceRadioButton.isSelected()) {
 			breadthFirstSearch.setEnabled(false);
 			depthFirstSearch.setEnabled(false);
 			heuristicSearch.setEnabled(false);
 			randomSearch.setEnabled(false);
 			return;
-		}else{
+		} else if (queryType.getSelectedIndex() == 1) {
+            breadthFirstSearch.setEnabled(false);
+            depthFirstSearch.setEnabled(true);
+            heuristicSearch.setEnabled(false);
+            randomSearch.setEnabled(false);
+        } else {
 			breadthFirstSearch.setEnabled(true);
 			depthFirstSearch.setEnabled(true);
 			heuristicSearch.setEnabled(true);
@@ -1506,9 +1511,13 @@ public class QueryDialog extends JPanel {
 	private void toggleDialogType() {
        if (queryType.getSelectedIndex() == 1) {
            showLTLButtons(true);
+           updateShiphonTrap(true);
        } else {
            showLTLButtons(false);
+           updateShiphonTrap(false);
+
        }
+        setEnabledOptionsAccordingToCurrentReduction();
     }
 
 	private void initBoundednessCheckPanel() {
@@ -1901,6 +1910,9 @@ public class QueryDialog extends JPanel {
         existsDiamond.setVisible(isVisible);
         existsNext.setVisible(isVisible);
         existsUntil.setVisible(isVisible);
+    }
+    private void updateShiphonTrap(boolean isLTL) {
+        useSiphonTrap.setEnabled(!isLTL);
     }
 
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
@@ -2906,9 +2918,9 @@ public class QueryDialog extends JPanel {
 	    ReductionOption reduction = getReductionOption();
 	    useTraceRefinement.setEnabled(false);
 
-	    if (reduction != null && reduction.equals(ReductionOption.VerifyPN) && !hasInhibitorArcs &&
+	    if (queryType.getSelectedIndex() != 1 && reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
-            !newProperty.hasNestedPathQuantifiers()) {
+            !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
 	        useTraceRefinement.setEnabled(true);
         }
     }
