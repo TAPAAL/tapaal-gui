@@ -85,6 +85,7 @@ public class QueryDialog extends JPanel {
 
 	// Query Name Panel;
 	private JPanel namePanel;
+	private JComboBox queryType;
 	private JButton advancedButton;
 
 	// Boundedness check panel
@@ -105,6 +106,10 @@ public class QueryDialog extends JPanel {
     private JButton forAllBox;
     private JButton forAllNext;
     private JButton forAllUntil;
+    private JButton globallyButton;
+    private JButton finallyButton;
+    private JButton nextButton;
+    private JButton untilButton;
 
 	private JTextPane queryField;
 
@@ -233,7 +238,8 @@ public class QueryDialog extends JPanel {
 	//Strings for tool tips
 	//Tool tips for top panel
 	private static final String TOOL_TIP_QUERYNAME = "Enter the name of the query.";
-	private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different verification options.";
+    private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different verification options.";
+    private static final String TOOL_TIP_QUERY_TYPE = "Choose the type of query.";
 	private static final String TOOL_TIP_ADVANCED_VIEW_BUTTON = "Switch to the advanced view.";
 	private static final String TOOL_TIP_SIMPLE_VIEW_BUTTON = "Switch to the simple view.";
 
@@ -979,6 +985,10 @@ public class QueryDialog extends JPanel {
         existsNext.setEnabled(false);
         forAllUntil.setEnabled(false);
         forAllNext.setEnabled(false);
+        globallyButton.setEnabled(false);
+        finallyButton.setEnabled(false);
+        nextButton.setEnabled(false);
+        untilButton.setEnabled(false);
 
         conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
@@ -1050,6 +1060,10 @@ public class QueryDialog extends JPanel {
         existsNext.setEnabled(true);
         forAllUntil.setEnabled(true);
         forAllNext.setEnabled(true);
+        globallyButton.setEnabled(true);
+        finallyButton.setEnabled(true);
+        nextButton.setEnabled(true);
+        untilButton.setEnabled(true);
 
         conjunctionButton.setEnabled(true);
         disjunctionButton.setEnabled(true);
@@ -1363,6 +1377,10 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
+		queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL"});
+		queryType.setToolTipText(TOOL_TIP_QUERY_TYPE);
+		queryType.addActionListener(arg0 -> toggleDialogType());
+
 		advancedButton = new JButton("Advanced view");
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
@@ -1430,6 +1448,7 @@ public class QueryDialog extends JPanel {
 		});
 		JPanel topButtonPanel = new JPanel(new FlowLayout());
 		topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		if (!lens.isTimed() && !lens.isGame()) topButtonPanel.add(queryType);
 		topButtonPanel.add(advancedButton);
 		topButtonPanel.add(infoButton);
 
@@ -1483,6 +1502,14 @@ public class QueryDialog extends JPanel {
 		guiDialog.pack();
 		guiDialog.setLocation(location);
 	}
+
+	private void toggleDialogType() {
+       if (queryType.getSelectedIndex() == 1) {
+           showLTLButtons(true);
+       } else {
+           showLTLButtons(false);
+       }
+    }
 
 	private void initBoundednessCheckPanel() {
 
@@ -1642,6 +1669,10 @@ public class QueryDialog extends JPanel {
         existsNext = new JButton("EX");
         forAllUntil = new JButton("AU");
         forAllNext = new JButton("AX");
+        globallyButton = new JButton("G");
+        finallyButton = new JButton("F");
+        nextButton = new JButton("X");
+        untilButton = new JButton("U");
 
         // Add tool-tips
         existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
@@ -1652,6 +1683,10 @@ public class QueryDialog extends JPanel {
         existsNext.setToolTipText(TOOL_TIP_EXISTS_NEXT);
         forAllUntil.setToolTipText(TOOL_TIP_FORALL_UNTIL);
         forAllNext.setToolTipText(TOOL_TIP_FORALL_NEXT);
+        globallyButton.setToolTipText(TOOL_TIP_FORALL_BOX);
+        finallyButton.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
+        nextButton.setToolTipText(TOOL_TIP_FORALL_NEXT);
+        untilButton.setToolTipText(TOOL_TIP_FORALL_UNTIL);
 
         // Add buttons to panel
         quantificationButtonGroup.add(existsDiamond);
@@ -1662,6 +1697,10 @@ public class QueryDialog extends JPanel {
         quantificationButtonGroup.add(existsNext);
         quantificationButtonGroup.add(forAllUntil);
         quantificationButtonGroup.add(forAllNext);
+        quantificationButtonGroup.add(globallyButton);
+        quantificationButtonGroup.add(finallyButton);
+        quantificationButtonGroup.add(nextButton);
+        quantificationButtonGroup.add(untilButton);
 
         // Place buttons in GUI
         GridBagConstraints gbc = new GridBagConstraints();
@@ -1672,8 +1711,10 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 5, 0);
         quantificationPanel.add(existsDiamond, gbc);
+        quantificationPanel.add(globallyButton, gbc);
         gbc.gridy = 1;
         quantificationPanel.add(existsBox, gbc);
+        quantificationPanel.add(finallyButton, gbc);
         gbc.gridy = 2;
         quantificationPanel.add(existsUntil, gbc);
         gbc.gridy = 3;
@@ -1684,8 +1725,10 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 5, 0);
         quantificationPanel.add(forAllDiamond, gbc);
+        quantificationPanel.add(nextButton, gbc);
         gbc.gridy = 1;
         quantificationPanel.add(forAllBox, gbc);
+        quantificationPanel.add(untilButton, gbc);
         gbc.gridy = 2;
         quantificationPanel.add(forAllUntil, gbc);
         gbc.gridy = 3;
@@ -1703,6 +1746,7 @@ public class QueryDialog extends JPanel {
             addTimedQuantificationListeners();
         } else {
             addUntimedQuantificationListeners();
+            showLTLButtons(false);
         }
     }
 
@@ -1773,6 +1817,20 @@ public class QueryDialog extends JPanel {
             }
         });
 
+        globallyButton.addActionListener(e -> {
+            TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            forAllBox.setSelected(true);
+            addPropertyToQuery(property);
+            unselectButtons();
+        });
+
+        finallyButton.addActionListener(e -> {
+            TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            forAllDiamond.setSelected(true);
+            addPropertyToQuery(property);
+            unselectButtons();
+        });
+
         forAllNext.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 TCTLAbstractPathProperty property;
@@ -1798,6 +1856,51 @@ public class QueryDialog extends JPanel {
                 addPropertyToQuery(property);
             }
         });
+
+        nextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractPathProperty property;
+                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+                } else {
+                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                }
+                addPropertyToQuery(property);
+            }
+        });
+
+        untilButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractPathProperty property;
+                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    property = new TCTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                        new TCTLStatePlaceHolder());
+                } else {
+                    property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                        getSpecificChildOfProperty(2, currentSelection.getObject()));
+                }
+                addPropertyToQuery(property);
+            }
+        });
+    }
+
+    private void showLTLButtons(boolean isVisible) {
+        globallyButton.setVisible(isVisible);
+        finallyButton.setVisible(isVisible);
+        nextButton.setVisible(isVisible);
+        untilButton.setVisible(isVisible);
+        showCTLButtons(!isVisible);
+    }
+
+    private void showCTLButtons(boolean isVisible) {
+        forAllBox.setVisible(isVisible);
+        forAllDiamond.setVisible(isVisible);
+        forAllNext.setVisible(isVisible);
+        forAllUntil.setVisible(isVisible);
+        existsBox.setVisible(isVisible);
+        existsDiamond.setVisible(isVisible);
+        existsNext.setVisible(isVisible);
+        existsUntil.setVisible(isVisible);
     }
 
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
