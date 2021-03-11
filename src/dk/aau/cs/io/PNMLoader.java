@@ -177,7 +177,6 @@ public class PNMLoader {
             }
             node = node.getNextSibling();
         }
-
         //We parse the transitions last, as we need the places and transitions it refers to
         node = first;
         while(node != null){
@@ -198,10 +197,8 @@ public class PNMLoader {
         if(name == null){
             name = new Name(nameGenerator.getNewPlaceName(template.model()));
         }
-        System.out.println(name);
         Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
         String id = NamePurifier.purify(((Element) node).getAttribute("id"));
-        System.out.println(id);
         InitialMarking marking = null;
         ArcExpression colorMarking = null;
         Point markingOffset = null;
