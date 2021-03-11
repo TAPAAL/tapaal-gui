@@ -34,10 +34,7 @@ public class UserOperatorExpression extends ColorExpression {
     @Override
     public ColorExpression updateColor(Color color, ColorType newColorType) {
         if (userOperator.equals(color)) {
-            if(!userOperator.getColorType().getId().equals(newColorType.getId())) {
-                return null;
-            }
-            userOperator = newColorType.getFirstColor();
+            return null;
         }
         return this;
     }

@@ -79,7 +79,7 @@ public class UpdateInputArcColorTypeCommand extends Command {
     public void redo() {
 
         if(newColorType instanceof ProductType){
-            arc.createNewArcExpression();
+            arc.createNewArcExpression(newColorType);
             CreateGui.getModel().repaintAll(true);
             return;
         }
@@ -100,7 +100,7 @@ public class UpdateInputArcColorTypeCommand extends Command {
         if(arcExpr != null){
             arc.setExpression(arcExpr);
         } else{
-            arc.createNewArcExpression();
+            arc.createNewArcExpression(newColorType);
         }
 
         arc.getColorTimeIntervals().removeAll(intervalsToRemove);

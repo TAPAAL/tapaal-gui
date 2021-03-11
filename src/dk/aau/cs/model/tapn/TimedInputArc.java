@@ -168,8 +168,8 @@ public class TimedInputArc extends TAPNElement {
 		return result;
 	}
 
-    public void createNewArcExpression() {
-        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(source.getColorType().getFirstColor());
+    public void createNewArcExpression(ColorType newColorType) {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(newColorType.getFirstColor());
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(userOperatorExpression);
         NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);

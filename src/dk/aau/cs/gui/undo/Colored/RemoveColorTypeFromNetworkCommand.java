@@ -10,19 +10,19 @@ public class RemoveColorTypeFromNetworkCommand extends Command {
     private final ColorType colorType;
     private final TimedArcPetriNetNetwork network;
     private final ConstantsPane.ColorTypesListModel colorTypesListModel;
+    private final int index;
 
-    public RemoveColorTypeFromNetworkCommand(ColorType colorType, TimedArcPetriNetNetwork network, ConstantsPane.ColorTypesListModel colorTypesListModel) {
+    public RemoveColorTypeFromNetworkCommand(ColorType colorType, TimedArcPetriNetNetwork network, ConstantsPane.ColorTypesListModel colorTypesListModel, int index) {
         this.colorType = colorType;
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
+        this.index = index;
     }
 
     @Override
     public void undo() {
-        if(!network.colorTypes().contains(colorType)) {
-            network.colorTypes().add(colorType);
-            colorTypesListModel.updateName();
-        }
+        network.colorTypes().add(index, colorType);
+        colorTypesListModel.updateName();
     }
 
     @Override
