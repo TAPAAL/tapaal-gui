@@ -55,7 +55,7 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 public class PNMLoader {
 
 
-    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+    private TabContent.TAPNLens lens;
 
     enum GraphicsType { Position, Offset }
 
@@ -74,6 +74,7 @@ public class PNMLoader {
     private LoadTACPN loadTACPN;
 
     public PNMLoader() {
+        this.lens = TabContent.TAPNLens.Default;
         loadTACPN = new LoadTACPN();
     }
 
@@ -111,7 +112,7 @@ public class PNMLoader {
         Node pnmlElement = doc.getElementsByTagName("pnml").item(0);
         Node netNode = getFirstDirectChild(pnmlElement, "net");
 
-        //lens = new TabContent.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
+        lens = new TabContent.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
 
         String name = getTAPNName(netNode);
 

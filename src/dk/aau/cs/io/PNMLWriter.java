@@ -57,7 +57,7 @@ public class PNMLWriter implements NetWriter {
 		Document document = null;
 		Transformer transformer = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, true);
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
 		composedNetwork = composer.transformModel(network).value1();
 		
 		// Build a Petri Net XML Document

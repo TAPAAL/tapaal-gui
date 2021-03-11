@@ -32,7 +32,10 @@ import javax.swing.undo.UndoableEditSupport;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.FormatException;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -3127,7 +3130,7 @@ public class QueryDialog extends JPanel {
 
 			mergeNetComponentsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, true);
+					TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
 					Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
 					ArrayList<Template> templates = new ArrayList<Template>(1);
@@ -3164,8 +3167,6 @@ public class QueryDialog extends JPanel {
 
             openReducedNetButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-
-
                     if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved and verified, the net is marked as modified
@@ -3181,7 +3182,7 @@ public class QueryDialog extends JPanel {
 
                         exit();
 
-                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,null);
+                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true);
 
                         File reducedNetFile = new File(Verifier.getReducedNetFilePath());
 
@@ -3203,6 +3204,25 @@ public class QueryDialog extends JPanel {
                                     JOptionPane.ERROR_MESSAGE);
                             }
                         }
+
+                        /*TapnXmlLoader tapnLoader = new TapnXmlLoader();
+                        File fileOut = new File(Verifier.getReducedNetFilePath());
+                        LoadedModel loadedModel = null;
+                        TabContent oldTab = CreateGui.getCurrentTab();
+
+                        try {
+                            loadedModel = tapnLoader.load(fileOut);
+                            TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+                            newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-reduced");
+                            TAPNQuery convertedQuery = query.convertPropertyForReducedNet(newTab.currentTemplate().toString());
+                            newTab.addQuery(convertedQuery);
+                            CreateGui.openNewTabFromStream(newTab);
+                        } catch (FormatException exception) {
+                            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                exception.getMessage(),
+                                "Error loading reduced net file",
+                                JOptionPane.ERROR_MESSAGE);
+                        }*/
                     }
                 }
             });

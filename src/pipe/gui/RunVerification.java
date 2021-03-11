@@ -20,6 +20,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -342,15 +345,20 @@ public class RunVerification extends RunVerificationBase {
                         public void actionPerformed(ActionEvent e) {
                             openReducedButton.setEnabled(false);
                             reducedNetOpened = true;
+
                             File reducedNetFile = new File(reducedNetFilePath);
 
                             if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
                                 try {
                                     TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
-                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                                    TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                    reducedNetTab.addQuery(convertedQuery);
-                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                    //Ensure that a net was created by the query reduction
+                                    if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                        || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
+                                        reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                        TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                        reducedNetTab.addQuery(convertedQuery);
+                                        CreateGui.openNewTabFromStream(reducedNetTab);
+                                    }
                                 } catch (Exception e1){
                                     JOptionPane.showMessageDialog(CreateGui.getApp(),
                                         e1.getMessage(),
@@ -358,6 +366,25 @@ public class RunVerification extends RunVerificationBase {
                                         JOptionPane.ERROR_MESSAGE);
                                 }
                             }
+
+                            /*TapnXmlLoader tapnLoader = new TapnXmlLoader();
+                            File fileOut = new File(reducedNetFilePath);
+                            LoadedModel loadedModel = null;
+                            TabContent oldTab = CreateGui.getCurrentTab();
+
+                            try {
+                                loadedModel = tapnLoader.load(fileOut);
+                                TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+                                newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-reduced");
+                                TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(newTab.currentTemplate().toString());
+                                newTab.addQuery(convertedQuery);
+                                CreateGui.openNewTabFromStream(newTab);
+                            } catch (FormatException exception) {
+                                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                    exception.getMessage(),
+                                    "Error loading reduced net file",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }*/
                         }
                     });
 

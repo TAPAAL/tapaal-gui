@@ -46,24 +46,28 @@ public class TAPNComposer implements ITAPNComposer {
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
-    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+    private final TabContent.TAPNLens lens;
 
-    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentNoPrefix, boolean inlineConstants){
+    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens, boolean singleComponentNoPrefix, boolean inlineConstants){
 		this.messenger = messenger;
-		
-		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-		for(Entry<TimedArcPetriNet, DataLayer> entry : guiModels.entrySet()) {
-			newGuiModels.put(entry.getKey(), entry.getValue().copy(entry.getKey()));
-		}
-		
-		this.guiModels = newGuiModels;
+
+		if(guiModels != null){
+            HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+            for(Entry<TimedArcPetriNet, DataLayer> entry : guiModels.entrySet()) {
+                newGuiModels.put(entry.getKey(), entry.getValue().copy(entry.getKey()));
+            }
+
+            this.guiModels = newGuiModels;
+        }
 		this.singleComponentNoPrefix = singleComponentNoPrefix;
 		this.inlineConstants = inlineConstants;
+		this.lens = lens;
 	}
 	
 	public TAPNComposer(Messenger messenger, boolean singleComponentNoPrefix) {
 		this.messenger = messenger;
 		this.singleComponentNoPrefix = singleComponentNoPrefix;
+		this.lens = TabContent.TAPNLens.Default;
 	}
 	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {

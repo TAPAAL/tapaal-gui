@@ -87,9 +87,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-		ITAPNComposer composer = new TAPNComposer(messenger, guiModels, false, true);
+        TabContent.TAPNLens lens =  new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
+		ITAPNComposer composer = new TAPNComposer(messenger, guiModels, lens,  false, true);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-
 		if (options.enabledOverApproximation())
 		{
 			OverApproximation overaprx = new OverApproximation();

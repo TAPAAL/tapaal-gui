@@ -296,7 +296,7 @@ public class TabTransformer {
     }
 
     public static TabContent unfoldTab(TabContent oldTab) {
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), oldTab.getGuiModels(), true, true);
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), oldTab.getGuiModels(), oldTab.getLens(), true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(oldTab.network());
 
         File modelFile = null;
