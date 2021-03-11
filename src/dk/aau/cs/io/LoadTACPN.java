@@ -149,6 +149,12 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             ColorType ct = new ColorType(name, name);
             if (typetag.equals("dot")) {
                 ct.addColor("dot");
+            } else if (typetag.equals("finiteintrange")){
+                int start = Integer.parseInt(getAttribute(type, "start").getNodeValue());
+                int end = Integer.parseInt(getAttribute(type, "end").getNodeValue());
+                for(int i = start; i <= end; i++){
+                    ct.addColor(String.valueOf(i));
+                }
             } else {
                 Node typechild = skipWS(type.getFirstChild());
                 while (typechild != null) {
@@ -255,7 +261,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseArcExpression(child);
-        } else {
+        } else if (name.matches("tuple")){
+            Vector<ColorExpression> ceVector = new Vector<>();
+            ceVector.add(parseColorExpression(node));
+            return new NumberOfExpression(1, ceVector);
+        } else{
             throw new FormatException(String.format("Could not parse %s as an arc expression\n", name));
         }
     }
