@@ -504,37 +504,13 @@ public class TapnXmlLoader {
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
 			p = network.getSharedPlaceByName(nameInput);
-			tapn.add(p);
+			p.setColorType(ct);
+            addColoredDependencies(p,ctiList,colorMarking,network,initialMarkingInput);
+            tapn.add(p);
 		}else{
 		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), ct);
 		    tapn.add(p);
-		    p.setCtiList(ctiList);
-		    ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
-		    if(colorMarking!= null){
-                ColorMultiset cm = colorMarking.eval(context);
-
-                p.setTokenExpression(colorMarking);
-
-
-                for (TimedToken ctElement : cm.getTokens(p)) {
-                    network.marking().add(ctElement);
-                    //p.addToken(ctElement);
-                }
-
-            } else {
-                for (int i = 0; i < initialMarkingInput; i++) {
-                    //Regular tokens will just be dotconstant
-                    network.marking().add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
-                }
-                if(initialMarkingInput > 1) {
-                    Vector<ColorExpression> v = new Vector<>();
-                    v.add(new DotConstantExpression());
-                    Vector<ArcExpression> numbOfExpression = new Vector<>();
-                    numbOfExpression.add(new NumberOfExpression(initialMarkingInput, v));
-                    p.setTokenExpression(new AddExpression(numbOfExpression));
-                }
-            }
-
+		    addColoredDependencies(p,ctiList,colorMarking,network,initialMarkingInput);
 
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
@@ -547,6 +523,35 @@ public class TapnXmlLoader {
 
         return placeComponent;
 	}
+
+	private void addColoredDependencies(TimedPlace p, List<ColoredTimeInvariant> ctiList, ArcExpression colorMarking, TimedArcPetriNetNetwork network, int initialMarkingInput){
+        p.setCtiList(ctiList);
+        ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
+        if(colorMarking!= null){
+            ColorMultiset cm = colorMarking.eval(context);
+
+            p.setTokenExpression(colorMarking);
+
+
+            for (TimedToken ctElement : cm.getTokens(p)) {
+                network.marking().add(ctElement);
+                //p.addToken(ctElement);
+            }
+
+        } else {
+            for (int i = 0; i < initialMarkingInput; i++) {
+                //Regular tokens will just be dotconstant
+                network.marking().add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
+            }
+            if(initialMarkingInput > 1) {
+                Vector<ColorExpression> v = new Vector<>();
+                v.add(new DotConstantExpression());
+                Vector<ArcExpression> numbOfExpression = new Vector<>();
+                numbOfExpression.add(new NumberOfExpression(initialMarkingInput, v));
+                p.setTokenExpression(new AddExpression(numbOfExpression));
+            }
+        }
+    }
 
 	private void parseAndAddArc(Element arc, Template template, ConstantStore constants, TimedArcPetriNetNetwork network) throws FormatException {
 		String idInput = arc.getAttribute("id");
