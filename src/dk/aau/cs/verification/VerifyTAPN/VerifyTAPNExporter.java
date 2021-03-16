@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.List;
 
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.verification.NameMapping;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -19,10 +23,15 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.Transition;
+
+import javax.xml.crypto.Data;
 
 public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL){
@@ -31,53 +40,57 @@ public class VerifyTAPNExporter {
 			queryFile = createTempFile(".q");
 		}
 		this.model = model;
-		
 
-		return export(model, query, modelFile, queryFile, null, lens);
+		return export(model, query, modelFile, queryFile, null, lens, mapping);
 	}
 
-    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, String queryPath) {
+    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, String queryPath, NameMapping mapping) {
         if(queryPath == null || queryPath.isEmpty()){
-            return export(model, query, lens);
+            return export(model, query, lens,mapping);
         } else {
             File modelFile = createTempFile(".xml");
             this.model = model;
-            return export(model, query, modelFile, queryPath, null, lens);
+            return export(model, query, modelFile, queryPath, null, lens,mapping);
         }
     }
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
-		if (queryFile == null)
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping) {
+		if (modelFile == null || queryFile == null)
 			return null;
 
 		try{
+			PrintStream modelStream = new PrintStream(modelFile);
+
+			outputModel(model, modelStream, mapping);
+			modelStream.close();
+
 			PrintStream queryStream = new PrintStream(queryFile);
-			if (query.getCategory() == QueryCategory.CTL){
-			    CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-			    queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-			} else if (lens != null && lens.isGame()) {
-			    queryStream.append("control: " + query.getProperty().toString());
+            if (query == null) {
+                throw new FileNotFoundException(null);
+            } else if (query.getCategory() == QueryCategory.CTL) {
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            } else if (lens != null && lens.isGame()) {
+                queryStream.append("control: " + query.getProperty().toString());
             } else {
                 queryStream.append(query.getProperty().toString());
             }
-
-			
 			queryStream.close();
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
 		}
-		return export(model, query, modelFile, queryFile.getAbsolutePath(), dataLayerQuery, lens);
+		return export(model, query, modelFile, queryFile.getAbsolutePath(), dataLayerQuery, lens, mapping);
 	}
 
-    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, String queryPath, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens) {
+    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, String queryPath, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping) {
         if (modelFile == null)
             return null;
 
         try{
             PrintStream modelStream = new PrintStream(modelFile);
 
-            outputModel(model, modelStream);
+            outputModel(model, modelStream, mapping);
             modelStream.close();
         } catch(FileNotFoundException e) {
             System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
@@ -86,14 +99,16 @@ public class VerifyTAPNExporter {
         return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryPath);
     }
 	
-	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
+	private void outputModel(TimedArcPetriNet model, PrintStream modelStream, NameMapping mapping) {
+        Collection<DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels().values();
+
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
 		for(TimedPlace p : model.places())
-			outputPlace(p, modelStream);
+			outputPlace(p, modelStream, guiModels, mapping);
 		
 		for(TimedTransition t : model.transitions())
-			outputTransition(t,modelStream);
+			outputTransition(t,modelStream, guiModels, mapping);
 		
 		for(TimedInputArc inputArc : model.inputArcs())
 			outputInputArc(inputArc, modelStream);
@@ -116,28 +131,63 @@ public class VerifyTAPNExporter {
 	protected void outputDeclarations(PrintStream modelStream){
 	    return;
     }
-	
-	protected void outputPlace(TimedPlace p, PrintStream modelStream) {
+
+	protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
+        //remove the net prefix from the place name
+        String placeName = mapping.map(p.name()).value2();
+        Place guiPlace = null;
+
+        for(DataLayer guiModel : guiModels ){
+            guiPlace = guiModel.getPlaceById(placeName);
+            if(guiPlace != null){
+                break;
+            }
+        }
+
 		modelStream.append("<place ");
 		
 		modelStream.append("id=\"" + p.name() + "\" ");
 		modelStream.append("name=\"" + p.name() + "\" ");
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
-		
-		modelStream.append("/>\n");
+        modelStream.append(">\n");
+        outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+
+        modelStream.append("</place>\n");
 	}
 
-	protected void outputTransition(TimedTransition t, PrintStream modelStream) {
+	protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
+        //remove the net prefix from the transition name
+	    String transitionName = mapping.map(t.name()).value2();
+        Transition guiTransition = null;
+
+        for(DataLayer guiModel : guiModels){
+	        guiTransition = guiModel.getTransitionById(transitionName);
+	        if(guiTransition != null){
+	            break;
+            }
+        }
+
 		modelStream.append("<transition ");
 
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
-		modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
-		
-		modelStream.append("/>\n");
+        modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
+        modelStream.append(">\n");
+        outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
+
+        modelStream.append("</transition>\n");
 	}
+
+    private void outputPosition(PrintStream modelStream, int positionX, int positionY) {
+        modelStream.append("<graphics>");
+        modelStream.append("<position ");
+        modelStream.append("x=\"" + positionX + "\" ");
+        modelStream.append("y=\"" + positionY + "\" ");
+        modelStream.append("/>");
+        modelStream.append("</graphics>");
+    }
 
 	protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
 		modelStream.append("<inputArc ");

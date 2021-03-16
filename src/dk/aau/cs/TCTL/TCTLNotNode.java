@@ -52,7 +52,12 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 		return children;
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        property.convertForReducedNet(templateName);
+    }
+
+    @Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLNotNode(property.copy());
 	}

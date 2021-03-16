@@ -51,6 +51,8 @@ public abstract class TCTLAbstractProperty {
 		return children;
 	}
 
+	public abstract void convertForReducedNet(String templateName);
+
 	public abstract void accept(ITCTLVisitor visitor, Object context);
 
 	public abstract boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName);

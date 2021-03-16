@@ -2067,7 +2067,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, inlineConstants);
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
         ArrayList<Template> templates = new ArrayList<Template>(1);

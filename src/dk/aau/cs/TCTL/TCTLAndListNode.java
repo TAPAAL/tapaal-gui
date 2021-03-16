@@ -122,7 +122,14 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		return children;
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        for (TCTLAbstractProperty property : properties){
+            property.convertForReducedNet(templateName);
+        }
+    }
+
+    @Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLAndListNode) {
 			TCTLAndListNode node = (TCTLAndListNode) o;

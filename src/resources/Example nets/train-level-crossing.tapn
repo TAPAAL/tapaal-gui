@@ -112,6 +112,6 @@
 <arcpath arcPointType="false" id="1" xCoord="117" yCoord="147"/>
 </arc>
 </net>
-<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Crossing is Save" overApproximation="true" pTrie="true" query="AG (!(Train.DangerZone &gt; 0) or TraficLight.Red = 1)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
+<query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Crossing is Safe" overApproximation="true" pTrie="true" query="AG (!(Train.DangerZone &gt; 0) or TraficLight.Red = 1)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE"/>
 <k-bound bound="3"/>
 </pnml>

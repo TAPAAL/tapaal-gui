@@ -27,4 +27,5 @@ public interface ModelChecker {
 	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options);
 
 	String[] getStatsExplanations();
+
 }

@@ -22,7 +22,11 @@ public class AritmeticOperator extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+    }
+
+    @Override
 	public TCTLAbstractStateProperty copy() {
 		return new AritmeticOperator(operator);
 	}

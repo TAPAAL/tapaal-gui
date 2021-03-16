@@ -67,7 +67,13 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	@Override
+    @Override
+    public void convertForReducedNet(String templateName) {
+        left.convertForReducedNet(templateName);
+        right.convertForReducedNet(templateName);
+    }
+
+    @Override
 	public String toString() {
 		return left + " " + op + " " + right;
 	}
@@ -87,6 +93,31 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
     public boolean hasNestedPathQuantifiers() {
         return false;
     }
+
+/*    @Override
+    public StringPosition[] getChildren() {
+        StringPosition[] children = new StringPosition[2];
+
+        int start = 0;
+        int end = 0;
+        boolean leftSimpleProperty = left.isSimpleProperty();
+
+        start = leftSimpleProperty ? 0 : 1;
+        end = start + left.toString().length();
+
+        StringPosition posLeft = new StringPosition(start, end, left);
+
+        start = end + 5 + (right.isSimpleProperty() ? 0 : 1)
+            + (leftSimpleProperty ? 0 : 1);
+
+        end = start + right.toString().length();
+
+        StringPosition posRight = new StringPosition(start, end, right);
+
+        children[0] = posLeft;
+        children[1] = posRight;
+        return children;
+    }*/
 
     @Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {

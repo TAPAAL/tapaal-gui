@@ -53,9 +53,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
-
-
-    private TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+    private TabContent.TAPNLens lens;
 
     enum GraphicsType { Position, Offset }
 
@@ -74,6 +72,7 @@ public class PNMLoader {
     private LoadTACPN loadTACPN;
 
     public PNMLoader() {
+        this.lens = TabContent.TAPNLens.Default;
         loadTACPN = new LoadTACPN();
     }
 

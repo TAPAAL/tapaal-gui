@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.QueryReductionTime;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
@@ -16,28 +17,33 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private final QueryCategory queryCategory;
 	private final AlgorithmOption algorithmOption;
 	private boolean useSiphontrap = false; 
-	private boolean useQueryReduction = true; 
+	private QueryReductionTime queryReductionTime;
 	private boolean useStubbornReduction = true;
 	private boolean coloredNet = false;
+	private boolean useTarOption;
+	private String pathToReducedNet;
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction, 
-		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-		boolean siphontrap, boolean queryReduction, boolean stubbornReduction, boolean coloredNet) {
-		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
+
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
+                           boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean coloredNet, String pathToReducedNet, boolean useTarOption) {
+		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
 		this.algorithmOption = algorithmOption;
 		this.useSiphontrap = siphontrap;
-		this.useQueryReduction = queryReduction;
+		this.queryReductionTime = queryReduction;
 		this.useStubbornReduction = stubbornReduction;
 		this.coloredNet = coloredNet;
+		this.useTarOption = useTarOption;
+		this.pathToReducedNet = pathToReducedNet;
 	}
-	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction, 
-		boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-		boolean siphontrap, boolean queryReduction, boolean stubbornReduction) {
-		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
-			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, false);
+
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
+                           boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction) {
+		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation,
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, false, null, false);
 	}
 
 	@Override
@@ -51,12 +57,16 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
+            String writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            result.append(writeReducedCMD);
 			break;
 		case NO_REDUCTION:
 			result.append(" -r 0 ");
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
+            writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            result.append(writeReducedCMD);
 			break;
 		default:
 			break;			
@@ -71,12 +81,18 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
 		}
-		if (!this.useQueryReduction) {
+		if (this.queryReductionTime == QueryReductionTime.NoTime) {
 			result.append(" -q 0 ");
-		}
+		} else if (this.queryReductionTime == QueryReductionTime.ShortestTime) {
+		    //Run query reduction for 1 second, to avoid conflict with -s OverApprox argument, but also still not run the verification.
+		    result.append(" -q 1");
+        }
 		if (!this.useStubbornReduction) {
 			result.append(" -p ");
 		}
+		if (this.useTarOption) {
+		    result.append(" -tar ");
+        }
 		return result.toString();
 	}
 
