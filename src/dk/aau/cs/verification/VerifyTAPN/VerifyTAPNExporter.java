@@ -50,7 +50,7 @@ public class VerifyTAPNExporter {
         } else {
             File modelFile = createTempFile(".xml");
             this.model = model;
-            return export(model, query, modelFile, new File(queryPath), null, lens,mapping);
+            return export(model, query, modelFile, queryPath, null, lens,mapping);
         }
     }
 
