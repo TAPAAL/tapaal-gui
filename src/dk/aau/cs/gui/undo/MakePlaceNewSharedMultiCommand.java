@@ -39,7 +39,8 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 
                 if (component != null) {
                     if (first) { //We make a new shared place with the first place
-                        command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(), component, context.tabContent(), true);
+                        command = new MakePlaceNewSharedCommand(template.model(), newSharedName, component.underlyingPlace(),
+                            component, context.tabContent(), true);
                         command.redo();
                         sharedPlace = (SharedPlace) component.underlyingPlace();
                         commands.add(command);

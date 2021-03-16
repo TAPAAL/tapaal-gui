@@ -40,6 +40,11 @@ public class LocalTimedPlace  extends TimedPlace {
 
 	public LocalTimedPlace copy() {
 		LocalTimedPlace p = new LocalTimedPlace(name);
+		p.setColorType(colorType);
+		if(tokensAsExpression != null){
+            p.setTokenExpression(tokensAsExpression.deepCopy());
+        }
+		p.setCtiList(ctiList);
 
 		p.invariant = invariant.copy();
 

@@ -104,7 +104,7 @@ public class NumberOfExpression extends ArcExpression {
             }
         }
 
-        if(this.color.isEmpty()) {
+        if(newExpressions.isEmpty()) {
             return null;
         } else {
             return new NumberOfExpression(number, newExpressions);

@@ -122,9 +122,9 @@ public class PlaceEditorPanel extends JPanel {
         initColorInvariantPanel();
 		initTokensPanel();
         setInitialComboBoxValue();
-        writeTokensToList();
-		setColoredTimeInvariants();
-		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN) {
+        writeTokensToList(place.underlyingPlace());
+		setColoredTimeInvariants(place.underlyingPlace());
+		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN || currentTab.getEditorMode() == Pipe.ElementType.DELTOKEN) {
             basicPropertiesPanel.setVisible(false);
             timeInvariantPanel.setVisible(false);
             colorTypePanel.setVisible(false);
@@ -522,6 +522,7 @@ public class PlaceEditorPanel extends JPanel {
 
 		SharedPlace selected = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
 		setInvariantControlsBasedOn(selected);
+		setColorControlsBasedOn(selected);
 		if(selected.getComponentsUsingThisPlace().size() > 0){
 			setMarking(selected.numberOfTokens());
 		}
@@ -536,6 +537,13 @@ public class PlaceEditorPanel extends JPanel {
 			setInvariantControlsBasedOn(place.invariant());
 		}
 	}
+    private void setColorControlsBasedOn(TimedPlace place) {
+        if(place instanceof SharedPlace && ((SharedPlace) place).getComponentsUsingThisPlace().size() > 0){
+            colorTypeComboBox.setSelectedItem(place.getColorType());
+            writeTokensToList(place);
+            setColoredTimeInvariants(place);
+        }
+    }
 	
 	private void setInvariantControlsBasedOn(TimeInvariant invariant) {
 		if(invariant.upperBound() instanceof ConstantBound){
@@ -623,9 +631,9 @@ public class PlaceEditorPanel extends JPanel {
 				return false;
 			}
 			context.nameGenerator().updateIndices(context.activeModel(), newName);
-		
 			if(makeNewShared){
-				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent(), false);
+				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(),
+                    place, context.tabContent(), false);
 				context.undoManager().addEdit(command);
 				try{
 					command.redo();
@@ -648,12 +656,35 @@ public class PlaceEditorPanel extends JPanel {
 				}	
 			}
 		}
-		//TODO: Look at this
+        doOkColors(newMarking);
+
+
+		TimeInvariant newInvariant = constructInvariant();
+		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
+		if(!newInvariant.equals(oldInvariant)){
+			context.undoManager().addEdit(new ChangedInvariantCommand(place.underlyingPlace(), oldInvariant, newInvariant));
+			place.underlyingPlace().setInvariant(newInvariant);
+		}
+
+		if ((place.getAttributesVisible() && !attributesCheckBox.isSelected()) || (!place.getAttributesVisible() && attributesCheckBox.isSelected())) {
+			place.toggleAttributesVisible();
+		}
+		place.update(true);
+		place.repaint();
+
+		context.network().buildConstraints();
+		
+		return true;
+	}
+
+	private void doOkColors(int newMarking){
+        //TODO: Look at this
         if(!place.isColored()){
             if(newMarking != place.underlyingPlace().numberOfTokens()){
                 Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
                 command.redo();
                 context.undoManager().addEdit(command);
+                return;
             }
         }
 
@@ -694,25 +725,7 @@ public class PlaceEditorPanel extends JPanel {
         Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, oldExpression, newExpression, context, place, ctiList, colorType);
         command.redo();
         context.undoManager().addEdit(command);
-
-
-		TimeInvariant newInvariant = constructInvariant();
-		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
-		if(!newInvariant.equals(oldInvariant)){
-			context.undoManager().addEdit(new ChangedInvariantCommand(place.underlyingPlace(), oldInvariant, newInvariant));
-			place.underlyingPlace().setInvariant(newInvariant);
-		}
-
-		if ((place.getAttributesVisible() && !attributesCheckBox.isSelected()) || (!place.getAttributesVisible() && attributesCheckBox.isSelected())) {
-			place.toggleAttributesVisible();
-		}
-		place.update(true);
-		place.repaint();
-
-		context.network().buildConstraints();
-		
-		return true;
-	}
+    }
 
 	private TimeInvariant constructInvariant() {
 		if(normalInvRadioButton.isSelected()){
@@ -1075,7 +1088,10 @@ public class PlaceEditorPanel extends JPanel {
         colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
 
         colorTypeComboBox.addActionListener(actionEvent -> {
-            if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()) {
+            if(colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals( place.underlyingPlace().getColorType())){
+                return;
+            }
+            if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the color type for this place?\n" +
                     "All tokens and time invariants for colors will be deleted.","alert", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
@@ -1167,9 +1183,9 @@ public class PlaceEditorPanel extends JPanel {
         }
     }
 
-    private void writeTokensToList() {
+    private void writeTokensToList(TimedPlace tp) {
         coloredTokenListModel.clear();
-        AddExpression tokenExpression = (AddExpression)place.underlyingPlace().getTokensAsExpression();
+        AddExpression tokenExpression = (AddExpression)tp.getTokensAsExpression();
         if(tokenExpression != null){
             for(ArcExpression expr : tokenExpression.getAddExpression()){
                 addTokenExpression((NumberOfExpression)expr);
@@ -1180,6 +1196,7 @@ public class PlaceEditorPanel extends JPanel {
 
     private void updateSpinnerValue(boolean updateSelection){
         NumberOfExpression expr = buildTokenExpression(1);
+
         if(coloredTokenListModel.getSize() > 0){
             for(int i = 0; i < coloredTokenListModel.getSize();i++){
                 NumberOfExpression otherExpr = coloredTokenListModel.getElementAt(i);
@@ -1218,8 +1235,8 @@ public class PlaceEditorPanel extends JPanel {
         parent.pack();
     }
 
-    private void setColoredTimeInvariants() {
-        for (ColoredTimeInvariant timeInvariant : place.underlyingPlace().getCtiList()) {
+    private void setColoredTimeInvariants(TimedPlace tp) {
+        for (ColoredTimeInvariant timeInvariant : tp.getCtiList()) {
             timeConstraintListModel.addElement(timeInvariant);
         }
         timeConstraintList.setSelectedIndex(0);

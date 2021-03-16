@@ -72,6 +72,10 @@ public class Color {
             return false;
         Color object = (Color) o;
 
+        if(object.getColorName().equals( "dot") && this.colorName.equals("dot")){
+            return true;
+        }
+
         if (!object.getName().equals(this.getName()))
             return false;
 

@@ -765,6 +765,7 @@ public class ColorTypeDialogPanel extends JPanel {
                                 network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
+                            undoManager.newEdit();
                             network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
@@ -794,10 +795,10 @@ public class ColorTypeDialogPanel extends JPanel {
                         if(showDialog) {
                             int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
-                                undoManager.newEdit();
                                 network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             }
                         } else{
+                            undoManager.newEdit();
                             network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
@@ -835,11 +836,10 @@ public class ColorTypeDialogPanel extends JPanel {
                         if(showDialog) {
                             int cont = JOptionPane.showConfirmDialog(this, "<html>" + editProductTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                             if (cont == JOptionPane.OK_OPTION) {
-
-                                undoManager.newEdit();
                                 network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
                             }
                         } else{
+                            undoManager.newEdit();
                             network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }

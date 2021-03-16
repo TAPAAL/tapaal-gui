@@ -149,6 +149,12 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             ColorType ct = new ColorType(name, name);
             if (typetag.equals("dot")) {
                 ct.addColor("dot");
+            } else if (typetag.equals("finiteintrange")){
+                int start = Integer.parseInt(getAttribute(type, "start").getNodeValue());
+                int end = Integer.parseInt(getAttribute(type, "end").getNodeValue());
+                for(int i = start; i <= end; i++){
+                    ct.addColor(String.valueOf(i));
+                }
             } else {
                 Node typechild = skipWS(type.getFirstChild());
                 while (typechild != null) {
@@ -255,7 +261,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseArcExpression(child);
-        } else {
+        } else if (name.matches("tuple")){
+            Vector<ColorExpression> ceVector = new Vector<>();
+            ceVector.add(parseColorExpression(node));
+            return new NumberOfExpression(1, ceVector);
+        } else{
             throw new FormatException(String.format("Could not parse %s as an arc expression\n", name));
         }
     }
@@ -324,8 +334,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if(name.equals("all")){
             ColorType ct = parseUserSort(node);
             return new AllExpression(ct);
-        }
-        else if (name.equals("tuple")) {
+        } else if (name.equals("tuple")) {
             Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
 
             Node child = skipWS(node.getFirstChild());
@@ -338,6 +347,14 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseColorExpression(child);
+        } else if (name.equals("finiteintrangeconstant")){
+            String value = getAttribute(node, "value").getNodeValue();
+            //we assume first child is finiteintrange
+            Node intRangeElement = skipWS(node.getFirstChild());
+            String start = getAttribute(intRangeElement, "start").getNodeValue();
+            String end = getAttribute(intRangeElement, "end").getNodeValue();
+            return new UserOperatorExpression(findColorForIntRange(value,start,end));
+
         } else {
             throw new FormatException(String.format("Could not parse %s as an color expression\n", name));
         }
@@ -382,8 +399,17 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
             return new AndExpression(subexps.value1(), subexps.value2());
         } else if (name.equals("or")) {
-            Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
-            return new OrExpression(subexps.value1(), subexps.value2());
+            Node left = skipWS(node.getFirstChild());
+            Node right = skipWS(left.getNextSibling());
+            GuardExpression leftg = parseGuardExpression(left);
+            if(right == null){
+                return parseGuardExpression(left);
+            }
+            GuardExpression parentOr = new OrExpression(parseGuardExpression(left), parseGuardExpression(right));
+            for (var it = skipWS(right.getNextSibling()); it != null; it = skipWS(it.getNextSibling())){
+                parentOr = new OrExpression(parentOr, parseGuardExpression(it));
+            }
+            return parentOr;
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseGuardExpression(child);
@@ -443,6 +469,16 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return new AddExpression(coloredTokenList);
     }
 
-
-
+    Color findColorForIntRange(String value, String start, String end) throws FormatException {
+        for(var ct : colortypes.values()){
+            if(ct.getColors().get(0).getColorName().equals(start) && ct.getColors().get(ct.getColors().size()-1).getColorName().equals(end)){
+                for (dk.aau.cs.model.CPN.Color c : ct) {
+                    if (c.getName().equals(value)) {
+                        return c;
+                    }
+                }
+            }
+        }
+        throw new FormatException(String.format("The color \"%s\" was not declared in an int range\n", value));
+    }
 }

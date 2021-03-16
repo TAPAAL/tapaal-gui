@@ -467,6 +467,10 @@ public class TimedArcPetriNetNetwork {
 		return true;
 	}
 
+	public boolean isTimed(){
+		return !isUntimed();
+	}
+
 	public boolean hasWeights() {
 		for(TimedArcPetriNet t : tapns){
 			if(t.isActive() && t.hasWeights()){
@@ -634,7 +638,7 @@ public class TimedArcPetriNetNetwork {
 
         Command command = new UpdateColorTypeCommand(this, oldColorType, colorType, index, colorTypesListModel);
         command.redo();
-        undoManager.addNewEdit(command);
+        undoManager.addEdit(command);
         updateProductTypes(oldColorType, colorType, undoManager);
 
         for (TimedArcPetriNet tapn : tapns) {
@@ -643,13 +647,13 @@ public class TimedArcPetriNetNetwork {
     }
 
     public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
-        updateColorType(colorType, oldColorType, undoManager);
+        undoManager.newEdit();
+	    updateColorType(colorType, oldColorType, undoManager);
 
         renameColorType(oldColorType,colorType,colorTypesListModel, undoManager);
     }
 
     private void updateColorType(ColorType colorType, ColorType oldColorType, UndoManager undoManager){
-
         for (TimedArcPetriNet tapn : tapns) {
             updateColorTypeOnArcs(oldColorType,colorType,tapn,undoManager);
             updateColorTypeOnTransitions(tapn.transitions(), colorType, oldColorType, undoManager);
@@ -715,6 +719,16 @@ public class TimedArcPetriNetNetwork {
         command.redo();
         undoManager.addEdit(command);
 
+    }
+
+    public void resetPlaces(ColorType oldColorType, List<TimedPlace> places, UndoManager undoManager){
+        for(TimedPlace place : places){
+            if(place.getColorType().equals(oldColorType)){
+                Command command = new ResetPlaceCommand(place, oldColorType);
+                command.redo();
+                undoManager.addEdit(command);
+            }
+        }
     }
 
     public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places, UndoManager undoManager){
@@ -859,12 +873,16 @@ public class TimedArcPetriNetNetwork {
     }
 
     public void remove(ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
+        Integer index = getColorTypeIndex(colorType.getName());
         List<ColorType> toRemove = collectColorTypesToRemoveAndUpdateTodot(colorType);
         for(ColorType ct : toRemove){
-            Command command = new RemoveColorTypeFromNetworkCommand(ct, this, colorTypesListModel);
+            Command command = new RemoveColorTypeFromNetworkCommand(ct, this, colorTypesListModel, index);
             command.redo();
             undoManager.addEdit(command);
             updateColorType(ColorType.COLORTYPE_DOT, ct, undoManager);
+            for (TimedArcPetriNet tapn : tapns) {
+                resetPlaces(ct, tapn.places(), undoManager);
+            }
         }
         /*
 	    if (colorType != null) {

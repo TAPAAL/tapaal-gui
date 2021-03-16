@@ -53,8 +53,6 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
-
-
     private TabContent.TAPNLens lens;
 
     enum GraphicsType { Position, Offset }
@@ -178,7 +176,6 @@ public class PNMLoader {
             }
             node = node.getNextSibling();
         }
-
         //We parse the transitions last, as we need the places and transitions it refers to
         node = first;
         while(node != null){
@@ -191,51 +188,44 @@ public class PNMLoader {
     }
     //TODO: implement color
     private void parsePlace(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
-        if(!(node instanceof Element)){
+        if (!(node instanceof Element)) {
             return;
         }
 
         Name name = parseName(getFirstDirectChild(node, "name"));
-        if(name == null){
+        if (name == null) {
             name = new Name(nameGenerator.getNewPlaceName(template.model()));
         }
-        System.out.println(name);
         Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
         String id = NamePurifier.purify(((Element) node).getAttribute("id"));
-        System.out.println(id);
-        InitialMarking marking = null;
         ArcExpression colorMarking = null;
         Point markingOffset = null;
         TimedPlace place;
-
-        if (lens.isColored()) {
-            Node typeNode = getFirstDirectChild(node, "type");
-            ColorType colorType = null;
-            if(typeNode != null) {
+        InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking"));
+        ColorType colorType = ColorType.COLORTYPE_DOT;
+        Node typeNode = getFirstDirectChild(node, "type");
+        if (typeNode != null) {
+            try {
                 colorType = loadTACPN.parseUserSort(typeNode);
+            } catch (FormatException e) {
+                e.printStackTrace();
             }
-
-            Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
-            if (markingNode == null) {
-                markingOffset = new Point();
-                colorMarking = null;
-            } else {
-                markingOffset = parseGraphics(getFirstDirectChild(markingNode, "graphics"), GraphicsType.Offset);
-                Node markingExpression = getFirstDirectChild(markingNode, "structure");
-                colorMarking = loadTACPN.parseTokenExpression(markingExpression);
-            }
-            place = new LocalTimedPlace(id, colorType);
-
-        } else {
-            marking = parseMarking(getFirstDirectChild(node, "initialMarking"));
-
-            place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()), null);
         }
+        Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
+        if (markingNode != null && markingNode instanceof Element) {
+            try {
+                colorMarking = loadTACPN.parseTokenExpression(((Element) markingNode).getElementsByTagName("structure").item(0));
+            } catch (FormatException e) {
+                e.printStackTrace();
+            }
+        }
+        place = new LocalTimedPlace(id, colorType);
+
         Require.that(places.put(id, place) == null && !transitions.containsKey(id),
             "The name: " + id + ", was already used");
         tapn.add(place);
 
-        if(isNetDrawable()){
+        if (isNetDrawable()) {
             //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
             TimedPlaceComponent placeComponent;
             placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
@@ -245,20 +235,19 @@ public class PNMLoader {
 
         idResolver.add(tapn.name(), id, id);
 
-        if (lens.isColored()) {
-            if (colorMarking != null) {
-                ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
-                ColorMultiset cm = colorMarking.eval(context);
-                place.setTokenExpression(colorMarking);
-                for (TimedToken ct : cm.getTokens(place)) {
-                    tapn.parentNetwork().marking().add(ct);
-                }
+
+        if (colorMarking != null) {
+            ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
+            ColorMultiset cm = colorMarking.eval(context);
+            place.setTokenExpression(colorMarking);
+            for (TimedToken ct : cm.getTokens(place)) {
+                tapn.parentNetwork().marking().add(ct);
             }
         } else {
             for (int i = 0; i < marking.marking; i++) {
                 tapn.parentNetwork().marking().add(new TimedToken(place, ColorType.COLORTYPE_DOT.getFirstColor()));
             }
-            if(marking.marking > 1) {
+            if (marking.marking > 1) {
                 Vector<ColorExpression> v = new Vector<>();
                 v.add(new DotConstantExpression());
                 Vector<ArcExpression> numbOfExpression = new Vector<>();
@@ -267,6 +256,7 @@ public class PNMLoader {
             }
         }
     }
+
 
     private static Node skipWS(Node node) {
         if (node != null && !(node instanceof Element)) {
@@ -280,54 +270,6 @@ public class PNMLoader {
         return node.getAttributes().getNamedItem(attribute);
     }
 
-    private ColorExpression parseColorExpression(Node node) throws FormatException {
-        String name = node.getNodeName();
-        if (name.equals("dotconstant")) {
-            return new DotConstantExpression();
-        } else if (name.equals("variable")) {
-            String varname = getAttribute(node, "refvariable").getNodeValue();
-            Variable var = variables.get(varname);
-            return new VariableExpression(var);
-        } else if (name.equals("useroperator")) {
-            String colorname = getAttribute(node, "declaration").getNodeValue();
-            Color color = getColor(colorname);
-            return new UserOperatorExpression(color);
-        } else if (name.equals("successor")) {
-            Node child = skipWS(node.getFirstChild());
-            ColorExpression childexp = parseColorExpression(child);
-            return new SuccessorExpression(childexp);
-        } else if (name.equals("predecessor")) {
-            Node child = skipWS(node.getFirstChild());
-            ColorExpression childexp = parseColorExpression(child);
-            return new PredecessorExpression(childexp);
-        } else if (name.equals("tuple")) {
-            Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
-
-            Node child = skipWS(node.getFirstChild());
-            while (child != null) {
-                ColorExpression colorexp = parseColorExpression(child);
-                colorexps.add(colorexp);
-                child = skipWS(child.getNextSibling());
-            }
-            return new TupleExpression(colorexps);
-        } else if (name.matches("subterm|structure")) {
-            Node child = skipWS(node.getFirstChild());
-            return parseColorExpression(child);
-        } else {
-            throw new FormatException(String.format("Could not parse %s as an color expression\n", name));
-        }
-    }
-
-    private Color getColor(String colorname) throws FormatException {
-        for (ColorType ct : colortypes.values()) {
-            for (Color c : ct) {
-                if (c.getName().equals(colorname)) {
-                    return c;
-                }
-            }
-        }
-        throw new FormatException(String.format("The color \"%s\" was not declared\n", colorname));
-    }
 
     private InitialMarking parseMarking(Node node) {
         if(!(node instanceof Element)){

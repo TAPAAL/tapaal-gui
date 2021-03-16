@@ -372,12 +372,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
             //TODO: check if all this is correct. What should the default be?
-            ColorType ct = p2.underlyingPlace().getColorType();
-            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
-            vecColorExpr.add(ct.createColorExpressionForFirstColor());
-            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-            tta.setInputExpression(numbExpr);
-            tta.setOutputExpression(numbExpr);
+            instantiateArcExpressions(p1,t,p2,tta);
 
             TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr, lens);
             TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr, lens);
@@ -404,6 +399,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             return new Result<>(ttac1);
 
+        }
+
+        private void instantiateArcExpressions(TimedPlaceComponent p1, Transition t, TimedPlaceComponent p2, TransportArc tta){
+            //make for input
+            ColorType ctin = p1.underlyingPlace().getColorType();
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(ctin.createColorExpressionForFirstColor());
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tta.setInputExpression(numbExpr);
+
+            //make for output
+            ColorType ctout = p2.underlyingPlace().getColorType();
+            vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(ctout.createColorExpressionForFirstColor());
+            numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tta.setOutputExpression(numbExpr);
         }
 
         private int getNextTransportArcMaxGroupNumber(TimedPlaceComponent p, TimedTransitionComponent t) {

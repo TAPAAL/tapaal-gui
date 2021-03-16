@@ -67,6 +67,7 @@ public class UpdateColorTypeForPlaceCommand extends Command {
                 }
             }
         }
+
         //For arcs we want the numberofexpressions unwrapped if there is only one
         //but for places we want it to be addexpressions
         if(newTokenExpression instanceof NumberOfExpression){
@@ -74,6 +75,7 @@ public class UpdateColorTypeForPlaceCommand extends Command {
             numberOfExpressionVector.add(newTokenExpression);
             newTokenExpression = new AddExpression(numberOfExpressionVector);
         }
+
         if(newTokenExpression != null){
             updateColorTypesOnColorsInExpression();
         }

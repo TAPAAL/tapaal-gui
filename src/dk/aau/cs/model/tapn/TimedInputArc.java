@@ -105,7 +105,9 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public TimedInputArc copy(TimedArcPetriNet tapn) {
-		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy(), weight, expression.copy());
+        TimedInputArc tia = new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy(), weight, expression.copy());
+        tia.setColorTimeIntervals(colorTimeIntervals);
+		return tia;
 	}
 
 	// This method should ONLY be called in relation to sharing/unsharing a place
@@ -166,8 +168,8 @@ public class TimedInputArc extends TAPNElement {
 		return result;
 	}
 
-    public void createNewArcExpression() {
-        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(source.getColorType().getFirstColor());
+    public void createNewArcExpression(ColorType newColorType) {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(newColorType.getFirstColor());
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(userOperatorExpression);
         NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
