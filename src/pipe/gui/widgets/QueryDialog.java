@@ -3150,6 +3150,9 @@ public class QueryDialog extends JPanel {
 					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 
 					network.add(transformedModel.value1());
+					network.setColorTypes(tapnNetwork.colorTypes());
+					network.setConstants(tapnNetwork.constants());
+					network.setVariables(tapnNetwork.variables());
 
 					NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
 
