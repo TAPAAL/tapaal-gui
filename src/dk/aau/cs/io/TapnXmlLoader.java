@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.sql.Time;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -115,8 +116,7 @@ public class TapnXmlLoader {
 	private LoadedModel parse(Document doc) throws FormatException {
 		idResolver.clear();
 
-        parseFeature(doc);
-		
+
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
         //TODO: parse colors
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
@@ -148,6 +148,7 @@ public class TapnXmlLoader {
 		
 		parseBound(doc, network);
 
+		parseFeature(doc, network);
 
         if (hasFeatureTag) {
             return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, lens);
@@ -163,15 +164,20 @@ public class TapnXmlLoader {
 		}
 	}
 
-    private void parseFeature(Document doc) {
+    private void parseFeature(Document doc, TimedArcPetriNetNetwork network) {
         if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");
 
 	        hasFeatureTag = true;
 
-            var isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
-            var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
-            var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
+            var isTimedElement = nodeList.item(0).getAttributes().getNamedItem("isTimed");
+            boolean isTimed = isTimedElement == null ? network.isTimed() : Boolean.parseBoolean(isTimedElement.getNodeValue());
+
+            var isGameElement = nodeList.item(0).getAttributes().getNamedItem("isGame");
+            boolean isGame = isGameElement == null ? network.hasUncontrollableTransitions() : Boolean.parseBoolean(isGameElement.getNodeValue());
+
+            var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
+            boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
             lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
         }

@@ -467,6 +467,10 @@ public class TimedArcPetriNetNetwork {
 		return true;
 	}
 
+	public boolean isTimed(){
+		return !isUntimed();
+	}
+
 	public boolean hasWeights() {
 		for(TimedArcPetriNet t : tapns){
 			if(t.isActive() && t.hasWeights()){
