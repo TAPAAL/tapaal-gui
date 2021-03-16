@@ -55,7 +55,7 @@ import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 public class PNMLoader {
 
 
-    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+    private TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
     enum GraphicsType { Position, Offset }
 
@@ -111,7 +111,7 @@ public class PNMLoader {
         Node pnmlElement = doc.getElementsByTagName("pnml").item(0);
         Node netNode = getFirstDirectChild(pnmlElement, "net");
 
-        //lens = new TabContent.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
+        lens = new TabContent.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
 
         String name = getTAPNName(netNode);
 
@@ -225,7 +225,7 @@ public class PNMLoader {
         } else {
             marking = parseMarking(getFirstDirectChild(node, "initialMarking"));
 
-            place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()), null);
+            place = new LocalTimedPlace(id, new TimeInvariant(false, new Bound.InfBound()), ColorType.COLORTYPE_DOT);
         }
         Require.that(places.put(id, place) == null && !transitions.containsKey(id),
             "The name: " + id + ", was already used");
