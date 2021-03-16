@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Vector;
 
 public class TabTransformer {
-    private static String unfoldpath = "";
 
     static public void removeTimingInformation(TabContent tab){
         for(Template template : tab.allTemplates()){
@@ -369,11 +368,10 @@ public class TabTransformer {
         }
 
         VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", false, false);
-        String unfoldingEnginePath = getunfoldPath();
-        if (unfoldingEnginePath == null){
-            return null;
-        }
-        runner = new ProcessRunner(unfoldingEnginePath, createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
+        VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
+        verifypn.setup();
+
+        runner = new ProcessRunner(verifypn.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
         //String errorOutput = readOutput(runner.errorOutput());
@@ -438,22 +436,5 @@ public class TabTransformer {
         }
 
         return buffer.toString();
-    }
-
-    public static String getunfoldPath() {
-        if (unfoldpath.isEmpty()) {
-            VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
-            verifypn.setup();
-            if (!verifypn.isCorrectVersion()) {
-                new MessengerImpl().displayErrorMessage(
-                    "No "+verifypn+" specified: The unfolding is cancelled",
-                    "Unfolding Error");
-                return null;
-            }
-            unfoldpath = verifypn.getPath();
-            return unfoldpath;
-        } else {
-            return unfoldpath;
-        }
     }
 }
