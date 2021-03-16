@@ -12,6 +12,8 @@ import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
@@ -190,7 +192,8 @@ public class TimedTransitionComponent extends Transition {
 			if(underlyingTransition().getGuard() != null && lens.isColored()){
                 pnName.setText("");
                 super.update(displayConstantNames);
-                pnName.setText(pnName.getText() + "\n" + this.underlyingTransition().getGuard().toString());
+                ;
+                pnName.setText(pnName.getText() + "\n" + buildGuardString(this.underlyingTransition().getGuard().toString()));
             } else {
                 getNameLabel().setText("");
             }
@@ -201,6 +204,24 @@ public class TimedTransitionComponent extends Transition {
 		//super.update(displayConstantNames);
 		repaint();
 	}
+
+	private String buildGuardString(String str){
+	    //We split the guard on every 4th and or or
+        //(.*?) reluctantly take characters until and or or
+        //( and | or ) take and or or
+        // (.(?! and | or ))*.) take everything but and and or
+        // {1,4} max 4 ands and ors in one string
+        final String regex = "((.*?)( and | or )(.(?! and | or ))*.){1,4}";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(str);
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            sb.append(matcher.group());
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 
 	@Override
 	public void paintComponent(Graphics g) {
