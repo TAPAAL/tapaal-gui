@@ -104,7 +104,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			parsedQuery.setCategory(detectCategory(query, isCTL));
+			parsedQuery.setCategory(detectCategory(query, isCTL)); //todo ltl
 			parsedQuery.setUseSiphontrap(siphontrap);
 			parsedQuery.setUseQueryReduction(queryReduction);
 			parsedQuery.setUseStubbornReduction(stubborn);

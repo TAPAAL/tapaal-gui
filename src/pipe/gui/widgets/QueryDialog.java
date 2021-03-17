@@ -170,7 +170,8 @@ public class QueryDialog extends JPanel {
     private JCheckBox useQueryReduction;
     private JCheckBox useReduction;
 	private JCheckBox useStubbornReduction;
-	private JCheckBox useTraceRefinement;
+    private JCheckBox useTraceRefinement;
+    private JCheckBox useTarjan;
 
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
@@ -301,6 +302,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freedom by using siphon-trap analysis via linear programming.";
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
     private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
+    private final static String TOOL_TIP_USE_TARJAN= "Uses the Tarjan algorithm when verifying. If not selected it will verify using the nested DFS algorithm.";
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
@@ -445,11 +447,16 @@ public class QueryDialog extends JPanel {
             /* enableUnderApproximation */false,
             0
         );
-        query.setCategory(TAPNQuery.QueryCategory.CTL);
+        if (queryType.getSelectedIndex() == 1) {
+            query.setCategory(TAPNQuery.QueryCategory.LTL);
+        } else {
+            query.setCategory(TAPNQuery.QueryCategory.CTL);
+        }
         query.setUseSiphontrap(useSiphonTrap.isSelected());
         query.setUseQueryReduction(useQueryReduction.isSelected());
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
         query.setUseTarOption(useTraceRefinement.isSelected());
+        query.setUseTarjan(useTarjan.isSelected());
         return query;
     }
 
@@ -1232,12 +1239,17 @@ public class QueryDialog extends JPanel {
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
 		setupTarOptionsFromQuery(queryToCreateFrom);
+        setupTarjanOptionsFromQuery(queryToCreateFrom);
 	}
 
 	private void setupTarOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 	    if (queryToCreateFrom.isTarOptionEnabled()) {
 	        useTraceRefinement.setSelected(true);
         }
+    }
+
+    private void setupTarjanOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+        useTarjan.setSelected(queryToCreateFrom.isTarjan());
     }
 
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1312,6 +1324,7 @@ public class QueryDialog extends JPanel {
         useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
         useReduction.setSelected(queryToCreateFrom.useReduction());
         useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
+        useTarjan.setSelected(queryToCreateFrom.isTarjan());
     }
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1827,14 +1840,24 @@ public class QueryDialog extends JPanel {
         });
 
         globallyButton.addActionListener(e -> {
-            TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject())){
+                @Override
+                public String toString() {
+                    return super.toString().replace("AG", "G");
+                }
+            };
             forAllBox.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
         });
 
         finallyButton.addActionListener(e -> {
-            TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject())){
+                @Override
+                public String toString() {
+                    return super.toString().replace("AF", "F");
+                }
+            };
             forAllDiamond.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
@@ -1870,9 +1893,19 @@ public class QueryDialog extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 TCTLAbstractPathProperty property;
                 if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+                    property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject()){
+                        @Override
+                        public String toString() {
+                            return super.toString().replace("AX", "X");
+                        }
+                    };
                 } else {
-                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject())){
+                        @Override
+                        public String toString() {
+                            return super.toString().replace("AX", "X");
+                        }
+                    };
                 }
                 addPropertyToQuery(property);
             }
@@ -2782,6 +2815,7 @@ public class QueryDialog extends JPanel {
         usePTrie = new JCheckBox("Use PTrie");
         useOverApproximation = new JCheckBox("Use untimed state-equations check");
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
+        useTarjan = new JCheckBox("Use tarjan");
 
         useReduction.setSelected(true);
         useSiphonTrap.setSelected(false);
@@ -2795,6 +2829,7 @@ public class QueryDialog extends JPanel {
         usePTrie.setSelected(true);
         useOverApproximation.setSelected(true);
         useTraceRefinement.setSelected(false);
+        useTarjan.setSelected(true);
 
         useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
         useSiphonTrap.setToolTipText(TOOL_TIP_USE_SIPHONTRAP);
@@ -2808,6 +2843,7 @@ public class QueryDialog extends JPanel {
         usePTrie.setToolTipText(TOOL_TIP_PTRIE);
         useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
         useTraceRefinement.setToolTipText(TOOL_TIP_USE_TRACE_REFINEMENT);
+        useTarjan.setToolTipText(TOOL_TIP_USE_TARJAN);
 
         if (lens.isTimed() || lens.isGame()) {
             initTimedReductionOptions();
@@ -2896,6 +2932,9 @@ public class QueryDialog extends JPanel {
         gbc.gridx = 3;
         gbc.gridy = 0;
         reductionOptionsPanel.add(useTraceRefinement, gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        reductionOptionsPanel.add(useTarjan, gbc);
     }
 
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
@@ -2909,6 +2948,7 @@ public class QueryDialog extends JPanel {
             refreshOverApproximationOption();
         } else if (!lens.isTimed()) {
             refreshTraceRefinement();
+            refreshTarjan();
         }
 		updateSearchStrategies();
 		refreshExportButtonText();
@@ -2922,6 +2962,14 @@ public class QueryDialog extends JPanel {
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
             !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
 	        useTraceRefinement.setEnabled(true);
+        }
+    }
+
+    private void refreshTarjan() {
+        if (queryType.getSelectedIndex() == 1) {
+            useTarjan.setVisible(true);
+        } else {
+            useTarjan.setVisible(false);
         }
     }
 

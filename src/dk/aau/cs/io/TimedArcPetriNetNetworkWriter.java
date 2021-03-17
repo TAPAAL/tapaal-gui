@@ -285,7 +285,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendQueries(Document document, Element root) {
 		for (TAPNQuery query : queries) {
 			Element newQuery;
-			if (query.getCategory() == QueryCategory.CTL){
+			if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL ){
 				newQuery = createCTLQueryElement(query, document);
 			} else {
 				newQuery = createQueryElement(query, document);
@@ -336,7 +336,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
-		queryElement.setAttribute("type", "CTL");
+		queryElement.setAttribute("type", query.getCategory().toString());
 		queryElement.setAttribute("capacity", "" + query.getCapacity());
 		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
 		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
@@ -360,8 +360,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
 		queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
 		queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
-		
-		return queryElement;
+        queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+
+        return queryElement;
 	}
 	
 	private Node XMLQueryStringToElement(String formulaString){

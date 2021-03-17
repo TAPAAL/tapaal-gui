@@ -1581,6 +1581,10 @@ public class BatchProcessingDialog extends JDialog {
             s.append("Trace Abstract Refinement: ");
             s.append(query.isTarOptionEnabled() ? "Yes\n\n" : "No\n\n");
 
+            s.append("\n\n");
+            s.append("USe Tarjan: ");
+            s.append(query.isTarjan() ? "Yes\n\n" : "No\n\n");
+
 			s.append("Query Property:\n");
                         s.append(query.getProperty().toString());
 			
