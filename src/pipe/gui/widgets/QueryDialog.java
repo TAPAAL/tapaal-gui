@@ -1840,25 +1840,13 @@ public class QueryDialog extends JPanel {
         });
 
         globallyButton.addActionListener(e -> {
-            TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject())){
-                @Override
-                public String toString() {
-                    return super.toString().replace("AG", "G");
-                }
-            };
-            forAllBox.setSelected(true);
+            LTLAGNode property = new LTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             addPropertyToQuery(property);
             unselectButtons();
         });
 
         finallyButton.addActionListener(e -> {
-            TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject())){
-                @Override
-                public String toString() {
-                    return super.toString().replace("AF", "F");
-                }
-            };
-            forAllDiamond.setSelected(true);
+            LTLAFNode property = new LTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -1893,19 +1881,9 @@ public class QueryDialog extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 TCTLAbstractPathProperty property;
                 if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject()){
-                        @Override
-                        public String toString() {
-                            return super.toString().replace("AX", "X");
-                        }
-                    };
+                    property = new LTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
                 } else {
-                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject())){
-                        @Override
-                        public String toString() {
-                            return super.toString().replace("AX", "X");
-                        }
-                    };
+                    property = new LTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
                 }
                 addPropertyToQuery(property);
             }
@@ -1915,10 +1893,10 @@ public class QueryDialog extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 TCTLAbstractPathProperty property;
                 if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                    property = new LTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
                         new TCTLStatePlaceHolder());
                 } else {
-                    property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                    property = new LTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
                         getSpecificChildOfProperty(2, currentSelection.getObject()));
                 }
                 addPropertyToQuery(property);

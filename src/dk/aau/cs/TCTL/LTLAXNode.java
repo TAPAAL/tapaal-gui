@@ -1,0 +1,44 @@
+package dk.aau.cs.TCTL;
+
+public class LTLAXNode extends TCTLAXNode{
+    TCTLAbstractStateProperty property;
+
+    public LTLAXNode(TCTLAbstractStateProperty property) {
+        this.property = property;
+        this.property.setParent(this);
+    }
+
+    @Override
+    public String toString() {
+        String s = property.isSimpleProperty() ? property.toString() : "("
+            + property.toString() + ")";
+        return "X " + s;
+    }
+
+    @Override
+    public StringPosition[] getChildren() {
+        int start = property.isSimpleProperty() ? 0 : 1;
+        start = start + 2;
+        int end = start + property.toString().length();
+        StringPosition position = new StringPosition(start, end, property);
+
+        StringPosition[] children = { position };
+        return children;
+    }
+
+    @Override
+    public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1,
+                                            TCTLAbstractProperty object2) {
+        if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
+            return (TCTLAbstractPathProperty) object2;
+        } else {
+            property = property.replace(object1, object2);
+            return this;
+        }
+    }
+
+    @Override
+    public boolean containsPlaceHolder() {
+        return property.containsPlaceHolder();
+    }
+}
