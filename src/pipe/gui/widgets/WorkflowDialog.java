@@ -1289,7 +1289,8 @@ public class WorkflowDialog extends JDialog {
 	private void checkBound() {
 		Verifier.analyzeKBound(model,
 				(Integer) numberOfExtraTokensInNet.getValue(),
-				numberOfExtraTokensInNet);
+				numberOfExtraTokensInNet,
+                 CreateGui.getCurrentTab().getGuiModels(), null);
 	}
 
 	private TAPNNetworkTrace mapTraceToRealModel(TAPNNetworkTrace tapnNetworkTrace){

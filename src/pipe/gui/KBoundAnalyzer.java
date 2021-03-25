@@ -2,6 +2,8 @@ package pipe.gui;
 
 import javax.swing.JSpinner;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
@@ -22,6 +24,8 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
+import java.util.HashMap;
+
 public class KBoundAnalyzer {
 	protected TimedArcPetriNetNetwork tapnNetwork;
 	protected int k;
@@ -30,14 +34,16 @@ public class KBoundAnalyzer {
 	private final ModelChecker unfoldingEngine;
 	private final Messenger messenger;
 	private final JSpinner spinner;
+	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 
-	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k,
-                          ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, JSpinner tokensControl) {
+	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k, ModelChecker modelChecker,
+                          ModelChecker unfoldingEngine, Messenger messenger, JSpinner tokensControl, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
         this.unfoldingEngine = unfoldingEngine;
         this.messenger = messenger;
+        this.guiModels = guiModels;
 		spinner = tokensControl;
 	}
 
@@ -45,7 +51,7 @@ public class KBoundAnalyzer {
 		TAPNQuery query = getBoundednessQuery();
 		VerifyTAPNOptions options = verificationOptions();
 
-		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, unfoldingEngine, messenger, spinner);
+		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, unfoldingEngine, messenger, spinner, guiModels);
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
 		analyzer.execute(options, tapnNetwork, query, null);

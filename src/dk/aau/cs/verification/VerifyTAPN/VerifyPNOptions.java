@@ -57,17 +57,21 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
-            String writeReducedCMD = " --write-reduced " +pathToReducedNet;
-            result.append(writeReducedCMD);
+			if(pathToReducedNet != null){
+                String writeReducedCMD = " --write-reduced " +pathToReducedNet;
+                result.append(writeReducedCMD);
+            }
 			break;
 		case NO_REDUCTION:
 			result.append(" -r 0 ");
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
-            writeReducedCMD = " --write-reduced " +pathToReducedNet;
-            result.append(writeReducedCMD);
-			break;
+            if(pathToReducedNet != null){
+                String writeReducedCMD = " --write-reduced " +pathToReducedNet;
+                result.append(writeReducedCMD);
+            }
+            break;
 		default:
 			break;			
 		}
@@ -77,6 +81,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
                 result.append(" -x 1");
             }
 		}
+
+		if(coloredNet){
+		    result.append(" -x 1");
+        }
 		
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");

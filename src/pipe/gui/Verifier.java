@@ -56,14 +56,18 @@ public class Verifier {
     }
 
     public static ModelChecker getModelChecker(TAPNQuery query) {
-        if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
+        return getModelChecker(query.getReductionOption());
+    }
+
+    public static ModelChecker getModelChecker(ReductionOption reductionOption) {
+        if (reductionOption == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
-        } else if (query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
+        } else if (reductionOption == ReductionOption.VerifyTAPNdiscreteVerification) {
             return getVerifydTAPN();
-        } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+        } else if (reductionOption == ReductionOption.VerifyPN) {
             return getVerifyPN();
         } else {
-            throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
+            throw new RuntimeException("Verification method: " + reductionOption + ", should not be send here");
         }
     }
 
@@ -71,15 +75,19 @@ public class Verifier {
         return reducedNetTempFile.getAbsolutePath();
     }
 
-    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
+    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl, HashMap<TimedArcPetriNet, DataLayer> guiModels, ReductionOption reductionOption) {
         ModelChecker modelChecker;
 
-        if (tapnNetwork.isUntimed()) {
-            modelChecker = getVerifyPN();
-        } else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
-            modelChecker = getVerifydTAPN();
+        if(reductionOption == null){
+            if (tapnNetwork.isUntimed()) {
+                modelChecker = getVerifyPN();
+            } else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
+                modelChecker = getVerifydTAPN();
+            } else {
+                modelChecker = getVerifyTAPN();
+            }
         } else {
-            modelChecker = getVerifyTAPN();
+            modelChecker = getModelChecker(reductionOption);
         }
 
         ModelChecker unfoldingEngine = getVerifyPN();
@@ -96,7 +104,7 @@ public class Verifier {
                 "Verification Error");
             return;
         }
-        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, unfoldingEngine, new MessengerImpl(), tokensControl);
+        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, unfoldingEngine, new MessengerImpl(), tokensControl, guiModels);
         optimizer.analyze();
     }
 

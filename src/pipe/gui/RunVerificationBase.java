@@ -205,6 +205,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         ArrayList<Template> templates = new ArrayList<Template>(1);
         ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
 
+
+
         network.add(transformedModel.value1());
         for (ColorType ct :model.colorTypes()) {
             if (!network.isNameUsedForColorType(ct.getName()))
@@ -223,7 +225,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         File queryFile = null;
         try{
             modelOut = File.createTempFile("modelOut", ".xml");
-            queryOut = File.createTempFile("queryOut", ".q");
+            queryOut = File.createTempFile("queryOut", ".xml");
             modelFile = File.createTempFile("modelIn", ".tapn");
             queryFile = File.createTempFile("queryIn", ".xml");
             writerTACPN.savePNML(modelFile);
