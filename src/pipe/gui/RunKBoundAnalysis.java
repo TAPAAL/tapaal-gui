@@ -4,22 +4,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
-import pipe.dataLayer.DataLayer;
-
-import java.util.HashMap;
 
 public class RunKBoundAnalysis extends RunVerificationBase {
 
 	private final JSpinner spinner;
 
-	public RunKBoundAnalysis(ModelChecker modelChecker,ModelChecker unfoldingEngine, Messenger messenger,JSpinner spinner, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-		super(modelChecker, unfoldingEngine, messenger, guiModels);
+	public RunKBoundAnalysis(ModelChecker modelChecker,ModelChecker unfoldingEngine, Messenger messenger,JSpinner spinner) {
+		super(modelChecker, unfoldingEngine, messenger, null);
 		this.spinner = spinner;
 	}
 

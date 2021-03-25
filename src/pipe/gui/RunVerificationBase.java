@@ -202,8 +202,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         ArrayList<Template> templates = new ArrayList<Template>(1);
         ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
 
-
-
         network.add(transformedModel.value1());
         for (ColorType ct :model.colorTypes()) {
             if (!network.isNameUsedForColorType(ct.getName()))

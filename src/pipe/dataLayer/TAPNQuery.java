@@ -293,7 +293,12 @@ public class TAPNQuery {
 	public ExtrapolationOption getExtrapolationOption() {
 		return extrapolationOption;
 	}
-
+    public static TAPNQuery getDefaultQuery(TCTLAbstractProperty property){
+        //new TCTLEFNode(new TCTLTrueNode())
+        return new TAPNQuery("true", 1000, property, TraceOption.SOME, SearchOption.DFS,
+            ReductionOption.VerifyPN, false,false,false,false,false,
+            HashTableSize.MB_4, ExtrapolationOption.NONE,WorkflowMode.NOT_WORKFLOW);
+    }
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,

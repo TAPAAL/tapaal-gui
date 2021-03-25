@@ -57,21 +57,17 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
-			if(pathToReducedNet != null){
-                String writeReducedCMD = " --write-reduced " +pathToReducedNet;
-                result.append(writeReducedCMD);
-            }
+            String writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            result.append(writeReducedCMD);
 			break;
 		case NO_REDUCTION:
 			result.append(" -r 0 ");
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
-            if(pathToReducedNet != null){
-                String writeReducedCMD = " --write-reduced " +pathToReducedNet;
-                result.append(writeReducedCMD);
-            }
-            break;
+            writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            result.append(writeReducedCMD);
+			break;
 		default:
 			break;			
 		}
