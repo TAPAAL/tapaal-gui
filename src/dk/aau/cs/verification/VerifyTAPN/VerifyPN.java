@@ -270,7 +270,7 @@ public class VerifyPN implements ModelChecker{
 
 		}
 
-		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String queryPath) throws Exception {
+		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
 			if(!supportsModel(model.value1(), options))
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
@@ -289,7 +289,7 @@ public class VerifyPN implements ModelChecker{
             } else {
                 exporter = new VerifyPNExporter();
             }
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, queryPath, model.value2());
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");

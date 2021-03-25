@@ -7,7 +7,8 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
-import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
@@ -63,6 +64,20 @@ public class VerifyTAPNExporter {
 
 			outputModel(model, modelStream, mapping);
 			modelStream.close();
+
+            RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
+			query.getProperty().accept(placeVisitor, null);
+
+
+            if(query.getProperty() instanceof TCTLNotNode) {
+                TCTLPathToStateConverter innerQuery = (TCTLPathToStateConverter) ((TCTLNotNode) query.getProperty()).getProperty();
+                if (innerQuery.getProperty() instanceof TCTLEFNode) {
+                    TCTLAbstractStateProperty queryBody = ((TCTLEFNode) innerQuery.getProperty()).getProperty();
+                    TCTLNotNode negatedQueryBody = new TCTLNotNode(queryBody);
+                    TCTLAGNode agQuery = new TCTLAGNode(negatedQueryBody);
+                    query.setProperty(agQuery);
+                }
+            }
 
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
@@ -151,7 +166,9 @@ public class VerifyTAPNExporter {
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
-        outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        if(guiPlace != null){
+            outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        }
 
         modelStream.append("</place>\n");
 	}
@@ -175,7 +192,9 @@ public class VerifyTAPNExporter {
 		modelStream.append("name=\"" + t.name() + "\" ");
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
-        outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
+        if(guiTransition != null){
+            outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
+        }
 
         modelStream.append("</transition>\n");
 	}

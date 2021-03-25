@@ -17,7 +17,7 @@ public interface ModelChecker {
 
 	String getPath(); // TODO: MJ -- Delete me when refactoring is done
 
-	VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String queryPath) throws Exception;
+	VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception;
 
 
     void kill();

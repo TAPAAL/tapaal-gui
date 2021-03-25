@@ -82,10 +82,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
             }
 		}
 
-		if(coloredNet){
-		    result.append(" -x 1");
-        }
-		
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
 		}

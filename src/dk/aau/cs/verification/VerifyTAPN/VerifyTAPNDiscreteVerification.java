@@ -250,7 +250,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, String queryPath) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
 		if (!supportsModel(model.value1(), options)) {
 			throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 		}
@@ -271,7 +271,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(), queryPath,model.value2());
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
