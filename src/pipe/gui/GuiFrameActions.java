@@ -48,6 +48,8 @@ public interface GuiFrameActions {
     void setShowEnabledTransitionsSelected(boolean b);
     void setShowDelayEnabledTransitionsSelected(boolean b);
     void setShowToolTipsSelected(boolean b);
+    void setShowPlaceNames(boolean b);
+    void setShowTransitionNames(boolean b);
     void setShowZeroToInfinityIntervalsSelected(boolean b);
     void setShowTokenAgeSelected(boolean b);
 

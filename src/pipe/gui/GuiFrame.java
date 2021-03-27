@@ -333,6 +333,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
     };
+    private final GuiAction showPlaceNames = new GuiAction("Display place names ", "Show/hide names of all places", true) {
+        public void actionPerformed(ActionEvent e) {
+            guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayPlaceNames);
+        }
+    };
+    private final GuiAction showTransitionNames = new GuiAction("Display transition names", "Show/hide names of all transitions", true) {
+        public void actionPerformed(ActionEvent e) {
+            guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayTransitionNames);
+        }
+    };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::showAdvancedWorkspace);
@@ -673,6 +683,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         addCheckboxMenuItem(viewMenu, showToolTipsAction);
 
         showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, showTokenAge(), showTokenAgeAction);
+
+        addCheckboxMenuItem(viewMenu, showPlaceNames);
+        addCheckboxMenuItem(viewMenu, showTransitionNames);
 
         viewMenu.addSeparator();
 
@@ -1067,6 +1080,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showDelayEnabledTransitionsAction.setEnabled(enable);
         showToolTipsAction.setEnabled(enable);
         showTokenAgeAction.setEnabled(enable);
+        showPlaceNames.setEnabled(enable);
+        showTransitionNames.setEnabled(enable);
         showAdvancedWorkspaceAction.setEnabled(enable);
         showSimpleWorkspaceAction.setEnabled(enable);
         saveWorkSpaceAction.setEnabled(enable);
@@ -1291,6 +1306,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public void setShowToolTipsSelected(boolean b) {
         showToolTipsAction.setSelected(b);
+    }
+
+    @Override
+    public void setShowPlaceNames(boolean b) {
+        showPlaceNames.setSelected(b);
+    }
+
+    @Override
+    public void setShowTransitionNames(boolean b) {
+        showTransitionNames.setSelected(b);
     }
 
     @Override

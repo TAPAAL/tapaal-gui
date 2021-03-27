@@ -161,7 +161,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             Require.notNull(p, "Point can't be null");
 
             dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
-            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens);
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens, isPlaceNameVisible);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
 
@@ -173,7 +173,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
             transition.setUncontrollable(isUncontrollable);
-            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens, isTransitionNameVisible);
 
             guiModelToModel.get(c).add(transition);
             c.addPetriNetObject(pnObject);
@@ -843,6 +843,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
+	private boolean isPlaceNameVisible = true;
+    private boolean isTransitionNameVisible = true;
 
 	private TabContent(boolean isTimed, boolean isGame) {
 	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
@@ -1619,6 +1621,28 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
             updateFeatureText();
         }
+    }
+
+    @Override
+    public void showPlaceNames(boolean show) {
+      Component[] components = drawingSurface.getComponents();
+      for (Component component : components) {
+          if (component instanceof TimedPlaceComponent) {
+              ((TimedPlaceComponent) component).getNameLabel().displayName(show);
+          }
+      }
+      isPlaceNameVisible = show;
+	}
+
+    @Override
+    public void showTransitionNames(boolean show) {
+        Component[] components = drawingSurface.getComponents();
+        for (Component component : components) {
+            if (component instanceof TimedTransitionComponent) {
+                ((TimedTransitionComponent) component).getNameLabel().displayName(show); //todo: fix not all transitions displayed
+            }
+        }
+        isTransitionNameVisible = show;
     }
 
     public static Split getEditorModelRoot(){

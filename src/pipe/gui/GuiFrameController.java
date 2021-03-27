@@ -58,6 +58,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
     boolean showEnabledTransitions = true;
     boolean showDelayEnabledTransitions = true;
     private boolean showToolTips = true;
+    private boolean showPlaceNames = true;
+    private boolean showTransitionNames = true;
     private boolean showZeroToInfinityIntervals = true;
     private boolean showTokenAge = true;
 
@@ -688,6 +690,20 @@ public class GuiFrameController implements GuiFrameControllerActions{
         ToolTipManager.sharedInstance().setInitialDelay(400);
         ToolTipManager.sharedInstance().setReshowDelay(800);
         ToolTipManager.sharedInstance().setDismissDelay(60000);
+    }
+
+    @Override
+    public void toggleDisplayPlaceNames() {
+        showPlaceNames = !showPlaceNames;
+        guiFrame.setShowPlaceNames(showPlaceNames);
+        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showPlaceNames));
+    }
+
+    @Override
+    public void toggleDisplayTransitionNames() {
+        showTransitionNames = !showTransitionNames;
+        guiFrame.setShowTransitionNames(showTransitionNames);
+        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showTransitionNames));
     }
 
     @Override
