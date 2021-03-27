@@ -1270,6 +1270,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             // create a tabChanged event loop.
             // Throw exception if tab is not found
             appTab.setSelectedComponent(tab);
+            guiFrameController.ifPresent(GuiFrameControllerActions::updateDisplayPlaceNames);
+            guiFrameController.ifPresent(GuiFrameControllerActions::updateDisplayTransitionNames);
         }
     }
 

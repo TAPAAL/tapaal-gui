@@ -116,6 +116,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //XXX fixes an issue where on first open of a net the time intervals are not shown
         tab.drawingSurface().repaintAll();
 
+        updateDisplayPlaceNames();
+        updateDisplayTransitionNames();
     }
 
     //If needed, add boolean forceClose, where net is not checkedForSave and just closed
@@ -695,15 +697,25 @@ public class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void toggleDisplayPlaceNames() {
         showPlaceNames = !showPlaceNames;
-        guiFrame.setShowPlaceNames(showPlaceNames);
-        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showPlaceNames));
+        updateDisplayPlaceNames();
     }
 
     @Override
     public void toggleDisplayTransitionNames() {
         showTransitionNames = !showTransitionNames;
-        guiFrame.setShowTransitionNames(showTransitionNames);
-        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showTransitionNames));
+        updateDisplayTransitionNames();
+    }
+
+    @Override
+    public void updateDisplayPlaceNames() {
+        guiFrame.setShowPlaceNames(showPlaceNames);
+        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showPlaceNames));
+    }
+
+    @Override
+    public void updateDisplayTransitionNames() {
+        guiFrame.setShowPlaceNames(showPlaceNames);
+        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showPlaceNames));
     }
 
     @Override
