@@ -1624,25 +1624,25 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     @Override
-    public void showPlaceNames(boolean show) {
+    public void showPlaceNames(boolean isVisible) {
       Component[] components = drawingSurface.getComponents();
       for (Component component : components) {
           if (component instanceof TimedPlaceComponent) {
-              ((TimedPlaceComponent) component).getNameLabel().displayName(show);
+              ((TimedPlaceComponent) component).getNameLabel().displayName(isVisible);
           }
       }
-      isPlaceNameVisible = show;
+      isPlaceNameVisible = isVisible;
 	}
 
     @Override
-    public void showTransitionNames(boolean show) {
+    public void showTransitionNames(boolean isVisible) {
         Component[] components = drawingSurface.getComponents();
         for (Component component : components) {
             if (component instanceof TimedTransitionComponent) {
-                ((TimedTransitionComponent) component).getNameLabel().displayName(show); //todo: fix not all transitions displayed
+                ((TimedTransitionComponent) component).getNameLabel().displayName(isVisible); //todo: fix not all transitions displayed
             }
         }
-        isTransitionNameVisible = show;
+        isTransitionNameVisible = isVisible;
     }
 
     public static Split getEditorModelRoot(){
