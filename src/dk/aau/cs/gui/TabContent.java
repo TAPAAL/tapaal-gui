@@ -1639,7 +1639,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         Component[] components = drawingSurface.getComponents();
         for (Component component : components) {
             if (component instanceof TimedTransitionComponent) {
-                ((TimedTransitionComponent) component).getNameLabel().displayName(isVisible); //todo: fix not all transitions displayed
+                ((TimedTransitionComponent) component).getNameLabel().setVisible(isVisible);
             }
         }
         isTransitionNameVisible = isVisible;

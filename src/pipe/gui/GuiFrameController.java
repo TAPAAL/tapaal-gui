@@ -703,7 +703,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     public void toggleDisplayTransitionNames() {
         showTransitionNames = !showTransitionNames;
         guiFrame.setShowTransitionNames(showTransitionNames);
-        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showTransitbzrionNames));
+        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showTransitionNames));
     }
 
     @Override
