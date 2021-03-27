@@ -1625,13 +1625,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     @Override
     public void showPlaceNames(boolean isVisible) {
-      Component[] components = drawingSurface.getComponents();
-      for (Component component : components) {
-          if (component instanceof TimedPlaceComponent) {
+	    Component[] components = drawingSurface.getComponents();
+        for (Component component : components) {
+            if (component instanceof TimedPlaceComponent) {
               ((TimedPlaceComponent) component).getNameLabel().displayName(isVisible);
-          }
-      }
-      isPlaceNameVisible = isVisible;
+            }
+        }
+        isPlaceNameVisible = isVisible;
 	}
 
     @Override
@@ -1698,6 +1698,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			drawingSurface.getSelectionObject().clearSelection();
 
 		}
+        showPlaceNames(isPlaceNameVisible);
+        showTransitionNames(isTransitionNameVisible);
     }
 
 

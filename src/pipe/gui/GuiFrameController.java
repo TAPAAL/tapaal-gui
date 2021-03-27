@@ -714,8 +714,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void updateDisplayTransitionNames() {
-        guiFrame.setShowPlaceNames(showPlaceNames);
-        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showPlaceNames));
+        guiFrame.setShowTransitionNames(showTransitionNames);
+        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showTransitionNames));
     }
 
     @Override
