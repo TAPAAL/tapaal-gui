@@ -244,7 +244,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 
 
-        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", false, false);
+        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", SearchOption.HEURISTIC, false, false, 1);
         ProcessRunner runner = new ProcessRunner(unfoldingEngine.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
         String errorOutput = readOutput(runner.errorOutput());

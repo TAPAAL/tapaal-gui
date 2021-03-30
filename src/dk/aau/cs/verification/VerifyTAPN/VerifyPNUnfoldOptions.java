@@ -3,19 +3,27 @@ package dk.aau.cs.verification.VerifyTAPN;
 import dk.aau.cs.verification.VerificationOptions;
 import pipe.dataLayer.TAPNQuery;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class VerifyPNUnfoldOptions extends VerificationOptions {
 
+    private static final Map<TAPNQuery.SearchOption, String> searchMap = createSearchOptionsMap();
     private String modelOut;
     private String queryOut;
     private String verifydtapnOptions;
+    private int numQueries;
     private boolean reduceQuery;
     private boolean enableStructuralReductions;
-    public VerifyPNUnfoldOptions(String modelOut, String queryOut, String verifydtapnOptions, boolean reduceQuery, boolean enableStructuralReductions) {
+    private TAPNQuery.SearchOption searchOption;
+    public VerifyPNUnfoldOptions(String modelOut, String queryOut, String verifydtapnOptions, TAPNQuery.SearchOption search, boolean reduceQuery, boolean enableStructuralReductions, int numQueries) {
         this.modelOut = modelOut;
         this.queryOut = queryOut;
         this.verifydtapnOptions = verifydtapnOptions;
         this.reduceQuery = reduceQuery;
         this.enableStructuralReductions = enableStructuralReductions;
+        this.numQueries = numQueries;
+        searchOption = search;
     }
 
 
@@ -57,18 +65,35 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
 
     @Override
     public String toString() {
-        String options =  "--write-simplified " + queryOut + " --write-reduced " + modelOut + " -x 1";
+        StringBuilder result = new StringBuilder();
+        result.append("--write-simplified " + queryOut + " --write-reduced " + modelOut + " -x 1");
+        for(int i = 2; i <= numQueries; i++){
+            result.append("," + i);
+        }
+
+        result.append(searchMap.get(searchOption));
 
         if(!reduceQuery){
-            options += " -q 0 ";
+            result.append(" -q 0 ");
         }
         if(!enableStructuralReductions){
-            options += " -r 0 ";
+            result.append(" -r 0 ");
         }
 
         if (verifydtapnOptions.equals("tt"))
-        options += " -verifydtapn " + verifydtapnOptions;
+        result.append(" -verifydtapn " + verifydtapnOptions);
 
-        return options;
+        return result.toString();
+    }
+
+    private static final Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {
+        HashMap<TAPNQuery.SearchOption, String> map = new HashMap<TAPNQuery.SearchOption, String>();
+        map.put(TAPNQuery.SearchOption.BFS, " -s BFS");
+        map.put(TAPNQuery.SearchOption.DFS, " -s DFS");
+        map.put(TAPNQuery.SearchOption.RANDOM, " -s RDFS");
+        map.put(TAPNQuery.SearchOption.HEURISTIC, " -s BestFS");
+        map.put(TAPNQuery.SearchOption.OVERAPPROXIMATE, " -s OverApprox");
+
+        return map;
     }
 }
