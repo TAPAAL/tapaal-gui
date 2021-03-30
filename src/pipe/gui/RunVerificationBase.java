@@ -281,7 +281,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
                 newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
                 newTab.addQuery(unfoldedQuery);
-                CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab));
 
                 Thread thread = new Thread(){
                     public void run(){
@@ -300,8 +299,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         } catch (ThreadDeath d){
             return null;
         }
-
-
 
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
         return composer.transformModel(loadedModel.network());

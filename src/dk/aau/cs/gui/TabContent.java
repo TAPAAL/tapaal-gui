@@ -1709,6 +1709,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
+    @Override
     public void createNewAndUnfoldColor(){
         //Verifier.runVerifyTAPNVerification(network(), TAPNQuery.getDefaultQuery(new TCTLTrueNode()), null, getGuiModels(), true);
 	    TabTransformer.unfoldTab(this);
@@ -1844,6 +1845,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
+
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
                 switchToAnimationComponents(true);
 

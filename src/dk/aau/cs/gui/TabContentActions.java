@@ -40,6 +40,8 @@ public interface TabContentActions {
 
     void toggleAnimationMode();
 
+    void createNewAndUnfoldColor();
+
     void setMode(Pipe.ElementType mode);
 
     void showStatistics();

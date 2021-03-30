@@ -395,6 +395,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
+            if(getCurrentTab().getLens().isColored()){
+                currentTab.ifPresent(TabContentActions::createNewAndUnfoldColor);
+            }
             currentTab.ifPresent(TabContentActions::toggleAnimationMode);
         }
     };
