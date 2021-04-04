@@ -83,5 +83,5 @@ public class Pipe {
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
-	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 999;
+	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 9999999;
 }
