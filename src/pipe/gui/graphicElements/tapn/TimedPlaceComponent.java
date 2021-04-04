@@ -254,9 +254,20 @@ public class TimedPlaceComponent extends Place {
                 case 0:
                     break;
                 default:
-                    if (marking > 999) {
+                    if (marking > 99999999) {
+                        String subMarking1 = String.valueOf(marking).substring(0, 4);
+                        String subMarking2 = String.valueOf(marking).substring(4);
+                        g.drawString(">" + subMarking1, x - 5, y + 15);
+                        g.drawString(subMarking2, x + 4, y + 25);
+                    } else if (marking > 9999) {
                         // XXX could be better...
-                        g.drawString("#" + marking, x, y + 20);
+                        String subMarking1 = String.valueOf(marking).substring(0, 4);
+                        String subMarking2 = String.valueOf(marking).substring(4);
+                        g.drawString("#" + subMarking1, x - 5, y + 15);
+                        g.drawString(subMarking2, x + 4, y + 25);
+                    } else if (marking > 999) {
+                        // XXX could be better...
+                        g.drawString("#" + marking, x - 5, y + 20);
                     } else if (marking > 99) {
                         g.drawString("#" + marking, x, y + 20);
                     } else if (marking > 9) {
