@@ -138,4 +138,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		if(inhibitorArc == null) return new IntWeight(1);		// Hack to support inherited constructor (updateLabel called before inhibitorArc set when opening a saved file)
 		return inhibitorArc.getWeight();
 	}
+
+    @Override
+    public void setExpression(ArcExpression expr){
+        inhibitorArc.setExpression(expr);
+    }
 }

@@ -1105,7 +1105,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             undoManager.addEdit(cmd);
         } else if(isInhibitorArc){
             TimedInhibitorArc inhibitorArc = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
-            Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)objectToBeEdited, inhibitorArc.getArcExpression(), arcExpression);
+            Command cmd = new SetArcExpressionCommand((TimedInhibitorArcComponent)objectToBeEdited, inhibitorArc.getArcExpression(), arcExpression);
             cmd.redo();
             undoManager.addEdit(cmd);
         } else {
