@@ -867,7 +867,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
      * for generic addition of comboboxes
      */
     private void addZoomComboBox(JToolBar toolBar, Action action) {
-        Dimension zoomComboBoxDimension = new Dimension(75, 28);
+        Dimension zoomComboBoxDimension = new Dimension(100, 28);
 
         String[] zoomExamplesStrings = new String[zoomLevels.length];
         int i;
