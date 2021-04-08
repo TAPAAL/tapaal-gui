@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.CreateGui;
@@ -250,7 +251,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
 		if (!supportsModel(model.value1(), options)) {
 			throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 		}
@@ -271,7 +272,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2());
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2(), guiModel);
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

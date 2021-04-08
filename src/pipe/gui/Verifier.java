@@ -216,7 +216,7 @@ public class Verifier {
                     query.isSiphontrapEnabled(),
                     TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
-                    tapnNetwork.isColored(),
+                    tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
                     reducedNetTempFile.getAbsolutePath(),
                     query.isTarOptionEnabled()
                 );
@@ -235,7 +235,7 @@ public class Verifier {
                     query.isSiphontrapEnabled(),
                     query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
-                    tapnNetwork.isColored(),
+                    tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
                     reducedNetTempFile.getAbsolutePath(),
                     query.isTarOptionEnabled()
                 );

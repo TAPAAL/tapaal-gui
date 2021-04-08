@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
@@ -24,16 +26,20 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
 
 import javax.xml.crypto.Data;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping) {
-		File modelFile = createTempFile(".xml");
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
+		File modelFile = createTempFile(".tapn");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL){
 			queryFile = createTempFile(".xml");
@@ -42,28 +48,30 @@ public class VerifyTAPNExporter {
 		}
 		this.model = model;
 
-		return export(model, query, modelFile, queryFile, null, lens, mapping);
+		return export(model, query, modelFile, queryFile, null, lens, mapping, guiModel);
 	}
 
-    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, String queryPath, NameMapping mapping) {
+    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, String queryPath, NameMapping mapping, DataLayer guiModel) {
         if(queryPath == null || queryPath.isEmpty()){
-            return export(model, query, lens,mapping);
+            return export(model, query, lens,mapping, guiModel);
         } else {
-            File modelFile = createTempFile(".xml");
+            File modelFile = createTempFile(".tapn");
             this.model = model;
-            return export(model, query, modelFile, queryPath, null, lens,mapping);
+            return export(model, query, modelFile, queryPath, null, lens,mapping, guiModel);
         }
     }
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
-		try{
-			PrintStream modelStream = new PrintStream(modelFile);
+        ArrayList<Template> templates = new ArrayList<Template>(1);
+        ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+        templates.add(new Template(model, guiModel, new Zoomer()));
 
-			outputModel(model, modelStream, mapping);
-			modelStream.close();
+		try{
+            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants());
+            writerTACPN.savePNML(modelFile);
 
             RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 			query.getProperty().accept(placeVisitor, null);
@@ -94,22 +102,37 @@ public class VerifyTAPNExporter {
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
-		}
-		return export(model, query, modelFile, queryFile.getAbsolutePath(), dataLayerQuery, lens, mapping);
+		}  catch (IOException e){
+            e.printStackTrace();
+        } catch (ParserConfigurationException e){
+            e.printStackTrace();
+        } catch (TransformerException e){
+            e.printStackTrace();
+        }
+
+		return export(model, query, modelFile, queryFile.getAbsolutePath(), dataLayerQuery, lens, mapping, guiModel);
 	}
 
-    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, String queryPath, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping) {
+    public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, String queryPath, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
         if (modelFile == null)
             return null;
 
-        try{
-            PrintStream modelStream = new PrintStream(modelFile);
+        ArrayList<Template> templates = new ArrayList<Template>(1);
+        ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+        templates.add(new Template(model, guiModel, new Zoomer()));
 
-            outputModel(model, modelStream, mapping);
-            modelStream.close();
+        try{
+            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants());
+            writerTACPN.savePNML(modelFile);
         } catch(FileNotFoundException e) {
             System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
             return null;
+        }  catch (IOException e){
+            e.printStackTrace();
+        } catch (ParserConfigurationException e){
+            e.printStackTrace();
+        } catch (TransformerException e){
+            e.printStackTrace();
         }
         return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryPath);
     }

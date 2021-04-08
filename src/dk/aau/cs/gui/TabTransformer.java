@@ -332,24 +332,5 @@ public class TabTransformer {
         return buffer.toString();
     }
 
-    @SuppressWarnings("Duplicates")
-    public static String readOutput(BufferedReader reader) {
-        try {
-            if (!reader.ready())
-                return "";
-        } catch (IOException e1) {
-            return "";
-        }
-        StringBuffer buffer = new StringBuffer();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-                buffer.append(System.getProperty("line.separator"));
-            }
-        } catch (IOException e) {
-        }
 
-        return buffer.toString();
-    }
 }

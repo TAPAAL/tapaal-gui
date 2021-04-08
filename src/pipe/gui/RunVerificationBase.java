@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
+import javax.swing.*;
+import javax.xml.crypto.Data;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -51,6 +53,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	protected VerificationOptions options;
 	protected TimedArcPetriNetNetwork model;
+	protected DataLayer guiModel;
 	protected TAPNQuery query;
 	protected TAPNQuery clonedQuery;
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
@@ -60,6 +63,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected boolean reducedNetOpened = false;
 	
 	protected Messenger messenger;
+    //if the unfolded net is too big, do not try to load it
+    private final int maxNetSize = 4000;
 
 	public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
 		super();
@@ -89,6 +94,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         TabContent.TAPNLens lens =  new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
 		ITAPNComposer composer = new TAPNComposer(messenger, guiModels, lens,  false, true);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
+		guiModel = composer.getGuiModel();
 		if (options.enabledOverApproximation())
 		{
 			OverApproximation overaprx = new OverApproximation();
@@ -117,7 +123,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					// Prevents verification from displaying error.
 				}
 
-				if(model.isColored()){
+				if(model.isColored() && (!model.isUntimed() | options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE)){
                     transformedModel = unfoldColoredNet((TAPNComposer) composer, transformedModel, clonedQuery);
                 }else {
                     if (!verifypn.setup()) {
@@ -140,12 +146,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     dataLayerQuery.isSiphontrapEnabled(),
                                     dataLayerQuery.isQueryReductionEnabled()? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime: pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
                                     dataLayerQuery.isStubbornReductionEnabled(),
-                                    model.isColored(),
+                                    model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
                                     reducedNetFilePath,
                                     dataLayerQuery.isTarOptionEnabled()
                                 ),
                                 transformedModel,
-                                clonedQuery);
+                                clonedQuery, composer.getGuiModel());
                         } else {
                             overapprox_result = verifypn.verify(
                                 new VerifyPNOptions(
@@ -162,12 +168,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                     false,
                                     dataLayerQuery.isQueryReductionEnabled()? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime: pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
                                     false,
-                                    model.isColored(),
+                                    model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
                                     reducedNetFilePath,
                                     dataLayerQuery.isTarOptionEnabled()
                                 ),
                                 transformedModel,
-                                clonedQuery);
+                                clonedQuery,
+                                composer.getGuiModel());
                         }
 
                         if (overapprox_result.getQueryResult() != null) {
@@ -189,12 +196,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                     }
                 }
 			}
-		} else if(model.isColored()){
+		} else if(model.isColored() && (!model.isUntimed() | options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE)){
             transformedModel = unfoldColoredNet((TAPNComposer) composer, transformedModel, clonedQuery);
         }
 		ApproximationWorker worker = new ApproximationWorker();
 
-		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model);
+		return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel);
 	}
 
     private Tuple<TimedArcPetriNet, NameMapping> unfoldColoredNet(TAPNComposer composer, Tuple<TimedArcPetriNet, NameMapping> transformedModel, TAPNQuery clonedQuery) {
@@ -244,14 +251,15 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 
 
-        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", SearchOption.HEURISTIC, false, false, 1);
+        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", SearchOption.OVERAPPROXIMATE, false, false, 1);
         ProcessRunner runner = new ProcessRunner(unfoldingEngine.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
         String errorOutput = readOutput(runner.errorOutput());
-        String standardOutput = readOutput(runner.standardOutput());
+        int netSize = readUnfoldedSize(runner.standardOutput());
         Logger.log(errorOutput);
+        Logger.log(netSize);
 
-        transformedModel = getUnfoldedModel(modelOut, queryOut);
+        transformedModel = getUnfoldedModel(modelOut, queryOut, netSize);
 
         return transformedModel;
     }
@@ -265,7 +273,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		return decomposer.decompose();
 	}
 
-	private Tuple<TimedArcPetriNet, NameMapping> getUnfoldedModel(File modelFile, File queryFile){
+	private Tuple<TimedArcPetriNet, NameMapping> getUnfoldedModel(File modelFile, File queryFile, int netSize){
         TapnXmlLoader tapnLoader = new TapnXmlLoader();
         File fileOut = new File(modelFile.getAbsolutePath());
         LoadedModel loadedModel = null;
@@ -277,11 +285,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             clonedQuery = new TAPNQuery(unfoldedQuery.getProperty().copy(), clonedQuery.getExtraTokens());
             model = loadedModel.network();
 
-            if(options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE) {
-                TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
-                newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
-                newTab.addQuery(unfoldedQuery);
+            TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
+            newTab.addQuery(unfoldedQuery);
+            guiModel = newTab.getModel();
 
+            if(options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE && netSize < maxNetSize) {
                 Thread thread = new Thread(){
                     public void run(){
                         CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab));
@@ -293,6 +302,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                         thread.stop();
                     }
                 }
+            } else if (netSize >= maxNetSize){
+                options.setTraceOption(pipe.dataLayer.TAPNQuery.TraceOption.NONE);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), "Cannot show trace, as the unfolded net is too large to be loaded");
             }
         } catch (FormatException e) {
             e.printStackTrace();
@@ -301,7 +313,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
 
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
-        return composer.transformModel(loadedModel.network());
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(loadedModel.network());
+        return transformedModel;
     }
 
     private static pipe.dataLayer.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
@@ -375,6 +388,31 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
 
         return buffer.toString();
+    }
+
+    private int readUnfoldedSize(BufferedReader reader){
+        try {
+            if (!reader.ready())
+                return 0;
+        } catch (IOException e1) {
+            return 0;
+        }
+        int numElements = 0;
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                if(line.startsWith("Size of unfolded net: ")){
+                    Pattern p = Pattern.compile("\\d+");
+                    Matcher m = p.matcher(line);
+                    while (m.find()) {
+                        numElements += Integer.parseInt(m.group());
+                    }
+                }
+            }
+        } catch (IOException e) {
+        }
+
+        return numElements;
     }
 
 	private String error;

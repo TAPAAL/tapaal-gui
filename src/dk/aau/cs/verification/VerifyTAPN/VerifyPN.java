@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -270,7 +271,7 @@ public class VerifyPN implements ModelChecker{
 
 		}
 
-		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
 			if(!supportsModel(model.value1(), options))
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
@@ -289,7 +290,7 @@ public class VerifyPN implements ModelChecker{
             } else {
                 exporter = new VerifyPNExporter();
             }
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2(), guiModel);
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -40,6 +41,8 @@ import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
+
+import javax.xml.crypto.Data;
 
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
@@ -259,7 +262,7 @@ public class VerifyTAPN implements ModelChecker {
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
 		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		
@@ -273,7 +276,7 @@ public class VerifyTAPN implements ModelChecker {
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null,model.value2());
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null,model.value2(), guiModel);
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

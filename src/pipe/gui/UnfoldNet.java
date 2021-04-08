@@ -6,6 +6,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnXmlLoader;
@@ -27,14 +28,10 @@ import pipe.dataLayer.Template;
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static dk.aau.cs.gui.TabTransformer.createUnfoldArgumentString;
 import static dk.aau.cs.gui.TabTransformer.mapQueryToNewNames;
@@ -47,6 +44,9 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
     protected TimedArcPetriNetNetwork model;
     protected Iterable<TAPNQuery> queries;
     protected TabContent oldTab;
+
+    //if the unfolded net is too big, do not try to load it
+    private final int maxNetSize = 4000;
 
     public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
         super();
@@ -147,8 +147,13 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         runner.run();
 
         //String errorOutput = readOutput(runner.errorOutput());
-        //String standardOutput = readOutput(runner.standardOutput());
-        //Logger.log(errorOutput);
+        int netSize = readUnfoldedSize(runner.standardOutput());
+
+        if(netSize > maxNetSize){
+            cancel(true);
+            JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolded net is too large to be loaded");
+            return null;
+        }
 
         TapnXmlLoader tapnLoader = new TapnXmlLoader();
         File fileOut = new File(modelOut.getAbsolutePath());
@@ -190,5 +195,60 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
         queries.addAll(queryLoader.parseQueries().getQueries());
         return queries;
+    }
+
+    private int readUnfoldedSize(BufferedReader reader){
+        try {
+            if (!reader.ready())
+                return 0;
+        } catch (IOException e1) {
+            return 0;
+        }
+        int numElements = 0;
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                if(line.startsWith("Size of unfolded net: ")){
+                    Pattern p = Pattern.compile("\\d+");
+                    Matcher m = p.matcher(line);
+                    while (m.find()) {
+                        numElements += Integer.parseInt(m.group());
+                    }
+                }
+            }
+        } catch (IOException e) {
+        }
+
+        return numElements;
+    }
+
+    @SuppressWarnings("Duplicates")
+    public static String readOutput(BufferedReader reader) {
+        try {
+            if (!reader.ready())
+                return "";
+        } catch (IOException e1) {
+            return "";
+        }
+        StringBuffer buffer = new StringBuffer();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                if(line.startsWith("Size of unfolded net: ")){
+                    LinkedList<String> numbers = new LinkedList<String>();
+
+                    Pattern p = Pattern.compile("\\d+");
+                    Matcher m = p.matcher(line);
+                    while (m.find()) {
+                        numbers.add(m.group());
+                    }
+                }
+                buffer.append(line);
+                buffer.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+        }
+
+        return buffer.toString();
     }
 }

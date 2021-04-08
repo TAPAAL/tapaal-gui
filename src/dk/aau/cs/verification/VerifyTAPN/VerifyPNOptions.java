@@ -19,14 +19,14 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private boolean useSiphontrap = false; 
 	private QueryReductionTime queryReductionTime;
 	private boolean useStubbornReduction = true;
-	private boolean coloredNet = false;
+	private boolean unfold = false;
 	private boolean useTarOption;
 	private String pathToReducedNet;
 	
 
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean coloredNet, String pathToReducedNet, boolean useTarOption) {
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean unfold, String pathToReducedNet, boolean useTarOption) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
@@ -34,7 +34,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.useSiphontrap = siphontrap;
 		this.queryReductionTime = queryReduction;
 		this.useStubbornReduction = stubbornReduction;
-		this.coloredNet = coloredNet;
+		this.unfold = unfold;
 		this.useTarOption = useTarOption;
 		this.pathToReducedNet = pathToReducedNet;
 	}
@@ -73,7 +73,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		}
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			if(!coloredNet){
+			if(!unfold){
                 result.append(" -x 1");
             }
 		}
