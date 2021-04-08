@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import net.tapaal.swinghelpers.SwingHelper;
 import pipe.dataLayer.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
@@ -80,8 +81,7 @@ public class SharedPlaceNamePanel extends JPanel {
 		
 		String initialText = (placeToEdit == null) ? "" : placeToEdit.name();
 		nameField = new JTextField(initialText);
-		nameField.setMinimumSize(new Dimension(330, 25));
-		nameField.setPreferredSize(new Dimension(330, 25));
+        SwingHelper.setPreferredWidth(nameField,330);
 		nameField.addActionListener(e -> {
 			okButton.requestFocusInWindow();
 			okButton.doClick();

@@ -27,6 +27,7 @@ import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
+import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.TAPNQuery;
@@ -878,9 +879,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomComboBox.setEditable(true);
         zoomComboBox.setSelectedItem("100%");
         zoomComboBox.setMaximumRowCount(zoomLevels.length);
-        zoomComboBox.setMaximumSize(zoomComboBoxDimension);
-        zoomComboBox.setMinimumSize(zoomComboBoxDimension);
-        zoomComboBox.setPreferredSize(zoomComboBoxDimension);
+        SwingHelper.setPreferredWidth(zoomComboBox,zoomComboBoxDimension.width);
         zoomComboBox.setAction(action);
         zoomComboBox.setFocusable(false);
         toolBar.add(zoomComboBox);

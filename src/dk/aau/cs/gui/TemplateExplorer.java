@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
+import net.tapaal.swinghelpers.SwingHelper;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -551,9 +552,9 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		nameContainer.setLayout(new GridBagLayout());
 		size = new Dimension(330, 25);
 
-		nameTextField = new javax.swing.JTextField();	
-		nameTextField.setPreferredSize(size);
-		nameTextField.setText(nameToShow);	
+		nameTextField = new javax.swing.JTextField();
+        SwingHelper.setPreferredWidth(nameTextField,330);
+		nameTextField.setText(nameToShow);
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(e -> {
 			okButton.requestFocusInWindow();
@@ -659,10 +660,9 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		container.setLayout(new GridBagLayout());
 		nameContainer = new JPanel();
 		nameContainer.setLayout(new GridBagLayout());
-		size = new Dimension(330, 25);
 
-		nameTextField = new javax.swing.JTextField();	
-		nameTextField.setPreferredSize(size);
+		nameTextField = new javax.swing.JTextField();
+		SwingHelper.setPreferredWidth(nameTextField,330);
 		nameTextField.setText(oldname);
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(e -> {

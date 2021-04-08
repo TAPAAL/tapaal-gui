@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.RequestFocusListener;
+import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
@@ -75,9 +76,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private void initComponents() {
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
-		size = new Dimension(330, 25);
-		nameTextField = new javax.swing.JTextField();	
-		nameTextField.setPreferredSize(size);
+		nameTextField = new javax.swing.JTextField();
+        SwingHelper.setPreferredWidth(nameTextField,330);
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(e -> {
 			okButton.requestFocusInWindow();
