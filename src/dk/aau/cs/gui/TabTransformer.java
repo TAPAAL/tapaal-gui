@@ -39,6 +39,7 @@ import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -201,7 +202,7 @@ public class TabTransformer {
         }
     }
     static public void removeColorInformation(TabContent tab) {
-        tab.network().setColorTypes(new ArrayList<ColorType>());
+        tab.network().setColorTypes(Arrays.asList(ColorType.COLORTYPE_DOT));
         tab.network().setVariables(new ArrayList<Variable>());
         for (Template template : tab.allTemplates()) {
             for(TimedPlace place : template.model().places()){
