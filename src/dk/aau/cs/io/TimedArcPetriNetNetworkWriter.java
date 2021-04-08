@@ -111,6 +111,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendSharedTransitions(document, pnmlRootNode);
 		appendConstants(document, pnmlRootNode);
 		appendTemplates(document, pnmlRootNode);
+
         writeTACPN.appendDeclarations(document, pnmlRootNode);
         appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
@@ -146,6 +147,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 					.println("DOMException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath() + "\" transformer=\"");
+			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
 			System.out
 					.println("TransformerConfigurationException thrown in savePNML() "

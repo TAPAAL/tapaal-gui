@@ -150,8 +150,14 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         int netSize = readUnfoldedSize(runner.standardOutput());
 
         if(netSize > maxNetSize){
+            //We make a thread so the workers doesn't cancel itself before showing the dialog
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolded net is too large to be loaded");
+                }
+            }).start();
             cancel(true);
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolded net is too large to be loaded");
             return null;
         }
 

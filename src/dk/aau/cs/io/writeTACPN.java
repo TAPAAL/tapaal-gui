@@ -144,7 +144,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             structureElement.appendChild(allElement);
             Element usersortElement = document.createElement("usersort");
             allElement.appendChild(usersortElement);
-            usersortElement.setAttribute("declaration", ((AllExpression) expression).getColorType().getName());
+            usersortElement.setAttribute("declaration", ((AllExpression) expression).getColorType().getId());
         }
 
         else if(expression instanceof UserOperatorExpression) {
@@ -325,7 +325,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 Element subtermElement = document.createElement("subterm");
                 succElement.appendChild(subtermElement);
                 SuccessorExpression expr = (SuccessorExpression) expression;
-                subtermElement.appendChild(parseGuardExpression(expr.getSuccessorExpression(), document, subtermElement));
+                succElement.appendChild(parseGuardExpression(expr.getSuccessorExpression(), document, subtermElement));
                 structureElement.appendChild(succElement);
             } else if (expression instanceof TupleExpression) {
                 Element tupleElement = document.createElement("tuple");
@@ -360,7 +360,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
         Element typeStructure = document.createElement("structure");
         type.appendChild(typeStructure);
         Element typeUsersort = document.createElement("usersort");
-        typeUsersort.setAttribute("declaration", colorType.getName());
+        typeUsersort.setAttribute("declaration", colorType.getId());
 
         typeStructure.appendChild(typeUsersort);
         placeElement.appendChild(type);
@@ -381,6 +381,10 @@ public class writeTACPN { // both export and save share some of the same syntax 
 
     public void appendDeclarations (Document document, Element NET) {
         Require.that(document != null, "Error: document was null");
+
+        if(!network.isColored()){
+            return;
+        }
 
         Element declarationElement = document.createElement("declaration");
         NET.appendChild(declarationElement);
@@ -412,7 +416,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
                         namedsortElement.appendChild(productSortElement);
                         for (ColorType ct : ((ProductType) colorType).getColorTypes()) {
                             Element usersortElement = document.createElement("usersort");
-                            usersortElement.setAttribute("declaration", ct.getName());
+                            usersortElement.setAttribute("declaration", ct.getId());
                             productSortElement.appendChild(usersortElement);
                         }
                     } else {
@@ -443,7 +447,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             }
             Element usersortElement = document.createElement("usersort");
             variableDeclearationElement.appendChild(usersortElement);
-            usersortElement.setAttribute("declaration", variable.getColorType().getName());
+            usersortElement.setAttribute("declaration", variable.getColorType().getId());
 
         }
 

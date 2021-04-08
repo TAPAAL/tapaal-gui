@@ -129,10 +129,13 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     }
     @SuppressWarnings("Duplicates")
     private void parseNamedSort(Node node, TimedArcPetriNetNetwork network) throws FormatException {
+        //We always use the dot colortype
+        colortypes.put("dot", ColorType.COLORTYPE_DOT);
         Node type = skipWS(node.getFirstChild());
         String typetag = type.getNodeName();
         String name = getAttribute(node, "name").getNodeValue();
         String id = getAttribute(node, "id").getNodeValue();
+
         if (typetag.equals("productsort")) {
             ProductType pt = new ProductType(name, name);
             Node typechild = skipWS(type.getFirstChild());
@@ -146,9 +149,9 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             Require.that(colortypes.put(id, pt) == null, "the name " + id + ", was already used");
             network.add(pt);
         } else {
-            ColorType ct = new ColorType(name, name);
+            ColorType ct = new ColorType(name, id);
             if (typetag.equals("dot")) {
-                ct.addColor("dot");
+                return;
             } else if (typetag.equals("finiteintrange")){
                 int start = Integer.parseInt(getAttribute(type, "start").getNodeValue());
                 int end = Integer.parseInt(getAttribute(type, "end").getNodeValue());
@@ -158,9 +161,9 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             } else {
                 Node typechild = skipWS(type.getFirstChild());
                 while (typechild != null) {
-                    Node dotId = getAttribute(typechild, "id");
-                    if (dotId != null) {
-                        ct.addColor(dotId.getNodeValue());
+                    Node colorId = getAttribute(typechild, "id");
+                    if (colorId != null) {
+                        ct.addColor(colorId.getNodeValue());
                         typechild = skipWS(typechild.getNextSibling());
                     } else {
                         throw new FormatException(String.format("No id found on %s\n", typechild.getNodeName()));

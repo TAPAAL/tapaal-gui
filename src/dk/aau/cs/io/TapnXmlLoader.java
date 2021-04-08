@@ -119,7 +119,7 @@ public class TapnXmlLoader {
 
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
         //TODO: parse colors
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
         NodeList declarations = doc.getElementsByTagName("declaration");
 
         if (declarations.getLength() > 0) {

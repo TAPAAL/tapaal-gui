@@ -137,7 +137,7 @@ public class TapnLegacyXmlLoader {
 			}
 		}
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, Arrays.asList(ColorType.COLORTYPE_DOT));
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
 		NodeList nets = tapnDoc.getElementsByTagName("net");
 		
 		if(nets.getLength() <= 0)
