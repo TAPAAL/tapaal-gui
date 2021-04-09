@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
+import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.GuiFrame;
@@ -127,8 +128,7 @@ public class NewTAPNPanel extends JPanel {
 		String defaultName = String.format("New Petri net %1$d", frame
 				.getNameCounter());
 		nameTextBox = new JTextField(defaultName);
-		Dimension size = new Dimension(330, 25);			
-		nameTextBox.setPreferredSize(size);
+        SwingHelper.setPreferredWidth(nameTextBox,330);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
