@@ -206,6 +206,11 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	private String buildGuardString(String str){
+        //TODO make this part of regex if possible
+        if(!(str.contains("and") && str.contains("or"))){
+            return str;
+        }
+
 	    //We split the guard on every 4th and or or
         //(.*?) reluctantly take characters until and or or
         //( and | or ) take and or or
