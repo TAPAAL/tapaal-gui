@@ -206,8 +206,24 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	private String buildGuardString(String str){
+	    var strArray = str.split(" ");
+	    int counter = 0;
+	    StringBuilder builder  = new StringBuilder();
+	    int maxAndOr = 5;
+        for(String subStr : strArray){
+            if(subStr.equals("and") || subStr.equals("or")){
+                counter++;
+            }
+            if(counter >= maxAndOr){
+                builder.append("\n");
+                counter = 0;
+            }
+            builder.append(subStr + " ");
+        }
+
+        return builder.toString();
         //TODO make this part of regex if possible
-        if(!(str.contains("and") && str.contains("or"))){
+        /*if(!(str.contains("and") && str.contains("or"))){
             return str;
         }
 
@@ -225,7 +241,7 @@ public class TimedTransitionComponent extends Transition {
             sb.append("\n");
         }
 
-        return sb.toString();
+        return sb.toString();*/
     }
 
 	@Override
