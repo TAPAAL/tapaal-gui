@@ -23,7 +23,7 @@ public class NewTAPNPanel extends JDialog {
 	private JRadioButton coloredNet;
 	private static int newNameCounter = 1;
     static NewTAPNPanel newTAPNPanel;
-    private final static String COLORED_GAMES_NOT_SUPPORTED = "There exists no verification engine for colored games, we only allow modeling.\n\n Do you wish to continue?";
+    private final static String COLORED_GAMES_NOT_SUPPORTED = "There exists no verification engine for colored games, we only allow modelling.\n\n Do you wish to continue?";
 
     /* ListOfQueries is used throughout the class to check if
     BatchProcessing was called from QueryPane
