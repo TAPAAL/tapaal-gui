@@ -63,8 +63,7 @@ public class MakePlaceNewSharedCommand extends Command {
 		tapn.remove(place);
 
 		if(sharedPlace == null){
-			sharedPlace = new SharedPlace(newSharedName);
-			sharedPlace.setColorType(colorType);
+			sharedPlace = new SharedPlace(newSharedName, colorType);
 			sharedPlace.setTokenExpression(tokenExpression);
 		}
 		

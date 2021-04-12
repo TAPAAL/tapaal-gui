@@ -18,16 +18,19 @@ public class SharedPlace extends TimedPlace{
     private TimedArcPetriNetNetwork network;
 
     public SharedPlace(String name){
-		this(name, ColorType.COLORTYPE_DOT);
+		this(name, TimeInvariant.LESS_THAN_INFINITY, ColorType.COLORTYPE_DOT);
 	}
     public SharedPlace(String name, ColorType colorType) {
-        this(name, TimeInvariant.LESS_THAN_INFINITY);
-        this.colorType = colorType;
+        this(name, TimeInvariant.LESS_THAN_INFINITY, colorType);
     }
 	public SharedPlace(String name, TimeInvariant invariant){
-		setName(name);
-		setInvariant(invariant);
+		this(name, invariant, ColorType.COLORTYPE_DOT);
 	}
+    public SharedPlace(String name, TimeInvariant invariant, ColorType colorType){
+        setName(name);
+        setInvariant(invariant);
+        this.colorType = colorType;
+    }
 
     public void setNetwork(TimedArcPetriNetNetwork network) {
 		this.network = network;		
@@ -40,8 +43,7 @@ public class SharedPlace extends TimedPlace{
 
     //TODO: check that colored time invariant is copied correctly
 	public TimedPlace copy() {
-        SharedPlace p = new SharedPlace(this.name(), this.invariant().copy());
-        p.setColorType(colorType);
+        SharedPlace p = new SharedPlace(this.name(), this.invariant().copy(),colorType);
         p.setTokenExpression(tokensAsExpression.deepCopy());
         p.setCtiList(ctiList);
         return p;

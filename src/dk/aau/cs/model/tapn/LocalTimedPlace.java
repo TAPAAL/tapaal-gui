@@ -39,8 +39,7 @@ public class LocalTimedPlace  extends TimedPlace {
 	}
 
 	public LocalTimedPlace copy() {
-		LocalTimedPlace p = new LocalTimedPlace(name);
-		p.setColorType(colorType);
+		LocalTimedPlace p = new LocalTimedPlace(name, colorType);
 		if(tokensAsExpression != null){
             p.setTokenExpression(tokensAsExpression.deepCopy());
         }
