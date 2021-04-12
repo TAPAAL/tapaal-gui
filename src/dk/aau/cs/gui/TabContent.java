@@ -367,7 +367,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
             int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
 
             TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
-            //TODO: check if all this is correct. What should the default be?
             instantiateArcExpressions(p1,t,p2,tta);
 
             TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr, lens);
@@ -760,7 +759,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
                 tab.lens.isGame(),
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
-                q.hasUntimedOnlyProperties()
+                q.hasUntimedOnlyProperties(),
+                tab.lens.isColored()
             };
             for(EngineSupportOptions engine : engineSupportOptions){
                 if(engine.areOptionsSupported(queryOptions)){
