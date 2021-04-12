@@ -849,7 +849,8 @@ public class QueryDialog extends JPanel {
             (queryHasDeadlock() && highestNetDegree > 2),
             lens.isGame(),
             (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2,
-            newProperty.hasNestedPathQuantifiers()
+            newProperty.hasNestedPathQuantifiers(),
+            lens.isColored()
         };
 
 

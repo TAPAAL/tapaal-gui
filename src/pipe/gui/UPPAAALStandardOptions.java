@@ -18,7 +18,8 @@ public class UPPAAALStandardOptions extends EngineSupportOptions {
             false,// support deadlock with net degree > 2
             false, //support games
             false, //support EG or AF with net degree > 2);
-            false //support for nested quantification
+            false, //support for nested quantification,
+            false
         );
     }
 }
