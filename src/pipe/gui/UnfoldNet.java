@@ -76,7 +76,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         try {
             modelFile = File.createTempFile("modelInUnfold", ".tapn");
             queryFile = File.createTempFile("queryInUnfold", ".xml");
-            modelOut = File.createTempFile("modelOut", ".tapn");
+            modelOut = File.createTempFile("modelOut", ".xml");
             queryOut = File.createTempFile("queryOut", ".xml");
         } catch (IOException e) {
             e.printStackTrace();

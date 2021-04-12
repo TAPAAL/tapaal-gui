@@ -617,7 +617,7 @@ public class TapnXmlLoader {
 
 		Arc tempArc;
 
-		if (type.equals("tapnInhibitor")) {
+		if (type.equals("tapnInhibitor") || type.equals("inhibitor")) {
 
 			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
 					inscriptionTempStorage, sourceIn, targetIn,
