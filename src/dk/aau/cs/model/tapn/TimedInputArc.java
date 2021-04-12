@@ -35,7 +35,7 @@ public class TimedInputArc extends TAPNElement {
 		this(source, destination, interval, new IntWeight(1), expression);
 	}
     public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight){
-        this(source, destination, interval, weight, null);
+        this(source, destination, interval, weight,null);
     }
 	
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
@@ -47,7 +47,11 @@ public class TimedInputArc extends TAPNElement {
 		this.destination = destination;
 		setTimeInterval(interval);
 		this.weight = weight;
-		this.expression = expression;
+		if(expression == null){
+		    createNewArcExpression(source.getColorType());
+        } else{
+            this.expression = expression;
+        }
 	}
 	
 	public Weight getWeight(){
