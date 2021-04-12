@@ -561,7 +561,7 @@ public class TapnLegacyXmlLoader {
 
         TimedPlaceComponent place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
 
-        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), null);
+        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), ColorType.COLORTYPE_DOT);
         tapn.add(p);
 
         place.setUnderlyingPlace(p);
