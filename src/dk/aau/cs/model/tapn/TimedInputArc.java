@@ -34,9 +34,6 @@ public class TimedInputArc extends TAPNElement {
     public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, ArcExpression expression){
 		this(source, destination, interval, new IntWeight(1), expression);
 	}
-    public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight){
-        this(source, destination, interval, weight,null);
-    }
 	
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
@@ -176,7 +173,7 @@ public class TimedInputArc extends TAPNElement {
         UserOperatorExpression userOperatorExpression = new UserOperatorExpression(newColorType.getFirstColor());
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(userOperatorExpression);
-        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setExpression(numbExpr);
         setWeight(new IntWeight(1));
     }

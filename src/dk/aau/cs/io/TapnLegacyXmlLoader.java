@@ -319,7 +319,7 @@ public class TapnLegacyXmlLoader {
 			firstInhibitorIntervalWarning = false;
 		}
 		
-		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval, null);
+		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval,null);
 
 		tempArc.setUnderlyingArc(inhibArc);
 		guiModel.addPetriNetObject(tempArc);

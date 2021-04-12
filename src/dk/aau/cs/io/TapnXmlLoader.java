@@ -719,10 +719,8 @@ public class TapnXmlLoader {
                 tempArc.setGroupNr(groupNr);
                 postsetTransportArc.setGroupNr(groupNr);
 
-				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, timeInterval, weight);
+				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, timeInterval, weight,expr,transportExpr);
 				transArc.setColorTimeIntervals(ctiList);
-                transArc.setOutputExpression(transportExpr);
-                transArc.setInputExpression(expr);
 
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
@@ -765,7 +763,7 @@ public class TapnXmlLoader {
                 tempArc.setGroupNr(groupNr);
                 presetTransportArc.setGroupNr(groupNr);
 
-				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight);
+				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight,transportExpr,expr);
 				transArc.setColorTimeIntervals(timeIntervals);
                 transArc.setOutputExpression(expr);
                 transArc.setInputExpression(transportExpr);

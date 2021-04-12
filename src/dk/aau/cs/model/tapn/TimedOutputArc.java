@@ -17,9 +17,8 @@ public class TimedOutputArc extends TAPNElement {
 	public TimedOutputArc(TimedTransition source, TimedPlace destination){
 		this(source, destination, new IntWeight(1), null);
 	}
-
-    public TimedOutputArc(TimedTransition source, TimedPlace destination, Weight weight){
-        this(source, destination, weight, null);
+    public TimedOutputArc(TimedTransition source, TimedPlace destination, ArcExpression expr){
+        this(source, destination, new IntWeight(expr.weight()), expr);
     }
 
 	public TimedOutputArc(TimedTransition source, TimedPlace destination, Weight weight, ArcExpression expression) {
@@ -29,7 +28,11 @@ public class TimedOutputArc extends TAPNElement {
 		this.source = source;
 		this.destination = destination;
 		this.weight = weight;
-		this.expression = expression;
+        if(expression == null){
+            createNewArcExpression();
+        } else{
+            this.expression = expression;
+        }
 	}
 	
 	public Weight getWeight(){
@@ -56,7 +59,7 @@ public class TimedOutputArc extends TAPNElement {
         UserOperatorExpression userOperatorExpression = new UserOperatorExpression(destination().getColorType().getFirstColor());
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(userOperatorExpression);
-        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setExpression(numbExpr);
         setWeight(new IntWeight(1));
     }

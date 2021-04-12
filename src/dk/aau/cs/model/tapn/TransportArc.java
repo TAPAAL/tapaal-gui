@@ -32,17 +32,7 @@ public class TransportArc extends TAPNElement {
 	}
 
     public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight) {
-        Require.that(source != null, "The source place cannot be null");
-        Require.that(transition != null, "The associated transition cannot be null");
-        Require.that(destination != null, "The destination place cannot be null");
-        Require.that(!source.isShared() || !transition.isShared(), "You cannot draw an arc between a shared transition and shared place.");
-        Require.that(!transition.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
-
-        this.source = source;
-        this.transition = transition;
-        this.destination = destination;
-        setTimeInterval(interval);
-        this.weight = weight;
+        this(source,transition,destination,interval,weight, null, null);
     }
 	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight,ArcExpression inputExpression, ArcExpression outputExpression) {
 		Require.that(source != null, "The source place cannot be null");
@@ -56,6 +46,16 @@ public class TransportArc extends TAPNElement {
 		this.destination = destination;
 		setTimeInterval(interval);
 		this.weight = weight;
+        if(inputExpression == null){
+            createNewInputArcExpression();
+        } else{
+            this.inputExpression = inputExpression;
+        }
+        if(outputExpression == null){
+            createNewOutputArcExpression();
+        } else{
+            this.outputExpression = outputExpression;
+        }
 	}
 
     public TransportArc(TimedPlace source, TimedTransition transitions, TimedPlace destination) {
@@ -127,9 +127,7 @@ public class TransportArc extends TAPNElement {
 	    TransportArc ta = new TransportArc(tapn.getPlaceByName(source.name()),
             tapn.getTransitionByName(transition.name()),
             tapn.getPlaceByName(destination.name()),
-            interval.copy(), weight);
-	    ta.setOutputExpression(outputExpression.deepCopy());
-	    ta.setInputExpression(inputExpression.deepCopy());
+            interval.copy(), weight,inputExpression.deepCopy(),outputExpression.deepCopy());
 	    ta.setColorTimeIntervals(ctiList);
 		return ta;
 	}
@@ -202,7 +200,7 @@ public class TransportArc extends TAPNElement {
         UserOperatorExpression userOperatorExpression = new UserOperatorExpression(source().getColorType().getFirstColor());
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(userOperatorExpression);
-        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setInputExpression(numbExpr);
         setWeight(new IntWeight(1));
     }
@@ -211,7 +209,7 @@ public class TransportArc extends TAPNElement {
         UserOperatorExpression userOperatorExpression = new UserOperatorExpression(destination().getColorType().getFirstColor());
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(userOperatorExpression);
-        NumberOfExpression numbExpr = new NumberOfExpression(getWeight().value(), vecColorExpr);
+        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setOutputExpression(numbExpr);
         setWeight(new IntWeight(1));
     }

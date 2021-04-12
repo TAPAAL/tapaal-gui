@@ -272,20 +272,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
-
-            TimedOutputArc toa = new TimedOutputArc(
-                t.underlyingTransition(),
-                p.underlyingPlace()
-            );
-
-            //Init color
             ColorType ct = p.underlyingPlace().getColorType();
             Vector<ColorExpression> vecColorExpr = new Vector<>();
             vecColorExpr.add(ct.createColorExpressionForFirstColor());
             NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
 
-            toa.setExpression(numbExpr);
-
+            TimedOutputArc toa = new TimedOutputArc(
+                t.underlyingTransition(),
+                p.underlyingPlace(),
+                numbExpr
+            );
 
             TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa, lens);
 

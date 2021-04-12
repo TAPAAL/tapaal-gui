@@ -502,9 +502,8 @@ public class TAPNComposer implements ITAPNComposer {
                         newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
                     }
                 }
-				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
-				addedArc.setOutputExpression(arc.getOutputExpression());
-				addedArc.setInputExpression(arc.getInputExpression());
+				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue(),
+                    arc.getInputExpression().deepCopy(), arc.getOutputExpression().deepCopy());
 				addedArc.setColorTimeIntervals(arc.getColorTimeIntervals());
 				constructedModel.add(addedArc);
 				
