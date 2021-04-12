@@ -131,6 +131,8 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     private void parseNamedSort(Node node, TimedArcPetriNetNetwork network) throws FormatException {
         //We always use the dot colortype
         colortypes.put("dot", ColorType.COLORTYPE_DOT);
+        network.add(ColorType.COLORTYPE_DOT);
+
         Node type = skipWS(node.getFirstChild());
         String typetag = type.getNodeName();
         String name = getAttribute(node, "name").getNodeValue();
