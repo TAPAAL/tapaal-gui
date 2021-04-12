@@ -60,7 +60,7 @@ public class SuccessorExpression extends ColorExpression {
             return obj2;
         }
         else
-            return this.color.replace(object1, object2,replaceAllInstances);
+            return new SuccessorExpression(color.replace(object1, object2,replaceAllInstances));
     }
     @Override
     public ColorExpression replace(Expression object1, Expression object2){
