@@ -829,7 +829,7 @@ public class TapnXmlLoader {
             messages.add("The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).");
 			firstInhibitorIntervalWarning = false;
 		}
-		
+
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval, weight, arcExpr);
         TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent((TimedPlaceComponent)sourceIn, (TimedTransitionComponent)targetIn, inhibArc);
 		tempArc.setUnderlyingArc(inhibArc);

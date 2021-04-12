@@ -99,22 +99,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
     }
 
-    private void setTransportExpression() {
-        ArcExpression arcExprInput = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getInputExpression();
-        ArcExpression arcExprOutput = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().getOutputExpression();
-
-        if (arcExprInput instanceof NumberOfExpression) {
-            transportWeight = arcExprInput.weight();
-            Vector<ColorExpression> vecColorExpr = ((NumberOfExpression) arcExprInput).getColor();
-            transportInputExpr = new TupleExpression(vecColorExpr);
-        }
-
-        if (arcExprOutput instanceof  NumberOfExpression) {
-            Vector<ColorExpression> vecColorExpr = ((NumberOfExpression) arcExprOutput).getColor();
-            transportOutputExpr = new TupleExpression(vecColorExpr);
-        }
-    }
-
     private void initPanels() {
         initRegularArcExpressionPanel();
         if(isInputArc && !isInhibitorArc){
@@ -126,32 +110,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }*/
 
     }
-
-    /*private void initWeightPanel(){
-        transportWeightPanel = new JPanel(new GridBagLayout());
-        //int current = transportWeight;
-        int min = 1;
-        int max = 9999;
-        int step = 1;
-        numberModel = new SpinnerNumberModel(1, min, max, step);
-        colorExpressionWeightSpinner = new JSpinner(numberModel);
-        JLabel weightLabel = new JLabel("Weight:");
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(5, 10 ,5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
-        transportWeightPanel.add(weightLabel, gbc);
-
-        gbc.gridx = 1;
-        transportWeightPanel.add(colorExpressionWeightSpinner, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        add(transportWeightPanel, gbc);
-    }*/
 
     private void initNonDefaultColorIntervalPanel() {
         nonDefaultArcColorIntervalPanel = new JPanel(new GridBagLayout());
@@ -1114,19 +1072,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             cmd.redo();
             undoManager.addEdit(cmd);
         }
-    }
-
-    private ArcExpression getTransportExpression(ColorExpression colorExpr, int weight) {
-        ArcExpression expr;
-        Vector<ColorExpression> vecColorExpr = new Vector<>();
-        if (colorExpr instanceof TupleExpression) { // we have to use TupleExpression if we want the colorExpressionPanel inside arcPanel when it is transport. IF the tuple only have one element we extract it to remove an unnecessary expression and parentheses
-            if (((TupleExpression) colorExpr).getColors().size() == 1) {
-                colorExpr = ((TupleExpression) colorExpr).getColors().firstElement();
-            }
-        }
-        vecColorExpr.add(colorExpr);
-        expr = new NumberOfExpression(weight, vecColorExpr);
-        return expr;
     }
 
     private void setTimeConstraints() {

@@ -115,7 +115,7 @@ public class GuardDialogue extends JPanel /*
                 guardEditPanel.setVisible(false);
             }
         }
-        if(!objectToBeEdited.isColored()){
+        if(!objectToBeEdited.isColored() || objectToBeEdited instanceof TimedInhibitorArcComponent){
             coloredArcGuardPanel.setVisible(false);
         } else{
             if(objectToBeEdited.isTimed() && guardEditPanel != null){

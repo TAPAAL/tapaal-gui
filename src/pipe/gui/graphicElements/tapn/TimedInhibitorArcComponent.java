@@ -66,29 +66,23 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		getNameLabel().setText("");
-		if(!isColored()) {
-            if (getWeight().value() > 1 || displayConstantNames) {
-                getNameLabel().setText(getWeight().toString(displayConstantNames));
-            }
-
-            boolean focusedConstant = false;
-            if (getWeight() instanceof ConstantWeight) {
-                if (((ConstantWeight) getWeight()).constant().hasFocus()) {
-                    focusedConstant = true;
-                }
-                pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
-            }
-            if(focusedConstant){
-                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-            }else{
-                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
-            }
-        }else{
-            ArcExpression expression = getExpression();
-		    if(expression != null){
-                getNameLabel().setText(expression.toString());
-            }
+        if (getWeight().value() > 1 || displayConstantNames) {
+            getNameLabel().setText(getWeight().toString(displayConstantNames));
         }
+
+        boolean focusedConstant = false;
+        if (getWeight() instanceof ConstantWeight) {
+            if (((ConstantWeight) getWeight()).constant().hasFocus()) {
+                focusedConstant = true;
+            }
+            pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
+        }
+        if(focusedConstant){
+            getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+        }else{
+            getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+        }
+
 
 		this.setLabelPosition();
 	}

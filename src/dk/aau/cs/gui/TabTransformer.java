@@ -58,7 +58,6 @@ public class TabTransformer {
             for(TimedTransition transition : template.model().transitions()){
                 transition.setUrgent(false);
                 //TODO: what is default guard?
-                transition.setGuard(null);
             }
 
             for(Arc arc : template.guiModel().getArcs()){
@@ -233,7 +232,7 @@ public class TabTransformer {
                 UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                NumberOfExpression numbExpr = new NumberOfExpression(expressionWeight, vecColorExpr);
                 arc.setExpression(numbExpr);
                 arc.setWeight(new IntWeight(expressionWeight));
             }
@@ -243,7 +242,7 @@ public class TabTransformer {
                 UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                NumberOfExpression numbExpr = new NumberOfExpression(expressionWeight, vecColorExpr);
                 arc.setExpression(numbExpr);
                 arc.setWeight(new IntWeight(expressionWeight));
             }
@@ -253,7 +252,7 @@ public class TabTransformer {
                 UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
-                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+                NumberOfExpression numbExpr = new NumberOfExpression(oldInputExpr.weight(), vecColorExpr);
                 arc.setInputExpression(numbExpr);
                 arc.setOutputExpression(numbExpr);
                 arc.setWeight(new IntWeight(oldInputExpr.weight()));
