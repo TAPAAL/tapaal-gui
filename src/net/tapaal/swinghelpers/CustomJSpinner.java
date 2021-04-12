@@ -104,9 +104,7 @@ public class CustomJSpinner extends JSpinner{
 					((JSpinner)e.getSource()).setValue(maximumValue);
 				}
 			});
-			this.setPreferredSize(new Dimension(100, 25));
-			this.setMaximumSize(new Dimension(100, 25));
-			this.setMinimumSize(new Dimension(100, 25));
+			SwingHelper.setPreferredWidth(this, 100);
 			
 			final JSpinner spinner = this;
 

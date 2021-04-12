@@ -30,6 +30,7 @@ import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
@@ -1296,6 +1297,7 @@ public class QueryDialog extends JPanel {
         useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
         useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
         useReduction.setSelected(queryToCreateFrom.useReduction());
+        useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
     }
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2295,7 +2297,11 @@ public class QueryDialog extends JPanel {
 					TCTLAbstractProperty newQuery = null;
 
 					try {
-						newQuery = TAPAALQueryParser.parse(queryField.getText());
+					    if (lens.isTimed()) {
+                            newQuery = TAPAALQueryParser.parse(queryField.getText());
+                        } else {
+						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
+                        }
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),

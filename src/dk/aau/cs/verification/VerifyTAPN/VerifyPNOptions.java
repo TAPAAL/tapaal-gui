@@ -46,6 +46,13 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, false, null, false);
 	}
 
+    public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
+                           boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean useTarOption) {
+        this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation,
+            enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, useTarOption);
+    }
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();

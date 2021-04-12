@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
@@ -86,8 +87,7 @@ public class SharedTransitionNamePanel extends JPanel {
 		
 		String initialText = (transitionToEdit == null) ? "" : transitionToEdit.name();
 		nameField = new JTextField(initialText);
-		nameField.setMinimumSize(new Dimension(330, 25));
-		nameField.setPreferredSize(new Dimension(330, 25));
+        SwingHelper.setPreferredWidth(nameField,330);
 		nameField.addActionListener(e -> {
 			okButton.requestFocusInWindow();
 			okButton.doClick();

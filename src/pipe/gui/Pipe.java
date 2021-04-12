@@ -79,9 +79,9 @@ public class Pipe {
 	public static final String verifytaMinRev = "4.1.19";
 	public static final String verifytapnMinRev = "1.3.0";
 	public static final String verifydtapnMinRev = "3.4.1";
-	public static final String verifypnMinRev = "3.1.1";
+	public static final String verifypnMinRev = "4.0.0";
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
-	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 999;
+	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 9999999;
 }

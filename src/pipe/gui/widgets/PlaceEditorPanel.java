@@ -26,6 +26,7 @@ import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
+import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
 import pipe.gui.ColoredComponents.ColorComboboxPanel;
@@ -279,11 +280,11 @@ public class PlaceEditorPanel extends JPanel {
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(290,27));
+        SwingHelper.setPreferredWidth(nameTextField,290);
 
 		sharedPlacesComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
 
-		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
+		SwingHelper.setPreferredWidth(sharedPlacesComboBox,290);
 
 		sharedPlacesComboBox.addItemListener(e -> {
 			SharedPlace place = (SharedPlace)e.getItem();
