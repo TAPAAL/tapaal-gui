@@ -8,7 +8,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Set;
 
-public class LessThanEqExpression extends GuardExpression {
+public class LessThanEqExpression extends GuardExpression implements LeftRightGuardExpression {
     private ColorExpression left;
     private ColorExpression right;
 

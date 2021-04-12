@@ -7,7 +7,7 @@ import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Set;
 
-public class GreaterThanExpression extends GuardExpression{
+public class GreaterThanExpression extends GuardExpression implements LeftRightGuardExpression{
     private ColorExpression left;
     private ColorExpression right;
 

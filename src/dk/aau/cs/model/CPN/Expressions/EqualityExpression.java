@@ -9,7 +9,7 @@ import dk.aau.cs.model.CPN.Variable;
 import java.util.List;
 import java.util.Set;
 
-public class EqualityExpression extends GuardExpression {
+public class EqualityExpression extends GuardExpression implements LeftRightGuardExpression{
     private ColorExpression left;
     private ColorExpression right;
 

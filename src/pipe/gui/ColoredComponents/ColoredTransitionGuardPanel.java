@@ -12,6 +12,8 @@ import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.util.Tuple;
+import kotlin.Pair;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.TAPNTransitionEditor;
@@ -129,10 +131,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             PredecessorExpression predExpr;
             if (currentSelection.getObject() instanceof ColorExpression) {
                 predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
-                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), predExpr);
-                newProperty = newProperty.replace(currentSelection.getObject(), predExpr);
-                updateSelection(predExpr);
-                undoSupport.postEdit(edit);
+                replaceAndAddToUndo(currentSelection.getObject(), predExpr);
             }
         });
 
@@ -140,10 +139,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             SuccessorExpression succExpr;
             if (currentSelection.getObject() instanceof  ColorExpression) {
                 succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
-                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), succExpr);
-                newProperty = newProperty.replace(currentSelection.getObject(), succExpr);
-                updateSelection(succExpr);
-                undoSupport.postEdit(edit);
+                replaceAndAddToUndo(currentSelection.getObject(), succExpr);
             }
         });
 
@@ -223,11 +219,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 newExpression = expr;
             }
             if (currentSelection.getObject() instanceof ColorExpression) {
-                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), newExpression);
-                newProperty = newProperty.replace(currentSelection.getObject(), newExpression);
-                updateSelection(newExpression);
-                undoSupport.postEdit(edit);
-
+                replaceAndAddToUndo(currentSelection.getObject(), newExpression);
             }
         });
 
@@ -320,76 +312,28 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         andButton.addActionListener(actionEvent -> {
             AndExpression andExpr = null;
-            if (currentSelection.getObject() instanceof AndExpression) {
-                andExpr = new AndExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-            }
-            else if (currentSelection.getObject() instanceof OrExpression) {
+            if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
-                //andExpr = new AndExpression((OrExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-
+            } else if (currentSelection.getObject() instanceof GuardExpression) {
+                andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
             }
-            else if (currentSelection.getObject() instanceof NotExpression) {
-                andExpr = new AndExpression((NotExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-            }
-            else if (currentSelection.getObject() instanceof GuardExpression) {
-                PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
-                andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), ph);
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), andExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
-            updateSelection(andExpr);
-            undoSupport.postEdit(edit);
-
+            replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
 
         orButton.addActionListener(actionEvent -> {
             OrExpression orExpr = null;
             if (currentSelection.getObject() instanceof AndExpression) {
                 orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
+            } else if (currentSelection.getObject() instanceof GuardExpression) {
+                orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
             }
-            else if (currentSelection.getObject() instanceof OrExpression) {
-                orExpr = new OrExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-            }
-            else if (currentSelection.getObject() instanceof NotExpression) {
-                orExpr = new OrExpression((AndExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-            }
-            else if (currentSelection.getObject() instanceof GuardExpression) {
-                PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
-                orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), ph);
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), orExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
-            updateSelection(orExpr);
-            undoSupport.postEdit(edit);
+            replaceAndAddToUndo(currentSelection.getObject(), orExpr);
         });
 
         notButton.addActionListener(actionEvent -> {
             NotExpression notExpr = null;
-            if (currentSelection.getObject() instanceof NotExpression) {
-                notExpr = new NotExpression((NotExpression)currentSelection.getObject());
-            }
-            else if (currentSelection.getObject() instanceof AndExpression) {
-                notExpr = new NotExpression((AndExpression)currentSelection.getObject());
-            }
-            else if (currentSelection.getObject() instanceof OrExpression) {
-                notExpr = new NotExpression((OrExpression) currentSelection.getObject());
-            }
-            else if (currentSelection.getObject() instanceof EqualityExpression ||
-                currentSelection.getObject() instanceof InequalityExpression ||
-                currentSelection.getObject() instanceof GreaterThanExpression ||
-                currentSelection.getObject() instanceof GreaterThanEqExpression ||
-                currentSelection.getObject() instanceof LessThanExpression ||
-                currentSelection.getObject() instanceof LessThanEqExpression) {
-                notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
-            }
-            else if (currentSelection.getObject() instanceof GuardExpression) {
-                PlaceHolderGuardExpression ph = new PlaceHolderGuardExpression();
-                notExpr = new NotExpression((GuardExpression)ph);
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), notExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-            updateSelection(notExpr);
-            undoSupport.postEdit(edit);
+            notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), notExpr);
         });
     }
 
@@ -485,176 +429,48 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
 
         equalityButton.addActionListener(actionEvent -> {
-            EqualityExpression eqExpr = null;
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                eqExpr = new EqualityExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                eqExpr = new EqualityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                eqExpr = new EqualityExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof InequalityExpression) {
-                eqExpr = new EqualityExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                eqExpr = new EqualityExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanExpression) {
-                eqExpr = new EqualityExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                eqExpr = new EqualityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), eqExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-            updateSelection(eqExpr);
-            undoSupport.postEdit(edit);
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new EqualityExpression(pair.component1(),pair.component2()));
+
         });
 
         greaterThanEqButton.addActionListener(actionEvent -> {
-            GreaterThanEqExpression greaterEqExpr = null;
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                greaterEqExpr = new GreaterThanEqExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                greaterEqExpr = new GreaterThanEqExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-            }
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new GreaterThanEqExpression(pair.component1(),pair.component2()));
 
-            else if (currentSelection.getObject() instanceof InequalityExpression) {
-                greaterEqExpr = new GreaterThanEqExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof EqualityExpression) {
-                greaterEqExpr = new GreaterThanEqExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanExpression) {
-                greaterEqExpr = new GreaterThanEqExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                greaterEqExpr = new GreaterThanEqExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), greaterEqExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), greaterEqExpr);
-            updateSelection(greaterEqExpr);
-            undoSupport.postEdit(edit);
         });
 
         greaterThanButton.addActionListener(actionEvent -> {
-            GreaterThanExpression greaterExpr = null;
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                greaterExpr = new GreaterThanExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                greaterExpr = new GreaterThanExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                greaterExpr = new GreaterThanExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof EqualityExpression) {
-                greaterExpr = new GreaterThanExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof InequalityExpression) {
-                greaterExpr = new GreaterThanExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                greaterExpr = new GreaterThanExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanExpression) {
-                greaterExpr = new GreaterThanExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), greaterExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-            updateSelection(greaterExpr);
-            undoSupport.postEdit(edit);
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new GreaterThanExpression(pair.component1(),pair.component2()));
+
         });
 
         inequalityButton.addActionListener(actionEvent -> {
-            InequalityExpression iqExpr = null;
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                iqExpr = new InequalityExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                iqExpr = new InequalityExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                iqExpr = new InequalityExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof EqualityExpression) {
-                iqExpr = new InequalityExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof InequalityExpression) {
-                iqExpr = new InequalityExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanExpression) {
-                iqExpr = new InequalityExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                iqExpr = new InequalityExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), iqExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-            updateSelection(iqExpr);
-            undoSupport.postEdit(edit);
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new InequalityExpression(pair.component1(),pair.component2()));
+
         });
         lessThanButton.addActionListener(actionEvent -> {
-            LessThanExpression lessThanExpr = null;
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                lessThanExpr = new LessThanExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                lessThanExpr = new LessThanExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                lessThanExpr = new LessThanExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof EqualityExpression) {
-                lessThanExpr = new LessThanExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof InequalityExpression) {
-                lessThanExpr = new LessThanExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanExpression) {
-                lessThanExpr = new LessThanExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                lessThanExpr = new LessThanExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), lessThanExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), lessThanExpr);
-            updateSelection(lessThanExpr);
-            undoSupport.postEdit(edit);
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new LessThanExpression(pair.component1(),pair.component2()));
         });
 
         lessThanEqButton.addActionListener(actionEvent -> {
-            LessThanEqExpression lessThanEqExpr = null;
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                lessThanEqExpr = new LessThanEqExpression(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanExpression) {
-                lessThanEqExpr = new LessThanEqExpression(((GreaterThanExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof GreaterThanEqExpression) {
-                lessThanEqExpr = new LessThanEqExpression(((GreaterThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((GreaterThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof InequalityExpression) {
-                lessThanEqExpr = new LessThanEqExpression(((InequalityExpression) currentSelection.getObject()).getLeftExpression(), ((InequalityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof EqualityExpression) {
-                lessThanEqExpr = new LessThanEqExpression(((EqualityExpression) currentSelection.getObject()).getLeftExpression(), ((EqualityExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanEqExpression) {
-                lessThanEqExpr = new LessThanEqExpression(((LessThanEqExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanEqExpression) currentSelection.getObject()).getRightExpression());
-            }
-            else if (currentSelection.getObject() instanceof LessThanExpression) {
-                lessThanEqExpr = new LessThanEqExpression(((LessThanExpression) currentSelection.getObject()).getLeftExpression(), ((LessThanExpression) currentSelection.getObject()).getRightExpression());
-            }
-            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), lessThanEqExpr);
-            newProperty = newProperty.replace(currentSelection.getObject(), lessThanEqExpr);
-            updateSelection(lessThanEqExpr);
-            undoSupport.postEdit(edit);
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new LessThanEqExpression(pair.component1(),pair.component2()));
         });
 
+    }
+
+    private Pair<ColorExpression,ColorExpression> getLeftRightExpression(Expression currentSelection){
+        if (currentSelection instanceof PlaceHolderGuardExpression) {
+            return new Pair<>(new PlaceHolderColorExpression(),
+                new PlaceHolderColorExpression());
+        }else{
+            return new Pair<>(((LeftRightGuardExpression) currentSelection).getLeftExpression(),
+                ((LeftRightGuardExpression) currentSelection).getRightExpression());
+        }
     }
 
     private void initExprEditPanel() {
@@ -1123,6 +939,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
 
     }*/
+    private void replaceAndAddToUndo(Expression currentSelection, Expression newExpression){
+        UndoableEdit edit = new ExpressionConstructionEdit(currentSelection, newExpression);
+        newProperty = newProperty.replace(currentSelection, newExpression);
+        updateSelection(newExpression);
+        undoSupport.postEdit(edit);
+    }
+
     private void updateColorType() {
         ColorType ct;
         ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
