@@ -29,6 +29,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
@@ -62,7 +63,7 @@ public class TabTransformer {
 
             for(Arc arc : template.guiModel().getArcs()){
                 // Make output arc guards infinite
-                if(arc instanceof TimedInputArcComponent && !(arc instanceof TimedTransportArcComponent)){
+                if(arc instanceof TimedInputArcComponent && !(arc instanceof TimedTransportArcComponent) && (!(arc instanceof TimedInhibitorArcComponent))){
                     TimedInputArcComponent arcComp = (TimedInputArcComponent) arc;
                     arcComp.underlyingTimedInputArc().setColorTimeIntervals(new ArrayList<ColoredTimeInterval>());
                 }
