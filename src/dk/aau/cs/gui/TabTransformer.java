@@ -249,6 +249,7 @@ public class TabTransformer {
 
             for(TransportArc arc : template.model().transportArcs()){
                 ArcExpression oldInputExpr = arc.getInputExpression();
+                arc.setColorTimeIntervals(new ArrayList<>());
                 UserOperatorExpression userOperatorExpression = new DotConstantExpression();
                 Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(userOperatorExpression);
