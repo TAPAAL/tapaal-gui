@@ -382,9 +382,9 @@ public class writeTACPN { // both export and save share some of the same syntax 
     public void appendDeclarations (Document document, Element NET) {
         Require.that(document != null, "Error: document was null");
 
-        if(!network.isColored()){
+        /*if(!network.isColored()){
             return;
-        }
+        }*/
 
         Element declarationElement = document.createElement("declaration");
         NET.appendChild(declarationElement);

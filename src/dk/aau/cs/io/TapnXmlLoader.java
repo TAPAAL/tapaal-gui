@@ -134,6 +134,8 @@ public class TapnXmlLoader {
             for(String message : loadTACPN.getMessages()){
                 messages.add(message);
             }
+        } else{
+            network.add(ColorType.COLORTYPE_DOT);
         }
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);
