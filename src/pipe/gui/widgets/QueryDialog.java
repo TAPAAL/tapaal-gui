@@ -1235,6 +1235,8 @@ public class QueryDialog extends JPanel {
             setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
         }
+
+        setupQueryCategoryFromQuery(queryToCreateFrom);
 		setupSearchOptionsFromQuery(queryToCreateFrom);
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
@@ -1364,6 +1366,17 @@ public class QueryDialog extends JPanel {
 			forAllBox.setSelected(true);
 		}
 	}
+
+	private void setupQueryCategoryFromQuery(TAPNQuery queryToCreateFrom) {
+        if (!lens.isTimed() && !lens.isGame()) {
+            TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
+            if (category.equals(TAPNQuery.QueryCategory.CTL)) {
+                queryType.setSelectedIndex(0);
+            } else if (category.equals(TAPNQuery.QueryCategory.LTL)) {
+                queryType.setSelectedIndex(1);
+            }
+        }
+    }
 
 	private void initQueryNamePanel() {
 
