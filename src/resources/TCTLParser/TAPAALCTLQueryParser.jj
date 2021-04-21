@@ -85,11 +85,11 @@ TOKEN :
     |
 	<EX: "EX">
 	|
-	<AF: "AF" | "A<>" | "F">
+	<AF: "AF" | "A<>">
 	|
-	<AG: "AG" | "A[]" | "G">
+	<AG: "AG" | "A[]">
 	|
-	<AX: "AX" | "X">
+	<AX: "AX">
 }
 
 TOKEN :
