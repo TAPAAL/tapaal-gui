@@ -41,4 +41,23 @@ public class LTLAFNode extends TCTLAFNode {
     public boolean containsPlaceHolder() {
         return property.containsPlaceHolder();
     }
+
+    @Override
+    public void convertForReducedNet(String templateName) {
+        property.convertForReducedNet(templateName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof LTLAFNode) {
+            LTLAFNode node = (LTLAFNode) o;
+            return property.equals(node.getProperty());
+        }
+        return false;
+    }
+
+    @Override
+    public TCTLAbstractPathProperty copy() {
+        return new LTLAFNode(property.copy());
+    }
 }

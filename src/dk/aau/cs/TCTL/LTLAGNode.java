@@ -27,6 +27,20 @@ public class LTLAGNode extends TCTLAGNode {
     }
 
     @Override
+    public void convertForReducedNet(String templateName) {
+        property.convertForReducedNet(templateName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof LTLAGNode) {
+            LTLAGNode node = (LTLAGNode) o;
+            return property.equals(node.getProperty());
+        }
+        return false;
+    }
+
+    @Override
     public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1,
                                             TCTLAbstractProperty object2) {
         if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
@@ -35,6 +49,11 @@ public class LTLAGNode extends TCTLAGNode {
             property = property.replace(object1, object2);
             return this;
         }
+    }
+
+    @Override
+    public TCTLAbstractPathProperty copy() {
+        return new LTLAGNode(property.copy());
     }
 
     @Override

@@ -53,4 +53,19 @@ public class LTLAUNode extends TCTLAUNode {
     public boolean containsPlaceHolder() {
         return left.containsPlaceHolder() || right.containsPlaceHolder();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof LTLAUNode) {
+            LTLAUNode node = (LTLAUNode) o;
+            return this.left.equals(node.getLeft())
+                && this.right.equals(node.getRight());
+        }
+        return false;
+    }
+
+    @Override
+    public TCTLAbstractPathProperty copy() {
+        return new LTLAUNode(left.copy(), right.copy());
+    }
 }

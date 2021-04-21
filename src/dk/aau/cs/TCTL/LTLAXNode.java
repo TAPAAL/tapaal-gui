@@ -41,4 +41,24 @@ public class LTLAXNode extends TCTLAXNode{
     public boolean containsPlaceHolder() {
         return property.containsPlaceHolder();
     }
+
+    @Override
+    public void convertForReducedNet(String templateName) {
+        property.convertForReducedNet(templateName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof LTLAXNode) {
+            LTLAXNode node = (LTLAXNode) o;
+            return property.equals(node.getProperty());
+        }
+        return false;
+    }
+
+    @Override
+    public TCTLAbstractPathProperty copy() {
+        return new LTLAXNode(property.copy());
+    }
+
 }
