@@ -3,6 +3,15 @@ package dk.aau.cs.TCTL;
 public class LTLAFNode extends TCTLAFNode {
     TCTLAbstractStateProperty property;
 
+    public void setProperty(TCTLAbstractStateProperty property) {
+        this.property = property;
+        this.property.setParent(this);
+    }
+
+    public TCTLAbstractStateProperty getProperty() {
+        return property;
+    }
+
     public LTLAFNode(TCTLAbstractStateProperty property) {
         this.property = property;
         this.property.setParent(this);
@@ -59,5 +68,23 @@ public class LTLAFNode extends TCTLAFNode {
     @Override
     public TCTLAbstractPathProperty copy() {
         return new LTLAFNode(property.copy());
+    }
+
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return property instanceof TCTLPathToStateConverter || property.hasNestedPathQuantifiers();
+    }
+
+    public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+        return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+    }
+
+    public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+        return property.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
+    }
+
+    @Override
+    public TCTLAbstractProperty findFirstPlaceHolder() {
+        return property.findFirstPlaceHolder();
     }
 }

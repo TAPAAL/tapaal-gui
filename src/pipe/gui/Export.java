@@ -7,6 +7,7 @@
 package pipe.gui;
 
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
+import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import java.awt.image.BufferedImage;
@@ -115,7 +116,11 @@ public class Export {
                 // Attempt to parse and possibly transform the string query using the manual edit parser
                 TCTLAbstractProperty newProperty;
                 try {
-                    newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    if (clonedQuery.getCategory().equals(TAPNQuery.QueryCategory.LTL)) {
+                        newProperty = TAPAALLTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    } else {
+                        newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    }
                 } catch (Throwable ex) {
                     newProperty = clonedQuery == null ? new TCTLPathPlaceHolder() : clonedQuery.getProperty();
                 }

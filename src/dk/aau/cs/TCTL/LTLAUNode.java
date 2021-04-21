@@ -4,6 +4,22 @@ public class LTLAUNode extends TCTLAUNode {
     private TCTLAbstractStateProperty left;
     private TCTLAbstractStateProperty right;
 
+    public TCTLAbstractStateProperty getLeft() {
+        return this.left;
+    }
+
+    public void setLeft(TCTLAbstractStateProperty left) {
+        this.left = left;
+    }
+
+    public TCTLAbstractStateProperty getRight() {
+        return this.right;
+    }
+
+    public void setRight(TCTLAbstractStateProperty right) {
+        this.right = right;
+    }
+
     public LTLAUNode(TCTLAbstractStateProperty left, TCTLAbstractStateProperty right) {
         this.left = left;
         this.right = right;
@@ -67,5 +83,30 @@ public class LTLAUNode extends TCTLAUNode {
     @Override
     public TCTLAbstractPathProperty copy() {
         return new LTLAUNode(left.copy(), right.copy());
+    }
+
+    @Override
+    public boolean hasNestedPathQuantifiers() {
+        return left instanceof TCTLPathToStateConverter || right instanceof TCTLPathToStateConverter
+            || left.hasNestedPathQuantifiers() || right.hasNestedPathQuantifiers();
+    }
+
+    public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+        return left.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName)
+            || right.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+    }
+
+    public boolean containsAtomicPropositionWithSpecificTransitionInTemplate(String templateName, String transitionName) {
+        return right.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName) ||
+            left.containsAtomicPropositionWithSpecificTransitionInTemplate(templateName, transitionName);
+    }
+
+    @Override
+    public TCTLAbstractProperty findFirstPlaceHolder() {
+        TCTLAbstractProperty result = left.findFirstPlaceHolder();
+        if (result == null){
+            return right.findFirstPlaceHolder();
+        }
+        return result;
     }
 }
