@@ -17,6 +17,11 @@ public class LTLAFNode extends TCTLAFNode {
         this.property.setParent(this);
     }
 
+    public LTLAFNode() {
+        this.property = new TCTLStatePlaceHolder();
+        this.property.setParent(this);
+    }
+
     @Override
     public String toString() {
         String s = property.isSimpleProperty() ? property.toString() : "("

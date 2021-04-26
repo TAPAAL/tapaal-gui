@@ -122,14 +122,12 @@ public class TAPNQueryLoader extends QueryLoader{
         StringPosition[] children = query.getChildren();
 
         // If query is root and state property
-        // todo: lena ltl?
         if(query instanceof TCTLAbstractStateProperty){
             if(((TCTLAbstractStateProperty) query).getParent() == null){
                 return TAPNQuery.QueryCategory.CTL;
             }
         }
 
-        // todo: lena ltl?
         if(query instanceof TCTLStateToPathConverter ||
 				query instanceof TCTLPathToStateConverter){
 			return TAPNQuery.QueryCategory.CTL;

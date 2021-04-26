@@ -17,6 +17,11 @@ public class LTLAXNode extends TCTLAXNode{
         this.property.setParent(this);
     }
 
+    public LTLAXNode() {
+        this.property = new TCTLStatePlaceHolder();
+        this.property.setParent(this);
+    }
+
     @Override
     public String toString() {
         String s = property.isSimpleProperty() ? property.toString() : "("

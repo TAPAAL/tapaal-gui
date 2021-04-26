@@ -17,6 +17,11 @@ public class LTLAGNode extends TCTLAGNode {
         this.property.setParent(this);
     }
 
+    public LTLAGNode() {
+        this.property = new TCTLStatePlaceHolder();;
+        this.property.setParent(this);
+    }
+
     @Override
     public String toString() {
         String s = property.isSimpleProperty() ? property.toString() : "("

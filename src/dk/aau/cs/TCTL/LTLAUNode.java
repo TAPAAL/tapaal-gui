@@ -27,6 +27,13 @@ public class LTLAUNode extends TCTLAUNode {
         this.right.setParent(this);
     }
 
+    public LTLAUNode() {
+        left = new TCTLStatePlaceHolder();
+        right = new TCTLStatePlaceHolder();
+        left.setParent(this);
+        right.setParent(this);
+    }
+
     @Override
     public String toString() {
         String leftString = left.isSimpleProperty() ? left.toString() : "("

@@ -60,6 +60,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append(searchMap.get(searchOption));
 		switch(getModelReduction()){
 		case AGGRESSIVE:
+            if (this.queryCategory == QueryCategory.LTL) {
+                break;
+            }
 			result.append(" -r 1 ");
             String writeReducedCMD = " --write-reduced " +pathToReducedNet;
             result.append(writeReducedCMD);
@@ -78,10 +81,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
 			result.append(" -x 1");
-		} /*else if (this.queryCategory == QueryCategory.LTL) {
-            result.append(" -ltl ");
+		} else if (this.queryCategory == QueryCategory.LTL) {
+            result.append(" -ltl");
             result.append(" -x 1");
-        }*/
+        }
 		
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
