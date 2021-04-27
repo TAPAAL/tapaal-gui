@@ -71,14 +71,14 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
             result.append("," + i);
         }
 
-        result.append(searchMap.get(searchOption));
+        /*result.append(searchMap.get(searchOption));
 
         if(!reduceQuery){
             result.append(" -q 0 ");
         }
         if(!enableStructuralReductions){
             result.append(" -r 0 ");
-        }
+        }*/
 
         if (verifydtapnOptions.equals("tt"))
         result.append(" -verifydtapn " + verifydtapnOptions);

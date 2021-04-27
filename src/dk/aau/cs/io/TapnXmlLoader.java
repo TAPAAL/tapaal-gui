@@ -767,8 +767,6 @@ public class TapnXmlLoader {
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight,transportExpr,expr);
 				transArc.setColorTimeIntervals(timeIntervals);
-                transArc.setOutputExpression(expr);
-                transArc.setInputExpression(transportExpr);
                 transportExpr = null;
 
 				tempArc.setUnderlyingArc(transArc);

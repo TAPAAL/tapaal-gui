@@ -46,6 +46,7 @@ public class TransportArc extends TAPNElement {
 		this.destination = destination;
 		setTimeInterval(interval);
 		this.weight = weight;
+
         if(inputExpression == null){
             createNewInputArcExpression();
         } else{
