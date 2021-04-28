@@ -235,6 +235,7 @@ public class QueryDialog extends JPanel {
 	private static boolean hasForcedDisabledStubbornReduction = false;
 	private static boolean hasForcedDisabledGCD = false;
 	private static boolean disableSymmetryUpdate = false;
+	private boolean wasCTLType = true;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -1535,15 +1536,114 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void toggleDialogType() {
-       if (queryType.getSelectedIndex() == 1) {
+       if (queryType.getSelectedIndex() == 1 && wasCTLType) {
            showLTLButtons(true);
            updateShiphonTrap(true);
-       } else {
+           if (convertPropertyType(false, newProperty, true) == null) {
+               deleteProperty();
+           }
+           wasCTLType = false;
+       } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
            showLTLButtons(false);
            updateShiphonTrap(false);
-
+           if (convertPropertyType(true, newProperty, true) == null) {
+               deleteProperty();
+           }
+           wasCTLType = true;
        }
         setEnabledOptionsAccordingToCurrentReduction();
+    }
+
+    private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst) {
+        if (property != null) {
+            if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
+                property instanceof TCTLEXNode || property instanceof TCTLEUNode) {
+                return null;
+            }
+
+            TCTLAbstractProperty replacement = getReplacement(toCTL, property);
+
+            if (!isFirst) {
+                return replacement;
+            }
+            return replaceProperty(replacement);
+        }
+        return null;
+    }
+
+    private TCTLAbstractProperty getReplacement(boolean toCTL, TCTLAbstractProperty property) {
+        TCTLAbstractProperty replacement = null;
+        TCTLAbstractStateProperty firstChild = getChild(toCTL, property);
+        TCTLAbstractStateProperty secondChild = getChild(toCTL, property);
+
+        if (firstChild == null || secondChild == null) return null;
+
+	    if (toCTL) {
+            if (property instanceof LTLAGNode) {
+                replacement = new TCTLAGNode(firstChild);
+            } else if (property instanceof LTLAFNode) {
+                replacement = new TCTLAFNode(firstChild);
+            } else if (property instanceof LTLAXNode) {
+                replacement = new TCTLAXNode(firstChild);
+            } else if (property instanceof LTLAUNode) {
+                replacement = new TCTLAUNode(firstChild, secondChild);
+            }
+        } else {
+            if (property instanceof TCTLAGNode) {
+                replacement = new LTLAGNode(firstChild);
+            } else if (property instanceof TCTLAFNode) {
+                replacement = new LTLAFNode(firstChild);
+            } else if (property instanceof TCTLAXNode) {
+                replacement = new LTLAXNode(firstChild);
+            } else if (property instanceof TCTLAUNode) {
+                replacement = new LTLAUNode(firstChild, secondChild);
+            }
+        }
+	    return replacement;
+    }
+
+    private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property) {
+        TCTLAbstractStateProperty child = getSpecificChildOfProperty(1, property);
+        if (!(child instanceof TCTLStatePlaceHolder)) {
+            TCTLAbstractPathProperty convertedChild = ConvertToPathProperty(child);
+            if (!convertedChild.isSimpleProperty()) {
+                TCTLAbstractProperty childReplacement = convertPropertyType(toCTL, convertedChild, false);
+                if (childReplacement == null) return null;
+                if (!(childReplacement instanceof TCTLAbstractStateProperty)) {
+                    childReplacement = ConvertToStateProperty((TCTLAbstractPathProperty) childReplacement);
+                }
+                child = child.replace(child, childReplacement);
+            }
+        }
+        return child;
+    }
+
+    private TCTLAbstractProperty replaceProperty(TCTLAbstractProperty replacement) {
+        if (replacement != null) {
+            UndoableEdit edit = new QueryConstructionEdit(newProperty, replacement);
+            newProperty = newProperty.replace(newProperty, replacement);
+
+            if (newProperty instanceof TCTLAbstractPathProperty) resetQuantifierSelectionButtons();
+
+            updateSelection(replacement);
+            undoSupport.postEdit(edit);
+            queryChanged();
+
+            return newProperty;
+        }
+        return null;
+    }
+
+    private void deleteProperty() {
+        if (newProperty != null) {
+            TCTLAbstractProperty replacement = null;
+            if (newProperty instanceof TCTLAbstractStateProperty) {
+                replacement = getSpecificChildOfProperty(1, newProperty);
+            } else if (newProperty instanceof TCTLAbstractPathProperty) {
+                replacement = new TCTLPathPlaceHolder();
+            }
+            replaceProperty(replacement);
+        }
     }
 
 	private void initBoundednessCheckPanel() {

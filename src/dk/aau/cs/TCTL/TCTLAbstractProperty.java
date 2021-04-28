@@ -26,7 +26,7 @@ public abstract class TCTLAbstractProperty {
 
 	// Determine the index of a specified property in the string
 	public StringPosition indexOf(TCTLAbstractProperty property) {
-		if (this.equals(property)) {
+		if (this == property) {
 			return new StringPosition(0, toString().length(), this);
 		} else {
 			StringPosition[] children = getChildren();
