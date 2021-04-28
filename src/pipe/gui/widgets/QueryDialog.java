@@ -1537,18 +1537,30 @@ public class QueryDialog extends JPanel {
 
 	private void toggleDialogType() {
        if (queryType.getSelectedIndex() == 1 && wasCTLType) {
+           if (convertPropertyType(false, newProperty, true) == null &&
+               !(newProperty instanceof TCTLStatePlaceHolder)) {
+               if (showWarningMessage(false) == JOptionPane.YES_OPTION) {
+                   deleteProperty();
+               } else {
+                   queryType.setSelectedIndex(0);
+                   return;
+               }
+           }
            showLTLButtons(true);
            updateShiphonTrap(true);
-           if (convertPropertyType(false, newProperty, true) == null) {
-               deleteProperty();
-           }
            wasCTLType = false;
        } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
+           if (convertPropertyType(true, newProperty, true) == null &&
+               !(newProperty instanceof TCTLStatePlaceHolder)) {
+               if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
+                   deleteProperty();
+               } else {
+                   queryType.setSelectedIndex(1);
+                   return;
+               }
+           }
            showLTLButtons(false);
            updateShiphonTrap(false);
-           if (convertPropertyType(true, newProperty, true) == null) {
-               deleteProperty();
-           }
            wasCTLType = true;
        }
         setEnabledOptionsAccordingToCurrentReduction();
@@ -1559,6 +1571,9 @@ public class QueryDialog extends JPanel {
             if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
                 property instanceof TCTLEXNode || property instanceof TCTLEUNode) {
                 return null;
+            } else if (!(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
+                property instanceof TCTLAXNode || property instanceof TCTLAUNode)) {
+                return property;
             }
 
             TCTLAbstractProperty replacement = getReplacement(toCTL, property);
@@ -1599,6 +1614,8 @@ public class QueryDialog extends JPanel {
                 replacement = new LTLAUNode(firstChild, secondChild);
             }
         }
+	    if (replacement == null && property instanceof TCTLPathPlaceHolder)
+	        return property;
 	    return replacement;
     }
 
@@ -1644,6 +1661,20 @@ public class QueryDialog extends JPanel {
             }
             replaceProperty(replacement);
         }
+    }
+
+    private int showWarningMessage(boolean toCTL) {
+	    String category = toCTL ? "CTL" : "LTL";
+	    String message = "The query property will be deleted, because it is not compatible with "+category+"-queries.\n" +
+            "Are you sure you want to change query category?";
+	    String title = "Incompatible query";
+
+	    return JOptionPane.showConfirmDialog(
+            CreateGui.getApp(),
+            message,
+            title,
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
     }
 
 	private void initBoundednessCheckPanel() {
