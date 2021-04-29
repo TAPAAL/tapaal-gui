@@ -684,6 +684,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
+            } else {
+                if (q.getCategory() == TAPNQuery.QueryCategory.LTL) {
+                    queriesToRemove.add(q);
+                    tab.removeQuery(q);
+                }
             }
         }
         String message = "";

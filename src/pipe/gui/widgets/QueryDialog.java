@@ -1910,6 +1910,7 @@ public class QueryDialog extends JPanel {
 
 		if (lens.isTimed()|| lens.isGame()) {
             addTimedQuantificationListeners();
+            showLTLButtons(false);
         } else {
             addUntimedQuantificationListeners();
             showLTLButtons(false);
