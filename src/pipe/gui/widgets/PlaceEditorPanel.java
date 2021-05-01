@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
+import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
@@ -251,11 +252,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(290,27));
+        SwingHelper.setPreferredWidth(nameTextField,290);
 
 		sharedPlacesComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
 
-		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
+		SwingHelper.setPreferredWidth(sharedPlacesComboBox,290);
 
 		sharedPlacesComboBox.addItemListener(e -> {
 			SharedPlace place = (SharedPlace)e.getItem();

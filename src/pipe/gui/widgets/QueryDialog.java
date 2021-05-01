@@ -30,6 +30,7 @@ import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
@@ -2563,7 +2564,11 @@ public class QueryDialog extends JPanel {
 					TCTLAbstractProperty newQuery = null;
 
 					try {
-						newQuery = TAPAALQueryParser.parse(queryField.getText());
+					    if (lens.isTimed()) {
+                            newQuery = TAPAALQueryParser.parse(queryField.getText());
+                        } else {
+						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
+                        }
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),
