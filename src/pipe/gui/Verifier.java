@@ -49,17 +49,23 @@ public class Verifier {
         return verifydtapn;
     }
 
+    private static VerifyTAPNDiscreteVerification getVerifydTACPN() {
+        VerifyTAPNDiscreteVerification verifydtacpn = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+        verifydtacpn.setup();
+        return verifydtacpn;
+    }
+
     private static VerifyPN getVerifyPN() {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
         return verifypn;
     }
 
-    public static ModelChecker getModelChecker(TAPNQuery query) {
+    public static ModelChecker getModelChecker(TAPNQuery query, boolean isColored) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
-            return getVerifydTAPN();
+            return isColored? getVerifydTACPN(): getVerifydTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return getVerifyPN();
         } else {
@@ -156,8 +162,17 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet
     ) {
-        ModelChecker verifytapn = getModelChecker(query);
+        ModelChecker verifytapn = getModelChecker(query, tapnNetwork.isColored());
 
+
+        try {
+            reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+        } catch (IOException e) {
+            new MessengerImpl().displayErrorMessage(
+                e.getMessage(),
+                "Error");
+            return;
+        }
 
         if (!verifytapn.isCorrectVersion()) {
             new MessengerImpl().displayErrorMessage(
@@ -188,17 +203,11 @@ public class Verifier {
                 query.isOverApproximationEnabled(),
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
-                query.isStubbornReductionEnabled()
+                query.isStubbornReductionEnabled(),
+                reducedNetTempFile.getAbsolutePath()
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
-            try {
-                reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
-            } catch (IOException e) {
-                new MessengerImpl().displayErrorMessage(
-                    e.getMessage(),
-                    "Error");
-                return;
-            }
+
 
             if (onlyCreateReducedNet) {
                 //These options should disable the verification and only produce the net after applying reduction rules

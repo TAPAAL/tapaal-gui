@@ -5,6 +5,10 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.PNMLoader;
+import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
@@ -42,10 +46,10 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 	protected static String verifydtapnpath = "";
 
-	private final FileFinder fileFinder;
-	private final Messenger messenger;
+	protected final FileFinder fileFinder;
+	protected final Messenger messenger;
 
-	private ProcessRunner runner;
+	protected ProcessRunner runner;
 
 	public VerifyTAPNDiscreteVerification(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
@@ -245,8 +249,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 			}
 		}
-
-
 		return false;
 
 	}
@@ -282,13 +284,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 	}
 
     //An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
-	private void addGhostPlace(TimedArcPetriNet net) {
+	protected void addGhostPlace(TimedArcPetriNet net) {
 	    TimedPlace place = new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
 	    net.add(place);
         place.addToken(new TimedToken(place, new BigDecimal(0), ColorType.COLORTYPE_DOT.getFirstColor()));
     }
 
-	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+	protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions) options;
 
 		if (verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces)
@@ -309,7 +311,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		((VerifyTAPNOptions) options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 		((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
         runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
@@ -327,6 +329,26 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
 
+                if(options.traceOption() != TraceOption.NONE && model.value1().isColored()) {
+                    PNMLoader tapnLoader = new PNMLoader();
+                    File fileOut = new File(options.unfoldedModelPath());
+                    TabContent newTab;
+                    LoadedModel loadedModel = null;
+                    try {
+                        loadedModel = tapnLoader.load(fileOut);
+                        newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
+                        newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
+                        CreateGui.openNewTabFromStream(newTab);
+
+                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        model = newComposer.transformModel(loadedModel.network());
+                    } catch (FormatException e) {
+                        e.printStackTrace();
+                    } catch (ThreadDeath d) {
+                        return null;
+                    }
+                }
+
 				// Parse covered trace
 				TimedArcPetriNetTrace secondaryTrace = null;
 				if (queryResult.value2().getCoveredMarking() != null) {
@@ -334,7 +356,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				}
 
 				TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput);
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput, model);
 			}
 		}
 	}

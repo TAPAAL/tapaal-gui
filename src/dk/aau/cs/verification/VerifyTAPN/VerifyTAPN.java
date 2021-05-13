@@ -51,10 +51,10 @@ public class VerifyTAPN implements ModelChecker {
 	
 	private static String verifytapnpath = "";
 	
-	private final FileFinder fileFinder;
-	private final Messenger messenger;
+	protected final FileFinder fileFinder;
+	protected final Messenger messenger;
 
-	private ProcessRunner runner;
+	protected ProcessRunner runner;
 	
 	public VerifyTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
@@ -285,7 +285,7 @@ public class VerifyTAPN implements ModelChecker {
 		return verify(options, model, exportedModel, query);
 	}
 
-    private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+    protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
 		
 		if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 
@@ -306,7 +306,7 @@ public class VerifyTAPN implements ModelChecker {
 		((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 		((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 		runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();

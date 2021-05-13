@@ -19,7 +19,7 @@ public class VerifyTAPNEngineOptions extends EngineSupportOptions {
             false, //support games
             false, //support EG or AF with net degree > 2
             false, //support for nested quantification
-            true
+            false
         );
     }
 }

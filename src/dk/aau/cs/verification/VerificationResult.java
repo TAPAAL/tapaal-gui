@@ -6,10 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Tuple;
 
 public class VerificationResult<TTrace> {
@@ -22,6 +19,7 @@ public class VerificationResult<TTrace> {
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
 	private boolean isSolvedUsingStateEquation = false;
+	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
 	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -40,9 +38,10 @@ public class VerificationResult<TTrace> {
         this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
     }
 	
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput){
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel){
 		this(queryResult, trace, verificationTime, stats, rawOutput);
 		this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
+		this.unfoldedModel = unfoldedModel;
 	}
 
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, String rawOutput) {
@@ -58,8 +57,9 @@ public class VerificationResult<TTrace> {
 			TTrace tapnTrace,
 			TTrace secondaryTrace2, long runningTime,
 			Stats value2,
-			boolean isSolvedUsingStateEquation) {
-		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, null);
+			boolean isSolvedUsingStateEquation,
+            Tuple<TimedArcPetriNet, NameMapping> unfoldedModel) {
+		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, null, unfoldedModel);
 		this.secondaryTrace = secondaryTrace2;
 	}
 
@@ -67,8 +67,8 @@ public class VerificationResult<TTrace> {
                               TTrace tapnTrace,
                               TTrace secondaryTrace2, long runningTime,
                               Stats value2,
-                              boolean isSolvedUsingStateEquation, String rawOutput) {
-        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput);
+                              boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel) {
+        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel);
         this.secondaryTrace = secondaryTrace2;
     }
 
@@ -136,6 +136,8 @@ public class VerificationResult<TTrace> {
 	public TTrace getSecondaryTrace() {
 		return secondaryTrace;
 	}
+
+	public Tuple<TimedArcPetriNet, NameMapping> getUnfoldedModel() { return unfoldedModel;}
 
 	public String errorMessage() {
 		return errorMessage;

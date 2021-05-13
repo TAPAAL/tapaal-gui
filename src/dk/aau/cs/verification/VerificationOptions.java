@@ -15,6 +15,8 @@ public abstract class VerificationOptions {
 	protected int approximationDenominator;
 	protected boolean useStateequationCheck;
 	protected int extraTokens;
+	protected String reducedModelPath;
+    protected String unfoldedModelPath;
 
 	public abstract String toString();
 
@@ -45,4 +47,12 @@ public abstract class VerificationOptions {
 	public SearchOption searchOption() {
 		return searchOption;
 	}
+
+	public String reducedModelPath(){
+	    return reducedModelPath;
+    }
+
+    public String unfoldedModelPath(){
+        return unfoldedModelPath;
+    }
 }

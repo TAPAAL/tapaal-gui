@@ -3,7 +3,11 @@ package dk.aau.cs.verification.VerifyTAPN;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
+
+import java.io.File;
+import java.io.IOException;
 
 public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
@@ -30,7 +34,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			int approximationDenominator,
 			boolean stubbornReduction
 	) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction);
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -50,7 +54,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean enableOverApproximation,
 			boolean enableUnderApproximation,
 			int approximationDenominator,
-			boolean stubbornReduction
+			boolean stubbornReduction,
+            String reducedModelPath
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -59,6 +64,16 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.gcd = gcd;
 		this.workflowbound = workflowbound;
 		this.useStubbornReduction = stubbornReduction;
+		this.reducedModelPath = reducedModelPath;
+
+        try {
+            unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+        } catch (IOException e) {
+            new MessengerImpl().displayErrorMessage(
+                e.getMessage(),
+                "Error");
+            return;
+        }
 	}
 	
 	@Override
@@ -88,6 +103,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
 			result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
 		}
+
+
 
 		return result.toString();
 	}

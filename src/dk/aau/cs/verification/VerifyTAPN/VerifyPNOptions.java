@@ -1,5 +1,7 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +10,7 @@ import pipe.dataLayer.TAPNQuery.QueryReductionTime;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
@@ -21,8 +24,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private boolean useStubbornReduction = true;
 	private boolean unfold = false;
 	private boolean useTarOption;
-	private String pathToReducedNet;
-	
+
 
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
@@ -36,7 +38,17 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.useStubbornReduction = stubbornReduction;
 		this.unfold = unfold;
 		this.useTarOption = useTarOption;
-		this.pathToReducedNet = pathToReducedNet;
+		reducedModelPath = pathToReducedNet;
+
+        try {
+            unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+        } catch (IOException e) {
+            new MessengerImpl().displayErrorMessage(
+                e.getMessage(),
+                "Error");
+            return;
+        }
+
 	}
 
     public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
@@ -57,26 +69,37 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" -r 1 ");
-            String writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            String writeReducedCMD = " --write-reduced " +reducedModelPath;
             result.append(writeReducedCMD);
 			break;
 		case NO_REDUCTION:
 			result.append(" -r 0 ");
+
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
-            writeReducedCMD = " --write-reduced " +pathToReducedNet;
+            writeReducedCMD = " --write-reduced " +reducedModelPath;
             result.append(writeReducedCMD);
 			break;
 		default:
 			break;			
 		}
+
+        if(unfold){
+            String writeUnfoldedCMD = " --write-unfolded " +unfoldedModelPath;
+            result.append(writeUnfoldedCMD);
+        }
+
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			if(!unfold){
+			//if(!unfold){
                 result.append(" -x 1");
-            }
+            //}
 		}
+
+/*		if(unfold){
+		    result.append(" --write-simplified " + );
+        }*/
 
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
