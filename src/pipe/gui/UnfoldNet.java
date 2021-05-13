@@ -8,9 +8,7 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
@@ -19,6 +17,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
@@ -95,10 +94,18 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
                 network.add(variable);
             }
             templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
-            TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+            if(lens.isTimed()){
+                TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+                writerTACPN.savePNML(modelFile);
+            } else{
+                var guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+                guiModels.put(transformedModel.value1(),composer.getGuiModel());
+                PNMLWriter writerTACPN = new PNMLWriter(network,guiModels, lens);
+                writerTACPN.savePNML(modelFile);
+            }
 
 
-            writerTACPN.savePNML(modelFile);
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
@@ -139,8 +146,13 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
             return null;
         }
-
-        VerificationOptions unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), "ff", TAPNQuery.SearchOption.OVERAPPROXIMATE, false, false, clonedQueries.size());
+        VerificationOptions unfoldTACPNOptions;
+        if(lens.isTimed()){
+            //TODO: implement timed options
+            return null;
+        } else{
+            unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size());
+        }
 
 
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
@@ -161,12 +173,15 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             return null;
         }
 
-        TapnXmlLoader tapnLoader = new TapnXmlLoader();
         File fileOut = new File(modelOut.getAbsolutePath());
         TabContent newTab;
         LoadedModel loadedModel = null;
         try {
-            loadedModel = tapnLoader.load(fileOut);
+            if(lens.isTimed()){
+                loadedModel = new TapnXmlLoader().load(fileOut);
+            } else{
+                loadedModel = new PNMLoader().load(fileOut);
+            }
             newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){

@@ -284,8 +284,11 @@ public class TapnXmlLoader {
 		Template template = new Template(tapn, guiModel, new Zoomer());
 
 		NodeList nodeList = tapnNode.getChildNodes();
+        System.out.println(nodeList.getLength());
 		for (int i = 0; i < nodeList.getLength(); i++) {
+
 			Node node = nodeList.item(i);
+            System.out.println(node.getNodeName());
 			if(node instanceof Element){
 				parseElement((Element)node, template, network, constants);
 			}
