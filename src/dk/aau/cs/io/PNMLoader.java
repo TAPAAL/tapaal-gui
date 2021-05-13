@@ -321,6 +321,7 @@ public class PNMLoader {
         if(!(node instanceof Element)){
             return;
         }
+        System.out.println("Entered expected parse arc func");
 
         Element element = (Element) node;
 
@@ -345,12 +346,17 @@ public class PNMLoader {
         int weight = 1;
         Node inscription  = getFirstDirectChild(node, "inscription");
         if(inscription != null){
+            System.out.println("found incription");
             Node text = getFirstDirectChild(inscription, "text");
             if(text != null){
+                System.out.println("found text tag");
                 String weightString = text.getTextContent().trim();
                 try {
                     weight = Integer.parseInt(weightString);
-                } catch (NumberFormatException ignored) {} //Default values is 1
+                    System.out.println("Passed weight! " + weight);
+                } catch (NumberFormatException ignored) {
+                    System.out.println("Passing of string failed: " + weightString);
+                } //Default values is 1
             }
         }
 
