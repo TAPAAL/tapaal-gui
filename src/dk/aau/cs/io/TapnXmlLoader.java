@@ -500,7 +500,7 @@ public class TapnXmlLoader {
         }
         if (hlInitialMarkingNode != null && hlInitialMarkingNode instanceof Element) {
             try {
-                colorMarking = loadTACPN.parseTokenExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
+                colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
             } catch (FormatException e) {
                 e.printStackTrace();
             }
@@ -537,7 +537,7 @@ public class TapnXmlLoader {
         if(colorMarking!= null){
             ColorMultiset cm = colorMarking.eval(context);
 
-            p.setTokenExpression(colorMarking);
+            p.setTokenExpression(loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
 
 
             for (TimedToken ctElement : cm.getTokens(p)) {

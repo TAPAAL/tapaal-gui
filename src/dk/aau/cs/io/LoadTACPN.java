@@ -1,11 +1,9 @@
 package dk.aau.cs.io;
 
+import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
@@ -439,41 +437,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return new Tuple<GuardExpression, GuardExpression>(leftexp, rightexp);
     }
 
-    public AddExpression parseTokenExpression(Node node) throws FormatException{
-        ArcExpression tokenExpr = parseArcExpression(node);
-        //This is a small hack since sometimes the token expression is a number of expression
-        //and sometimes it is a add expression
-        if(tokenExpr instanceof NumberOfExpression){
-            Vector<ArcExpression> coloredTokenList = new Vector<>();
-            coloredTokenList.add(tokenExpr);
-            return new AddExpression(coloredTokenList);
-        }
-
-        return normalizeTokenExpression(tokenExpr);
-    }
-
-    private AddExpression normalizeTokenExpression(ArcExpression colorMarking){
-        Vector<ArcExpression> coloredTokenList = new Vector<>();
-        if(colorMarking != null){
-            for(ArcExpression expr : ((AddExpression)colorMarking).getAddExpression()){
-                NumberOfExpression numberOfExpression = (NumberOfExpression) expr;
-                boolean exists = false;
-                for(int i = 0; i < coloredTokenList.size();i++){
-                    NumberOfExpression otherExpr = (NumberOfExpression)coloredTokenList.get(i);
-                    if(numberOfExpression.equalsColor(otherExpr)){
-                        exists = true;
-                        otherExpr.setNumber(otherExpr.getNumber() + numberOfExpression.getNumber());
-                        break;
-                    }
-                }
-                if(!exists){
-                    coloredTokenList.add(numberOfExpression);
-                }
-            }
-        }
-        return new AddExpression(coloredTokenList);
-    }
-
     Color findColorForIntRange(String value, String start, String end) throws FormatException {
         for(var ct : colortypes.values()){
             if(ct.getColors().get(0).getColorName().equals(start) && ct.getColors().get(ct.getColors().size()-1).getColorName().equals(end)){
@@ -485,5 +448,21 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             }
         }
         throw new FormatException(String.format("The color \"%s\" was not declared in an int range\n", value));
+    }
+
+    public AddExpression constructCleanAddExpression(ColorType ct, ColorMultiset multiset){
+        Vector<ArcExpression> coloredTokenList = new Vector<>();
+        for(Color c : ct.getColors()){
+            int numberOf = multiset.get(c);
+            if(numberOf < 1){
+                continue;
+            }
+            UserOperatorExpression color = new UserOperatorExpression(c);
+            Vector<ColorExpression> v = new Vector<>();
+            v.add(color);
+            NumberOfExpression numOf = new NumberOfExpression(numberOf,v);
+            coloredTokenList.add(numOf);
+        }
+        return new AddExpression(coloredTokenList);
     }
 }

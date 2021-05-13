@@ -214,7 +214,7 @@ public class PNMLoader {
         Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
         if (markingNode != null && markingNode instanceof Element) {
             try {
-                colorMarking = loadTACPN.parseTokenExpression(((Element) markingNode).getElementsByTagName("structure").item(0));
+                colorMarking = loadTACPN.parseArcExpression(((Element) markingNode).getElementsByTagName("structure").item(0));
             } catch (FormatException e) {
                 e.printStackTrace();
             }
@@ -239,10 +239,11 @@ public class PNMLoader {
         if (colorMarking != null) {
             ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
             ColorMultiset cm = colorMarking.eval(context);
-            place.setTokenExpression(colorMarking);
+            place.setTokenExpression(loadTACPN.constructCleanAddExpression(colorType,cm));
             for (TimedToken ct : cm.getTokens(place)) {
                 tapn.parentNetwork().marking().add(ct);
             }
+
         } else {
             for (int i = 0; i < marking.marking; i++) {
                 tapn.parentNetwork().marking().add(new TimedToken(place, ColorType.COLORTYPE_DOT.getFirstColor()));
