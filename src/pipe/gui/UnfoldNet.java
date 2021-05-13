@@ -176,6 +176,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         File fileOut = new File(modelOut.getAbsolutePath());
         TabContent newTab;
         LoadedModel loadedModel = null;
+        Collection<TAPNQuery> queries;
         try {
             if(lens.isTimed()){
                 loadedModel = new TapnXmlLoader().load(fileOut);

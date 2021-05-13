@@ -57,7 +57,8 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("--write-simplified " + queryOut + " --write-reduced " + modelOut + " -x 1");
+        //for now we don't want to do structural or query reductions, could be options later
+        result.append("--write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut + " -s OverApprox -r 0 -q 0 -x 1");
         for(int i = 2; i <= numQueries; i++){
             result.append("," + i);
         }
