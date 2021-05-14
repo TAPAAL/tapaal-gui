@@ -6,6 +6,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.TapnXmlLoader;
@@ -37,6 +38,8 @@ import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+
+import javax.swing.*;
 
 public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
@@ -339,6 +342,11 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
                         newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
                         newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
                         CreateGui.openNewTabFromStream(newTab);
+
+                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        if(dialogResult == JOptionPane.YES_OPTION) {
+                            SmartDrawDialog.showSmartDrawDialog();
+                        }
 
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());

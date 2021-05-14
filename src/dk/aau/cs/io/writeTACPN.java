@@ -202,8 +202,18 @@ public class writeTACPN { // both export and save share some of the same syntax 
             }
             structureElement.appendChild(tupleElement);
         } else if (expression instanceof  ScalarProductExpression) {
-            Element ScalarElement = document.createElement("scalarproduct");
-
+            Element scalarElement = document.createElement("scalarproduct");
+            ScalarProductExpression expr = (ScalarProductExpression) expression;
+            Element subtermElement = document.createElement("subterm");
+            scalarElement.appendChild(subtermElement);
+            Element numberConstantElement = document.createElement("numberconstant");
+            numberConstantElement.setAttribute("value", expr.getScalar().toString());
+            subtermElement.appendChild(numberConstantElement);
+            /*Element positiveElement = document.createElement("positive");
+            numberConstantElement.appendChild(positiveElement);*/
+            Element subtermElement2 = document.createElement("subterm");
+            scalarElement.appendChild((parseArcExpression(expr.getExpr(), document, subtermElement2)));
+            structureElement.appendChild(scalarElement);
         }
         return structureElement;
     }

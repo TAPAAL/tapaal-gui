@@ -61,7 +61,6 @@ public class TimedOutputArc extends TAPNElement {
         vecColorExpr.add(userOperatorExpression);
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setExpression(numbExpr);
-        setWeight(new IntWeight(1));
     }
 
 	@Override

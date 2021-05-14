@@ -37,6 +37,14 @@ public class ScalarProductExpression extends ArcExpression {
 
     }
 
+    public Integer getScalar(){
+        return scalar;
+    }
+
+    public ArcExpression getExpr(){
+        return expr;
+    }
+
     public Integer weight() {
         return scalar * expr.weight();
     }

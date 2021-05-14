@@ -104,7 +104,6 @@ public abstract class ColorComboboxPanel extends JPanel {
             //.all is always last so we just select the last item
             colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount()-1);
         } else{
-            System.out.println(((UserOperatorExpression)expr).getUserOperator().getColorType());
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
         }
     }

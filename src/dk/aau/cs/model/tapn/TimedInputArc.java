@@ -175,7 +175,6 @@ public class TimedInputArc extends TAPNElement {
         vecColorExpr.add(userOperatorExpression);
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setExpression(numbExpr);
-        setWeight(new IntWeight(1));
     }
 
     public ArcExpression getArcExpression() {return this.expression;}
