@@ -339,6 +339,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
         queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
         queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
+        queryElement.setAttribute("partitioning", "" + query.usePartitioning());
+        queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
 
 		return queryElement;
 	}
@@ -377,6 +379,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
 		queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
 		queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
+		queryElement.setAttribute("partitioning", "" + query.usePartitioning());
+		queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
 		
 		return queryElement;
 	}

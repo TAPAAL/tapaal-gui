@@ -12,11 +12,15 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     private String modelOut;
     private String queryOut;
     private int numQueries;
+    private boolean partition;
+    private  boolean computeColorFixpoint;
 
-    public VerifyPNUnfoldOptions(String modelOut, String queryOut, int numQueries) {
+    public VerifyPNUnfoldOptions(String modelOut, String queryOut, int numQueries, boolean partition, boolean computeColorFixpoint) {
         this.modelOut = modelOut;
         this.queryOut = queryOut;
         this.numQueries = numQueries;
+        this.partition = partition;
+        this.computeColorFixpoint = computeColorFixpoint;
     }
 
 
@@ -61,6 +65,13 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         result.append("--write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut + " -s OverApprox -r 0 -q 0 -x 1");
         for(int i = 2; i <= numQueries; i++){
             result.append("," + i);
+        }
+
+        if(!partition){
+            result.append(" --disable-partitioning");
+        }
+        if(!computeColorFixpoint){
+            result.append(" --disable-cfp");
         }
 
         return result.toString();

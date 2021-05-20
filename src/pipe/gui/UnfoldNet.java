@@ -8,6 +8,7 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
@@ -43,15 +44,19 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
     protected TimedArcPetriNetNetwork model;
     protected Iterable<TAPNQuery> queries;
     protected TabContent oldTab;
+    protected boolean partition;
+    protected boolean computeColorFixpoint;
 
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = 4000;
 
-    public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+    public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint) {
         super();
         this.modelChecker = modelChecker;
         this.messenger = messenger;
         this.guiModels = guiModels;
+        this.partition = partition;
+        this.computeColorFixpoint = computeColorFixpoint;
     }
 
     public void execute(TimedArcPetriNetNetwork model, Iterable<TAPNQuery> queries, TabContent oldTab) {
@@ -151,7 +156,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             //TODO: implement timed options
             return null;
         } else{
-            unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size());
+            unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint);
         }
 
 
@@ -206,6 +211,11 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             e.printStackTrace();
         } catch (ThreadDeath d){
             return null;
+        }
+
+        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+        if(dialogResult == JOptionPane.YES_OPTION) {
+            SmartDrawDialog.showSmartDrawDialog();
         }
 
         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);

@@ -298,7 +298,7 @@ public class TabTransformer {
         }
     }
 
-    public static void unfoldTab(TabContent oldTab) {
+    public static void unfoldTab(TabContent oldTab, boolean partition, boolean computeColorFixpoint) {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
 
@@ -308,7 +308,7 @@ public class TabTransformer {
                 "Verification Error");
             return;
         }
-        UnfoldNet thread = new UnfoldNet(verifypn, new MessengerImpl(), oldTab.getGuiModels());
+        UnfoldNet thread = new UnfoldNet(verifypn, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint);
 
         RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread, "Unfolding");
         thread.execute(oldTab.network(), oldTab.queries(), oldTab);

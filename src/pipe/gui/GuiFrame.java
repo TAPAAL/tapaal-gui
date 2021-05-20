@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
@@ -397,7 +398,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
             if(getCurrentTab().getLens().isColored()){
-                currentTab.ifPresent(TabContentActions::createNewAndUnfoldColor);
+                UnfoldDialog.showDialog(getCurrentTab());
             }
             currentTab.ifPresent(TabContentActions::toggleAnimationMode);
         }

@@ -48,6 +48,7 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
+import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
@@ -1708,7 +1709,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
     @Override
     public void createNewAndUnfoldColor(){
         //Verifier.runVerifyTAPNVerification(network(), TAPNQuery.getDefaultQuery(new TCTLTrueNode()), null, getGuiModels(), true);
-	    TabTransformer.unfoldTab(this);
+	    TabTransformer.unfoldTab(this, true, true);
+    }
+
+    public void createNewAndUnfoldColor(boolean partition, boolean computeColorFixpoint){
+        TabTransformer.unfoldTab(this, partition, computeColorFixpoint);
     }
 
     @Override
@@ -3020,7 +3025,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction unfoldTabAction = new GuiAction("Unfold tab", "Unfold the colors in the tab") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            createNewAndUnfoldColor();
+            UnfoldDialog.showDialog(TabContent.this);
         }
     };
 

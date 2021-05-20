@@ -142,7 +142,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 dataLayerQuery.isStubbornReductionEnabled(),
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
                                 reducedNetFilePath,
-                                dataLayerQuery.isTarOptionEnabled()
+                                dataLayerQuery.isTarOptionEnabled(),
+                                dataLayerQuery.usePartitioning(),
+                                dataLayerQuery.useColorFixpoint()
                             ),
                             transformedModel,
                             clonedQuery, composer.getGuiModel());
@@ -164,7 +166,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 false,
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
                                 reducedNetFilePath,
-                                dataLayerQuery.isTarOptionEnabled()
+                                dataLayerQuery.isTarOptionEnabled(),
+                                dataLayerQuery.usePartitioning(),
+                                dataLayerQuery.useColorFixpoint()
                             ),
                             transformedModel,
                             clonedQuery,

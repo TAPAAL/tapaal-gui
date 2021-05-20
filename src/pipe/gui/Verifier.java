@@ -204,7 +204,9 @@ public class Verifier {
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
                 query.isStubbornReductionEnabled(),
-                reducedNetTempFile.getAbsolutePath()
+                reducedNetTempFile.getAbsolutePath(),
+                query.usePartitioning(),
+                query.useColorFixpoint()
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
 
@@ -227,7 +229,9 @@ public class Verifier {
                     query.isStubbornReductionEnabled(),
                     tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
                     reducedNetTempFile.getAbsolutePath(),
-                    query.isTarOptionEnabled()
+                    query.isTarOptionEnabled(),
+                    query.usePartitioning(),
+                    query.useColorFixpoint()
                 );
             } else {
                 verifytapnOptions = new VerifyPNOptions(
@@ -246,7 +250,9 @@ public class Verifier {
                     query.isStubbornReductionEnabled(),
                     tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
                     reducedNetTempFile.getAbsolutePath(),
-                    query.isTarOptionEnabled()
+                    query.isTarOptionEnabled(),
+                    query.usePartitioning(),
+                    query.useColorFixpoint()
                 );
             }
         } else {

@@ -54,11 +54,11 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,false, tapnNetwork.isColored() && !tapnNetwork.isUntimed(), null, false);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,false, tapnNetwork.isColored() && !tapnNetwork.isUntimed(), null, false, true, true);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false);
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false, true, true);
 		}
 		return null;
 	}

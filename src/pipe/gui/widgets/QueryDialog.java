@@ -147,6 +147,9 @@ public class QueryDialog extends JPanel {
 	private JRadioButton randomSearch;
 	private JRadioButton heuristicSearch;
 
+
+
+
 	// Trace options panel
 	private JPanel traceOptionsPanel;
 
@@ -154,6 +157,14 @@ public class QueryDialog extends JPanel {
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
 	private JRadioButton fastestTraceRadioButton;
+
+
+
+    // Unfolding options panel
+    private JPanel verificationPanel;
+    private JPanel unfoldingOptionsPanel;
+    private JCheckBox usePartitioning;
+    private JCheckBox useColorFixpoint;
 
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
@@ -300,7 +311,11 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
     private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
 
-	//Tool tips for search options panel
+    //Tool tips for unfolding options panel
+    private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
+    private final static String TOOL_TIP_COLOR_FIXPOINT = "Explores the possible colored markings and only unfolds for those";
+
+    //Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
 			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
@@ -409,7 +424,9 @@ public class QueryDialog extends JPanel {
 				inclusionPlaces,
 				overApproximationEnable.isSelected(),
 				underApproximationEnable.isSelected(),
-				(Integer) overApproximationDenominator.getValue()
+				(Integer) overApproximationDenominator.getValue(),
+                usePartitioning.isSelected(),
+                useColorFixpoint.isSelected()
 		);
 
 		query.setUseStubbornReduction(useStubbornReduction.isSelected());
@@ -441,7 +458,9 @@ public class QueryDialog extends JPanel {
             inclusionPlaces,
             /* enableOverApproximation */false,
             /* enableUnderApproximation */false,
-            0
+            0,
+            usePartitioning.isSelected(),
+            useColorFixpoint.isSelected()
         );
         query.setCategory(TAPNQuery.QueryCategory.CTL);
         query.setUseSiphontrap(useSiphonTrap.isSelected());
@@ -1183,7 +1202,7 @@ public class QueryDialog extends JPanel {
 
 		initQueryPanel();
 		initUppaalOptionsPanel();
-		initReductionOptionsPanel();
+		initVerificationPanel();
 		initOverApproximationPanel();
 		initButtonPanel(option);
 
@@ -1213,6 +1232,9 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed() || lens.isGame()) {
             setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
+        }
+        if(lens.isColored()){
+            setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
 		setupSearchOptionsFromQuery(queryToCreateFrom);
 		setupReductionOptionsFromQuery(queryToCreateFrom);
@@ -1298,6 +1320,11 @@ public class QueryDialog extends JPanel {
         useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
         useReduction.setSelected(queryToCreateFrom.useReduction());
         useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
+    }
+
+    private void setupUnfoldingOptionsFromQuery(TAPNQuery queryToCreateFrom){
+	    usePartitioning.setSelected(queryToCreateFrom.usePartitioning());
+	    useColorFixpoint.setSelected(queryToCreateFrom.useColorFixpoint());
     }
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1467,6 +1494,10 @@ public class QueryDialog extends JPanel {
 		Point location = guiDialog.getLocation();
 
 		searchOptionsPanel.setVisible(advancedView);
+		if(lens.isColored()){
+            unfoldingOptionsPanel.setVisible(advancedView);
+        }
+
 		reductionOptionsPanel.setVisible(advancedView);
 		if (lens.isTimed() || lens.isGame()) {
 		    saveUppaalXMLButton.setVisible(advancedView);
@@ -1518,7 +1549,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 0;
-		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
 
@@ -2473,6 +2504,23 @@ public class QueryDialog extends JPanel {
 
 	}
 
+    private void initVerificationPanel() {
+
+        verificationPanel = new JPanel(new GridBagLayout());
+
+        initReductionOptionsPanel();
+        initUnfoldingOptionsPanel();
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5,10,5,10);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        add(verificationPanel, gridBagConstraints);
+
+    }
+
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
 		searchOptionsPanel.setVisible(false);
@@ -2512,11 +2560,45 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.insets = new Insets(0, 5, 0, 5);
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
 
 	}
+
+
+    private void initUnfoldingOptionsPanel() {
+        unfoldingOptionsPanel = new JPanel(new GridBagLayout());
+        unfoldingOptionsPanel.setVisible(false);
+
+        unfoldingOptionsPanel.setBorder(BorderFactory.createTitledBorder("Unfolding Options"));
+        usePartitioning = new JCheckBox("Use partitioning of the colored net");
+        useColorFixpoint = new JCheckBox("Use color fixpoint analysis");
+
+        usePartitioning.setToolTipText(TOOL_TIP_PARTITIONING);
+        useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
+
+        usePartitioning.setSelected(true);
+        useColorFixpoint.setSelected(true);
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        unfoldingOptionsPanel.add(usePartitioning, gridBagConstraints);
+        gridBagConstraints.gridy = 1;
+        unfoldingOptionsPanel.add(useColorFixpoint, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
+        verificationPanel.add(unfoldingOptionsPanel, gridBagConstraints);
+
+    }
 
 	private void initTraceOptionsPanel() {
 		traceOptionsPanel = new JPanel(new GridBagLayout());
@@ -2576,7 +2658,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
-		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
@@ -2644,8 +2726,8 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-        Dimension d = lens.isTimed() ? new Dimension(898, 100) : new Dimension(810, 130);
-		reductionOptionsPanel.setPreferredSize(d);
+      /*  Dimension d = lens.isTimed() ? new Dimension(898, 100) : new Dimension(810, 130);
+		reductionOptionsPanel.setPreferredSize(d);*/
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
@@ -2718,42 +2800,42 @@ public class QueryDialog extends JPanel {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(0, 10, 0, 10);
-		add(reductionOptionsPanel, gbc);
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		verificationPanel.add(reductionOptionsPanel, gbc);
 	}
 
     private void initTimedReductionOptions() {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0,5,0,5);
         reductionOptionsPanel.add(symmetryReduction, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        reductionOptionsPanel.add(discreteInclusion, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        reductionOptionsPanel.add(useStubbornReduction, gbc);
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 2;
+        reductionOptionsPanel.add(discreteInclusion, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        reductionOptionsPanel.add(useStubbornReduction, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         reductionOptionsPanel.add(useOverApproximation, gbc);
-        gbc.gridx = 3;
+        gbc.gridx = 2;
         gbc.gridy = 1;
         reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-        gbc.gridx = 3;
+        gbc.gridx = 1;
         gbc.gridy = 2;
         reductionOptionsPanel.add(useTimeDarts, gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         reductionOptionsPanel.add(useGCD, gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.gridy = 3;
         reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.gridy = 3;
         reductionOptionsPanel.add(usePTrie, gbc);
 
         discreteInclusion.addActionListener(new ActionListener() {
@@ -2773,22 +2855,22 @@ public class QueryDialog extends JPanel {
 
     private void initUntimedReductionOptions() {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0,5,0,5);
         reductionOptionsPanel.add(useReduction, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        reductionOptionsPanel.add(useSiphonTrap, gbc);
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 2;
-        reductionOptionsPanel.add(useQueryReduction, gbc);
-        gbc.gridx = 2;
+        reductionOptionsPanel.add(useSiphonTrap, gbc);
+        gbc.gridx = 0;
         gbc.gridy = 3;
+        reductionOptionsPanel.add(useQueryReduction, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         reductionOptionsPanel.add(useStubbornReduction, gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         reductionOptionsPanel.add(useTraceRefinement, gbc);
     }
 

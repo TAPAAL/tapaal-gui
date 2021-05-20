@@ -19,6 +19,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 	private boolean useStubbornReduction = true;
+	private boolean partition;
+	private boolean colorFixpoint;
 	
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -32,9 +34,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean enableOverApproximation,
 			boolean enableUnderApproximation,
 			int approximationDenominator,
-			boolean stubbornReduction
+			boolean stubbornReduction,
+            boolean partition,
+            boolean colorFixpoint
 	) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null);
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -55,7 +59,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean enableUnderApproximation,
 			int approximationDenominator,
 			boolean stubbornReduction,
-            String reducedModelPath
+            String reducedModelPath,
+            boolean partition,
+            boolean colorFixpoint
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -65,6 +71,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.workflowbound = workflowbound;
 		this.useStubbornReduction = stubbornReduction;
 		this.reducedModelPath = reducedModelPath;
+		this.partition = partition;
+		this.colorFixpoint = colorFixpoint;
 
         try {
             unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -104,7 +112,13 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
 		}
 
+        if(!this.partition){
+            result.append(" --disable-partitioning");
+        }
 
+        if(!this.colorFixpoint){
+            result.append(" --disable-cfp");
+        }
 
 		return result.toString();
 	}
