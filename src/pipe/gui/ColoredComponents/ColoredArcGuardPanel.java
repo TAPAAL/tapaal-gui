@@ -96,6 +96,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         if(isTransportArc){
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
+            scalarButton.setEnabled(false);
+            scalarJSpinner.setEnabled(false);
+
         }
     }
 
@@ -477,7 +480,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         Integer step = 1;
         SpinnerNumberModel numberModelScalar = new SpinnerNumberModel(current, min, max, step);
 
-        JSpinner scalarJSpinner = new JSpinner(numberModelScalar);
+        scalarJSpinner = new JSpinner(numberModelScalar);
 
         scalarJSpinner.setPreferredSize(new Dimension(50, 27));
         scalarJSpinner.setPreferredSize(new Dimension(50, 27));
@@ -1181,6 +1184,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     JButton additionButton;
     JButton subtractionButton;
     JButton scalarButton;
+    JSpinner scalarJSpinner;
     JButton addExpressionButton;
     SpinnerNumberModel numberModel;
     ColorExpressionDialogPanel inputPanel;
