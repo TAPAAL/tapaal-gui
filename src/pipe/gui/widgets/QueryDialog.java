@@ -1644,7 +1644,7 @@ public class QueryDialog extends JPanel {
             if (newProperty instanceof TCTLAbstractPathProperty) resetQuantifierSelectionButtons();
 
             updateSelection(replacement);
-            undoSupport.postEdit(edit);
+            if (undoSupport != null) undoSupport.postEdit(edit);
             queryChanged();
 
             return newProperty;

@@ -395,7 +395,7 @@ public class VerifyPN implements ModelChecker{
 		}
 	
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-			if(query.getCategory() == QueryCategory.CTL){
+			if(query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL){
 				return true;
 			}
 			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
