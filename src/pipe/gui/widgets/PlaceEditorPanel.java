@@ -111,7 +111,12 @@ public class PlaceEditorPanel extends JPanel {
 
 		gridBagConstraints = GridBagHelper.as(0,2, WEST, HORIZONTAL, new Insets(0, 8, 0, 8));
 		mainPanel.add(timeInvariantPanel, gridBagConstraints);
-
+        initColorTypePanel();
+        initColorInvariantPanel();
+        initTokensPanel();
+        setInitialComboBoxValue();
+        writeTokensToList(place.underlyingPlace());
+        setColoredTimeInvariants(place.underlyingPlace());
 
 		initButtonPanel();
 
@@ -119,12 +124,7 @@ public class PlaceEditorPanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		mainPanel.add(buttonPanel, gridBagConstraints);
-		initColorTypePanel();
-        initColorInvariantPanel();
-		initTokensPanel();
-        setInitialComboBoxValue();
-        writeTokensToList(place.underlyingPlace());
-		setColoredTimeInvariants(place.underlyingPlace());
+
 		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN || currentTab.getEditorMode() == Pipe.ElementType.DELTOKEN) {
             basicPropertiesPanel.setVisible(false);
             timeInvariantPanel.setVisible(false);
