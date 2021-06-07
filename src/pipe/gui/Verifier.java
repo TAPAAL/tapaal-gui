@@ -202,7 +202,8 @@ public class Verifier {
                     TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
                     reducedNetTempFile.getAbsolutePath(),
-                    query.isTarOptionEnabled()
+                    query.isTarOptionEnabled(),
+                    query.isTarjan()
                 );
             } else {
                 verifytapnOptions = new VerifyPNOptions(
@@ -220,7 +221,8 @@ public class Verifier {
                     query.isQueryReductionEnabled()? TAPNQuery.QueryReductionTime.UnlimitedTime: TAPNQuery.QueryReductionTime.NoTime,
                     query.isStubbornReductionEnabled(),
                     reducedNetTempFile.getAbsolutePath(),
-                    query.isTarOptionEnabled()
+                    query.isTarOptionEnabled(),
+                    query.isTarjan()
                 );
             }
 		} else {

@@ -261,6 +261,11 @@ public class QueryDialog extends JPanel {
     private static final String TOOL_TIP_FORALL_UNTIL = "On every computation the first formula holds until the second one holds";
     private static final String TOOL_TIP_FORALL_NEXT = "After any transition firing the reached marking satisfies the given property.";
 
+    private static final String TOOL_TIP_G = "Globally";
+    private static final String TOOL_TIP_F = "Eventually";
+    private static final String TOOL_TIP_U = "Until";
+    private static final String TOOL_TIP_X = "Next";
+
     //Tool tips for logic panel
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
 	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
@@ -962,8 +967,8 @@ public class QueryDialog extends JPanel {
 		} else if (queryType.getSelectedIndex() == 1) {
             breadthFirstSearch.setEnabled(false);
             depthFirstSearch.setEnabled(true);
-            heuristicSearch.setEnabled(false);
-            randomSearch.setEnabled(false);
+            heuristicSearch.setEnabled(true);
+            randomSearch.setEnabled(true);
         } else {
 			breadthFirstSearch.setEnabled(true);
 			depthFirstSearch.setEnabled(true);
@@ -1850,10 +1855,10 @@ public class QueryDialog extends JPanel {
         existsNext.setToolTipText(TOOL_TIP_EXISTS_NEXT);
         forAllUntil.setToolTipText(TOOL_TIP_FORALL_UNTIL);
         forAllNext.setToolTipText(TOOL_TIP_FORALL_NEXT);
-        globallyButton.setToolTipText(TOOL_TIP_FORALL_BOX);
-        finallyButton.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
-        nextButton.setToolTipText(TOOL_TIP_FORALL_NEXT);
-        untilButton.setToolTipText(TOOL_TIP_FORALL_UNTIL);
+        globallyButton.setToolTipText(TOOL_TIP_G);
+        finallyButton.setToolTipText(TOOL_TIP_F);
+        nextButton.setToolTipText(TOOL_TIP_X);
+        untilButton.setToolTipText(TOOL_TIP_U);
 
         // Add buttons to panel
         quantificationButtonGroup.add(existsDiamond);
@@ -2943,7 +2948,7 @@ public class QueryDialog extends JPanel {
         usePTrie = new JCheckBox("Use PTrie");
         useOverApproximation = new JCheckBox("Use untimed state-equations check");
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
-        useTarjan = new JCheckBox("Use tarjan");
+        useTarjan = new JCheckBox("Use Tarjan");
 
         useReduction.setSelected(true);
         useSiphonTrap.setSelected(false);
