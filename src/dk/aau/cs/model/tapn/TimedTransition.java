@@ -497,6 +497,19 @@ public class TimedTransition extends TAPNElement {
 	}
 
     public GuardExpression getGuard() {return guard;}
+    public void setGuard(GuardExpression guard) {
+        setGuard(guard,true);
 
-    public void setGuard(GuardExpression guard) {this.guard = guard;}
+    }
+
+    public void setGuard(GuardExpression guard, boolean cascade) {
+        this.guard = guard;
+	    if (isShared() && cascade) {
+	        if(guard != null){
+                sharedTransition.setGuard(guard.copy());
+            } else{
+	            sharedTransition.setGuard(null);
+            }
+        }
+	}
 }

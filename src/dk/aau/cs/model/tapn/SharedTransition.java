@@ -1,10 +1,12 @@
 package dk.aau.cs.model.tapn;
 
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
@@ -17,6 +19,7 @@ public class SharedTransition {
 	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+	private GuardExpression guard = null;
 
 	private TimedArcPetriNetNetwork network;
 	
@@ -51,6 +54,21 @@ public class SharedTransition {
 	    this.isUncontrollable = isUncontrollable;
 	    for (TimedTransition transition : transitions) {
 	        transition.setUncontrollable(isUncontrollable, false);
+        }
+    }
+
+    public GuardExpression getGuard() {
+        return guard;
+    }
+
+    public void setGuard(GuardExpression guard) {
+        this.guard = guard;
+        for (TimedTransition transition : transitions) {
+            if(guard != null){
+                transition.setGuard(guard.copy(), false);
+            } else{
+                transition.setGuard(null, false);
+            }
         }
     }
 

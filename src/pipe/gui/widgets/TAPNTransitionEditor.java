@@ -83,13 +83,16 @@ public class TAPNTransitionEditor extends JPanel {
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
 		sharedTransitionsComboBox.addActionListener(e -> {
+		    //coloredTransitionGuardPanel.onOK(context.undoManager());
 			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
-			}else{
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
+            }else{
                 urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
                 uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
-			}
+                coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
+            }
 		});
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
@@ -257,6 +260,7 @@ public class TAPNTransitionEditor extends JPanel {
 		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
+		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
 
 		if(transition.underlyingTransition().isShared()){
 			switchToNameDropDown();
@@ -311,11 +315,13 @@ public class TAPNTransitionEditor extends JPanel {
 		if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
         }else{
             urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
             uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
+            coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
 		}
-    		transitionEditorPanel.validate();
+		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
 

@@ -97,8 +97,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         initComparisonPanel();
         initExprEditPanel();
         initColorExpressionPanel();
-        initExpr();
-        updateSelection();
+        //initExpr(transition.underlyingTransition().getGuard());
+        //updateSelection();
         updateColorType();
 
         //TODO: implement these
@@ -665,11 +665,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         add(exprScrollPane, gbc);
     }
 
-    private void initExpr() {
-        TimedTransition t = transition.underlyingTransition();
+    public void initExpr(GuardExpression guard) {
         newProperty = new PlaceHolderGuardExpression();
-        if (t.getGuard() != null) {
-            newProperty = t.getGuard().copy();
+        //new Exception().printStackTrace();
+        if (guard != null) {
+            newProperty = guard.copy();
         }
         updateSelection(newProperty);
     }
@@ -869,6 +869,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.select(0, 0);
         currentSelection = null;
 
+    }
+
+    public GuardExpression getExpression(){
+        return newProperty;
     }
 
     private void setExprFieldEditable(boolean isEditable) {
