@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
@@ -47,6 +48,11 @@ public class NumberConstantExpression extends Expression {
     }
 
     public void getVariables(Set<Variable> variables) {
+
+    }
+    @Override
+    public boolean containsColor(Color color) {
+        return false;
 
     }
 

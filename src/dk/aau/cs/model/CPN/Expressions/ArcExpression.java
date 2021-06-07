@@ -40,8 +40,4 @@ public abstract class ArcExpression extends Expression {
     public abstract ColorMultiset eval(ExpressionContext context);
     public abstract void expressionType();
     public abstract Integer weight();
-
-    public abstract ArcExpression removeColorFromExpression(Color color, ColorType newColorType);
-
-    public abstract ArcExpression removeExpressionVariables(List<Variable> variables);
 }

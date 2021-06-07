@@ -28,7 +28,7 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
-    public boolean hasColor(Color color) {
+    public boolean containsColor(Color color) {
         //This should also have been fixed beforehand
         return false;
     }
@@ -183,4 +183,5 @@ public class VariableExpression extends ColorExpression {
 
         return new Vector<>(Arrays.asList(variable.getColorType()));
     }
+
 }

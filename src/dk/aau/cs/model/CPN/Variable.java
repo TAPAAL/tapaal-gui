@@ -14,7 +14,9 @@ public class Variable {
         this.name = name;
         this.colorType = colorType;
     }
-
+    public void setName(String name){
+        this.name = name;
+    }
     public String getName() {return this.name;}
 
     public String getId() {return this.id;}

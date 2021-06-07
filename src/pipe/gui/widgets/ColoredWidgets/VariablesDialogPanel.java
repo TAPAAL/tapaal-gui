@@ -1,9 +1,13 @@
 package pipe.gui.widgets.ColoredWidgets;
 
+import dk.aau.cs.gui.undo.Colored.AddVariableCommand;
+import dk.aau.cs.gui.undo.Colored.UpdateVariableCommand;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.CreateGui;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
 
@@ -42,23 +46,25 @@ public class VariablesDialogPanel extends JPanel {
     JButton okButton;
     JButton cancelButton;
     private JScrollPane scrollPane;
+    private UndoManager undoManager;
 
     public VariablesDialogPanel() throws IOException {
         initComponents();
     }
 
-    public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network) throws IOException {
+    public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, UndoManager undoManager) throws IOException {
         rootPane = pane;
         oldName = "";
         this.network = network;
         this.listModel = listModel;
         initComponents();
         nameTextField.setText(oldName);
+        this.undoManager = undoManager;
 
 
     }
 
-    public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, Variable variable) throws IOException {
+    public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, Variable variable,UndoManager undoManager) throws IOException {
         rootPane = pane;
         this.variable = variable;
         // set combobox value to the already chosen ColorType
@@ -67,6 +73,7 @@ public class VariablesDialogPanel extends JPanel {
         this.listModel = listModel;
         initComponents();
         nameTextField.setText(oldName);
+        this.undoManager = undoManager;
     }
 
     public void showDialog() {
@@ -284,12 +291,17 @@ public class VariablesDialogPanel extends JPanel {
         }
         if (!oldName.equals("")) {
             //TODO MAKE SURE THAT ID DOES NOT DESTROY ANYTHING
-            network.updateVariable(oldName, new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex())));
-            listModel.updateName();
+            Command cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
+            undoManager.addNewEdit(cmd);
+            cmd.redo();
         }
         else {
-            //TODO SAME AS THE ONE OVER
-            listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
+            //TODO SAME AS THE ONE ABOVE
+            Command cmd = new AddVariableCommand(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
+                network, listModel, network.variables().size());
+            undoManager.addNewEdit(cmd);
+            cmd.redo();
+            //listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
         }
         exit();
 

@@ -23,12 +23,8 @@ public class LessThanExpression extends GuardExpression implements LeftRightGuar
         return this.right;
     }
     @Override
-    public GuardExpression removeColorFromExpression(Color color) {
-        if(left.hasColor(color) || right.hasColor(color)){
-            return null;
-        } else{
-            return this;
-        }
+    public boolean containsColor(Color color) {
+        return left.containsColor(color) || right.containsColor(color);
     }
     @Override
     public GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {

@@ -7,7 +7,6 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -95,39 +94,13 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression removeColorFromExpression(Color color, ColorType newColorType) {
-        Vector<ColorExpression> newExpressions = new Vector<>();
-        for(ColorExpression color1 : this.color){
-            ColorExpression updatedExpr = color1.updateColor(color, newColorType);
-            if(updatedExpr != null) {
-                newExpressions.add(updatedExpr);
+    public boolean containsColor(Color color) {
+        for(ColorExpression c : this.color){
+            if(c.containsColor(color)){
+                return true;
             }
         }
-
-        if(newExpressions.isEmpty()) {
-            return null;
-        } else {
-            return new NumberOfExpression(number, newExpressions);
-        }
-    }
-
-
-    @Override
-    public ArcExpression removeExpressionVariables(List<Variable> variables) {
-        List<ColorExpression> toRemove = new ArrayList<>();
-        for (ColorExpression expr : this.color) {
-            if(expr.hasVariable(variables)) {
-                toRemove.add(expr);
-            }
-        }
-        for (ColorExpression expr : toRemove){
-            this.color.remove(expr);
-        }
-        if(this.color.isEmpty()){
-            return null;
-        } else{
-            return this;
-        }
+        return false;
     }
 
     @Override

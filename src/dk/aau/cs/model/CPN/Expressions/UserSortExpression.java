@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
@@ -84,5 +85,10 @@ public class UserSortExpression extends Expression {
             return userSort.equals(expr);
         }
         return false;
+    }
+
+    @Override
+    public boolean containsColor(Color color) {
+        return userSort.contains(color);
     }
 }

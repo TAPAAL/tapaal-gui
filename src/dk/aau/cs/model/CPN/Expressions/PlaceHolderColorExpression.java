@@ -15,7 +15,7 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
-    public boolean hasColor(Color color) {
+    public boolean containsColor(Color color) {
         return false;
     }
 
@@ -35,19 +35,19 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
-    public ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
+    public ColorExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof ColorExpression) {
-            ColorExpression obj2 = (ColorExpression)object2;
+            ColorExpression obj2 = (ColorExpression) object2;
             obj2.setParent(parent);
             return obj2;
-        }
-        else {
+        } else {
             return this;
         }
     }
+
     @Override
-    public ColorExpression replace(Expression object1, Expression object2){
-        return replace(object1,object2,false);
+    public ColorExpression replace(Expression object1, Expression object2) {
+        return replace(object1, object2, false);
     }
 
     @Override
@@ -83,24 +83,24 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     @Override
     public boolean equals(Object o) {
         if (o instanceof PlaceHolderColorExpression) {
-            return  true;
-        }
-        else {
+            return true;
+        } else {
             return false;
         }
     }
 
     @Override
-    public boolean isComparable(ColorExpression otherExpr){
+    public boolean isComparable(ColorExpression otherExpr) {
         return false;
     }
 
     @Override
-    public ColorExpression getButtomColorExpression(){
+    public ColorExpression getButtomColorExpression() {
         return this;
     }
+
     @Override
-    public Vector<ColorType> getColorTypes(){
+    public Vector<ColorType> getColorTypes() {
         return new Vector<>();
     }
 }

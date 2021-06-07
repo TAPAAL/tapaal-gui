@@ -2,12 +2,9 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
-import pipe.gui.graphicElements.Place;
 
-import java.util.List;
 import java.util.Set;
 
 public class PlaceHolderArcExpression extends ArcExpression implements PlaceHolderExpression {
@@ -28,15 +25,8 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     }
 
     @Override
-    public ArcExpression removeColorFromExpression(Color color, ColorType newColorType) {
-        //We could also return null here
-        return this;
-    }
-
-    @Override
-    public ArcExpression removeExpressionVariables(List<Variable> variables) {
-        //We could also return null here
-        return this;
+    public boolean containsColor(Color color) {
+        return false;
     }
 
     @Override

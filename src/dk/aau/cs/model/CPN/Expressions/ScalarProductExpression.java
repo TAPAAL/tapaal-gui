@@ -2,12 +2,10 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.List;
 import java.util.Set;
 
 public class ScalarProductExpression extends ArcExpression {
@@ -50,21 +48,8 @@ public class ScalarProductExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression removeColorFromExpression(Color color, ColorType newColorType) {
-        if(expr.removeColorFromExpression(color, newColorType) == null){
-            return null;
-        } else{
-            return this;
-        }
-    }
-
-    @Override
-    public ArcExpression removeExpressionVariables(List<Variable> variables) {
-        if(expr.removeExpressionVariables(variables) == null) {
-            return null;
-        } else {
-            return this;
-        }
+    public boolean containsColor(Color color) {
+        return expr.containsColor(color);
     }
 
     public ArcExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {

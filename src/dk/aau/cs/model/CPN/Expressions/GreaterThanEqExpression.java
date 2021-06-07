@@ -24,12 +24,9 @@ public class GreaterThanEqExpression extends GuardExpression implements LeftRigh
     }
 
     @Override
-    public GuardExpression removeColorFromExpression(Color color) {
-        if(left.hasColor(color) || right.hasColor(color)){
-            return null;
-        } else{
-            return this;
-        }
+    public boolean containsColor(Color color) {
+        return left.containsColor(color) || right.containsColor(color);
+
     }
     @Override
     public GuardExpression replace(Expression object1, Expression object2){

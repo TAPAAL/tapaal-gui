@@ -18,8 +18,8 @@ public class NotExpression extends GuardExpression {
         return this.expr;
     }
     @Override
-    public GuardExpression removeColorFromExpression(Color color) {
-        return expr.removeColorFromExpression(color);
+    public boolean containsColor(Color color) {
+        return expr.containsColor(color);
     }
     @Override
     public GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {

@@ -60,8 +60,8 @@ public class PlaceHolderGuardExpression extends GuardExpression implements Place
     }
 
     @Override
-    public GuardExpression removeColorFromExpression(Color color) {
-        return this;
+    public boolean containsColor(Color color) {
+        return false;
     }
 
     @Override

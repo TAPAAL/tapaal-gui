@@ -41,21 +41,8 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
-    public boolean hasColor(Color color) {
-        List<ColorExpression> toRemove = new ArrayList<>();
-        for (ColorExpression expr : colors){
-            if(expr.hasColor(color)){
-                toRemove.add(expr);
-            }
-        }
-        for(ColorExpression expr : toRemove){
-            colors.remove(expr);
-        }
-        if(colors.isEmpty()){
-            return true;
-        } else{
-            return false;
-        }
+    public boolean containsColor(Color color) {
+        return equals(color);
     }
 
     @Override

@@ -18,16 +18,8 @@ public class OrExpression extends GuardExpression {
     }
 
     @Override
-    public GuardExpression removeColorFromExpression(Color color) {
-        GuardExpression leftExprRemoved = left.removeColorFromExpression(color);
-        GuardExpression rightExprRemoved = right.removeColorFromExpression(color);
-        if(leftExprRemoved == null && rightExprRemoved == null){
-            return null;
-        } else if(leftExprRemoved == null){
-            return rightExprRemoved;
-        }else{
-            return leftExprRemoved;
-        }
+    public boolean containsColor(Color color) {
+        return left.containsColor(color) || right.containsColor(color);
     }
 
     public GuardExpression getLeftExpression() {

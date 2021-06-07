@@ -37,9 +37,8 @@ public class AllExpression extends ColorExpression {
     }
 
     @Override
-    public boolean hasColor(Color color) {
-        //This should always be false because we replace all arc expressions
-        return false;
+    public boolean containsColor(Color color) {
+        return sort.contains(color);
     }
 
     @Override

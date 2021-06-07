@@ -21,7 +21,7 @@ public class DotConstantExpression extends UserOperatorExpression {
     }
 
     @Override
-    public boolean hasColor(Color color) {
+    public boolean containsColor(Color color) {
         return color.getColorName() == "dot";
     }
 

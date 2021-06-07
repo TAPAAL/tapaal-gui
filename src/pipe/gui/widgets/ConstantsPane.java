@@ -15,13 +15,13 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import dk.aau.cs.gui.undo.Colored.UpdateColorTypePanelCommand;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
@@ -227,13 +227,28 @@ public class ConstantsPane extends JPanel implements SidePane {
                             showEditConstantDialog(c);
                         } else if(isDisplayingVariables()){
                             Variable v = (Variable) dlm.getElementAt(index);
-					        showEditVariableDialog(v);
+                            ArrayList<String> messages = new ArrayList<>();
+                            if(parent.network().canVariableBeRemoved(v,messages)) {
+                                showEditVariableDialog(v);
+                            }else{
+                                String message = "Variable cannot be edited for the following reasons: \n\n";
+                                message += String.join("", messages);
+                                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
+                            }
                         } else{
                             ColorType ct = (ColorType) dlm.getElementAt(index);
                             if((ct).equals(ColorType.COLORTYPE_DOT)) {
                                 JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                             }else {
-                                showEditColorTypeDialog(ct);
+                                ArrayList<String> messages = new ArrayList<>();
+                                System.out.println(messages.size());
+                                if(parent.network().canColorTypeBeRemoved(ct,messages)) {
+                                    showEditColorTypeDialog(ct);
+                                }else{
+                                    String message = "Colortype cannot be edited for the following reasons: \n\n";
+                                    message += String.join("", messages);
+                                    JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit color type", JOptionPane.WARNING_MESSAGE);
+                                }
                             }
 					    }
 					}
@@ -429,20 +444,35 @@ public class ConstantsPane extends JPanel implements SidePane {
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditColorType);
 		editBtn.addActionListener(e -> {
-            if (isDisplayingVariables()) {
-                Variable v = (Variable) list.getSelectedValue();
-                showEditVariableDialog(v);
+            if (isDisplayingVariables()){
+                Variable v = (Variable)  list.getSelectedValue();
+                ArrayList<String> messages = new ArrayList<>();
+                if(parent.network().canVariableBeRemoved(v,messages)) {
+                    showEditVariableDialog(v);
+                }else{
+                    String message = "Variable cannot be edited for the following reasons: \n\n";
+                    message += String.join("", messages);
+                    JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
+                }
             }
             else if (isDisplayingGlobalConstants()) {
                 Constant c = (Constant) list.getSelectedValue();
                 showEditConstantDialog(c);
             }
-            else {
-                ColorType colorType = (ColorType)list.getSelectedValue();
-                if((colorType).equals(ColorType.COLORTYPE_DOT)) {
+            else{
+                ColorType ct = (ColorType) list.getSelectedValue();
+                if((ct).equals(ColorType.COLORTYPE_DOT)) {
                     JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                 }else {
-                    showEditColorTypeDialog(colorType);
+                    ArrayList<String> messages = new ArrayList<>();
+                    System.out.println(messages.size());
+                    if(parent.network().canColorTypeBeRemoved(ct,messages)) {
+                        showEditColorTypeDialog(ct);
+                    }else{
+                        String message = "Colortype cannot be edited for the following reasons: \n\n";
+                        message += String.join("", messages);
+                        JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit color type", JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             }
 		});
@@ -681,14 +711,14 @@ public class ConstantsPane extends JPanel implements SidePane {
         VariablesDialogPanel panel = null;
         if (variable != null) {
             try {
-                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, parent.network(), variable);
+                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, parent.network(), variable, parent.getUndoManager());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         else {
             try {
-                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, parent.network());
+                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, parent.network(), parent.getUndoManager());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -815,20 +845,25 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(Variable variable) {
-            int cont = JOptionPane.showConfirmDialog(CreateGui.getApp(),  removeVariableMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if(cont == JOptionPane.OK_OPTION) {
-                network.remove(variable);
-                fireContentsChanged(this, 0, getSize());
+            UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+            undoManager.newEdit();
+            ArrayList<String> messages = new ArrayList<>();
+            network.remove(variable, variablesListModel, undoManager, messages);
+            if(messages.isEmpty()){
                 int numElements = list.getModel().getSize();
-                if (numElements <= 1) {
-                    moveDownButton.setEnabled(false);
-                    moveUpButton.setEnabled(false);
+                if (numElements > 1) {
+                    moveDownButton.setEnabled(true);
+                    moveUpButton.setEnabled(true);
                 }
-                if (numElements <= 0) {
-                    editBtn.setEnabled(false);
-                    editBtn.setEnabled(false);
+                if (numElements > 0) {
+                    removeBtn.setEnabled(true);
+                    editBtn.setEnabled(true);
                 }
                 updateName();
+            } else{
+                String message = "Variable could not be removed for the following reasons: \n\n";
+                message += String.join("", messages);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove variable", JOptionPane.WARNING_MESSAGE);
             }
         }
 
@@ -903,16 +938,27 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(ColorType colorType) {
-            int cont = JOptionPane.showConfirmDialog(CreateGui.getApp(),  removeColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if(cont == JOptionPane.OK_OPTION) {
-                UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
-                undoManager.newEdit();
-                network.remove(colorType,colorTypesListModel , undoManager);
-
-                Command command = new UpdateColorTypePanelCommand(colorTypesListModel, list, moveUpButton, moveDownButton, editBtn, removeBtn);
-                command.redo();
-                undoManager.addEdit(command);
+            UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+            undoManager.newEdit();
+            ArrayList<String> messages = new ArrayList<>();
+            network.remove(colorType, colorTypesListModel, undoManager, messages);
+            if(messages.isEmpty()){
+                int numElements = list.getModel().getSize();
+                if (numElements > 1) {
+                    moveDownButton.setEnabled(true);
+                    moveUpButton.setEnabled(true);
+                }
+                if (numElements > 0) {
+                    removeBtn.setEnabled(true);
+                    editBtn.setEnabled(true);
+                }
+                updateName();
+            } else{
+                String message = "Color type could not be removed for the following reasons: \n\n";
+                message += String.join("", messages);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color type", JOptionPane.WARNING_MESSAGE);
             }
+
         }
 
         public void updateName() {

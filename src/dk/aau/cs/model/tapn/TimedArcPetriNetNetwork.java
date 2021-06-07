@@ -5,6 +5,7 @@ import java.util.*;
 import dk.aau.cs.gui.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import org.jetbrains.annotations.NotNull;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -640,27 +641,14 @@ public class TimedArcPetriNetNetwork {
         command.redo();
         undoManager.addEdit(command);
         updateProductTypes(oldColorType, colorType, undoManager);
-
-        for (TimedArcPetriNet tapn : tapns) {
-            updateColorTypeOnPlaces(oldColorType, colorType, tapn.places(), undoManager);
-        }
     }
 
     public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
         undoManager.newEdit();
-	    updateColorType(colorType, oldColorType, undoManager);
 
         renameColorType(oldColorType,colorType,colorTypesListModel, undoManager);
     }
 
-    private void updateColorType(ColorType colorType, ColorType oldColorType, UndoManager undoManager){
-        for (TimedArcPetriNet tapn : tapns) {
-            updateColorTypeOnArcs(oldColorType,colorType,tapn,undoManager);
-            updateColorTypeOnTransitions(tapn.transitions(), colorType, oldColorType, undoManager);
-        }
-        updateColorTypeOnVariables(oldColorType, colorType, undoManager);
-
-    }
 
     private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
         for(ColorType ct : colorTypes){
@@ -671,119 +659,15 @@ public class TimedArcPetriNetNetwork {
             }
         }
     }
-    private void updateColorTypeOnTransitions(List<TimedTransition> transitions, ColorType colorType, ColorType oldColorType, UndoManager undoManager){
-	    for(TimedTransition transition : transitions){
-            Command command = new UpdateTransitionColorsCommand(transition, oldColorType, colorType);
-            command.redo();
-            undoManager.addEdit(command);
-        }
-    }
 
-    private void updateColorTypeOnArcs(ColorType oldColorType, ColorType colorType, TimedArcPetriNet tapn, UndoManager undoManager){
-        ArrayList<Variable> variablesToRemove = new ArrayList<>();
-	    for(Variable var : variables){
-            if(!var.getColorType().equals(colorType) ){
-                if (!var.getColorType().getId().equals(colorType.getId())) {
-                    variablesToRemove.add(var);
-                }
-            }
-        }
-	    for(TimedInputArc arc : tapn.inputArcs()) {
-	        if(arc.source().getColorType().equals(oldColorType)){
-                Command command = new UpdateInputArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-        for(TimedOutputArc arc : tapn.outputArcs()){
-            if(arc.destination().getColorType().equals(oldColorType)){
-                Command command = new UpdateOutputArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-        for(TransportArc arc : tapn.transportArcs()){
-            if(arc.source().getColorType().equals(oldColorType) || arc.destination().getColorType().equals(oldColorType)){
-                Command command = new UpdateTransportArcColorTypeCommand(oldColorType, colorType, arc, variablesToRemove);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-    }
-    public void updateColorTypeOnVariables(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
-        if (oldColorType.getId().equals(colorType.getId())) {
-            //If it is the same color type that has just had some colors removed, the variables should be kept
-            return;
-        }
-        Command command = new RemoveVariablesForColorTypeCommand(oldColorType, colorType , variables);
-        command.redo();
-        undoManager.addEdit(command);
-
-    }
-
-    public void resetPlaces(ColorType oldColorType, List<TimedPlace> places, UndoManager undoManager){
-        for(TimedPlace place : places){
-            if(place.getColorType().equals(oldColorType)){
-                Command command = new ResetPlaceCommand(place, oldColorType);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-    }
-
-    public void updateColorTypeOnPlaces(ColorType oldColorType, ColorType colorType, List<TimedPlace> places, UndoManager undoManager){
-        for(TimedPlace place : places){
-            if(place.getColorType().equals(oldColorType)){
-                Command command = new UpdateColorTypeForPlaceCommand(place, oldColorType, colorType);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-    }
     public void updateVariable(String oldName, Variable variable) {
         Integer index = getVariableIndex(oldName);
         Variable oldVar = getVariableByIndex(index);
-        VariableExpression oldVarExpr = new VariableExpression(oldVar);
-        VariableExpression newVarExpr = new VariableExpression(variable);
-        updateVariable(newVarExpr, oldVarExpr);
         if (index != null) {
             variables.set(index, variable);
         }
     }
 
-    private void updateVariable(ColorExpression newExpr, VariableExpression oldExpression){
-        for (TimedArcPetriNet tapn : tapns) {
-            int i = 0;
-            for (TimedTransition transition : tapn.transitions()) {
-                Expression expr = transition.getGuard();
-                if (expr != null) {
-                    expr.replace(oldExpression, newExpr, true);
-                    transition.setGuard((GuardExpression) expr);
-                    tapn.replace(transition, i);
-
-                }
-                for(TimedInputArc arc : transition.getInputArcs()){
-                    Expression arcexpr = arc.getArcExpression();
-                    arcexpr.replace(oldExpression, newExpr, true);
-                    arc.setExpression((ArcExpression)arcexpr);
-                }
-                for(TimedOutputArc arc : transition.getOutputArcs()){
-                    Expression arcexpr = arc.getExpression();
-                    arcexpr.replace(oldExpression, newExpr, true);
-                    arc.setExpression((ArcExpression)arcexpr);
-                }
-                for(TransportArc arc : transition.getTransportArcsGoingThrough()){
-                    Expression arcexpr = arc.getInputExpression();
-                    arcexpr.replace(oldExpression, newExpr, true);
-                    arc.setInputExpression((ArcExpression)arcexpr);
-                    arcexpr = arc.getOutputExpression();
-                    arcexpr.replace(oldExpression, newExpr, true);
-                    arc.setOutputExpression((ArcExpression)arcexpr);
-                }
-                i++;
-            }
-        }
-    }
     public Integer getColorTypeIndex(String name) {
         for (int i = 0; i < colorTypes.size(); i++) {
             if (colorTypes.get(i).getName().equalsIgnoreCase(name)) {
@@ -872,44 +756,90 @@ public class TimedArcPetriNetNetwork {
         variables.add(variable);
     }
 
-    public void remove(ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
+    public boolean remove(ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager, ArrayList<String> messages) {
         Integer index = getColorTypeIndex(colorType.getName());
-        List<ColorType> toRemove = collectColorTypesToRemoveAndUpdateTodot(colorType);
-        for(ColorType ct : toRemove){
-            Command command = new RemoveColorTypeFromNetworkCommand(ct, this, colorTypesListModel, index);
+
+        if(canColorTypeBeRemoved(colorType, messages)){
+            Command command = new RemoveColorTypeFromNetworkCommand(colorType, this, colorTypesListModel, index);
             command.redo();
             undoManager.addEdit(command);
-            updateColorType(ColorType.COLORTYPE_DOT, ct, undoManager);
-            for (TimedArcPetriNet tapn : tapns) {
-                resetPlaces(ct, tapn.places(), undoManager);
-            }
+            //Success
+            return true;
         }
-        /*
-	    if (colorType != null) {
-            colorTypes.removeAll(toRemove);
-        }
-         */
+
+        return false;
     }
 
-    private List<ColorType> collectColorTypesToRemoveAndUpdateTodot(ColorType colorType){
-        List<ColorType> toRemove = new ArrayList<>();
-        toRemove.add(colorType);
-        for(ColorType ct : colorTypes){
-            if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
-                toRemove.addAll(collectColorTypesToRemoveAndUpdateTodot(ct));
+    public boolean canColorTypeBeRemoved(ColorType colorType, ArrayList<String> messages){
+	    isColorTypeUsedInProduct(colorType, messages);
+	    for(TimedArcPetriNet tapn : allTemplates()){
+            for(TimedPlace p : tapn.places()){
+                if(p.getColorType().equals(colorType)){
+                    messages.add("Color type is used in place " + p.name() + " \n");
+                }
+            }
+            for(TimedTransition t : tapn.transitions()){
+                for(Color c : colorType.getColors()){
+                    if(t.getGuard() != null && t.getGuard().containsColor(c)){
+                        messages.add("Colors of color type is used in transition " + t.name() + "\n");
+                    }
+                }
             }
         }
-        return toRemove;
+        return messages.isEmpty();
+    }
+    private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages){
+        for(ColorType ct : colorTypes){
+            if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
+                messages.add("Color type is used in product type " + ct.getName() + " \n");
+            }
+        }
+    }
+
+    public void remove(Variable variable , ConstantsPane.VariablesListModel variablesListModel, UndoManager undoManager, List<String> messages) {
+	    if(canVariableBeRemoved(variable,messages)){
+            Integer index = getVariableIndex(variable.getName());
+            Command command = new RemoveVariableFromNetworkCommand(variable, this, variablesListModel, index);
+            command.redo();
+            undoManager.addEdit(command);
+
+        }
     }
 
     public void remove(Variable variable) {
-        VariableExpression oldVarExpr = new VariableExpression(variable);
-        UserOperatorExpression newExpr = new UserOperatorExpression(variable.getColorType().getFirstColor());
-        updateVariable(newExpr,oldVarExpr);
-
-	    if (variable != null) {
-            variables.remove(variable);
+	    if(variable != null){
+	        variables.remove(variable);
         }
+    }
+
+    public boolean canVariableBeRemoved(Variable variable, List<String> messages){
+        for (TimedArcPetriNet tapn : allTemplates()){
+
+            for(TimedInputArc arc : tapn.inputArcs()){
+                Set<Variable> variables = new HashSet<>();
+                arc.getArcExpression().getVariables(variables);
+                if(variables.contains(variable)){
+                    messages.add("Variable contained on input arc " + arc.fromTo());
+                }
+            }
+            for(TimedOutputArc arc : tapn.outputArcs()){
+                Set<Variable> variables = new HashSet<>();
+                arc.getExpression().getVariables(variables);
+                if(variables.contains(variable)){
+                    messages.add("Variable contained on output arc " + arc.toString());
+                }
+            }
+            for(TransportArc arc : tapn.transportArcs()){
+                Set<Variable> variables = new HashSet<>();
+                arc.getInputExpression().getVariables(variables);
+                arc.getOutputExpression().getVariables(variables);
+
+                if(variables.contains(variable)){
+                    messages.add("Variable contained on transport arc " + arc.fromTo());
+                }
+            }
+        }
+        return messages.isEmpty();
     }
     //TODO: Refactor the all these functions
     public ColorType[] sortColorTypes() {

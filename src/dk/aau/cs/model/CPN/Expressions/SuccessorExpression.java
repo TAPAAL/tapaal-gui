@@ -28,8 +28,8 @@ public class SuccessorExpression extends ColorExpression {
     }
 
     @Override
-    public boolean hasColor(Color color) {
-        return this.color.hasColor(color);
+    public boolean containsColor(Color color) {
+        return this.color.containsColor(color);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -61,4 +62,5 @@ public abstract class Expression {
     public abstract void getValues(ExprValues exprValues);
 
     public abstract void getVariables(Set<Variable> variables);
+    public abstract boolean containsColor(Color color);
 }

@@ -56,43 +56,6 @@ public class AddExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression removeColorFromExpression(Color color, ColorType newColorType) {
-        List<ArcExpression> toRemove = new ArrayList<>();
-        for(ArcExpression expr : constituents){
-            if(expr.removeColorFromExpression(color, newColorType) == null){
-                toRemove.add(expr);
-            }
-        }
-        for(ArcExpression expr : toRemove){
-            constituents.remove(expr);
-        }
-        if(constituents.size() < 1){
-            return null;
-        } else if(constituents.size() < 2){
-            return constituents.get(0);
-        } else{
-            return this;
-        }
-    }
-
-    @Override
-    public ArcExpression removeExpressionVariables(List<Variable> variables) {
-        Vector<ArcExpression> newConstituents = new Vector<>();
-        for(ArcExpression expr : constituents) {
-            ArcExpression newExpr = expr.removeExpressionVariables(variables);
-            if(newExpr != null) {
-                newConstituents.add(newExpr);
-            }
-        }
-
-        if(newConstituents.isEmpty()) {
-            return null;
-        } else {
-            return new AddExpression(newConstituents);
-        }
-    }
-
-    @Override
     public ArcExpression replace(Expression object1, Expression object2){
         return replace(object1,object2,false);
     }
@@ -200,6 +163,16 @@ public class AddExpression extends ArcExpression {
         for (ArcExpression element : constituents) {
             element.getVariables(variables);
         }
+    }
+
+    @Override
+    public boolean containsColor(Color color) {
+        for(var c : constituents){
+            if(c.containsColor(color)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public String toString() {

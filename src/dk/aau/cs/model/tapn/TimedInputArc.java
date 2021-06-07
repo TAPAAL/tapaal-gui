@@ -122,6 +122,10 @@ public class TimedInputArc extends TAPNElement {
 	public String toString() {
 		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString();
 	}
+
+    public String fromTo() {
+        return "From " + source.name() + " to " + destination.name();
+    }
 	//TODO: Add color properties to this
 	public List<TimeInterval> getDEnabledInterval(){
 		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();

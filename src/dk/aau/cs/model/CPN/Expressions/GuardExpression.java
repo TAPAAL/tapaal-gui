@@ -30,5 +30,4 @@ public abstract class GuardExpression extends Expression {
 
     public abstract void getVariables(Set<Variable> variables);
     public abstract Boolean eval(ExpressionContext context);
-    public abstract GuardExpression removeColorFromExpression(Color color);
 }

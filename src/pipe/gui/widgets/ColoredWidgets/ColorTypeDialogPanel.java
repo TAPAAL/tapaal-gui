@@ -1,5 +1,7 @@
 package pipe.gui.widgets.ColoredWidgets;
 
+import dk.aau.cs.gui.undo.Colored.AddColorTypeCommand;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -760,17 +762,17 @@ public class ColorTypeDialogPanel extends JPanel {
                             }
                         }
                         if(showDialog){
-                            int cont = JOptionPane.showConfirmDialog(this,  removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                            if(cont == JOptionPane.OK_OPTION){
-                                network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                            }
+                            network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                         } else{
                             undoManager.newEdit();
                             network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {
-                        colorTypesListModel.addElement(newColorType);
+                        Command cmd = new AddColorTypeCommand(newColorType,
+                            network, colorTypesListModel, network.colorTypes().size());
+                        undoManager.addNewEdit(cmd);
+                        cmd.redo();
                     }
 
                 }
@@ -793,10 +795,7 @@ public class ColorTypeDialogPanel extends JPanel {
                             }
                         }
                         if(showDialog) {
-                            int cont = JOptionPane.showConfirmDialog(this, "<html>" + removeColorInColorTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                            if (cont == JOptionPane.OK_OPTION) {
-                                network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                            }
+                            network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
                         } else{
                             undoManager.newEdit();
                             network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
@@ -804,7 +803,10 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                     }
                     else {
-                        colorTypesListModel.addElement(newColorType);
+                        Command cmd = new AddColorTypeCommand(newColorType,
+                            network, colorTypesListModel, network.colorTypes().size());
+                        undoManager.addNewEdit(cmd);
+                        cmd.redo();
                     }
                 }
                 else if(selectedColorType.equals(productColor)) {
@@ -834,17 +836,18 @@ public class ColorTypeDialogPanel extends JPanel {
                             showDialog = true;
                         }
                         if(showDialog) {
-                            int cont = JOptionPane.showConfirmDialog(this, "<html>" + editProductTypeMessage, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                            if (cont == JOptionPane.OK_OPTION) {
-                                network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
-                            }
+                            network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
+
                         } else{
                             undoManager.newEdit();
                             network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
                             colorTypesListModel.updateName();
                         }
                     } else {
-                        colorTypesListModel.addElement(productType);
+                        Command cmd = new AddColorTypeCommand(productType,
+                            network, colorTypesListModel, network.colorTypes().size());
+                        undoManager.addNewEdit(cmd);
+                        cmd.redo();
                     }
                 }
             }
