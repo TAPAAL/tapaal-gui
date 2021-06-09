@@ -144,7 +144,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 reducedNetFilePath,
                                 dataLayerQuery.isTarOptionEnabled(),
                                 dataLayerQuery.usePartitioning(),
-                                dataLayerQuery.useColorFixpoint()
+                                dataLayerQuery.useColorFixpoint(),
+                                dataLayerQuery.useSymmetricVars()
                             ),
                             transformedModel,
                             clonedQuery, composer.getGuiModel());
@@ -168,7 +169,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 reducedNetFilePath,
                                 dataLayerQuery.isTarOptionEnabled(),
                                 dataLayerQuery.usePartitioning(),
-                                dataLayerQuery.useColorFixpoint()
+                                dataLayerQuery.useColorFixpoint(),
+                                dataLayerQuery.useSymmetricVars()
                             ),
                             transformedModel,
                             clonedQuery,

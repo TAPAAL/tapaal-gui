@@ -164,6 +164,7 @@ public class QueryDialog extends JPanel {
     private JPanel verificationPanel;
     private JPanel unfoldingOptionsPanel;
     private JCheckBox usePartitioning;
+    private JCheckBox useSymmetricvars;
     private JCheckBox useColorFixpoint;
 
 	// Reduction options panel
@@ -314,6 +315,7 @@ public class QueryDialog extends JPanel {
     //Tool tips for unfolding options panel
     private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
     private final static String TOOL_TIP_COLOR_FIXPOINT = "Explores the possible colored markings and only unfolds for those";
+    private final static String TOOL_TIP_SYMMETRIC_VARIABLES = "Finds variables with equivalent behavior and treats them as the same variable";
 
     //Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
@@ -425,8 +427,9 @@ public class QueryDialog extends JPanel {
 				overApproximationEnable.isSelected(),
 				underApproximationEnable.isSelected(),
 				(Integer) overApproximationDenominator.getValue(),
-                usePartitioning.isSelected(),
-                useColorFixpoint.isSelected()
+                false,   //usePartitioning.isSelected(),
+                false,   //useColorFixpoint.isSelected(),
+                false   //useSymmetricVars.isSelected()
 		);
 
 		query.setUseStubbornReduction(useStubbornReduction.isSelected());
@@ -460,7 +463,8 @@ public class QueryDialog extends JPanel {
             /* enableUnderApproximation */false,
             0,
             usePartitioning.isSelected(),
-            useColorFixpoint.isSelected()
+            useColorFixpoint.isSelected(),
+            useSymmetricvars.isSelected()
         );
         query.setCategory(TAPNQuery.QueryCategory.CTL);
         query.setUseSiphontrap(useSiphonTrap.isSelected());
@@ -1233,7 +1237,7 @@ public class QueryDialog extends JPanel {
             setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
         }
-        if(lens.isColored()){
+        if(lens.isColored() && !lens.isTimed()){
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
 		setupSearchOptionsFromQuery(queryToCreateFrom);
@@ -1325,6 +1329,7 @@ public class QueryDialog extends JPanel {
     private void setupUnfoldingOptionsFromQuery(TAPNQuery queryToCreateFrom){
 	    usePartitioning.setSelected(queryToCreateFrom.usePartitioning());
 	    useColorFixpoint.setSelected(queryToCreateFrom.useColorFixpoint());
+	    useSymmetricvars.setSelected(queryToCreateFrom.useSymmetricVars());
     }
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1494,7 +1499,7 @@ public class QueryDialog extends JPanel {
 		Point location = guiDialog.getLocation();
 
 		searchOptionsPanel.setVisible(advancedView);
-		if(lens.isColored()){
+		if(lens.isColored() && !lens.isTimed()){
             unfoldingOptionsPanel.setVisible(advancedView);
         }
 
@@ -2509,7 +2514,9 @@ public class QueryDialog extends JPanel {
         verificationPanel = new JPanel(new GridBagLayout());
 
         initReductionOptionsPanel();
-        initUnfoldingOptionsPanel();
+        if(lens.isColored() && !lens.isTimed()){
+            initUnfoldingOptionsPanel();
+        }
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2575,12 +2582,15 @@ public class QueryDialog extends JPanel {
         unfoldingOptionsPanel.setBorder(BorderFactory.createTitledBorder("Unfolding Options"));
         usePartitioning = new JCheckBox("Use partitioning of the colored net");
         useColorFixpoint = new JCheckBox("Use color fixpoint analysis");
+        useSymmetricvars = new JCheckBox("Use reduction of symmetric variables");
 
         usePartitioning.setToolTipText(TOOL_TIP_PARTITIONING);
         useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
+        useSymmetricvars.setToolTipText(TOOL_TIP_SYMMETRIC_VARIABLES);
 
         usePartitioning.setSelected(true);
         useColorFixpoint.setSelected(true);
+        useSymmetricvars.setSelected(true);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -2589,6 +2599,8 @@ public class QueryDialog extends JPanel {
         unfoldingOptionsPanel.add(usePartitioning, gridBagConstraints);
         gridBagConstraints.gridy = 1;
         unfoldingOptionsPanel.add(useColorFixpoint, gridBagConstraints);
+        gridBagConstraints.gridy = 2;
+        unfoldingOptionsPanel.add(useSymmetricvars, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;

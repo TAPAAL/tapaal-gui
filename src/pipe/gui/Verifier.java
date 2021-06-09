@@ -231,7 +231,8 @@ public class Verifier {
                     reducedNetTempFile.getAbsolutePath(),
                     query.isTarOptionEnabled(),
                     query.usePartitioning(),
-                    query.useColorFixpoint()
+                    query.useColorFixpoint(),
+                    query.useSymmetricVars()
                 );
             } else {
                 verifytapnOptions = new VerifyPNOptions(
@@ -252,7 +253,8 @@ public class Verifier {
                     reducedNetTempFile.getAbsolutePath(),
                     query.isTarOptionEnabled(),
                     query.usePartitioning(),
-                    query.useColorFixpoint()
+                    query.useColorFixpoint(),
+                    query.useSymmetricVars()
                 );
             }
         } else {

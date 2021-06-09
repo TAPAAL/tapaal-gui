@@ -341,6 +341,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
         queryElement.setAttribute("partitioning", "" + query.usePartitioning());
         queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
+        queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
 
 		return queryElement;
 	}
@@ -381,7 +382,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
 		queryElement.setAttribute("partitioning", "" + query.usePartitioning());
 		queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
-		
+        queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
+
 		return queryElement;
 	}
 	

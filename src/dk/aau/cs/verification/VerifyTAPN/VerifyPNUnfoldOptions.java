@@ -14,13 +14,15 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     private int numQueries;
     private boolean partition;
     private  boolean computeColorFixpoint;
+    private boolean symmetricVars;
 
-    public VerifyPNUnfoldOptions(String modelOut, String queryOut, int numQueries, boolean partition, boolean computeColorFixpoint) {
+    public VerifyPNUnfoldOptions(String modelOut, String queryOut, int numQueries, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         this.modelOut = modelOut;
         this.queryOut = queryOut;
         this.numQueries = numQueries;
         this.partition = partition;
         this.computeColorFixpoint = computeColorFixpoint;
+        symmetricVars = useSymmetricVars;
     }
 
 
@@ -72,6 +74,10 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         }
         if(!computeColorFixpoint){
             result.append(" --disable-cfp");
+        }
+
+        if(!symmetricVars){
+            result.append(" --disable-symmetry-vars");
         }
 
         return result.toString();

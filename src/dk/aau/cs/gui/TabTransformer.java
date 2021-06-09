@@ -18,12 +18,10 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.ProcessRunner;
-import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTACPNDiscreteVerification;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -298,17 +296,23 @@ public class TabTransformer {
         }
     }
 
-    public static void unfoldTab(TabContent oldTab, boolean partition, boolean computeColorFixpoint) {
-        VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
-        verifypn.setup();
+    public static void unfoldTab(TabContent oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
+        System.out.println("unfolding tab");
+        ModelChecker engine;
+        if(oldTab.getLens().isTimed()){
+            engine = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+        } else {
+            engine = new VerifyPN(new FileFinder(), new MessengerImpl());
+        }
+        engine.setup();
 
-        if (!verifypn.isCorrectVersion()) {
+        if (!engine.isCorrectVersion()) {
             new MessengerImpl().displayErrorMessage(
-                "No " + verifypn + " specified: The verification is cancelled",
+                "No " + engine + " specified: The verification is cancelled",
                 "Verification Error");
             return;
         }
-        UnfoldNet thread = new UnfoldNet(verifypn, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint);
+        UnfoldNet thread = new UnfoldNet(engine, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint, useSymmetricVars);
 
         RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread, "Unfolding");
         thread.execute(oldTab.network(), oldTab.queries(), oldTab);
@@ -326,11 +330,12 @@ public class TabTransformer {
 
     public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
         StringBuffer buffer = new StringBuffer();
+        buffer.append(options.toString());
+        buffer.append(" ");
         buffer.append(modelFile);
         buffer.append(" ");
         buffer.append(queryFile);
-        buffer.append(" ");
-        buffer.append(options.toString());
+
         return buffer.toString();
     }
 

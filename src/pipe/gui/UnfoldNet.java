@@ -19,6 +19,7 @@ import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNUnfoldOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
@@ -46,17 +47,19 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
     protected TabContent oldTab;
     protected boolean partition;
     protected boolean computeColorFixpoint;
+    protected boolean symmetricVars;
 
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = 4000;
 
-    public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint) {
+    public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         super();
         this.modelChecker = modelChecker;
         this.messenger = messenger;
         this.guiModels = guiModels;
         this.partition = partition;
         this.computeColorFixpoint = computeColorFixpoint;
+        symmetricVars = useSymmetricVars;
     }
 
     public void execute(TimedArcPetriNetNetwork model, Iterable<TAPNQuery> queries, TabContent oldTab) {
@@ -78,8 +81,8 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         File modelOut = null;
         File queryOut = null;
         try {
-            modelFile = File.createTempFile("modelInUnfold", ".tapn");
-            queryFile = File.createTempFile("queryInUnfold", ".xml");
+            modelFile = lens.isTimed()? File.createTempFile("modelInUnfold", ".xml"): File.createTempFile("modelInUnfold", ".tapn");
+            queryFile = lens.isTimed()? File.createTempFile("queryInUnfold", ".q"): File.createTempFile("queryInUnfold", ".xml");
             modelOut = File.createTempFile("modelOut", ".xml");
             queryOut = File.createTempFile("queryOut", ".xml");
         } catch (IOException e) {
@@ -143,7 +146,13 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
             String formattedQueries = "";
             for(pipe.dataLayer.TAPNQuery query : clonedQueries){
-                formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
+                if (query.getCategory() == TAPNQuery.QueryCategory.CTL || !lens.isTimed()) {
+                    formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
+                } else if (lens != null && lens.isGame()) {
+                    queryStream.append("control: " + query.getProperty().toString());
+                } else {
+                    queryStream.append(query.getProperty().toString());
+                }
             }
             queryStream.append(formattedQueries);
             queryStream.close();
@@ -153,10 +162,9 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         }
         VerificationOptions unfoldTACPNOptions;
         if(lens.isTimed()){
-            //TODO: implement timed options
-            return null;
+            unfoldTACPNOptions = new VerifyDTAPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), model.marking().size()*2);
         } else{
-            unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint);
+            unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint, symmetricVars);
         }
 
 
@@ -222,7 +230,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         return newComposer.transformModel(loadedModel.network());
     }
 
-    private static List<pipe.dataLayer.TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
+    public static List<pipe.dataLayer.TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
         List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
         queries.addAll(queryLoader.parseQueries().getQueries());
@@ -249,6 +257,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
                 }
             }
         } catch (IOException e) {
+            System.out.println("Got exception: " + e.getMessage());
         }
 
         return numElements;

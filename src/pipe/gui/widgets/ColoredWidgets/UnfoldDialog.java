@@ -18,9 +18,11 @@ import java.util.regex.Pattern;
 public class UnfoldDialog extends JDialog {
     private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
     private final static String TOOL_TIP_COLOR_FIXPOINT = "Explores the possible colored markings and only unfolds for those";
+    private final static String TOOL_TIP_SYMMETRIC_VARIABLES = "Finds variables with equivalent behavior and treats them as the same variable";
 
     private JCheckBox usePartition;
     private JCheckBox useColorFixpoint;
+    private JCheckBox useSymmetricvars;
 
     private JPanel mainPanel;
     private JButton okButton;
@@ -36,6 +38,11 @@ public class UnfoldDialog extends JDialog {
 
     public static void showDialog(TabContent tab) {
         currentTab = tab;
+        if(tab.getLens().isTimed()){
+            currentTab.createNewAndUnfoldColor(false, false, false);
+            return;
+        }
+
         if(unfoldDialog == null){
             unfoldDialog = new UnfoldDialog(CreateGui.getApp(), "Unfold", true);
             unfoldDialog.pack();
@@ -93,11 +100,20 @@ public class UnfoldDialog extends JDialog {
         useColorFixpoint = new JCheckBox("Color Fixpoint");
         useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
         useColorFixpoint.setSelected(true);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 8, 0, 8);
         checkboxPanel.add(useColorFixpoint, gbc);
+
+        useSymmetricvars = new JCheckBox("Symmetric Variables");
+        useSymmetricvars.setToolTipText(TOOL_TIP_SYMMETRIC_VARIABLES);
+        useSymmetricvars.setSelected(true);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 8, 0, 8);
+        checkboxPanel.add(useSymmetricvars, gbc);
         return checkboxPanel;
     }
 
@@ -145,7 +161,7 @@ public class UnfoldDialog extends JDialog {
     }
 
     private void onOK() {
-            currentTab.createNewAndUnfoldColor(usePartition.isSelected(), useColorFixpoint.isSelected());
+            currentTab.createNewAndUnfoldColor(usePartition.isSelected(), useColorFixpoint.isSelected(), useSymmetricvars.isSelected());
             exit();
     }
 

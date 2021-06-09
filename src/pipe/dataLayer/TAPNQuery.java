@@ -62,6 +62,7 @@ public class TAPNQuery {
     //Used for unfolding
     private boolean partitioning;
     private boolean colorFixpoint;
+    private boolean symmetricVars;
 	
 	private boolean enableOverApproximation = false;
 	private boolean enableUnderApproximation = false;
@@ -239,6 +240,14 @@ public class TAPNQuery {
         partitioning = usePartitioning;
     }
 
+    public boolean useSymmetricVars(){
+        return symmetricVars;
+    }
+
+    public void setUseSymmetricVars(boolean useSymmetricVars){
+        symmetricVars = useSymmetricVars;
+    }
+
     public boolean useColorFixpoint(){
         return colorFixpoint;
     }
@@ -345,14 +354,14 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, reduction, hashTabelSize, extrapolationOption, new InclusionPlaces(), false, false, 0, true, true);
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, reduction, hashTabelSize, extrapolationOption, new InclusionPlaces(), false, false, 0, true, true, true);
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, 
-			int approximationDenominator, boolean partitioning, boolean colorFixpoint) {
+			int approximationDenominator, boolean partitioning, boolean colorFixpoint, boolean symmetricVars) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -373,6 +382,7 @@ public class TAPNQuery {
 		this.denominator = approximationDenominator;
         this.partitioning = partitioning;
         this.colorFixpoint = colorFixpoint;
+        this.symmetricVars = symmetricVars;
 	}
 
 
@@ -412,7 +422,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, denominator, partitioning, colorFixpoint);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, useReduction, hashTableSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, denominator, partitioning, colorFixpoint, symmetricVars);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		copy.setCategory(queryCategory);

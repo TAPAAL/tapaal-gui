@@ -1709,11 +1709,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
     @Override
     public void createNewAndUnfoldColor(){
         //Verifier.runVerifyTAPNVerification(network(), TAPNQuery.getDefaultQuery(new TCTLTrueNode()), null, getGuiModels(), true);
-	    TabTransformer.unfoldTab(this, true, true);
+	    TabTransformer.unfoldTab(this, true, true, true);
     }
 
-    public void createNewAndUnfoldColor(boolean partition, boolean computeColorFixpoint){
-        TabTransformer.unfoldTab(this, partition, computeColorFixpoint);
+    public void createNewAndUnfoldColor(boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars){
+        TabTransformer.unfoldTab(this, partition, computeColorFixpoint, useSymmetricVars);
     }
 
     @Override

@@ -17,6 +17,7 @@ public abstract class VerificationOptions {
 	protected int extraTokens;
 	protected String reducedModelPath;
     protected String unfoldedModelPath;
+    protected String unfoldedQueriesPath;
 
 	public abstract String toString();
 
@@ -54,5 +55,8 @@ public abstract class VerificationOptions {
 
     public String unfoldedModelPath(){
         return unfoldedModelPath;
+    }
+    public String unfoldedQueriesPath(){
+        return unfoldedQueriesPath;
     }
 }

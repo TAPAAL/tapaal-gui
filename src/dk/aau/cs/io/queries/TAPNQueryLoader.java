@@ -94,6 +94,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean useTar = getTarOption(queryElement, "useTarOption", false);
 		boolean partitioning = getUnfoldingOption(queryElement, "partitioning", true);
 		boolean colorFixpoint = getUnfoldingOption(queryElement, "colorFixpoint", true);
+        boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
 
 		TCTLAbstractProperty query;
 		if (queryElement.getElementsByTagName("formula").item(0) != null){
@@ -103,7 +104,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		}
 
 		if (query != null) {
-			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint);
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			parsedQuery.setCategory(detectCategory(query, isCTL));

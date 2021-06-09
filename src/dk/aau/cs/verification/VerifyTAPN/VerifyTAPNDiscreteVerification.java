@@ -32,10 +32,7 @@ import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
-import pipe.gui.CreateGui;
-import pipe.gui.FileFinder;
-import pipe.gui.MessengerImpl;
-import pipe.gui.Pipe;
+import pipe.gui.*;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 
@@ -333,14 +330,19 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			} else {
 
                 if(options.traceOption() != TraceOption.NONE && model.value1().isColored()) {
-                    PNMLoader tapnLoader = new PNMLoader();
+                    TapnXmlLoader tapnLoader = new TapnXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
+                    File queriesOut = new File(options.unfoldedQueriesPath());
                     TabContent newTab;
                     LoadedModel loadedModel = null;
                     try {
                         loadedModel = tapnLoader.load(fileOut);
                         newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
                         newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
+                        for(pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())){
+                            newTab.addQuery(loadedQuery);
+                        }
+
                         CreateGui.openNewTabFromStream(newTab);
 
                         int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);

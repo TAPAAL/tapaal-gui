@@ -284,11 +284,9 @@ public class TapnXmlLoader {
 		Template template = new Template(tapn, guiModel, new Zoomer());
 
 		NodeList nodeList = tapnNode.getChildNodes();
-        System.out.println(nodeList.getLength());
 		for (int i = 0; i < nodeList.getLength(); i++) {
 
 			Node node = nodeList.item(i);
-            System.out.println(node.getNodeName());
 			if(node instanceof Element){
 				parseElement((Element)node, template, network, constants);
 			}
@@ -321,7 +319,7 @@ public class TapnXmlLoader {
 		} else if ("transition".equals(element.getNodeName())) {
 			TimedTransitionComponent transition = parseTransition(element, network, template.model());
 			template.guiModel().addPetriNetObject(transition);
-		} else if ("arc".equals(element.getNodeName())) {
+		} else if (element.getNodeName().matches("arc|outputArc|inputArc|inhibitorArc|transportArc")) {
             parseAndAddArc(element, template, constants, network);
         }
 	}
@@ -391,8 +389,36 @@ public class TapnXmlLoader {
 	}
 
 	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
-		int positionXInput = (int)Double.parseDouble(transition.getAttribute("positionX"));
-		int positionYInput = (int)Double.parseDouble(transition.getAttribute("positionY"));
+		String posX = transition.getAttribute("positionX");
+		String posY = transition.getAttribute("positionY");
+		String nameOffsetX = transition.getAttribute("nameOffsetX");
+		String nameOffsetY = transition.getAttribute("nameOffsetY");
+		String angleStr = transition.getAttribute("angle");
+		String priorityStr = transition.getAttribute("priority");
+	    int positionXInput = 0;
+		int positionYInput = 0;
+		int nameOffsetXInput = 0;
+		int nameOffsetYInput = 0;
+		int angle = 0;
+        int priority = 0;
+		if(!posX.isEmpty()){
+		    positionXInput = (int)Double.parseDouble(posX);
+        }
+		if(!posY.isEmpty()){
+		    positionYInput = (int)Double.parseDouble(posY);
+        }
+		if(!nameOffsetX.isEmpty()){
+		    nameOffsetXInput = (int)Double.parseDouble(nameOffsetX);
+        }
+		if(!nameOffsetY.isEmpty()){
+		    nameOffsetYInput = (int)Double.parseDouble(nameOffsetY);
+        }
+		if(!angleStr.isEmpty()){
+		    angle = Integer.parseInt(angleStr);
+        }
+		if(!priorityStr.isEmpty()){
+		    priority = Integer.parseInt(priorityStr);
+        }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
@@ -400,12 +426,9 @@ public class TapnXmlLoader {
 		String player = transition.getAttribute("player");
 
 		idResolver.add(tapn.name(), idInput, nameInput);
-		
-		int nameOffsetXInput = (int)Double.parseDouble(transition.getAttribute("nameOffsetX"));
-		int nameOffsetYInput = (int)Double.parseDouble(transition.getAttribute("nameOffsetY"));
+
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
-		int angle = Integer.parseInt(transition.getAttribute("angle"));
-		int priority = Integer.parseInt(transition.getAttribute("priority"));
+
 		boolean displayName = transition.getAttribute("displayName").equals("false") ? false : true;
 
 
@@ -451,12 +474,30 @@ public class TapnXmlLoader {
 	}
 
 	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
-		int positionXInput = (int)Double.parseDouble(place.getAttribute("positionX"));
-		int positionYInput = (int)Double.parseDouble(place.getAttribute("positionY"));
+        String placePosX = place.getAttribute("positionX");
+        String placePosY = place.getAttribute("positionY");
+        String nameOffsetX = place.getAttribute("nameOffsetX");
+        String nameOffsetY = place.getAttribute("nameOffsetY");
+        int positionXInput = 0;
+        int positionYInput = 0;
+	    if(!placePosX.isEmpty()){
+	        positionXInput = (int)Double.parseDouble(placePosX);
+        }
+	    if(!placePosY.isEmpty()){
+            positionYInput = (int)Double.parseDouble(placePosY);
+        }
 		String idInput = place.getAttribute("id");
 		String nameInput = place.getAttribute("name");
-		int nameOffsetXInput = (int)Double.parseDouble(place.getAttribute("nameOffsetX"));
-		int nameOffsetYInput = (int)Double.parseDouble(place.getAttribute("nameOffsetY"));
+
+		int nameOffsetXInput = 0;
+        int nameOffsetYInput = 0;
+		if(!nameOffsetX.isEmpty()){
+		    nameOffsetXInput = (int)Double.parseDouble(nameOffsetX);
+        }
+		if(!nameOffsetY.isEmpty()){
+		    nameOffsetYInput = (int)Double.parseDouble(nameOffsetY);
+        }
+
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
@@ -570,6 +611,17 @@ public class TapnXmlLoader {
 		boolean taggedArc = arc.getAttribute("tagged").equals("true") ? true : false;
 		String inscriptionTempStorage = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
+		if(type.isEmpty()){
+		    if(arc.getNodeName().equals("transportArc")){
+		        type = "transport";
+            } else if (arc.getNodeName().equals("inhibitorArc")){
+		        type = "inhibitor";
+            } else if (arc.getNodeName().equals("inputArc")){
+		        type = "timed";
+            } else {
+		        type = "";
+            }
+        }
 		int nameOffsetXInput;
 		int nameOffsetYInput;
 		
@@ -621,6 +673,7 @@ public class TapnXmlLoader {
         }
 
 		Arc tempArc;
+        Arc tempArc2 = null;
 
 		if (type.equals("tapnInhibitor") || type.equals("inhibitor")) {
 
@@ -635,10 +688,23 @@ public class TapnXmlLoader {
                     _endx, _endy, template, constants, weight, ctiList, arcExpr);
 
 			} else if (type.equals("transport")) {
-				tempArc = parseAndAddTransportArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn,
-                    _endx, _endy, template, constants, weight, ctiList, arcExpr);
+                String transition = arc.getAttribute("transition");
+                if(transition.isEmpty()){
+                    tempArc = parseAndAddTransportArc(idInput, taggedArc,
+                        inscriptionTempStorage, sourceIn, targetIn,
+                        _endx, _endy, template, constants, weight, ctiList, arcExpr);
+                } else {
+                    transition = idResolver.get(template.model().name(), transition);
+                    PlaceTransitionObject transitionIn = template.guiModel().getPlaceTransitionObject(transition);
 
+                    tempArc = parseAndAddTransportArc(idInput, taggedArc,
+                        inscriptionTempStorage, sourceIn, transitionIn,
+                        _endx, _endy, template, constants, weight, ctiList, arcExpr);
+
+                    tempArc2 = parseAndAddTransportArc(idInput, taggedArc,
+                        inscriptionTempStorage, transitionIn, targetIn,
+                        _endx, _endy, template, constants, weight, ctiList, arcExpr);
+                }
 			} else {
 				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
 						inscriptionTempStorage, sourceIn, targetIn,
@@ -650,6 +716,12 @@ public class TapnXmlLoader {
 		tempArc.setNameOffsetY(nameOffsetYInput);
 
 		parseArcPath(arc, tempArc);
+		if(tempArc2 != null){
+            tempArc2.setNameOffsetX(nameOffsetXInput);
+            tempArc2.setNameOffsetY(nameOffsetYInput);
+
+            parseArcPath(arc, tempArc2);
+        }
 	}
 
 	private TimedOutputArcComponent parseAndAddTimedOutputArc(String idInput, boolean taggedArc,

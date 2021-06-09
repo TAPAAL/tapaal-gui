@@ -452,16 +452,28 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
     public AddExpression constructCleanAddExpression(ColorType ct, ColorMultiset multiset){
         Vector<ArcExpression> coloredTokenList = new Vector<>();
+
         for(Color c : ct.getColors()){
             int numberOf = multiset.get(c);
             if(numberOf < 1){
                 continue;
             }
-            UserOperatorExpression color = new UserOperatorExpression(c);
             Vector<ColorExpression> v = new Vector<>();
-            v.add(color);
+            if(ct.isProductColorType()){
+                Vector<ColorExpression> tupleColors = new Vector<>();
+                for(Color tupleCol : c.getTuple()){
+                    UserOperatorExpression color = new UserOperatorExpression(tupleCol);
+                    tupleColors.add(color);
+                }
+                TupleExpression tupleExpr = new TupleExpression(tupleColors);
+                v.add(tupleExpr);
+            } else {
+                UserOperatorExpression color = new UserOperatorExpression(c);
+                v.add(color);
+            }
             NumberOfExpression numOf = new NumberOfExpression(numberOf,v);
             coloredTokenList.add(numOf);
+
         }
         return new AddExpression(coloredTokenList);
     }
