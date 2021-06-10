@@ -186,7 +186,6 @@ public class PNMLoader {
             node = node.getNextSibling();
         }
     }
-    //TODO: implement color
     private void parsePlace(Node node, TimedArcPetriNet tapn, Template template) throws FormatException {
         if (!(node instanceof Element)) {
             return;

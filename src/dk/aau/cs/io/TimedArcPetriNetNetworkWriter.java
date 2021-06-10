@@ -439,9 +439,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		placeElement.setAttribute("nameOffsetY", String.valueOf(inputPlace.getNameOffsetY()));
 		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
 		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
-		//TODO: Kind of nasty to have two types of invariants, needs more work
+		//In colored nets the "invariant" tag describes the general invariant
+        //But we can also have invariants for specific colors
         createColoredInvariants(inputPlace.underlyingPlace(), document, placeElement);
-        writeTACPN.appendColoredPlaceDependencies(inputPlace.underlyingPlace(), document, placeElement);
         return placeElement;
 	}
     private void createColoredInvariants(TimedPlace inputPlace, Document document, Element placeElement) {

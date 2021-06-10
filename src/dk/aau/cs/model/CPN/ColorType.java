@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class ColorType implements Iterable<Color> {
-    public static final ColorType COLORTYPE_DOT = new ColorType("dot") {{addColor("dot");}};
+    public static final ColorType COLORTYPE_DOT = new ColorType("dot") {{addColor(DotConstant.getInstance());}};
     private Vector<Color> colors = new Vector<Color>();
     private String id;
     private String name;
@@ -19,6 +19,10 @@ public class ColorType implements Iterable<Color> {
 
     public void addColor(String colorName) {
         colors.add(new Color(this, colors.size(), colorName));
+    }
+
+    public void addColor(Color color) {
+        colors.add(color);
     }
 
     public String getName() {
