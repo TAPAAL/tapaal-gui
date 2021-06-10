@@ -346,6 +346,10 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 colorexps.add(colorexp);
                 child = skipWS(child.getNextSibling());
             }
+            //Sometimes PNML nets have tuples with only 1 color, we just remove the tuple
+            if(colorexps.size() < 2){
+                return colorexps.get(0);
+            }
             return new TupleExpression(colorexps);
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
