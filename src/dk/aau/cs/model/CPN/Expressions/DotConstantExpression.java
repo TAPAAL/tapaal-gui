@@ -13,11 +13,11 @@ import java.util.Vector;
 public class DotConstantExpression extends UserOperatorExpression {
 
     public DotConstantExpression() {
-        super(DotConstant.getInstance());
+        super(ColorType.COLORTYPE_DOT.getFirstColor());
     }
 
     public List<Color> eval(ExpressionContext context) {
-        return Arrays.asList(DotConstant.getInstance());
+        return Arrays.asList(ColorType.COLORTYPE_DOT.getFirstColor());
     }
 
     @Override
