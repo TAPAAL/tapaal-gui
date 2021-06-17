@@ -107,11 +107,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         if(isInputArc && !isInhibitorArc){
             initNonDefaultColorIntervalPanel();
         }
-        //initWeightPanel();
-        /*if(isTransportArc){
-            initTransportArcExpressionPanel();
-        }*/
-
     }
 
     private void initNonDefaultColorIntervalPanel() {
@@ -754,25 +749,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
     }
 
-    /*private void parseExpression(ArcExpression expressionToParse) {
-        if (expressionToParse instanceof AddExpression) {
-            AddExpression addExpr = new AddExpression(((AddExpression) expressionToParse).getAddExpression());
-            arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
-            updateSelection(addExpr);
-        }
-        else if(expressionToParse instanceof SubtractExpression) {
-            SubtractExpression subExpr = new SubtractExpression(((SubtractExpression) expressionToParse).getLeftExpression(), ((SubtractExpression) expressionToParse).getRightExpression());
-            arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
-            updateSelection(subExpr);
-        }
-        else if (expressionToParse instanceof NumberOfExpression) {
-            NumberOfExpression expessionToParse = (NumberOfExpression) expressionToParse;
-            NumberOfExpression numbExpr = null;
-            numbExpr = new NumberOfExpression(expessionToParse.getNumber(), expessionToParse.getNumberOfExpression());
-            arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
-            updateSelection(numbExpr);
-        }
-    }*/
     private void deleteSelection() {
         if (currentSelection != null) {
             Expression replacement = null;
@@ -896,46 +872,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         exprField.setText(arcExpression.toString());
         updateSelection(arcExpression);
     }
-    /*private void initExpr() {
-        if (!isTransportArc) {
-            ArcExpression expression;
-            if(isInputArc && !isInhibitorArc){
-                expression = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc().getArcExpression();
-            } else if(isInhibitorArc){
-                expression = ((TimedInhibitorArcComponent) objectToBeEdited).underlyingTimedInhibitorArc().getArcExpression();
-            } else{
-                expression = (((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression();
-            }
-            arcExpression = new PlaceHolderArcExpression();
-            if(expression != null){
-                updateSelection(arcExpression);
-                parseExpression(expression);
-            } else {
-                exprField.setText(arcExpression.toString());
-            }
-        } else {
-            TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
-            if (isInputArc) {
-                if (transportArc.getInputExpression() != null) {
-                    arcExpression = new PlaceHolderArcExpression();
-                    updateSelection(arcExpression);
-                    parseExpression(transportArc.getInputExpression());
-                } else {
-                    arcExpression = new PlaceHolderArcExpression();
-                    exprField.setText(arcExpression.toString());
-                }
-            } else {
-                if (transportArc.getOutputExpression() != null) {
-                    arcExpression = new PlaceHolderArcExpression();
-                    updateSelection(arcExpression);
-                    parseExpression(transportArc.getOutputExpression());
-                } else {
-                    arcExpression = new PlaceHolderArcExpression();
-                    exprField.setText(arcExpression.toString());
-                }
-            }
-        }
-    }*/
+
     private void updateSelection() {
         int index = exprField.getCaretPosition();
         ExprStringPosition position = arcExpression.objectAt(index);
@@ -1113,15 +1050,14 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void returnFromManualEdit(ArcExpression newExpr) {
         setExprFieldEditable(false);
         deleteExprSelectionButton.setEnabled(true);
-        if (newExpr != null)
+        if (newExpr != null) {
             arcExpression = newExpr;
+        }
 
         updateSelection(arcExpression);
         resetExprButton.setText("Reset Expression");
         editExprButton.setText("Edit Expression");
 
-        /*resetExprButton.setToolTipText(TOOL_TIP_RESETBUTTON);
-        editExprButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);*/
         toggleEnabledButtons();
     }
 

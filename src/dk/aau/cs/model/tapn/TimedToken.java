@@ -52,17 +52,6 @@ public class TimedToken {
 	}
     @Override
 	public String toString() {
-        /*String token = "<";
-        if (color.getTuple() != null &&  color.getTuple().size() != 0) {
-            for (Color element : color.getTuple()) {
-                token += element.getColorName() + ", ";
-            }
-        }
-        else {
-            return token + color.getColorName() + ">";
-        }
-        token = token.substring(0, token.length()-2);
-        return token + ">";*/
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 

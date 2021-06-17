@@ -245,20 +245,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return new Result<>(tiac);
         }
 
-        /*private ColorExpression createColorExpression(ColorType ct) {
-            if(ct instanceof ProductType){
-                Vector<ColorExpression> tempVec = new Vector();
-                for(ColorType colorType : ((ProductType)ct).getColorTypes()){
-                    tempVec.add(createColorExpression(colorType));
-                }
-                TupleExpression tupleExpr = new TupleExpression(tempVec);
-                return tupleExpr;
-            } else{
-                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
-                return userOperatorExpression;
-            }
-        }*/
-
         public Result<TimedOutputArcComponent, ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
             Require.notNull(c, "DataLayer can't be null");
             Require.notNull(p, "Place can't be null");

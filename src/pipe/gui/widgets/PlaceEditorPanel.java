@@ -1119,8 +1119,6 @@ public class PlaceEditorPanel extends JPanel {
 
         Dimension colorTypeComboBoxSize = new Dimension(500, 30);
         colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);
-        /*colorTypeComboBox.setMinimumSize(colorTypeComboBoxSize);
-        colorTypeComboBox.setPreferredSize(colorTypeComboBoxSize);*/
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;

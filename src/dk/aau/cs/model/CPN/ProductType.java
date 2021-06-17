@@ -187,11 +187,7 @@ public class ProductType extends ColorType {
                 constituents.set(index, newColorType);
             }
         }
-/*        for(ColorType ct : constituents){
-            if(ct instanceof ProductType){
-                ((ProductType)ct).replaceColorType(newColorType,oldColorType);
-            }
-        }*/
+
     }
     @Override
     public ColorExpression createColorExpressionForFirstColor() {

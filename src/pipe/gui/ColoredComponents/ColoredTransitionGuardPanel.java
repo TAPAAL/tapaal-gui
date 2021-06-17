@@ -828,15 +828,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void returnFromManualEdit(GuardExpression newExpr) {
         setExprFieldEditable(false);
         deleteExprSelectionButton.setEnabled(true);
-        if (newExpr != null)
+        if (newExpr != null) {
             newProperty = newExpr;
+        }
 
         updateSelection(newProperty);
         resetExprButton.setText("Reset Expression");
         editExprButton.setText("Edit Expression");
 
-        /*resetExprButton.setToolTipText(TOOL_TIP_RESETBUTTON);
-        editExprButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);*/
         updateEnabledButtons();
     }
 
@@ -894,55 +893,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
     }
 
-    /*private void parseExpression(GuardExpression expression) {
-        if (expression instanceof AndExpression) {
-            AndExpression andExpr = new AndExpression(((AndExpression) expression).getLeftExpression(), ((AndExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), andExpr);
-            updateSelection(andExpr);
-        }
-        else if (expression instanceof OrExpression) {
-            OrExpression orExpr = new OrExpression(((OrExpression) expression).getLeftExpression(), ((OrExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), orExpr);
-            updateSelection(orExpr);
-        }
-
-        else if (expression instanceof NotExpression) {
-            NotExpression notExpr = new NotExpression(((NotExpression) expression).getExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), notExpr);
-            updateSelection(notExpr);
-        }
-        else if (expression instanceof EqualityExpression) {
-            EqualityExpression eqExpr = new EqualityExpression(((EqualityExpression) expression).getLeftExpression(), ((EqualityExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), eqExpr);
-            updateSelection(eqExpr);
-        }
-        else if (expression instanceof InequalityExpression) {
-            InequalityExpression iqExpr = new InequalityExpression(((InequalityExpression) expression).getLeftExpression(), ((InequalityExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), iqExpr);
-            updateSelection(iqExpr);
-        }
-        else if (expression instanceof GreaterThanEqExpression) {
-            GreaterThanEqExpression gEQExpr = new GreaterThanEqExpression(((GreaterThanEqExpression) expression).getLeftExpression(), ((GreaterThanEqExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), gEQExpr);
-            updateSelection(gEQExpr);
-        }
-        else if (expression instanceof GreaterThanExpression) {
-            GreaterThanExpression greaterExpr = new GreaterThanExpression(((GreaterThanExpression) expression).getLeftExpression(), ((GreaterThanExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), greaterExpr);
-            updateSelection(greaterExpr);
-        }
-        else if (expression instanceof LessThanEqExpression) {
-            LessThanEqExpression lesseQExpr = new LessThanEqExpression(((LessThanEqExpression) expression).getLeftExpression(), ((LessThanEqExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), lesseQExpr);
-            updateSelection(lesseQExpr);
-        }
-        else if (expression instanceof LessThanExpression) {
-            LessThanExpression lessExpr = new LessThanExpression(((LessThanExpression) expression).getLeftExpression(), ((LessThanExpression) expression).getRightExpression());
-            newProperty = newProperty.replace(currentSelection.getObject(), lessExpr);
-            updateSelection(lessExpr);
-        }
-
-    }*/
     private void replaceAndAddToUndo(Expression currentSelection, Expression newExpression){
         UndoableEdit edit = new ExpressionConstructionEdit(currentSelection, newExpression);
         newProperty = newProperty.replace(currentSelection, newExpression);

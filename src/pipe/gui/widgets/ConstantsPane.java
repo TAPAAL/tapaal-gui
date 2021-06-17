@@ -176,38 +176,6 @@ public class ConstantsPane extends JPanel implements SidePane {
             }
 
         });
-		/*list = new NonsearchableJList<>(constantsListModel);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (!(e.getValueIsAdjusting())) {
-					if (list.getSelectedIndex() == -1) {
-						editBtn.setEnabled(false);
-						removeBtn.setEnabled(false);
-					} else {
-						removeBtn.setEnabled(true);
-						editBtn.setEnabled(true);						
-					}
-					
-					if (list.getModel().getSize() >= 2) {
-						sortButton.setEnabled(true);
-					} else
-						sortButton.setEnabled(false);
-
-					int index = list.getSelectedIndex();
-					if(index > 0)
-						moveUpButton.setEnabled(true);
-					else
-						moveUpButton.setEnabled(false);
-
-
-					if(index < parent.network().constants().size() - 1)
-						moveDownButton.setEnabled(true);
-					else
-						moveDownButton.setEnabled(false);
-				}
-			}
-		});*/
 
 		list.addMouseListener(new MouseAdapter() {
 			@Override

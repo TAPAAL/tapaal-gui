@@ -2738,8 +2738,7 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-      /*  Dimension d = lens.isTimed() ? new Dimension(898, 100) : new Dimension(810, 130);
-		reductionOptionsPanel.setPreferredSize(d);*/
+
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
@@ -3308,25 +3307,6 @@ public class QueryDialog extends JPanel {
                                     JOptionPane.ERROR_MESSAGE);
                             }
                         }
-
-                        /*TapnXmlLoader tapnLoader = new TapnXmlLoader();
-                        File fileOut = new File(Verifier.getReducedNetFilePath());
-                        LoadedModel loadedModel = null;
-                        TabContent oldTab = CreateGui.getCurrentTab();
-
-                        try {
-                            loadedModel = tapnLoader.load(fileOut);
-                            TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
-                            newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-reduced");
-                            TAPNQuery convertedQuery = query.convertPropertyForReducedNet(newTab.currentTemplate().toString());
-                            newTab.addQuery(convertedQuery);
-                            CreateGui.openNewTabFromStream(newTab);
-                        } catch (FormatException exception) {
-                            JOptionPane.showMessageDialog(CreateGui.getApp(),
-                                exception.getMessage(),
-                                "Error loading reduced net file",
-                                JOptionPane.ERROR_MESSAGE);
-                        }*/
                     }
                 }
             });

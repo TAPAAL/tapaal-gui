@@ -585,9 +585,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 productTypeComboBox.addItem(element);
             }
         }
-/*        if(oldColorType != null && oldColorType instanceof ProductType){
-            productTypeComboBox.removeItem(oldColorType);
-        }*/
+
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridx = 1;
         gbc.gridy = 0;
