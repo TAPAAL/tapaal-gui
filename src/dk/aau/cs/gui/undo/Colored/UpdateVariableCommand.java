@@ -7,12 +7,14 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.widgets.ConstantsPane;
 
 public class UpdateVariableCommand extends Command {
-    Variable variable;
-    String newName;
-    String oldName;
-    ColorType newColorType;
-    ColorType oldColorType;
-    ConstantsPane.VariablesListModel listModel;
+
+    private final Variable variable;
+    private final String newName;
+    private final String oldName;
+    private final ColorType newColorType;
+    private final ColorType oldColorType;
+    private final ConstantsPane.VariablesListModel listModel;
+
     public UpdateVariableCommand(Variable var, String newName, ColorType colorType, ConstantsPane.VariablesListModel listModel){
         this.variable = var;
         this.newName = newName;
