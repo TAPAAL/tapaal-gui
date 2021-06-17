@@ -6,11 +6,11 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class SetTransportArcExpressionsCommand extends Command {
-    TimedTransportArcComponent arc;
-    ArcExpression oldInputExpression;
-    ArcExpression newInputExpression;
-    ArcExpression oldOutputExpression;
-    ArcExpression newOutputExpression;
+    private final TimedTransportArcComponent arc;
+    private final ArcExpression oldInputExpression;
+    private final ArcExpression newInputExpression;
+    private final ArcExpression oldOutputExpression;
+    private final ArcExpression newOutputExpression;
 
     public SetTransportArcExpressionsCommand(TimedTransportArcComponent arc, ArcExpression oldInputExpression, ArcExpression newInputExpression, ArcExpression oldOutputExpression, ArcExpression newOutputExpression){
         this.arc = arc;
