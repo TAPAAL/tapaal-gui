@@ -7,7 +7,7 @@ import java.util.Vector;
 
 public class ColoredTimeInvariant extends TimeInvariant {
     private Color color;
-    private static final DotConstant dotConstant = new DotConstant();
+    private static final Color dotConstant = new Color(null, null, "dot");
     public static final ColoredTimeInvariant LESS_THAN_INFINITY_AND_DOT = new ColoredTimeInvariant(false, Bound.Infinity, dotConstant);
     public static final ColoredTimeInvariant LESS_THAN_INFINITY_AND_STAR = new ColoredTimeInvariant(false, Bound.Infinity, Color.STAR_COLOR);
 

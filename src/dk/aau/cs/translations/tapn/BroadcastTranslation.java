@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.NTA.Edge;
 import dk.aau.cs.model.NTA.Location;
 import dk.aau.cs.model.NTA.NTA;

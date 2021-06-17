@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;

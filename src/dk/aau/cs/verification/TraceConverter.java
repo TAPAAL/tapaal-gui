@@ -3,7 +3,6 @@ package dk.aau.cs.verification;
 import java.util.ArrayList;
 
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.DotConstant;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
