@@ -7,9 +7,10 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class SetTransitionExpressionCommand extends Command {
-    TimedTransitionComponent transition;
-    GuardExpression oldExpression;
-    GuardExpression newExpression;
+    private final TimedTransitionComponent transition;
+    private final GuardExpression oldExpression;
+    private final GuardExpression newExpression;
+
     public SetTransitionExpressionCommand(TimedTransitionComponent transition, GuardExpression oldExpression, GuardExpression newExpression){
         this.transition = transition;
         this.oldExpression = oldExpression;
