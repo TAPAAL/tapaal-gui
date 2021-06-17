@@ -9,9 +9,10 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 public class SetArcExpressionCommand extends Command {
-    Arc arc;
-    ArcExpression oldExpression;
-    ArcExpression newExpression;
+    private final Arc arc;
+    private final ArcExpression oldExpression;
+    private final ArcExpression newExpression;
+
     public SetArcExpressionCommand(Arc arc, ArcExpression oldExpression, ArcExpression newExpression){
         this.arc = arc;
         this.oldExpression = oldExpression;
