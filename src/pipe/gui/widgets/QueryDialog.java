@@ -31,6 +31,7 @@ import javax.swing.undo.UndoableEditSupport;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
+import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
@@ -2571,8 +2572,12 @@ public class QueryDialog extends JPanel {
 					try {
 					    if (lens.isTimed()) {
                             newQuery = TAPAALQueryParser.parse(queryField.getText());
-                        } else {
+                        } else if (queryType.getSelectedIndex() == 0) {
 						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
+                        } else if (queryType.getSelectedIndex() == 1) {
+					        newQuery = TAPAALLTLQueryParser.parse(queryField.getText());
+                        } else {
+					        throw new Exception();
                         }
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
