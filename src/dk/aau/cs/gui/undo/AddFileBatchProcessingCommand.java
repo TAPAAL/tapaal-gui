@@ -8,8 +8,8 @@ import java.util.List;
 
 public class AddFileBatchProcessingCommand extends Command{
     private final DefaultListModel<File> listModel;
-    final List<File> files;
-    final File file;
+    private final List<File> files;
+    private final File file;
     private final BatchProcessingDialog dialog;
 
     public AddFileBatchProcessingCommand(DefaultListModel<File> listModel, File file, List<File> files, BatchProcessingDialog dialog){
