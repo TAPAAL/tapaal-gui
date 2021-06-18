@@ -297,7 +297,7 @@ public class TabTransformer {
     }
 
     public static void unfoldTab(TabContent oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
-        System.out.println("unfolding tab");
+
         ModelChecker engine;
         if(oldTab.getLens().isTimed()){
             engine = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());

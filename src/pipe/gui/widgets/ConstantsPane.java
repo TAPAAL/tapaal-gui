@@ -209,7 +209,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                                 JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                             }else {
                                 ArrayList<String> messages = new ArrayList<>();
-                                System.out.println(messages.size());
+
                                 if(parent.network().canColorTypeBeRemoved(ct,messages)) {
                                     showEditColorTypeDialog(ct);
                                 }else{
@@ -433,7 +433,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                     JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                 }else {
                     ArrayList<String> messages = new ArrayList<>();
-                    System.out.println(messages.size());
+
                     if(parent.network().canColorTypeBeRemoved(ct,messages)) {
                         showEditColorTypeDialog(ct);
                     }else{
