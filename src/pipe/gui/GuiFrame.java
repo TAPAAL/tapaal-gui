@@ -64,9 +64,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     JMenu toolsMenu;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
-    private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
-    private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
-    private JComboBox<String> colorFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -415,7 +415,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
 
 
-    private GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
+    private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::previousComponent);
         }
@@ -426,21 +426,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
+    private final GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
         }
     };
 
-    private GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
+    private final GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeGameFeature(isGame));
         }
     };
 
-    private GuiAction changeColorFeatureAction = new GuiAction("Color", "Change color semantics") {
+    private final GuiAction changeColorFeatureAction = new GuiAction("Color", "Change color semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeColorFeature(isColor));
