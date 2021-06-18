@@ -191,11 +191,10 @@ public class ProductType extends ColorType {
     }
     @Override
     public ColorExpression createColorExpressionForFirstColor() {
-        Vector<ColorExpression> tempVec = new Vector();
+        Vector<ColorExpression> tempVec = new Vector<>();
         for(ColorType colorType : getColorTypes()){
             tempVec.add(colorType.createColorExpressionForFirstColor());
         }
-        TupleExpression tupleExpr = new TupleExpression(tempVec);
-        return tupleExpr;
+        return new TupleExpression(tempVec);
     }
 }
