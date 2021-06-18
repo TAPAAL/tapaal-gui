@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.io.LoadedQueries;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
@@ -80,6 +81,16 @@ public class XMLQueryLoader extends QueryLoader{
 
         // Get all properties from DOM
         NodeList propList = doc.getElementsByTagName("property");
+        int choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
+            "Do you want to import the queries as CTL or LTL?",
+            "Choose query category",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new Object[]{"CTL", "LTL", "Cancel"},
+            0);
+
+        if (choice == 2) return null;
 
         for(int i = 0; i < propList.getLength(); i++){
             Node prop = propList.item(i);
@@ -89,9 +100,16 @@ public class XMLQueryLoader extends QueryLoader{
             this.faultyQueries.add(queryWrapper);
 
             // Update queryWrapper name and property
-            if(!XMLCTLQueryParser.parse(prop, queryWrapper)){
-                queries.add(null); 
-                continue; 
+            if (choice == 0) {
+                if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
+                    queries.add(null);
+                    continue;
+                }
+            } else if (choice == 1) {
+                if (!XMLLTLQueryParser.parse(prop, queryWrapper)) {
+                    queries.add(null);
+                    continue;
+                }
             }
 
             // The number 9999 is the number of extra tokens allowed, 
@@ -103,9 +121,10 @@ public class XMLQueryLoader extends QueryLoader{
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), false, false));
+
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), choice == 0, choice == 1));
             
-            if(query.getCategory() == TAPNQuery.QueryCategory.CTL){
+            if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
             	query.setUseReduction(true);
             }
