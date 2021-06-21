@@ -269,7 +269,7 @@ public class VariablesDialogPanel extends JPanel {
             nameTextField.requestFocusInWindow();
             return;
         }
-        if (network.isNameUsedForVariable(newName) && variable.getColorType().equals(colorTypeComboBox.getSelectedIndex())) {
+        if (network.isNameUsedForVariable(newName)) {
             JOptionPane
                     .showMessageDialog(
                             CreateGui.getApp(),
@@ -279,7 +279,7 @@ public class VariablesDialogPanel extends JPanel {
             nameTextField.requestFocusInWindow();
             return;
         }
-        if (!oldName.equals("") && !oldName.equalsIgnoreCase(newName) && network.isNameUsedForVariable(newName) && variable.getColorType().equals(colorTypeComboBox.getSelectedIndex())) {
+        if (!oldName.equals("") && !oldName.equalsIgnoreCase(newName) && network.isNameUsedForVariable(newName)) {
             JOptionPane
                     .showMessageDialog(
                             CreateGui.getApp(),
@@ -289,20 +289,19 @@ public class VariablesDialogPanel extends JPanel {
             nameTextField.requestFocusInWindow();
             return;
         }
+        Command cmd;
         if (!oldName.equals("")) {
             //TODO MAKE SURE THAT ID DOES NOT DESTROY ANYTHING
-            Command cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
-            undoManager.addNewEdit(cmd);
-            cmd.redo();
+            cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
         }
         else {
             //TODO SAME AS THE ONE ABOVE
-            Command cmd = new AddVariableCommand(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
+            cmd = new AddVariableCommand(new Variable(nameTextField.getText(), "Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
                 network, listModel, network.variables().size());
-            undoManager.addNewEdit(cmd);
-            cmd.redo();
             //listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
         }
+        undoManager.addNewEdit(cmd);
+        cmd.redo();
         exit();
 
     }
