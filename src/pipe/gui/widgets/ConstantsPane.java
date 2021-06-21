@@ -131,10 +131,13 @@ public class ConstantsPane extends JPanel implements SidePane {
 		});
         list.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
+                System.out.println("mojn mojn");
                 JList source = (JList)e.getSource();
                 if (source.getSelectedIndex() == -1) {
                     removeBtn.setEnabled(false);
                     editBtn.setEnabled(false);
+                    moveDownButton.setEnabled(false);
+                    return;
                 }
                 else  {
                     removeBtn.setEnabled(true);
@@ -142,37 +145,8 @@ public class ConstantsPane extends JPanel implements SidePane {
                 }
 
                 int index = list.getSelectedIndex();
-                if (index > 0) {
-                    moveUpButton.setEnabled(true);
-                }
-                else {
-                    moveUpButton.setEnabled(false);
-                }
-
-                if (isDisplayingColorTypes()) {
-                    if (index < colorTypesListModel.getSize() - 1) {
-                        moveDownButton.setEnabled(true);
-                    }
-                    else {
-                        moveDownButton.setEnabled(false);
-                    }
-                }
-                else if(isDisplayingVariables()) {
-                    if (index < variablesListModel.getSize() -1) {
-                        moveDownButton.setEnabled(true);
-                    }
-                    else {
-                        moveDownButton.setEnabled(false);
-                    }
-                }
-                else {
-                    if (index < constantsListModel.getSize() - 1) {
-                        moveDownButton.setEnabled(true);
-                    }
-                    else {
-                        moveDownButton.setEnabled(false);
-                    }
-                }
+                moveUpButton.setEnabled(index > 0);
+                moveDownButton.setEnabled(index < list.getModel().getSize() - 1);
             }
 
         });
@@ -453,6 +427,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		removeBtn.setEnabled(false);
 		removeBtn.setToolTipText(toolTipRemoveColorType);
 		removeBtn.addActionListener(e -> {
+            System.out.println("Remove");
             if (isDisplayingGlobalConstants()) {
                 String constName = ((Constant) list.getSelectedValue()).name();
                 removeConstant(constName);
@@ -818,15 +793,12 @@ public class ConstantsPane extends JPanel implements SidePane {
             ArrayList<String> messages = new ArrayList<>();
             network.remove(variable, variablesListModel, undoManager, messages);
             if(messages.isEmpty()){
-                int numElements = list.getModel().getSize();
-                if (numElements > 1) {
-                    moveDownButton.setEnabled(true);
-                    moveUpButton.setEnabled(true);
-                }
-                if (numElements > 0) {
-                    removeBtn.setEnabled(true);
-                    editBtn.setEnabled(true);
-                }
+                //Since we just removed our selection everything is false
+                moveDownButton.setEnabled(false);
+                moveUpButton.setEnabled(false);
+                removeBtn.setEnabled(false);
+                editBtn.setEnabled(false);
+
                 updateName();
             } else{
                 String message = "Variable could not be removed for the following reasons: \n\n";
@@ -911,15 +883,11 @@ public class ConstantsPane extends JPanel implements SidePane {
             ArrayList<String> messages = new ArrayList<>();
             network.remove(colorType, colorTypesListModel, undoManager, messages);
             if(messages.isEmpty()){
-                int numElements = list.getModel().getSize();
-                if (numElements > 1) {
-                    moveDownButton.setEnabled(true);
-                    moveUpButton.setEnabled(true);
-                }
-                if (numElements > 0) {
-                    removeBtn.setEnabled(true);
-                    editBtn.setEnabled(true);
-                }
+                //Since we just removed our selection everything is false
+                moveDownButton.setEnabled(false);
+                moveUpButton.setEnabled(false);
+                removeBtn.setEnabled(false);
+                editBtn.setEnabled(false);
                 updateName();
             } else{
                 String message = "Color type could not be removed for the following reasons: \n\n";
