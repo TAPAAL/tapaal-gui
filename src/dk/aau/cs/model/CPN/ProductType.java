@@ -68,12 +68,12 @@ public class ProductType extends ColorType {
     }
 
     public String toString() {
-        String out = "Domain: " + name + " is <";
+        String out = "<html>Domain: " + name + "<b> is </b> &lt;";
         for (ColorType element : constituents) {
             out += element.getName() + ", ";
         }
         out = out.substring(0, out.length() -2);
-        out += ">";
+        out += "&gt; </html>";
         return out;
     }
 

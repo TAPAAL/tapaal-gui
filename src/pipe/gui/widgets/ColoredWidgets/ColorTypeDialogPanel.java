@@ -34,7 +34,6 @@ public class ColorTypeDialogPanel extends JPanel {
     private EscapableDialog dialog;
     private List<ColorType> colorTypes;
     private ColorType oldColorType;
-    private final HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
     private String oldName;
     private ConstantsPane.ColorTypesListModel colorTypesListModel;
     private UndoManager undoManager;
@@ -68,6 +67,8 @@ public class ColorTypeDialogPanel extends JPanel {
     private JButton cyclicRemoveButton;
     private JButton okButton;
     private JScrollPane scrollPane;
+
+    private static final int MAXIMUM_INTEGER = 10000;
     private static final String removeColorInColorTypeMessage = "You have removed a color in this color type. " +
         "\nAll tokens of this color will be removed and all usages of this color in Arc expressions and guards will also be removed,\n " +
         "while maintaing as much of the expression as possible.\n" +
@@ -674,183 +675,201 @@ public class ColorTypeDialogPanel extends JPanel {
     }
 
     private void onOK() {
-            String name = nameTextField.getText();
-            String lowerbound = lowerBoundTextField.getText();
-            String upperbound = upperBoundTextField.getText();
-            String enumerationName = enumTextField.getText();
+        String name = nameTextField.getText();
+        String lowerbound = lowerBoundTextField.getText();
+        String upperbound = upperBoundTextField.getText();
 
-
-            if (name == null || name.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        CreateGui.getApp(), "You have to enter a name for the color",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            } else if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", name)) {
-                JOptionPane.showMessageDialog(
-                                CreateGui.getApp(),
-                                "Acceptable names for color types are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            } else if (network.isNameUsedForColorType(name) && oldColorType == null) {
-                JOptionPane.showMessageDialog(
-                                CreateGui.getApp(),
-                                "There is already another color type with the same name.\n\n"
-                                        + "Choose a different name for the color type.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }else if (!oldName.equals("") && !oldName.equalsIgnoreCase(name) && network.isNameUsedForColorType(name)) {
-                JOptionPane.showMessageDialog(
-                                CreateGui.getApp(),
-                                "There is already another color type with the same name.\n\n"
-                                        + "Choose a different name for the color type.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }else if (!Pattern.matches("[0-9]+", lowerbound) && rangeOfIntegersPanelEnabled ) {
-                JOptionPane.showMessageDialog(
-                                CreateGui.getApp(),
-                                "Lower bound must be a number",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            } else if (!Pattern.matches("[0-9]+", upperbound) && rangeOfIntegersPanelEnabled ) {
-                JOptionPane.showMessageDialog(
-                                CreateGui.getApp(),
-                                "Upper bound must be a number",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if (rangeOfIntegersPanelEnabled && (Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(upperBoundTextField.getText()))) {
-                JOptionPane.showMessageDialog(
-                        CreateGui.getApp(),
-                        "Lower bound must be smaller than Upper bound",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if((lowerbound.trim().isEmpty() || upperbound.trim().isEmpty()) && rangeOfIntegersPanelEnabled) {
-                JOptionPane.showMessageDialog(
-                        CreateGui.getApp(),
-                        "You must specify both a lower and upper bound",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            else {
-                String selectedColorType = colorTypeComboBox.getSelectedItem().toString();
-                ColorType newColorType = new ColorType(name);
-
-                 if(selectedColorType.equals(finiteEnumeration) || selectedColorType.equals(cyclicEnumeration)) {
-                    for(int i = 0; i < enumList.getModel().getSize();i++) {
-                        newColorType.addColor(enumList.getModel().getElementAt(i).toString());
-                    }
-                    if (newColorType.size() <= 0) {
-                        JOptionPane.showMessageDialog(
+        if (name == null || name.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    CreateGui.getApp(), "You have to enter a name for the color",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", name)) {
+            JOptionPane.showMessageDialog(
                             CreateGui.getApp(),
-                            "You must specify at least one enumeration name",
+                            "Acceptable names for color types are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                             "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    if (oldColorType != null) {
-                        if(oldColorType.equals(newColorType)){
-                            exit();
-                            return;
-                        }
-                        boolean showDialog = false;
-                        for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                            if(!newColorType.contains(c)){
-                                showDialog = true;
-                            }
-                        }
-                        if(showDialog){
-                            network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                        } else{
-                            undoManager.newEdit();
-                            network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                            colorTypesListModel.updateName();
-                        }
-                    } else {
-                        Command cmd = new AddColorTypeCommand(newColorType,
-                            network, colorTypesListModel, network.colorTypes().size());
-                        undoManager.addNewEdit(cmd);
-                        cmd.redo();
-                    }
+            return;
+        }
+        if (network.isNameUsedForColorType(name) && oldColorType == null) {
+            JOptionPane.showMessageDialog(
+                            CreateGui.getApp(),
+                            "There is already another color type with the same name.\n\n"
+                                    + "Choose a different name for the color type.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!oldName.equals("") && !oldName.equalsIgnoreCase(name) && network.isNameUsedForColorType(name)) {
+            JOptionPane.showMessageDialog(
+                            CreateGui.getApp(),
+                            "There is already another color type with the same name.\n\n"
+                                    + "Choose a different name for the color type.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Pattern.matches("[0-9]+", lowerbound) && rangeOfIntegersPanelEnabled ) {
+            JOptionPane.showMessageDialog(
+                            CreateGui.getApp(),
+                            "Lower bound must be a number",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Pattern.matches("[0-9]+", upperbound) && rangeOfIntegersPanelEnabled ) {
+            JOptionPane.showMessageDialog(
+                            CreateGui.getApp(),
+                            "Upper bound must be a number",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try{
+            if (rangeOfIntegersPanelEnabled && (Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(upperBoundTextField.getText()))) {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "Lower bound must be smaller than Upper bound",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e){
+            JOptionPane.showMessageDialog(
+                CreateGui.getApp(),
+                "Input could not be parsed as integers",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        if(rangeOfIntegersPanelEnabled && (Integer.parseInt(upperBoundTextField.getText()) - Integer.parseInt(lowerBoundTextField.getText())  > MAXIMUM_INTEGER)){
+            JOptionPane.showMessageDialog(
+                CreateGui.getApp(),
+                "We do not allow integer ranges with more than " + MAXIMUM_INTEGER + " elements",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if((lowerbound.trim().isEmpty() || upperbound.trim().isEmpty()) && rangeOfIntegersPanelEnabled) {
+            JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "You must specify both a lower and upper bound",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //If everything is false add the colortype
+        String selectedColorType = colorTypeComboBox.getSelectedItem().toString();
+        ColorType newColorType = new ColorType(name);
+
+         if(selectedColorType.equals(finiteEnumeration) || selectedColorType.equals(cyclicEnumeration)) {
+            for(int i = 0; i < enumList.getModel().getSize();i++) {
+                newColorType.addColor(enumList.getModel().getElementAt(i).toString());
+            }
+            if (newColorType.size() <= 0) {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    "You must specify at least one enumeration name",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (oldColorType != null) {
+                if(oldColorType.equals(newColorType)){
+                    exit();
+                    return;
                 }
-                else if(selectedColorType.equals(rangeOfIntegers)) {
-                    int lowerboundNumber = Integer.parseInt(lowerbound);
-                    int upperboundNumber = Integer.parseInt(upperbound);
-                    for(int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
-                        newColorType.addColor(String.valueOf(i));
-                    }
-
-                    if (oldColorType != null) {
-                        if(oldColorType.equals(newColorType)){
-                            exit();
-                            return;
-                        }
-                        boolean showDialog = false;
-                        for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                            if(!newColorType.getColors().contains(c)){
-                                showDialog = true;
-                            }
-                        }
-                        if(showDialog) {
-                            network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                        } else{
-                            undoManager.newEdit();
-                            network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                            colorTypesListModel.updateName();
-                        }
-                    }
-                    else {
-                        Command cmd = new AddColorTypeCommand(newColorType,
-                            network, colorTypesListModel, network.colorTypes().size());
-                        undoManager.addNewEdit(cmd);
-                        cmd.redo();
+                boolean showDialog = false;
+                for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
+                    if(!newColorType.contains(c)){
+                        showDialog = true;
                     }
                 }
-                else if(selectedColorType.equals(productColor)) {
-                    ProductType productType = new ProductType(name);
-                    int size = productColorTypeList.getModel().getSize();
-                    for(int i = 0; i < size; i++) {
-                        String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
-                        int size2 = productTypeComboBox.getItemCount();
-                        for (int j = 0; j < size2; j++) {
-                            if (colorTypeName.equals(productTypeComboBox.getItemAt(j).toString())) {
-                                productType.addType(colorTypes.get(j));
-                            }
-                        }
-                    };
-                    if (oldColorType != null) {
-                        if(oldColorType.equals(productType)){
-                            exit();
-                            return;
-                        }
-                        boolean showDialog = false;
-                        for(ColorType ct : ((ProductType)oldColorType).getColorTypes()){
-                            if(!productType.getColorTypes().contains(ct)){
-                                showDialog = true;
-                            }
-                        }
-                        if(!showDialog && ((ProductType)oldColorType).getColorTypes().size() != productType.getColorTypes().size()){
-                            showDialog = true;
-                        }
-                        if(showDialog) {
-                            network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
+                if(showDialog){
+                    network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                } else{
+                    undoManager.newEdit();
+                    network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                    colorTypesListModel.updateName();
+                }
+            } else {
+                Command cmd = new AddColorTypeCommand(newColorType,
+                    network, colorTypesListModel, network.colorTypes().size());
+                undoManager.addNewEdit(cmd);
+                cmd.redo();
+            }
 
-                        } else{
-                            undoManager.newEdit();
-                            network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
-                            colorTypesListModel.updateName();
-                        }
-                    } else {
-                        Command cmd = new AddColorTypeCommand(productType,
-                            network, colorTypesListModel, network.colorTypes().size());
-                        undoManager.addNewEdit(cmd);
-                        cmd.redo();
+        }
+        else if(selectedColorType.equals(rangeOfIntegers)) {
+            int lowerboundNumber = Integer.parseInt(lowerbound);
+            int upperboundNumber = Integer.parseInt(upperbound);
+            for(int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
+                newColorType.addColor(String.valueOf(i));
+            }
+
+            if (oldColorType != null) {
+                if(oldColorType.equals(newColorType)){
+                    exit();
+                    return;
+                }
+                boolean showDialog = false;
+                for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
+                    if(!newColorType.getColors().contains(c)){
+                        showDialog = true;
                     }
+                }
+                if(showDialog) {
+                    network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                } else{
+                    undoManager.newEdit();
+                    network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                    colorTypesListModel.updateName();
                 }
             }
-            exit();
+            else {
+                Command cmd = new AddColorTypeCommand(newColorType,
+                    network, colorTypesListModel, network.colorTypes().size());
+                undoManager.addNewEdit(cmd);
+                cmd.redo();
+            }
+        }
+        else if(selectedColorType.equals(productColor)) {
+            ProductType productType = new ProductType(name);
+            int size = productColorTypeList.getModel().getSize();
+            for(int i = 0; i < size; i++) {
+                String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
+                int size2 = productTypeComboBox.getItemCount();
+                for (int j = 0; j < size2; j++) {
+                    if (colorTypeName.equals(productTypeComboBox.getItemAt(j).toString())) {
+                        productType.addType(colorTypes.get(j));
+                    }
+                }
+            };
+            if (oldColorType != null) {
+                if(oldColorType.equals(productType)){
+                    exit();
+                    return;
+                }
+                boolean showDialog = false;
+                for(ColorType ct : ((ProductType)oldColorType).getColorTypes()){
+                    if(!productType.getColorTypes().contains(ct)){
+                        showDialog = true;
+                    }
+                }
+                if(!showDialog && ((ProductType)oldColorType).getColorTypes().size() != productType.getColorTypes().size()){
+                    showDialog = true;
+                }
+                if(showDialog) {
+                    network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
+
+                } else{
+                    undoManager.newEdit();
+                    network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
+                    colorTypesListModel.updateName();
+                }
+            } else {
+                Command cmd = new AddColorTypeCommand(productType,
+                    network, colorTypesListModel, network.colorTypes().size());
+                undoManager.addNewEdit(cmd);
+                cmd.redo();
+            }
+        }
+
+        exit();
     }
-
-
 }

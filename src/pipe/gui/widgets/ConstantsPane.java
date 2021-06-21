@@ -22,6 +22,7 @@ import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import dk.aau.cs.gui.components.ColortypeListCellRenderer;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
@@ -131,7 +132,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 		});
         list.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                System.out.println("mojn mojn");
                 JList source = (JList)e.getSource();
                 if (source.getSelectedIndex() == -1) {
                     removeBtn.setEnabled(false);
@@ -150,7 +150,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             }
 
         });
-
+        list.setCellRenderer(new ColortypeListCellRenderer());
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
