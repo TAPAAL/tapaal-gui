@@ -241,7 +241,6 @@ public class ConstantsPane extends JPanel implements SidePane {
                                 JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                             }else {
                                 ArrayList<String> messages = new ArrayList<>();
-                                System.out.println(messages.size());
                                 if(parent.network().canColorTypeBeRemoved(ct,messages)) {
                                     showEditColorTypeDialog(ct);
                                 }else{
@@ -371,6 +370,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             constantsPanel.add(moveDownButton, gbc);
             gbc = GridBagHelper.as(1,3, GridBagHelper.Anchor.NORTH);
             constantsPanel.add(sortButton, gbc);
+            constantsColorTypesVariablesComboBox.setSelectedItem(CONSTANTS);
 
         } else {
 	        list.setModel(colorTypesListModel);
@@ -465,7 +465,6 @@ public class ConstantsPane extends JPanel implements SidePane {
                     JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                 }else {
                     ArrayList<String> messages = new ArrayList<>();
-                    System.out.println(messages.size());
                     if(parent.network().canColorTypeBeRemoved(ct,messages)) {
                         showEditColorTypeDialog(ct);
                     }else{
@@ -512,13 +511,13 @@ public class ConstantsPane extends JPanel implements SidePane {
 		addConstantButton.setEnabled(true);
 		addConstantButton.addActionListener(e ->  {
 		    String source = constantsColorTypesVariablesComboBox.getSelectedItem().toString();
-            if (source.equals(CONSTANTS)) {
+            if (isDisplayingGlobalConstants()) {
                 showEditConstantDialog(null);
             }
-            else if (source.equals(VARIABLES)) {
+            else if (isDisplayingVariables()) {
                 showEditVariableDialog(null);
             }
-            else if (source.equals(COLORTYPES)) {
+            else if (isDisplayingColorTypes()) {
                 showEditColorTypeDialog(null);
             }
         });
