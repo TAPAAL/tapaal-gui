@@ -27,7 +27,6 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.GridBagHelper;
-import org.jdesktop.swingx.JXComboBox;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
@@ -49,7 +48,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     private ColorTypesListModel colorTypesListModel;
     private VariablesListModel variablesListModel;
-    private JXComboBox constantsColorTypesVariablesComboBox;
 	private JList<?> list;
 	private final ConstantsListModel constantsListModel;
 	private JButton editBtn;
@@ -69,6 +67,8 @@ public class ConstantsPane extends JPanel implements SidePane {
     private static final String CONSTANTS = "Constants";
     private static final String COLORTYPES = "Color type";
     private static final String VARIABLES = "Variables";
+    private final JComboBox<String> constantsColorTypesVariablesComboBox = new JComboBox<String>(new String[]{COLORTYPES, VARIABLES, CONSTANTS });
+
 
     private static final String toolTipComboBox = "Switch between constants, colors and variables";
     private static final String toolTipEditConstant = "Edit the value of the selected constant";
@@ -302,16 +302,6 @@ public class ConstantsPane extends JPanel implements SidePane {
             moveDownButton.setToolTipText(toolTipMoveDownConstant);
             moveUpButton.setToolTipText(toolTipMoveUpConstant);
             sortButton.setToolTipText(toolTipSortConstants);
-            constantsPanel.remove(moveUpButton);
-            constantsPanel.remove(moveDownButton);
-            constantsPanel.remove(sortButton);
-
-            GridBagConstraints gbc = GridBagHelper.as(1,1, GridBagHelper.Anchor.NORTH);
-            constantsPanel.add(moveUpButton, gbc);
-            gbc = GridBagHelper.as(1,2, GridBagHelper.Anchor.NORTH);
-            constantsPanel.add(moveDownButton, gbc);
-            gbc = GridBagHelper.as(1,3, GridBagHelper.Anchor.NORTH);
-            constantsPanel.add(sortButton, gbc);
             constantsColorTypesVariablesComboBox.setSelectedItem(CONSTANTS);
 
         } else {
@@ -454,7 +444,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 		addConstantButton.setToolTipText(toolTipNewColorType);
 		addConstantButton.setEnabled(true);
 		addConstantButton.addActionListener(e ->  {
-		    String source = constantsColorTypesVariablesComboBox.getSelectedItem().toString();
             if (isDisplayingGlobalConstants()) {
                 showEditConstantDialog(null);
             }
@@ -481,12 +470,11 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void addConstantsComponents() {
-        constantsColorTypesVariablesComboBox = new JXComboBox(new String[]{COLORTYPES, VARIABLES, CONSTANTS });
         constantsColorTypesVariablesComboBox.setToolTipText(toolTipComboBox);
         constantsColorTypesVariablesComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JComboBox source = (JXComboBox)e.getSource();
+                JComboBox<String> source = (JComboBox) e.getSource();
                 String selectedItem = source.getSelectedItem().toString();
                 if (selectedItem.equals(CONSTANTS)) {
                     list.setModel(constantsListModel);
@@ -533,10 +521,6 @@ public class ConstantsPane extends JPanel implements SidePane {
         });
         // GBC for the scroller
         GridBagConstraints gbc = new GridBagConstraints();
-        Dimension size = new Dimension(150,30);
-        constantsColorTypesVariablesComboBox.setPreferredSize(size);
-        constantsColorTypesVariablesComboBox.setMaximumSize(size);
-        constantsColorTypesVariablesComboBox.setMinimumSize(size);
 
         constantsColorTypesVariablesComboBox.setBackground(Color.white);
         gbc.gridx = 0;
@@ -582,8 +566,8 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.NORTH;
         constantsPanel.add(moveUpButton,gbc);
 
         moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
@@ -612,7 +596,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.NORTH;
         constantsPanel.add(moveDownButton,gbc);
 
@@ -638,8 +622,8 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 3;
+        //gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTH;
         constantsPanel.add(sortButton,gbc);
 	}
