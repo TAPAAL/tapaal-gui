@@ -186,17 +186,7 @@ public class TupleExpression extends ColorExpression {
         }
     }
 
-    public String toString() { /*
-        boolean firstTime = true;
-        String test = "";
-        for (ColorExpression element : colors) {
-            if (firstTime) {
-
-            }
-        }
-        */
-
-
+    public String toString() {
         String res = "(" + colors.get(0);
         for (int i = 1; i < colors.size(); i++) {
             res += ", " + colors.get(i).toString();

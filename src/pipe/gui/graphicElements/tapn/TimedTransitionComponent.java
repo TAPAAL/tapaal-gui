@@ -222,26 +222,7 @@ public class TimedTransitionComponent extends Transition {
         }
 
         return builder.toString();
-        //TODO make this part of regex if possible
-        /*if(!(str.contains("and") && str.contains("or"))){
-            return str;
-        }
 
-	    //We split the guard on every 4th and or or
-        //(.*?) reluctantly take characters until and or or
-        //( and | or ) take and or or
-        // (.(?! and | or ))*.) take everything but and and or
-        // {1,4} max 4 ands and ors in one string
-        final String regex = "((.*?)( and | or )(.(?! and | or ))*.){1,4}";
-        final Pattern pattern = Pattern.compile(regex);
-        final Matcher matcher = pattern.matcher(str);
-        StringBuilder sb = new StringBuilder();
-        while (matcher.find()) {
-            sb.append(matcher.group());
-            sb.append("\n");
-        }
-
-        return sb.toString();*/
     }
 
 	@Override

@@ -19,13 +19,21 @@ public class ColoredPlaceMarkingEdit extends Command {
     private final TimedPlaceComponent place;
     private final List<ColoredTimeInvariant> ctiList;
     private final ColorType colorType;
-    private ColorType oldColorType;
-    List<ColoredTimeInvariant> oldCtiList;
-    private ArcExpression oldExpression;
-    private ArcExpression newExpression;
+    private final ColorType oldColorType;
+    private final List<ColoredTimeInvariant> oldCtiList;
+    private final ArcExpression oldExpression;
+    private final ArcExpression newExpression;
 
-    public ColoredPlaceMarkingEdit(ArrayList<TimedToken> tokenList, ArrayList<TimedToken> newTokenList, ArcExpression oldExpression, ArcExpression newExpression,
-                                   Context context, TimedPlaceComponent place, List<ColoredTimeInvariant> ctiList, ColorType colorType1){
+    public ColoredPlaceMarkingEdit(
+        ArrayList<TimedToken> tokenList,
+        ArrayList<TimedToken> newTokenList,
+        ArcExpression oldExpression,
+        ArcExpression newExpression,
+        Context context,
+        TimedPlaceComponent place,
+        List<ColoredTimeInvariant> ctiList,
+        ColorType colorType1
+    ){
         this.tokenList = tokenList;
         this.newTokenList = newTokenList;
         this.context = context;
@@ -34,6 +42,8 @@ public class ColoredPlaceMarkingEdit extends Command {
         this.colorType = colorType1;
         this.oldExpression = oldExpression;
         this.newExpression = newExpression;
+        this.oldColorType = place.underlyingPlace().getColorType();
+        this.oldCtiList = place.underlyingPlace().getCtiList();
     }
 
     @Override
@@ -57,8 +67,7 @@ public class ColoredPlaceMarkingEdit extends Command {
 
     @Override
     public void redo() {
-        oldColorType = place.underlyingPlace().getColorType();
-        oldCtiList = place.underlyingPlace().getCtiList();
+
 
         for (TimedToken token : tokenList) {
             context.activeModel().marking().remove(token);

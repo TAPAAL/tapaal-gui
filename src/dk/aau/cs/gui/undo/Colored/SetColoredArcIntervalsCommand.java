@@ -7,9 +7,10 @@ import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import java.util.List;
 
 public class SetColoredArcIntervalsCommand extends Command {
-    TimedInputArcComponent arc;
-    List<ColoredTimeInterval> oldIntervalList;
-    List<ColoredTimeInterval> newIntervalList;
+    private final TimedInputArcComponent arc;
+    private final List<ColoredTimeInterval> oldIntervalList;
+    private final List<ColoredTimeInterval> newIntervalList;
+
     public SetColoredArcIntervalsCommand(TimedInputArcComponent arc, List<ColoredTimeInterval> oldIntervalList, List<ColoredTimeInterval> newIntervalList){
         this.arc = arc;
         this.oldIntervalList = oldIntervalList;

@@ -187,19 +187,14 @@ public class ProductType extends ColorType {
                 constituents.set(index, newColorType);
             }
         }
-/*        for(ColorType ct : constituents){
-            if(ct instanceof ProductType){
-                ((ProductType)ct).replaceColorType(newColorType,oldColorType);
-            }
-        }*/
+
     }
     @Override
     public ColorExpression createColorExpressionForFirstColor() {
-        Vector<ColorExpression> tempVec = new Vector();
+        Vector<ColorExpression> tempVec = new Vector<>();
         for(ColorType colorType : getColorTypes()){
             tempVec.add(colorType.createColorExpressionForFirstColor());
         }
-        TupleExpression tupleExpr = new TupleExpression(tempVec);
-        return tupleExpr;
+        return new TupleExpression(tempVec);
     }
 }

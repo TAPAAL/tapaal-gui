@@ -366,25 +366,6 @@ public class RunVerification extends RunVerificationBase {
                                         JOptionPane.ERROR_MESSAGE);
                                 }
                             }
-
-                            /*TapnXmlLoader tapnLoader = new TapnXmlLoader();
-                            File fileOut = new File(reducedNetFilePath);
-                            LoadedModel loadedModel = null;
-                            TabContent oldTab = CreateGui.getCurrentTab();
-
-                            try {
-                                loadedModel = tapnLoader.load(fileOut);
-                                TabContent newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
-                                newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-reduced");
-                                TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(newTab.currentTemplate().toString());
-                                newTab.addQuery(convertedQuery);
-                                CreateGui.openNewTabFromStream(newTab);
-                            } catch (FormatException exception) {
-                                JOptionPane.showMessageDialog(CreateGui.getApp(),
-                                    exception.getMessage(),
-                                    "Error loading reduced net file",
-                                    JOptionPane.ERROR_MESSAGE);
-                            }*/
                         }
                     });
 

@@ -7,10 +7,10 @@ import dk.aau.cs.model.CPN.ProductType;
 import java.util.Vector;
 
 public class UpdatePTColorTypeCommand extends Command {
-    private ColorType oldColorType;
-    private ColorType newColorType;
-    private ProductType productType;
-    private Vector<ColorType> oldConstituents;
+    private final ColorType oldColorType;
+    private final ColorType newColorType;
+    private final ProductType productType;
+    private final Vector<ColorType> oldConstituents;
 
     public UpdatePTColorTypeCommand(ColorType oldColorType, ColorType newColorType, ProductType productType) {
         this.oldColorType = oldColorType;
@@ -21,15 +21,6 @@ public class UpdatePTColorTypeCommand extends Command {
 
     @Override
     public void undo() {
-/*        Vector<ColorType> newConstituents = productType.getConstituents();
-        for (ColorType ct : oldConstituents) {
-            if(ct.equals(oldColorType)){
-                int index = oldConstituents.indexOf(ct);
-                newConstituents.set(index, oldColorType);
-            }
-        }
-        productType.setConstituents(newConstituents);*/
-
         productType.setConstituents(oldConstituents);
     }
 

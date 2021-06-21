@@ -57,50 +57,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
         Element structureElement = document.createElement("structure");
         hlinscriptionElement.appendChild(structureElement);
         hlinscriptionElement.appendChild(parseArcExpression(arcExpr, document, structureElement));
-        /*
-        if(arc instanceof ColoredInputArcComponent)  {
-            ColoredInputArc inputArc = (ColoredInputArc)((ColoredInputArcComponent) arc).underlyingTimedInputArc();
-            if(inputArc.getArcExpression() != null) {
-                textElement.setTextContent(inputArc.getArcExpression().toString());
-            }
-        }
-        else if(arc instanceof ColoredOutputArcComponent) {
-            ColoredOutputArcComponent coloredArc = (ColoredOutputArcComponent) arc;
-            if(coloredArc.getExpression() != null) {
-                textElement.setTextContent(coloredArc.getExpression().toString());
-            }
-        }
-        hlinscriptionElement.appendChild(textElement);
-        Element structureElement = document.createElement("structure");
-        hlinscriptionElement.appendChild(structureElement);
 
-
-        if( arc instanceof ColoredInputArcComponent) {
-            ColoredInputArc inputArc = (ColoredInputArc) ((ColoredInputArcComponent) arc).underlyingTimedInputArc();
-            ArcExpression expr;
-
-            if (inputArc.getArcExpression() != null) {
-                expr = inputArc.getArcExpression();
-                hlinscriptionElement.appendChild(parseArcExpression(expr, document, structureElement));
-            }
-        }
-        else if (arc instanceof ColoredOutputArcComponent) {
-            ColoredOutputArc outputArc = (ColoredOutputArc) ((ColoredOutputArcComponent) arc).underlyingArc();
-            ArcExpression expr;
-            if(outputArc.getExpression() != null){
-                expr = outputArc.getExpression();
-                hlinscriptionElement.appendChild(parseArcExpression(expr, document, structureElement));
-            }
-        }
-        else if (arc instanceof ColoredTransportArcComponent) {
-            ColoredTransportArc transportArc = (ColoredTransportArc) ((ColoredTransportArcComponent)arc).underlyingTransportArc();
-            ArcExpression expr;
-            if(transportArc.getInputExpression() != null) {
-                expr = transportArc.getInputExpression();
-                hlinscriptionElement.appendChild(parseArcExpression(expr, document, structureElement));
-            }
-        }
-           */
         return hlinscriptionElement;
     }
 
@@ -209,8 +166,6 @@ public class writeTACPN { // both export and save share some of the same syntax 
             Element numberConstantElement = document.createElement("numberconstant");
             numberConstantElement.setAttribute("value", expr.getScalar().toString());
             subtermElement.appendChild(numberConstantElement);
-            /*Element positiveElement = document.createElement("positive");
-            numberConstantElement.appendChild(positiveElement);*/
             Element subtermElement2 = document.createElement("subterm");
             scalarElement.appendChild((parseArcExpression(expr.getExpr(), document, subtermElement2)));
             structureElement.appendChild(scalarElement);
@@ -391,10 +346,6 @@ public class writeTACPN { // both export and save share some of the same syntax 
 
     public void appendDeclarations (Document document, Element NET) {
         Require.that(document != null, "Error: document was null");
-
-        /*if(!network.isColored()){
-            return;
-        }*/
 
         Element declarationElement = document.createElement("declaration");
         NET.appendChild(declarationElement);

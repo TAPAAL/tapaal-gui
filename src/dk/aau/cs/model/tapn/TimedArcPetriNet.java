@@ -288,7 +288,7 @@ public class TimedArcPetriNet {
 
 	public TimedPlace getPlaceByName(String placeName) {
 		for (TimedPlace p : places) {
-			if (p.name().toLowerCase().equals(placeName.toLowerCase())) {
+			if (p.name().equalsIgnoreCase(placeName)) {
 				return p;
 			}
 		}
@@ -297,7 +297,7 @@ public class TimedArcPetriNet {
 
 	public TimedTransition getTransitionByName(String transitionName) {
 		for (TimedTransition t : transitions) {
-			if (t.name().toLowerCase().equals(transitionName.toLowerCase())) {
+			if (t.name().equalsIgnoreCase(transitionName)) {
 				return t;
 			}
 		}

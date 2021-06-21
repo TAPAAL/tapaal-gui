@@ -99,14 +99,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			//if(!unfold){
-                result.append(" -x 1");
-            //}
+			result.append(" -x 1");
 		}
-
-/*		if(unfold){
-		    result.append(" --write-simplified " + );
-        }*/
 
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
